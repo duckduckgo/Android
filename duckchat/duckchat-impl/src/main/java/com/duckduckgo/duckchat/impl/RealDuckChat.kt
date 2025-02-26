@@ -141,6 +141,9 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChat(parameters: Map<String, String>) {
         val url = appendParameters(parameters, duckChatLink)
         startDuckChatActivity(url)
+        appCoroutineScope.launch {
+            duckChatFeatureRepository.registerOpened()
+        }
     }
 
     private fun startDuckChatActivity(url: String) {
@@ -186,6 +189,10 @@ class RealDuckChat @Inject constructor(
             val queryParameters = uri.queryParameterNames
             queryParameters.contains(CHAT_QUERY_NAME) && uri.getQueryParameter(CHAT_QUERY_NAME) == CHAT_QUERY_VALUE
         }.getOrDefault(false)
+    }
+
+    override suspend fun wasOpenedBefore(): Boolean {
+        return duckChatFeatureRepository.wasOpenedBefore()
     }
 
     private fun cacheDuckChatLink() {

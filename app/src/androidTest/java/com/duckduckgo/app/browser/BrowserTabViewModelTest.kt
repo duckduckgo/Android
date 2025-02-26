@@ -200,6 +200,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -5767,6 +5768,33 @@ class BrowserTabViewModelTest {
         ) { "someUrl" }
         verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
         assertCommandNotIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenDuckChatMenuItemClickedThenOpenDuckChat() {
+        testee.onDuckChatMenuClicked()
+
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndItWasntUsedBeforeThenSendPixel() = runTest {
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "0"))
+    }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenSendPixel() = runTest {
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
     }
 
     private fun aCredential(): LoginCredentials {

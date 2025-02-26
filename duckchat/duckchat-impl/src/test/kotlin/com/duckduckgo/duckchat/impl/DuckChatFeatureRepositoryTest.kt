@@ -54,4 +54,20 @@ class DuckChatFeatureRepositoryTest {
 
         assertTrue(testee.shouldShowInBrowserMenu())
     }
+
+    @Test
+    fun `when register Duck Chat opened, then data store called`() = runTest {
+        testee.registerOpened()
+
+        verify(mockDatabase).registerOpened()
+    }
+
+    @Test
+    fun `when was opened before checked, then return data from the store`() = runTest {
+        whenever(mockDatabase.wasOpenedBefore()).thenReturn(true)
+
+        val result = testee.wasOpenedBefore()
+
+        assertTrue(result)
+    }
 }

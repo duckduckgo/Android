@@ -54,4 +54,9 @@ interface DuckChat {
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean
+
+    /**
+     * Returns `true` if Duck Chat was ever opened before.
+     */
+    suspend fun wasOpenedBefore(): Boolean
 }
