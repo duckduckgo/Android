@@ -122,4 +122,11 @@ class NewSettingsViewModelTest {
 
         verify(settingsPixelDispatcherMock).fireSyncPressed()
     }
+
+    @Test
+    fun `when Duck Chat pressed then pixel is fired`() {
+        testee.onDuckChatSettingClicked()
+
+        verify(settingsPixelDispatcherMock).fireDuckChatPressed()
+    }
 }

@@ -316,6 +316,7 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onDuckChatSettingClicked() {
         viewModelScope.launch { command.send(LaunchDuckChatScreen) }
+        settingsPixelDispatcher.fireDuckChatPressed()
     }
 
     fun onAppearanceSettingClicked() {

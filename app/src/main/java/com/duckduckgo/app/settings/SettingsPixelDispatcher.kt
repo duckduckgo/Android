@@ -21,6 +21,8 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,6 +37,7 @@ import kotlinx.coroutines.launch
  */
 interface SettingsPixelDispatcher {
     fun fireSyncPressed()
+    fun fireDuckChatPressed()
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -43,6 +46,7 @@ class SettingsPixelDispatcherImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
     private val syncStateMonitor: SyncStateMonitor,
+    private val duckChat: DuckChat,
 ) : SettingsPixelDispatcher {
 
     override fun fireSyncPressed() {
@@ -58,7 +62,20 @@ class SettingsPixelDispatcherImpl @Inject constructor(
         }
     }
 
+    override fun fireDuckChatPressed() {
+        appCoroutineScope.launch {
+            val wasUsedBefore = duckChat.wasOpenedBefore()
+            pixel.fire(
+                pixel = DUCK_CHAT_SETTINGS_PRESSED,
+                parameters = mapOf(
+                    PARAM_DUCK_CHAT_USED_BEFORE to wasUsedBefore.toBinaryString(),
+                ),
+            )
+        }
+    }
+
     private companion object {
         const val PARAM_SYNC_IS_ENABLED = "is_enabled"
+        const val PARAM_DUCK_CHAT_USED_BEFORE = "was_used_before"
     }
 }

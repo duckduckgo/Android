@@ -19,6 +19,8 @@ package com.duckduckgo.app.settings
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import kotlinx.coroutines.flow.emptyFlow
@@ -40,6 +42,8 @@ class SettingsPixelDispatcherTest {
     @Mock private lateinit var pixelMock: Pixel
 
     @Mock private lateinit var syncStateMonitorMock: SyncStateMonitor
+
+    @Mock private lateinit var duckChatMock: DuckChat
 
     lateinit var testee: SettingsPixelDispatcherImpl
 
@@ -113,9 +117,36 @@ class SettingsPixelDispatcherTest {
         )
     }
 
+    @Test
+    fun `when fireDuckChatPressed and wasn't used before, then send a pixel with not used information`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+
+        val testee = createTestee()
+        testee.fireDuckChatPressed()
+
+        verify(pixelMock).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED,
+            parameters = mapOf("was_used_before" to "0"),
+        )
+    }
+
+    @Test
+    fun `when fireDuckChatPressed and was used before, then send a pixel with used information`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+
+        val testee = createTestee()
+        testee.fireDuckChatPressed()
+
+        verify(pixelMock).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED,
+            parameters = mapOf("was_used_before" to "1"),
+        )
+    }
+
     private fun createTestee() = SettingsPixelDispatcherImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         pixel = pixelMock,
         syncStateMonitor = syncStateMonitorMock,
+        duckChat = duckChatMock,
     )
 }

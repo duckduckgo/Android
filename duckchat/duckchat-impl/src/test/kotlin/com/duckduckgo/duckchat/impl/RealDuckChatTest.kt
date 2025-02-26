@@ -126,7 +126,7 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalled_activityStarted() {
+    fun whenOpenDuckChatCalled_activityStarted() = runTest {
         testee.openDuckChat()
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -137,10 +137,11 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
+        verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() {
+    fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() = runTest {
         testee.openDuckChat(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -151,10 +152,11 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
+        verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() {
+    fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() = runTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -165,6 +167,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
+        verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 
     @Test
@@ -180,6 +183,13 @@ class RealDuckChatTest {
     @Test
     fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_isNotDuckChatUrl() {
         assertFalse(testee.isDuckChatUrl("https://example.com/?ia=chat".toUri()))
+    }
+
+    @Test
+    fun `when was opened before queried, then repo state is returned`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
+
+        assertTrue(testee.wasOpenedBefore())
     }
 
     private fun setFeatureToggle(enabled: Boolean) {
