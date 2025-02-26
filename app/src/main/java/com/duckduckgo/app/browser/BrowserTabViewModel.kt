@@ -1808,14 +1808,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun pageStarted(webViewNavigationState: WebViewNavigationState) {
-        browserViewState.postValue(
+        browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 fireButton = HighlightableButton.Visible(enabled = false),
                 maliciousSiteBlocked = false,
-            ),
-        )
+            )
         navigationStateChanged(webViewNavigationState)
     }
 
@@ -3319,48 +3318,46 @@ class BrowserTabViewModel @Inject constructor(
             Timber.d("Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit")
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
-            siteUrl?.let {
-                loadingViewState.postValue(
-                    currentLoadingViewState().copy(
-                        isLoading = false,
-                        progress = 100,
-                        url = it,
-                        trackersAnimationEnabled = false,
-                    ),
-                )
-            }
 
-            browserViewState.postValue(
-                browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus),
-            )
-            siteUrl?.let {
-                omnibarViewState.postValue(
-                    currentOmnibarViewState().copy(
-                        omnibarText = it,
-                        isEditing = false,
-                    ),
-                )
-            }
+            viewModelScope.launch(dispatchers.main()) {
+                siteUrl?.let {
+                    loadingViewState.value =
+                        currentLoadingViewState().copy(
+                            isLoading = false,
+                            progress = 100,
+                            url = it,
+                            trackersAnimationEnabled = false,
+                        )
+                }
 
-            command.postValue(
-                ShowWarningMaliciousSite(maliciousUri = maliciousUri, documentUri = mainframeUri, feed = feed) { navigationStateChanged(it) },
-            )
+                browserViewState.value =
+                    browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus)
+
+                siteUrl?.let {
+                    omnibarViewState.value =
+                        currentOmnibarViewState().copy(
+                            omnibarText = it,
+                            isEditing = false,
+                        )
+                }
+
+                command.value =
+                    ShowWarningMaliciousSite(maliciousUri = maliciousUri, documentUri = mainframeUri, feed = feed) { navigationStateChanged(it) }
+            }
         } else {
-            browserViewState.postValue(
-                currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus),
-            )
-            siteUrl?.let {
-                omnibarViewState.postValue(
-                    currentOmnibarViewState().copy(
-                        omnibarText = it,
-                        isEditing = false,
-                    ),
-                )
-                loadingViewState.postValue(
-                    currentLoadingViewState().copy(
-                        url = it,
-                    ),
-                )
+            viewModelScope.launch(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
+                siteUrl?.let {
+                    omnibarViewState.value =
+                        currentOmnibarViewState().copy(
+                            omnibarText = it,
+                            isEditing = false,
+                        )
+                    loadingViewState.value =
+                        currentLoadingViewState().copy(
+                            url = it,
+                        )
+                }
             }
         }
     }
@@ -3370,9 +3367,11 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
     ) {
         if (isForMainFrame) {
-            browserViewState.postValue(
-                browserStateModifier.copyForBrowserShowing(currentBrowserViewState()),
-            )
+            viewModelScope.launch(dispatchers.main()) {
+                browserViewState.value =
+                    browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
+            }
+
             buildSiteFactory(url = url.toString(), updateMaliciousSiteStatus = true, maliciousSiteStatus = null)
         }
     }
