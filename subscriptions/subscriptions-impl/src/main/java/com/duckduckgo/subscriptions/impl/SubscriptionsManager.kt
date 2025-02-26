@@ -56,9 +56,6 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
-import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedMonthly
-import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedYearly
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -245,7 +242,6 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
-    private val freeTrialPrivacyProPixelsPlugin: Lazy<FreeTrialPrivacyProPixelsPlugin>,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -467,9 +463,9 @@ class RealSubscriptionsManager @Inject constructor(
             if (subscription.isActive()) {
                 // Free Trial experiment metrics
                 if (confirmationResponse.subscription.productId.contains("monthly-renews-us")) {
-                    freeTrialPrivacyProPixelsPlugin.get().onSubscriptionStartedMonthly()
+                    pixelSender.reportFreeTrialOnSubscriptionStartedMonthly()
                 } else if (confirmationResponse.subscription.productId.contains("yearly-renews-us")) {
-                    freeTrialPrivacyProPixelsPlugin.get().onSubscriptionStartedYearly()
+                    pixelSender.reportFreeTrialOnSubscriptionStartedYearly()
                 }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()

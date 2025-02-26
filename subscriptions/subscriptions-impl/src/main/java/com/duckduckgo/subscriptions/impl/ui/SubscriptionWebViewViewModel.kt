@@ -51,10 +51,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
-import com.duckduckgo.subscriptions.impl.freetrial.onPaywallImpression
-import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedMonthly
-import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedYearly
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -88,7 +84,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
-    private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin,
     private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore,
 ) : ViewModel() {
 
@@ -235,13 +230,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
             } else {
                 command.send(SubscriptionSelected(id, offerId))
             }
-
-            // Free Trial experiment metrics
-            if (id?.contains("monthly-renews-us") == true) {
-                freeTrialPrivacyProPixelsPlugin.onStartClickedMonthly()
-            } else if (id?.contains("yearly-renews-us") == true) {
-                freeTrialPrivacyProPixelsPlugin.onStartClickedYearly()
-            }
         }
     }
 
@@ -371,7 +359,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         pixelSender.reportOfferScreenShown()
         viewModelScope.launch {
             freeTrialExperimentDataStore.increaseMetricForPaywallImpressions()
-            freeTrialPrivacyProPixelsPlugin.onPaywallImpression()
+            pixelSender.reportFreeTrialExperimentOnPaywallImpression()
         }
     }
 
