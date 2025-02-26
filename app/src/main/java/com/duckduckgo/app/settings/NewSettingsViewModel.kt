@@ -39,7 +39,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
@@ -106,6 +105,7 @@ class NewSettingsViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val settingsPixelDispatcher: SettingsPixelDispatcher,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -301,7 +301,7 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(LaunchSyncSettings) }
-        pixel.fire(SETTINGS_SYNC_PRESSED)
+        settingsPixelDispatcher.fireSyncPressed()
     }
 
     fun onFireButtonSettingClicked() {
