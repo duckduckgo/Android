@@ -948,7 +948,8 @@ html[data-focus-mode=on] .MobileApp_embed {
     max-width: unset;
     grid-template-rows: 0 0 auto 12px 0 max-content;
   }
-  .MobileApp_main[data-youtube-error=true] :is(.MobileApp_logo, .MobileApp_switch) {
+  .MobileApp_main[data-youtube-error=true] .MobileApp_logo,
+  .MobileApp_main[data-youtube-error=true] .MobileApp_switch {
     display: none;
   }
   .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
