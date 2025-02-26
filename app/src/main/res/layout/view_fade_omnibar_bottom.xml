@@ -71,7 +71,7 @@
             android:background="?attr/daxColorToolbar"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_4"
             android:paddingBottom="8dp"
             android:paddingTop="12dp"
