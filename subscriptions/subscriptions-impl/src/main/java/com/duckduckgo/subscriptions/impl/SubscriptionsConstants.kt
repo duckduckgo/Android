@@ -34,8 +34,8 @@ object SubscriptionsConstants {
     const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
 
     // List of offers
-    const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-monthly-renews-us" // TODO NOELIA change when experiment added
-    const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-yearly-renews-us" // TODO NOELIA change when experiment added
+    const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
+    const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-yearly-renews-us"
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"
