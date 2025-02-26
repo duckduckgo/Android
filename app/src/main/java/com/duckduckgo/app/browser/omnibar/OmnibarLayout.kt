@@ -21,10 +21,15 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -161,6 +166,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val aiChatMenu: FrameLayout by lazy { findViewById(R.id.aiChatIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
@@ -168,7 +174,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
     internal val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
-    internal val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    internal val toolbarContainer: ViewGroup by lazy { findViewById(R.id.toolbarContainer) }
     internal val customTabToolbarContainer by lazy {
         IncludeCustomTabToolbarBinding.bind(
             findViewById(R.id.customTabToolbarContainer),
@@ -187,6 +193,27 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
+    internal val omniBarButtonTransitionSet: TransitionSet by lazy {
+        TransitionSet().apply {
+            ordering = TransitionSet.ORDERING_TOGETHER
+            addTransition(
+                ChangeBounds().apply {
+                    duration = 400
+                    interpolator = OvershootInterpolator(1.3f)
+                }
+            )
+            addTransition(
+                Fade().apply {
+                    duration = 200
+                    addTarget(clearTextButton)
+                    addTarget(aiChatMenu)
+                    addTarget(fireIconMenu)
+                    addTarget(tabsMenu)
+                    addTarget(browserMenu)
+                }
+            )
+        }
+    }
 
     internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
@@ -383,6 +410,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
+        aiChatMenu.setOnClickListener {
+            omnibarItemPressedListener?.onDuckChatButtonPressed()
+        }
         shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onPrivacyShieldButtonPressed()
@@ -495,14 +525,49 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private var isInitialRender = true
+
+    data class ButtonState(
+        val showClearButton: Boolean,
+        val showVoiceSearch: Boolean,
+        val showTabsMenu: Boolean,
+        val showFireIcon: Boolean,
+        val showBrowserMenu: Boolean,
+        val showBrowserMenuHighlight: Boolean,
+        val showChatMenu: Boolean,
+        val experimentalIconsEnabled: Boolean
+    )
+
+    private var previousButtonState: ButtonState? = null
+
     private fun renderButtons(viewState: ViewState) {
+        val newButtonState = ButtonState(
+            showClearButton = viewState.showClearButton,
+            showVoiceSearch = viewState.showVoiceSearch,
+            showTabsMenu = viewState.showTabsMenu,
+            showFireIcon = viewState.showFireIcon,
+            showBrowserMenu = viewState.showBrowserMenu,
+            showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
+            showChatMenu = viewState.showChatMenu,
+            experimentalIconsEnabled = viewState.experimentalIconsEnabled
+        )
+
+        if (!isInitialRender && newButtonState != previousButtonState) {
+            TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
+        }
+
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = viewState.showTabsMenu
         fireIconMenu.isVisible = viewState.showFireIcon
         browserMenu.isVisible = viewState.showBrowserMenu
         browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
-        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+        spacer.isVisible = viewState.showVoiceSearch || viewState.showClearButton
+        aiChatMenu.isVisible = viewState.showChatMenu
+        toolbarContainer.requestLayout()
+
+        isInitialRender = false
+        previousButtonState = newButtonState
     }
 
     private fun renderBrowserMode(viewState: ViewState) {

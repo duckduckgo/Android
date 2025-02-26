@@ -121,10 +121,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
-        val showClearButton: Boolean = false,
-        val showTabsMenu: Boolean = true,
-        val showFireIcon: Boolean = true,
-        val showBrowserMenu: Boolean = true,
+        val showClearButton: Boolean = true,
+        val showTabsMenu: Boolean = false,
+        val showFireIcon: Boolean = false,
+        val showBrowserMenu: Boolean = false,
+        val showChatMenu: Boolean = true,
         val showBrowserMenuHighlight: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
@@ -157,13 +158,41 @@ class OmnibarLayoutViewModel @Inject constructor(
         logVoiceSearchAvailability()
     }
 
+    private fun onOmnibarClicked() {
+        Timber.d("Omnibar: onOmnibarClicked")
+
+        viewModelScope.launch {
+            command.send(Command.CancelTrackersAnimation)
+        }
+
+        _viewState.update {
+            it.copy(
+                hasFocus = true,
+                expanded = true,
+                leadingIconState = SEARCH,
+                highlightPrivacyShield = HighlightableButton.Gone,
+                showClearButton = true,
+                showTabsMenu = false,
+                showFireIcon = false,
+                showBrowserMenu = false,
+                showChatMenu = true,
+                showVoiceSearch = shouldShowVoiceSearch(
+                    hasFocus = true,
+                    query = _viewState.value.omnibarText,
+                    hasQueryChanged = false,
+                    urlLoaded = _viewState.value.url,
+                ),
+            )
+        }
+    }
+
     fun onOmnibarFocusChanged(
         hasFocus: Boolean,
         query: String,
     ) {
         Timber.d("Omnibar: onOmnibarFocusChanged")
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = query.isBlank()
+        val showClearButton = hasFocus
+        val showControls = !hasFocus
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -180,6 +209,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
+                    showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -213,6 +243,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
+                    showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -309,6 +340,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
+                            showChatMenu = false,
                         )
                     }
                 }
@@ -380,6 +412,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
+                showChatMenu = !showControls,
             )
         }
     }
@@ -459,6 +492,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
+                showChatMenu = !showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
@@ -548,6 +582,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         Timber.d("Omnibar: onUserTouchedOmnibarTextInput")
+        onOmnibarClicked()
         if (touchAction == ACTION_UP) {
             firePixelBasedOnCurrentUrl(
                 AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
