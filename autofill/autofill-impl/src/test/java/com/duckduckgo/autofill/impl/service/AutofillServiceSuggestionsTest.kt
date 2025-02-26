@@ -139,7 +139,7 @@ class AutofillServiceSuggestionsTest {
                 ),
             ),
             loginDeduplicator = object : AutofillLoginDeduplicator {
-                override fun deduplicate(
+                override suspend fun deduplicate(
                     originalUrl: String,
                     logins: List<LoginCredentials>,
                 ): List<LoginCredentials> {

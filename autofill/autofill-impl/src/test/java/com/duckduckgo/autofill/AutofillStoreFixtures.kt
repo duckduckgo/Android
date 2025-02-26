@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import org.mockito.kotlin.mock
 
 fun fakeAutofillStore(
     secureStorage: SecureStorage = fakeStorage(),
@@ -56,6 +57,7 @@ fun fakeAutofillStore(
         coroutineScope,
     ),
     autofillFeature = autofillFeature,
+    usernameComparer = mock(),
 )
 
 fun fakeStorage(
@@ -73,7 +75,7 @@ fun lastUpdatedTimeProvider() = object : LastUpdatedTimeProvider {
 fun autofillDomainNameUrlMatcher() = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
 
 fun noopDeduplicator() = object : AutofillLoginDeduplicator {
-    override fun deduplicate(
+    override suspend fun deduplicate(
         originalUrl: String,
         logins: List<LoginCredentials>,
     ): List<LoginCredentials> = logins

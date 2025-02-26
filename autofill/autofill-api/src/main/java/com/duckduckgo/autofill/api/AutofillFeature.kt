@@ -128,4 +128,10 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(defaultValue = true)
     fun newScrollBehaviourInPasswordManagementScreen(): Toggle
+
+    /**
+     * Kill switch for making case insensitive checks on existing username matches
+     */
+    @Toggle.DefaultValue(defaultValue = true)
+    fun ignoreCaseOnUsernameComparisons(): Toggle
 }
