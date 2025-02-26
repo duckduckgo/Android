@@ -37,6 +37,7 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Su
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_OPEN
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ContinueWithoutAuthentication
@@ -94,7 +95,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
         setupToolbar(binding.toolbar)
         setTitle(R.string.autofill_service_select_password_activity)
         observeViewModel()
-        viewModel.onActivityCreated()
+        pixel.fire(AUTOFILL_SERVICE_PASSWORDS_OPEN)
     }
 
     private fun observeViewModel() {
@@ -127,12 +128,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
             }
 
             ContinueWithoutAuthentication -> {
-                Timber.i("DDGAutofillService ContinueWithoutAuthentication credentialId: $credentialId")
-                credentialId?.let { nonNullId ->
-                    viewModel.continueAfterAuthentication(nonNullId)
-                } ?: run {
-                    showListMode()
-                }
+                showListMode()
             }
 
             is AutofillLogin -> {
