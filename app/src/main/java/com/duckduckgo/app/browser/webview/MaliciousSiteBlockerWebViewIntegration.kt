@@ -154,19 +154,31 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Safe(request.isForMainFrame)
         }
 
-        val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
+        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+        val isForIframe = (isForIframe(request) && belongsToCurrentPage)
+
+        val exemptedUrl = if (isForIframe) {
+            val decodedDocumentUri = URLDecoder.decode(documentUri.toString(), "UTF-8").lowercase()
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedDocumentUri
+            }
+        } else {
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedUrl
+            }
+        }
 
         if (exemptedUrl != null) {
             Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
             return IsMaliciousViewData.MaliciousSite(url, exemptedUrl.feed, true)
         }
 
-        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
+        if (request.isForMainFrame || isForIframe) {
             when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                 is ConfirmedResult -> {
                     when (val status = result.status) {
                         is Malicious -> {
+                            Timber.tag("Cris").d("Returning MaliciousSite for $decodedUrl")
                             return IsMaliciousViewData.MaliciousSite(url, status.feed, false)
                         }
                         is Safe -> {
