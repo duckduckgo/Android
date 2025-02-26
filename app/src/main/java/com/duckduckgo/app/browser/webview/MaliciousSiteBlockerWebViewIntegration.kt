@@ -158,7 +158,19 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Safe(request.isForMainFrame)
         }
 
-        val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
+        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+        val isForIframe = (isForIframe(request) && belongsToCurrentPage)
+
+        val exemptedUrl = if (isForIframe) {
+            val decodedDocumentUri = URLDecoder.decode(documentUri.toString(), "UTF-8").lowercase()
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedDocumentUri
+            }
+        } else {
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedUrl
+            }
+        }
 
         if (exemptedUrl != null) {
             Timber.d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
@@ -174,8 +186,6 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             }
         }
 
-        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        val isForIframe = isForIframe(request) && belongsToCurrentPage
         if (request.isForMainFrame || isForIframe) {
             val result = checkMaliciousUrl(decodedUrl) {
                 if (isForIframe && it is Malicious) {
