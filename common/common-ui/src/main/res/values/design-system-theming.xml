@@ -126,7 +126,8 @@
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
-        <item name="daxColorToolbarBackground">?attr/daxColorSurface</item>
+        <item name="daxColorToolbar">?attr/daxColorSurface</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>

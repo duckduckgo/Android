@@ -44,7 +44,7 @@
         android:id="@+id/autoCompleteSuggestionsList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface"
+        android:background="?attr/daxColorBrowserOverlay"
         android:clipToPadding="false"
         android:elevation="2dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -56,7 +56,7 @@
         android:id="@+id/focusedView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface"
+        android:background="?attr/daxColorBrowserOverlay"
         android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_scrollFlags="noScroll" />

@@ -68,7 +68,8 @@
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
-    <attr name="daxColorToolbarBackground" format="color"/>
+    <attr name="daxColorToolbar" format="color"/>
+    <attr name="daxColorBrowserOverlay" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>

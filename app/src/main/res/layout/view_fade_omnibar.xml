@@ -28,7 +28,7 @@
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?daxColorToolbarBackground">
+        android:background="?daxColorToolbar">
 
         <LinearLayout
             android:id="@+id/minibar"
@@ -66,10 +66,10 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="64dp"
+            android:layout_height="@dimen/experimentalToolbarSize"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
-            android:background="?attr/daxColorToolbarBackground"
+            android:background="?attr/daxColorToolbar"
             android:layout_marginEnd="@dimen/keyline_2"
             android:layout_marginStart="@dimen/keyline_4"
             android:paddingTop="8dp"

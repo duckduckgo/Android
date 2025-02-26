@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/appBarLayoutMockup"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
+    android:layout_height="@dimen/experimentalToolbarSize"
     android:background="?daxColorToolbar"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
@@ -29,8 +29,11 @@
         android:id="@+id/omniBarContainerMockup"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/keyline_2"
-        android:background="@drawable/omnibar_field_background"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/fading_omnibar_field_background"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
