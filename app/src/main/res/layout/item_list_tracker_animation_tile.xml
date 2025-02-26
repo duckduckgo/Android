@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="7dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="7dp"
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="@color/green0"
+    app:cardCornerRadius="10dp"
+    tools:ignore="InvalidColorAttribute">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cardContentsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="0dp"
+        android:paddingTop="@dimen/twoLineItemVerticalPadding"
+        android:paddingEnd="@dimen/twoLineItemVerticalPadding"
+        android:paddingBottom="@dimen/twoLineItemVerticalPadding">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/shieldAnimation"
+            android:layout_width="56dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/faviconContentDescription"
+            app:layout_constraintBottom_toBottomOf="@id/subtitle"
+            app:layout_constraintEnd_toStartOf="@id/title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/title"
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/tab_shield" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_1"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textColor="@color/green80"
+            android:textIsSelectable="false"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/subtitle"
+            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintStart_toEndOf="@id/shieldAnimation"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="DeprecatedWidgetInXml,SpUsage"
+            tools:text="93 Trackers blocked" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="@string/inTheLast7Days"
+            android:textColor="@color/green70"
+            android:textIsSelectable="false"
+            android:textSize="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/title"
+            app:layout_constraintStart_toStartOf="@id/title"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            tools:ignore="DeprecatedWidgetInXml,SpUsage" />
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/selectable_circular_ripple"
+            android:contentDescription="@string/closeContentDescription"
+            android:scaleType="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_24_small" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>
