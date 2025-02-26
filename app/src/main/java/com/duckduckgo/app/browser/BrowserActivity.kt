@@ -90,6 +90,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -155,6 +156,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var tabManager: TabManager
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     private val lastActiveTabs = TabList()
 
@@ -468,6 +472,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
+            duckChat.openDuckChat()
+            return
+        }
+
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
             openExistingTab(existingTabId)
@@ -712,6 +721,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openExistingTabId: String? = null,
             isLaunchFromClearDataAction: Boolean = false,
             isLaunchFromDedicatedWebView: Boolean = false,
+            openDuckChat: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -724,6 +734,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(LAUNCH_FROM_DEDICATED_WEBVIEW, isLaunchFromDedicatedWebView)
+            intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             return intent
         }
 
@@ -741,6 +752,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val LAUNCH_FROM_DEDICATED_WEBVIEW = "LAUNCH_FROM_DEDICATED_WEBVIEW"
+        private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
     }
