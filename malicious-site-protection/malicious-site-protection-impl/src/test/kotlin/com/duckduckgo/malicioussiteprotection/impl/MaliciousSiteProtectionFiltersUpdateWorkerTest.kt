@@ -93,10 +93,12 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
     private val scheduler = MaliciousSiteProtectionFiltersUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature)
 
     @Test
-    fun onPrivacyConfigDownloaded_schedulesWorkerWithUpdateFrequencyFromRCFlagAndUpdatePolicy() {
+    fun onPrivacyConfigDownloadedWithFeatureOn_schedulesWorkerWithUpdateFrequencyFromRCFlagAndUpdatePolicy() {
         val updateFrequencyMinutes = 15L
 
         whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
 
         scheduler.onPrivacyConfigDownloaded()
 
@@ -112,5 +114,20 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
         val expectedInterval = TimeUnit.MINUTES.toMillis(updateFrequencyMinutes)
 
         assertEquals(expectedInterval, repeatInterval)
+    }
+
+    @Test
+    fun onPrivacyConfigDownloadedWithCanUpdateDatasetOff_cancelsWorker() {
+        val updateFrequencyMinutes = 15L
+
+        whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(false)
+
+        scheduler.onPrivacyConfigDownloaded()
+
+        verify(workManager).cancelUniqueWork(
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
+        )
     }
 }

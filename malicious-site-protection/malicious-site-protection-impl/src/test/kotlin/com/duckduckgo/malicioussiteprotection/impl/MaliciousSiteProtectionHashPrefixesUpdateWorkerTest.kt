@@ -97,6 +97,8 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
         val updateFrequencyMinutes = 15L
 
         whenever(maliciousSiteProtectionFeature.getHashPrefixUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
 
         scheduler.onPrivacyConfigDownloaded()
 
@@ -112,5 +114,20 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
         val expectedInterval = TimeUnit.MINUTES.toMillis(updateFrequencyMinutes)
 
         assertEquals(expectedInterval, repeatInterval)
+    }
+
+    @Test
+    fun onPrivacyConfigDownloadedWithCanUpdateDatasetOff_cancelsWorker() {
+        val updateFrequencyMinutes = 15L
+
+        whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(false)
+
+        scheduler.onPrivacyConfigDownloaded()
+
+        verify(workManager).cancelUniqueWork(
+            eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"),
+        )
     }
 }
