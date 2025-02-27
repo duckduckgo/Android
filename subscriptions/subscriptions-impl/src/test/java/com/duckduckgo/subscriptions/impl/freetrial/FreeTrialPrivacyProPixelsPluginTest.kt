@@ -52,7 +52,7 @@ class FreeTrialPrivacyProPixelsPluginTest {
         testFeature.privacyProFreeTrialJan25().setRawStoredState(state = State(enable = true))
 
         testee = FreeTrialPrivacyProPixelsPlugin(
-            toggle = testFeature,
+            toggle = { testFeature },
             freeTrialExperimentDataStore = mockFreeTrialExperimentDataStore,
             pixel = mockPixel,
         )
