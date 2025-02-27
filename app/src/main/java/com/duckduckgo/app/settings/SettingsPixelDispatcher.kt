@@ -17,8 +17,10 @@
 package com.duckduckgo.app.settings
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -38,6 +40,7 @@ import kotlinx.coroutines.launch
 interface SettingsPixelDispatcher {
     fun fireSyncPressed()
     fun fireDuckChatPressed()
+    fun fireEmailPressed()
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -47,6 +50,7 @@ class SettingsPixelDispatcherImpl @Inject constructor(
     private val pixel: Pixel,
     private val syncStateMonitor: SyncStateMonitor,
     private val duckChat: DuckChat,
+    private val emailManager: EmailManager,
 ) : SettingsPixelDispatcher {
 
     override fun fireSyncPressed() {
@@ -74,8 +78,21 @@ class SettingsPixelDispatcherImpl @Inject constructor(
         }
     }
 
+    override fun fireEmailPressed() {
+        appCoroutineScope.launch {
+            val isSignedIn = emailManager.isSignedIn()
+            pixel.fire(
+                pixel = SETTINGS_EMAIL_PROTECTION_PRESSED,
+                parameters = mapOf(
+                    PARAM_EMAIL_IS_SIGNED_IN to isSignedIn.toBinaryString(),
+                ),
+            )
+        }
+    }
+
     private companion object {
         const val PARAM_SYNC_IS_ENABLED = "is_enabled"
         const val PARAM_DUCK_CHAT_USED_BEFORE = "was_used_before"
+        const val PARAM_EMAIL_IS_SIGNED_IN = "is_signed_in"
     }
 }

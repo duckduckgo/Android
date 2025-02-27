@@ -31,7 +31,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
@@ -281,7 +280,7 @@ class NewSettingsViewModel @Inject constructor(
             }
             this@NewSettingsViewModel.command.send(command)
         }
-        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
+        settingsPixelDispatcher.fireEmailPressed()
     }
 
     fun onAppTPSettingClicked() {

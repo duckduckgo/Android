@@ -129,4 +129,11 @@ class NewSettingsViewModelTest {
 
         verify(settingsPixelDispatcherMock).fireDuckChatPressed()
     }
+
+    @Test
+    fun `when Email pressed then pixel is fired`() {
+        testee.onEmailProtectionSettingClicked()
+
+        verify(settingsPixelDispatcherMock).fireEmailPressed()
+    }
 }

@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.settings
 
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
@@ -44,6 +46,8 @@ class SettingsPixelDispatcherTest {
     @Mock private lateinit var syncStateMonitorMock: SyncStateMonitor
 
     @Mock private lateinit var duckChatMock: DuckChat
+
+    @Mock private lateinit var emailManagerMock: EmailManager
 
     lateinit var testee: SettingsPixelDispatcherImpl
 
@@ -143,10 +147,37 @@ class SettingsPixelDispatcherTest {
         )
     }
 
+    @Test
+    fun `when fireEmailPressed and is not signed in, then send a pixel with not actively used information`() = runTest {
+        whenever(emailManagerMock.isSignedIn()).thenReturn(false)
+
+        val testee = createTestee()
+        testee.fireEmailPressed()
+
+        verify(pixelMock).fire(
+            pixel = SETTINGS_EMAIL_PROTECTION_PRESSED,
+            parameters = mapOf("is_signed_in" to "0"),
+        )
+    }
+
+    @Test
+    fun `when fireEmailPressed and is signed in, then send a pixel with actively used information`() = runTest {
+        whenever(emailManagerMock.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
+        testee.fireEmailPressed()
+
+        verify(pixelMock).fire(
+            pixel = SETTINGS_EMAIL_PROTECTION_PRESSED,
+            parameters = mapOf("is_signed_in" to "1"),
+        )
+    }
+
     private fun createTestee() = SettingsPixelDispatcherImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         pixel = pixelMock,
         syncStateMonitor = syncStateMonitorMock,
         duckChat = duckChatMock,
+        emailManager = emailManagerMock,
     )
 }
