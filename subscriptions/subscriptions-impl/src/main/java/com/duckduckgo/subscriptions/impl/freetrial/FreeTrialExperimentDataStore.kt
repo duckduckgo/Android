@@ -38,7 +38,7 @@ interface FreeTrialExperimentDataStore {
     suspend fun increaseMetricForPaywallImpressions()
 
     /**
-     * Returns the number [Int] of paywall impressions for the given [definition]
+     * Returns the value [String] for the given pixel [definition]
      */
     suspend fun getMetricForPixelDefinition(definition: PixelDefinition): String?
 

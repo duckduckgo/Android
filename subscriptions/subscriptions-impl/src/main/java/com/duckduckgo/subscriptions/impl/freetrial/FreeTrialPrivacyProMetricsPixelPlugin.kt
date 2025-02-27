@@ -111,11 +111,10 @@ class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
     internal suspend fun firePixelFor(metricsPixel: MetricsPixel?) {
         metricsPixel?.let { metric ->
             metric.getPixelDefinitions().forEach { definition ->
-                if (definition.isInConversionWindow()) {
-                    freeTrialExperimentDataStore.getMetricForPixelDefinition(definition).takeIf { it != metric.value }?.let {
-                        freeTrialExperimentDataStore.increaseMetricForPixelDefinition(definition, metric.value)
-                        pixel.fire(definition.pixelName, definition.params)
-                    }
+                val hasMetricValueChanged = freeTrialExperimentDataStore.getMetricForPixelDefinition(definition) != metric.value
+                if (definition.isInConversionWindow() && hasMetricValueChanged) {
+                    freeTrialExperimentDataStore.increaseMetricForPixelDefinition(definition, metric.value)
+                    pixel.fire(definition.pixelName, definition.params)
                 }
             }
         }
