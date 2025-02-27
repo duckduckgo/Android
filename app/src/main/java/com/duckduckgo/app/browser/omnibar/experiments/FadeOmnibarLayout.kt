@@ -56,6 +56,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         inflate(context, layout, this)
 
+        minibar.setOnClickListener { }
+
         AndroidSupportInjection.inject(this)
     }
 
