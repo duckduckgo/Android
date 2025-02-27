@@ -19,13 +19,13 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 
 class TabSwitcherItemDiffCallback(
     old: List<TabSwitcherItem>,
     new: List<TabSwitcherItem>,
-    private val oldMode: TabSwitcherViewModel.SelectionViewState.Mode = TabSwitcherViewModel.SelectionViewState.Mode.Normal,
-    private val newMode: TabSwitcherViewModel.SelectionViewState.Mode = TabSwitcherViewModel.SelectionViewState.Mode.Normal,
+    private val oldMode: Mode = Mode.Normal,
+    private val newMode: Mode = Mode.Normal,
 ) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
@@ -49,7 +49,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
-                    oldItem.isSelected == newItem.isSelected
+                    oldItem.isSelected == newItem.isSelected &&
+                    oldMode == newMode
             }
             else -> false
         }

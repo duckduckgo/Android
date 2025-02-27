@@ -19,12 +19,10 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
-import com.duckduckgo.app.browser.di.BrowserModule_WebViewSessionStorageFactory.webViewSessionStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -88,11 +86,6 @@ class TabSwitcherViewModel @Inject constructor(
             activeTab = activeTab,
             fabType = fabType,
         )
-        if (viewState.mode is SelectionViewState.Mode.Selection) {
-            viewState.copy(fabType = SelectionViewState.FabType.CLOSE_TABS)
-        } else {
-            viewState.copy(fabType = SelectionViewState.FabType.NEW_TAB)
-        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
@@ -192,7 +185,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabs.value?.map { it.tabId } ?: emptyList())) }
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
     }
 
     fun onShareSelectedTabs() {

@@ -221,7 +221,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.selectionViewState.value.mode)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
@@ -311,7 +311,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         } else {
             viewModel.activeTab.observe(this) { tab ->
-                if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
+                if (tab != null && tab.tabId != tabItemDecorator.highlightedTabId && !tab.deletable) {
                     updateTabGridItemDecorator(tab.tabId)
                 }
             }
@@ -320,7 +320,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
             tabsAdapter.updateData(tabSwitcherItems)
 
-            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.highlightedTabId }
             if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                 updateTabGridItemDecorator(tabSwitcherItems.last().id)
             }
@@ -453,11 +453,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
             val mode = viewModel.selectionViewState.value.mode
             when (mode) {
-                Normal -> {
+                Mode.Normal -> {
                     createNormalModeMenu(menu)
                 }
                 is Mode.Selection -> {
-                    createSelectionModeMenu(menu, mode.selectedTabs.size, viewModel.tabs.value?.size ?: 0)
+                    createSelectionModeMenu(menu, mode.selectedTabs.size, viewModel.tabSwitcherItems.value?.size ?: 0)
                 }
             }
         } else {
@@ -637,7 +637,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun updateTabGridItemDecorator(tabId: String?) {
-        tabItemDecorator.tabSwitcherItemId = tabId
+        tabItemDecorator.highlightedTabId = tabId
+        tabItemDecorator.selectionMode = viewModel.selectionViewState.value.mode
         tabsRecycler.invalidateItemDecorations()
     }
 
