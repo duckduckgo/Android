@@ -132,7 +132,8 @@ class RealAutofillProviderSuggestions @Inject constructor(
         Timber.i("DDGAutofillService adding suggestion DuckDuckGo Search")
         response.addDataset(ddgAppDataSetBuild)
 
-        // TODO: add ignoredAutofillIds https://app.asana.com/0/1200156640058969/1209226370597334/f
+        val unknownIds = nodeToAutofill.parsedAutofillFields.filter { it.type == UNKNOWN }.map { it.autofillId }
+        response.setIgnoredIds(*unknownIds.toTypedArray())
         return response.build()
     }
 
