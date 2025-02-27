@@ -50,7 +50,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
-                    oldItem.isSelected == newItem.isSelected
+                    oldItem.isSelected == newItem.isSelected &&
+                    oldMode == newMode
             }
             else -> false
         }
