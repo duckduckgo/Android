@@ -174,6 +174,6 @@ class AppShortcutCreator @Inject constructor(
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
         private const val SHORTCUT_ID_DESIGN_SYSTEM_DEMO = "designSystemDemo"
-        private const val SHORTCUT_ID_DUCK_AI = "duckAIDemo"
+        private const val SHORTCUT_ID_DUCK_AI = "duckAI"
     }
 }
