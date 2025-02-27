@@ -70,6 +70,9 @@ interface DuckPlayerFeatureRepository {
     fun setOpenInNewTab(enabled: Boolean)
     fun observeOpenInNewTab(): Flow<Boolean>
     fun shouldOpenInNewTab(): Boolean
+
+    suspend fun wasUsedBefore(): Boolean
+    suspend fun setUsed()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -200,5 +203,13 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
 
     override fun shouldOpenInNewTab(): Boolean {
         return duckPlayerDataStore.getOpenInNewTab()
+    }
+
+    override suspend fun wasUsedBefore(): Boolean {
+        return duckPlayerDataStore.wasUsedBefore()
+    }
+
+    override suspend fun setUsed() {
+        duckPlayerDataStore.setUsed()
     }
 }

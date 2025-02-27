@@ -28,6 +28,7 @@ import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_RC
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_USER_ONBOARDED
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_WAS_USED
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_YOUTUBE_PATH
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_YOUTUBE_REFERRER_HEADERS
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.OVERLAY_INTERACTED
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -97,6 +99,10 @@ interface DuckPlayerDataStore {
     fun observeOpenInNewTab(): Flow<Boolean>
 
     fun getOpenInNewTab(): Boolean
+
+    suspend fun wasUsedBefore(): Boolean
+
+    suspend fun setUsed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -119,6 +125,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val DUCK_PLAYER_YOUTUBE_EMBED_URL = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_EMBED_URL")
         val DUCK_PLAYER_USER_ONBOARDED = booleanPreferencesKey(name = "DUCK_PLAYER_USER_ONBOARDED")
         val DUCK_PLAYER_OPEN_IN_NEW_TAB = booleanPreferencesKey(name = "DUCK_PLAYER_OPEN_IN_NEW_TAB")
+        val DUCK_PLAYER_WAS_USED = booleanPreferencesKey(name = "DUCK_PLAYER_WAS_USED")
     }
 
     private val overlayInteracted: StateFlow<Boolean> = store.data
@@ -311,5 +318,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override fun getOpenInNewTab(): Boolean {
         return duckPlayerOpenInNewTab.value
+    }
+
+    override suspend fun wasUsedBefore(): Boolean {
+        return store.data.map { it[DUCK_PLAYER_WAS_USED] }.firstOrNull() ?: false
+    }
+
+    override suspend fun setUsed() {
+        store.edit { it[DUCK_PLAYER_WAS_USED] = true }
     }
 }
