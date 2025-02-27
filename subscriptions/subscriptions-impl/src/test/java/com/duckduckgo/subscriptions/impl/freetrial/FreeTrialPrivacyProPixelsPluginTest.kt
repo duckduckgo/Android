@@ -19,8 +19,11 @@ package com.duckduckgo.subscriptions.impl.freetrial
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import kotlinx.coroutines.test.runTest
@@ -29,6 +32,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class FreeTrialPrivacyProPixelsPluginTest {
@@ -52,7 +57,7 @@ class FreeTrialPrivacyProPixelsPluginTest {
         testFeature.privacyProFreeTrialJan25().setRawStoredState(state = State(enable = true))
 
         testee = FreeTrialPrivacyProPixelsPlugin(
-            toggle = testFeature,
+            toggle = { testFeature },
             freeTrialExperimentDataStore = mockFreeTrialExperimentDataStore,
             pixel = mockPixel,
         )
@@ -126,5 +131,24 @@ class FreeTrialPrivacyProPixelsPluginTest {
         val value = testee.getMetricsPixelValue(60)
 
         assertEquals(value, "51+")
+    }
+
+    @Test
+    fun givenMetricValueAlreadyFiredWhenFirePixelRequestedThenDoNotFireAgain() = runTest {
+        val mockPixelDefinition: PixelDefinition = mock()
+        whenever(mockFreeTrialExperimentDataStore.getMetricForPixelDefinition(mockPixelDefinition)).thenReturn("6-10")
+
+        testee.firePixelFor(getMetricPixel("6-10"))
+        verifyNoInteractions(mockPixel)
+        verifyNoInteractions(mockFreeTrialExperimentDataStore)
+    }
+
+    private fun getMetricPixel(value: String): MetricsPixel {
+        return MetricsPixel(
+            metric = "metric",
+            value = value,
+            toggle = testFeature.privacyProFreeTrialJan25(),
+            conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
+        )
     }
 }

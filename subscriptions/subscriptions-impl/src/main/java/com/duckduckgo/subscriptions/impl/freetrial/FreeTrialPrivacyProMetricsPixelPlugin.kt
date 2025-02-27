@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -57,7 +58,7 @@ internal suspend fun FreeTrialPrivacyProPixelsPlugin.onSubscriptionStartedYearly
 
 @ContributesMultibinding(AppScope::class)
 class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
-    private val toggle: PrivacyProFeature,
+    private val toggle: Lazy<PrivacyProFeature>,
     private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore,
     private val pixel: Pixel,
 ) : MetricsPixelPlugin {
@@ -67,31 +68,31 @@ class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = "paywallImpressions",
                 value = getMetricsPixelValue(freeTrialExperimentDataStore.paywallImpressions),
-                toggle = toggle.privacyProFreeTrialJan25(),
+                toggle = toggle.get().privacyProFreeTrialJan25(),
                 conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
             ),
             MetricsPixel(
                 metric = "startClickedMonthly",
                 value = getMetricsPixelValue(freeTrialExperimentDataStore.paywallImpressions),
-                toggle = toggle.privacyProFreeTrialJan25(),
+                toggle = toggle.get().privacyProFreeTrialJan25(),
                 conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
             ),
             MetricsPixel(
                 metric = "startClickedYearly",
                 value = getMetricsPixelValue(freeTrialExperimentDataStore.paywallImpressions),
-                toggle = toggle.privacyProFreeTrialJan25(),
+                toggle = toggle.get().privacyProFreeTrialJan25(),
                 conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
             ),
             MetricsPixel(
                 metric = "subscriptionStartedMonthly",
                 value = getMetricsPixelValue(freeTrialExperimentDataStore.paywallImpressions),
-                toggle = toggle.privacyProFreeTrialJan25(),
+                toggle = toggle.get().privacyProFreeTrialJan25(),
                 conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
             ),
             MetricsPixel(
                 metric = "subscriptionStartedYearly",
                 value = getMetricsPixelValue(freeTrialExperimentDataStore.paywallImpressions),
-                toggle = toggle.privacyProFreeTrialJan25(),
+                toggle = toggle.get().privacyProFreeTrialJan25(),
                 conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 3)),
             ),
         )
@@ -110,13 +111,10 @@ class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
     internal suspend fun firePixelFor(metricsPixel: MetricsPixel?) {
         metricsPixel?.let { metric ->
             metric.getPixelDefinitions().forEach { definition ->
-                if (definition.isInConversionWindow()) {
-                    freeTrialExperimentDataStore.getMetricForPixelDefinition(definition).takeIf {
-                        it < freeTrialExperimentDataStore.paywallImpressions
-                    }?.let {
-                        freeTrialExperimentDataStore.increaseMetricForPixelDefinition(definition)
-                        pixel.fire(definition.pixelName, definition.params)
-                    }
+                val hasMetricValueChanged = freeTrialExperimentDataStore.getMetricForPixelDefinition(definition) != metric.value
+                if (definition.isInConversionWindow() && hasMetricValueChanged) {
+                    freeTrialExperimentDataStore.increaseMetricForPixelDefinition(definition, metric.value)
+                    pixel.fire(definition.pixelName, definition.params)
                 }
             }
         }

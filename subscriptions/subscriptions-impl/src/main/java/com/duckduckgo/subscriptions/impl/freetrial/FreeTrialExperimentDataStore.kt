@@ -38,14 +38,17 @@ interface FreeTrialExperimentDataStore {
     suspend fun increaseMetricForPaywallImpressions()
 
     /**
-     * Returns the number [Int] of paywall impressions for the given [definition]
+     * Returns the value [String] for the given pixel [definition]
      */
-    suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int
+    suspend fun getMetricForPixelDefinition(definition: PixelDefinition): String?
 
     /**
      * Increases the count of paywall impressions for the given [definition]
      */
-    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int
+    suspend fun increaseMetricForPixelDefinition(
+        definition: PixelDefinition,
+        value: String,
+    ): String?
 }
 
 @ContributesBinding(AppScope::class)
@@ -54,7 +57,11 @@ class FreeTrialExperimentDataStoreImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : FreeTrialExperimentDataStore {
 
-    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+        )
+    }
 
     override var paywallImpressions: Int
         get() = preferences.getInt(KEY_PAYWALL_IMPRESSIONS, 0)
@@ -66,22 +73,24 @@ class FreeTrialExperimentDataStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int {
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition): String? {
         val tag = "$definition"
         return withContext(dispatcherProvider.io()) {
-            preferences.getInt(tag, 0)
+            preferences.getString(tag, null)
         }
     }
 
-    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int =
+    override suspend fun increaseMetricForPixelDefinition(
+        definition: PixelDefinition,
+        value: String,
+    ): String? =
         withContext(dispatcherProvider.io()) {
             val tag = "$definition"
-            val count = preferences.getInt(tag, 0)
             preferences.edit {
-                putInt(tag, count + 1)
+                putString(tag, value)
                 apply()
             }
-            preferences.getInt(tag, 0)
+            preferences.getString(tag, null)
         }
 
     companion object {
