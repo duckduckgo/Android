@@ -54,8 +54,13 @@ class TabItemDecorator(
 
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
-                if (tabSwitcherItem.id == tabSwitcherItemId) {
-                    drawSelectedTabDecoration(child, canvas)
+                when(tabSwitcherItem) {
+                    is TabSwitcherItem.Tab -> {
+                        if (tabSwitcherItem.id == tabSwitcherItemId) {
+                            drawSelectedTabDecoration(child, canvas)
+                        }
+                    }
+                    TabSwitcherItem.TrackerAnimationTile -> Unit // No border for animation tile
                 }
             }
         }
