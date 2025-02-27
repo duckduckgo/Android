@@ -952,7 +952,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         openMessageInNewTabJob = lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 tabPagerAdapter.setMessageForNewFragment(message)
-                tabManager.openNewTab(sourceTabId)
+                tabManager.openNewTab(sourceTabId = sourceTabId)
             } else {
                 val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
                 val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
