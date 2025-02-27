@@ -25,16 +25,18 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
 class TabItemDecorator(
     context: Context,
-    var tabSwitcherItemId: String?,
+    tabSwitcherItemId: String?,
+    mode: Mode,
 ) : RecyclerView.ItemDecoration() {
 
     var highlightedTabId: String? = tabSwitcherItemId
-        private set
+    var selectionMode: Mode = mode
 
     private val activeTabBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
@@ -65,8 +67,10 @@ class TabItemDecorator(
         recyclerView.children.forEach { child ->
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
-                if ((tabSwitcherItem as? TabSwitcherItem.Tab)?.isSelected == true) {
-                    drawTabDecoration(child, canvas, selectionBorderStroke)
+                if (selectionMode is Mode.Selection) {
+                    if (tabSwitcherItem is TabSwitcherItem.Tab && tabSwitcherItem.isSelected) {
+                        drawTabDecoration(child, canvas, selectionBorderStroke)
+                    }
                 } else if (tabSwitcherItem.id == highlightedTabId) {
                     drawTabDecoration(child, canvas, activeTabBorderStroke)
                 }
@@ -78,7 +82,7 @@ class TabItemDecorator(
 
     private fun drawTabDecoration(child: View, c: Canvas, paint: Paint) {
         selectionBorderStroke.alpha = (child.alpha * 255).toInt()
-        c.drawRoundRect(child.getBounds(), SELECTION_BORDER_WIDTH, SELECTION_BORDER_WIDTH, selectionBorderStroke)
+        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, paint)
     }
 
     private fun View.getBounds(): RectF {
