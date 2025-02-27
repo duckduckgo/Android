@@ -287,6 +287,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             sendOptionJson(subscriptionOptions)
+            pixelSender.reportFreeTrialExperimentOnPaywallImpression() // move to paywallShown() if needed after experiment
         }
     }
 
@@ -359,7 +360,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         pixelSender.reportOfferScreenShown()
         viewModelScope.launch {
             freeTrialExperimentDataStore.increaseMetricForPaywallImpressions()
-            pixelSender.reportFreeTrialExperimentOnPaywallImpression()
         }
     }
 
