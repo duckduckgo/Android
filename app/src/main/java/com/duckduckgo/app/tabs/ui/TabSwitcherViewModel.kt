@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
@@ -59,6 +60,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
+    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
@@ -66,7 +68,14 @@ class TabSwitcherViewModel @Inject constructor(
         .conflate()
         .asLiveData()
         .map { tabEntities ->
-            tabEntities.map { TabSwitcherItem.Tab(it) }
+            // TODO use dismissal logic and or test framework to determine whether to show tracker animation tile
+            if (tabSwitcherAnimationFeature.self().isEnabled()) {
+                val trackerAnimationTile = TabSwitcherItem.TrackerAnimationTile
+                val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
+                listOf(trackerAnimationTile) + tabItems
+            } else {
+                tabEntities.map { TabSwitcherItem.Tab(it) }
+            }
         }
 
     val activeTab = tabRepository.liveSelectedTab
