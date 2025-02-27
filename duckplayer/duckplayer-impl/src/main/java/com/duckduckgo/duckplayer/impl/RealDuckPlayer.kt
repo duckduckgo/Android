@@ -480,7 +480,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun shouldShowCustomError(): Boolean {
-        return duckPlayerFeature.customError().isEnabled();
+        return duckPlayerFeature.customError().isEnabled()
     }
 
     override fun customErrorSettings(): CustomErrorSettings? {
