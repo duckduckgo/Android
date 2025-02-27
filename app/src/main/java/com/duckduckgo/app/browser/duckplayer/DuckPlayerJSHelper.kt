@@ -116,10 +116,6 @@ class DuckPlayerJSHelper @Inject constructor(
                     "settings": {
                         "pip": {
                             "state": "disabled"
-                        },
-                        "customError": {
-                            "state": "enabled",
-                            "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                         }
                     },
                     "userValues": {
@@ -141,6 +137,9 @@ class DuckPlayerJSHelper @Inject constructor(
                 jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
                 jsonObject.put("locale", java.util.Locale.getDefault().language)
                 jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
+
+                // Custom Error Settings
+                jsonObject.getJSONObject("settings").put("customError", getCustomErrorSettings())
             }
             DUCK_PLAYER_FEATURE_NAME -> {
                 jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
@@ -154,6 +153,17 @@ class DuckPlayerJSHelper @Inject constructor(
             method,
             id,
         )
+    }
+
+    private fun getCustomErrorSettings(): JSONObject {
+        val customErrorObject = JSONObject()
+        customErrorObject.put("state", if (duckPlayer.shouldShowCustomError()) "enabled" else "disabled")
+
+        duckPlayer.customErrorSettings()?.let { settings ->
+            customErrorObject.put("signInRequiredSelector", settings.signInRequiredSelector.takeIf { it.isNotEmpty() } ?: "")
+        }
+
+        return customErrorObject
     }
 
     private suspend fun setUserPreferences(data: JSONObject) {
