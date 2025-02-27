@@ -171,6 +171,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -3995,19 +3996,19 @@ class BrowserTabFragment :
             } else {
                 {}
             }
+            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
+                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+                } else {
+                    null
+                }
             configuration.showOnboardingCta(
                 binding,
                 { viewModel.onUserClickCtaOkButton(configuration) },
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
+                onSuggestedOptionsSelected,
             )
-            if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                configuration.setOnOptionClicked(
-                    daxDialogInContext,
-                ) {
-                    userEnteredQuery(it.link)
-                }
-            }
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
