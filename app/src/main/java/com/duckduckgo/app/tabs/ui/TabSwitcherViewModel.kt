@@ -55,6 +55,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -241,16 +243,26 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onShareSelectedTabs() {
-        val selectedTabs = (selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.selectedTabs ?: emptyList()
-        if (selectedTabs.size == 1) {
-            val entity = (tabSwitcherItems.value?.firstOrNull { it.id == selectedTabs.first() } as? TabSwitcherItem.Tab)?.tabEntity
-            command.value = Command.ShareLink(
-                link = entity?.url ?: "",
-                title = entity?.title ?: "",
-            )
-        } else if (selectedTabs.size > 1) {
-            val links = tabSwitcherItems.value?.filter { it.id in selectedTabs }?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
-            command.value = Command.ShareLinks(links ?: emptyList())
+        when (val mode = selectionViewState.value.mode) {
+            is SelectionViewState.Mode.Selection -> {
+                if (mode.selectedTabs.size == 1) {
+                    val entity = (tabSwitcherItems.value?.firstOrNull { it.id == mode.selectedTabs.first() } as? TabSwitcherItem.Tab)?.tabEntity
+                    command.value = ShareLink(
+                        link = entity?.url ?: "",
+                        title = entity?.title ?: "",
+                    )
+                } else if (mode.selectedTabs.size > 1) {
+                    val links = tabSwitcherItems.value?.filter { it.id in mode.selectedTabs }?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
+                    command.value = ShareLinks(links ?: emptyList())
+                }
+            }
+            SelectionViewState.Mode.Normal -> {
+                val entity = activeTab.value
+                command.value = ShareLink(
+                    link = entity?.url ?: "",
+                    title = entity?.title ?: "",
+                )
+            }
         }
     }
 
