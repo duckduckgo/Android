@@ -59,7 +59,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookies
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -68,6 +67,7 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -108,7 +108,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
 
-        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
         data class HighlightOmnibarItem(
             val fireButton: Boolean,
             val privacyShield: Boolean,
@@ -121,6 +120,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     sealed class StateChange {
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
+        data class PrivacyStateChange(val privacyShieldViewState: PrivacyShieldViewState) : StateChange()
     }
 
     @Inject
@@ -532,10 +532,6 @@ open class OmnibarLayout @JvmOverloads constructor(
         when (decoration) {
             is Mode -> {
                 viewModel.onViewModeChanged(decoration.viewMode)
-            }
-
-            is PrivacyShieldChanged -> {
-                viewModel.onPrivacyShieldChanged(decoration.privacyShield)
             }
 
             is Outline -> {

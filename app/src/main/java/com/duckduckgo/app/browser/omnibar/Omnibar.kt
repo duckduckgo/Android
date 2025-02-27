@@ -45,7 +45,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
@@ -277,8 +277,9 @@ class Omnibar(
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
     }
 
-    fun setPrivacyShield(privacyShield: PrivacyShield) {
-        newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
+    fun renderPrivacyViewState(privacyShieldViewState: PrivacyShieldViewState) {
+        Timber.d("Omnibar: renderPrivacyViewState $privacyShieldViewState")
+        newOmnibar.reduce(StateChange.PrivacyStateChange(privacyShieldViewState))
     }
 
     fun isPulseAnimationPlaying(): Boolean {
