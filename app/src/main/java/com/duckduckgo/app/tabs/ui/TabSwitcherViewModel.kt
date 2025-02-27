@@ -19,12 +19,10 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
-import com.duckduckgo.app.browser.di.BrowserModule_WebViewSessionStorageFactory.webViewSessionStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -34,7 +32,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -96,6 +96,10 @@ class TabSwitcherViewModel @Inject constructor(
                 TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
             }
     }.asLiveData()
+
+    val layoutType = tabRepository.tabSwitcherData
+        .map { it.layoutType }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     sealed class Command {
         data object Close : Command()
@@ -188,7 +192,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabs.value?.map { it.tabId } ?: emptyList())) }
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
     }
 
     fun onShareSelectedTabs() {
@@ -280,13 +284,13 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
-        when (selectionViewState.value.fabType) {
-            SelectionViewState.FabType.NEW_TAB -> {
+        when (selectionViewState.value.dynamicInterface.fabType) {
+            FabType.NEW_TAB -> {
                 viewModelScope.launch {
                     onNewTabRequested(fromOverflowMenu = false)
                 }
             }
-            SelectionViewState.FabType.CLOSE_TABS -> {
+            FabType.CLOSE_TABS -> {
                 onCloseSelectedTabs()
             }
         }
