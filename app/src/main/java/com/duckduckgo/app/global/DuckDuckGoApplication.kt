@@ -39,6 +39,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
+private const val PIR_PROCESS_NAME = "pir"
 
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
@@ -110,6 +111,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 }
             }
         }
+
+        runInSecondaryProcessNamed(PIR_PROCESS_NAME) {
+            configureLogging()
+            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
+            configureStrictMode()
+            configureDependencyInjection()
+        }
     }
 
     private fun setupActivityLifecycleCallbacks() {
@@ -171,12 +179,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         mode: Int,
     ): File {
         val dir = super.getDir(name, mode)
-        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
+        if (!isMainProcess) {
             if (name == "webview") {
-                return File("${dir.absolutePath}/vpn").apply {
-                    Timber.d(":vpn process getDir = $absolutePath")
-                    if (!exists()) {
-                        mkdirs()
+                val processName = shortProcessName
+                if (processName != "UNKNOWN") {
+                    return File("${dir.absolutePath}/$processName").apply {
+                        Timber.d(":$processName process getDir = $absolutePath")
+                        if (!exists()) {
+                            mkdirs()
+                        }
                     }
                 }
             }
@@ -186,11 +197,14 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun getCacheDir(): File {
         val dir = super.getCacheDir()
-        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
-            return File("${dir.absolutePath}/vpn").apply {
-                Timber.d(":vpn process getCacheDir = $absolutePath")
-                if (!exists()) {
-                    mkdirs()
+        if (!isMainProcess) {
+            val processName = shortProcessName
+            if (processName != "UNKNOWN") {
+                return File("${dir.absolutePath}/$processName").apply {
+                    Timber.d(":$processName process getCacheDir = $absolutePath")
+                    if (!exists()) {
+                        mkdirs()
+                    }
                 }
             }
         }

@@ -23,9 +23,7 @@ import android.os.Build
 import android.os.Process
 
 abstract class MultiProcessApplication : Application() {
-    private val shortProcessName: String by lazy {
-        currentProcessName?.substringAfter(delimiter = packageName, missingDelimiterValue = "UNKNOWN") ?: "UNKNOWN"
-    }
+    private val shortProcessNameCached: String by lazy { shortProcessName }
     private val isMainProcessCached: Boolean by lazy { isMainProcess }
 
     final override fun onCreate() {
@@ -33,7 +31,7 @@ abstract class MultiProcessApplication : Application() {
         if (isMainProcessCached) {
             onMainProcessCreate()
         } else {
-            onSecondaryProcessCreate(shortProcessName)
+            onSecondaryProcessCreate(shortProcessNameCached)
         }
     }
 
@@ -42,17 +40,27 @@ abstract class MultiProcessApplication : Application() {
     open fun onSecondaryProcessCreate(shortProcessName: String) {}
 }
 
+inline val Application.shortProcessName: String
+    get() = currentProcessName?.substringAfter(delimiter = "$packageName:", missingDelimiterValue = "UNKNOWN") ?: "UNKNOWN"
+
 inline val Application.isMainProcess: Boolean
     get() = packageName == currentProcessName
 
-inline fun Context.runInSecondaryProcessNamed(name: String, block: () -> Unit) {
+inline fun Context.runInSecondaryProcessNamed(
+    name: String,
+    block: () -> Unit,
+) {
     if (currentProcessName == "$packageName:$name") {
         block()
     }
 }
 
 val Context.currentProcessName: String?
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { Application.getProcessName() } else { processNameFromSystemService() }
+    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        Application.getProcessName()
+    } else {
+        processNameFromSystemService()
+    }
 
 private fun Context.processNameFromSystemService(): String {
     val am = this.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
