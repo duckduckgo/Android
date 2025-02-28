@@ -932,11 +932,9 @@ class BrowserTabViewModelTest {
         val maliciousUri = "https://www.malicious.com".toUri()
         testee.onReceivedMaliciousSiteWarning(
             maliciousUri,
-            maliciousUri,
             Feed.PHISHING,
             exempted = false,
             clientSideHit = false,
-            isForMainFrame = true,
         )
 
         testee.navigationStateChanged(
@@ -951,11 +949,9 @@ class BrowserTabViewModelTest {
         val maliciousUri = "https://www.malicious.com".toUri()
         testee.onReceivedMaliciousSiteWarning(
             maliciousUri,
-            maliciousUri,
             Feed.PHISHING,
             exempted = false,
             clientSideHit = false,
-            isForMainFrame = true,
         )
         testee.navigationStateChanged(
             buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
@@ -5200,7 +5196,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabThenClose() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, url, MALWARE, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
     }
@@ -5208,7 +5204,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, url, MALWARE, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.EscapeMaliciousSite })
     }
@@ -5994,7 +5990,7 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, "http://example.com".toUri(), Feed.PHISHING, false)
 
         assertEquals(
             loadingViewState(),
@@ -6017,7 +6013,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLeaveSiteAndCustomTabThenEmitCloseCustomTab() {
-        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, true)
         assertCommandIssued<CloseCustomTab>()
     }
 
@@ -6027,7 +6023,7 @@ class BrowserTabViewModelTest {
         whenever(mockLiveSelectedTab.value).thenReturn(TabEntity("ID"))
         whenever(mockTabRepository.liveSelectedTab).thenReturn(mockLiveSelectedTab)
 
-        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, false)
 
         assertCommandIssued<EscapeMaliciousSite>()
         assertCommandIssued<LaunchNewTab>()
@@ -6036,13 +6032,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLearnMoreThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(LearnMore, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LearnMore, "http://example.com".toUri(), Feed.PHISHING, false)
         assertCommandIssued<OpenBrokenSiteLearnMore>()
     }
 
     @Test
     fun whenReportErrorThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), Feed.PHISHING, false)
         assertCommandIssued<ReportBrokenSiteError>()
     }
 
