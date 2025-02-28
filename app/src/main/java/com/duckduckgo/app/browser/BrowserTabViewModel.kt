@@ -1960,7 +1960,10 @@ class BrowserTabViewModel @Inject constructor(
                 loadingViewState.value = currentLoadingViewState().copy(
                     isLoading = true,
                     trackersAnimationEnabled = true,
-                    progress = 0,
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                    * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                    * showing in case the URL was blocked locally and therefore never started to show*/
+                    progress = 20,
                     url = documentUrlString,
                 )
                 omnibarViewState.value = currentOmnibarViewState().copy(
