@@ -86,9 +86,8 @@ class FreeTrialExperimentDataStoreImpl @Inject constructor(
     ): String? =
         withContext(dispatcherProvider.io()) {
             val tag = "$definition"
-            preferences.edit {
+            preferences.edit(commit = true) {
                 putString(tag, value)
-                apply()
             }
             preferences.getString(tag, null)
         }
