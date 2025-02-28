@@ -296,10 +296,12 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         }
     }
 
-    private fun isForIframe(request: WebResourceRequest) = request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||
-        request.url.path?.contains("/embed/") == true ||
-        request.url.path?.contains("/iframe/") == true ||
-        request.requestHeaders["Accept"]?.contains("text/html") == true
+    private fun isForIframe(request: WebResourceRequest) = request.isForMainFrame.not() && (
+        request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||
+            request.url.path?.contains("/embed/") == true ||
+            request.url.path?.contains("/iframe/") == true ||
+            request.requestHeaders["Accept"]?.contains("text/html") == true
+        )
 
     private fun isEnabled(): Boolean {
         return isFeatureEnabled && isSettingEnabled
