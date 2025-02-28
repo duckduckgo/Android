@@ -77,6 +77,17 @@
         <item quantity="other">Share %1$d Links</item>
     </plurals>
 
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bookmark Selected Tab?</item>
+        <item quantity="other">Bookmark %1$d Tabs?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">No new bookmark was added.</item>
+        <item quantity="one">One new bookmark was added.</item>
+        <item quantity="other">%1$d new bookmarks were added.</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Existing bookmarks will not be duplicated.</string>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Bookmark</string>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bookmark Tab</item>
         <item quantity="other">Bookmark %1$d Tabs</item>
