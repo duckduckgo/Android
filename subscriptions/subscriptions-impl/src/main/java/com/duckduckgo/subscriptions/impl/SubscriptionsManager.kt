@@ -657,7 +657,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun storeLogin(accountExternalId: String? = null): StoreLoginResult {
         return try {
-            val purchase = playBillingManager.purchaseHistory.lastOrNull()
+            val purchase = playBillingManager.purchases.lastOrNull()
                 ?: return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
 
             val codeVerifier = pkceGenerator.generateCodeVerifier()

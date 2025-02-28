@@ -20,6 +20,7 @@ import android.app.Activity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -64,6 +65,7 @@ interface PlayBillingManager {
     val products: List<ProductDetails>
     val productsFlow: Flow<List<ProductDetails>>
     val purchaseHistory: List<PurchaseHistoryRecord>
+    val purchases: List<Purchase>
     val purchaseState: Flow<PurchaseState>
 
     /**
@@ -109,6 +111,8 @@ class RealPlayBillingManager @Inject constructor(
     // Purchase History
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
 
+    override var purchases: List<Purchase> = emptyList()
+
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
     }
@@ -120,6 +124,7 @@ class RealPlayBillingManager @Inject constructor(
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                 }
             }
         }
@@ -266,6 +271,16 @@ class RealPlayBillingManager @Inject constructor(
                 purchaseHistory = result.history
             }
             SubscriptionsPurchaseHistoryResult.Failure -> {
+            }
+        }
+    }
+
+    private suspend fun loadPurchases() {
+        when (val result = billingClient.getSubscriptionPurchases()) {
+            is SubscriptionPurchasesResult.Success -> {
+                purchases = result.purchases
+            }
+            SubscriptionPurchasesResult.Failure -> {
             }
         }
     }

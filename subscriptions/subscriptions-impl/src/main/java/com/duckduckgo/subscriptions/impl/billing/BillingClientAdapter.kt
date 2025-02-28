@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.billing
 
 import android.app.Activity
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 
 interface BillingClientAdapter {
@@ -31,6 +32,8 @@ interface BillingClientAdapter {
     suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult
 
     suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult
+
+    suspend fun getSubscriptionPurchases(): SubscriptionPurchasesResult
 
     suspend fun launchBillingFlow(
         activity: Activity,
@@ -57,6 +60,11 @@ sealed class SubscriptionsResult {
 sealed class SubscriptionsPurchaseHistoryResult {
     data class Success(val history: List<PurchaseHistoryRecord>) : SubscriptionsPurchaseHistoryResult()
     data object Failure : SubscriptionsPurchaseHistoryResult()
+}
+
+sealed class SubscriptionPurchasesResult {
+    data class Success(val purchases: List<Purchase>) : SubscriptionPurchasesResult()
+    data object Failure : SubscriptionPurchasesResult()
 }
 
 sealed class LaunchBillingFlowResult {

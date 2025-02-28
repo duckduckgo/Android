@@ -30,8 +30,10 @@ import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
+import com.android.billingclient.api.queryPurchasesAsync
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_CRASH_ERROR
@@ -143,6 +145,22 @@ class RealBillingClientAdapter @Inject constructor(
         return when (billingResult.responseCode) {
             BillingResponseCode.OK -> SubscriptionsPurchaseHistoryResult.Success(history = purchaseHistory.orEmpty())
             else -> SubscriptionsPurchaseHistoryResult.Failure
+        }
+    }
+
+    override suspend fun getSubscriptionPurchases(): SubscriptionPurchasesResult {
+        val client = billingClient
+        if (client == null || !client.isReady) return SubscriptionPurchasesResult.Failure
+
+        val queryParams = QueryPurchasesParams.newBuilder()
+            .setProductType(ProductType.SUBS)
+            .build()
+
+        val (billingResult, purchases) = client.queryPurchasesAsync(queryParams)
+
+        return when (billingResult.responseCode) {
+            BillingResponseCode.OK -> SubscriptionPurchasesResult.Success(purchases)
+            else -> SubscriptionPurchasesResult.Failure
         }
     }
 
