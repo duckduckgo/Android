@@ -27,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="?daxColorSurface"
         app:layout_scrollFlags="scroll|enterAlways|snap">
 
@@ -35,6 +35,7 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/daxColorSurface"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             android:layout_marginHorizontal="@dimen/keyline_2"

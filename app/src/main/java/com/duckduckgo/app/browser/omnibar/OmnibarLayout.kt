@@ -31,7 +31,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -85,7 +84,6 @@ import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -93,7 +91,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class OmnibarLayout @JvmOverloads constructor(
+open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -124,8 +122,6 @@ class OmnibarLayout @JvmOverloads constructor(
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
-
-    private val omnibarPosition: OmnibarPosition
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -187,23 +183,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
-    init {
-        val attr =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
-        omnibarPosition =
-            OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
-
-        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_new_omnibar_bottom
-        } else {
-            R.layout.view_new_omnibar
-        }
-        inflate(context, layout, this)
-
-        AndroidSupportInjection.inject(this)
-    }
-
-    private fun omnibarViews(): List<View> = listOf(
+    internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
         omnibarTextInput,
         searchIcon,
@@ -237,6 +217,8 @@ class OmnibarLayout @JvmOverloads constructor(
             isAttachedToWindow && it.hasFocus
         }
     }
+
+    open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -403,7 +385,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun render(viewState: ViewState) {
+    open fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -492,14 +474,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
-        if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
-        } else {
-            fireIconImageView.setImageResource(R.drawable.ic_fire)
-            tabsMenu.setIcon(R.drawable.ic_tabs)
-        }
-
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = viewState.showTabsMenu
@@ -605,30 +579,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun reduceDeferred(stateChange: StateChange) {
         viewModel.onExternalStateChange(stateChange)
-    }
-
-    override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {

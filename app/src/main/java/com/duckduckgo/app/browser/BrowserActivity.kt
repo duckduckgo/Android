@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultAppsActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
+import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
@@ -82,6 +83,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -160,6 +162,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var duckChat: DuckChat
 
+    @Inject
+    lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
+
     private val lastActiveTabs = TabList()
 
     private var _currentTab: BrowserTabFragment? = null
@@ -201,6 +206,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
+    private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
 
     private var openMessageInNewTabJob: Job? = null
 
@@ -278,17 +284,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
-        toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
-            TOP -> {
-                binding.bottomMockupToolbar.appBarLayoutMockup.gone()
-                binding.topMockupToolbar
-            }
-
-            BOTTOM -> {
-                binding.topMockupToolbar.appBarLayoutMockup.gone()
-                binding.bottomMockupToolbar
-            }
-        }
+        bindMockupToolbars()
 
         setContentView(binding.root)
 
@@ -702,6 +698,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (this::toolbarMockupBinding.isInitialized) {
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
+                if (this::experimentalToolbarMockupBinding.isInitialized) {
+                    experimentalToolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                }
             },
             300,
         )
@@ -1032,6 +1031,42 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onSystemDefaultBrowserDialogShown()
         } catch (ex: Exception) {
             Timber.e(ex)
+        }
+    }
+
+    private fun bindMockupToolbars() {
+        if (experimentalUIThemingFeature.self().isEnabled()) {
+            experimentalToolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                TOP -> {
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar
+                }
+
+                BOTTOM -> {
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar
+                }
+            }
+        } else {
+            toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                TOP -> {
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar
+                }
+
+                BOTTOM -> {
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar
+                }
+            }
         }
     }
 }
