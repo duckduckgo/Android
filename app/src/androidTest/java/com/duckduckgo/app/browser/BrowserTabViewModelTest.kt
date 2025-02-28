@@ -6020,7 +6020,7 @@ class BrowserTabViewModelTest {
             loadingViewState().copy(
                 isLoading = true,
                 trackersAnimationEnabled = true,
-                progress = 0,
+                progress = 20,
                 url = "http://example.com",
             ),
         )
