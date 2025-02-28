@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemGridTrackerAnimationTileBinding
 import com.duckduckgo.app.browser.databinding.ItemListTrackerAnimationTileBinding
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
@@ -60,6 +61,7 @@ import kotlin.Int
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.random.Random
 
 private const val ANIMATED_TILE_NO_REPLACE_ALPHA = 0.4f
 private const val ANIMATED_TILE_DEFAULT_ALPHA = 1f
@@ -71,6 +73,7 @@ class TabSwitcherAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider,
+    private val trackerCountAnimator: TrackerCountAnimator,
 ) : Adapter<ViewHolder>() {
 
     private val list = mutableListOf<TabSwitcherItem>()
@@ -137,13 +140,29 @@ class TabSwitcherAdapter(
                 bindListTab(holder, tab)
             }
             is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder -> {
-                // TODO animate number of trackers blocked
+                trackerCountAnimator.animateTrackersBlockedCountView(
+                    context = holder.binding.root.context,
+                    stringRes = R.string.trackersBlockedInTheLast7days,
+                    totalTrackerCount = when (Random.Default.nextInt(10)) {
+                        in 0..6 -> Random.Default.nextInt(10, 1000)
+                        else -> Random.Default.nextInt(1000, 10000)
+                    },
+                    trackerTextView = holder.binding.text,
+                )
                 holder.binding.close.setOnClickListener {
                     // TODO delete
                 }
             }
             is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder -> {
-                // TODO animate number of trackers blocked
+                trackerCountAnimator.animateTrackersBlockedCountView(
+                    context = holder.binding.root.context,
+                    stringRes = R.string.trackersBlocked,
+                    totalTrackerCount = when (Random.Default.nextInt(10)) {
+                        in 0..6 -> Random.Default.nextInt(10, 1000)
+                        else -> Random.Default.nextInt(1000, 10000)
+                    },
+                    trackerTextView = holder.binding.title,
+                )
                 holder.binding.close.setOnClickListener {
                     // TODO delete
                 }

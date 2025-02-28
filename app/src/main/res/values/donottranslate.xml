@@ -82,4 +82,8 @@
     <!--    Bottom Navigation Bar Experiment-->
     <string name="refreshPage">Refresh Page</string>
 
+    <string name="trackersBlockedInTheLast7days" tools:ignore="MissingInstruction">&lt;b&gt;%1$d trackers blocked &lt;/b&gt; in the last 7 days</string>
+    <string name="trackersBlocked" tools:ignore="MissingInstruction">&lt;b&gt;%1$d trackers blocked &lt;/b&gt;</string>
+    <string name="inTheLast7Days" tools:ignore="MissingInstruction">in the last 7 days</string>
+
 </resources>
