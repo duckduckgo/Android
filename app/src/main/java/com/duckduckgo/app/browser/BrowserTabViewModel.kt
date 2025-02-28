@@ -1946,8 +1946,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMaliciousSiteUserAction(
         action: MaliciousSiteBlockedWarningLayout.Action,
-        maliciousUrl: Uri,
-        documentUrl: Uri?,
+        siteUrl: Uri,
         feed: Feed,
         activeCustomTab: Boolean,
     ) {
@@ -1965,25 +1964,23 @@ class BrowserTabViewModel @Inject constructor(
             VisitSite -> {
                 val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
-                documentUrl?.let {
-                    command.postValue(BypassMaliciousSiteWarning(it, feed))
-                    val documentUrlString = documentUrl.toString()
-                    loadingViewState.value = currentLoadingViewState().copy(
-                        isLoading = true,
-                        trackersAnimationEnabled = true,
-                        progress = 0,
-                        url = documentUrlString,
-                    )
-                    omnibarViewState.value = currentOmnibarViewState().copy(
-                        omnibarText = documentUrlString,
-                        isEditing = false,
-                        navigationChange = true,
-                    )
-                }
+                command.postValue(BypassMaliciousSiteWarning(siteUrl, feed))
+                val documentUrlString = siteUrl.toString()
+                loadingViewState.value = currentLoadingViewState().copy(
+                    isLoading = true,
+                    trackersAnimationEnabled = true,
+                    progress = 0,
+                    url = documentUrlString,
+                )
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = documentUrlString,
+                    isEditing = false,
+                    navigationChange = true,
+                )
             }
 
             LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
-            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$maliciousUrl"))
+            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$siteUrl"))
         }
     }
 
@@ -3289,29 +3286,25 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(
-        mainframeUri: Uri?,
-        maliciousUri: Uri,
+        siteUrl: Uri,
         feed: Feed,
         exempted: Boolean,
         clientSideHit: Boolean,
-        isForMainFrame: Boolean,
     ) {
         val previousSite = site
 
-        val siteUrl = (if (isForMainFrame) maliciousUri else mainframeUri)?.toString()
+        val siteUrlString = siteUrl.toString()
 
         val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
 
-        siteUrl?.let {
-            buildSiteFactory(
-                url = it,
-                updateMaliciousSiteStatus = true,
-                maliciousSiteStatus = maliciousSiteStatus,
-            )
-        }
+        buildSiteFactory(
+            url = siteUrlString,
+            updateMaliciousSiteStatus = true,
+            maliciousSiteStatus = maliciousSiteStatus,
+        )
 
         if (!exempted) {
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) return
@@ -3320,44 +3313,38 @@ class BrowserTabViewModel @Inject constructor(
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
 
             viewModelScope.launch(dispatchers.main()) {
-                siteUrl?.let {
-                    loadingViewState.value =
-                        currentLoadingViewState().copy(
-                            isLoading = false,
-                            progress = 100,
-                            url = it,
-                            trackersAnimationEnabled = false,
-                        )
-                }
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        isLoading = false,
+                        progress = 100,
+                        url = siteUrlString,
+                        trackersAnimationEnabled = false,
+                    )
 
                 browserViewState.value =
                     browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus)
 
-                siteUrl?.let {
-                    omnibarViewState.value =
-                        currentOmnibarViewState().copy(
-                            omnibarText = it,
-                            isEditing = false,
-                        )
-                }
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = siteUrlString,
+                        isEditing = false,
+                    )
 
                 command.value =
-                    ShowWarningMaliciousSite(maliciousUri = maliciousUri, documentUri = mainframeUri, feed = feed) { navigationStateChanged(it) }
+                    ShowWarningMaliciousSite(siteUrl, feed) { navigationStateChanged(it) }
             }
         } else {
             viewModelScope.launch(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
-                siteUrl?.let {
-                    omnibarViewState.value =
-                        currentOmnibarViewState().copy(
-                            omnibarText = it,
-                            isEditing = false,
-                        )
-                    loadingViewState.value =
-                        currentLoadingViewState().copy(
-                            url = it,
-                        )
-                }
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = siteUrlString,
+                        isEditing = false,
+                    )
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        url = siteUrlString,
+                    )
             }
         }
     }

@@ -1465,8 +1465,7 @@ class BrowserTabFragment :
     }
 
     private fun showMaliciousWarning(
-        maliciousUri: Uri,
-        documentUri: Uri?,
+        siteUrl: Uri,
         feed: Feed,
         onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
     ) {
@@ -1481,13 +1480,7 @@ class BrowserTabFragment :
         webView?.hide()
         webView?.stopLoading()
         maliciousWarningView.bind(feed) { action ->
-            viewModel.onMaliciousSiteUserAction(
-                action = action,
-                maliciousUrl = maliciousUri,
-                documentUrl = documentUri,
-                feed = feed,
-                activeCustomTab = isActiveCustomTab(),
-            )
+            viewModel.onMaliciousSiteUserAction(action, siteUrl, feed, isActiveCustomTab())
         }
         viewModel.deleteTabPreview(tabId)
         lifecycleScope.launch(dispatchers.main()) {
@@ -1496,7 +1489,7 @@ class BrowserTabFragment :
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
         val navigationList = webView?.safeCopyBackForwardList() ?: return
-        onMaliciousWarningShown(ErrorNavigationState(navigationList, maliciousSiteUrl = maliciousUri, SITE_SECURITY_WARNING))
+        onMaliciousWarningShown(ErrorNavigationState(navigationList, maliciousSiteUrl = siteUrl, SITE_SECURITY_WARNING))
     }
 
     private fun hideMaliciousWarning() {
@@ -1900,12 +1893,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(
-                maliciousUri = it.maliciousUri,
-                documentUri = it.documentUri,
-                feed = it.feed,
-                onMaliciousWarningShown = it.onMaliciousWarningShown,
-            )
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.siteUrl, it.feed, it.onMaliciousWarningShown)
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()

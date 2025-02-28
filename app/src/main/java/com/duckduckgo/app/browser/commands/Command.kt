@@ -220,8 +220,7 @@ sealed class Command {
     ) : Command()
 
     data class ShowWarningMaliciousSite(
-        val maliciousUri: Uri,
-        val documentUri: Uri?,
+        val siteUrl: Uri,
         val feed: Feed,
         val onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
     ) : Command()

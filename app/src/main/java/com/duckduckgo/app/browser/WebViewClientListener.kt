@@ -99,12 +99,10 @@ interface WebViewClientListener {
     fun isActiveTab(): Boolean
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
     fun onReceivedMaliciousSiteWarning(
-        mainframeUri: Uri?,
-        maliciousUri: Uri,
+        url: Uri,
         feed: Feed,
         exempted: Boolean,
         clientSideHit: Boolean,
-        isForMainFrame: Boolean,
     )
     fun onReceivedMaliciousSiteSafe(
         url: Uri,

@@ -115,7 +115,7 @@ class WebViewRequestInterceptor(
         documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
-        val url: Uri? = request.url
+        val url: Uri = request.url
 
         maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
             handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
@@ -207,7 +207,7 @@ class WebViewRequestInterceptor(
     private fun shouldBlock(
         result: IsMaliciousViewData,
         webViewClientListener: WebViewClientListener?,
-        url: Uri?,
+        url: Uri,
         documentUrl: Uri?,
         isForMainFrame: Boolean,
     ): Boolean {
@@ -235,7 +235,7 @@ class WebViewRequestInterceptor(
     private fun handleConfirmationCallback(
         isMalicious: MaliciousStatus,
         webViewClientListener: WebViewClientListener?,
-        url: Uri?,
+        url: Uri,
         documentUrl: Uri?,
         isForMainFrame: Boolean,
     ) {
@@ -260,23 +260,19 @@ class WebViewRequestInterceptor(
 
     private fun handleSiteBlocked(
         webViewClientListener: WebViewClientListener?,
-        maliciousUri: Uri?,
+        maliciousUri: Uri,
         documentUrl: Uri?,
         feed: Feed,
         exempted: Boolean,
         clientSideHit: Boolean,
         isForMainFrame: Boolean,
     ) {
-        maliciousUri?.let {
-            webViewClientListener?.onReceivedMaliciousSiteWarning(
-                mainframeUri = documentUrl,
-                maliciousUri = it,
-                feed = feed,
-                exempted = exempted,
-                clientSideHit = clientSideHit,
-                isForMainFrame = isForMainFrame,
-            )
-        }
+        webViewClientListener?.onReceivedMaliciousSiteWarning(
+            url = if (isForMainFrame || documentUrl == null) maliciousUri else documentUrl,
+            feed = feed,
+            exempted = exempted,
+            clientSideHit = clientSideHit,
+        )
     }
 
     private fun handleSiteSafe(
