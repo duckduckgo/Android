@@ -3155,7 +3155,7 @@
           /** @type {HTMLElement} */
           node
         );
-        return element.classList.contains("ytp-error") || !!element.querySelector("ytp-error");
+        return element.classList.contains("ytp-error") || !!element.querySelector(".ytp-error");
       }
       return false;
     }
