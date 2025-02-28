@@ -1519,7 +1519,6 @@ class BrowserTabFragment :
         url: Uri,
         feed: Feed,
     ) {
-        showBrowser()
         webViewClient.addExemptedMaliciousSite(url, feed)
         webView?.loadUrl(url.toString())
     }
