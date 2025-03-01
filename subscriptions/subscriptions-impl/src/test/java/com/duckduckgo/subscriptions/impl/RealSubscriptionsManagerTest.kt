@@ -316,7 +316,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsNotSignedIn()
         givenCreateAccountSucceeds()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         if (authApiV2Enabled) {
             verify(authClient).authorize(any())
@@ -334,7 +334,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(emailManager.getToken()).thenReturn("emailToken")
         givenUserIsNotSignedIn()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         verify(authService).createAccount("Bearer emailToken")
     }
@@ -345,7 +345,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -359,7 +359,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateTokenSucceedsNoEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
     }
@@ -372,7 +372,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), "")
+        subscriptionsManager.purchase(mock(), "", null)
 
         verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
     }
@@ -386,7 +386,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), isNull())
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
@@ -402,7 +402,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenStoreLoginFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -415,7 +415,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         givenUserIsSignedIn()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         verify(authService).validateToken(any())
     }
@@ -426,7 +426,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
             assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
@@ -440,7 +440,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -452,7 +452,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsSignedIn()
         givenValidateTokenFails("failure")
 
-        subscriptionsManager.purchase(mock(), "")
+        subscriptionsManager.purchase(mock(), "", null)
 
         verify(authService, never()).createAccount(any())
     }
@@ -464,7 +464,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSubscriptionSucceedsWithoutEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
         if (authApiV2Enabled) {
             assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
             assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
@@ -486,7 +486,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSubscriptionSucceedsWithoutEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
             if (authApiV2Enabled) {
@@ -509,7 +509,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsSignedIn()
         givenSubscriptionFails(httpResponseCode = 400)
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         verify(playBillingManager).launchBillingFlow(any(), any(), any(), isNull())
     }
@@ -519,7 +519,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsSignedIn()
         givenSubscriptionFails(httpResponseCode = 404)
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(mock(), planId = "", offerId = null)
 
         verify(playBillingManager).launchBillingFlow(any(), any(), any(), isNull())
     }
@@ -1100,7 +1100,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
 
@@ -1137,7 +1137,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), planId = "")
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
 
@@ -1274,6 +1274,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = "AUTO_RENEWABLE",
+                activeOffers = listOf(),
             )
         }
 
@@ -1355,6 +1356,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = status,
+                activeOffers = listOf(),
             ),
         )
     }
@@ -1368,6 +1370,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = status,
+                activeOffers = listOf(),
             ),
         )
     }
@@ -1564,6 +1567,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                     status = "Auto-Renewable",
                     startedAt = 1000000L,
                     expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
                 ),
             ),
         )

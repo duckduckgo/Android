@@ -75,7 +75,7 @@ interface PlayBillingManager {
         activity: Activity,
         planId: String,
         externalId: String,
-        offerId: String? = null,
+        offerId: String?,
     )
 }
 
