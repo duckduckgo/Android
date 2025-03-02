@@ -39,6 +39,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
+private const val AUTOFILL_SERVICE_PROCESS_NAME = "autofill"
 
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
@@ -113,6 +114,14 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     }
                 }
             }
+        }
+
+        runInSecondaryProcessNamed(AUTOFILL_SERVICE_PROCESS_NAME) {
+            configureLogging()
+            configureStrictMode()
+            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
+            configureDependencyInjection()
+            configureUncaughtExceptionHandler()
         }
     }
 
