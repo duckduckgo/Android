@@ -54,6 +54,8 @@ class RealAutofillService : AutofillService() {
 
     @Inject lateinit var autofillProviderSuggestions: AutofillProviderSuggestions
 
+    @Inject lateinit var autofillServiceExceptions: AutofillServiceExceptions
+
     @Inject lateinit var pixel: Pixel
 
     private val autofillJob = ConflatedJob()
@@ -122,6 +124,18 @@ class RealAutofillService : AutofillService() {
 
         if (autofillServiceFeature.canAutofillInsideDDG().isEnabled().not() && nodeToAutofill.packageId in DDG_PACKAGE_IDS) {
             return true
+        }
+
+        nodeToAutofill.packageId.takeUnless { it.isNullOrBlank() }?.let {
+            if (autofillServiceExceptions.isAnException(it)) {
+                return true
+            }
+        }
+
+        nodeToAutofill.website.takeUnless { it.isNullOrBlank() }?.let {
+            if (autofillServiceExceptions.isAnException(it)) {
+                return true
+            }
         }
 
         if (nodeToAutofill.packageId in BROWSERS_PACKAGE_IDS && nodeToAutofill.website.isNullOrBlank()) {
