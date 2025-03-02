@@ -190,7 +190,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SERVICE_PASSWORDS_DISMISSED("autofill_extension_passwords_dismissed"),
     AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH("autofill_extension_passwords_dismissed_auth"),
     AUTOFILL_SERVICE_PASSWORD_SELECTED("autofill_extension_password_selected"),
-    AUTOFILL_SERVICE_PASSWORDS_SEARCH("autofill_extension_passwords_search"), // doesn't apply, we automatically focus the search bar
+    AUTOFILL_SERVICE_PASSWORDS_SEARCH("autofill_extension_passwords_search"),
     AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT("autofill_extension_passwords_search_input"), // when user types in the search bar first time
     AUTOFILL_SERVICE_CRASH("autofill_service_crash"),
 }
