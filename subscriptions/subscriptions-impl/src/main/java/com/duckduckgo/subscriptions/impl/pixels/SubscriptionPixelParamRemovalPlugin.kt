@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class SubscriptionPixelParamRemovalPlugin @Inject constructor() : PixelParamRemo
             "m_subscribe" to PixelParameter.removeAtb(),
             "m_subscribe" to PixelParameter.removeOSVersion(),
             "m_ppro_feedback" to PixelParameter.removeAtb(),
+            APP_SETTINGS_GET_SUBSCRIPTION_CLICK.baseName to PixelParameter.removeAtb(),
         )
     }
 }

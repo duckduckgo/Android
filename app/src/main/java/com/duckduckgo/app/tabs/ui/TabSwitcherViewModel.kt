@@ -34,7 +34,10 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -50,6 +53,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val duckChat: DuckChat,
 ) : ViewModel() {
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
         tabEntities.map { TabSwitcherItem.Tab(it) }
@@ -186,6 +190,18 @@ class TabSwitcherViewModel @Inject constructor(
                 GRID
             }
             tabRepository.setTabLayoutType(newLayoutType)
+        }
+    }
+
+    fun onDuckChatMenuClicked() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+
+            val wasUsedBefore = duckChat.wasOpenedBefore()
+            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
+
+            duckChat.openDuckChat()
         }
     }
 }

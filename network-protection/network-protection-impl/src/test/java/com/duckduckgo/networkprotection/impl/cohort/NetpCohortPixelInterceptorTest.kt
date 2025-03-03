@@ -157,6 +157,18 @@ class NetpCohortPixelInterceptorTest {
         assertEquals(null, result.body)
     }
 
+    @Test
+    fun `when cohort local date is not set then send exempted main VPN settings pressed pixel`() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_ev_setting_pressed_c")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?appVersion=5.135.0&test=1"
     }

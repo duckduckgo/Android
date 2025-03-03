@@ -65,15 +65,32 @@ class LegacyProSettingNetPViewModelTest {
     }
 
     @Test
-    fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
+    fun `when NetP setting clicked and not onboarded then return screen for current state and send pixel`() = runTest {
         val testScreen = object : ActivityParams {}
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
 
         proSettingNetPViewModel.commands().test {
             proSettingNetPViewModel.onNetPSettingClicked()
 
             assertEquals(Command.OpenNetPScreen(testScreen), awaitItem())
-            verify(pixel).fire(NETP_SETTINGS_PRESSED)
+            verify(pixel).fire(NETP_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to "0"))
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when NetP setting clicked and onboarded then return screen for current state and send pixel`() = runTest {
+        val testScreen = object : ActivityParams {}
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
+        proSettingNetPViewModel.commands().test {
+            proSettingNetPViewModel.onNetPSettingClicked()
+
+            assertEquals(Command.OpenNetPScreen(testScreen), awaitItem())
+            verify(pixel).fire(NETP_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to "1"))
 
             cancelAndConsumeRemainingEvents()
         }
