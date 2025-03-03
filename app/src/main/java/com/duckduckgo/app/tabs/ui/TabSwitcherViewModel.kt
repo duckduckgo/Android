@@ -19,7 +19,6 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -28,11 +27,11 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.FabType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -42,7 +41,7 @@ import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -58,10 +57,9 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : ViewModel() {
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
-        tabEntities.map { TabSwitcherItem.Tab(it) }
-    }
+
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
@@ -73,8 +71,28 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val _viewState = MutableStateFlow<ViewState>(ViewState())
-    val viewState = _viewState.asStateFlow()
+    private val _selectionViewState = MutableStateFlow<SelectionViewState>(SelectionViewState())
+    val selectionViewState = combine(
+        _selectionViewState,
+        tabRepository.flowSelectedTab,
+    ) { viewState, activeTab ->
+        val fabType = if (viewState.mode is SelectionViewState.Mode.Selection && viewState.mode.selectedTabs.isNotEmpty()) {
+            SelectionViewState.FabType.CLOSE_TABS
+        } else {
+            SelectionViewState.FabType.NEW_TAB
+        }
+
+        viewState.copy(
+            activeTab = activeTab,
+            fabType = fabType,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
+
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
+        tabEntities.map {
+            TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
+        }
+    }.asLiveData()
 
     sealed class Command {
         data object Close : Command()
@@ -105,9 +123,20 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onTabSelected(tab: TabEntity) {
-        tabRepository.select(tab.tabId)
-        command.value = Command.Close
-        pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
+            _selectionViewState.update {
+                val selectionMode = it.mode as SelectionViewState.Mode.Selection
+                if (tab.tabId in selectionMode.selectedTabs) {
+                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                } else {
+                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+                }
+            }
+        } else {
+            tabRepository.select(tab.tabId)
+            command.value = Command.Close
+            pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        }
     }
 
     suspend fun onTabDeleted(tab: TabEntity) {
@@ -123,10 +152,24 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
         }
+
+        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+            if (tab.tabId in selectionMode.selectedTabs) {
+                _selectionViewState.update {
+                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                }
+            }
+        }
     }
 
     suspend fun undoDeletableTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
+
+        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+            }
+        }
     }
 
     suspend fun purgeDeletableTabs() {
@@ -142,6 +185,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
     }
 
     fun onShareSelectedTabs() {
@@ -154,6 +198,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(emptyList())) }
     }
 
     fun onCloseSelectedTabs() {
@@ -172,6 +217,15 @@ class TabSwitcherViewModel @Inject constructor(
             // Make sure all exemptions are removed as all tabs are deleted.
             adClickManager.clearAll()
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+
+            // Trigger a normal mode when there are no tabs
+            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+        }
+    }
+
+    fun onEmptyAreaClicked() {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
+            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
         }
     }
 
@@ -210,28 +264,30 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onLayoutTypeToggled() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val newLayoutType = if (layoutType.value == GRID) {
-                pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-                LIST
-            } else {
-                pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-                GRID
+            val newLayoutType = when (layoutType.value) {
+                GRID -> {
+                    pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                    LIST
+                }
+                LIST -> {
+                    pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                    GRID
+                }
+                else -> null
             }
-            tabRepository.setTabLayoutType(newLayoutType)
+            newLayoutType?.let { tabRepository.setTabLayoutType(it) }
         }
     }
 
     fun onFabClicked() {
-        when {
-            viewState.value.mode is ViewState.Mode.Normal -> {
-                _viewState.update { it.copy(mode = ViewState.Mode.Selection(emptyList())) }
-            }
-            viewState.value.mode is ViewState.Mode.Selection -> {
-                if ((viewState.value.mode as ViewState.Mode.Selection).selectedTabs.isEmpty()) {
-                    _viewState.update { it.copy(mode = ViewState.Mode.Selection(listOf("123", "456"))) }
-                } else {
-                    _viewState.update { it.copy(mode = ViewState.Mode.Normal) }
+        when (selectionViewState.value.fabType) {
+            SelectionViewState.FabType.NEW_TAB -> {
+                viewModelScope.launch {
+                    onNewTabRequested(fromOverflowMenu = false)
                 }
+            }
+            SelectionViewState.FabType.CLOSE_TABS -> {
+                onCloseSelectedTabs()
             }
         }
     }
@@ -248,9 +304,10 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    data class ViewState(
+    data class SelectionViewState(
+        val activeTab: TabEntity? = null,
         val fabType: FabType = FabType.NEW_TAB,
-        val mode: Mode = Mode.Selection(emptyList<String>()),
+        val mode: Mode = Mode.Normal,
     ) {
         enum class FabType {
             NEW_TAB,
