@@ -127,8 +127,9 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     }
 
     sealed class IsMaliciousViewData {
-        data object Safe : IsMaliciousViewData()
+        data class Safe(val isForMainFrame: Boolean) : IsMaliciousViewData()
         data object WaitForConfirmation : IsMaliciousViewData()
+        data object Ignored : IsMaliciousViewData()
         data class MaliciousSite(val url: Uri, val feed: Feed, val exempted: Boolean) : IsMaliciousViewData()
     }
 
@@ -138,7 +139,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
         if (!isEnabled()) {
-            return IsMaliciousViewData.Safe
+            return IsMaliciousViewData.Safe(request.isForMainFrame)
         }
 
         val url = request.url.let {
@@ -151,7 +152,19 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
         val decodedUrl = decodeUrl(url)
 
-        val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
+        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+        val isForIframe = (isForIframe(request) && belongsToCurrentPage)
+
+        val exemptedUrl = if (isForIframe) {
+            val decodedDocumentUri = URLDecoder.decode(documentUri.toString(), "UTF-8").lowercase()
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedDocumentUri
+            }
+        } else {
+            exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull {
+                it.url.toString() == decodedUrl
+            }
+        }
 
         if (exemptedUrl != null) {
             Timber.d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
@@ -162,13 +175,11 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             processedUrls.remove(decodedUrl)
             Timber.d("Already intercepted, skipping $decodedUrl, status: $it")
             return when (it) {
-                is Safe -> IsMaliciousViewData.Safe
+                is Safe -> IsMaliciousViewData.Safe(request.isForMainFrame)
                 is Malicious -> IsMaliciousViewData.MaliciousSite(url, it.feed, false)
             }
         }
 
-        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        val isForIframe = isForIframe(request) && belongsToCurrentPage
         if (request.isForMainFrame || isForIframe) {
             val result = checkMaliciousUrl(decodedUrl) {
                 if (isForIframe && it is Malicious) {
@@ -188,7 +199,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                         }
 
                         is Safe -> {
-                            return IsMaliciousViewData.Safe
+                            return IsMaliciousViewData.Safe(request.isForMainFrame)
                         }
                     }
                 }
@@ -198,7 +209,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                 }
             }
         }
-        return IsMaliciousViewData.Safe
+        return IsMaliciousViewData.Ignored
     }
 
     override fun shouldOverrideUrlLoading(
@@ -208,7 +219,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     ): IsMaliciousViewData {
         return runBlocking {
             if (!isEnabled()) {
-                return@runBlocking IsMaliciousViewData.Safe
+                return@runBlocking IsMaliciousViewData.Safe(isForMainFrame)
             }
             val decodedUrl = decodeUrl(url)
 
@@ -223,7 +234,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                 processedUrls.remove(decodedUrl)
                 Timber.d("Already intercepted, skipping $decodedUrl, status: $it")
                 return@runBlocking when (it) {
-                    is Safe -> IsMaliciousViewData.Safe
+                    is Safe -> IsMaliciousViewData.Safe(isForMainFrame)
                     is Malicious -> IsMaliciousViewData.MaliciousSite(url, it.feed, false)
                 }
             }
@@ -232,13 +243,14 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             if (isForMainFrame) {
                 when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                     is ConfirmedResult -> {
-                        when (val status = result.status) {
+                        val status = result.status
+                        processedUrls[decodedUrl] = status
+                        when (status) {
                             is Malicious -> {
                                 return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, false)
                             }
                             is Safe -> {
-                                processedUrls[decodedUrl] = Safe
-                                return@runBlocking IsMaliciousViewData.Safe
+                                return@runBlocking IsMaliciousViewData.Safe(true)
                             }
                         }
                     }
@@ -247,7 +259,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                     }
                 }
             }
-            IsMaliciousViewData.Safe
+            IsMaliciousViewData.Ignored
         }
     }
 
@@ -272,10 +284,12 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         }
     }
 
-    private fun isForIframe(request: WebResourceRequest) = request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||
-        request.url.path?.contains("/embed/") == true ||
-        request.url.path?.contains("/iframe/") == true ||
-        request.requestHeaders["Accept"]?.contains("text/html") == true
+    private fun isForIframe(request: WebResourceRequest) = request.isForMainFrame.not() && (
+        request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||
+            request.url.path?.contains("/embed/") == true ||
+            request.url.path?.contains("/iframe/") == true ||
+            request.requestHeaders["Accept"]?.contains("text/html") == true
+        )
 
     private fun isEnabled(): Boolean {
         return isFeatureEnabled && isSettingEnabled
