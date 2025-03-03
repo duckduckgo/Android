@@ -3855,4 +3855,8 @@ internal class FakeVariantManager : VariantManager {
         saveVariantsCallCounter++
         variant = ""
     }
+
+    override fun isReinstallVariant(): Boolean {
+        TODO("Not yet implemented")
+    }
 }
