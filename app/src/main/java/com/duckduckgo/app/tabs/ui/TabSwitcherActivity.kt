@@ -444,18 +444,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
-            is Command.ShareLinks -> {
-                launchShareMultipleLinkChooser(command.links)
-            }
-            is Command.ShareLink -> {
-                launchShareLinkChooser(command.link, command.title)
-            }
-            is Command.BookmarkTabs -> {
-                showBookmarkTabsConfirmation(command.numTabs)
-            }
-            is Command.ShowBookmarkToast -> {
-                showBookmarkToast(command.numBookmarks)
-            }
+            is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
+            is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
+            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.numTabs)
+            is Command.ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
         }
     }
 
