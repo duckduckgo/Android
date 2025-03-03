@@ -106,11 +106,12 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
+    private val tabList = listOf(TabEntity("1", position = 1), TabEntity("2", position = 2))
     private val repoDeletableTabs = Channel<List<TabEntity>>()
-    private val tabs = MutableLiveData<List<TabEntity>>()
+    private val tabs = MutableLiveData<List<TabEntity>>(tabList)
 
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
-    private val flowTabs = flowOf(listOf(TabEntity("1", position = 1), TabEntity("2", position = 2)))
+    private val flowTabs = flowOf(tabList)
 
     @Before
     fun before() {
