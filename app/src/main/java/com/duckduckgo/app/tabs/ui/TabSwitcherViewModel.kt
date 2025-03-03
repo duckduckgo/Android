@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -32,15 +33,21 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -49,6 +56,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -60,6 +68,8 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val faviconManager: FaviconManager,
+    private val savedSitesRepository: SavedSitesRepository,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -101,6 +111,8 @@ class TabSwitcherViewModel @Inject constructor(
         data object CloseAllTabsRequest : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
+        data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
+        data class ShowBookmarkToast(val numBookmarks: Int) : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -219,9 +231,23 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBookmarkSelectedTabs() {
+        when (val mode = selectionViewState.value.mode) {
+            is SelectionViewState.Mode.Normal -> {
+                activeTab.value?.tabId?.let { tabId ->
+                    command.value = BookmarkTabsRequest(listOf(tabId))
+                }
+            }
+
+            is SelectionViewState.Mode.Selection -> {
+                command.value = BookmarkTabsRequest(mode.selectedTabs)
+            }
+        }
     }
 
     fun onBookmarkAllTabs() {
+        tabSwitcherItems.value?.map { it.id }?.let { tabIds ->
+            command.value = BookmarkTabsRequest(tabIds)
+        }
     }
 
     fun onSelectionModeRequested() {
@@ -232,6 +258,22 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseOtherTabs() {
+    }
+
+    fun onBookmarkTabsConfirmed(tabIds: List<String>) {
+        viewModelScope.launch {
+            val numBookmarkedTabs = bookmarkTabs(tabIds)
+            command.value = ShowBookmarkToast(numBookmarkedTabs)
+        }
+    }
+
+    private suspend fun bookmarkTabs(tabIds: List<String>): Int {
+        val results = tabIds.map { tabId ->
+            viewModelScope.async {
+                saveSiteBookmark(tabId)
+            }
+        }
+        return results.awaitAll().count { it != null }
     }
 
     fun onCloseAllTabsConfirmed() {
@@ -246,14 +288,18 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
 
             // Trigger a normal mode when there are no tabs
-            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+            triggerNormalMode()
         }
     }
 
     fun onEmptyAreaClicked() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
-            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+            triggerNormalMode()
         }
+    }
+
+    private fun triggerNormalMode() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
     }
 
     fun onUpButtonPressed() {
@@ -317,6 +363,22 @@ class TabSwitcherViewModel @Inject constructor(
                 onCloseSelectedTabs()
             }
         }
+    }
+
+    private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
+        var bookmark: Bookmark? = null
+        (tabSwitcherItems.value?.firstOrNull { it.id == tabId } as? TabSwitcherItem.Tab)?.let { tab ->
+            tab.tabEntity.url?.let { url ->
+                if (url.isNotBlank()) {
+                    // Only bookmark new sites
+                    if (savedSitesRepository.getBookmark(url) == null) {
+                        faviconManager.persistCachedFavicon(tabId, url)
+                        bookmark = savedSitesRepository.insertBookmark(url, tab.tabEntity.title.orEmpty())
+                    }
+                }
+            }
+        }
+        return@withContext bookmark
     }
 
     fun onDuckChatMenuClicked() {
