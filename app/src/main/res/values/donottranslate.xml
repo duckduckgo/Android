@@ -81,8 +81,8 @@
         <item quantity="one">Bookmark Selected Tab?</item>
         <item quantity="other">Bookmark %1$d Tabs?</item>
     </plurals>
+    <string name="tabSwitcherBookmarkToastZero">No unique bookmark was added.</string>
     <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="zero">No new bookmark was added.</item>
         <item quantity="one">One new bookmark was added.</item>
         <item quantity="other">%1$d new bookmarks were added.</item>
     </plurals>
