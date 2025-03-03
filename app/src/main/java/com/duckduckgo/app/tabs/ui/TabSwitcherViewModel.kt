@@ -227,7 +227,9 @@ class TabSwitcherViewModel @Inject constructor(
                         title = entity?.title ?: "",
                     )
                 } else if (mode.selectedTabs.size > 1) {
-                    val links = tabSwitcherItems.value?.filter { it.id in mode.selectedTabs }?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
+                    val links = tabSwitcherItems.value
+                        ?.filter { it.id in mode.selectedTabs }
+                        ?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
                     command.value = ShareLinks(links ?: emptyList())
                 }
             }
