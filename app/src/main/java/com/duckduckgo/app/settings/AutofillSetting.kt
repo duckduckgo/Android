@@ -66,9 +66,7 @@ class AutofillSettingNode @Inject constructor() : RootSettingsNode {
     override fun generateKeywords(): Set<String> {
         return setOf(
             "password", "login", "autofill", "credentials",
-            "manager", "security", "vault", "biometric",
-            "2fa", "two-factor", "authentication", "fingerprint",
-            "face recognition", "secure", "protection",
+            "manager", "security", "vault", "authentication",
         )
     }
 }

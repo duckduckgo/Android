@@ -59,8 +59,10 @@ class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
 
     override fun generateKeywords(): Set<String> {
         return setOf(
-            "vpn", "subscription", "removal", "privacy", "pro",
-            "privacy pro", "itr", "pir", "theft", "information", "identity", "restoration",
+            "subscription","privacy", "pro", "privacy pro",
+            "vpn", "protection", "tunnel", "tunneling", "ip", "ip address",
+            "pir", "information", "removal", "private",
+            "itr", "theft", "identity", "restoration",
         )
     }
 }

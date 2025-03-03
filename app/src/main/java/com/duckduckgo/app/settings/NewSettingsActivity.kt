@@ -322,7 +322,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             val indexedValue = iterator.next()
             val view = indexedValue.value
             val index = indexedValue.index
-            if (view !is Searchable) {
+            if (view !is Searchable || !view.isVisible) {
                 continue
             }
             val searchableView = view as Searchable
@@ -330,22 +330,24 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             if (searchResults != null && !searchResults.contains(plugin.id)) {
                 continue
             }
+
             val titleRes = plugin.categoryNameResId
-            if (index == 0) {
-                val header = SectionHeaderListItem(this)
-                header.setText(titleRes)
-                binding.includeSettings.searchableSettingsContent.addView(header, 0)
-                previousTitleRes = titleRes
-            } else if (previousTitleRes != titleRes) {
+
+            fun addSectionHeader() {
                 val header = SectionHeaderListItem(this)
                 header.setText(titleRes)
                 binding.includeSettings.searchableSettingsContent.addView(header, index)
+            }
+
+            if (index == 0 || previousTitleRes == null) {
+                addSectionHeader()
+            } else if (previousTitleRes != titleRes) {
+                addSectionHeader()
 
                 val divider = HorizontalDivider(this)
                 binding.includeSettings.searchableSettingsContent.addView(divider, index)
-
-                previousTitleRes = titleRes
             }
+            previousTitleRes = titleRes
         }
     }
 
