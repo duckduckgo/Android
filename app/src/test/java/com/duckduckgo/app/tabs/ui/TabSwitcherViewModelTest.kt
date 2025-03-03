@@ -65,6 +65,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
@@ -195,8 +196,10 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabDeletedThenRepositoryNotified() = runTest {
-        val entity = TabEntity("abc", "", "", position = 0)
-        testee.onTabDeleted(entity)
+        val entity = tabList.first()
+        whenever(mockTabRepository.getTab(any())).thenReturn(entity)
+
+        testee.onTabDeleted(entity.tabId)
         verify(mockTabRepository).delete(entity)
         verify(mockAdClickManager).clearTabId(entity.tabId)
     }
@@ -282,16 +285,18 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
+        val tabIdCaptor = argumentCaptor<String>()
+        whenever(mockTabRepository.getTab(tabIdCaptor.capture())).thenAnswer { _ -> tabList.first { it.tabId == tabIdCaptor.lastValue } }
+
         testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
-        flowTabs.first().forEach { tab ->
-            verify(mockTabRepository).delete(tab)
-            verify(mockAdClickManager).clearTabId(tab.tabId)
-            verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        tabList.forEach {
+            verify(mockTabRepository).delete(it)
+            verify(mockAdClickManager).clearTabId(it.tabId)
+            verify(mockWebViewSessionStorage).deleteSession(it.tabId)
         }
-
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
