@@ -51,9 +51,9 @@ class TabSwitcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
+    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
 ) : ViewModel() {
-    
+
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
         // TODO use dismissal logic and or test framework to determine whether to show tracker animation tile
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
