@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.baseHost
-import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.RowBookmarkTwoLineItemBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
@@ -152,7 +151,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
     }
 
     class BookmarkFoldersViewHolder(
-        private val binding: RowTwoLineItemBinding,
+        private val binding: RowBookmarkTwoLineItemBinding,
         private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
         private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
         private val onLongClick: () -> Unit,
