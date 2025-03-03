@@ -17,14 +17,22 @@
 package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.pixels.AppPixelName.SPLASHSCREEN_FAILED_TO_LAUNCH
+import com.duckduckgo.app.pixels.AppPixelName.SPLASHSCREEN_SHOWN
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
@@ -32,14 +40,21 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val pixel: Pixel,
 ) :
     ViewModel() {
+
+    private var splashScreenFailToExitJob: Job? = null
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
+    }
+
+    fun sendWelcomeScreenPixel() {
+        pixel.fire(SPLASHSCREEN_SHOWN)
     }
 
     suspend fun determineViewToShow() {
@@ -50,6 +65,19 @@ class LaunchViewModel @Inject constructor(
         } else {
             command.value = Command.Home()
         }
+    }
+
+    fun launchSplashScreenFailToExitJob() {
+        splashScreenFailToExitJob = viewModelScope.launch {
+            delay(1.5.seconds)
+            sendWelcomeScreenPixel()
+            determineViewToShow()
+            pixel.fire(SPLASHSCREEN_FAILED_TO_LAUNCH)
+        }
+    }
+
+    fun cancelSplashScreenFailToExitJob() {
+        splashScreenFailToExitJob?.cancel()
     }
 
     private suspend fun waitForReferrerData() {
