@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.TitleProtectionsSettingViewModel.ViewState
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -45,7 +46,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class TitleProtectionsSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingProtections
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Protections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

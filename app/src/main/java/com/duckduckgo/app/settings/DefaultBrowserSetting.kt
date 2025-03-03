@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -50,9 +51,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(1)
+@PriorityKey(101)
 class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingProtections
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Protections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

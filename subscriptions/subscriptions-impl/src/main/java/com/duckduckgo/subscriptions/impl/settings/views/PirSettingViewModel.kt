@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus

@@ -18,9 +18,12 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 
 import android.content.Context
 import android.view.View
+import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId.PPro
 import com.duckduckgo.common.ui.settings.SettingsNode
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
@@ -36,20 +39,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.UUID
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
-@PriorityKey(100)
-class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
-    override fun getView(context: Context): View {
-        return SectionHeaderListItem(context).apply {
-            primaryText = context.getString(R.string.privacyPro)
-        }
-    }
-}
-
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(204)
 class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.privacyPro
+    override val settingsHeaderNodeId = PPro
     override val children: List<SettingsNode> = emptyList()
     override val id: UUID = UUID.randomUUID()
 
@@ -59,7 +52,7 @@ class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
 
     override fun generateKeywords(): Set<String> {
         return setOf(
-            "subscription","privacy", "pro", "privacy pro",
+            "subscription", "privacy", "pro", "privacy pro",
             "vpn", "protection", "tunnel", "tunneling", "ip", "ip address",
             "pir", "information", "removal", "private",
             "itr", "theft", "identity", "restoration",
@@ -70,7 +63,7 @@ class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(202)
 class PIRSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.privacyPro
+    override val settingsHeaderNodeId = PPro
     override val children: List<SettingsNode> = emptyList()
     override val id: UUID = UUID.randomUUID()
 
@@ -88,7 +81,7 @@ class PIRSettingNode @Inject constructor() : RootSettingsNode {
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(203)
 class ITRSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.privacyPro
+    override val settingsHeaderNodeId = PPro
     override val children: List<SettingsNode> = emptyList()
     override val id: UUID = UUID.randomUUID()
 

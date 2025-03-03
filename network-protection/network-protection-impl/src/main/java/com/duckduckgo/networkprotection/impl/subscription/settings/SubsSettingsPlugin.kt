@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId.PPro
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.R
@@ -33,7 +34,7 @@ import javax.inject.Inject
 @PriorityKey(201)
 class ProSettingsNetP @Inject constructor() : RootSettingsNode {
 
-    override val categoryNameResId = R.string.privacyPro
+    override val settingsHeaderNodeId = PPro
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

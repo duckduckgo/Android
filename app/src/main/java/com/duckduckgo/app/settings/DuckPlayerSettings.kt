@@ -34,6 +34,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -50,7 +51,7 @@ import javax.inject.Inject
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(309)
 class DuckPlayerSetting @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingMainSettings
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Other
     override val children: List<SettingsNode> = emptyList()
     override val id: UUID = UUID.randomUUID()
 

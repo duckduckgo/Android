@@ -28,7 +28,6 @@ import androidx.core.view.children
 import androidx.core.view.contains
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
-import androidx.core.view.iterator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -58,11 +57,11 @@ import com.duckduckgo.common.ui.settings.SearchStatus
 import com.duckduckgo.common.ui.settings.SearchStatus.HIT
 import com.duckduckgo.common.ui.settings.Searchable
 import com.duckduckgo.common.ui.settings.SearchableTag
+import com.duckduckgo.common.ui.settings.SettingsHeader
+import com.duckduckgo.common.ui.settings.SettingsHeaderNode
 import com.duckduckgo.common.ui.settings.SettingsNode
-import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
-import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -246,19 +245,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun removeHeaders() {
-        val iterator = binding.includeSettings.searchableSettingsContent.iterator()
-        while (iterator.hasNext()) {
-            val view = iterator.next()
-            if (view !is Searchable) {
-                iterator.remove()
-            }
-        }
-    }
-
     private fun applySearchResults(searchResults: Set<UUID>?) {
-        removeHeaders()
-
         binding.includeSettings.searchableSettingsContent.children.forEach {
             it.updateSearchStatus(searchResults)
         }
@@ -312,42 +299,35 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 binding.includeSettings.searchableSettingsContent.removeView(it)
             }
         }
-        addHeaders(searchResults)
-    }
 
-    private fun addHeaders(searchResults: Set<UUID>?) {
-        var previousTitleRes: Int? = null
-        val iterator = binding.includeSettings.searchableSettingsContent.children.iterator().withIndex()
-        while (iterator.hasNext()) {
-            val indexedValue = iterator.next()
-            val view = indexedValue.value
-            val index = indexedValue.index
-            if (view !is Searchable || !view.isVisible) {
-                continue
+        if (searchResults != null) {
+            var firstHeader = true
+            binding.includeSettings.searchableSettingsContent.children.forEach {
+                if (it.isAttachedToWindow && it is SettingsHeader) {
+                    val searchableView = it as Searchable
+                    val plugin = settingsPlugins.findNodeAndParentById(searchableView.searchableId)!!.node
+                    if (searchResults.contains(plugin.id)) {
+                        if (firstHeader) {
+                            firstHeader = false
+                            it.hideDivider()
+                        } else {
+                            it.showDivider()
+                        }
+                    }
+                }
             }
-            val searchableView = view as Searchable
-            val plugin = settingsPlugins.findNodeAndParentById(searchableView.searchableId)!!.node
-            if (searchResults != null && !searchResults.contains(plugin.id)) {
-                continue
+        } else {
+            var firstHeader = true
+            binding.includeSettings.searchableSettingsContent.children.forEach {
+                if (it.isAttachedToWindow && it is SettingsHeader) {
+                    if (firstHeader) {
+                        firstHeader = false
+                        it.hideDivider()
+                    } else {
+                        it.showDivider()
+                    }
+                }
             }
-
-            val titleRes = plugin.categoryNameResId
-
-            fun addSectionHeader() {
-                val header = SectionHeaderListItem(this)
-                header.setText(titleRes)
-                binding.includeSettings.searchableSettingsContent.addView(header, index)
-            }
-
-            if (index == 0 || previousTitleRes == null) {
-                addSectionHeader()
-            } else if (previousTitleRes != titleRes) {
-                addSectionHeader()
-
-                val divider = HorizontalDivider(this)
-                binding.includeSettings.searchableSettingsContent.addView(divider, index)
-            }
-            previousTitleRes = titleRes
         }
     }
 
@@ -416,10 +396,34 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun Collection<SettingsNode>.generateSearchableTags(): List<SearchableTag> {
         fun generateTagsRecursively(node: SettingsNode): List<SearchableTag> =
-            listOf(SearchableTag(node.id, node.generateKeywords())) +
+            listOf(SearchableTag(node.id, node.generateKeywords(), node.settingsHeaderNodeId)) +
                 node.children.flatMap { generateTagsRecursively(it) }
 
-        return this.flatMap { generateTagsRecursively(it) }
+        val tags = this.flatMap {
+            if (it !is SettingsHeaderNode) {
+                generateTagsRecursively(it)
+            } else {
+                emptyList()
+            }
+        }
+
+        val headerTags = this.flatMap { node ->
+            if (node is SettingsHeaderNode) {
+                val id = node.settingsHeaderNodeId
+                val keywords = tags.flatMap { tag ->
+                    if (tag.settingsHeaderNodeId == id) {
+                        tag.keywords
+                    } else {
+                        emptyList()
+                    }
+                }.toSet()
+                listOf(SearchableTag(node.id, keywords, id))
+            } else {
+                emptyList()
+            }
+        }
+
+        return listOf(tags, headerTags).flatten()
     }
 
     data class FoundNode(

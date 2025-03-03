@@ -37,6 +37,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -49,9 +50,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(2)
+@PriorityKey(102)
 class PrivateSearchSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingProtections
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Protections
 
     @Inject
     lateinit var _nestedSettingsPlugins: PluginPoint<PrivateSearchNestedSettingNode>

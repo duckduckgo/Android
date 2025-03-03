@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -61,7 +62,7 @@ interface AppearanceNestedSettingNodePluginPoint
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(303)
 class AppearanceSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingMainSettings
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Other
 
     @Inject
     lateinit var _nestedSettingsPlugins: PluginPoint<AppearanceNestedSettingNode>

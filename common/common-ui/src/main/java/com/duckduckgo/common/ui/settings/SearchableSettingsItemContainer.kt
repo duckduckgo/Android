@@ -35,13 +35,29 @@ enum class SearchStatus {
 
 data class SearchableTag(
     val id: UUID,
-    val keywords: Set<String>
+    val keywords: Set<String>,
+    val settingsHeaderNodeId: SettingsHeaderNodeId
 )
+
+enum class SettingsHeaderNodeId {
+    Protections,
+    PPro,
+    Other,
+}
+
+interface SettingsHeaderNode {
+    val settingsHeaderNodeId: SettingsHeaderNodeId
+}
+
+interface SettingsHeader {
+    fun showDivider()
+    fun hideDivider()
+}
 
 interface SettingsNode {
     val id: UUID
 
-    val categoryNameResId: Int
+    val settingsHeaderNodeId: SettingsHeaderNodeId
 
     val children: Collection<SettingsNode>
 

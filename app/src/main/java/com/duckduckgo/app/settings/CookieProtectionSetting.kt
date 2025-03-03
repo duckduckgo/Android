@@ -38,6 +38,7 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -53,7 +54,7 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(105)
 class CookieProtectionSettingNode @Inject constructor() : RootSettingsNode {
-    override val categoryNameResId = R.string.settingsHeadingProtections
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Protections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

@@ -49,6 +49,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -72,7 +73,7 @@ import javax.inject.Inject
 )
 @PriorityKey(0)
 class AppearanceThemeSettingNode @Inject constructor() : AppearanceNestedSettingNode {
-    override val categoryNameResId = R.string.settingsHeadingMainSettings
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Other
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

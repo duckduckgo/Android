@@ -39,6 +39,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsHeaderNodeId
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -60,7 +61,7 @@ import javax.inject.Inject
 )
 @PriorityKey(0)
 class PrivateSearchAutocompleteSettingNode @Inject constructor() : PrivateSearchNestedSettingNode {
-    override val categoryNameResId = R.string.settingsHeadingProtections
+    override val settingsHeaderNodeId = SettingsHeaderNodeId.Protections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()
