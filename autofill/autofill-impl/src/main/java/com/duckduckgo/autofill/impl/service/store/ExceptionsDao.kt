@@ -21,7 +21,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailInContextExceptionEntity
 
 @Dao
 abstract class ExceptionsDao {
@@ -36,10 +35,10 @@ abstract class ExceptionsDao {
     }
 
     @Query("select * from autofill_service_exceptions where domain = :domain")
-    abstract fun get(domain: String): EmailInContextExceptionEntity
+    abstract fun get(domain: String): AutofillServiceException
 
     @Query("select * from autofill_service_exceptions")
-    abstract fun getAll(): List<EmailInContextExceptionEntity>
+    abstract fun getAll(): List<AutofillServiceException>
 
     @Query("delete from autofill_service_exceptions")
     abstract fun deleteAll()
