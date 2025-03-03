@@ -39,7 +39,6 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
-private const val PIR_PROCESS_NAME = "pir"
 
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
@@ -95,28 +94,25 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
-        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
-            configureLogging()
-            configureStrictMode()
-            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
-            configureDependencyInjection()
-            configureUncaughtExceptionHandler()
+        if (shortProcessName != "UNKNOWN") {
+            runInSecondaryProcessNamed(shortProcessName) {
+                configureLogging()
+                Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
+                configureStrictMode()
+                configureDependencyInjection()
+                configureUncaughtExceptionHandler()
 
-            // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
-            // is good enough.
-            // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
-            ProcessLifecycleOwner.get().lifecycle.apply {
-                vpnLifecycleObserverPluginPoint.getPlugins().forEach {
-                    it.onVpnProcessCreated()
+                if (shortProcessName == VPN_PROCESS_NAME) {
+                    // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
+                    // is good enough.
+                    // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
+                    ProcessLifecycleOwner.get().lifecycle.apply {
+                        vpnLifecycleObserverPluginPoint.getPlugins().forEach {
+                            it.onVpnProcessCreated()
+                        }
+                    }
                 }
             }
-        }
-
-        runInSecondaryProcessNamed(PIR_PROCESS_NAME) {
-            configureLogging()
-            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
-            configureStrictMode()
-            configureDependencyInjection()
         }
     }
 
