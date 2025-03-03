@@ -168,7 +168,7 @@ class TabSwitcherViewModel @Inject constructor(
         data object DismissAnimatedTileDismissalDialog : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
-        data class BookmarkTabsRequest(val numTabs: Int) : Command()
+        data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
         data class ShowBookmarkToast(val numBookmarks: Int) : Command()
     }
 
@@ -200,9 +200,9 @@ class TabSwitcherViewModel @Inject constructor(
             _selectionViewState.update {
                 val selectionMode = it.mode as Selection
                 if (tab.tabId in selectionMode.selectedTabs) {
-                    it.copy(mode = Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 } else {
-                    it.copy(mode = Selection(selectionMode.selectedTabs + tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
                 }
             }
         } else {
@@ -229,7 +229,7 @@ class TabSwitcherViewModel @Inject constructor(
         (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             if (tab.tabId in selectionMode.selectedTabs) {
                 _selectionViewState.update {
-                    it.copy(mode = Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 }
             }
         }
@@ -240,7 +240,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             _selectionViewState.update {
-                it.copy(mode = Selection(selectionMode.selectedTabs + tab.tabId))
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
             }
         }
     }
@@ -258,7 +258,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = Selection(tabItems.map { tab -> tab.id })) }
+        _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabItems.map { tab -> tab.id })) }
     }
 
     fun onDeselectAllTabs() {
@@ -284,12 +284,14 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onBookmarkSelectedTabs() {
         when (val mode = selectionViewState.value.mode) {
-            is SelectionViewState.Mode.Normal -> {
-                command.value = BookmarkTabsRequest(1)
+            is Normal -> {
+                activeTab.value?.tabId?.let { tabId ->
+                    command.value = BookmarkTabsRequest(listOf(tabId))
+                }
             }
 
-            is SelectionViewState.Mode.Selection -> {
-                command.value = BookmarkTabsRequest(mode.selectedTabs.size)
+            is Selection -> {
+                command.value = BookmarkTabsRequest(mode.selectedTabs)
             }
         }
     }
@@ -308,34 +310,11 @@ class TabSwitcherViewModel @Inject constructor(
     fun onCloseOtherTabs() {
     }
 
-    fun onBookmarkTabsConfirmed(numTabs: Int) {
+    fun onBookmarkTabsConfirmed(tabIds: List<String>) {
         viewModelScope.launch {
-            val numBookmarkedTabs = when (val mode = selectionViewState.value.mode) {
-                is SelectionViewState.Mode.Selection -> {
-                    // bookmark selected tabs (or all tabs if none selected)
-                    if (mode.selectedTabs.isNotEmpty()) {
-                        bookmarkTabs(mode.selectedTabs)
-                    } else {
-                        bookmarkAllTabs()
-                    }
-                }
-
-                SelectionViewState.Mode.Normal -> {
-                    if (numTabs == 1) {
-                        activeTab.value?.tabId?.let { bookmarkTabs(listOf(it)) } ?: 0
-                    } else {
-                        bookmarkAllTabs()
-                    }
-                }
-            }
+            val numBookmarkedTabs = bookmarkTabs(tabIds)
             command.value = ShowBookmarkToast(numBookmarkedTabs)
         }
-    }
-
-    private suspend fun bookmarkAllTabs(): Int {
-        return tabSwitcherItems.value?.filterIsInstance<TabSwitcherItem.Tab>()?.let { tabIds ->
-            bookmarkTabs(tabIds.map { it.id })
-        } ?: 0
     }
 
     private suspend fun bookmarkTabs(tabIds: List<String>): Int {
@@ -360,21 +339,25 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
 
             // Trigger a normal mode when there are no tabs
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         }
     }
 
     fun onEmptyAreaClicked() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         }
+    }
+
+    private fun triggerNormalMode() {
+        _selectionViewState.update { it.copy(mode = Normal) }
     }
 
     fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         } else {
             command.value = Command.Close
         }
@@ -384,7 +367,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         } else {
             command.value = Command.Close
         }
@@ -446,7 +429,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
         var bookmark: Bookmark? = null
-        (tabSwitcherItems.value?.firstOrNull { it.id == tabId } as? TabSwitcherItem.Tab)?.let { tab ->
+        (tabSwitcherItems.value?.firstOrNull { it.id == tabId } as? Tab)?.let { tab ->
             tab.tabEntity.url?.let { url ->
                 if (url.isNotBlank()) {
                     // Only bookmark new sites
