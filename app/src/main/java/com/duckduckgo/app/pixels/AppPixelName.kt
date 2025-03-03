@@ -38,6 +38,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PROTECTION_TOGGLE_BROKEN_SITE_REPORT("m_protection-toggled-off-breakage-report"),
 
     SPLASHSCREEN_SHOWN("m_splashscreen_shown"),
+    SPLASHSCREEN_FAILED_TO_LAUNCH("m_splashscreen_failed_to_launch"),
 
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),

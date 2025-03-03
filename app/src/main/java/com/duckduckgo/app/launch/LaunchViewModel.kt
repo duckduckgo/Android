@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.pixels.AppPixelName.SPLASHSCREEN_FAILED_TO_LAUNCH
 import com.duckduckgo.app.pixels.AppPixelName.SPLASHSCREEN_SHOWN
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
@@ -71,6 +72,7 @@ class LaunchViewModel @Inject constructor(
             delay(1.5.seconds)
             sendWelcomeScreenPixel()
             determineViewToShow()
+            pixel.fire(SPLASHSCREEN_FAILED_TO_LAUNCH)
         }
     }
 
