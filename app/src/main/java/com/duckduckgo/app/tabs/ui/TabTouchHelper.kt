@@ -121,7 +121,7 @@ class TabTouchHelper(
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: ViewHolder
+        viewHolder: ViewHolder,
     ): Int {
         if (viewHolder.isTabAnimatedTabViewHolder()) {
             return 0
@@ -148,8 +148,8 @@ class TabTouchHelper(
         return ObjectAnimator.ofFloat(view, View.SCALE_Y, view.scaleY, scaleTo)
     }
 
-    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean = this is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder
-        || this is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder
+    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean = this is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder ||
+        this is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder
 
     companion object {
         private const val ANIM_DURATION = 100L
