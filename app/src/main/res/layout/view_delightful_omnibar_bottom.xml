@@ -31,15 +31,16 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorSurface">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/minibar"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginHorizontal="@dimen/keyline_4"
             android:paddingVertical="@dimen/keyline_2">
 
             <ImageView
@@ -50,9 +51,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
                 android:layout_marginEnd="@dimen/keyline_1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:src="@drawable/ic_shield_exploration" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -61,30 +59,25 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/keyline_1"
                 app:typography="body2"
-                app:layout_constraintStart_toEndOf="@+id/minibarShield"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center"
                 android:visibility="visible"
                 android:text="2"
                 tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/domainText"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="@dimen/keyline_1"
+                android:padding="@dimen/keyline_1"
+                android:layout_marginEnd="40dp"
                 android:maxLines="1"
-                android:ellipsize="end"
                 app:typography="body2"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center_horizontal"
                 android:visibility="visible"
                 android:text="domain.com"
                 tools:ignore="HardcodedText"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -231,30 +224,72 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:lottie_loop="false" />
 
-                <com.duckduckgo.common.ui.view.KeyboardAwareEditText
-                    android:id="@+id/omnibarTextInput"
-                    style="@style/Base.V7.Widget.AppCompat.EditText"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginEnd="6dp"
-                    android:background="@null"
-                    android:fontFamily="sans-serif"
-                    android:hint="@string/omnibarInputHint"
-                    android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                    android:inputType="textUri|textNoSuggestions"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:selectAllOnFocus="true"
-                    android:textColor="?attr/daxColorPrimaryText"
-                    android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
-                    android:textColorHint="?attr/daxColorSecondaryText"
-                    android:textCursorDrawable="@drawable/text_cursor"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.duckduckgo.common.ui.view.KeyboardAwareEditText
+                        android:id="@+id/omnibarTextInput"
+                        style="@style/Base.V7.Widget.AppCompat.EditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
+                        android:hint="@string/omnibarInputHint"
+                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                        android:inputType="textUri|textNoSuggestions"
+                        android:maxLines="1"
+                        android:selectAllOnFocus="true"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                        android:textColorHint="?attr/daxColorSecondaryText"
+                        android:textCursorDrawable="@drawable/text_cursor"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="16sp"
+                        android:textStyle="normal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/trackersBlockedTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="2dp"
+                        android:paddingEnd="2dp"
+                        android:text="@string/trackersBlockedAnimationMessage"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:visibility="gone"
+                        app:typography="body1"
+                        app:textType="secondary"
+                        app:layout_constraintStart_toEndOf="@id/trackersBlockedCountView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/trackersBlockedCountView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="2dp"
+                        android:visibility="gone"
+                        app:textType="primary"
+                        app:typography="body1_bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/voiceSearchButton"

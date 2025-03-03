@@ -33,8 +33,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability

@@ -33,7 +33,7 @@ interface AppPersonalityFeature {
      * @return `true` when the remote config has the global "appPersonality" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 
     /**
@@ -41,7 +41,7 @@ interface AppPersonalityFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun trackersBlockedAnimation(): Toggle
 
     /**

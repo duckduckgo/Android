@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "experimentalUITheming",
 )
 interface ExperimentalUIThemingFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 
     @Toggle.DefaultValue(true)

@@ -33,7 +33,7 @@ interface ExperimentTrackersAnimationHelper {
         trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
         omnibarPosition: OmnibarPosition,
-        omnibarView: View,
+        minibarView: View,
         logos: List<TrackerLogo>,
     )
 

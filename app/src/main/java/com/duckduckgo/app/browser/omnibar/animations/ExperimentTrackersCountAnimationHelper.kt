@@ -41,8 +41,14 @@ class ExperimentTrackersCountAnimationHelperImpl @Inject constructor() : Experim
 
     override var isAnimating: Boolean = false
 
-    override fun animate(trackersCountView: TextView, trackersBlocked: Int, previousCount: Int) {
-        if (!isAnimating && (trackersCountView.text.isNullOrEmpty() || trackersBlocked.toString() != trackersCountView.text || trackersBlocked != previousCount)) {
+    override fun animate(
+        trackersCountView: TextView,
+        trackersBlocked: Int,
+        previousCount: Int,
+    ) {
+        if (!isAnimating &&
+            (trackersCountView.text.isNullOrEmpty() || trackersBlocked.toString() != trackersCountView.text || trackersBlocked != previousCount)
+        ) {
             isAnimating = true
             updateTrackersCountWithAnimation(trackersBlocked, previousCount, trackersCountView)
         }

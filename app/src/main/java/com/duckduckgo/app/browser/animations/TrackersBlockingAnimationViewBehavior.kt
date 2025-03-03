@@ -34,7 +34,7 @@ class TrackersBlockingAnimationViewBehavior(val context: Context, attrs: Attribu
         // Apply this only when the view is aligned to the bottom, which occurs when the omnibar is positioned there.
         if (gravity == Gravity.BOTTOM) {
             // Offset the view by half of its height and half of the omnibar height.
-            val offset = child.height / 2 + context.getActionBarSize() / 2
+            val offset = child.height / 2 - context.getActionBarSize() / 2
             child.translationY = offset.toFloat()
         }
 

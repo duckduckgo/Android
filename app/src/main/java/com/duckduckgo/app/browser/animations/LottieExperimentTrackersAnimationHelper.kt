@@ -22,6 +22,7 @@ import android.content.Context
 import android.view.Gravity
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isGone
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
@@ -30,8 +31,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.isFullyWithinScreenBounds
-import com.duckduckgo.common.ui.view.isPartiallyWithinScreenBounds
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
@@ -65,7 +64,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
         omnibarPosition: OmnibarPosition,
-        omnibarView: View,
+        minibarView: View,
         logos: List<TrackerLogo>,
     ) {
         this.trackersBurstAnimationView = trackersBurstAnimationView
@@ -115,9 +114,9 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 },
             )
 
-            val isOmnibarTopAndFullyVisible = (omnibarPosition == TOP && omnibarView.isFullyWithinScreenBounds())
-            val isOmnibarBottomAndPartiallyVisible = (omnibarPosition == BOTTOM && omnibarView.isPartiallyWithinScreenBounds())
-            if (isOmnibarTopAndFullyVisible || isOmnibarBottomAndPartiallyVisible) {
+            val isOmnibarTopAndMinibarGone = (omnibarPosition == TOP && minibarView.isGone)
+            val isOmnibarBottomAndMinibarGone = (omnibarPosition == BOTTOM && minibarView.isGone)
+            if (isOmnibarTopAndMinibarGone || isOmnibarBottomAndMinibarGone) {
                 this.setMaxProgress(1f)
                 this.playAnimation()
             }

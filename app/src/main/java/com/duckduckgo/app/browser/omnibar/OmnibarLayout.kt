@@ -60,7 +60,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookies
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentTrackersAnimation
