@@ -446,7 +446,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
             is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
-            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.numTabs)
+            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
             is Command.ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
         }
     }
@@ -728,7 +728,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .show()
     }
 
-    private fun showBookmarkTabsConfirmation(numTabs: Int) {
+    private fun showBookmarkTabsConfirmation(tabIds: List<String>) {
+        val numTabs = tabIds.size
         val title = resources.getQuantityString(R.plurals.tabSwitcherBookmarkDialogTitle, numTabs, numTabs)
         TextAlertDialogBuilder(this)
             .setTitle(title)
@@ -738,7 +739,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onBookmarkTabsConfirmed(numTabs)
+                        viewModel.onBookmarkTabsConfirmed(tabIds)
                     }
                 },
             )
