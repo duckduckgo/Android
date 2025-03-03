@@ -543,7 +543,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
             is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
-            is Command.BookmarkTabs -> showBookmarkTabsConfirmation(command.numTabs)
+            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.numTabs)
             is Command.ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
             ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
