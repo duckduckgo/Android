@@ -144,7 +144,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
 
-        assertEquals(Safe, result)
+        assertEquals(Safe(true), result)
     }
 
     @Test
