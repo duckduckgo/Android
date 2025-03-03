@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
     <string name="autofill_service_suggestion_open_passwords">Open Passwords</string>
     <string name="autofill_service_select_password_activity">Select a Saved Password</string>
 </resources>
