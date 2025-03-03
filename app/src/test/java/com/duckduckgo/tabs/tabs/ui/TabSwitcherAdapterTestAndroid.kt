@@ -52,7 +52,7 @@ class TabSwitcherAdapterTestAndroid {
         verify(mockTabSwitchListener).onTabDeleted(3, false)
     }
 
-    fun createMockTabSwitcherAdapter(
+    private fun createMockTabSwitcherAdapter(
         listener: TabSwitcherListener,
     ): TabSwitcherAdapter {
         return TabSwitcherAdapter(
