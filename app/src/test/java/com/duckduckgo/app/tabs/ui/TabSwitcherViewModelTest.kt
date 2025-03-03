@@ -105,11 +105,12 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
+    private val tabList = listOf(TabEntity("1", position = 1), TabEntity("2", position = 2))
     private val repoDeletableTabs = Channel<List<TabEntity>>()
-    private val tabs = MutableLiveData<List<TabEntity>>()
+    private val tabs = MutableLiveData<List<TabEntity>>(tabList)
 
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
-    private val flowTabs = flowOf(listOf(TabEntity("1", position = 1), TabEntity("2", position = 2)))
+    private val flowTabs = flowOf(tabList)
 
     @Before
     fun before() {
@@ -267,16 +268,13 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
-        val tab = TabEntity("ID", position = 0)
-        tabs.value = listOf(tab)
-
         testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
-        verify(mockTabRepository).delete(tab)
-        verify(mockAdClickManager).clearTabId(tab.tabId)
-        verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        verify(mockTabRepository).delete(tabList.first())
+        verify(mockAdClickManager).clearTabId(tabList.first().tabId)
+        verify(mockWebViewSessionStorage).deleteSession(tabList.first().tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
