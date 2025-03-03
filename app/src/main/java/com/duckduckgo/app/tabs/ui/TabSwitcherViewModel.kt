@@ -37,6 +37,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsReque
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -83,12 +85,12 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val _selectionViewState = MutableStateFlow<SelectionViewState>(SelectionViewState())
+    private val _selectionViewState = MutableStateFlow(SelectionViewState())
     val selectionViewState = combine(
         _selectionViewState,
         tabRepository.flowSelectedTab,
     ) { viewState, activeTab ->
-        val fabType = if (viewState.mode is SelectionViewState.Mode.Selection && viewState.mode.selectedTabs.isNotEmpty()) {
+        val fabType = if (viewState.mode is Selection && viewState.mode.selectedTabs.isNotEmpty()) {
             SelectionViewState.FabType.CLOSE_TABS
         } else {
             SelectionViewState.FabType.NEW_TAB
@@ -102,12 +104,13 @@ class TabSwitcherViewModel @Inject constructor(
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
         tabEntities.map {
-            TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
+            TabSwitcherItem.Tab(tabEntity = it, isSelected = viewState.mode is Selection && it.tabId in viewState.mode.selectedTabs)
         }
     }.asLiveData()
 
     sealed class Command {
         data object Close : Command()
+        data class CloseTabsRequest(val tabIds: List<String>) : Command()
         data object CloseAllTabsRequest : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
@@ -139,13 +142,13 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onTabSelected(tab: TabEntity) {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             _selectionViewState.update {
-                val selectionMode = it.mode as SelectionViewState.Mode.Selection
+                val selectionMode = it.mode as Selection
                 if (tab.tabId in selectionMode.selectedTabs) {
-                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 } else {
-                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
                 }
             }
         } else {
@@ -155,10 +158,12 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onTabDeleted(tab: TabEntity) {
-        tabRepository.delete(tab)
-        adClickManager.clearTabId(tab.tabId)
-        webViewSessionStorage.deleteSession(tab.tabId)
+    suspend fun onTabDeleted(tabId: String) {
+        tabRepository.getTab(tabId)?.let { tab ->
+            tabRepository.delete(tab)
+            adClickManager.clearTabId(tabId)
+            webViewSessionStorage.deleteSession(tabId)
+        }
     }
 
     suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
@@ -169,10 +174,10 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
         }
 
-        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             if (tab.tabId in selectionMode.selectedTabs) {
                 _selectionViewState.update {
-                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 }
             }
         }
@@ -181,9 +186,9 @@ class TabSwitcherViewModel @Inject constructor(
     suspend fun undoDeletableTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
 
-        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             _selectionViewState.update {
-                it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
             }
         }
     }
@@ -201,30 +206,30 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
+        _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabSwitcherItems.value?.map { tab -> tab.id }.orEmpty())) }
     }
 
     fun onShareSelectedTabs() {
         when (val mode = selectionViewState.value.mode) {
-            is SelectionViewState.Mode.Selection -> {
+            is Selection -> {
                 if (mode.selectedTabs.size == 1) {
                     val entity = (tabSwitcherItems.value?.firstOrNull { it.id == mode.selectedTabs.first() } as? TabSwitcherItem.Tab)?.tabEntity
                     command.value = ShareLink(
-                        link = entity?.url ?: "",
-                        title = entity?.title ?: "",
+                        link = entity?.url.orEmpty(),
+                        title = entity?.title.orEmpty(),
                     )
                 } else if (mode.selectedTabs.size > 1) {
                     val links = tabSwitcherItems.value
                         ?.filter { it.id in mode.selectedTabs }
                         ?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
-                    command.value = ShareLinks(links ?: emptyList())
+                    command.value = ShareLinks(links.orEmpty())
                 }
             }
-            SelectionViewState.Mode.Normal -> {
+            Normal -> {
                 val entity = activeTab.value
                 command.value = ShareLink(
-                    link = entity?.url ?: "",
-                    title = entity?.title ?: "",
+                    link = entity?.url.orEmpty(),
+                    title = entity?.title.orEmpty(),
                 )
             }
         }
@@ -232,13 +237,12 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onBookmarkSelectedTabs() {
         when (val mode = selectionViewState.value.mode) {
-            is SelectionViewState.Mode.Normal -> {
+            is Normal -> {
                 activeTab.value?.tabId?.let { tabId ->
                     command.value = BookmarkTabsRequest(listOf(tabId))
                 }
             }
-
-            is SelectionViewState.Mode.Selection -> {
+            is Selection -> {
                 command.value = BookmarkTabsRequest(mode.selectedTabs)
             }
         }
@@ -251,13 +255,53 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
-        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(emptyList())) }
+        _selectionViewState.update { it.copy(mode = Selection(emptyList())) }
     }
 
     fun onCloseSelectedTabs() {
+        (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
+            val allTabsCount = tabSwitcherItems.value?.size ?: 0
+            command.value = if (allTabsCount == selectedTabs.size) {
+                Command.CloseAllTabsRequest
+            } else {
+                Command.CloseTabsRequest(selectedTabs)
+            }
+        }
     }
 
     fun onCloseOtherTabs() {
+        (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
+            val otherTabsIds = (tabSwitcherItems.value?.map { it.id }.orEmpty()) - selectedTabs.toSet()
+            if (otherTabsIds.isNotEmpty()) {
+                command.value = Command.CloseTabsRequest(otherTabsIds)
+            }
+        }
+    }
+
+    fun onCloseTabsConfirmed(tabIds: List<String>) {
+        val allTabsCount = tabSwitcherItems.value?.size ?: 0
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabIds.forEach {
+                onTabDeleted(it)
+            }
+
+            if (allTabsCount == tabIds.size) {
+                // Make sure all exemptions are removed as all tabs are deleted.
+                adClickManager.clearAll()
+                pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+
+                // Close the tab switcher when there are no tabs
+                command.value = Command.Close
+            } else {
+                // Remove the deleted tab from the selection
+                (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+                    _selectionViewState.update {
+                        it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tabIds.toSet()))
+                    }
+                }
+            }
+        }
     }
 
     fun onBookmarkTabsConfirmed(tabIds: List<String>) {
@@ -277,29 +321,17 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseAllTabsConfirmed() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            tabSwitcherItems.value?.forEach { tabSwitcherItem ->
-                when (tabSwitcherItem) {
-                    is TabSwitcherItem.Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                }
-            }
-            // Make sure all exemptions are removed as all tabs are deleted.
-            adClickManager.clearAll()
-            pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
-
-            // Trigger a normal mode when there are no tabs
-            triggerNormalMode()
-        }
+        onCloseTabsConfirmed(tabSwitcherItems.value?.map { it.id }.orEmpty())
     }
 
     fun onEmptyAreaClicked() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         }
     }
 
     private fun triggerNormalMode() {
-        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+        _selectionViewState.update { it.copy(mode = Normal) }
     }
 
     fun onUpButtonPressed() {
@@ -396,7 +428,7 @@ class TabSwitcherViewModel @Inject constructor(
     data class SelectionViewState(
         val activeTab: TabEntity? = null,
         val fabType: FabType = FabType.NEW_TAB,
-        val mode: Mode = Mode.Normal,
+        val mode: Mode = Normal,
     ) {
         enum class FabType {
             NEW_TAB,
@@ -406,7 +438,7 @@ class TabSwitcherViewModel @Inject constructor(
         sealed interface Mode {
             data object Normal : Mode
             data class Selection(
-                val selectedTabs: List<String> = emptyList<String>(),
+                val selectedTabs: List<String> = emptyList(),
             ) : Mode
         }
     }
