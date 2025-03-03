@@ -61,7 +61,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import java.io.File
 import kotlin.Int
-import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber

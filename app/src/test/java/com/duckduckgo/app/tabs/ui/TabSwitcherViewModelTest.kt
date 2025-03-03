@@ -145,7 +145,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             tabSwitcherAnimationFeature,
-             mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedAppRepository,
         )
         testee.command.observeForever(mockCommandObserver)
     }
