@@ -46,6 +46,7 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val maliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository,
     private val messageDigest: MessageDigest,
     private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
+    private val urlCanonicalization: UrlCanonicalization,
 ) : MaliciousSiteProtection {
 
     private val timber = Timber.tag("MaliciousSiteProtection")
@@ -60,12 +61,14 @@ class RealMaliciousSiteProtection @Inject constructor(
     ): IsMaliciousResult {
         timber.d("isMalicious $url")
 
+        val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
+
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
-            timber.d("should not block (feature disabled) $url")
+            timber.d("should not block (feature disabled) $canonicalUri")
             return ConfirmedResult(Safe)
         }
 
-        val hostname = url.host ?: return ConfirmedResult(Safe)
+        val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
         if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
             timber.d("should not block (exempted) $hostname")
@@ -78,33 +81,33 @@ class RealMaliciousSiteProtection @Inject constructor(
         val hashPrefix = hash.substring(0, 8)
 
         if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-            timber.d("should not block (no hash) $hashPrefix,  $url")
+            timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
             return ConfirmedResult(Safe)
         }
         maliciousSiteRepository.getFilters(hash)?.forEach { filterSet ->
             filterSet.filters.firstOrNull {
-                Pattern.compile(it.regex).matcher(url.toString()).find()
+                Pattern.compile(it.regex).matcher(canonicalUri.toString()).find()
             }?.let {
-                timber.d("should block $url")
+                timber.d("should block $canonicalUri")
                 return ConfirmedResult(Malicious(filterSet.feed))
             }
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
-                val result = matches(hashPrefix, url, hostname, hash)?.let { feed: Feed ->
+                val result = matches(hashPrefix, canonicalUri, hostname, hash)?.let { feed: Feed ->
                     Malicious(feed)
                 } ?: Safe
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $url")
-                    is Safe -> timber.d("should not block (no match) $url")
+                    is Malicious -> timber.d("should block (matches) $canonicalUri")
+                    is Safe -> timber.d("should not block (no match) $canonicalUri")
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
-                timber.e(e, "shouldBlock $url")
+                timber.e(e, "shouldBlock $canonicalUri")
                 confirmationCallback(Safe)
             }
         }
-        timber.d("wait for confirmation $url")
+        timber.d("wait for confirmation $canonicalUri")
         return IsMaliciousResult.WaitForConfirmation
     }
 
