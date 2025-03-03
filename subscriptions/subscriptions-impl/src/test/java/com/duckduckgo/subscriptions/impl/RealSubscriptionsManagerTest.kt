@@ -70,6 +70,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -309,6 +310,26 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(subscriptionsManager.getAccount())
         assertNull(authRepository.getAuthToken())
         assertNull(authRepository.getAccessToken())
+    }
+
+    @Test
+    fun whenPurchaseFlowIfUserIsSignedInAndSubscriptionFailsWith401ThenSignOutAndCreateNewAccount() = runTest {
+        givenUserIsSignedIn(accountExternalId = "5678")
+        givenSubscriptionFails(httpResponseCode = 401)
+        givenCreateAccountSucceeds()
+        val accountExternalId = authDataStore.externalId
+
+        subscriptionsManager.purchase(mock(), planId = "")
+
+        if (authApiV2Enabled) {
+            verify(authClient).authorize(any())
+            verify(authClient).createAccount(any())
+            verify(authClient).getTokens(any(), any(), any())
+        } else {
+            verify(authService).createAccount(any())
+        }
+
+        assertNotEquals(accountExternalId, authDataStore.externalId)
     }
 
     @Test
@@ -1384,7 +1405,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.refreshTokenV2ExpiresAt = null
     }
 
-    private fun givenUserIsSignedIn(useAuthV2: Boolean = authApiV2Enabled) {
+    private fun givenUserIsSignedIn(useAuthV2: Boolean = authApiV2Enabled, accountExternalId: String = "1234") {
         if (useAuthV2) {
             authDataStore.accessTokenV2 = FAKE_ACCESS_TOKEN_V2
             authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
@@ -1394,7 +1415,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authDataStore.accessToken = "accessToken"
             authDataStore.authToken = "authToken"
         }
-        authDataStore.externalId = "1234"
+        authDataStore.externalId = accountExternalId
     }
 
     private suspend fun givenCreateAccountFails() {
