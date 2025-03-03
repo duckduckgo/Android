@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.R.attr.mode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -34,7 +33,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabs
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
@@ -112,7 +111,7 @@ class TabSwitcherViewModel @Inject constructor(
         data object CloseAllTabsRequest : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
-        data class BookmarkTabs(val numTabs: Int) : Command()
+        data class BookmarkTabsRequest(val numTabs: Int) : Command()
         data class ShowBookmarkToast(val numBookmarks: Int) : Command()
     }
 
@@ -234,17 +233,17 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBookmarkSelectedTabs() {
         when (val mode = selectionViewState.value.mode) {
             is SelectionViewState.Mode.Normal -> {
-                command.value = BookmarkTabs(1)
+                command.value = BookmarkTabsRequest(1)
             }
 
             is SelectionViewState.Mode.Selection -> {
-                command.value = BookmarkTabs(mode.selectedTabs.size)
+                command.value = BookmarkTabsRequest(mode.selectedTabs.size)
             }
         }
     }
 
     fun onBookmarkAllTabs() {
-        command.value = BookmarkTabs(tabSwitcherItems.value?.size ?: 0)
+        command.value = BookmarkTabsRequest(tabSwitcherItems.value?.size ?: 0)
     }
 
     fun onSelectionModeRequested() {
