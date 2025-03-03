@@ -139,7 +139,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             tabSwitcherAnimationFeature,
-             mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedAppRepository,
         )
         testee.command.observeForever(mockCommandObserver)
     }

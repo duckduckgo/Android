@@ -39,13 +39,13 @@ import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
