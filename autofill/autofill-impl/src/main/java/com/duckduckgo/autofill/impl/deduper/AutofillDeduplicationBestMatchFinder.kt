@@ -20,7 +20,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetector.MatchType.NotAMatch
 import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetector.MatchType.PartialMatch
 import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetector.MatchType.PerfectMatch
-import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,7 +34,6 @@ interface AutofillDeduplicationBestMatchFinder {
 
 @ContributesBinding(AppScope::class)
 class RealAutofillDeduplicationBestMatchFinder @Inject constructor(
-    private val urlMatcher: AutofillUrlMatcher,
     private val matchTypeDetector: AutofillDeduplicationMatchTypeDetector,
 ) : AutofillDeduplicationBestMatchFinder {
 

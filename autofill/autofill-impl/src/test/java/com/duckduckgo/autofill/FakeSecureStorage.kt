@@ -29,7 +29,7 @@ class FakeSecureStore(
     private val urlMatcher: AutofillUrlMatcher,
 ) : SecureStorage {
 
-    private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
+    private val credentials = mutableMapOf<Long, WebsiteLoginDetailsWithCredentials>()
 
     override suspend fun addWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
@@ -38,7 +38,7 @@ class FakeSecureStore(
         val credentialWithId: WebsiteLoginDetailsWithCredentials = websiteLoginDetailsWithCredentials.copy(
             details = websiteLoginDetailsWithCredentials.details.copy(id = id),
         )
-        credentials.add(credentialWithId)
+        credentials[id] = credentialWithId
         return credentialWithId
     }
 
@@ -57,12 +57,12 @@ class FakeSecureStore(
 
     override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> {
         return flow {
-            emit(credentials.map { it.details })
+            emit(credentials.values.map { it.details })
         }
     }
 
     override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? {
-        return credentials.firstOrNull() { it.details.id == id }
+        return credentials[id]
     }
 
     override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> {
@@ -73,7 +73,7 @@ class FakeSecureStore(
         }
     }
 
-    private fun domainLookup(domain: String) = credentials
+    private fun domainLookup(domain: String) = credentials.values
         .filter { it.details.domain?.contains(domain) == true }
         .filter {
             val visitedSite = urlMatcher.extractUrlPartsForAutofill(domain)
@@ -83,25 +83,26 @@ class FakeSecureStore(
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> {
         return flow {
-            emit(credentials)
+            emit(credentials.values.toList())
         }
     }
 
     override suspend fun updateWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials {
-        credentials.indexOfFirst { it.details.id == websiteLoginDetailsWithCredentials.details.id }.also {
-            credentials[it] = websiteLoginDetailsWithCredentials
-        }
+        val id = websiteLoginDetailsWithCredentials.details.id ?: return websiteLoginDetailsWithCredentials
+        credentials[id] = websiteLoginDetailsWithCredentials
         return websiteLoginDetailsWithCredentials
     }
 
     override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
-        credentials.removeAll { it.details.id == id }
+        credentials.remove(id)
     }
 
     override suspend fun deleteWebSiteLoginDetailsWithCredentials(ids: List<Long>) {
-        credentials.removeAll { ids.contains(it.details.id) }
+        ids.forEach {
+            credentials.remove(it)
+        }
     }
 
     override suspend fun addToNeverSaveList(domain: String) {

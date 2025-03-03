@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredent
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.username.AutofillUsernameComparer
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
@@ -58,6 +59,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
     private val autofillFeature: AutofillFeature,
+    private val usernameComparer: AutofillUsernameComparer,
     passwordStoreEventListenersPlugins: PluginPoint<PasswordStoreEventListener>,
 ) : InternalAutofillStore, AutofillDeclineStore {
 
@@ -171,7 +173,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url)
             .firstOrNull()
-            ?.filter(filter)
+            ?.filter { filter(it) }
 
         if (matchingCredentials.isNullOrEmpty()) {
             Timber.w("Cannot update credentials as no credentials were found for %s", url)
@@ -182,9 +184,19 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         var updatedCredentials: WebsiteLoginDetailsWithCredentials? = null
 
-        matchingCredentials.forEach {
-            val modifiedDetails = it.details.copy(username = credentials.username, lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
-            val modified = it.copy(password = credentials.password, details = modifiedDetails)
+        matchingCredentials.forEach { existingCredential ->
+            val modifiedDetails = existingCredential.details.copy(
+                // only update username if that was the update type
+                username = if (updateType == Username) credentials.username else existingCredential.details.username,
+                lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
+            )
+
+            val modified = existingCredential.copy(
+                // only update password if that was the update type
+                password = if (updateType == Password) credentials.password else existingCredential.password,
+                details = modifiedDetails,
+            )
+
             updatedCredentials = secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)?.also {
                 syncCredentialsListener.onCredentialUpdated(it.details.id!!)
             }
@@ -193,10 +205,13 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return updatedCredentials?.toLoginCredentials()
     }
 
-    private fun filterMatchingUsername(credentials: LoginCredentials): (WebsiteLoginDetailsWithCredentials) -> Boolean =
-        { it.details.username == credentials.username }
+    private fun filterMatchingUsername(credentials: LoginCredentials): suspend (WebsiteLoginDetailsWithCredentials) -> Boolean = {
+        // we only update password when usernames are equal
+        usernameComparer.isEqual(it.details.username, credentials.username)
+    }
 
-    private fun filterMatchingPassword(credentials: LoginCredentials): (WebsiteLoginDetailsWithCredentials) -> Boolean = {
+    private fun filterMatchingPassword(credentials: LoginCredentials): suspend (WebsiteLoginDetailsWithCredentials) -> Boolean = {
+        // we only update username if stored username is null or empty, and only when password matches
         it.password == credentials.password && it.details.username.isNullOrEmpty()
     }
 
@@ -340,11 +355,12 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         }
     }
 
-    private fun usernameMatch(
+    private suspend fun usernameMatch(
         credentials: WebsiteLoginDetailsWithCredentials,
         username: String?,
     ): Boolean {
-        return credentials.details.username != null && credentials.details.username == username
+        // special case where we don't want to consider two null usernames as equals
+        return credentials.details.username != null && usernameComparer.isEqual(credentials.details.username, username)
     }
 
     private fun usernameMissing(

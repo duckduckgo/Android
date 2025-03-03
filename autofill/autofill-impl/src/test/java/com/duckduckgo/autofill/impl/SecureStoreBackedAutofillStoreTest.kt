@@ -22,6 +22,7 @@ import com.duckduckgo.autofill.FakeSecureStore
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
@@ -35,6 +36,7 @@ import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.username.RealAutofillUsernameComparer
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
@@ -78,6 +80,7 @@ class SecureStoreBackedAutofillStoreTest {
     private lateinit var secureStore: FakeSecureStore
 
     private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
+    private val usernameComparer = RealAutofillUsernameComparer(autofillFeature, coroutineTestRule.testDispatcherProvider)
 
     @Before
     fun setUp() {
@@ -413,6 +416,67 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
+    fun whenUpdatingPasswordWithUsernameInDifferentCasingThenOriginalUsernameUntouched() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "example.com"
+        storeCredentials(1, url, "username", "password123")
+
+        val incomingCredentials = LoginCredentials(
+            domain = url,
+            username = "USERNAME",
+            password = "newpassword",
+            id = 1,
+        )
+
+        testee.updateCredentials(url, incomingCredentials, updateType = Password)
+
+        testee.getCredentials(url).run {
+            this.assertHasLoginCredentials(url, "username", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
+        }
+    }
+
+    @Test
+    fun whenUpdateUsernameCalledWithMatchingPasswordAndOriginalAlreadyHasPopulatedUsernameThenIsNotUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "example.com"
+        storeCredentials(1, url, "originalUsername", "originalPassword")
+
+        val incomingCredentials = LoginCredentials(
+            domain = url,
+            username = "username",
+            password = "newpassword",
+            id = 1,
+        )
+
+        testee.updateCredentials(url, incomingCredentials, updateType = Username)
+
+        testee.getCredentials(url).run {
+            this.assertHasLoginCredentials(url, "originalUsername", "originalPassword")
+        }
+    }
+
+    @Test
+    fun whenUpdateUsernameCalledWithMatchingPasswordAndOriginalHasEmptyUsernameThenIsUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "example.com"
+        storeCredentials(1, url, "", "originalPassword")
+
+        val incomingCredentials = LoginCredentials(
+            domain = url,
+            username = "newUsername",
+            password = "originalPassword",
+            id = 1,
+        )
+
+        val updated = testee.updateCredentials(url, incomingCredentials, updateType = Username)
+        assertNotNull(updated)
+
+        testee.getCredentials(url).run {
+            this.assertHasLoginCredentials(url, "newUsername", "originalPassword", UPDATED_INITIAL_LAST_UPDATED)
+        }
+    }
+
+    @Test
     fun whenDomainIsUpdatedTheCleanRawUrl() = runTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
@@ -690,6 +754,7 @@ class SecureStoreBackedAutofillStoreTest {
                 coroutineTestRule.testScope,
             ),
             autofillFeature = autofillFeature,
+            usernameComparer = usernameComparer,
         )
     }
 
