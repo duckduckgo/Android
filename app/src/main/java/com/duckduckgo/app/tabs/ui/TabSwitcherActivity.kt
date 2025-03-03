@@ -455,7 +455,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun showBookmarkToast(numBookmarks: Int) {
-        val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
+        val message = if (numBookmarks == 0) {
+            getString(R.string.tabSwitcherBookmarkToastZero)
+        } else {
+            resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
+        }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 

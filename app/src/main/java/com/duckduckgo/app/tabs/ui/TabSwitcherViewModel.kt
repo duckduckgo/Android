@@ -59,6 +59,8 @@ import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -266,54 +268,48 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseSelectedTabs() {
-        (selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.selectedTabs?.size?.let { numTabs ->
-            if (numTabs > 0) {
-                command.value = BookmarkTabs(numTabs)
-            }
-        }
     }
 
     fun onCloseOtherTabs() {
     }
 
     fun onBookmarkTabsConfirmed(numTabs: Int) {
-        val numBookmarkedTabs = when (val mode = selectionViewState.value.mode) {
-            is SelectionViewState.Mode.Selection -> {
-                // bookmark selected tabs (or all tabs if none selected)
-                if (mode.selectedTabs.isNotEmpty()) {
-                    bookmarkTabs(mode.selectedTabs)
-                } else {
-                    bookmarkAllTabs()
+        viewModelScope.launch {
+            val numBookmarkedTabs = when (val mode = selectionViewState.value.mode) {
+                is SelectionViewState.Mode.Selection -> {
+                    // bookmark selected tabs (or all tabs if none selected)
+                    if (mode.selectedTabs.isNotEmpty()) {
+                        bookmarkTabs(mode.selectedTabs)
+                    } else {
+                        bookmarkAllTabs()
+                    }
                 }
-            }
 
-            SelectionViewState.Mode.Normal -> {
-                if (numTabs == 1) {
-                    activeTab.value?.tabId?.let { bookmarkTabs(listOf(it)) } ?: 0
-                } else {
-                    bookmarkAllTabs()
+                SelectionViewState.Mode.Normal -> {
+                    if (numTabs == 1) {
+                        activeTab.value?.tabId?.let { bookmarkTabs(listOf(it)) } ?: 0
+                    } else {
+                        bookmarkAllTabs()
+                    }
                 }
             }
+            command.value = ShowBookmarkToast(numBookmarkedTabs)
         }
-        command.value = ShowBookmarkToast(numBookmarkedTabs)
     }
 
-    private fun bookmarkAllTabs(): Int {
+    private suspend fun bookmarkAllTabs(): Int {
         return tabSwitcherItems.value?.filterIsInstance<TabSwitcherItem.Tab>()?.let { tabIds ->
             bookmarkTabs(tabIds.map { it.id })
         } ?: 0
     }
 
-    private fun bookmarkTabs(tabIds: List<String>): Int {
-        var bookmarkedSites = 0
-        tabIds.forEach {
-            viewModelScope.launch {
-                if (saveSiteBookmark(it) != null) {
-                    bookmarkedSites++
-                }
+    private suspend fun bookmarkTabs(tabIds: List<String>): Int {
+        val results = tabIds.map { tabId ->
+            viewModelScope.async {
+                saveSiteBookmark(tabId)
             }
         }
-        return bookmarkedSites
+        return results.awaitAll().count { it != null }
     }
 
     fun onCloseAllTabsConfirmed() {
