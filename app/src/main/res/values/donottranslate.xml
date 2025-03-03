@@ -86,6 +86,10 @@
         <item quantity="other">%1$d bookmarks added</item>
     </plurals>
     <string name="tabSwitcherBookmarkDialogDescription">Existing bookmarks will not be duplicated.</string>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Are you sure you want to close this tab?</item>
+        <item quantity="other">Are you sure you want to close these tabs?</item>
+    </plurals>
     <string name="tabSwitcherBookmarkDialogPositiveButton">Bookmark</string>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bookmark Tab</item>
