@@ -161,4 +161,19 @@ interface MaliciousSiteDao {
     private suspend fun getLatestRevision(feed: Feed, type: Type): Int {
         return getLatestRevision(feed = feed.name, type = type.name)?.revision ?: 0
     }
+
+    @Transaction
+    fun updateAllExceptions(exceptions: List<FeatureExceptionEntity>) {
+        deleteAllExceptions()
+        insertAllExceptions(exceptions)
+    }
+
+    @Query("DELETE FROM featureExceptions")
+    fun deleteAllExceptions() {}
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllExceptions(exceptions: List<FeatureExceptionEntity>)
+
+    @Query("SELECT * FROM featureExceptions")
+    fun getExceptions(): List<FeatureExceptionEntity>
 }
