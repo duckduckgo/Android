@@ -39,6 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -52,6 +53,7 @@ class RealMaliciousSiteProtectionTest {
     private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
     private val mockMaliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository = mock()
+    private val urlCanonicalization: UrlCanonicalization = mock()
 
     @Before
     fun setup() {
@@ -62,8 +64,10 @@ class RealMaliciousSiteProtectionTest {
             mockMaliciousSiteProtectionRCRepository,
             messageDigest,
             mockMaliciousSiteProtectionRCFeature,
+            urlCanonicalization,
         )
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(urlCanonicalization.canonicalizeUrl(any())).thenAnswer { it.arguments[0] }
     }
 
     @Test
