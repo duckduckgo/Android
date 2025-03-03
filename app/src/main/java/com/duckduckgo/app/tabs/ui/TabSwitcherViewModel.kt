@@ -60,7 +60,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
-    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
+    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs

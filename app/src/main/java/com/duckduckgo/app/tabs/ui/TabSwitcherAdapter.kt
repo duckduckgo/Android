@@ -51,8 +51,8 @@ import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Compa
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
@@ -63,10 +63,11 @@ import com.duckduckgo.common.utils.swap
 import com.duckduckgo.mobile.android.R as AndroidR
 import java.io.File
 import java.security.MessageDigest
+import kotlin.Int
+import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.random.Random
 
 private const val GRID_ITEM_HEIGHT_DP = 170
 private const val ANIMATED_TILE_NO_REPLACE_ALPHA = 0.4f
@@ -405,10 +406,10 @@ class TabSwitcherAdapter(
         val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackerAnimationTile }
         if (animatedTilePosition != -1) {
             notifyItemChanged(
-                    animatedTilePosition,
-                    Bundle().apply {
-                        putFloat(ALPHA, alpha)
-                    },
+                animatedTilePosition,
+                Bundle().apply {
+                    putFloat(ALPHA, alpha)
+                },
             )
         }
     }
