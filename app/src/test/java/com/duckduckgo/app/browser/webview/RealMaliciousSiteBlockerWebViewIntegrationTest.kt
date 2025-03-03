@@ -264,6 +264,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val firstCallbackResult = firstCallbackDeferred.await()
         val secondCallbackResult = secondCallbackDeferred.await()
 
+        assertTrue(testee.processedUrls[maliciousUri.toString()] is Malicious)
         assertEquals(false, firstCallbackResult)
         assertEquals(true, secondCallbackResult)
     }

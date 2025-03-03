@@ -56,6 +56,8 @@ interface MaliciousSiteRepository {
     suspend fun loadHashPrefixes(): Result<Unit>
 }
 
+private const val MATCHES_ENDPOINT_TIMEOUT = 1000L
+
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealMaliciousSiteRepository @Inject constructor(
@@ -84,7 +86,7 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
-            withTimeout(1000) {
+            withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
                 maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
                     val feed = when (it.feed.uppercase()) {
                         PHISHING.name -> PHISHING

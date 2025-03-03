@@ -141,8 +141,6 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Safe
         }
 
-        Timber.d("shouldIntercept ${request.url}")
-
         val url = request.url.let {
             if (it.fragment != null) {
                 it.buildUpon().fragment(null).build()
@@ -269,7 +267,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             } else {
                 Safe
             }
-            processedUrls[url] = isMalicious
+            processedUrls[url] = it
             confirmationCallback(isMalicious)
         }
     }
