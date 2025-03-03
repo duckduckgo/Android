@@ -80,8 +80,8 @@
     <string name="skipOnboarding">Skip Onboarding</string>"
 
     <!-- Tab switcher -->
-    <string name="tabSwitcherFabNewTab">New Tab</string>
-    <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
+    <string name="tabSwitcherFabTitleNewTab">New Tab</string>
+    <string name="tabSwitcherFabTitleCloseTabs">Close Tabs</string>
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
     <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links from DuckDuckGo</string>
@@ -101,6 +101,10 @@
         <item quantity="other">%1$d new bookmarks were added.</item>
     </plurals>
     <string name="tabSwitcherBookmarkDialogDescription">Existing bookmarks will not be duplicated.</string>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Are you sure you want to close this tab?</item>
+        <item quantity="other">Are you sure you want to close these tabs?</item>
+    </plurals>
     <string name="tabSwitcherBookmarkDialogPositiveButton">Bookmark</string>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Bookmark This Page</item>
