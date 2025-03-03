@@ -139,13 +139,12 @@ class TabSwitcherAdapter(
                 bindListTab(holder, tab)
             }
             is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder -> {
+                val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = R.string.trackersBlockedInTheLast7days,
-                    totalTrackerCount = when (Random.Default.nextInt(10)) {
-                        in 0..6 -> Random.Default.nextInt(10, 1000)
-                        else -> Random.Default.nextInt(1000, 10000)
-                    },
+                    totalTrackerCount = trackerAnimationTile.trackerCount,
                     trackerTextView = holder.binding.text,
                 )
                 holder.binding.close.setOnClickListener {
@@ -153,13 +152,12 @@ class TabSwitcherAdapter(
                 }
             }
             is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder -> {
+                val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = R.string.trackersBlocked,
-                    totalTrackerCount = when (Random.Default.nextInt(10)) {
-                        in 0..6 -> Random.Default.nextInt(10, 1000)
-                        else -> Random.Default.nextInt(1000, 10000)
-                    },
+                    totalTrackerCount = trackerAnimationTile.trackerCount,
                     trackerTextView = holder.binding.title,
                 )
                 holder.binding.close.setOnClickListener {
