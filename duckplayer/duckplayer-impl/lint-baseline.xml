@@ -8,7 +8,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="743"
+            line="860"
             column="9"/>
     </issue>
 
@@ -19,7 +19,18 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="744"
+            line="861"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        duckPlayerFeature.customError().setRawStoredState(newState)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
+            line="867"
             column="9"/>
     </issue>
 
