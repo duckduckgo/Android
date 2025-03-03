@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.impl.service
 import android.annotation.SuppressLint
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
+import android.app.assist.AssistStructure.WindowNode
 import android.view.autofill.AutofillId
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -72,7 +72,13 @@ class RealAutofillParser @Inject constructor(
             val windowNode = structure.getWindowNodeAt(i)
             windowNode.rootViewNode?.let { viewNode ->
                 autofillRootNodes.add(
-                    traverseViewNode(viewNode).convertIntoAutofillNode(),
+                    traverseViewNode(viewNode).convertIntoAutofillNode().let { rootNode ->
+                        if (rootNode.packageId.isNullOrBlank()) {
+                            rootNode.copy(packageId = extractPackageFromTitle(windowNode))
+                        } else {
+                            rootNode
+                        }
+                    },
                 )
             }
         }
@@ -114,6 +120,11 @@ class RealAutofillParser @Inject constructor(
             website = this.firstOrNull { it.website != null }?.website,
             parsedAutofillFields = this,
         )
+    }
+
+    private fun extractPackageFromTitle(windowNode: WindowNode): String? {
+        // window node title format looks like: packageId/ActivityName
+        return windowNode.title.takeUnless { it.isNullOrBlank() }?.split('/')?.firstOrNull()
     }
 
     private fun ViewNode.validPackageId(): String? {
