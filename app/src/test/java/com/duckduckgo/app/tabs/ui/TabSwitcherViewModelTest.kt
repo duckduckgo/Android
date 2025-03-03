@@ -38,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -93,6 +94,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var statisticsDataStore: StatisticsDataStore
 
+    @Mock
+    private lateinit var mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
@@ -135,6 +139,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             tabSwitcherAnimationFeature,
+            mockWebTrackersBlockedAppRepository,
         )
         testee.command.observeForever(mockCommandObserver)
     }
