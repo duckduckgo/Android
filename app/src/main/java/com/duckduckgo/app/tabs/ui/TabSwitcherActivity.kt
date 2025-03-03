@@ -46,6 +46,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -118,9 +119,24 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var duckChat: DuckChat
 
+    @Inject
+    lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
+
+    @Inject
+    lateinit var trackerCountAnimator: TrackerCountAnimator
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager, dispatchers) }
+    private val tabsAdapter: TabSwitcherAdapter by lazy {
+        TabSwitcherAdapter(
+            this,
+            webViewPreviewPersister,
+            this,
+            faviconManager,
+            dispatchers,
+            trackerCountAnimator,
+        )
+    }
 
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
@@ -411,16 +427,29 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
+                TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
             }
         }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        val tabCount = viewModel.tabSwitcherItems.value?.size ?: 0
-        val canSwap = from in 0..< tabCount && to in 0..< tabCount
-        if (canSwap) {
-            tabsAdapter.onTabMoved(from, to)
-            viewModel.onTabMoved(from, to)
+        if (tabSwitcherAnimationFeature.self().isEnabled()) {
+            val isTrackerAnimationTileVisible = viewModel.tabSwitcherItems.value?.get(0) is TabSwitcherItem.TrackerAnimationTile
+            val canSwapFromIndex = if (isTrackerAnimationTileVisible) 1 else 0
+            val tabItemCount = viewModel.tabSwitcherItems.value?.count { it is TabSwitcherItem.Tab } ?: 0
+
+            val canSwap = from in canSwapFromIndex..<tabItemCount && to in canSwapFromIndex..<tabItemCount
+            if (canSwap) {
+                tabsAdapter.onTabMoved(from, to)
+                viewModel.onTabMoved(from, to)
+            }
+        } else {
+            val tabCount = viewModel.tabSwitcherItems.value?.size ?: 0
+            val canSwap = from in 0..<tabCount && to in 0..<tabCount
+            if (canSwap) {
+                tabsAdapter.onTabMoved(from, to)
+                viewModel.onTabMoved(from, to)
+            }
         }
     }
 
