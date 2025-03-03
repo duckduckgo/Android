@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.R.attr.mode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.ViewModel
@@ -52,15 +51,15 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackBu
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabs
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -169,7 +168,7 @@ class TabSwitcherViewModel @Inject constructor(
         data object DismissAnimatedTileDismissalDialog : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
-        data class BookmarkTabs(val numTabs: Int) : Command()
+        data class BookmarkTabsRequest(val numTabs: Int) : Command()
         data class ShowBookmarkToast(val numBookmarks: Int) : Command()
     }
 
@@ -286,11 +285,11 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBookmarkSelectedTabs() {
         when (val mode = selectionViewState.value.mode) {
             is SelectionViewState.Mode.Normal -> {
-                command.value = BookmarkTabs(1)
+                command.value = BookmarkTabsRequest(1)
             }
 
             is SelectionViewState.Mode.Selection -> {
-                command.value = BookmarkTabs(mode.selectedTabs.size)
+                command.value = BookmarkTabsRequest(mode.selectedTabs.size)
             }
         }
     }
