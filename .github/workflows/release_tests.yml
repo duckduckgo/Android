@@ -18,7 +18,7 @@ concurrency:
 jobs:
   run-release-tests:
     name: Run Release tests of tag version in Maestro
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
