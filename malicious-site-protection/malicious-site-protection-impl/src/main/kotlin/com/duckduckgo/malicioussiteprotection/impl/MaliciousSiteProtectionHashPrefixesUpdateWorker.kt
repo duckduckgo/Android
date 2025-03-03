@@ -29,6 +29,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
@@ -51,7 +52,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorker(
 
     override suspend fun doWork(): Result {
         return withContext(dispatcherProvider.io()) {
-            if (maliciousSiteProtectionFeature.isFeatureEnabled().not()) {
+            if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not()) {
                 return@withContext Result.success()
             }
             return@withContext if (maliciousSiteRepository.loadHashPrefixes().isSuccess) {
@@ -65,6 +66,10 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
@@ -72,9 +77,21 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler @Inject construct
     private val workManager: WorkManager,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature,
 
-) : MainProcessLifecycleObserver {
+) : PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
+        enqueuePeriodicWork()
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        enqueuePeriodicWork()
+    }
+
+    private fun enqueuePeriodicWork() {
+        if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not()) {
+            workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG)
+            return
+        }
         val workerRequest = PeriodicWorkRequestBuilder<MaliciousSiteProtectionHashPrefixesUpdateWorker>(
             maliciousSiteProtectionFeature.getHashPrefixUpdateFrequency(),
             TimeUnit.MINUTES,

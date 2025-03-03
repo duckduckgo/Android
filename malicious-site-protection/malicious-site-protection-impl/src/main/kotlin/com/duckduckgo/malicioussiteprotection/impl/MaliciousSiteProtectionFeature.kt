@@ -37,4 +37,11 @@ interface MaliciousSiteProtectionFeature {
     @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun self(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun visibleAndOnByDefault(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun canUpdateDatasets(): Toggle
 }
