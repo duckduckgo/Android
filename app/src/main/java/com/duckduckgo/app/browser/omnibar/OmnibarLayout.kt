@@ -62,6 +62,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -399,7 +401,11 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        if (viewState.leadingIconState == PRIVACY_SHIELD) {
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        } else {
+            lastSeenPrivacyShield = null
+        }
         renderButtons(viewState)
     }
 
