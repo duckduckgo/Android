@@ -24,17 +24,36 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Autofill Service runs on its own process https://app.asana.com/0/72649045549333/1209537052601451 -->
         <activity
             android:name=".service.AutofillProviderFillSuggestionActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
+            android:process=":autofill"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".service.AutofillProviderChooseActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
+            android:process=":autofill"
             android:windowSoftInputMode="adjustResize" />
+        <service
+            android:name="com.duckduckgo.autofill.impl.service.RealAutofillService"
+            android:exported="true"
+            android:label="@string/serviceName"
+            android:enabled="false"
+            android:process=":autofill"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/service_configuration" />
+        </service>
+        <!-- Autofill Service -->
     </application>
 
 </manifest>
