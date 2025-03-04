@@ -223,6 +223,10 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
     }
 
+    fun onDeselectAllTabs() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(emptyList())) }
+    }
+
     fun onShareSelectedTabs() {
     }
 
