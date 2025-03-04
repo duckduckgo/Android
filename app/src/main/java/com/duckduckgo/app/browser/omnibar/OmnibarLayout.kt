@@ -69,6 +69,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -231,6 +232,8 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
+
+    private var lastSeenPrivacyShield: PrivacyShield? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -637,13 +640,16 @@ open class OmnibarLayout @JvmOverloads constructor(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
     ) {
-        val shieldIcon = if (viewMode is ViewMode.Browser) {
-            shieldIcon
-        } else {
-            customTabToolbarContainer.customTabShieldIcon
-        }
+        renderIfChanged(privacyShield, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = privacyShield
+            val shieldIcon = if (viewMode is ViewMode.Browser) {
+                shieldIcon
+            } else {
+                customTabToolbarContainer.customTabShieldIcon
+            }
 
-        privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+            privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+        }
     }
 
     private fun renderOutline(enabled: Boolean) {
