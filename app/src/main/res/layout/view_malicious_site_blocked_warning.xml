@@ -24,7 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="150dp"
-        android:paddingBottom="50dp" >
+        android:paddingBottom="50dp"
+        android:paddingHorizontal="@dimen/keyline_5">
 
         <ImageView
             android:id="@+id/alertImage"
@@ -55,7 +56,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:gravity="center"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/errorTitle"
@@ -68,7 +68,6 @@
             android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_6"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:text="@string/maliciousSiteLeaveCTA"
             app:buttonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +78,6 @@
             android:id="@+id/advancedCTA"
             android:layout_width="360dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:text="@string/sslErrorAdvancedCTA"
             app:buttonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
@@ -108,7 +106,6 @@
             android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +118,6 @@
             android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
