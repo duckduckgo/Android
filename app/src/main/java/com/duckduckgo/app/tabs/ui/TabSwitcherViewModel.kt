@@ -250,7 +250,7 @@ class TabSwitcherViewModel @Inject constructor(
             val tabItems = tabEntities.map { Tab(it) }
             val trackerCount = getTrackerCountForLast7Days()
 
-            val tabSwitcherItems = if (!isDismissed && trackerCount >= 10) {
+            val tabSwitcherItems = if (!isDismissed && trackerCount >= 10 && tabEntities.count() >= 2) {
                 listOf(TrackerAnimationTile(trackerCount)) + tabItems
             } else {
                 tabItems
