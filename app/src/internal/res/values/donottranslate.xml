@@ -46,6 +46,8 @@
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDefault">Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
+    <string name="devSettingsShowTabSwitcherAnimatedTile">Show TabSwitcher Animated Tile</string>
+    <string name="devSettingsShowTabSwitcherAnimatedSubtitle">Click here to show the animated tile if you have previously dismissed it</string>
 
     <!-- Tabs -->
     <string name="devSettingsScreenTabs">Tabs</string>
