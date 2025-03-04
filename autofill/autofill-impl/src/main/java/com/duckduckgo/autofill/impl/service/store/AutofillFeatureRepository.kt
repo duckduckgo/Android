@@ -51,7 +51,7 @@ class RealAutofillFeatureRepository @Inject constructor(
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             Timber.i("DDGAutofillService: Init AutofillFeatureRepository from $processName")
-            if (isMainProcess || processName == "autofill") { // TODO: Revisit this after merging autofill process PR
+            if (isMainProcess || processName == ":autofill") {
                 loadToMemory()
             }
         }
