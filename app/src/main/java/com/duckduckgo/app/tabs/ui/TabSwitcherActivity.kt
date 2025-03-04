@@ -59,8 +59,13 @@ import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -386,11 +391,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (fabType) {
             TabSwitcherViewModel.SelectionViewState.FabType.NEW_TAB -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_add_24)
-                tabsFab.setText(R.string.tabSwitcherFabNewTab)
+                tabsFab.setText(R.string.tabSwitcherFabTitleNewTab)
             }
             TabSwitcherViewModel.SelectionViewState.FabType.CLOSE_TABS -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_close_24)
-                tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
+                tabsFab.setText(R.string.tabSwitcherFabTitleCloseTabs)
             }
         }
     }
@@ -447,10 +452,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
-            is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
-            is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
-            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
-            is Command.ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
+            is ShareLinks -> launchShareMultipleLinkChooser(command.links)
+            is ShareLink -> launchShareLinkChooser(command.link, command.title)
+            is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
+            is ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
+            is CloseTabsRequest -> showCloseTabsConfirmation(command.tabIds)
         }
     }
 
@@ -811,6 +817,25 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onCloseAllTabsConfirmed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showCloseTabsConfirmation(tabIds: List<String>) {
+        val numTabs = tabIds.size
+        val title = resources.getQuantityString(R.plurals.closeTabsMenuItem, numTabs, numTabs)
+        val description = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsDialogDescription, numTabs, numTabs)
+        TextAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(description)
+            .setPositiveButton(R.string.closeAppTabsConfirmationDialogClose, DESTRUCTIVE)
+            .setNegativeButton(R.string.closeAppTabsConfirmationDialogCancel, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onCloseTabsConfirmed(tabIds)
                     }
                 },
             )
