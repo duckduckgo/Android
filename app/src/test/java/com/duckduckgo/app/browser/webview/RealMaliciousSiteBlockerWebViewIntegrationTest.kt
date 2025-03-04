@@ -109,7 +109,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverrideUrlLoading returns safe when url is already processed and safe`() = runTest {
-        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
+        testee.processedUrls[exampleUri] = MaliciousStatus.Safe
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertEquals(Safe(true), result)
@@ -117,7 +117,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverrideUrlLoading returns malicious when url is already processed and malicious`() = runTest {
-        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+        testee.processedUrls[exampleUri] = Malicious(MALWARE)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertEquals(MaliciousSite(exampleUri, MALWARE, false), result)
@@ -136,7 +136,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldInterceptRequest returns safe when url is already processed and safe`() = runTest {
-        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
+        testee.processedUrls[exampleUri] = MaliciousStatus.Safe
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
         whenever(request.isForMainFrame).thenReturn(true)
@@ -149,7 +149,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldInterceptRequest returns malicious when url is already processed and malicious`() = runTest {
-        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+        testee.processedUrls[exampleUri] = Malicious(MALWARE)
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
         whenever(request.isForMainFrame).thenReturn(true)
@@ -221,14 +221,14 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `onPageLoadStarted with different URL clears processedUrls`() = runTest {
-        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.processedUrls.put(exampleUri, MaliciousStatus.Safe)
         testee.onPageLoadStarted("http://another.com")
         assertTrue(testee.processedUrls.isEmpty())
     }
 
     @Test
     fun `onPageLoadStarted with same URL does not clear processedUrls`() = runTest {
-        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.processedUrls.put(exampleUri, MaliciousStatus.Safe)
         testee.onPageLoadStarted(exampleUri.toString())
         assertFalse(testee.processedUrls.isEmpty())
     }
@@ -267,7 +267,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val firstCallbackResult = firstCallbackDeferred.await()
         val secondCallbackResult = secondCallbackDeferred.await()
 
-        assertTrue(testee.processedUrls[maliciousUri.toString()] is Malicious)
+        assertTrue(testee.processedUrls[maliciousUri] is Malicious)
         assertEquals(false, firstCallbackResult)
         assertEquals(true, secondCallbackResult)
     }
