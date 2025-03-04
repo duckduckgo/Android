@@ -498,7 +498,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         popupBinding.newTabMenuItem.isVisible = false
         popupBinding.selectAllMenuItem.isVisible = numSelectedTabs < numTabs
         popupBinding.deselectAllMenuItem.isVisible = numSelectedTabs == numTabs
-        popupBinding.selectionActionsDivider.isVisible = true
+        popupBinding.selectionActionsDivider.isVisible = numSelectedTabs > 0
         popupBinding.shareSelectedLinksMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.bookmarkSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.selectTabsDivider.isVisible = false
