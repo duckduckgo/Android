@@ -21,7 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
-import java.net.URLDecoder
 import javax.inject.Inject
 
 interface UrlCanonicalization {
@@ -38,7 +37,7 @@ class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
     private val multipleSlashesRegex = Regex("/+")
 
     private fun String.canonicalizeDomain(): String {
-        return URLDecoder.decode(this, "UTF-8")
+        return this
             .lowercase()
             .filter { it.code in 0x20..0x7E }
             .trim('.')
