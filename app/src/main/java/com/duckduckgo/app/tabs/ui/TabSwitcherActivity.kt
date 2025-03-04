@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -58,6 +59,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -219,41 +221,111 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.selectionViewState.value.mode)
         tabsRecycler.addItemDecoration(tabItemDecorator)
+
         tabsRecycler.setHasFixedSize(true)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            tabsRecycler.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        if (dy > 0) {
-                            tabsFab.shrink()
-                        } else if (dy < 0) {
-                            tabsFab.extend()
+            handleFabStateUpdates()
+            handleSelectionModeCancellation()
+        }
+    }
+
+    private fun handleSelectionModeCancellation() {
+        tabsRecycler.addOnItemTouchListener(
+            object : RecyclerView.OnItemTouchListener {
+                private var lastEventAction: Int? = null
+                override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                    if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
+                        e.action == MotionEvent.ACTION_MOVE
+                    ) {
+                        lastEventAction = e.action
+                    } else if (e.action == MotionEvent.ACTION_UP) {
+                        if (lastEventAction == MotionEvent.ACTION_DOWN) {
+                            viewModel.onEmptyAreaClicked()
                         }
+                        lastEventAction = null
                     }
-                },
-            )
+                    return false
+                }
+
+                override fun onTouchEvent(
+                    rv: RecyclerView,
+                    e: MotionEvent,
+                ) {
+                    // no-op
+                }
+
+                override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                    // no-op
+                }
+            },
+        )
+    }
+
+    private fun handleFabStateUpdates() {
+        tabsRecycler.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0) {
+                        tabsFab.shrink()
+                    } else if (dy < 0) {
+                        tabsFab.extend()
+                    }
+                }
+            },
+        )
+    }
+
+    private fun updateToolbarTitle(mode: Mode) {
+        toolbar.title = if (mode is Mode.Selection) {
+            if (mode.selectedTabs.isEmpty()) {
+                getString(R.string.selectTabsMenuItem)
+            } else {
+                getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
+            }
+        } else {
+            getString(R.string.tabActivityTitle)
         }
     }
 
     private fun configureObservers() {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            lifecycleScope.launch {
+                viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
+                    tabsRecycler.invalidateItemDecorations()
+                    tabsAdapter.updateSelection(it.mode)
+
+                    updateToolbarTitle(it.mode)
+                    updateTabGridItemDecorator(it.activeTab?.tabId)
+                    updateFabType(it.fabType)
+
+                    invalidateOptionsMenu()
+                }
+            }
+        } else {
+            viewModel.activeTab.observe(this) { tab ->
+                if (tab != null && tab.tabId != tabItemDecorator.highlightedTabId && !tab.deletable) {
+                    updateTabGridItemDecorator(tab.tabId)
+                }
+            }
+        }
+
         viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+            tabsAdapter.updateData(tabSwitcherItems)
 
-            render(tabSwitcherItems)
-
-            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.highlightedTabId }
             if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                 updateTabGridItemDecorator(tabSwitcherItems.last().id)
             }
         }
-        viewModel.activeTab.observe(this) { tab ->
-            if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
-                updateTabGridItemDecorator(tab.tabId)
-            }
-        }
+
         viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
                 onDeletableTab(it.last())
@@ -263,14 +335,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
                 updateLayoutType(it)
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
-                invalidateOptionsMenu()
-
-                updateFabType(it.fabType)
             }
         }
 
@@ -314,13 +378,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.show()
     }
 
-    private fun updateFabType(fabType: TabSwitcherViewModel.ViewState.FabType) {
+    private fun updateFabType(fabType: TabSwitcherViewModel.SelectionViewState.FabType) {
         when (fabType) {
-            TabSwitcherViewModel.ViewState.FabType.NEW_TAB -> {
+            TabSwitcherViewModel.SelectionViewState.FabType.NEW_TAB -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_add_24)
                 tabsFab.setText(R.string.tabSwitcherFabNewTab)
             }
-            TabSwitcherViewModel.ViewState.FabType.CLOSE_TABS -> {
+            TabSwitcherViewModel.SelectionViewState.FabType.CLOSE_TABS -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_close_24)
                 tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
             }
@@ -360,10 +424,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
-    private fun render(tabs: List<TabSwitcherItem>) {
-        tabsAdapter.updateData(tabs)
-    }
-
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
         if (index != -1) {
@@ -391,13 +451,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
             popupMenuItem = menu.findItem(R.id.popupMenuItem)
 
-            val mode = viewModel.viewState.value.mode
+            val mode = viewModel.selectionViewState.value.mode
             when (mode) {
-                TabSwitcherViewModel.ViewState.Mode.Normal -> {
+                Mode.Normal -> {
                     createNormalModeMenu(menu)
                 }
-                is TabSwitcherViewModel.ViewState.Mode.Selection -> {
-                    createSelectionModeMenu(menu, mode.selectedTabs.size)
+                is Mode.Selection -> {
+                    createSelectionModeMenu(menu, mode.selectedTabs.size, viewModel.tabSwitcherItems.value?.size ?: 0)
                 }
             }
         } else {
@@ -414,7 +474,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         return true
     }
 
-    private fun createSelectionModeMenu(menu: Menu, numSelectedTabs: Int) {
+    private fun createSelectionModeMenu(menu: Menu, numSelectedTabs: Int, numTabs: Int) {
         menu.findItem(R.id.layoutTypeMenuItem).isVisible = false
         menu.findItem(R.id.fireMenuItem).isVisible = false
 
@@ -436,13 +496,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
 
         popupBinding.newTabMenuItem.isVisible = false
-        popupBinding.selectAllMenuItem.isVisible = true
+        popupBinding.selectAllMenuItem.isVisible = numSelectedTabs < numTabs
+        popupBinding.deselectAllMenuItem.isVisible = numSelectedTabs == numTabs
         popupBinding.selectionActionsDivider.isVisible = numSelectedTabs > 0
         popupBinding.shareSelectedLinksMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.bookmarkSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.selectTabsDivider.isVisible = false
         popupBinding.selectTabsMenuItem.isVisible = false
-        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs > 0
+        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs in 1..<numTabs
         popupBinding.closeSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.closeAllTabsMenuItem.isVisible = numSelectedTabs == 0
 
@@ -473,6 +534,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         popupBinding.newTabMenuItem.isVisible = true
         popupBinding.selectAllMenuItem.isVisible = false
+        popupBinding.deselectAllMenuItem.isVisible = false
         popupBinding.selectionActionsDivider.isVisible = true
         popupBinding.shareSelectedLinksMenuItem.isVisible = true
         popupBinding.bookmarkSelectedTabsMenuItem.isVisible = true
@@ -493,6 +555,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun initMenuClickListeners() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkAllTabsMenuItem)) { viewModel.onBookmarkAllTabs() }
@@ -531,7 +594,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        closeAllTabsMenuItem?.isVisible = viewModel.tabSwitcherItems.value?.isNotEmpty() == true
+        closeAllTabsMenuItem?.isVisible = !viewModel.tabSwitcherItems.value.isNullOrEmpty()
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
@@ -572,12 +635,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        updateTabGridItemDecorator(tab.tabId)
+        updateTabGridItemDecorator(selectedTabId)
         launch { viewModel.onTabSelected(tab) }
     }
 
-    private fun updateTabGridItemDecorator(tabSwitcherItemId: String) {
-        tabItemDecorator.tabSwitcherItemId = tabSwitcherItemId
+    private fun updateTabGridItemDecorator(tabId: String?) {
+        tabItemDecorator.highlightedTabId = tabId
+        tabItemDecorator.selectionMode = viewModel.selectionViewState.value.mode
         tabsRecycler.invalidateItemDecorations()
     }
 
