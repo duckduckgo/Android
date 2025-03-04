@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -34,6 +35,8 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -61,19 +64,16 @@ class TabSwitcherViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
+    private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.switchMap { tabEntities ->
-        // TODO use dismissal logic and or test framework to determine whether to show tracker animation tile
-        if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            liveData {
-                val trackerAnimationTile = createTrackerAnimationTile()
-                val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
-                emit(listOf(trackerAnimationTile) + tabItems)
-            }
-        } else {
-            liveData {
-                val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
+        // TODO use test framework to determine whether to show tracker animation tile
+        liveData {
+            if (tabSwitcherAnimationFeature.self().isEnabled()) {
+                collectTabItemsWithOptionalAnimationTile(tabEntities)
+            } else {
+                val tabItems = tabEntities.map { Tab(it) }
                 emit(tabItems)
             }
         }
@@ -235,5 +235,20 @@ class TabSwitcherViewModel @Inject constructor(
                 endTime = now,
             )
         return TrackerAnimationTile(trackerCount)
+    }
+
+    private suspend fun LiveDataScope<List<TabSwitcherItem>>.collectTabItemsWithOptionalAnimationTile(
+        tabEntities: List<TabEntity>,
+    ) {
+        tabSwitcherPrefsDataStore.isAnimationTileDismissed().collect { isDismissed ->
+            val tabItems = tabEntities.map { Tab(it) }
+
+            val tabSwitcherItems = if (!isDismissed) {
+                listOf(createTrackerAnimationTile()) + tabItems
+            } else {
+                tabItems
+            }
+            emit(tabSwitcherItems)
+        }
     }
 }
