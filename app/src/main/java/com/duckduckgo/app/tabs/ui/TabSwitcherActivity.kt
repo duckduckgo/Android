@@ -156,6 +156,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
 
+        if(tabSwitcherAnimationFeature.self().isEnabled()) {
+            tabsAdapter.setAnimationTileCloseClickListener {
+                viewModel.onTrackerAnimationTileCloseClicked()
+            }
+        }
+
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
