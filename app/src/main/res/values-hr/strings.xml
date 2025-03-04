@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Prikaz popisa</string>
     <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$d alata za praćenje blokirano &lt;/b&gt; u posljednjih 7 dana</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$d alata za praćenje blokirano &lt;/b&gt;</string>
+    <string name="inTheLast7Days">u posljednjih 7 dana</string>
+
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
     <string name="fireClearAll">Obriši sve kartice i podatke</string>
