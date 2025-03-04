@@ -18,6 +18,8 @@ package com.duckduckgo.malicioussiteprotection.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.FDROID
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -42,6 +44,7 @@ interface MaliciousSiteProtectionRCFeature {
 class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
+    private val appBuildConfig: AppBuildConfig,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MaliciousSiteProtectionRCFeature, PrivacyConfigCallbackPlugin {
@@ -79,8 +82,9 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
+            // MSP is disabled in F-Droid builds, as we can't download datasets
             isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled() &&
-                maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled()
+                maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled() && appBuildConfig.flavor != FDROID
             canUpdateDatasets = maliciousSiteProtectionFeature.canUpdateDatasets().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->

@@ -32,7 +32,8 @@ if (localPropertiesFile.exists()) {
 }
 
 dependencies {
-	implementation project(":malicious-site-protection-api")
+    implementation project(":app-build-config-api")
+    implementation project(":malicious-site-protection-api")
     implementation project(':browser-api')
 
     anvil project(path: ':anvil-compiler')
