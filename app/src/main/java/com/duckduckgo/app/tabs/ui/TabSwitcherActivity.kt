@@ -497,12 +497,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         popupBinding.newTabMenuItem.isVisible = false
         popupBinding.selectAllMenuItem.isVisible = numSelectedTabs < numTabs
-        popupBinding.selectionActionsDivider.isVisible = numSelectedTabs > 0 && numSelectedTabs < numTabs
+        popupBinding.deselectAllMenuItem.isVisible = numSelectedTabs == numTabs
+        popupBinding.selectionActionsDivider.isVisible = true
         popupBinding.shareSelectedLinksMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.bookmarkSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.selectTabsDivider.isVisible = false
         popupBinding.selectTabsMenuItem.isVisible = false
-        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs > 0 && numSelectedTabs < numTabs
+        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs in 1..<numTabs
         popupBinding.closeSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
         popupBinding.closeAllTabsMenuItem.isVisible = numSelectedTabs == 0
 
@@ -533,6 +534,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         popupBinding.newTabMenuItem.isVisible = true
         popupBinding.selectAllMenuItem.isVisible = false
+        popupBinding.deselectAllMenuItem.isVisible = false
         popupBinding.selectionActionsDivider.isVisible = true
         popupBinding.shareSelectedLinksMenuItem.isVisible = true
         popupBinding.bookmarkSelectedTabsMenuItem.isVisible = true
@@ -553,6 +555,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun initMenuClickListeners() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkAllTabsMenuItem)) { viewModel.onBookmarkAllTabs() }
