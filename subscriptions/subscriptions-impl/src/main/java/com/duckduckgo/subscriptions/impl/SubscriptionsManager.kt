@@ -800,10 +800,10 @@ class RealSubscriptionsManager @Inject constructor(
                 isSignedInV2() -> try {
                     refreshSubscriptionData()
                 } catch (e: HttpException) {
-                    if (e.code() in listOf(400, 404)) {
-                        // expected if this is a first ever purchase using this account - ignore
-                    } else {
-                        throw e
+                    when (e.code()) {
+                        400, 404 -> {} // expected if this is a first ever purchase using this account - ignore
+                        401 -> signOut() // access token was rejected even though it's not expired - can happen if the account was removed from BE
+                        else -> throw e
                     }
                 }
 
