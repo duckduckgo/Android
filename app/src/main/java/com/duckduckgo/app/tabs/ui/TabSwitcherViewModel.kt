@@ -141,6 +141,27 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
     }
 
+    fun onSelectAllTabs() {
+    }
+
+    fun onShareSelectedTabs() {
+    }
+
+    fun onBookmarkSelectedTabs() {
+    }
+
+    fun onBookmarkAllTabs() {
+    }
+
+    fun onSelectionModeRequested() {
+    }
+
+    fun onCloseSelectedTabs() {
+    }
+
+    fun onCloseOtherTabs() {
+    }
+
     fun onCloseAllTabsConfirmed() {
         viewModelScope.launch(dispatcherProvider.io()) {
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
@@ -201,10 +222,17 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
-        if (viewState.value.fabType == FabType.NEW_TAB) {
-            _viewState.update { it.copy(FabType.CLOSE_TABS) }
-        } else {
-            _viewState.update { it.copy(FabType.NEW_TAB) }
+        when {
+            viewState.value.mode is ViewState.Mode.Normal -> {
+                _viewState.update { it.copy(mode = ViewState.Mode.Selection(emptyList())) }
+            }
+            viewState.value.mode is ViewState.Mode.Selection -> {
+                if ((viewState.value.mode as ViewState.Mode.Selection).selectedTabs.isEmpty()) {
+                    _viewState.update { it.copy(mode = ViewState.Mode.Selection(listOf("123", "456"))) }
+                } else {
+                    _viewState.update { it.copy(mode = ViewState.Mode.Normal) }
+                }
+            }
         }
     }
 
@@ -222,10 +250,18 @@ class TabSwitcherViewModel @Inject constructor(
 
     data class ViewState(
         val fabType: FabType = FabType.NEW_TAB,
+        val mode: Mode = Mode.Selection(emptyList<String>()),
     ) {
         enum class FabType {
             NEW_TAB,
             CLOSE_TABS,
+        }
+
+        sealed interface Mode {
+            data object Normal : Mode
+            data class Selection(
+                val selectedTabs: List<String> = emptyList<String>(),
+            ) : Mode
         }
     }
 }
