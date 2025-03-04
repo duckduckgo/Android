@@ -37,6 +37,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
+import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -102,6 +103,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository
 
+    @Mock
+    private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
@@ -146,6 +150,7 @@ class TabSwitcherViewModelTest {
             duckChatMock,
             tabSwitcherAnimationFeature,
             mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
     }
