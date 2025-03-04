@@ -33,6 +33,12 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/selectAllTabsMenuItem" />
 
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/deselectAllMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/deselectAllTabsMenuItem" />
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/selectionActionsDivider"
         android:layout_width="match_parent"
