@@ -109,6 +109,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
+        binding.showTabSwitcherAnimatedTile.setOnClickListener { viewModel.showAnimatedTileClicked() }
     }
 
     private fun observeViewModel() {
@@ -139,6 +140,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
             Tabs -> showTabs()
+            is Command.Toast -> showToast(it.message)
         }
     }
 
@@ -185,6 +187,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun showTabs() {
         startActivity(DevTabsActivity.intent(this))
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
