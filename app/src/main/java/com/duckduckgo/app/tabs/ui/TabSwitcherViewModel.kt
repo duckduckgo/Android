@@ -19,7 +19,8 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -33,12 +34,15 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -56,18 +60,25 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
     private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+    private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
 ) : ViewModel() {
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.switchMap { tabEntities ->
         // TODO use dismissal logic and or test framework to determine whether to show tracker animation tile
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val trackerAnimationTile = TabSwitcherItem.TrackerAnimationTile
-            val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
-            listOf(trackerAnimationTile) + tabItems
+            liveData {
+                val trackerAnimationTile = createTrackerAnimationTile()
+                val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
+                emit(listOf(trackerAnimationTile) + tabItems)
+            }
         } else {
-            tabEntities.map { TabSwitcherItem.Tab(it) }
+            liveData {
+                val tabItems = tabEntities.map { TabSwitcherItem.Tab(it) }
+                emit(tabItems)
+            }
         }
     }
+
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
@@ -149,7 +160,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
                     is TabSwitcherItem.Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                    TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete
+                    is TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
@@ -214,5 +225,15 @@ class TabSwitcherViewModel @Inject constructor(
 
             duckChat.openDuckChat()
         }
+    }
+
+    private suspend fun createTrackerAnimationTile(): TrackerAnimationTile {
+        val now = LocalDateTime.now()
+        val trackerCount =
+            webTrackersBlockedAppRepository.getTrackersCountBetween(
+                startTime = now.minusDays(7),
+                endTime = now,
+            )
+        return TrackerAnimationTile(trackerCount)
     }
 }
