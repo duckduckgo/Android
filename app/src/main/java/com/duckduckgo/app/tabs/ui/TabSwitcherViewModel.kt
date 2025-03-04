@@ -248,13 +248,21 @@ class TabSwitcherViewModel @Inject constructor(
     ) {
         tabSwitcherPrefsDataStore.isAnimationTileDismissed().collect { isDismissed ->
             val tabItems = tabEntities.map { Tab(it) }
+            val trackerCount = getTrackerCountForLast7Days()
 
-            val tabSwitcherItems = if (!isDismissed) {
-                listOf(createTrackerAnimationTile()) + tabItems
+            val tabSwitcherItems = if (!isDismissed && trackerCount >= 10) {
+                listOf(TrackerAnimationTile(trackerCount)) + tabItems
             } else {
                 tabItems
             }
             emit(tabSwitcherItems)
         }
+    }
+
+    private suspend fun getTrackerCountForLast7Days(): Int {
+        return webTrackersBlockedAppRepository.getTrackersCountBetween(
+            startTime = LocalDateTime.now().minusDays(7),
+            endTime = LocalDateTime.now(),
+        )
     }
 }
