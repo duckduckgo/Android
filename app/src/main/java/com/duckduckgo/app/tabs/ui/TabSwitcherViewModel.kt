@@ -97,7 +97,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
         if (swipingTabsFeature.isEnabled) {
-            val tabItemList = tabSwitcherItems.value?.filterIsInstance<TabSwitcherItem.Tab>()
+            val tabItemList = tabSwitcherItems.value?.filterIsInstance<Tab>()
             val emptyTabItem = tabItemList?.firstOrNull { tabItem -> tabItem.tabEntity.url.isNullOrBlank() }
             val emptyTabId = emptyTabItem?.tabEntity?.tabId
 
@@ -159,8 +159,8 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
-                    is TabSwitcherItem.Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                    is TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete
+                    is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
+                    is TrackerAnimationTile -> Unit // TODO delete
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
