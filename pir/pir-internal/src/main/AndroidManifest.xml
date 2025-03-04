@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <application>
+        <activity
+            android:name=".settings.PirDevSettings"
+            android:label="@string/pirDevSettings" />
+        <service
+            android:name=".scan.PirForegroundScanService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":pir" />
+    </application>
 </manifest>

@@ -95,9 +95,6 @@ report
 !/node_modules/@duckduckgo/content-scope-scripts/build/
 /node_modules/@duckduckgo/content-scope-scripts/build/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/
-/node_modules/@duckduckgo/content-scope-scripts/build/android/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/
 /node_modules/@duckduckgo/content-scope-scripts/build/android/pages/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/
-!/node_modules/@duckduckgo/content-scope-scripts/build/android/contentScope.js
-!/node_modules/@duckduckgo/content-scope-scripts/build/android/autofillPasswordImport.js
