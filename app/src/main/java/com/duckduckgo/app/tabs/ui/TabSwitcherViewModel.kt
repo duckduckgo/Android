@@ -227,6 +227,12 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onTrackerAnimationTileCloseClicked() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabSwitcherPrefsDataStore.setIsAnimationTileDismissed(isDismissed = true)
+        }
+    }
+
     private suspend fun createTrackerAnimationTile(): TrackerAnimationTile {
         val now = LocalDateTime.now()
         val trackerCount =
