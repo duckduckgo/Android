@@ -147,6 +147,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartExperimentTrackersAnimation(val entities: List<Entity>?) : Command()
         data object StartExperimentVariant1Animation : Command()
+        data class StartExperimentVariant2Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
     }
 
@@ -604,6 +605,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled()) {
                         command.send(Command.StartExperimentVariant1Animation)
+                    } else if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled()) {
+                        command.send(Command.StartExperimentVariant2Animation(decoration.entities))
                     } else if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
                         command.send(Command.StartExperimentTrackersAnimation(decoration.entities))
                     } else {

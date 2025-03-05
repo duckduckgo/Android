@@ -21,6 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 class TrackersBlockingExperimentViewModel@Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appPersonalityFeature: AppPersonalityFeature,
+    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -60,6 +62,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
             appPersonalityFeature.variant1().setRawStoredState(State(checked))
 
             if (checked) {
+                experimentalUIThemingFeature.self().setRawStoredState(State(false))
                 appPersonalityFeature.variant2().setRawStoredState(State(false))
                 appPersonalityFeature.variant3().setRawStoredState(State(false))
                 appPersonalityFeature.variant4().setRawStoredState(State(false))
@@ -74,8 +77,10 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             appPersonalityFeature.self().setRawStoredState(State(true))
             appPersonalityFeature.variant2().setRawStoredState(State(checked))
+            appPersonalityFeature.trackersBlockedAnimation().setRawStoredState(State(checked))
 
             if (checked) {
+                experimentalUIThemingFeature.self().setRawStoredState(State(false))
                 appPersonalityFeature.variant1().setRawStoredState(State(false))
                 appPersonalityFeature.variant3().setRawStoredState(State(false))
                 appPersonalityFeature.variant4().setRawStoredState(State(false))

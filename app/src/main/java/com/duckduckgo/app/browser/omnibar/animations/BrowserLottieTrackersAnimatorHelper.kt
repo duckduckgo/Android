@@ -197,6 +197,32 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
+    override fun startExperimentVariant2Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        entities: List<Entity>?,
+    ) {
+        this.trackersBlockedAnimationView = trackersBlockedAnimationView
+        this.trackersBlockedCountAnimationView = trackersBlockedCountAnimationView
+
+        if (entities.isNullOrEmpty()) {
+            tryToStartCookiesAnimation(context, omnibarViews)
+            return
+        }
+
+        val logos = getExperimentLogos(context, entities)
+        if (logos.isEmpty()) {
+            tryToStartCookiesAnimation(context, omnibarViews)
+            return
+        }
+
+        animateTrackersBlockedView(omnibarViews)
+        animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
+    }
+
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 500L
@@ -239,7 +265,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         )
     }
 
-    private fun animateTrackersBlockedCountView(context: Context, entities: List<Entity>, logos: List<TrackerLogo>, omnibarViews: List<View>) {
+    private fun animateTrackersBlockedCountView(
+        context: Context,
+        entities: List<Entity>,
+        logos: List<TrackerLogo>,
+        omnibarViews: List<View>,
+    ) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 200L
         }

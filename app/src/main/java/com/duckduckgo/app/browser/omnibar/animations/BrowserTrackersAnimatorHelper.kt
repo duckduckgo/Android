@@ -59,6 +59,15 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
     )
 
+    fun startExperimentVariant2Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        entities: List<Entity>?,
+    )
+
     /**
      * This method creates or enqueues cookie consent animation.
      *
