@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
-import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -55,7 +54,7 @@ interface WgServerApi {
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
-    @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
+    private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
     private val appBuildConfig: AppBuildConfig,
@@ -83,7 +82,9 @@ class RealWgServerApi @Inject constructor(
             null
         }
 
-        val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
+        val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred(
+            wgVpnControllerService.getEligibleLocations(),
+        )
         val registerKeyBody = if (mode is FailureRecovery) {
             RegisterKeyBody(publicKey = publicKey, server = mode.currentServer, mode = mode.toString())
         } else if (selectedServer != null) {
