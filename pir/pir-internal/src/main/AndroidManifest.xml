@@ -9,10 +9,15 @@
             android:name=".settings.PirResultsActivity"
             android:label="@string/pirDevSimpleScanHeader" />
         <service
-            android:name=".scan.PirForegroundScanService"
+            android:name=".service.PirForegroundScanService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse"
+            android:process=":pir" />
+        <service
+            android:name=".service.PirScheduledService"
+            android:enabled="true"
+            android:exported="false"
             android:process=":pir" />
     </application>
 </manifest>

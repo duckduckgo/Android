@@ -139,6 +139,12 @@
                     app:editable="true"
                     app:type="single_line" />
             </LinearLayout>
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/scheduleScan"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevSchedule" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/viewResults"
