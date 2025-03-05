@@ -672,8 +672,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         launch { viewModel.onNewTabRequested(fromOverflowMenu) }
     }
 
-    override fun onTabSelected(tab: TabEntity) {
-        selectedTabId = tab.tabId
+    override fun onTabSelected(tab: TabSwitcherItem.Tab) {
+        updateTabGridItemDecorator(tab.id)
         launch { viewModel.onTabSelected(tab) }
     }
 
