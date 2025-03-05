@@ -37,10 +37,12 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.decodeB64
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
@@ -52,12 +54,14 @@ import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutp
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncWithAnotherActivityViewModel @Inject constructor(
@@ -73,7 +77,31 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        generateQRCode()
+        startInvitationProcess()
+    }
+
+    private fun startInvitationProcess() {
+        viewModelScope.launch(dispatchers.io()) {
+            generateQRCode()
+            var polling = true
+            while (polling) {
+                delay(POLLING_INTERVAL)
+                syncAccountRepository.pollSecondDeviceAck()
+                    .onSuccess { success ->
+                        if (!success) return@onSuccess // continue polling
+                        // syncPixels.fireSignupConnectPixel(source) //TODO: pixel?
+                        command.send(Command.LoginSuccess)
+                        polling = false
+                    }.onFailure {
+                        when (it.code) {
+                            CONNECT_FAILED.code, LOGIN_FAILED.code -> {
+                                command.send(Command.ShowError(string.sync_connect_login_error, it.reason)) // TODO: review error message
+                                polling = false
+                            }
+                        }
+                    }
+            }
+        }
     }
 
     private fun generateQRCode() {
@@ -83,15 +111,29 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     private suspend fun showQRCode() {
-        syncAccountRepository.getRecoveryCode()
-            .onSuccess { connectQR ->
-                val qrBitmap = withContext(dispatchers.io()) {
-                    qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+        if (syncFeature.canShowRecoveryCode().isEnabled()) {
+            syncAccountRepository.getRecoveryCode()
+                .onSuccess { connectQR ->
+                    val qrBitmap = withContext(dispatchers.io()) {
+                        Timber.i("cdr QR code generated. ${connectQR.decodeB64()} $connectQR ")
+                        qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                    }
+                    viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
+                }.onFailure {
+                    command.send(Command.FinishWithError)
                 }
-                viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
-            }.onFailure {
-                command.send(Command.FinishWithError)
-            }
+        } else {
+            syncAccountRepository.getInvitationCode()
+                .onSuccess { connectQR ->
+                    val qrBitmap = withContext(dispatchers.io()) {
+                        Timber.i("cdr QR code generated. ${connectQR.decodeB64()} $connectQR ")
+                        qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                    }
+                    viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
+                }.onFailure {
+                    command.send(Command.FinishWithError)
+                }
+        }
     }
 
     fun onErrorDialogDismissed() {
@@ -110,7 +152,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val qrCodeBitmap: Bitmap? = null,
+        val qrCodeBitmap: Bitmap? = null, // TODO: this can be 2 different codes
     )
 
     sealed class Command {
@@ -157,7 +199,10 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun emitError(result: Error, qrCode: String) {
+    private suspend fun emitError(
+        result: Error,
+        qrCode: String,
+    ) {
         if (result.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
             command.send(AskToSwitchAccount(qrCode))
         } else {
@@ -214,6 +259,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     syncPixels.fireLoginPixel()
                     command.send(LoginSuccess)
                 }
+
                 EnterCodeContractOutput.SwitchAccountSuccess -> {
                     syncPixels.fireLoginPixel()
                     command.send(SwitchAccountSuccess)

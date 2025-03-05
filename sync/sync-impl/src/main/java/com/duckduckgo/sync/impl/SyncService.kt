@@ -69,6 +69,17 @@ interface SyncService {
         @Path("device_id") deviceId: String,
     ): Call<ConnectKey>
 
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/connect/{device_id}") // TODO: change url
+    fun invitationACK(
+        @Path("device_id") deviceId: String,
+    ): Call<InvitationACK>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/connect/{device_id}") // TODO: change url and validate is GET or POST
+    fun sendSecret(
+        @Path("device_id") deviceId: String,
+        @Path("secret") secret: String,
+    ): Call<Void>
+
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
     fun patch(
         @Header("Authorization") token: String,
@@ -128,6 +139,10 @@ data class Logout(
 
 data class ConnectKey(
     @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
+)
+
+data class InvitationACK(
+    @field:Json(name = "encrypted_recovery_key") val encryptedACK: String, // TODO: revisit once defined
 )
 
 data class Connect(

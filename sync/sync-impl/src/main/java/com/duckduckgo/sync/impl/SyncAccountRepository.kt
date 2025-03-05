@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
@@ -54,10 +55,12 @@ interface SyncAccountRepository {
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
     fun getRecoveryCode(): Result<String>
+    fun getInvitationCode(): Result<String>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getConnectQR(): Result<String>
     fun pollConnectionKeys(): Result<Boolean>
+    fun pollSecondDeviceAck(): Result<Boolean>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 }
@@ -76,6 +79,9 @@ class AppSyncAccountRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
 ) : SyncAccountRepository {
+
+    private var tempPrivateKey: String? = null
+    private var tempPublickKey: String? = null
 
     private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
@@ -169,6 +175,17 @@ class AppSyncAccountRepository @Inject constructor(
         return Result.Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
     }
 
+    override fun getInvitationCode(): Result<String> {
+        Timber.d("InvitationFlow: Generating invitation code")
+
+        val deviceID = syncStore.deviceId ?: return Error(reason = "Get Invitation Code: Not existing device ID").alsoFireAccountErrorPixel()
+        val prepareForConnect = nativeLib.prepareForConnect() // TODO: check if values returned are different or always the same
+        tempPrivateKey = prepareForConnect.secretKey
+        tempPublickKey = prepareForConnect.publicKey
+        val invitationCode = InvitationCode(deviceId = deviceID, publicKey = prepareForConnect.publicKey)
+        return Result.Success(Adapters.invitationCodeAdapter.toJson(invitationCode).encodeB64())
+    }
+
     override fun getConnectQR(): Result<String> {
         val prepareForConnect = kotlin.runCatching {
             nativeLib.prepareForConnect().also {
@@ -230,6 +247,53 @@ class AppSyncAccountRepository @Inject constructor(
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
                     return it.copy(code = LOGIN_FAILED.code)
                 }
+            }
+        }
+    }
+
+    // TODO: review error codes
+    override fun pollSecondDeviceAck(): Result<Boolean> {
+        val deviceId = syncDeviceIds.deviceId()
+
+        val result = syncApi.invitationACK(deviceId)
+        return when (result) {
+            is Error -> {
+                if (result.code == NOT_FOUND.code) { // TODO: check with JP which errors we can receive here.
+                    return Result.Success(false)
+                } else if (result.code == GONE.code) {
+                    return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel() // TODO: change according to JP errors
+                }
+                result.alsoFireAccountErrorPixel()
+            }
+
+            is Result.Success -> {
+                val sealOpen = kotlin.runCatching {
+                    nativeLib.sealOpen(result.data, tempPrivateKey!!, tempPublickKey!!) // TODO: handle those double bangs
+                }.getOrElse { throwable ->
+                    throwable.asErrorResult().alsoFireAccountErrorPixel()
+                    return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
+                }
+                val publicKeyNewDevice = Adapters.ackCodeAdapter.fromJson(sealOpen)?.publicKey
+                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading received recovery code").alsoFireAccountErrorPixel()
+                val deviceId2 = Adapters.ackCodeAdapter.fromJson(sealOpen)?.deviceId
+                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading received recovery code").alsoFireAccountErrorPixel()
+
+                // we encrypt our secrets with publickeynewdevice
+                // we send them to the BE endpoint
+                return sendSecrets(deviceId2, publicKeyNewDevice).onFailure {
+                    return it.copy(code = LOGIN_FAILED.code)
+                }
+            }
+        }
+    }
+
+    private fun sendSecrets(deviceId: String, publicKey: String): Result<Boolean> {
+        val recoveryCode = getRecoveryCode()
+        when (recoveryCode) {
+            is Error -> TODO()
+            is Success -> {
+                val encryptedSecrets = nativeLib.seal(recoveryCode.data, publicKey)
+                return syncApi.sendSecrets(deviceId, encryptedSecrets)
             }
         }
     }
@@ -527,6 +591,9 @@ class AppSyncAccountRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
+
+            val invitationCodeAdapter: JsonAdapter<InvitationCode> = moshi.adapter(InvitationCode::class.java)
+            val ackCodeAdapter: JsonAdapter<ACKCode> = moshi.adapter(ACKCode::class.java)
         }
     }
 }
@@ -561,6 +628,16 @@ data class AccountInfo(
 data class LinkCode(
     val recovery: RecoveryCode? = null,
     val connect: ConnectCode? = null,
+)
+
+data class InvitationCode(
+    val deviceId: String,
+    val publicKey: String,
+)
+
+data class ACKCode( // TODO: if this is the same as Invitation, we can remove
+    val deviceId: String,
+    val publicKey: String,
 )
 
 data class RecoveryCode(

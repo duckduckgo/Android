@@ -60,6 +60,15 @@ interface SyncApi {
         deviceId: String,
     ): Result<String>
 
+    fun invitationACK(
+        deviceId: String,
+    ): Result<String>
+
+    fun sendSecrets(
+        deviceId: String,
+        encryptedSecrets: String,
+    ): Result<Boolean>
+
     fun deleteAccount(token: String): Result<Boolean>
 
     fun getDevices(token: String): Result<List<Device>>
@@ -189,6 +198,37 @@ class SyncServiceRemote @Inject constructor(
             val sealed = response.body()?.encryptedRecoveryKey.takeUnless { it.isNullOrEmpty() }
                 ?: return@onSuccess Result.Error(reason = "ConnectDevice: empty body")
             Result.Success(sealed)
+        }
+    }
+
+    override fun invitationACK(deviceId: String): Result<String> {
+        val response = runCatching {
+            val logoutCall = syncService.invitationACK(deviceId)
+            logoutCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val sealed = response.body()?.encryptedACK.takeUnless { it.isNullOrEmpty() }
+                ?: return@onSuccess Result.Error(reason = "InvitationFlow: empty body")
+            Result.Success(sealed)
+        }
+    }
+
+    override fun sendSecrets(
+        deviceId: String,
+        encryptedSecrets: String,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val sendSecretCall = syncService.sendSecret(deviceId, encryptedSecrets)
+            sendSecretCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
         }
     }
 
