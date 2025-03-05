@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.animations
 
-import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.squareup.anvil.annotations.ContributesBinding

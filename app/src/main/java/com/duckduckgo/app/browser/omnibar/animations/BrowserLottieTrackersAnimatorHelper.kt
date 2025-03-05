@@ -164,6 +164,39 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
     }
 
+    override fun startExperimentVariant1Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        omnibarViews: List<View>,
+    ) {
+        if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
+
+        this.shieldAnimation = shieldAnimationView
+
+        with(shieldAnimationView) {
+            this.addAnimatorListener(
+                object : AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        tryToStartCookiesAnimation(context, omnibarViews)
+                        listener?.onAnimationFinished(emptyList())
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+                },
+            )
+
+            this.setMaxProgress(1f)
+            this.playAnimation()
+        }
+    }
+
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 500L

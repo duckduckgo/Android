@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.store
+package com.duckduckgo.common.ui.internal.experiments.trackersblocking
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import android.content.Context
+import android.view.View
+import com.duckduckgo.common.ui.internal.experiments.ExperimentalUIPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "experimentalUITheming",
-)
-interface ExperimentalUIThemingFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+@ContributesMultibinding(AppScope::class)
+class TrackersBlockingExperimentPlugin @Inject constructor() : ExperimentalUIPlugin {
 
-    @Toggle.DefaultValue(false)
-    fun warmColors(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun icons(): Toggle
+    override fun getView(context: Context): View {
+        return TrackersBlockingExperimentView(context)
+    }
 }

@@ -4,7 +4,6 @@ import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
-import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
@@ -31,6 +30,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory

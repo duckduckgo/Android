@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.apppersonality
+package com.duckduckgo.common.ui.internal.experiments.trackersblocking
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -33,7 +33,7 @@ interface AppPersonalityFeature {
      * @return `true` when the remote config has the global "appPersonality" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 
     /**
@@ -41,7 +41,7 @@ interface AppPersonalityFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun trackersBlockedAnimation(): Toggle
 
     /**
@@ -59,4 +59,19 @@ interface AppPersonalityFeature {
      */
     @Toggle.DefaultValue(false)
     fun tabSwitcherResonance(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun variant1(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun variant2(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun variant3(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun variant4(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun variant5(): Toggle
 }

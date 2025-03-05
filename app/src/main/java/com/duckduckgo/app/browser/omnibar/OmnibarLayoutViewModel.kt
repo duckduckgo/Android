@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
@@ -55,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -146,6 +146,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data object CancelTrackersAnimation : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartExperimentTrackersAnimation(val entities: List<Entity>?) : Command()
+        data object StartExperimentVariant1Animation : Command()
         data object MoveCaretToFront : Command()
     }
 
@@ -601,7 +602,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     )
                 }
                 viewModelScope.launch {
-                    if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+                    if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled()) {
+                        command.send(Command.StartExperimentVariant1Animation)
+                    } else if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
                         command.send(Command.StartExperimentTrackersAnimation(decoration.entities))
                     } else {
                         command.send(Command.StartTrackersAnimation(decoration.entities))

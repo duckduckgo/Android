@@ -46,7 +46,6 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
-import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -63,6 +62,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -77,6 +77,7 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -426,6 +427,10 @@ open class OmnibarLayout @JvmOverloads constructor(
                 startExperimentTrackersAnimation(command.entities)
             }
 
+            is StartExperimentVariant1Animation -> {
+                startExperimentVariant1Animation()
+            }
+
             OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
                 moveCaretToFront()
             }
@@ -667,6 +672,16 @@ open class OmnibarLayout @JvmOverloads constructor(
                 trackersBlockedCountAnimationView = trackersBlockedCountAnimation,
                 omnibarViews = omnibarViews(),
                 entities = events,
+            )
+        }
+    }
+
+    private fun startExperimentVariant1Animation() {
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.startExperimentVariant1Animation(
+                context = context,
+                shieldAnimationView = shieldIcon,
+                omnibarViews = omnibarViews(),
             )
         }
     }

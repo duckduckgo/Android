@@ -53,6 +53,12 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
+    fun startExperimentVariant1Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        omnibarViews: List<View>,
+    )
+
     /**
      * This method creates or enqueues cookie consent animation.
      *
