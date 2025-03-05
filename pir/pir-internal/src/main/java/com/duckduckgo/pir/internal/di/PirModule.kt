@@ -29,6 +29,7 @@ import com.duckduckgo.pir.internal.store.RealPirRepository
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -67,6 +68,12 @@ class PirModule {
         return database.scanResultsDao()
     }
 
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideUserProfileDao(database: PirDatabase): UserProfileDao {
+        return database.userProfileDao()
+    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePirRepository(
@@ -77,13 +84,15 @@ class PirModule {
         scanResultsDao: ScanResultsDao,
         currentTimeProvider: CurrentTimeProvider,
         moshi: Moshi,
+        userProfileDao: UserProfileDao,
     ): PirRepository = RealPirRepository(
+        moshi,
         dispatcherProvider,
         RealPirDataStore(sharedPreferencesProvider),
+        currentTimeProvider,
         brokerJsonDao,
         brokerDao,
         scanResultsDao,
-        currentTimeProvider,
-        moshi,
+        userProfileDao,
     )
 }

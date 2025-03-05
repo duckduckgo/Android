@@ -3,8 +3,11 @@
 
     <application>
         <activity
-            android:name=".settings.PirDevSettings"
+            android:name=".settings.PirDevSettingsActivity"
             android:label="@string/pirDevSettings" />
+        <activity
+            android:name=".settings.PirResultsActivity"
+            android:label="@string/pirDevSimpleScanHeader" />
         <service
             android:name=".scan.PirForegroundScanService"
             android:enabled="true"
