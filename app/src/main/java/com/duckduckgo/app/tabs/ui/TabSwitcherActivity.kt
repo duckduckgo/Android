@@ -195,6 +195,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                 updateTabGridItemDecorator(tabSwitcherItems.last().id)
             }
+
+            scrollToCurrentTab()
         }
         viewModel.activeTab.observe(this) { tab ->
             if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
@@ -242,15 +244,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
 
-        if (firstTimeLoadingTabsList) {
-            firstTimeLoadingTabsList = false
-
-            scrollToShowCurrentTab()
-        } else {
+        if (!firstTimeLoadingTabsList) {
             scrollToPreviousCenterOffset(centerOffsetPercent)
         }
 
         tabsRecycler.show()
+    }
+
+    private fun scrollToCurrentTab() {
+        firstTimeLoadingTabsList = false
+        scrollToPositionOfCurrentTab()
     }
 
     private fun scrollToPreviousCenterOffset(centerOffsetPercent: Float) {
@@ -290,7 +293,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.updateData(tabs)
     }
 
-    private fun scrollToShowCurrentTab() {
+    private fun scrollToPositionOfCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
         if (index != -1) {
             scrollToPosition(index)
