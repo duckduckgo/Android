@@ -173,18 +173,15 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onTabSelected(tab: TabEntity) {
+    suspend fun onTabSelected(tab: TabSwitcherItem.Tab) {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update {
-                val selectionMode = it.mode as Selection
-                if (tab.tabId in selectionMode.selectedTabs) {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
-                } else {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
-                }
+            if (tab.isSelected) {
+                unselectTab(tab.id)
+            } else {
+                selectTab(tab.id)
             }
         } else {
-            tabRepository.select(tab.tabId)
+            tabRepository.select(tab.id)
             command.value = Command.Close
             pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         }
@@ -198,6 +195,15 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    private suspend fun deleteTabs(tabIds: List<String>) {
+        tabRepository.deleteTabs(tabIds)
+
+        tabIds.forEach { tabId ->
+            adClickManager.clearTabId(tabId)
+            webViewSessionStorage.deleteSession(tabId)
+        }
+    }
+
     suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
         tabRepository.markDeletable(tab)
         if (swipeGestureUsed) {
@@ -206,23 +212,13 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
         }
 
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
-            if (tab.tabId in selectionMode.selectedTabs) {
-                _selectionViewState.update {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
-                }
-            }
-        }
+        unselectTab(tab.tabId)
     }
 
     suspend fun undoDeletableTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
 
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
-            _selectionViewState.update {
-                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
-            }
-        }
+        selectTab(tab.tabId)
     }
 
     suspend fun purgeDeletableTabs() {
@@ -337,24 +333,37 @@ class TabSwitcherViewModel @Inject constructor(
         val allTabsCount = tabSwitcherItems.value?.size ?: 0
 
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabIds.forEach {
-                onTabDeleted(it)
-            }
+            deleteTabs(tabIds)
 
             if (allTabsCount == tabIds.size) {
-                // Make sure all exemptions are removed as all tabs are deleted.
-                adClickManager.clearAll()
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
 
                 // Close the tab switcher when there are no tabs
-                command.value = Command.Close
-            } else {
-                // Remove the deleted tab from the selection
-                (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
-                    _selectionViewState.update {
-                        it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tabIds.toSet()))
-                    }
+                withContext(dispatcherProvider.main()) {
+                    command.value = Command.Close
                 }
+            } else {
+                unselectTabs(tabIds)
+            }
+        }
+    }
+
+    private fun unselectTab(tabId: String) = unselectTabs(listOf(tabId))
+
+    private fun selectTab(tabId: String) = selectTabs(listOf(tabId))
+
+    private fun unselectTabs(tabIds: List<String>) {
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tabIds.toSet()))
+            }
+        }
+    }
+
+    private fun selectTabs(tabIds: List<String>) {
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tabIds.toSet()))
             }
         }
     }
