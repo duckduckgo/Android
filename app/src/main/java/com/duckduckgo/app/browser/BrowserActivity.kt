@@ -219,6 +219,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (wasSwipingStarted) {
                 wasSwipingStarted = false
 
+                currentTab?.onTabSwipedAway()
                 viewModel.onTabsSwiped()
                 onTabPageSwiped(position)
 

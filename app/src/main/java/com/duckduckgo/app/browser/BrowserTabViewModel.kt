@@ -3847,6 +3847,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onTabSwipedAway() {
+        command.value = GenerateWebViewPreviewImage
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
