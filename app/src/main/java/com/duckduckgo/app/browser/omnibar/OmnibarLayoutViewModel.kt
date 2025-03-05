@@ -613,7 +613,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             command.send(Command.StartExperimentVariant2And5Animation(decoration.entities))
                         }
 
-                        appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled() -> {
+                        appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled() -> {
                             command.send(Command.StartExperimentTrackersAnimation(decoration.entities))
                         }
 

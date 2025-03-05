@@ -619,7 +619,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (targetView != null) {
             // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
             val isPrivacyShieldAnimation = targetView == placeholder
-            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()
+            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled()
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }

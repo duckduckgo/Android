@@ -676,7 +676,7 @@ class BrowserTabFragment :
                 }
                 context?.let {
                     if (appPersonalityFeature.self().isEnabled() &&
-                        appPersonalityFeature.trackersBlockedAnimation().isEnabled() &&
+                        !appPersonalityFeature.variant1().isEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         omnibar.enqueueCookiesAnimation(isCosmetic)
