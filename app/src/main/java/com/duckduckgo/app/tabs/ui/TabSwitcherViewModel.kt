@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -88,14 +89,22 @@ class TabSwitcherViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
-        .debounce(100.milliseconds)
-        .conflate()
-        .combine(_selectionViewState) { tabEntities, viewState ->
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+        tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
             tabEntities.map {
                 TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
             }
-    }.asLiveData()
+        }.asLiveData()
+    } else {
+        tabRepository.flowTabs
+            .debounce(100.milliseconds)
+            .conflate()
+            .combine(_selectionViewState) { tabEntities, viewState ->
+                tabEntities.map {
+                    TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
+                }
+            }.asLiveData()
+    }
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
