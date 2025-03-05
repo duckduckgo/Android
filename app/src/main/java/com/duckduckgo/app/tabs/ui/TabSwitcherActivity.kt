@@ -225,7 +225,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         val centerOffsetPercent = getCurrentCenterOffset()
 
-        this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
                 val gridLayoutManager = GridLayoutManager(
@@ -244,9 +243,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
 
-        if (!firstTimeLoadingTabsList) {
+        if (!firstTimeLoadingTabsList && this.layoutType != null) {
             scrollToPreviousCenterOffset(centerOffsetPercent)
         }
+
+        this.layoutType = layoutType
 
         tabsRecycler.show()
     }
