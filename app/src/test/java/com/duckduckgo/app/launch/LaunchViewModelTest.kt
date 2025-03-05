@@ -31,7 +31,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -60,6 +59,7 @@ class LaunchViewModelTest {
     @After
     fun after() {
         testee.command.removeObserver(mockCommandObserver)
+        fakePixel.firedPixels.clear()
     }
 
     @Test
@@ -156,7 +156,7 @@ class LaunchViewModelTest {
 
         testee.sendWelcomeScreenPixel()
 
-        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
+        assertTrue(fakePixel.firedPixels.containsKey(AppPixelName.SPLASHSCREEN_SHOWN.pixelName))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -171,12 +171,17 @@ class LaunchViewModelTest {
         )
 
         testee.command.observeForever(mockCommandObserver)
-        testee.launchSplashScreenFailToExitJob()
+        testee.launchSplashScreenFailToExitJob("testLauncher")
 
         // Wait for fail to exit timeout and referrer timeout
         advanceTimeBy(3.5.seconds)
 
-        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
+        assertTrue(fakePixel.firedPixels.containsKey(AppPixelName.SPLASHSCREEN_FAILED_TO_LAUNCH.pixelName))
+
+        val pixelParams = fakePixel.firedPixels[AppPixelName.SPLASHSCREEN_FAILED_TO_LAUNCH.pixelName]
+        assertTrue(pixelParams!!.containsValue("testLauncher"))
+        assertTrue(pixelParams.containsKey("api"))
+
         verify(mockCommandObserver).onChanged(any<Home>())
     }
 
@@ -192,7 +197,7 @@ class LaunchViewModelTest {
         )
 
         testee.command.observeForever(mockCommandObserver)
-        testee.launchSplashScreenFailToExitJob()
+        testee.launchSplashScreenFailToExitJob("testLauncher")
         testee.cancelSplashScreenFailToExitJob()
 
         // advance time to ensure that the code does not execute after the delay

@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 
 internal class FakePixel : Pixel {
 
-    val firedPixels = mutableListOf<String>()
+    val firedPixels = mutableMapOf<String, Map<String, String>>()
 
     override fun fire(
         pixel: PixelName,
@@ -30,7 +30,7 @@ internal class FakePixel : Pixel {
         encodedParameters: Map<String, String>,
         type: PixelType,
     ) {
-        firedPixels.add(pixel.pixelName)
+        firedPixels[pixel.pixelName] = parameters
     }
 
     override fun fire(
@@ -39,7 +39,7 @@ internal class FakePixel : Pixel {
         encodedParameters: Map<String, String>,
         type: PixelType,
     ) {
-        firedPixels.add(pixelName)
+        firedPixels[pixelName] = parameters
     }
 
     override fun enqueueFire(
@@ -47,7 +47,7 @@ internal class FakePixel : Pixel {
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
     ) {
-        firedPixels.add(pixel.pixelName)
+        firedPixels[pixel.pixelName] = parameters
     }
 
     override fun enqueueFire(
@@ -55,6 +55,6 @@ internal class FakePixel : Pixel {
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
     ) {
-        firedPixels.add(pixelName)
+        firedPixels[pixelName] = parameters
     }
 }
