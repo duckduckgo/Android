@@ -88,8 +88,7 @@ class RealPirScan @Inject constructor(
     private val brokerActionProcessor: BrokerActionProcessor,
     private val pirCssScriptLoader: PirCssScriptLoader,
 ) : PirScan, ActionResultListener {
-    // TODO: Allow to input profile
-    private val profileQuery: ProfileQuery = ProfileQuery(
+    private var profileQuery: ProfileQuery = ProfileQuery(
         firstName = "William",
         lastName = "Smith",
         city = "Chicago",
@@ -100,6 +99,7 @@ class RealPirScan @Inject constructor(
         age = 34,
         deprecated = false,
     )
+
     private var detachedWebView: WebView? = null
     private var currentAction: BrokerAction? = null
     private var currentActionIndex: Int = 0
@@ -128,6 +128,24 @@ class RealPirScan @Inject constructor(
          */
         runBlocking {
             repository.deleteAllResults()
+            repository.getUserProfiles().also {
+                if (it.isNotEmpty()) {
+                    val storedProfile = it[0]
+                    profileQuery = ProfileQuery(
+                        firstName = storedProfile.userName.firstName,
+                        lastName = storedProfile.userName.lastName,
+                        city = storedProfile.addresses.city,
+                        state = storedProfile.addresses.state,
+                        addresses = listOf(),
+                        birthYear = storedProfile.birthYear,
+                        fullName = storedProfile.userName.middleName?.run {
+                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
+                        } ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                        age = storedProfile.age,
+                        deprecated = false,
+                    )
+                }
+            }
         }
 
         _onScanComplete = onScanComplete
@@ -135,6 +153,7 @@ class RealPirScan @Inject constructor(
             pirCssScriptLoader.getScript()
         }
 
+        logcat { "PIR-SCAN: Running scan on profile: $profileQuery" }
         _brokers = brokers
         detachedWebView = pirDetachedWebViewProvider.getInstance(context, script) { url ->
             handleLoadingFinished(url)

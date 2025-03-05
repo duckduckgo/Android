@@ -21,6 +21,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -32,13 +33,15 @@ import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.UserProfile
+import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
@@ -48,6 +51,7 @@ import com.squareup.moshi.Types
         ScanNavigateResult::class,
         ScanErrorResult::class,
         ExtractProfileResult::class,
+        UserProfile::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -55,10 +59,39 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun brokerJsonDao(): BrokerJsonDao
     abstract fun brokerDao(): BrokerDao
     abstract fun scanResultsDao(): ScanResultsDao
+    abstract fun userProfileDao(): UserProfileDao
 
     companion object {
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Drop column is not supported by SQLite, so the data must be moved manually.
+                with(database) {
+                    execSQL(
+                        """ 
+                        CREATE TABLE IF NOT EXISTS pir_user_profile (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            -- UserName fields
+                            user_firstName TEXT NOT NULL,
+                            user_lastName TEXT NOT NULL,
+                            user_middleName TEXT,
+                            user_suffix TEXT,
+                            -- Address fields
+                            address_city TEXT NOT NULL,
+                            address_state TEXT NOT NULL,
+                            address_street TEXT,
+                            address_zip TEXT,
+                            -- Other fields
+                            birthYear INTEGER NOT NULL,
+                            phone TEXT,
+                            age INTEGER NOT NULL
+                        )    
+                        """.trimIndent(),
+                    )
+                }
+            }
+        }
         val ALL_MIGRATIONS: List<Migration>
-            get() = emptyList()
+            get() = listOf(MIGRATION_1_2)
     }
 }
 

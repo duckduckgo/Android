@@ -28,9 +28,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
-import com.duckduckgo.pir.internal.settings.PirDevSettings
-import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_CHANNEL_ID
-import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_ID_STATUS_COMPLETE
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import logcat.AndroidLogcatLogger
@@ -139,7 +139,7 @@ class PirForegroundScanService : Service() {
     private fun createNotification(message: String): Notification {
         val notificationIntent = Intent(
             this,
-            PirDevSettings::class.java,
+            PirDevSettingsActivity::class.java,
         )
         val pendingIntent = PendingIntent.getActivity(
             this,
