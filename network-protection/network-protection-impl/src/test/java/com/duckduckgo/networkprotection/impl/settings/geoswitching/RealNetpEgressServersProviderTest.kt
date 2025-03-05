@@ -36,7 +36,7 @@ class RealNetpEgressServersProviderTest {
     var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: RealNetpEgressServersProvider
-    private var wgVpnControllerService = FakeWgVpnControllerService()
+    private val wgVpnControllerService = FakeWgVpnControllerService()
 
     private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
@@ -44,7 +44,6 @@ class RealNetpEgressServersProviderTest {
     fun setUp() {
         netPGeoswitchingRepository = FakeNetPGeoswitchingRepository()
         testee = RealNetpEgressServersProvider(
-            wgVpnControllerService,
             coroutineRule.testDispatcherProvider,
             netPGeoswitchingRepository,
         )
@@ -52,7 +51,7 @@ class RealNetpEgressServersProviderTest {
 
     @Test
     fun whenDownloadDateThenParseAndReplaceStoredLocations() = runTest {
-        assertNull(testee.updateServerLocationsAndReturnPreferred())
+        assertNull(testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()))
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -82,7 +81,10 @@ class RealNetpEgressServersProviderTest {
             ),
         )
 
-        assertEquals(PreferredLocation(countryCode = "se", cityName = "Gothenburg"), testee.updateServerLocationsAndReturnPreferred())
+        assertEquals(
+            PreferredLocation(countryCode = "se", cityName = "Gothenburg"),
+            testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()),
+        )
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -112,7 +114,10 @@ class RealNetpEgressServersProviderTest {
             ),
         )
 
-        assertEquals(PreferredLocation(countryCode = "se"), testee.updateServerLocationsAndReturnPreferred())
+        assertEquals(
+            PreferredLocation(countryCode = "se"),
+            testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()),
+        )
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -142,7 +147,7 @@ class RealNetpEgressServersProviderTest {
             ),
         )
 
-        assertNull(testee.updateServerLocationsAndReturnPreferred())
+        assertNull(testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()))
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -172,7 +177,7 @@ class RealNetpEgressServersProviderTest {
             ),
         )
 
-        assertNull(testee.updateServerLocationsAndReturnPreferred())
+        assertNull(testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()))
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -202,7 +207,10 @@ class RealNetpEgressServersProviderTest {
             ),
         )
 
-        assertEquals(PreferredLocation(countryCode = "se", cityName = "Gothenburg"), testee.updateServerLocationsAndReturnPreferred())
+        assertEquals(
+            PreferredLocation(countryCode = "se", cityName = "Gothenburg"),
+            testee.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()),
+        )
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
