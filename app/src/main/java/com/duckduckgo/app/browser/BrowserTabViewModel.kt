@@ -768,6 +768,7 @@ class BrowserTabViewModel @Inject constructor(
         return downloadCallback.commands()
     }
 
+    // updateMaliciousSiteStatus should be false, unless you know the site is safe or malicious
     private fun buildSiteFactory(
         url: String,
         title: String? = null,
