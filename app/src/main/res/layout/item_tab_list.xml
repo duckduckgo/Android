@@ -35,7 +35,7 @@
             android:layout_width="@dimen/listItemImageMediumSize"
             android:layout_height="@dimen/listItemImageMediumSize"
             android:contentDescription="@string/faviconContentDescription"
-            android:src="@drawable/ic_globe_gray_16dp"
+            android:src="@drawable/ic_dax_icon"
             android:layout_marginHorizontal="@dimen/keyline_2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

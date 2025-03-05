@@ -33,7 +33,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:contentDescription="@string/faviconContentDescription"
-            android:src="@drawable/ic_globe_gray_16dp"
+            android:src="@drawable/ic_dax_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -87,6 +87,18 @@
             android:layout_marginTop="@dimen/keyline_3"
             android:importantForAccessibility="no"
             android:scaleType="matrix"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <ImageView
+            android:id="@+id/newTabImage"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/gridItemPreviewHeight"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_dax_splash_screen_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

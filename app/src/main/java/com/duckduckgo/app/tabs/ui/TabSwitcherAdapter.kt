@@ -48,6 +48,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
@@ -240,13 +241,24 @@ class TabSwitcherAdapter(
     }
 
     private fun loadFavicon(tab: TabEntity, view: ImageView) {
-        val url = tab.url ?: return
-        lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
+        if (tab.url == null) {
+            Glide.with(view).load(com.duckduckgo.mobile.android.R.drawable.ic_dax_icon).into(view)
+        } else {
+            lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, tab.url!!, view)
+            }
         }
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, holder: TabSwitcherViewHolder.GridTabViewHolder) {
+        if (tab.url == null) {
+            holder.newTabImage.show()
+            holder.tabPreview.hide()
+        } else {
+            holder.newTabImage.hide()
+            holder.tabPreview.show()
+        }
+
         val previewFile = tab.tabPreviewFile ?: return glide.clear(holder.tabPreview)
 
         lifecycleOwner.lifecycleScope.launch {
@@ -340,6 +352,7 @@ class TabSwitcherAdapter(
             override val close: ImageView = binding.close,
             override val tabUnread: ImageView = binding.tabUnread,
             val tabPreview: ImageView = binding.tabPreview,
+            val newTabImage: ImageView = binding.newTabImage,
         ) : TabSwitcherViewHolder(binding.root), TabViewHolder
 
         data class ListTabViewHolder(
