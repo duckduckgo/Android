@@ -127,6 +127,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             appPersonalityFeature.self().setRawStoredState(State(true))
             appPersonalityFeature.variant5().setRawStoredState(State(checked))
+            experimentalUIThemingFeature.self().setRawStoredState(State(checked))
 
             if (checked) {
                 appPersonalityFeature.variant1().setRawStoredState(State(false))

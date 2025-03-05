@@ -3859,7 +3859,9 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled()) {
+        if (appPersonalityFeature.self().isEnabled() &&
+            (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant5().isEnabled())
+        ) {
             command.value = Command.StartExperimentShieldPopAnimation
         } else if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
             if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD) {

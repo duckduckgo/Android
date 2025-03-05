@@ -63,7 +63,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesA
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2Animation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2And5Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -432,8 +432,8 @@ open class OmnibarLayout @JvmOverloads constructor(
                 startExperimentVariant1Animation()
             }
 
-            is StartExperimentVariant2Animation -> {
-                startExperimentVariant2Animation(command.entities)
+            is StartExperimentVariant2And5Animation -> {
+                startExperimentVariant2And5Animation(command.entities)
             }
 
             OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
@@ -691,7 +691,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startExperimentVariant2Animation(events: List<Entity>?) {
+    private fun startExperimentVariant2And5Animation(events: List<Entity>?) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
