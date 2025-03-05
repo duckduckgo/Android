@@ -32,12 +32,16 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.CodeType.UNKNOWN
+import com.duckduckgo.sync.impl.ExchangeResult.*
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
+import java.util.UUID
 import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -45,6 +49,7 @@ import timber.log.Timber
 
 interface SyncAccountRepository {
 
+    fun getCodeType(stringCode: String): CodeType
     fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
@@ -58,6 +63,9 @@ interface SyncAccountRepository {
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getConnectQR(): Result<String>
     fun pollConnectionKeys(): Result<Boolean>
+    fun generateExchangeInvitationCode(): Result<String>
+    fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
+    fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 }
@@ -75,7 +83,18 @@ class AppSyncAccountRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
+    private val deviceKeyGenerator: DeviceKeyGenerator,
 ) : SyncAccountRepository {
+
+    /**
+     * If there is a key-exchange invitation in progress, we need to keep a reference to them
+     * There are separate invitation details for the inviter and the receiver
+     *
+     * Inviter is reset every time a new exchange invitation code is created.
+     * Receiver is reset every time an exchange invitation is received.
+     */
+    private var pendingInvitationAsInviter: PendingInvitation? = null
+    private var pendingInvitationAsReceiver: PendingInvitation? = null
 
     private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
@@ -95,19 +114,139 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun processCode(stringCode: String): Result<Boolean> {
+        val decodedCode: String? = kotlin.runCatching {
+            return@runCatching stringCode.decodeB64()
+        }.getOrNull()
+        if (decodedCode == null) {
+            Timber.w("Failed while b64 decoding barcode; barcode is unusable")
+            return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
+        }
+
         kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(stringCode.decodeB64())?.recovery
+            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
         }.getOrNull()?.let {
+            Timber.d("Sync: code is a recovery code")
             return login(it)
         }
 
         kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(stringCode.decodeB64())?.connect
+            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
         }.getOrNull()?.let {
+            Timber.d("Sync: code is a connect code")
             return connectDevice(it)
         }
 
-        return Error(code = INVALID_CODE.code, reason = "Failed to decode recovery code")
+        kotlin.runCatching {
+            Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
+        }.getOrNull()?.let {
+            if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
+                Timber.w("Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled")
+                return@let null
+            }
+
+            return completeExchange(it)
+        }
+
+        Timber.e("Sync: code is not supported")
+        return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
+    }
+
+    override fun getCodeType(stringCode: String): CodeType {
+        return kotlin.runCatching {
+            val decodedCode = stringCode.decodeB64()
+            when {
+                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery != null -> CodeType.RECOVERY
+                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect != null -> CodeType.CONNECT
+                Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey != null -> CodeType.EXCHANGE
+                else -> UNKNOWN
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to decode code")
+        }.getOrDefault(UNKNOWN)
+    }
+
+    private fun completeExchange(invitationCode: InvitationCode): Result<Boolean> {
+        // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
+        Timber.d("Sync-exchange: InviteFlow - B. code is an exchange code $invitationCode")
+
+        // generate new ID and and public/private key-pair for receiving device
+        val thisDeviceKeyId = deviceKeyGenerator.generate()
+        val thisDeviceKeyPair = nativeLib.prepareForConnect()
+
+        pendingInvitationAsReceiver = PendingInvitation(
+            keyId = thisDeviceKeyId,
+            privateKey = thisDeviceKeyPair.secretKey,
+            publicKey = thisDeviceKeyPair.publicKey,
+        )
+        val deviceName = syncDeviceIds.deviceName()
+
+        Timber.i(
+            "Sync: details for this (receiver) device:" +
+                "\n\tkey ID is $thisDeviceKeyId" +
+                "\n\tpublic key is ${thisDeviceKeyPair.publicKey}" +
+                "\n\tdevice name is $deviceName",
+        )
+
+        val invitedDeviceDetails = InvitedDeviceDetails(
+            keyId = thisDeviceKeyId,
+            publicKey = thisDeviceKeyPair.publicKey,
+            deviceName = deviceName,
+        )
+
+        kotlin.runCatching {
+            val payload = Adapters.invitedDeviceAdapter.toJson(invitedDeviceDetails)
+            val encrypted = nativeLib.seal(payload, invitationCode.publicKey)
+            return syncApi.sendEncryptedMessage(invitationCode.keyId, encrypted)
+        }.getOrElse { throwable ->
+            throwable.asErrorResult().alsoFireAccountErrorPixel()
+            return Error(code = GENERIC_ERROR.code, reason = "Exchange: Error encrypting payload")
+        }
+    }
+
+    override fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult> {
+        // Sync: InviteFlow - E (https://app.asana.com/0/72649045549333/1209571867429615)
+        Timber.d("Sync-exchange: InviteFlow - E")
+
+        val pendingInvite = pendingInvitationAsReceiver
+            ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: No pending invite initialized").also {
+                Timber.w("Sync-exchange: no pending invite initialized")
+            }
+
+        return when (val result = syncApi.getEncryptedMessage(pendingInvite.keyId)) {
+            is Error -> {
+                if (result.code == NOT_FOUND.code) {
+                    return Success(Pending)
+                } else if (result.code == GONE.code) {
+                    return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
+                }
+                result.alsoFireAccountErrorPixel()
+            }
+
+            is Success -> {
+                Timber.d("Sync-exchange: received encrypted recovery code")
+
+                val decryptedJson = kotlin.runCatching {
+                    nativeLib.sealOpen(result.data, pendingInvite.publicKey, pendingInvite.privateKey)
+                }.getOrNull()
+                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal").alsoFireAccountErrorPixel()
+
+                val recoveryData = kotlin.runCatching {
+                    Adapters.recoveryCodeAdapter.fromJson(decryptedJson)?.recovery
+                }.getOrNull()
+                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading recovery code").alsoFireAccountErrorPixel()
+
+                return when (val loginResult = login(recoveryData)) {
+                    is Success -> Success(LoggedIn)
+                    is Error -> {
+                        return if (loginResult.code == ALREADY_SIGNED_IN.code) {
+                            Success(AccountSwitchingRequired(decryptedJson.encodeB64()))
+                        } else {
+                            loginResult
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
@@ -166,7 +305,28 @@ class AppSyncAccountRepository @Inject constructor(
     override fun getRecoveryCode(): Result<String> {
         val primaryKey = syncStore.primaryKey ?: return Error(reason = "Get Recovery Code: Not existing primary Key").alsoFireAccountErrorPixel()
         val userID = syncStore.userId ?: return Error(reason = "Get Recovery Code: Not existing userId").alsoFireAccountErrorPixel()
-        return Result.Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
+        return Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
+    }
+
+    override fun generateExchangeInvitationCode(): Result<String> {
+        // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
+        Timber.d("Sync-exchange: InviteFlow - A. Generating invitation code")
+
+        // generate new ID and and public/private key-pair
+        generateInviterDeviceDetails()
+
+        val pendingInvitation = pendingInvitationAsInviter
+            ?: return Error(code = GENERIC_ERROR.code, reason = "Exchange: No pending invitation initialized").alsoFireAccountErrorPixel()
+
+        val invitationCode = InvitationCode(keyId = pendingInvitation.keyId, publicKey = pendingInvitation.publicKey)
+        val invitationWrapper = InvitationCodeWrapper(invitationCode)
+
+        return kotlin.runCatching {
+            val code = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
+            Success(code)
+        }.getOrElse {
+            Error(code = GENERIC_ERROR.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
+        }
     }
 
     override fun getConnectQR(): Result<String> {
@@ -185,7 +345,7 @@ class AppSyncAccountRepository @Inject constructor(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
         ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
 
-        return Result.Success(linkingQRCode.encodeB64())
+        return Success(linkingQRCode.encodeB64())
     }
 
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
@@ -205,18 +365,17 @@ class AppSyncAccountRepository @Inject constructor(
     override fun pollConnectionKeys(): Result<Boolean> {
         val deviceId = syncDeviceIds.deviceId()
 
-        val result = syncApi.connectDevice(deviceId)
-        return when (result) {
+        return when (val result = syncApi.connectDevice(deviceId)) {
             is Error -> {
                 if (result.code == NOT_FOUND.code) {
-                    return Result.Success(false)
+                    return Success(false)
                 } else if (result.code == GONE.code) {
                     return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
                 }
                 result.alsoFireAccountErrorPixel()
             }
 
-            is Result.Success -> {
+            is Success -> {
                 val sealOpen = kotlin.runCatching {
                     nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
                 }.getOrElse { throwable ->
@@ -229,6 +388,85 @@ class AppSyncAccountRepository @Inject constructor(
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
                     return it.copy(code = LOGIN_FAILED.code)
+                }
+            }
+        }
+    }
+
+    override fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
+        // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
+        Timber.d("Sync-exchange: InviteFlow - C")
+
+        val keyId = pendingInvitationAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
+
+        return when (val result = syncApi.getEncryptedMessage(keyId)) {
+            is Error -> {
+                if (result.code == NOT_FOUND.code) {
+                    return Success(false)
+                } else if (result.code == GONE.code) {
+                    return Error(
+                        code = CONNECT_FAILED.code,
+                        reason = "Connect: keys expired",
+                    ).alsoFireAccountErrorPixel()
+                }
+                result.alsoFireAccountErrorPixel()
+            }
+
+            is Success -> {
+                Timber.v("Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}")
+
+                val decrypted = kotlin.runCatching {
+                    val pending = pendingInvitationAsInviter
+                        ?: return Error(code = CONNECT_FAILED.code, reason = "Exchange: No pending invitation initialized")
+                            .alsoFireAccountErrorPixel()
+
+                    nativeLib.sealOpen(result.data, pending.publicKey, pending.privateKey)
+                }.getOrElse { throwable ->
+                    throwable.asErrorResult().alsoFireAccountErrorPixel()
+                    return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
+                }
+
+                Timber.v("Sync-exchange: invitation acceptance received: $decrypted")
+
+                val response = Adapters.invitedDeviceAdapter.fromJson(decrypted)
+                    ?: return Error(code = GENERIC_ERROR.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
+
+                val otherDevicePublicKey = response.publicKey
+                val otherDeviceKeyId = response.keyId
+
+                Timber.v(
+                    "Sync-exchange: We have received the other device's details. " +
+                        "name:${response.deviceName}, keyId:${response.keyId}, public key: ${response.publicKey}",
+                )
+
+                // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
+                return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {
+                    Timber.w("Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}")
+                    return it.copy(code = LOGIN_FAILED.code)
+                }
+            }
+        }
+    }
+
+    private fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
+        // Sync: InviteFlow - D (https://app.asana.com/0/72649045549333/1209571867429615)
+        Timber.d("Sync-exchange: InviteFlow - D")
+
+        when (val recoveryCode = getRecoveryCode()) {
+            is Error -> {
+                Timber.e("Sync-exchange: failed to get recovery code. error code: ${recoveryCode.code} ${recoveryCode.reason}")
+                return Error(code = GENERIC_ERROR.code, reason = "Connect: Error getting recovery code").alsoFireAccountErrorPixel()
+            }
+            is Success -> {
+                Timber.v("Sync-exchange: Got recovery code, ready to share encrypted data for key ID: $keyId")
+
+                // recovery code comes b64 encoded, so we need to decode it, then encrypt, which automatically b64 encodes the encrypted form
+                return kotlin.runCatching {
+                    val json = recoveryCode.data.decodeB64()
+                    val encryptedJson = nativeLib.seal(json, publicKey)
+                    syncApi.sendEncryptedMessage(keyId, encryptedJson)
+                }.getOrElse {
+                    it.asErrorResult()
                 }
             }
         }
@@ -257,11 +495,11 @@ class AppSyncAccountRepository @Inject constructor(
                 result.copy(code = GENERIC_ERROR.code)
             }
 
-            is Result.Success -> {
+            is Success -> {
                 if (logoutThisDevice) {
                     syncStore.clearAll()
                 }
-                Result.Success(true)
+                Success(true)
             }
         }
     }
@@ -276,9 +514,9 @@ class AppSyncAccountRepository @Inject constructor(
                 result.alsoFireDeleteAccountErrorPixel().copy(code = GENERIC_ERROR.code)
             }
 
-            is Result.Success -> {
+            is Success -> {
                 syncStore.clearAll()
-                Result.Success(true)
+                Success(true)
             }
         }
     }
@@ -309,8 +547,8 @@ class AppSyncAccountRepository @Inject constructor(
                 result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
             }
 
-            is Result.Success -> {
-                return Result.Success(
+            is Success -> {
+                return Success(
                     result.data.mapNotNull { device ->
                         try {
                             val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
@@ -353,13 +591,31 @@ class AppSyncAccountRepository @Inject constructor(
                 syncPixels.fireUserSwitchedLogoutError()
                 result
             }
-            is Result.Success -> {
+
+            is Success -> {
                 val loginResult = processCode(stringCode)
                 if (loginResult is Error) {
                     syncPixels.fireUserSwitchedLoginError()
                 }
-                loginResult
+                Success(true)
             }
+        }
+    }
+
+    private fun generateInviterDeviceDetails() {
+        Timber.i("Sync-exchange: Generating inviter device details")
+        // generate new ID and and public/private key-pair
+        val keyId = deviceKeyGenerator.generate()
+        val prepareForConnect = nativeLib.prepareForConnect()
+
+        PendingInvitation(
+            keyId = keyId,
+            privateKey = prepareForConnect.secretKey,
+            publicKey = prepareForConnect.publicKey,
+        ).also {
+            pendingInvitationAsInviter = it
+            Timber.w("Sync-exchange: this (inviter) device's key ID is $keyId")
+            Timber.w("Sync-exchange: this (inviter) device's public key is ${it.publicKey}")
         }
     }
 
@@ -407,11 +663,11 @@ class AppSyncAccountRepository @Inject constructor(
                 result
             }
 
-            is Result.Success -> {
+            is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
                 syncEngine.triggerSync(ACCOUNT_CREATION)
                 Timber.d("Sync-Account: recovery code is ${getRecoveryCode()}")
-                Result.Success(true)
+                Success(true)
             }
         }
     }
@@ -450,7 +706,7 @@ class AppSyncAccountRepository @Inject constructor(
                 result
             }
 
-            is Result.Success -> {
+            is Success -> {
                 val decryptResult = kotlin.runCatching {
                     nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey).also {
                         it.checkResult("Login: decrypt protection keys failed")
@@ -464,7 +720,7 @@ class AppSyncAccountRepository @Inject constructor(
                     syncEngine.triggerSync(ACCOUNT_LOGIN)
                 }
 
-                Result.Success(true)
+                Success(true)
             }
         }
     }
@@ -527,6 +783,9 @@ class AppSyncAccountRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
+
+            val invitationCodeAdapter: JsonAdapter<InvitationCodeWrapper> = moshi.adapter(InvitationCodeWrapper::class.java)
+            val invitedDeviceAdapter: JsonAdapter<InvitedDeviceDetails> = moshi.adapter(InvitedDeviceDetails::class.java)
         }
     }
 }
@@ -568,6 +827,21 @@ data class RecoveryCode(
     @field:Json(name = "user_id") val userId: String,
 )
 
+data class InvitationCodeWrapper(
+    @field:Json(name = "exchange_key") val exchangeKey: InvitationCode,
+)
+
+data class InvitationCode(
+    @field:Json(name = "key_id") val keyId: String,
+    @field:Json(name = "public_key") val publicKey: String,
+)
+
+data class InvitedDeviceDetails(
+    @field:Json(name = "key_id") val keyId: String,
+    @field:Json(name = "public_key") val publicKey: String,
+    @field:Json(name = "device_name") val deviceName: String,
+)
+
 data class ConnectedDevice(
     val thisDevice: Boolean = false,
     val deviceName: String,
@@ -589,6 +863,13 @@ enum class AccountErrorCodes(val code: Int) {
     INVALID_CODE(55),
 }
 
+enum class CodeType {
+    RECOVERY,
+    CONNECT,
+    EXCHANGE,
+    UNKNOWN,
+}
+
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
@@ -607,23 +888,60 @@ sealed class Result<out R> {
 
 fun <T> Result<T>.getOrNull(): T? {
     return when (this) {
-        is Result.Success -> data
-        is Result.Error -> null
+        is Success -> data
+        is Error -> null
     }
 }
 
 inline fun <T> Result<T>.onSuccess(action: (value: T) -> Unit): Result<T> {
-    if (this is Result.Success) {
+    if (this is Success) {
         action(data)
     }
 
     return this
 }
 
-inline fun <T> Result<T>.onFailure(action: (error: Result.Error) -> Unit): Result<T> {
-    if (this is Result.Error) {
+inline fun <T> Result<T>.onFailure(action: (error: Error) -> Unit): Result<T> {
+    if (this is Error) {
         action(this)
     }
 
     return this
+}
+
+private data class PendingInvitation(
+    val keyId: String,
+    val privateKey: String,
+    var publicKey: String,
+)
+
+/**
+ * Used to indicate the result of the key exchange flow
+ */
+sealed interface ExchangeResult {
+    /**
+     * Exchange finished leaving the user logged in
+     */
+    data object LoggedIn : ExchangeResult
+
+    /**
+     * Exchange is currently pending, awaiting external action before it's completed
+     */
+    data object Pending : ExchangeResult
+
+    /**
+     * Exchange finished but the user is already logged in; account switching is required to complete the exchange and log the user in
+     */
+    data class AccountSwitchingRequired(val recoveryCode: String) : ExchangeResult
+}
+
+interface DeviceKeyGenerator {
+    fun generate(): String
+}
+
+@ContributesBinding(AppScope::class)
+class RealDeviceKeyGenerator @Inject constructor() : DeviceKeyGenerator {
+    override fun generate(): String {
+        return UUID.randomUUID().toString()
+    }
 }
