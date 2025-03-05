@@ -186,7 +186,7 @@ class TabSwitcherAdapter(
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
-            tab = tabItem.tabEntity,
+            tab = tabItem,
         )
     }
 
@@ -201,7 +201,7 @@ class TabSwitcherAdapter(
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
-            tab = tab.tabEntity,
+            tab = tab,
         )
     }
 
@@ -378,7 +378,7 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tab: TabEntity) {
+    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tab: Tab) {
         tabViewHolder.rootView.setOnClickListener {
             if (!isDragging) {
                 itemClickListener.onTabSelected(tab)
