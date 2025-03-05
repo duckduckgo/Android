@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.launch
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -43,7 +45,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        viewModel.launchSplashScreenFailToExitJob()
+        viewModel.launchSplashScreenFailToExitJob(getLauncherPackageName())
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             viewModel.cancelSplashScreenFailToExitJob()
@@ -90,5 +92,13 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         startActivity(BrowserActivity.intent(this))
         overridePendingTransition(0, 0)
         finish()
+    }
+
+    // Temporary to track splashscreen errors
+    private fun getLauncherPackageName(): String? {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        val resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolveInfo?.activityInfo?.packageName
     }
 }
