@@ -65,7 +65,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/leaveSiteCTA"
-            android:layout_width="360dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_6"
             android:text="@string/maliciousSiteLeaveCTA"
@@ -76,7 +76,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/advancedCTA"
-            android:layout_width="360dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/sslErrorAdvancedCTA"
             app:buttonSize="large"
