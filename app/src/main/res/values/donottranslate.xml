@@ -118,6 +118,11 @@
     </plurals>
     <string name="closeOtherTabsMenuItem">Close Other Tabs</string>
 
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 Private Tab</item>
+        <item quantity="other">%1$d Private Tabs</item>
+    </plurals>
+
     <!--    Bottom Navigation Bar Experiment-->
     <string name="refreshPage">Refresh Page</string>
 
