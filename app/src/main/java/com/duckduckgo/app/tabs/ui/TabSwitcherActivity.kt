@@ -336,15 +336,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         )
     }
 
-    private fun updateToolbarTitle(mode: Mode) {
-        toolbar.title = if (mode is Mode.Selection) {
+    private fun updateToolbarTitle(mode: Mode, tabCount: Int) {
+        toolbar.title = if (mode is Selection) {
             if (mode.selectedTabs.isEmpty()) {
                 getString(R.string.selectTabsMenuItem)
             } else {
                 getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
             }
         } else {
-            getString(R.string.tabActivityTitle)
+            resources.getQuantityString(R.plurals.tabSwitcherTitle, tabCount, tabCount)
         }
     }
 
@@ -386,7 +386,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     tabsRecycler.invalidateItemDecorations()
                     tabsAdapter.updateData(it.tabItems)
 
-                    updateToolbarTitle(it.mode)
+                    updateToolbarTitle(it.mode, it.tabItems.size)
                     updateTabGridItemDecorator()
 
                     invalidateOptionsMenu()
@@ -672,9 +672,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         launch { viewModel.onNewTabRequested(fromOverflowMenu) }
     }
 
-    override fun onTabSelected(tab: TabSwitcherItem.Tab) {
-        updateTabGridItemDecorator(tab.id)
-        launch { viewModel.onTabSelected(tab) }
+    override fun onTabSelected(tabId: String) {
+        launch { viewModel.onTabSelected(tabId) }
     }
 
     private fun updateTabGridItemDecorator() {

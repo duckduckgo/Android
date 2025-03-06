@@ -174,19 +174,19 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tabItem: Tab) {
+    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tab: Tab) {
         val context = holder.binding.root.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tabItem.tabEntity, context)
-        holder.url.text = tabItem.tabEntity.url ?: ""
-        holder.url.visibility = if (tabItem.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
-        updateUnreadIndicator(holder, tabItem.tabEntity)
-        loadFavicon(tabItem.tabEntity, glide, holder.favicon)
-        loadSelectionState(holder, tabItem)
+        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.url.text = tab.tabEntity.url ?: ""
+        holder.url.visibility = if (tab.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
+        updateUnreadIndicator(holder, tab.tabEntity)
+        loadFavicon(tab.tabEntity, glide, holder.favicon)
+        loadSelectionState(holder, tab)
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
-            tab = tabItem,
+            tabId = tab.id,
         )
     }
 
@@ -201,7 +201,21 @@ class TabSwitcherAdapter(
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
-            tab = tab,
+            tabId = tab.id,
+        )
+    }
+
+    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tabId: String) {
+        tabViewHolder.rootView.setOnClickListener {
+            if (!isDragging) {
+                itemClickListener.onTabSelected(tabId)
+            }
+        }
+        tabViewHolder.close.setOnClickListener(
+            createCloseClickListener(
+                bindingAdapterPosition = bindingAdapterPosition,
+                tabSwitcherListener = itemClickListener,
+            ),
         )
     }
 
@@ -376,20 +390,6 @@ class TabSwitcherAdapter(
         } else {
             glide.clear(tabPreview)
         }
-    }
-
-    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tab: Tab) {
-        tabViewHolder.rootView.setOnClickListener {
-            if (!isDragging) {
-                itemClickListener.onTabSelected(tab)
-            }
-        }
-        tabViewHolder.close.setOnClickListener(
-            createCloseClickListener(
-                bindingAdapterPosition = bindingAdapterPosition,
-                tabSwitcherListener = itemClickListener,
-            ),
-        )
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
