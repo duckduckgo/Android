@@ -21,5 +21,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 sealed class TabSwitcherItem(val id: String) {
 
     data class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId)
-    data object TrackerAnimationTile : TabSwitcherItem("TrackerAnimationTile")
+    data object TrackerAnimationTile : TabSwitcherItem("TrackerAnimationTile") {
+
+        const val ANIMATED_TILE_NO_REPLACE_ALPHA = 0.4f
+        const val ANIMATED_TILE_DEFAULT_ALPHA = 1f
+    }
 }
