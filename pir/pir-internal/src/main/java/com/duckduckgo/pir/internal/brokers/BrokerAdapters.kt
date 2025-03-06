@@ -27,7 +27,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class StepsAsStringAdapter {
-    private val adapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(Map::class.java)
+    private val adapter by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(Map::class.java) }
 
     @FromJson
     fun fromJson(steps: List<Map<String, Any>>): List<String> {

@@ -45,9 +45,9 @@ data class Address(
 data class ExtractedProfile(
     val id: Int? = null,
     val name: String? = null,
-    val alternativeNamesList: List<String>? = null,
-    val addressFull: List<AddressCityState>? = null,
-    val addressCityState: List<AddressCityState>? = null,
+    val alternativeNamesList: List<String>? = emptyList(),
+    val addressFull: List<AddressCityState>? = emptyList(),
+    val addressCityState: List<AddressCityState>? = emptyList(),
     val phoneNumbers: List<String>? = null,
     val relativesList: List<String>? = null,
     val profileUrl: ProfileUrl? = null,
