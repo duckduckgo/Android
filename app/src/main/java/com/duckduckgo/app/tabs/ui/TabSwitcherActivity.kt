@@ -64,6 +64,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -299,11 +300,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun updateFabType(fabType: TabSwitcherViewModel.ViewState.FabType) {
         when (fabType) {
             TabSwitcherViewModel.ViewState.FabType.NEW_TAB -> {
-                tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_add_24)
+                tabsFab.icon = AppCompatResources.getDrawable(this, commonR.drawable.ic_add_24)
                 tabsFab.setText(R.string.tabSwitcherFabNewTab)
             }
             TabSwitcherViewModel.ViewState.FabType.CLOSE_TABS -> {
-                tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+                tabsFab.icon = AppCompatResources.getDrawable(this, commonR.drawable.ic_close_24)
                 tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
             }
         }
