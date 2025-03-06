@@ -14,35 +14,31 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
-    tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <include
+        android:id="@+id/toolbarInclude"
+        layout="@layout/include_default_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <include layout="@layout/include_default_toolbar" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tabsRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="@dimen/keyline_2"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_tab_grid"
-            tools:showIn="@layout/activity_tab_switcher"
-            tools:spanCount="2"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-    </LinearLayout>
+        android:clipToPadding="false"
+        android:padding="@dimen/keyline_2"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_tab_grid"
+        tools:showIn="@layout/activity_tab_switcher"
+        tools:spanCount="2" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/tabsFab"
@@ -50,8 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/keyline_4"
-        android:contentDescription="New Tab"
-        android:text="New tab"
+        tools:text="Test"
         app:icon="@drawable/ic_add_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
