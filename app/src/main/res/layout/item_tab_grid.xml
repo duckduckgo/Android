@@ -32,7 +32,7 @@
             android:layout_height="@dimen/listItemImageSmallSize"
             android:contentDescription="@string/faviconContentDescription"
             android:src="@drawable/ic_dax_icon"
-            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_marginStart="@dimen/keyline_3"
             app:layout_constraintTop_toTopOf="@id/close"
             app:layout_constraintBottom_toBottomOf="@id/close"
             app:layout_constraintStart_toStartOf="parent" />

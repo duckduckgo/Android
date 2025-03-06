@@ -252,8 +252,10 @@ class TabSwitcherAdapter(
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, holder: TabSwitcherViewHolder.GridTabViewHolder) {
         if (tab.url == null) {
-            holder.tabPreview.scaleType = ScaleType.FIT_CENTER
-            Glide.with(holder.tabPreview).load(AndroidR.drawable.ic_dax_splash_screen_icon).into(holder.tabPreview)
+            holder.tabPreview.scaleType = ScaleType.CENTER
+            Glide.with(holder.tabPreview)
+                .load(AndroidR.drawable.ic_dax_icon_72)
+                .into(holder.tabPreview)
             return
         } else {
             holder.tabPreview.scaleType = ScaleType.MATRIX
