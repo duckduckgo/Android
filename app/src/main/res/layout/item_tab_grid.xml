@@ -77,7 +77,7 @@
             app:layout_constraintBottom_toBottomOf="@id/close"
             app:layout_constraintHorizontal_bias="0.0"
             app:typography="h5"
-            tools:text="Slashdot test tes tes tes tes tes tew tes tes tes tes tes tes tes" />
+            tools:text="Slashdot" />
 
         <ImageView
             android:id="@+id/tabPreview"

@@ -219,10 +219,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (wasSwipingStarted) {
                 wasSwipingStarted = false
 
-                currentTab?.onTabSwipedAway()
-                viewModel.onTabsSwiped()
                 onTabPageSwiped(position)
-
                 enableWebViewScrolling()
             }
         }
@@ -919,10 +916,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabPageSwiped(newPosition: Int) = lifecycleScope.launch {
-        val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
-        if (tabId != null) {
-            tabManager.switchToTab(tabId)
+    private fun onTabPageSwiped(newPosition: Int) {
+        currentTab?.onTabSwipedAway()
+        viewModel.onTabsSwiped()
+
+        lifecycleScope.launch {
+            val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
+            if (tabId != null) {
+                tabManager.switchToTab(tabId)
+            }
         }
     }
 
