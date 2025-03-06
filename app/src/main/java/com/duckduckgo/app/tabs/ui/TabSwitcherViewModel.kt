@@ -198,15 +198,16 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onTabSelected(tab: TabSwitcherItem.Tab) {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            if (tab is SelectableTab && tab.isSelected) {
-                unselectTab(tab.id)
+    suspend fun onTabSelected(tabId: String) {
+        val mode = _selectionViewState.value.mode as? Selection ?: Normal
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
+            if (tabId in mode.selectedTabs) {
+                unselectTab(tabId)
             } else {
-                selectTab(tab.id)
+                selectTab(tabId)
             }
         } else {
-            tabRepository.select(tab.id)
+            tabRepository.select(tabId)
             command.value = Command.Close
             pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         }
@@ -336,7 +337,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseSelectedTabs() {
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
-            val allTabsCount = tabSwitcherItems.value?.size ?: 0
+            val allTabsCount = tabItems.size
             command.value = if (allTabsCount == selectedTabs.size) {
                 Command.CloseAllTabsRequest
             } else {
@@ -347,7 +348,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseOtherTabs() {
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
-            val otherTabsIds = (tabSwitcherItems.value?.map { it.id }.orEmpty()) - selectedTabs.toSet()
+            val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
             if (otherTabsIds.isNotEmpty()) {
                 command.value = Command.CloseTabsRequest(otherTabsIds)
             }
@@ -355,7 +356,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseTabsConfirmed(tabIds: List<String>) {
-        val allTabsCount = tabSwitcherItems.value?.size ?: 0
+        val allTabsCount = tabItems.size
 
         viewModelScope.launch(dispatcherProvider.io()) {
             deleteTabs(tabIds)
@@ -394,7 +395,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseAllTabsConfirmed() {
-        onCloseTabsConfirmed(tabSwitcherItems.value?.map { it.id }.orEmpty())
+        onCloseTabsConfirmed(tabItems.map { it.id })
     }
 
     fun onEmptyAreaClicked() {

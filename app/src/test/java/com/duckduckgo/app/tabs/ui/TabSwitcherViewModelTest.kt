@@ -213,7 +213,7 @@ class TabSwitcherViewModelTest {
     fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
         initializeViewModel()
 
-        testee.onTabSelected(TabEntity("abc", "", "", position = 0))
+        testee.onTabSelected("abc")
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
