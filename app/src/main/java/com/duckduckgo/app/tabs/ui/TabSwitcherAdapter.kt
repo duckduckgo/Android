@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_ALPHA
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
@@ -56,6 +57,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -70,9 +73,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val GRID_ITEM_HEIGHT_DP = 170
-private const val ANIMATED_TILE_NO_REPLACE_ALPHA = 0.4f
-private const val ANIMATED_TILE_DEFAULT_ALPHA = 1f
-private const val ALPHA = "alpha"
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -250,7 +250,7 @@ class TabSwitcherAdapter(
             GRID_TRACKER_ANIMATION_TILE, LIST_TRACKER_ANIMATION_TILE -> {
                 for (payload in payloads) {
                     val bundle = payload as Bundle
-                    holder.itemView.alpha = bundle.getFloat("alpha", ANIMATED_TILE_DEFAULT_ALPHA)
+                    holder.itemView.alpha = bundle.getFloat(DIFF_ALPHA, ANIMATED_TILE_DEFAULT_ALPHA)
                 }
             }
         }
@@ -380,7 +380,7 @@ class TabSwitcherAdapter(
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
-        val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList))
+        val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList, isDragging))
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
@@ -408,7 +408,7 @@ class TabSwitcherAdapter(
             notifyItemChanged(
                 animatedTilePosition,
                 Bundle().apply {
-                    putFloat(ALPHA, alpha)
+                    putFloat(DIFF_ALPHA, alpha)
                 },
             )
         }
