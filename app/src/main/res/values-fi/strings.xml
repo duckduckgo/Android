@@ -708,8 +708,8 @@
     <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
     <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
-    <string name="preOnboardingComparisonChartItem4">Estä rasittavat mainokset</string>
-    <string name="preOnboardingComparisonChartItem5">Tyhjennä selaustiedot nopeasti</string>
+    <string name="preOnboardingComparisonChartItem4">Estä seurantamainokset</string>
+    <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
     <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
     <string name="onboardingSearchDaxDialogTitle">Kokeile hakua!</string>
