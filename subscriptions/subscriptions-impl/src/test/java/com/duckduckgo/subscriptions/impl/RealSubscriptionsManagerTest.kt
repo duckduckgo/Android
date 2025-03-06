@@ -319,7 +319,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenCreateAccountSucceeds()
         val accountExternalId = authDataStore.externalId
 
-        subscriptionsManager.purchase(mock(), planId = "")
+        subscriptionsManager.purchase(activity = mock(), planId = "", offerId = null)
 
         if (authApiV2Enabled) {
             verify(authClient).authorize(any())
