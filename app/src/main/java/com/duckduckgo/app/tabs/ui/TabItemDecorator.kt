@@ -82,7 +82,7 @@ class TabItemDecorator(
     }
 
     companion object {
-        private val BORDER_RADIUS = 12.toPx().toFloat()
+        private val BORDER_RADIUS = 10.toPx().toFloat()
         private val BORDER_WIDTH = 2.toPx().toFloat()
         private val BORDER_PADDING = 3.toPx().toFloat()
     }
