@@ -17,4 +17,5 @@
 <resources>
     <dimen name="sslWarningTextWidth">0dp</dimen>
     <dimen name="browserPopupMenuWidth">280dp</dimen>
+    <dimen name="toolbar_horizontal_margin">8dp</dimen>
 </resources>

@@ -38,7 +38,7 @@
             android:background="?attr/daxColorSurface"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
-            android:layout_marginHorizontal="@dimen/keyline_2"
+            android:layout_marginHorizontal="@dimen/toolbar_horizontal_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
             app:layout_constraintStart_toStartOf="parent"
