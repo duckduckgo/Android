@@ -63,10 +63,63 @@ class PirForegroundScanService : Service() {
         startId: Int,
     ): Int {
         logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
-        val notification: Notification = createNotification(getString(R.string.pirNotificationMessageInProgress))
+        val notification: Notification =
+            createNotification(getString(R.string.pirNotificationMessageInProgress))
         startForeground(1, notification)
 
-        pirScan.executeAllBrokers(this) {
+        val supportedBrokers = listOf(
+            "AdvancedBackgroundChecks",
+            "backgroundcheck.run",
+            "Centeda",
+            "Clubset",
+            "ClustrMaps",
+            "Councilon",
+            "CurAdvisor",
+            "Cyber Background Checks",
+            "Dataveria",
+            "FastBackgroundCheck.com",
+            "FastPeopleSearch",
+            "FreePeopleDirectory",
+            "Inforver",
+            "Kwold",
+            "mylife",
+            "Neighbor Report",
+            "New England Facts",
+            "OfficialUSA",
+            "People Background Check",
+            "People-Wizard.com",
+            "PeopleFinders",
+            "People Search Now",
+            "PeoplesWhizr",
+            "PeoplesWiz",
+            "PeoplesWizard",
+            "PeopleWhiz.com",
+            "PeopleWhiz.net",
+            "PeopleWhized.com",
+            "PeopleWhized.net",
+            "PeopleWhizr.com",
+            "PeopleWhizr.net",
+            "PeopleWiz",
+            "PeopleWizard.net",
+            "PeopleWizr",
+            "Pub360",
+            "PublicReports",
+            "Quick People Trace",
+            "Search People FREE",
+            "SmartBackgroundChecks",
+            "Spokeo",
+            "TruePeopleSearch",
+            "Verecor",
+            "USA People Search",
+            "USA Trace",
+            "USPhoneBook",
+            "Vericora",
+            "Veriforia",
+            "Veripages",
+            "Virtory",
+            "Wellnut",
+        )
+        pirScan.execute(supportedBrokers, this) {
             notificationManagerCompat.checkPermissionAndNotify(
                 applicationContext,
                 NOTIF_ID_STATUS_COMPLETE,
