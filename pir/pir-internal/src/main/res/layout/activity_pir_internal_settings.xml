@@ -147,21 +147,34 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/pirDevViewResults" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/debugTotalToProcess"
-                android:layout_width="match_parent"
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:editable="true"
-                app:primaryText="@string/pirStatsTotalHeader"
-                app:type="single_line" />
+                app:primaryText="@string/pirStatsStatusHeader" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/debugStatus"
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/statusSitesScanned"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:editable="true"
-                app:primaryText="@string/pirStatsStatusHeader"
-                app:type="single_line" />
+                android:layout_marginHorizontal="@dimen/keyline_4" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/statusTotalRecords"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/statusTotalBrokersFound"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/statusTotalAllClear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
