@@ -348,7 +348,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun scrollToShowCurrentTab() {
-        val index = tabsAdapter.adapterPositionForTab(selectedTabId)
+        val index = tabsAdapter.getAdapterPositionForTab(selectedTabId)
         if (index != -1) {
             scrollToPosition(index)
         }
