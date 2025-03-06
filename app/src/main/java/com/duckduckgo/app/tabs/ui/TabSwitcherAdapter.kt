@@ -133,11 +133,12 @@ class TabSwitcherAdapter(
 
     private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tab: TabEntity) {
         val context = holder.binding.root.context
+        val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab, context)
         holder.url.text = tab.url ?: ""
         holder.url.visibility = if (tab.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab)
-        loadFavicon(tab, holder.favicon)
+        loadFavicon(tab, glide, holder.favicon)
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
@@ -150,8 +151,8 @@ class TabSwitcherAdapter(
         val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
-        loadFavicon(tab, holder.favicon)
-        loadTabPreviewImage(tab, glide, holder)
+        loadFavicon(tab, glide, holder.favicon)
+        loadTabPreviewImage(tab, glide, holder.tabPreview)
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
@@ -201,7 +202,7 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
-                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder)
+                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview)
             }
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
@@ -240,9 +241,9 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun loadFavicon(tab: TabEntity, view: ImageView) {
+    private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
         if (tab.url == null) {
-            Glide.with(view).load(AndroidR.drawable.ic_dax_icon).into(view)
+            glide.load(AndroidR.drawable.ic_dax_icon).into(view)
         } else {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, tab.url!!, view)
@@ -250,18 +251,17 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, holder: TabSwitcherViewHolder.GridTabViewHolder) {
+    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, tabPreview: ImageView) {
         if (tab.url == null) {
-            holder.tabPreview.scaleType = ScaleType.CENTER
-            Glide.with(holder.tabPreview)
-                .load(AndroidR.drawable.ic_dax_icon_72)
-                .into(holder.tabPreview)
+            tabPreview.scaleType = ScaleType.CENTER
+            glide.load(AndroidR.drawable.ic_dax_icon_72)
+                .into(tabPreview)
             return
         } else {
-            holder.tabPreview.scaleType = ScaleType.MATRIX
+            tabPreview.scaleType = ScaleType.MATRIX
         }
 
-        val previewFile = tab.tabPreviewFile ?: return glide.clear(holder.tabPreview)
+        val previewFile = tab.tabPreviewFile ?: return glide.clear(tabPreview)
 
         lifecycleOwner.lifecycleScope.launch {
             val cachedWebViewPreview = withContext(dispatchers.io()) {
@@ -269,15 +269,15 @@ class TabSwitcherAdapter(
             }
 
             if (cachedWebViewPreview == null) {
-                glide.clear(holder.tabPreview)
+                glide.clear(tabPreview)
                 return@launch
             }
 
             glide.load(cachedWebViewPreview)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.tabPreview)
+                .into(tabPreview)
 
-            holder.tabPreview.show()
+            tabPreview.show()
         }
     }
 
