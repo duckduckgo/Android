@@ -35,6 +35,7 @@ import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
@@ -78,6 +79,7 @@ interface PirScan {
     scope = ServiceScope::class,
     boundType = ActionResultListener::class,
 )
+@SingleInstanceIn(ServiceScope::class)
 class RealPirScan @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,

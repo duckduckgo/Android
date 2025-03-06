@@ -49,20 +49,22 @@ interface BrokerStepsParser {
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : BrokerStepsParser {
-    val adapter: JsonAdapter<BrokerStep> = Moshi.Builder()
-        .add(
-            PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                .withSubtype(BrokerAction.Extract::class.java, "extract")
-                .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                .withSubtype(BrokerAction.Click::class.java, "click")
-                .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
-                .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
-        ).add(KotlinJsonAdapterFactory())
-        .build()
-        .adapter(BrokerStep::class.java)
+    val adapter: JsonAdapter<BrokerStep> by lazy {
+        Moshi.Builder()
+            .add(
+                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
+                    .withSubtype(BrokerAction.Extract::class.java, "extract")
+                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
+                    .withSubtype(BrokerAction.Click::class.java, "click")
+                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
+                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
+                    .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
+                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
+                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
+            ).add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(BrokerStep::class.java)
+    }
 
     override suspend fun parseStep(stepsJson: String): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {

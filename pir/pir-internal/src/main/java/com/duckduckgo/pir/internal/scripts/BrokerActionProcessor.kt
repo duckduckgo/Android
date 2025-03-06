@@ -89,35 +89,39 @@ class RealBrokerActionProcessor @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : BrokerActionProcessor {
-    private val requestAdapter = Moshi.Builder()
-        .add(
-            PolymorphicJsonAdapterFactory.of(PirScriptRequestData::class.java, "data")
-                .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
-                .withSubtype(UserProfile::class.java, "userProfile"),
-        ).add(
-            PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                .withSubtype(BrokerAction.Extract::class.java, "extract")
-                .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                .withSubtype(BrokerAction.Click::class.java, "click")
-                .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
-                .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
+    private val requestAdapter by lazy {
+        Moshi.Builder()
+            .add(
+                PolymorphicJsonAdapterFactory.of(PirScriptRequestData::class.java, "data")
+                    .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
+                    .withSubtype(UserProfile::class.java, "userProfile"),
+            ).add(
+                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
+                    .withSubtype(BrokerAction.Extract::class.java, "extract")
+                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
+                    .withSubtype(BrokerAction.Click::class.java, "click")
+                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
+                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
+                    .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
+                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
+                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
+            ).add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(PirScriptRequestParams::class.java)
+    }
+    private val responseAdapter by lazy {
+        Moshi.Builder().add(
+            PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
+                .withSubtype(NavigateResponse::class.java, "navigate")
+                .withSubtype(ExtractedResponse::class.java, "extract")
+                .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
+                .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
+                .withSubtype(ClickResponse::class.java, "click")
+                .withSubtype(ExpectationResponse::class.java, "expectation")
+                .withSubtype(FillFormResponse::class.java, "fillForm"),
         ).add(KotlinJsonAdapterFactory())
-        .build()
-        .adapter(PirScriptRequestParams::class.java)
-    private val responseAdapter = Moshi.Builder().add(
-        PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
-            .withSubtype(NavigateResponse::class.java, "navigate")
-            .withSubtype(ExtractedResponse::class.java, "extract")
-            .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
-            .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
-            .withSubtype(ClickResponse::class.java, "click")
-            .withSubtype(ExpectationResponse::class.java, "expectation")
-            .withSubtype(FillFormResponse::class.java, "fillForm"),
-    ).add(KotlinJsonAdapterFactory())
-        .build().adapter(PirResult::class.java)
+            .build().adapter(PirResult::class.java)
+    }
     private var registeredActionResultListener: ActionResultListener? = null
     private var timerJob: Job? = null
     private var actionPushed: BrokerAction? = null

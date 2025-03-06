@@ -44,7 +44,7 @@ import logcat.logcat
 class PirMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
-    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build()
+    private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build() }
     private val handlers = listOf(
         BrokerProtectionMessageHandler(),
     )

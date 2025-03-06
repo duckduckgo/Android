@@ -128,8 +128,8 @@ class RealPirRepository(
     private val currentTimeProvider: CurrentTimeProvider,
     private val moshi: Moshi,
 ) : PirRepository {
-    private val profileQueryAdapter = moshi.adapter(ProfileQuery::class.java)
-    private val scrapedDataAdapter = moshi.adapter(ScrapedData::class.java)
+    private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
+    private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
