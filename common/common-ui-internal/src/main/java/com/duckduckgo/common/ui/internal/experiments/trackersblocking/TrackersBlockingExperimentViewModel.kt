@@ -58,7 +58,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant1ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(true))
+            appPersonalityFeature.self().setRawStoredState(State(checked))
             appPersonalityFeature.variant1().setRawStoredState(State(checked))
 
             if (checked) {
@@ -75,7 +75,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant2ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(true))
+            appPersonalityFeature.self().setRawStoredState(State(checked))
             appPersonalityFeature.variant2().setRawStoredState(State(checked))
 
             if (checked) {
@@ -92,7 +92,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant3ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(true))
+            appPersonalityFeature.self().setRawStoredState(State(checked))
             appPersonalityFeature.variant3().setRawStoredState(State(checked))
             experimentalUIThemingFeature.self().setRawStoredState(State(checked))
 
@@ -109,8 +109,9 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant4ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(true))
+            appPersonalityFeature.self().setRawStoredState(State(checked))
             appPersonalityFeature.variant4().setRawStoredState(State(checked))
+            experimentalUIThemingFeature.self().setRawStoredState(State(checked))
 
             if (checked) {
                 appPersonalityFeature.variant1().setRawStoredState(State(false))
@@ -125,7 +126,7 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant5ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(true))
+            appPersonalityFeature.self().setRawStoredState(State(checked))
             appPersonalityFeature.variant5().setRawStoredState(State(checked))
             experimentalUIThemingFeature.self().setRawStoredState(State(checked))
 

@@ -820,7 +820,7 @@ class BrowserTabFragment :
         experimentTrackersAnimationHelper.startTrackersBurstAnimation(
             context = requireContext(),
             trackersBurstAnimationView = binding.trackersBurstAnimationView,
-            omnibarShieldAnimationView = omnibar.shieldIcon,
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
             omnibarPosition = omnibar.omnibarPosition,
             minibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
                 binding.fadeOmnibar.findViewById(R.id.minibar)
@@ -833,7 +833,7 @@ class BrowserTabFragment :
 
     private fun showExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
-            omnibarShieldAnimationView = omnibar.shieldIcon,
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
         )
     }
 
@@ -1174,7 +1174,13 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = omnibar.shieldIcon,
+            anchor = if (appPersonalityFeature.self().isEnabled() &&
+                !appPersonalityFeature.variant1().isEnabled()
+            ) {
+                omnibar.shieldIconExperiment
+            } else {
+                omnibar.shieldIcon
+            },
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)

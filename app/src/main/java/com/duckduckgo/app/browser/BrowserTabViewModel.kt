@@ -3863,8 +3863,11 @@ class BrowserTabViewModel @Inject constructor(
             (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant5().isEnabled())
         ) {
             command.value = Command.StartExperimentShieldPopAnimation
-        } else if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled()) {
+        } else if (appPersonalityFeature.self().isEnabled() &&
+            (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
+        ) {
             if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD) {
+                // TODO: ANA pass here a param if we should show the logos (variant 3) or not (variant 4)
                 command.value = Command.StartExperimentTrackersBurstAnimation(logos)
                 viewModelScope.launch {
                     pixel.fire(

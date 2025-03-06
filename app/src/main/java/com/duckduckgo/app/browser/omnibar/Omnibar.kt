@@ -203,6 +203,10 @@ class Omnibar(
         newOmnibar.shieldIcon
     }
 
+    val shieldIconExperiment: LottieAnimationView by lazy {
+        newOmnibar.shieldIconExperiment
+    }
+
     val textInputRootView: View by lazy {
         newOmnibar.omnibarTextInput.rootView
     }

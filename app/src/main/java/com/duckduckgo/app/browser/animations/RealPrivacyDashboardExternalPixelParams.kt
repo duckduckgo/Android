@@ -35,7 +35,9 @@ class RealPrivacyDashboardExternalPixelParams @Inject constructor(
     @Synchronized
     override fun getPixelParams(): Map<String, String> {
         if (pixelParams.isEmpty()) {
-            val key = if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled()) {
+            val key = if (appPersonalityFeature.self().isEnabled() &&
+                (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
+            ) {
                 PixelParameter.AFTER_BURST_ANIMATION
             } else {
                 PixelParameter.AFTER_CIRCLES_ANIMATION

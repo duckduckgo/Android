@@ -95,6 +95,7 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
         fireIconMenu.fade(alpha)
         tabsMenu.fade(alpha)
         browserMenu.fade(alpha)
+        shieldIconExperiment.fade(alpha)
     }
 
     private fun fadeMinibar(alpha: Float) {
