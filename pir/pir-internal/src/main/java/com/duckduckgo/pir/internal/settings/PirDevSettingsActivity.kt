@@ -48,7 +48,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @InjectWith(ActivityScope::class)
@@ -87,9 +86,28 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(results: List<ScanResult>) {
-        val extractedCount = results.filterIsInstance<ExtractedProfileResult>().size
-        val errorCount = results.filterIsInstance<ErrorResult>().size
-        binding.debugStatus.setSecondaryText(getString(R.string.pirStatsStatus, extractedCount, errorCount))
+        val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
+        val allError = results.filterIsInstance<ErrorResult>()
+        val brokersWithRecords = allExtracted.filter {
+            it.extractResults.isNotEmpty()
+        }
+        val totalSitesScanned = allExtracted.size + allError.size
+        val brokersWithRecordsCount = brokersWithRecords.size
+
+        val brokersWithNoRecords = allExtracted.filter {
+            it.extractResults.isEmpty()
+        }.size + allError.size
+
+        val totalRecordCount = brokersWithRecords.sumOf {
+            it.extractResults.size
+        }
+
+        with(binding) {
+            this.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, totalSitesScanned)
+            this.statusTotalRecords.text = getString(R.string.pirStatsStatusRecords, totalRecordCount)
+            this.statusTotalBrokersFound.text = getString(R.string.pirStatsStatusBrokerFound, brokersWithRecordsCount)
+            this.statusTotalAllClear.text = getString(R.string.pirStatsStatusAllClear, brokersWithNoRecords)
+        }
     }
 
     private fun setupViews() {
@@ -131,13 +149,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
         binding.viewResults.setOnClickListener {
             globalActivityStarter.start(this, PirResultsScreenNoParams)
-        }
-
-        lifecycleScope.launch(dispatcherProvider.io()) {
-            val toProcess = repository.getAllBrokersForScan().size
-            withContext(dispatcherProvider.main()) {
-                binding.debugTotalToProcess.setSecondaryText("" + toProcess)
-            }
         }
     }
 
