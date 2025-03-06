@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
@@ -200,7 +202,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 ChangeBounds().apply {
                     duration = 400
                     interpolator = OvershootInterpolator(1.3f)
-                }
+                },
             )
             addTransition(
                 Fade().apply {
@@ -210,7 +212,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                     addTarget(fireIconMenu)
                     addTarget(tabsMenu)
                     addTarget(browserMenu)
-                }
+                },
             )
         }
     }
@@ -563,7 +565,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = viewState.showBrowserMenu
         browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
         spacer.isVisible = viewState.showVoiceSearch || viewState.showClearButton
-        aiChatMenu.isVisible = viewState.showChatMenu
+        aiChatMenu.isVisible = viewState.viewMode is NewTab || viewState.showChatMenu
         toolbarContainer.requestLayout()
 
         isInitialRender = false

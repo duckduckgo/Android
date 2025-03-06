@@ -22,6 +22,8 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:fillViewport="true"
+    android:clickable="true"
+    android:focusable="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">

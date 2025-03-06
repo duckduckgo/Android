@@ -260,19 +260,17 @@
                 android:padding="@dimen/keyline_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
-                app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.duckduckgo.common.ui.view.text.DaxTextView
+                <ImageView
                     android:id="@+id/aiChatIconImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:contentDescription="AI Chat"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:drawableStart="@drawable/ic_ai_chat_outline_24"
-                    android:drawablePadding="@dimen/keyline_1"
-                    app:typography="body1_bold" />
+                    android:src="@drawable/ic_ai_chat_outline_24" />
             </FrameLayout>
 
             <FrameLayout
@@ -281,7 +279,6 @@
                 android:layout_height="match_parent"
                 android:padding="@dimen/keyline_2"
                 android:layout_marginEnd="6dp"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                 app:layout_constraintStart_toEndOf="@id/aiChatIconMenu"
@@ -305,7 +302,6 @@
                 android:layout_marginHorizontal="@dimen/keyline_0"
                 android:padding="@dimen/keyline_2"
                 android:background="?selectableItemBackgroundBorderless"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/browserMenu"
                 app:layout_constraintStart_toEndOf="@id/fireIconMenu"
@@ -317,7 +313,6 @@
                 android:layout_height="match_parent"
                 android:padding="@dimen/keyline_2"
                 android:layout_marginEnd="@dimen/keyline_0"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tabsMenu"
