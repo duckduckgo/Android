@@ -18,17 +18,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/keyline_2"
-    android:layout_marginVertical="6dp"
-    android:minHeight="@dimen/twoLineItemHeight"
-    app:cardCornerRadius="@dimen/smallShapeCornerRadius">
+    app:cardCornerRadius="10dp"
+    android:layout_marginStart="7dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="7dp"
+    android:layout_marginBottom="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
-        android:layout_marginHorizontal="@dimen/keyline_2"
-        android:layout_gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="@dimen/twoLineItemVerticalPadding">
 
         <ImageView
             android:id="@+id/favicon"
@@ -36,7 +36,7 @@
             android:layout_height="@dimen/listItemImageMediumSize"
             android:contentDescription="@string/faviconContentDescription"
             android:src="@drawable/ic_dax_icon"
-            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_marginHorizontal="@dimen/keyline_2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -61,11 +61,11 @@
 
         <ImageView
             android:id="@+id/close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="@drawable/selectable_circular_ripple"
             android:contentDescription="@string/closeContentDescription"
-            android:padding="@dimen/keyline_2"
+            android:scaleType="center"
             android:src="@drawable/ic_close_24_small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -75,14 +75,14 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:lines="1"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintStart_toEndOf="@id/favicon"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/url"
             app:typography="h3"
             tools:text="Slashdot" />
 
@@ -94,7 +94,6 @@
             android:lines="1"
             android:textIsSelectable="false"
             android:textColor="?attr/daxColorSecondaryText"
-            android:layout_marginBottom="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
