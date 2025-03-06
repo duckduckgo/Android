@@ -40,9 +40,14 @@ internal class TrackersLottieAssetDelegate(
     val context: Context,
     val logos: List<TrackerLogo>,
     private val flipLogos: Boolean = false,
+    private val ignoreLogos: Boolean = false,
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
+        if (ignoreLogos) {
+            return null
+        }
+
         return when (asset?.id) {
             "image_0" -> {
                 kotlin.runCatching { logos[0].asDrawable(context) }

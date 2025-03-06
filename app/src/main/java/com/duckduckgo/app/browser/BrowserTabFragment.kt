@@ -816,7 +816,7 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>) {
+    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>, ignoreLogos: Boolean) {
         experimentTrackersAnimationHelper.startTrackersBurstAnimation(
             context = requireContext(),
             trackersBurstAnimationView = binding.trackersBurstAnimationView,
@@ -828,6 +828,7 @@ class BrowserTabFragment :
                 binding.fadeOmnibarBottom.findViewById(R.id.minibar)
             },
             logos = logos,
+            ignoreLogos = ignoreLogos,
         )
     }
 
@@ -1940,7 +1941,7 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
-            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos)
+            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos, it.ignoreLogos)
             is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
             else -> {
                 // NO OP

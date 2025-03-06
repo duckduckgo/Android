@@ -66,6 +66,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         omnibarPosition: OmnibarPosition,
         minibarView: View,
         logos: List<TrackerLogo>,
+        ignoreLogos: Boolean,
     ) {
         this.trackersBurstAnimationView = trackersBurstAnimationView
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
@@ -89,7 +90,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
             this.setCacheComposition(false)
             this.setAnimation(R.raw.trackers_burst)
             this.maintainOriginalImageBounds = true
-            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos, omnibarPosition == BOTTOM))
+            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos, omnibarPosition == BOTTOM, ignoreLogos))
             this.removeAllAnimatorListeners()
             this.show()
 

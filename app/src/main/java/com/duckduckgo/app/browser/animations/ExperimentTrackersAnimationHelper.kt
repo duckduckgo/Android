@@ -35,6 +35,7 @@ interface ExperimentTrackersAnimationHelper {
         omnibarPosition: OmnibarPosition,
         minibarView: View,
         logos: List<TrackerLogo>,
+        ignoreLogos: Boolean,
     )
 
     fun cancelAnimations()

@@ -3867,8 +3867,8 @@ class BrowserTabViewModel @Inject constructor(
             (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
         ) {
             if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD) {
-                // TODO: ANA pass here a param if we should show the logos (variant 3) or not (variant 4)
-                command.value = Command.StartExperimentTrackersBurstAnimation(logos)
+                val ignoreLogos = appPersonalityFeature.variant4().isEnabled()
+                command.value = Command.StartExperimentTrackersBurstAnimation(logos, ignoreLogos)
                 viewModelScope.launch {
                     pixel.fire(
                         AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
