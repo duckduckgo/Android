@@ -54,8 +54,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_DEFAULT_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
