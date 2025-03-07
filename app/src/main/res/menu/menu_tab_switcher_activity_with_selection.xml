@@ -33,18 +33,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/bookmarkMenuItem"
-        android:icon="@drawable/ic_add_bookmark_24"
-        android:title=""
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/shareLinkMenuItem"
-        android:icon="@drawable/ic_share"
-        android:title=""
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/popupMenuItem"
         android:icon="@drawable/ic_menu_vertical_24"
         android:title="@string/browserPopupMenu"
