@@ -331,7 +331,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
+        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage?environment=staging"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 

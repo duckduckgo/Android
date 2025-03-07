@@ -23,7 +23,7 @@ import retrofit2.http.POST
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface EmailService {
-    @POST("https://quack.duckduckgo.com/api/email/addresses")
+    @POST("https://quackdev.duckduckgo.com/api/email/addresses")
     suspend fun newAlias(@Header("Authorization") authorization: String): EmailAlias
 }
 
