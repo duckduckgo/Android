@@ -155,6 +155,8 @@ data class ErrorNavigationState(
     val stack: WebBackForwardList,
     private val maliciousSiteUrl: Uri,
     private val maliciousSiteTitle: String?,
+    private val clientSideHit: Boolean,
+    private val isMainframe: Boolean,
 ) : WebNavigationState {
 
     private val maliciousSiteUrlString: String = maliciousSiteUrl.toString()
@@ -167,7 +169,7 @@ data class ErrorNavigationState(
 
     override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
 
-    override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
+    override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage && ((isMainframe && clientSideHit) || !isMainframe)
 
     override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
 

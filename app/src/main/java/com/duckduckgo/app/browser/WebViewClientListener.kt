@@ -103,6 +103,7 @@ interface WebViewClientListener {
         feed: Feed,
         exempted: Boolean,
         clientSideHit: Boolean,
+        isMainframe: Boolean,
     )
     fun onReceivedMaliciousSiteSafe(
         url: Uri,
