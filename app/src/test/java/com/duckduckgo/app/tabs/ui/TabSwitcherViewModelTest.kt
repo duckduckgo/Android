@@ -106,6 +106,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
 
+    @Mock
+    private lateinit var mockTabSwitcherTileAnimationMonitor: TabSwitcherTileAnimationMonitor
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
@@ -151,6 +154,7 @@ class TabSwitcherViewModelTest {
             tabSwitcherAnimationFeature,
             mockWebTrackersBlockedAppRepository,
             mockTabSwitcherPrefsDataStore,
+            mockTabSwitcherTileAnimationMonitor,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -433,5 +437,66 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
         verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Animation Tile Visible then Tab Switcher Items Include Animation Tile And Tabs`() = runTest {
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(3, items.size)
+        assert(items.first() is TabSwitcherItem.TrackerAnimationTile)
+        assert(items[1] is TabSwitcherItem.Tab)
+        assert(items[2] is TabSwitcherItem.Tab)
+    }
+
+    @Test
+    fun `when Animation Tile Not Visible then Tab Switcher Items Contain Only Tabs`() = runTest {
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(false))
+
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assert(item is TabSwitcherItem.Tab)
+        }
+    }
+
+    @Test
+    fun `when Tab Switcher Animation Feature disabled then Tab Switcher Items Contain Only Tabs`() = runTest {
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = false))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(true))
+
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assert(item is TabSwitcherItem.Tab)
+        }
     }
 }
