@@ -136,7 +136,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
-        fun onTrackersCountFinished(logos: List<TrackerLogo>)
+        fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean)
     }
 
     data class OmnibarTextState(

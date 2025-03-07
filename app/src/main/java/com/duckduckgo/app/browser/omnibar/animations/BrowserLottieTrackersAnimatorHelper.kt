@@ -172,7 +172,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
-    override fun startExperimentVariant2Animation(
+    override fun startExperimentVariant2To5Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,
@@ -180,6 +180,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,
+        hasKnownLogos: Boolean,
     ) {
         this.shieldAnimation = shieldAnimationView
         this.trackersBlockedAnimationView = trackersBlockedAnimationView
@@ -202,7 +203,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         )
 
         animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities, logos, omnibarViews, shieldViews)
+        animateTrackersBlockedCountView(context, entities, logos, omnibarViews, shieldViews, hasKnownLogos)
     }
 
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
@@ -253,6 +254,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
+        hasKnownLogos: Boolean,
     ) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 200L
@@ -266,7 +268,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    updateTrackersCountWithAnimation(context, entities, logos, omnibarViews, shieldViews)
+                    updateTrackersCountWithAnimation(context, entities, logos, omnibarViews, shieldViews, hasKnownLogos)
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -280,6 +282,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
+        hasKnownLogos: Boolean,
     ) {
         trackerCountAnimator.animateTrackersBlockedCountView(
             context = context,
@@ -290,10 +293,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 trackersBlockedCountAnimationView?.text = ""
                 trackersBlockedCountAnimationView?.gone()
                 animateOmnibarIn(omnibarViews).start()
-                listener?.onAnimationFinished(logos)
+                listener?.onAnimationFinished(logos, hasKnownLogos)
 
                 conflatedJob += MainScope().launch {
-                    delay(2500L)
+                    delay(1500L)
                     tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
                 }
             },

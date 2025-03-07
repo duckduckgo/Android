@@ -440,7 +440,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartExperimentVariant2To5Animation -> {
-                startExperimentVariant2To5Animation(command.entities)
+                startExperimentVariant2To5Animation(command.entities, command.hasKnownLogos)
             }
 
             OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
@@ -695,12 +695,12 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startExperimentVariant2To5Animation(events: List<Entity>?) {
+    private fun startExperimentVariant2To5Animation(events: List<Entity>?, hasKnownLogos: Boolean) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
 
-            animatorHelper.startExperimentVariant2Animation(
+            animatorHelper.startExperimentVariant2To5Animation(
                 context = context,
                 shieldAnimationView = shieldIconExperiment,
                 trackersBlockedAnimationView = trackersBlockedAnimation,
@@ -708,6 +708,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 omnibarViews = omnibarViews(),
                 shieldViews = shieldViews(),
                 entities = events,
+                hasKnownLogos = hasKnownLogos,
             )
         }
     }
@@ -815,7 +816,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         return isScrollingEnabled
     }
 
-    override fun onAnimationFinished(logos: List<TrackerLogo>) {
-        omnibarTextListener?.onTrackersCountFinished(logos)
+    override fun onAnimationFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
+        omnibarTextListener?.onTrackersCountFinished(logos, hasKnownLogos)
     }
 }

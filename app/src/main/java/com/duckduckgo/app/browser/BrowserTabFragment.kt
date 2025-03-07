@@ -2614,8 +2614,8 @@ class BrowserTabFragment :
                     )
                 }
 
-                override fun onTrackersCountFinished(logos: List<TrackerLogo>) {
-                    viewModel.onAnimationFinished(logos)
+                override fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
+                    viewModel.onAnimationFinished(logos, hasKnownLogos)
                 }
             },
         )

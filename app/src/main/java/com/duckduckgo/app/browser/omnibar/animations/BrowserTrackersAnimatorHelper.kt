@@ -50,7 +50,7 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
     )
 
-    fun startExperimentVariant2Animation(
+    fun startExperimentVariant2To5Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,
@@ -58,6 +58,7 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,
+        hasKnownLogos: Boolean,
     )
 
     /**
@@ -109,5 +110,5 @@ interface TrackersAnimatorListener {
      * Notifies the end of the animation.
      * The callback is not be invoked when a partial animation is paused.
      */
-    fun onAnimationFinished(logos: List<TrackerLogo>)
+    fun onAnimationFinished(logos: List<TrackerLogo> = emptyList(), hasKnownLogos: Boolean = false)
 }
