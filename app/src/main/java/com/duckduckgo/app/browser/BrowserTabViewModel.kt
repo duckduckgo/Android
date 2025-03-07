@@ -1324,7 +1324,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentBrowserViewState().maliciousSiteBlocked) {
-            command.postValue(HideWarningMaliciousSite)
+            command.postValue(HideWarningMaliciousSite(navigation.canGoBack))
             return true
         }
 
@@ -3289,6 +3289,7 @@ class BrowserTabViewModel @Inject constructor(
         feed: Feed,
         exempted: Boolean,
         clientSideHit: Boolean,
+        isMainframe: Boolean,
     ) {
         val previousSite = site
 
@@ -3333,7 +3334,7 @@ class BrowserTabViewModel @Inject constructor(
                     )
 
                 command.value =
-                    ShowWarningMaliciousSite(siteUrl, feed) { navigationStateChanged(it) }
+                    ShowWarningMaliciousSite(siteUrl, feed, clientSideHit, isMainframe) { navigationStateChanged(it) }
             }
         } else {
             viewModelScope.launch(dispatchers.main()) {

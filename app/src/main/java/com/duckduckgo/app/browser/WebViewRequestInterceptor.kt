@@ -272,6 +272,7 @@ class WebViewRequestInterceptor(
             feed = feed,
             exempted = exempted,
             clientSideHit = clientSideHit,
+            isMainframe = isForMainFrame,
         )
     }
 
