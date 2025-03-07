@@ -35,6 +35,10 @@ interface TabSwitcherDataStore {
 
     suspend fun setUserState(userState: UserState)
     suspend fun setTabLayoutType(layoutType: LayoutType)
+    fun isAnimationTileDismissed(): Flow<Boolean>
+    suspend fun setIsAnimationTileDismissed(isDismissed: Boolean)
+    fun hasAnimationTileBeenSeen(): Flow<Boolean>
+    suspend fun setAnimationTileSeen()
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,25 +71,25 @@ class TabSwitcherPrefsDataStore @Inject constructor(
         }
     }
 
-    fun isAnimationTileDismissed(): Flow<Boolean> {
+    override fun isAnimationTileDismissed(): Flow<Boolean> {
         return store.data.map { preferences ->
             preferences[booleanPreferencesKey(KEY_IS_ANIMATION_TILE_DISMISSED)] ?: false
         }
     }
 
-    suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
+    override suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
         store.edit { preferences ->
             preferences[booleanPreferencesKey(KEY_IS_ANIMATION_TILE_DISMISSED)] = isDismissed
         }
     }
 
-    fun hasAnimationTileBeenSeen(): Flow<Boolean> {
+    override fun hasAnimationTileBeenSeen(): Flow<Boolean> {
         return store.data.map { preferences ->
             preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] ?: false
         }
     }
 
-    suspend fun setAnimationTileSeen() {
+    override suspend fun setAnimationTileSeen() {
         store.edit { preferences ->
             preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] = true
         }
