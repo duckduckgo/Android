@@ -38,7 +38,7 @@ interface TabSwitcherDataStore {
     fun isAnimationTileDismissed(): Flow<Boolean>
     suspend fun setIsAnimationTileDismissed(isDismissed: Boolean)
     fun hasAnimationTileBeenSeen(): Flow<Boolean>
-    suspend fun setAnimationTileSeen()
+    suspend fun setAnimationTileSeen(isSeen: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -89,9 +89,9 @@ class TabSwitcherPrefsDataStore @Inject constructor(
         }
     }
 
-    override suspend fun setAnimationTileSeen() {
+    override suspend fun setAnimationTileSeen(isSeen: Boolean) {
         store.edit { preferences ->
-            preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] = true
+            preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] = isSeen
         }
     }
 }
