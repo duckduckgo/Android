@@ -160,7 +160,9 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
                     is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                    is TrackerAnimationTile -> Unit // TODO delete
+                    is TrackerAnimationTile -> {
+                        tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = false)
+                    }
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
