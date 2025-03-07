@@ -25,9 +25,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -64,6 +62,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -184,7 +183,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private var popupMenuItem: MenuItem? = null
     private var layoutTypeMenuItem: MenuItem? = null
-    private var layoutType: LayoutType? = null
 
     private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
 
@@ -351,8 +349,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                 invalidateOptionsMenu()
-
-                updateFabType(it.fabType)
             }
         }
 
@@ -367,7 +363,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         val centerOffsetPercent = getCurrentCenterOffset()
 
-        this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
                 val columnCount = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
@@ -423,20 +418,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, -newOffset)
             tabsRecycler.post {
                 onScrollCompleted()
-            }
-        }
-    }
-
-
-    private fun updateFabType(fabType: TabSwitcherViewModel.ViewState.FabType) {
-        when (fabType) {
-            TabSwitcherViewModel.ViewState.FabType.NEW_TAB -> {
-                tabsFab.icon = AppCompatResources.getDrawable(this, commonR.drawable.ic_add_24)
-                tabsFab.setText(R.string.tabSwitcherFabNewTab)
-            }
-            TabSwitcherViewModel.ViewState.FabType.CLOSE_TABS -> {
-                tabsFab.icon = AppCompatResources.getDrawable(this, commonR.drawable.ic_close_24)
-                tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
             }
         }
     }
@@ -498,103 +479,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
             popupMenuItem = menu.findItem(R.id.popupMenuItem)
 
-            val mode = viewModel.viewState.value.mode
-            when (mode) {
-                TabSwitcherViewModel.ViewState.Mode.Normal -> {
-                    createNormalModeMenu(menu)
-                }
-                is TabSwitcherViewModel.ViewState.Mode.Selection -> {
-                    createSelectionModeMenu(menu, mode.selectedTabs.size)
-                }
-            }
+            val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
+            val viewState = viewModel.viewState.value
+            val numSelectedTabs = (viewModel.viewState.value.mode as? Selection)?.selectedTabs?.size ?: 0
+
+            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, viewState.dynamicInterface)
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
-
-            when (layoutType) {
-                LayoutType.GRID -> showListLayoutButton()
-                LayoutType.LIST -> showGridLayoutButton()
-                null -> layoutTypeMenuItem?.isVisible = false
-            }
         }
 
-        return true
-    }
-
-    private fun createSelectionModeMenu(menu: Menu, numSelectedTabs: Int) {
-        menu.findItem(R.id.layoutTypeMenuItem).isVisible = false
-        menu.findItem(R.id.fireMenuItem).isVisible = false
-
-        menu.findItem(R.id.bookmarkMenuItem).apply {
-            if (numSelectedTabs == 0) {
-                isEnabled = false
-                iconTintList = ContextCompat.getColorStateList(this@TabSwitcherActivity, com.duckduckgo.mobile.android.R.color.disabledColor)
-            }
-            title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs)
-        }
-        menu.findItem(R.id.shareLinkMenuItem).apply {
-            if (numSelectedTabs == 0) {
-                isEnabled = false
-                iconTintList = ContextCompat.getColorStateList(this@TabSwitcherActivity, com.duckduckgo.mobile.android.R.color.disabledColor)
-            }
-            title = resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs)
-        }
-
-        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
-
-        popupBinding.newTabMenuItem.isVisible = false
-        popupBinding.selectAllMenuItem.isVisible = true
-        popupBinding.selectionActionsDivider.isVisible = numSelectedTabs > 0
-        popupBinding.shareSelectedLinksMenuItem.isVisible = numSelectedTabs > 0
-        popupBinding.bookmarkSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
-        popupBinding.selectTabsDivider.isVisible = false
-        popupBinding.selectTabsMenuItem.isVisible = false
-        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs > 0
-        popupBinding.closeSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
-        popupBinding.closeAllTabsMenuItem.isVisible = numSelectedTabs == 0
-
-        popupBinding.shareSelectedLinksMenuItem.apply {
-            setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs))
-        }
-        popupBinding.bookmarkSelectedTabsMenuItem.apply {
-            setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs))
-        }
-        popupBinding.closeSelectedTabsMenuItem.apply {
-            setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
-        }
-    }
-
-    private fun createNormalModeMenu(menu: Menu) {
-        layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
-
-        when (layoutType) {
+        when (viewModel.layoutType.value) {
             LayoutType.GRID -> showListLayoutButton()
             LayoutType.LIST -> showGridLayoutButton()
             null -> layoutTypeMenuItem?.isVisible = false
         }
 
-        menu.findItem(R.id.bookmarkMenuItem).isVisible = false
-        menu.findItem(R.id.shareLinkMenuItem).isVisible = false
-
-        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
-
-        popupBinding.newTabMenuItem.isVisible = true
-        popupBinding.selectAllMenuItem.isVisible = false
-        popupBinding.selectionActionsDivider.isVisible = true
-        popupBinding.shareSelectedLinksMenuItem.isVisible = true
-        popupBinding.bookmarkSelectedTabsMenuItem.isVisible = true
-        popupBinding.selectTabsDivider.isVisible = true
-        popupBinding.selectTabsMenuItem.isVisible = true
-        popupBinding.closeSelectedTabsMenuItem.isVisible = false
-        popupBinding.closeOtherTabsMenuItem.isVisible = false
-        popupBinding.closeAllTabsMenuItem.isVisible = true
-
-        popupBinding.shareSelectedLinksMenuItem.apply {
-            setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, 1))
-        }
-        popupBinding.bookmarkSelectedTabsMenuItem.apply {
-            setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, 1))
-        }
+        return true
     }
 
     private fun initMenuClickListeners() {
@@ -602,7 +503,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkAllTabsMenuItem)) { viewModel.onBookmarkAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectTabsMenuItem)) { viewModel.onSelectionModeRequested() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeSelectedTabsMenuItem)) { viewModel.onCloseSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeOtherTabsMenuItem)) { viewModel.onCloseOtherTabs() }
@@ -637,12 +537,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        closeAllTabsMenuItem?.isVisible = viewModel.tabSwitcherItems.value?.isNotEmpty() == true
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
-        return super.onPrepareOptionsMenu(menu)
+        return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            viewModel.viewState.value.dynamicInterface.isMoreMenuItemEnabled
+        } else {
+            super.onPrepareOptionsMenu(menu)
+        }
     }
 
     override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
