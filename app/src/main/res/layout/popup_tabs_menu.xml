@@ -50,17 +50,6 @@
         android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:defaultPadding="false" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/bookmarkAllTabsMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/bookmarkAllTabsMenuItem" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/selectTabsDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
