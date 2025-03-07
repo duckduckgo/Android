@@ -28,11 +28,13 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.FabType
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -44,6 +46,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
@@ -63,6 +66,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
@@ -78,14 +82,25 @@ class TabSwitcherViewModel @Inject constructor(
         context = viewModelScope.coroutineContext,
     )
 
-    val layoutType = tabRepository.tabSwitcherData
-        .map { it.layoutType }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState())
-    val viewState = _viewState.asStateFlow()
+    val viewState = combine(_viewState, tabRepository.flowTabs) { viewState, tabs ->
+        viewState.copy(items = tabs.map { TabSwitcherItem.Tab(it) })
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+
+    val layoutType = if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+        combine(tabRepository.tabSwitcherData, viewState) { tabSwitcherData, viewState ->
+            if (viewState.dynamicInterface.isLayoutTypeButtonVisible) {
+                tabSwitcherData.layoutType
+            } else {
+                null
+            }
+        }
+    } else {
+        tabRepository.tabSwitcherData
+            .map { it.layoutType }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     sealed class Command {
         data object Close : Command()
@@ -161,9 +176,6 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBookmarkSelectedTabs() {
     }
 
-    fun onBookmarkAllTabs() {
-    }
-
     fun onSelectionModeRequested() {
     }
 
@@ -234,11 +246,11 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onFabClicked() {
         when {
-            viewState.value.mode is ViewState.Mode.Normal -> {
+            _viewState.value.mode is ViewState.Mode.Normal -> {
                 _viewState.update { it.copy(mode = ViewState.Mode.Selection(emptyList())) }
             }
-            viewState.value.mode is ViewState.Mode.Selection -> {
-                if ((viewState.value.mode as ViewState.Mode.Selection).selectedTabs.isEmpty()) {
+            _viewState.value.mode is ViewState.Mode.Selection -> {
+                if ((_viewState.value.mode as ViewState.Mode.Selection).selectedTabs.isEmpty()) {
                     _viewState.update { it.copy(mode = ViewState.Mode.Selection(listOf("123", "456"))) }
                 } else {
                     _viewState.update { it.copy(mode = ViewState.Mode.Normal) }
@@ -260,9 +272,68 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val fabType: FabType = FabType.NEW_TAB,
-        val mode: Mode = Mode.Selection(emptyList<String>()),
+        val mode: Mode = Normal,
+        val items: List<TabSwitcherItem> = emptyList(),
     ) {
+        val dynamicInterface: DynamicInterface
+            get() = when (mode) {
+                is Normal -> DynamicInterface(
+                    isLayoutTypeButtonVisible = true,
+                    isFireButtonVisible = true,
+                    isNewTabVisible = true,
+                    isSelectAllVisible = false,
+                    isDeselectAllVisible = false,
+                    isSelectionActionsDividerVisible = false,
+                    isShareSelectedLinksVisible = false,
+                    isBookmarkSelectedTabsVisible = false,
+                    isSelectTabsDividerVisible = true,
+                    isSelectTabsVisible = true,
+                    isCloseSelectedTabsVisible = false,
+                    isCloseOtherTabsVisible = false,
+                    isCloseAllTabsVisible = true,
+                    isMoreMenuItemEnabled = items.size == 1 && (items.first() as? TabSwitcherItem.Tab)?.tabEntity?.url != null,
+                    isFabVisible = true,
+                    fabType = FabType.NEW_TAB,
+                )
+                is Mode.Selection -> DynamicInterface(
+                    isLayoutTypeButtonVisible = false,
+                    isFireButtonVisible = false,
+                    isNewTabVisible = false,
+                    isSelectAllVisible = mode.selectedTabs.size < items.size,
+                    isDeselectAllVisible = mode.selectedTabs.size == items.size,
+                    isSelectionActionsDividerVisible = mode.selectedTabs.isNotEmpty(),
+                    isShareSelectedLinksVisible = mode.selectedTabs.isNotEmpty(),
+                    isBookmarkSelectedTabsVisible = mode.selectedTabs.isNotEmpty(),
+                    isSelectTabsDividerVisible = mode.selectedTabs.isNotEmpty(),
+                    isSelectTabsVisible = false,
+                    isCloseSelectedTabsVisible = mode.selectedTabs.isNotEmpty(),
+                    isCloseOtherTabsVisible = mode.selectedTabs.isNotEmpty(),
+                    isCloseAllTabsVisible = false,
+                    isMoreMenuItemEnabled = true,
+                    isFabVisible = mode.selectedTabs.isNotEmpty(),
+                    fabType = FabType.CLOSE_TABS,
+                )
+            }
+
+        data class DynamicInterface(
+            val isLayoutTypeButtonVisible: Boolean,
+            val isFireButtonVisible: Boolean,
+            val isNewTabVisible: Boolean,
+            val isSelectAllVisible: Boolean,
+            val isDeselectAllVisible: Boolean,
+            val isSelectionActionsDividerVisible: Boolean,
+            val isShareSelectedLinksVisible: Boolean,
+            val isBookmarkSelectedTabsVisible: Boolean,
+            val isSelectTabsDividerVisible: Boolean,
+            val isSelectTabsVisible: Boolean,
+            val isCloseSelectedTabsVisible: Boolean,
+            val isCloseOtherTabsVisible: Boolean,
+            val isCloseAllTabsVisible: Boolean,
+            val isMoreMenuItemEnabled: Boolean,
+            val isFabVisible: Boolean,
+            val fabType: FabType,
+        )
+
         enum class FabType {
             NEW_TAB,
             CLOSE_TABS,
