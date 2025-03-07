@@ -45,7 +45,6 @@ import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
-import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -65,6 +64,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
+    private val tabSwitcherTileAnimationMonitor: TabSwitcherTileAnimationMonitor,
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.switchMap { tabEntities ->
@@ -233,36 +233,20 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createTrackerAnimationTile(): TrackerAnimationTile {
-        val now = LocalDateTime.now()
-        val trackerCount =
-            webTrackersBlockedAppRepository.getTrackersCountBetween(
-                startTime = now.minusDays(7),
-                endTime = now,
-            )
-        return TrackerAnimationTile(trackerCount)
-    }
-
     private suspend fun LiveDataScope<List<TabSwitcherItem>>.collectTabItemsWithOptionalAnimationTile(
         tabEntities: List<TabEntity>,
     ) {
-        tabSwitcherPrefsDataStore.isAnimationTileDismissed().collect { isDismissed ->
+        tabSwitcherTileAnimationMonitor.observeAnimationTileVisibility().collect { isVisible ->
             val tabItems = tabEntities.map { Tab(it) }
-            val trackerCount = getTrackerCountForLast7Days()
 
-            val tabSwitcherItems = if (!isDismissed && trackerCount >= 10 && tabEntities.count() >= 2) {
-                listOf(TrackerAnimationTile(trackerCount)) + tabItems
+            val tabSwitcherItems = if (isVisible) {
+                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+
+                listOf(TrackerAnimationTile(trackerCountForLast7Days)) + tabItems
             } else {
                 tabItems
             }
             emit(tabSwitcherItems)
         }
-    }
-
-    private suspend fun getTrackerCountForLast7Days(): Int {
-        return webTrackersBlockedAppRepository.getTrackersCountBetween(
-            startTime = LocalDateTime.now().minusDays(7),
-            endTime = LocalDateTime.now(),
-        )
     }
 }
