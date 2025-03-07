@@ -60,12 +60,11 @@ interface SyncApi {
         deviceId: String,
     ): Result<String>
 
-    fun invitationACK(
-        deviceId: String,
-    ): Result<String>
+    // TODO rename this
+    fun getExchange(keyId: String): Result<String>
 
     fun sendSecrets(
-        deviceId: String,
+        keyId: String,
         encryptedSecrets: String,
     ): Result<Boolean>
 
@@ -92,6 +91,11 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun acceptInvitation(
+        keyId: String,
+        encryptedMessage: String,
+    ): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -201,31 +205,53 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun invitationACK(deviceId: String): Result<String> {
+    override fun getExchange(keyId: String): Result<String> {
+        Timber.i("cdr Looking for exchange for keyId: $keyId")
         val response = runCatching {
-            val logoutCall = syncService.invitationACK(deviceId)
-            logoutCall.execute()
+            val request = syncService.getInvitationAcceptance(keyId)
+            request.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            val sealed = response.body()?.encryptedACK.takeUnless { it.isNullOrEmpty() }
+            Timber.v("cdr received exchange. ${response.body()} ${response.raw()}")
+            val sealed = response.body()?.encryptedMessage.takeUnless { it.isNullOrEmpty() }
                 ?: return@onSuccess Result.Error(reason = "InvitationFlow: empty body")
             Result.Success(sealed)
         }
     }
 
     override fun sendSecrets(
-        deviceId: String,
+        keyId: String,
         encryptedSecrets: String,
     ): Result<Boolean> {
         val response = runCatching {
-            val sendSecretCall = syncService.sendSecret(deviceId, encryptedSecrets)
+            val shareRecoveryKeyRequest = EncryptedMessage(
+                keyId = keyId,
+                encryptedMessage = encryptedSecrets,
+            )
+            val sendSecretCall = syncService.sendSecret(shareRecoveryKeyRequest)
             sendSecretCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
         }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun acceptInvitation(keyId: String, encryptedMessage: String): Result<Boolean> {
+        val response = runCatching {
+            Timber.v("cdr Accepting invitation with details $keyId")
+            val request = syncService.sendSecret(EncryptedMessage(keyId = keyId, encryptedMessage = encryptedMessage))
+            request.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        Timber.v("cdr Invitation acceptance successfully sent to backend")
 
         return onSuccess(response) {
             Result.Success(true)
