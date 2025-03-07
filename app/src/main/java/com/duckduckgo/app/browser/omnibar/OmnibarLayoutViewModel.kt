@@ -610,10 +610,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                         appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
                             command.send(
                                 Command.StartExperimentVariant2To5Animation(
-                                    decoration.entities,
-                                    decoration.entities.any {
+                                    entities = decoration.entities,
+                                    hasKnownLogos = decoration.entities.takeIf { it.size >= 3 }?.take(3)?.any {
                                         it.name.contains("Facebook", true) || it.name.contains("Google", true)
-                                    },
+                                    } ?: false,
                                 ),
                             )
                         }
