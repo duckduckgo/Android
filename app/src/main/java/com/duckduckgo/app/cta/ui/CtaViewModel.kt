@@ -257,20 +257,14 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
-        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips() &&
-            !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
+        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips()
 
     @WorkerThread
-    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
-        !daxDialogEndShown() &&
-        daxDialogIntroShown() &&
-        !hideTips() &&
-        (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
+    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() && !daxDialogEndShown() && daxDialogIntroShown() && !hideTips()
 
-    private suspend fun canShowPrivacyProCta(): Boolean {
-        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
-            subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
-    }
+    @WorkerThread
+    private suspend fun canShowPrivacyProCta(): Boolean = daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
+        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     @WorkerThread
     private suspend fun getBrowserCta(site: Site?): Cta? {
@@ -358,8 +352,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
-            noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+            noBrowserCtaExperiment || daxDialogEndShown() || hideTips()
         }
     }
 
@@ -367,7 +360,7 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
-            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips()
         }
     }
 
