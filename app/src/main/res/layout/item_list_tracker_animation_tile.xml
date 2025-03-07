@@ -53,33 +53,37 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/keyline_1"
             android:ellipsize="end"
+            android:lineSpacingExtra="2sp"
             android:lines="1"
             android:textColor="@color/green80"
             android:textIsSelectable="false"
             android:textSize="16dp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/subtitle"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintStart_toEndOf="@id/shieldAnimation"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="DeprecatedWidgetInXml,SpUsage"
-            tools:text="93 Trackers blocked" />
+            tools:ignore="DeprecatedWidgetInXml,SpUsage,UnusedAttribute"
+            tools:text="93 Trackers blocked"
+            tools:textStyle="bold" />
 
         <TextView
             android:id="@+id/subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:lineSpacingExtra="6sp"
             android:lines="1"
+            android:lineHeight="20sp"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/inTheLast7Days"
             android:textColor="@color/green70"
             android:textIsSelectable="false"
-            android:textSize="16dp"
+            android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintTop_toBottomOf="@id/title"
-            tools:ignore="DeprecatedWidgetInXml,SpUsage" />
+            tools:ignore="DeprecatedWidgetInXml,SpUsage,UnusedAttribute" />
 
         <ImageView
             android:id="@+id/close"
