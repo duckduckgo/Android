@@ -222,10 +222,14 @@ sealed class Command {
     data class ShowWarningMaliciousSite(
         val siteUrl: Uri,
         val feed: Feed,
+        val clientSideHit: Boolean,
+        val isMainFrame: Boolean,
         val onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
     ) : Command()
 
-    data object HideWarningMaliciousSite : Command()
+    data class HideWarningMaliciousSite(
+        val canGoBack: Boolean,
+    ) : Command()
 
     data object EscapeMaliciousSite : Command()
 
