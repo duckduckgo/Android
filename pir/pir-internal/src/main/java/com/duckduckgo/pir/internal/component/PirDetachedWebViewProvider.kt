@@ -25,7 +25,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat
@@ -46,7 +46,7 @@ interface PirDetachedWebViewProvider {
     ): WebView
 }
 
-@ContributesBinding(ServiceScope::class)
+@ContributesBinding(AppScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun getInstance(

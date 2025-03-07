@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.settings
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
@@ -28,10 +29,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import androidx.work.multiprocess.RemoteListenableWorker
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -44,8 +47,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.service.PirForegroundScanService
-import com.duckduckgo.pir.internal.service.PirScheduledScanWorker
-import com.duckduckgo.pir.internal.service.PirScheduledScanWorker.Companion.TAG_SCHEDULED_SCAN
+import com.duckduckgo.pir.internal.service.PirRemoteWorkerService
+import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
@@ -191,7 +195,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun schedulePeriodicScan() {
-        logcat { "PIR-SCHEDULED: Scheduling periodic scan" }
+        logcat { "PIR-SCHEDULED: Scheduling periodic scan appId: ${appBuildConfig.applicationId}" }
 
         val constraints = Constraints.Builder()
             .setRequiresCharging(true)
@@ -199,7 +203,8 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             .build()
 
         val periodicWorkRequest =
-            PeriodicWorkRequest.Builder(PirScheduledScanWorker::class.java, 12, TimeUnit.HOURS)
+            PeriodicWorkRequest.Builder(PirScheduledScanRemoteWorker::class.java, 12, TimeUnit.HOURS)
+                .boundToPirProcess(appBuildConfig.applicationId)
                 .setConstraints(constraints)
                 .setInitialDelay(1, TimeUnit.MINUTES)
                 .build()
@@ -209,6 +214,16 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             periodicWorkRequest,
         )
+    }
+
+    private fun PeriodicWorkRequest.Builder.boundToPirProcess(applicationId: String): PeriodicWorkRequest.Builder {
+        val componentName = ComponentName(applicationId, PirRemoteWorkerService::class.java.name)
+        val data = Data.Builder()
+            .putString(RemoteListenableWorker.ARGUMENT_PACKAGE_NAME, componentName.packageName)
+            .putString(RemoteListenableWorker.ARGUMENT_CLASS_NAME, componentName.className)
+            .build()
+
+        return this.setInputData(data)
     }
 
     private fun useUserInput(): Boolean {

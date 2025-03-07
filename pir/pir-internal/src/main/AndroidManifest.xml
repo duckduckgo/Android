@@ -15,8 +15,7 @@
             android:foregroundServiceType="specialUse"
             android:process=":pir" />
         <service
-            android:name=".service.PirScheduledService"
-            android:enabled="true"
+            android:name=".service.PirRemoteWorkerService"
             android:exported="false"
             android:process=":pir" />
     </application>

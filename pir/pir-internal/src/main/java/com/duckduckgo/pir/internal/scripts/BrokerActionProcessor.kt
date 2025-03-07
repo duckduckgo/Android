@@ -19,7 +19,7 @@ package com.duckduckgo.pir.internal.scripts
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -83,7 +83,7 @@ interface BrokerActionProcessor {
     }
 }
 
-@ContributesBinding(ServiceScope::class)
+@ContributesBinding(AppScope::class)
 class RealBrokerActionProcessor @Inject constructor(
     @Named("BrokerProtection") private val pirMessagingInterface: JsMessaging,
     private val dispatcherProvider: DispatcherProvider,

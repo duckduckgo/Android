@@ -18,7 +18,7 @@ package com.duckduckgo.pir.internal.scripts
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -37,7 +37,7 @@ import javax.inject.Named
 import logcat.logcat
 
 @ContributesBinding(
-    scope = ServiceScope::class,
+    scope = AppScope::class,
     boundType = JsMessaging::class,
 )
 @Named("BrokerProtection")

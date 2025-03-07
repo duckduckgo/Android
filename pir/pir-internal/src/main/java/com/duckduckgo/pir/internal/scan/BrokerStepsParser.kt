@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.internal.scan
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.squareup.anvil.annotations.ContributesBinding
@@ -45,7 +45,7 @@ interface BrokerStepsParser {
     )
 }
 
-@ContributesBinding(ServiceScope::class)
+@ContributesBinding(AppScope::class)
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : BrokerStepsParser {

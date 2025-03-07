@@ -17,23 +17,48 @@
 package com.duckduckgo.pir.internal.service
 
 import android.content.Context
-import android.content.Intent
 import android.os.Process
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.scan.PirScan
+import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesWorker(AppScope::class)
-class PirScheduledScanWorker(
+@SingleInstanceIn(AppScope::class)
+class PirScheduledScanRemoteWorker(
     private val context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters) {
-    override suspend fun doWork(): Result {
-        logcat { "PIR-WORKED: doRemoteWork ${Process.myPid()}" }
-        context.applicationContext.startService(Intent(context, PirScheduledService::class.java))
-        return Result.success()
+) : RemoteCoroutineWorker(context, workerParameters) {
+    @Inject
+    lateinit var pirScan: PirScan
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    private var shouldComplete: Boolean = false
+
+    override suspend fun doRemoteWork(): Result {
+        logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
+        withContext(dispatcherProvider.main()) {
+            pirScan.execute(supportedBrokers, context) {
+                shouldComplete = true
+            }
+        }
+
+        return withContext(dispatcherProvider.io()) {
+            while (!shouldComplete) {
+                delay(30000)
+            }
+            logcat { "PIR-WORKER: Completed remote work ${Process.myPid()}" }
+            Result.success()
+        }
     }
 
     companion object {

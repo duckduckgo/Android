@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.component.PirDetachedWebViewProvider
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
@@ -72,14 +72,14 @@ interface PirScan {
 }
 
 @ContributesBinding(
-    scope = ServiceScope::class,
+    scope = AppScope::class,
     boundType = PirScan::class,
 )
 @ContributesBinding(
-    scope = ServiceScope::class,
+    scope = AppScope::class,
     boundType = ActionResultListener::class,
 )
-@SingleInstanceIn(ServiceScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealPirScan @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
