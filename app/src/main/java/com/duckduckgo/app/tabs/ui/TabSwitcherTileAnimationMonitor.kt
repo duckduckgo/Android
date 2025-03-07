@@ -20,10 +20,10 @@ import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import javax.inject.Inject
 
 private const val MINIMUM_TRACKER_COUNT = 10
 private const val MINIMUM_TAB_COUNT = 2

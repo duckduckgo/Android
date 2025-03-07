@@ -46,7 +46,7 @@ class TabSwitcherTileAnimationMonitorTest {
             testDispatcherProvider,
             fakeTabSwitcherPrefsDataStore,
             mockTabDataRepository,
-            mockWebTrackersBlockedAppRepository
+            mockWebTrackersBlockedAppRepository,
         )
     }
 
