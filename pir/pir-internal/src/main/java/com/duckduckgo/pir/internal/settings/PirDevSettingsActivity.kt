@@ -182,6 +182,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
+            stopService(Intent(this, PirRemoteWorkerService::class.java))
         }
 
         binding.viewResults.setOnClickListener {
@@ -211,7 +212,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
         workManager.enqueueUniquePeriodicWork(
             TAG_SCHEDULED_SCAN,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             periodicWorkRequest,
         )
     }

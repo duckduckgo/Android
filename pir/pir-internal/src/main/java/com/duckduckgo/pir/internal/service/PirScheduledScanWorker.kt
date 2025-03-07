@@ -24,14 +24,10 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.scan.PirScan
-import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesWorker(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class PirScheduledScanRemoteWorker(
     private val context: Context,
     workerParameters: WorkerParameters,
@@ -42,26 +38,20 @@ class PirScheduledScanRemoteWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    private var shouldComplete: Boolean = false
-
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
-        withContext(dispatcherProvider.main()) {
-            pirScan.execute(supportedBrokers, context) {
-                shouldComplete = true
-            }
-        }
+        val result = pirScan.execute(supportedBrokers, context.applicationContext)
 
-        return withContext(dispatcherProvider.io()) {
-            while (!shouldComplete) {
-                delay(30000)
-            }
-            logcat { "PIR-WORKER: Completed remote work ${Process.myPid()}" }
+        return if (result.isSuccess) {
+            logcat { "PIR-WORKER ($this}: Successfully completed!" }
             Result.success()
+        } else {
+            logcat { "PIR-WORKER ($this}: Failed to complete." }
+            Result.failure()
         }
     }
 
     companion object {
-        const val TAG_SCHEDULED_SCAN = "TAG-PIR-SCHEDULED-SCAN"
+        internal const val TAG_SCHEDULED_SCAN = "TAG-PIR-SCHEDULED-SCAN"
     }
 }

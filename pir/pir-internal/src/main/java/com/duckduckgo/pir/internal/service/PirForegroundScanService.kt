@@ -33,19 +33,27 @@ import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
+import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
 import logcat.logcat
 
 @InjectWith(scope = ServiceScope::class)
-class PirForegroundScanService : Service() {
+class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var pirScan: PirScan
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     override fun onCreate() {
         super.onCreate()
@@ -68,15 +76,23 @@ class PirForegroundScanService : Service() {
             createNotification(getString(R.string.pirNotificationMessageInProgress))
         startForeground(1, notification)
 
-        pirScan.execute(supportedBrokers, this) {
-            notificationManagerCompat.checkPermissionAndNotify(
-                applicationContext,
-                NOTIF_ID_STATUS_COMPLETE,
-                createNotification(getString(R.string.pirNotificationMessageComplete)),
-            )
-            stopSelf()
+        synchronized(this) {
+            launch(serviceDispatcher) {
+                async {
+                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService)
+                    if (result.isSuccess) {
+                        notificationManagerCompat.checkPermissionAndNotify(
+                            applicationContext,
+                            NOTIF_ID_STATUS_COMPLETE,
+                            createNotification(getString(R.string.pirNotificationMessageComplete)),
+                        )
+                    }
+                    stopSelf()
+                }.await()
+            }
         }
 
+        logcat { "PIR-SCAN: START_NOT_STICKY" }
         return START_NOT_STICKY
     }
 

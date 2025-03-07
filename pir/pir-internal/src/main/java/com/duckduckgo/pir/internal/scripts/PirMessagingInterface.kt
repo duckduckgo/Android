@@ -18,7 +18,6 @@ package com.duckduckgo.pir.internal.scripts
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -29,19 +28,11 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.internal.brokers.JSONObjectAdapter
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
-import javax.inject.Named
 import logcat.logcat
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = JsMessaging::class,
-)
-@Named("BrokerProtection")
-class PirMessagingInterface @Inject constructor(
+class PirMessagingInterface constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
     private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build() }

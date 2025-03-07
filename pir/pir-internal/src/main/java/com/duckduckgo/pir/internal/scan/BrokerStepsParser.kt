@@ -34,11 +34,16 @@ interface BrokerStepsParser {
     /**
      * This method parses the given json into BrokerStep that contains the actions needed to execute whatever step type.
      *
+     * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
      */
-    suspend fun parseStep(stepsJson: String): BrokerStep?
+    suspend fun parseStep(
+        brokerName: String,
+        stepsJson: String,
+    ): BrokerStep?
 
     data class BrokerStep(
+        var brokerName: String? = null,
         val stepType: String,
         val scanType: String,
         val actions: List<BrokerAction>,
@@ -66,9 +71,14 @@ class RealBrokerStepsParser @Inject constructor(
             .adapter(BrokerStep::class.java)
     }
 
-    override suspend fun parseStep(stepsJson: String): BrokerStep? = withContext(dispatcherProvider.io()) {
+    override suspend fun parseStep(
+        brokerName: String,
+        stepsJson: String,
+    ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            adapter.fromJson(stepsJson)
+            adapter.fromJson(stepsJson)?.apply {
+                this.brokerName = brokerName
+            }
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
         }.getOrNull()
