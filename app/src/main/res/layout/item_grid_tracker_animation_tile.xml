@@ -19,12 +19,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/keyline_2"
-    app:cardBackgroundColor="@color/green0"
     app:cardCornerRadius="10dp"
     tools:ignore="InvalidColorAttribute">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
+        android:background="@drawable/background_animated_tile"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
