@@ -45,6 +45,7 @@ class TabSwitcherPrefsDataStore @Inject constructor(
         const val KEY_USER_STATE = "KEY_USER_STATE"
         const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
         const val KEY_IS_ANIMATION_TILE_DISMISSED = "KEY_IS_ANIMATION_TILE_DISMISSED"
+        const val KEY_HAS_ANIMATION_TILE_BEEN_SEEN = "KEY_HAS_ANIMATION_TILE_BEEN_SEEN"
     }
 
     override val data: Flow<TabSwitcherData> = store.data.map { preferences ->
@@ -75,6 +76,18 @@ class TabSwitcherPrefsDataStore @Inject constructor(
     suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
         store.edit { preferences ->
             preferences[booleanPreferencesKey(KEY_IS_ANIMATION_TILE_DISMISSED)] = isDismissed
+        }
+    }
+
+    fun hasAnimationTileBeenSeen(): Flow<Boolean> {
+        return store.data.map { preferences ->
+            preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] ?: false
+        }
+    }
+
+    suspend fun setAnimationTileSeen() {
+        store.edit { preferences ->
+            preferences[booleanPreferencesKey(KEY_HAS_ANIMATION_TILE_BEEN_SEEN)] = true
         }
     }
 }

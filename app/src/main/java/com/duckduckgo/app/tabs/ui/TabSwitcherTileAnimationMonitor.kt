@@ -21,8 +21,8 @@ import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val MINIMUM_TRACKER_COUNT = 10
@@ -35,14 +35,16 @@ class TabSwitcherTileAnimationMonitor @Inject constructor(
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
 ) {
 
-    fun observeAnimationTileVisibility(): Flow<Boolean> = tabSwitcherPrefsDataStore.isAnimationTileDismissed()
-        .map { isAnimationTileDismissed ->
-            if (!isAnimationTileDismissed) {
-                shouldDisplayAnimationTile()
-            } else {
-                false
-            }
-        }.flowOn(dispatchProvider.io())
+    fun observeAnimationTileVisibility(): Flow<Boolean> = combine(
+        tabSwitcherPrefsDataStore.isAnimationTileDismissed(),
+        tabSwitcherPrefsDataStore.hasAnimationTileBeenSeen(),
+    ) { isAnimationTileDismissed, hasAnimationTileBeenSeen ->
+        when {
+            isAnimationTileDismissed -> false
+            hasAnimationTileBeenSeen -> true
+            else -> shouldDisplayAnimationTile()
+        }
+    }.flowOn(dispatchProvider.io())
 
     private suspend fun shouldDisplayAnimationTile(): Boolean {
         val openedTabs = tabDataRepository.getOpenTabCount()
