@@ -3912,9 +3912,19 @@ class BrowserTabFragment :
                 if (isHidden) {
                     return@launch
                 }
+                /*
+                 * Since we introduce a delay on trackers animation, we need to make sure the conditions
+                 * haven't changed between the time trackers animation was emitted, and the time it'll
+                 * be started
+                 */
                 val privacyProtectionsPopupVisible = lastSeenBrowserViewState
                     ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
-                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
+                if (
+                    lastSeenOmnibarViewState?.isEditing != true &&
+                    !privacyProtectionsPopupVisible &&
+                    lastSeenBrowserViewState?.browserShowing == true &&
+                    lastSeenBrowserViewState?.maliciousSiteBlocked == false
+                ) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
