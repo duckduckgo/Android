@@ -44,15 +44,6 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
-    fun startExperimentTrackersAnimation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        trackersBlockedAnimationView: DaxTextView,
-        trackersBlockedCountAnimationView: DaxTextView,
-        omnibarViews: List<View>,
-        entities: List<Entity>?,
-    )
-
     fun startExperimentVariant1Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,

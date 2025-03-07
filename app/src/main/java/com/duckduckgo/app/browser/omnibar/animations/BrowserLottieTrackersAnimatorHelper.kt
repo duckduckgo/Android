@@ -138,32 +138,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
-    override fun startExperimentTrackersAnimation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        trackersBlockedAnimationView: DaxTextView,
-        trackersBlockedCountAnimationView: DaxTextView,
-        omnibarViews: List<View>,
-        entities: List<Entity>?,
-    ) {
-        this.trackersBlockedAnimationView = trackersBlockedAnimationView
-        this.trackersBlockedCountAnimationView = trackersBlockedCountAnimationView
-
-        if (entities.isNullOrEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
-            return
-        }
-
-        val logos = getExperimentLogos(context, entities)
-        if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
-            return
-        }
-
-        animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
-    }
-
     override fun startExperimentVariant1Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
@@ -218,6 +192,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             tryToStartCookiesAnimation(context, omnibarViews)
             return
         }
+
+        trackersBlockedAnimationView.text = context.resources.getQuantityString(
+            R.plurals.trackersBlockedAnimationMessage,
+            logos.size,
+        )
 
         animateTrackersBlockedView(omnibarViews)
         animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
