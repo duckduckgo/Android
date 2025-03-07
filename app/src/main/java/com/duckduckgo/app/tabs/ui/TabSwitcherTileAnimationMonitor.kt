@@ -17,7 +17,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import com.duckduckgo.app.tabs.model.TabDataRepository
-import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +30,7 @@ private const val MINIMUM_TAB_COUNT = 2
 
 class TabSwitcherTileAnimationMonitor @Inject constructor(
     private val dispatchProvider: DispatcherProvider,
-    private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
+    private val tabSwitcherPrefsDataStore: TabSwitcherDataStore,
     private val tabDataRepository: TabDataRepository,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
 ) {
