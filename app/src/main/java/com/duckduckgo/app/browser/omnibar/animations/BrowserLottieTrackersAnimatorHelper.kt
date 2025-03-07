@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
+    private val trackerCountAnimator: TrackerCountAnimator,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -177,19 +178,21 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         trackersBlockedAnimationView: DaxTextView,
         trackersBlockedCountAnimationView: DaxTextView,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         entities: List<Entity>?,
     ) {
+        this.shieldAnimation = shieldAnimationView
         this.trackersBlockedAnimationView = trackersBlockedAnimationView
         this.trackersBlockedCountAnimationView = trackersBlockedCountAnimationView
 
         if (entities.isNullOrEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
             return
         }
 
         val logos = getExperimentLogos(context, entities)
         if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
             return
         }
 
@@ -199,7 +202,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         )
 
         animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
+        animateTrackersBlockedCountView(context, entities, logos, omnibarViews, shieldViews)
     }
 
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
@@ -249,6 +252,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>,
         logos: List<TrackerLogo>,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
     ) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 200L
@@ -262,7 +266,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    updateTrackersCountWithAnimation(context, entities, logos, omnibarViews)
+                    updateTrackersCountWithAnimation(context, entities, logos, omnibarViews, shieldViews)
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -275,41 +279,31 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>,
         logos: List<TrackerLogo>,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
     ) {
-        val totalDuration = 2000L
-        val trackerCountUpdateDelay = totalDuration / entities.size
-        val animationCompletionDelay = if (logos.size < MAX_LOGOS_SHOWN) 10L else 1000L
+        trackerCountAnimator.animateTrackersBlockedCountView(
+            context = context,
+            totalTrackerCount = entities.size,
+            trackerTextView = trackersBlockedCountAnimationView!!,
+            onAnimationEnd = {
+                trackersBlockedAnimationView?.gone()
+                trackersBlockedCountAnimationView?.text = ""
+                trackersBlockedCountAnimationView?.gone()
+                animateOmnibarIn(omnibarViews).start()
+                listener?.onAnimationFinished(logos)
 
-        fun updateTrackersCountText(index: Int) {
-            conflatedJob += MainScope().launch {
-                if (index <= entities.size) {
-                    if (index == TRACKER_START_INDEX || index > (entities.size - TRACKER_THRESHOLD + TRACKER_START_INDEX)) {
-                        trackersBlockedCountAnimationView?.text = index.toString()
-                        delay(trackerCountUpdateDelay)
-                        updateTrackersCountText(index + 1)
-                    } else {
-                        updateTrackersCountText(index + 1) // Skip delay for certain indexes
-                    }
-                } else {
-                    delay(animationCompletionDelay)
-                    trackersBlockedAnimationView?.gone()
-                    trackersBlockedCountAnimationView?.text = ""
-                    trackersBlockedCountAnimationView?.gone()
-                    animateOmnibarIn(omnibarViews).start()
-                    listener?.onAnimationFinished(logos)
-
+                conflatedJob += MainScope().launch {
                     delay(2500L)
-                    tryToStartCookiesAnimation(context, omnibarViews)
+                    tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
                 }
-            }
-        }
-
-        updateTrackersCountText(TRACKER_START_INDEX)
+            },
+        )
     }
 
     override fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
@@ -324,7 +318,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
         } else if (this.trackersAnimation?.isAnimating != true) {
-            startCookiesAnimation(context, omnibarViews)
+            startCookiesAnimation(context, omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
         }

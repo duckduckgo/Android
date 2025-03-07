@@ -56,6 +56,7 @@ interface BrowserTrackersAnimatorHelper {
         trackersBlockedAnimationView: DaxTextView,
         trackersBlockedCountAnimationView: DaxTextView,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         entities: List<Entity>?,
     )
 
@@ -70,6 +71,7 @@ interface BrowserTrackersAnimatorHelper {
     fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,

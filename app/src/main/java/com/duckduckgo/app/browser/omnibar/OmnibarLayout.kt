@@ -201,6 +201,11 @@ open class OmnibarLayout @JvmOverloads constructor(
         searchIcon,
     )
 
+    internal fun shieldViews(): List<View> = listOf(
+        shieldIcon,
+        shieldIconExperiment,
+    )
+
     var isScrollingEnabled: Boolean
         get() {
             return if (isAttachedToWindow) {
@@ -652,6 +657,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             animatorHelper.createCookiesAnimation(
                 context,
                 omnibarViews(),
+                shieldViews(),
                 cookieDummyView,
                 cookieAnimation,
                 sceneRoot,
@@ -700,6 +706,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 trackersBlockedAnimationView = trackersBlockedAnimation,
                 trackersBlockedCountAnimationView = trackersBlockedCountAnimation,
                 omnibarViews = omnibarViews(),
+                shieldViews = shieldViews(),
                 entities = events,
             )
         }
