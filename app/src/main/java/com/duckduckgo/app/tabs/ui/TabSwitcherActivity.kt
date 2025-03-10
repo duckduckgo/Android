@@ -54,6 +54,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.SelectableTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
@@ -219,7 +222,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.selectionViewState.value.mode)
+        tabItemDecorator = TabItemDecorator(this)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
@@ -298,28 +301,34 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             lifecycleScope.launch {
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateSelection(it.mode)
+                    tabsAdapter.updateData(it.items)
 
                     updateToolbarTitle(it.mode)
-                    updateTabGridItemDecorator(it.selectedTab?.tabId)
+                    updateTabGridItemDecorator()
 
                     invalidateOptionsMenu()
                 }
             }
         } else {
             viewModel.activeTab.observe(this) { tab ->
-                if (tab != null && tab.tabId != tabItemDecorator.highlightedTabId && !tab.deletable) {
-                    updateTabGridItemDecorator(tab.tabId)
+                if (tab != null && !tab.deletable) {
+                    updateTabGridItemDecorator()
                 }
             }
-        }
 
-        viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
-            tabsAdapter.updateData(tabSwitcherItems)
+            viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+                tabsAdapter.updateData(tabSwitcherItems)
 
+<<<<<<< HEAD
             val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
             if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                 updateTabGridItemDecorator(tabSwitcherItems.last().id)
+=======
+                val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
+                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
+                    updateTabGridItemDecorator()
+                }
+>>>>>>> 503ddbfe9 (Avoid passing around the selection mode)
             }
 
             if (firstTimeLoadingTabsList) {
@@ -536,20 +545,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        updateTabGridItemDecorator(selectedTabId)
         launch { viewModel.onTabSelected(tab) }
     }
 
-    private fun updateTabGridItemDecorator(tabId: String?) {
-        tabItemDecorator.highlightedTabId = tabId
-        tabItemDecorator.selectionMode = viewModel.selectionViewState.value.mode
+    private fun updateTabGridItemDecorator() {
         tabsRecycler.invalidateItemDecorations()
     }
 
     override fun onTabDeleted(position: Int, deletedBySwipe: Boolean) {
         tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
             when (tab) {
-                is TabSwitcherItem.Tab -> {
+                is Tab -> {
                     launch {
                         viewModel.onMarkTabAsDeletable(
                             tab = tab.tabEntity,

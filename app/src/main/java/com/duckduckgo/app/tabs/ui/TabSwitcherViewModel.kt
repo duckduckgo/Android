@@ -20,12 +20,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -82,29 +85,27 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabRepository.flowTabs,
         tabRepository.flowSelectedTab,
-    ) { viewState, tabs, selectedTab ->
+    ) { viewState, tabs, activeTab ->
         viewState.copy(
-            items = tabs.map { TabSwitcherItem.Tab(it, false) },
-            selectedTab = selectedTab,
+            items = tabs.map {
+                if (viewState.mode is Selection) {
+                    TabSwitcherItem.SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
+                } else {
+                    TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+                }
+            }
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-        tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
+        .debounce(100.milliseconds)
+        .conflate()
+        .map { tabEntities ->
+            val activeTabId = tabRepository.liveSelectedTab.value?.tabId
             tabEntities.map {
-                TabSwitcherItem.Tab(it, viewState.mode is Selection && it.tabId in viewState.mode.selectedTabs)
+                TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTabId)
             }
         }.asLiveData()
-    } else {
-        tabRepository.flowTabs
-            .debounce(100.milliseconds)
-            .conflate()
-            .combine(_selectionViewState) { tabEntities, viewState ->
-                tabEntities.map {
-                    TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
-                }
-            }.asLiveData()
-    }
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -322,7 +323,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     data class SelectionViewState(
         val items: List<TabSwitcherItem> = emptyList(),
-        val selectedTab: TabEntity? = null,
         val mode: Mode = Mode.Normal,
     ) {
         val dynamicInterface: DynamicInterface
