@@ -3865,29 +3865,32 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (appPersonalityFeature.self().isEnabled() &&
-            (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant5().isEnabled())
-        ) {
-            command.value = Command.StartExperimentV2ShieldPopAnimation
-        } else if (appPersonalityFeature.self().isEnabled() &&
-            (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
-        ) {
-            val ignoreLogos = appPersonalityFeature.variant4().isEnabled()
-            if ((hasKnownLogos || ignoreLogos) &&
-                logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD &&
-                trackersBurstAnimationPreferencesStore.fetchCount() < 3
-            ) {
-                trackersBurstAnimationPreferencesStore.incrementCount()
-                command.value = Command.StartExperimentTrackersBurstAnimation(logos, ignoreLogos)
-                viewModelScope.launch {
-                    pixel.fire(
-                        AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
-                        mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
-                    )
-                    privacyDashboardExternalPixelParams.setPixelParams(AFTER_BURST_ANIMATION, "true")
-                }
-            } else {
+        when {
+            appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled() -> {
+                command.value = Command.StartExperimentV2ShieldPopAnimation
+            }
+            appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant5().isEnabled() -> {
                 command.value = Command.StartExperimentShieldPopAnimation
+            }
+            appPersonalityFeature.self().isEnabled() &&
+                (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled()) -> {
+                val ignoreLogos = appPersonalityFeature.variant4().isEnabled()
+                if ((hasKnownLogos || ignoreLogos) &&
+                    logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD &&
+                    trackersBurstAnimationPreferencesStore.fetchCount() < 3
+                ) {
+                    trackersBurstAnimationPreferencesStore.incrementCount()
+                    command.value = Command.StartExperimentTrackersBurstAnimation(logos, ignoreLogos)
+                    viewModelScope.launch {
+                        pixel.fire(
+                            AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
+                            mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
+                        )
+                        privacyDashboardExternalPixelParams.setPixelParams(AFTER_BURST_ANIMATION, "true")
+                    }
+                } else {
+                    command.value = Command.StartExperimentShieldPopAnimation
+                }
             }
         }
     }
