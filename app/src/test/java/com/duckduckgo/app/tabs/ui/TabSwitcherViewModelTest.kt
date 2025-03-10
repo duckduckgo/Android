@@ -117,13 +117,10 @@ class TabSwitcherViewModelTest {
 
     private lateinit var fakeTabSwitcherDataStore: TabSwitcherPrefsDataStore
 
-    @Mock
-    private lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
-
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
-    private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
-
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+    private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -138,6 +135,7 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
         whenever(mockTabRepository.flowDeletableTabs)
