@@ -100,7 +100,7 @@ class TabSwitcherViewModel @Inject constructor(
         .debounce(100.milliseconds)
         .conflate()
         .map { tabEntities ->
-            val activeTabId = tabRepository.liveSelectedTab.value?.tabId
+            val activeTabId = activeTab.value?.tabId
             tabEntities.map {
                 TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTabId)
             }
