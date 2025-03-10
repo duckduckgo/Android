@@ -88,10 +88,10 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
             pulse.duration = 1100L
 
             if (isExperimentAndShieldView) {
-                pulse.startDelay = 3500L
+                pulse.startDelay = 1000L
                 view.alpha = 0.0f
                 conflatedJob += CoroutineScope(Dispatchers.Main).launch {
-                    delay(3500L)
+                    delay(1000L)
                     view.alpha = 1.0f
                 }
             }
