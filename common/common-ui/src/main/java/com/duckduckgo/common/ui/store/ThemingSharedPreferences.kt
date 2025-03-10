@@ -20,12 +20,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.isInNightMode
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -44,8 +45,7 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            experimentalUIThemingFeature.self().isEnabled(),
-            experimentalUIThemingFeature.warmColors().isEnabled(),
+            visualDesignExperimentDataStore.experimentState.value.isEnabled,
         )
     }
 
@@ -71,7 +71,6 @@ class ThemingSharedPreferences @Inject constructor(
             defValue: DuckDuckGoTheme,
             isInNightMode: Boolean,
             isExperimentEnabled: Boolean,
-            warmColors: Boolean,
         ) =
             when (value) {
                 THEME_LIGHT -> if (isExperimentEnabled) {

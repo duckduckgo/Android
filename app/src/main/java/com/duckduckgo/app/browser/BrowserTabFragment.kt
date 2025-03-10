@@ -136,10 +136,14 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -230,8 +234,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
-import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -534,7 +538,7 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
+    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -790,6 +794,8 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
+    private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -851,7 +857,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, experimentalUIThemingFeature.self().isEnabled(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -863,6 +869,7 @@ class BrowserTabFragment :
         initPrivacyProtectionsPopup()
         createPopupMenu()
 
+        configureNavigationBar()
         configureOmnibar()
 
         if (savedInstanceState == null) {
@@ -917,6 +924,46 @@ class BrowserTabFragment :
         configureEditModeChangeDetection()
     }
 
+    private fun configureNavigationBar() {
+        val observer = object : BrowserNavigationBarObserver {
+            override fun onFireButtonClicked() {
+                onFireButtonPressed()
+            }
+
+            override fun onTabsButtonClicked() {
+                onTabsButtonPressed()
+            }
+
+            override fun onTabsButtonLongClicked() {
+                onTabsButtonLongPressed()
+            }
+
+            override fun onMenuButtonClicked() {
+                onBrowserMenuButtonPressed()
+            }
+
+            override fun onBackButtonClicked() {
+                onBackArrowClicked()
+            }
+
+            override fun onBackButtonLongClicked() {
+                onBackArrowLongClicked()
+            }
+
+            override fun onForwardButtonClicked() {
+                onForwardArrowClicked()
+            }
+        }
+
+        browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
+            lifecycleScope = lifecycleScope,
+            browserTabFragmentBinding = binding,
+            visualDesignExperimentDataStore = visualDesignExperimentDataStore,
+            omnibar = omnibar,
+            browserNavigationBarObserver = observer,
+        )
+    }
+
     private fun configureEditModeChangeDetection() {
         if (swipingTabsFeature.isEnabled) {
             omnibar.isInEditMode.onEach { isInEditMode ->
@@ -927,11 +974,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun onOmnibarTabsButtonPressed() {
+    private fun onTabsButtonPressed() {
         launch { viewModel.userLaunchingTabSwitcher() }
     }
 
-    private fun onOmnibarTabsButtonLongPressed() {
+    private fun onTabsButtonLongPressed() {
         launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
     }
 
@@ -962,16 +1009,14 @@ class BrowserTabFragment :
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
 
-    private fun onOmnibarFireButtonPressed() {
+    private fun onFireButtonPressed() {
         browserActivity?.launchFire()
         viewModel.onFireMenuSelected()
     }
 
-    private fun onOmnibarBrowserMenuButtonPressed() {
+    private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked()
-        hideKeyboardImmediately()
-        launchPopupMenu()
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -985,6 +1030,10 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
+    private fun onOmnibarDuckChatPressed(query: String) {
+        viewModel.onDuckChatOmnibarButtonClicked(query)
+    }
+
     private fun configureCustomTab() {
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
@@ -993,6 +1042,7 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
+            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 
@@ -1009,17 +1059,23 @@ class BrowserTabFragment :
         )
         popupMenu.apply {
             onMenuItemClicked(forwardMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
-                viewModel.onUserPressedForward()
+                onForwardArrowClicked()
             }
             onMenuItemClicked(backMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
-                activity?.onBackPressed()
+                onBackArrowClicked()
             }
             onMenuItemLongClicked(backMenuItem) {
-                viewModel.onUserLongPressedBack()
+                onBackArrowLongClicked()
             }
             onMenuItemClicked(refreshMenuItem) {
+                viewModel.onRefreshRequested(triggeredByUser = true)
+                if (isActiveCustomTab()) {
+                    viewModel.fireCustomTabRefreshPixel()
+                } else {
+                    viewModel.handleMenuRefreshAction()
+                }
+            }
+            onMenuItemClicked(refreshLongMenuItem) {
                 viewModel.onRefreshRequested(triggeredByUser = true)
                 if (isActiveCustomTab()) {
                     viewModel.fireCustomTabRefreshPixel()
@@ -1096,6 +1152,20 @@ class BrowserTabFragment :
         }
     }
 
+    private fun onForwardArrowClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+        viewModel.onUserPressedForward()
+    }
+
+    private fun onBackArrowLongClicked() {
+        viewModel.onUserLongPressedBack()
+    }
+
+    private fun onBackArrowClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+        activity?.onBackPressed()
+    }
+
     private fun launchCustomTabUrlInDdg(url: String) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(url)
@@ -1103,11 +1173,16 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu() {
+    private fun launchPopupMenu(anchorToNavigationBar: Boolean) {
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
-                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (anchorToNavigationBar) {
+                    val anchorView = binding.navigationBar.popupMenuAnchor
+                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
+                } else {
+                    popupMenu.show(binding.rootView, omnibar.toolbar)
+                }
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -1164,7 +1239,9 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+        val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
+        val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
+        if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
@@ -1200,6 +1277,7 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
 
@@ -1878,6 +1956,11 @@ class BrowserTabFragment :
                 browserActivity?.openExistingTab(it.tabId)
             }
 
+            is Command.LaunchPopupMenu -> {
+                hideKeyboardImmediately()
+                launchPopupMenu(it.anchorToNavigationBar)
+            }
+
             else -> {
                 // NO OP
             }
@@ -2482,19 +2565,19 @@ class BrowserTabFragment :
         omnibar.configureItemPressedListeners(
             object : Omnibar.ItemPressedListener {
                 override fun onTabsButtonPressed() {
-                    onOmnibarTabsButtonPressed()
+                    this@BrowserTabFragment.onTabsButtonPressed()
                 }
 
                 override fun onTabsButtonLongPressed() {
-                    onOmnibarTabsButtonLongPressed()
+                    this@BrowserTabFragment.onTabsButtonLongPressed()
                 }
 
                 override fun onFireButtonPressed() {
-                    onOmnibarFireButtonPressed()
+                    this@BrowserTabFragment.onFireButtonPressed()
                 }
 
                 override fun onBrowserMenuPressed() {
-                    onOmnibarBrowserMenuButtonPressed()
+                    onBrowserMenuButtonPressed()
                 }
 
                 override fun onPrivacyShieldPressed() {
@@ -2511,6 +2594,13 @@ class BrowserTabFragment :
 
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
+                }
+            },
+        )
+        omnibar.configureFadelOmnibarItemPressedListeners(
+            object : FadeOmnibarItemPressedListener {
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
                 }
             },
         )
@@ -3902,6 +3992,8 @@ class BrowserTabFragment :
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
                 val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)
                 viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(bookmark = bookmark)
+
+                browserNavigationBarIntegration.renderBrowserViewState(viewState)
             }
         }
 

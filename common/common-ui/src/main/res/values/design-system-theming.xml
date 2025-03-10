@@ -223,6 +223,10 @@
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
 
+        <!-- Browser Navigation Bar colors -->
+        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray50</item>
+        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray70</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -313,6 +317,10 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
+
+        <!-- Browser Navigation Bar colors -->
+        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray70</item>
+        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray50</item>
 
     </style>
 

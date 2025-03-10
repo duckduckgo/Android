@@ -19,6 +19,9 @@ package com.duckduckgo.common.utils
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class KeyboardVisibilityUtil(private val rootView: View) {
 
@@ -26,7 +29,7 @@ class KeyboardVisibilityUtil(private val rootView: View) {
         rootView.viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    if (isKeyboardVisible()) {
+                    if (rootView.isKeyboardVisible()) {
                         rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                         onKeyboardVisible()
                     }
@@ -34,16 +37,27 @@ class KeyboardVisibilityUtil(private val rootView: View) {
             },
         )
     }
+}
 
-    private fun isKeyboardVisible(): Boolean {
-        val rect = Rect()
-        rootView.getWindowVisibleDisplayFrame(rect)
-        val screenHeight = rootView.height
-        val keypadHeight = screenHeight - rect.bottom
-        return keypadHeight > screenHeight * KEYBOARD_VISIBILITY_THRESHOLD
+fun View.keyboardVisibilityFlow(): Flow<Boolean> = callbackFlow {
+    val layoutObserver = ViewTreeObserver.OnGlobalLayoutListener {
+        val isVisible = isKeyboardVisible()
+        trySend(isVisible)
     }
 
-    companion object {
-        private const val KEYBOARD_VISIBILITY_THRESHOLD = 0.15
+    viewTreeObserver.addOnGlobalLayoutListener(layoutObserver)
+
+    awaitClose {
+        viewTreeObserver.removeOnGlobalLayoutListener(layoutObserver)
     }
 }
+
+private fun View.isKeyboardVisible(): Boolean {
+    val rect = Rect()
+    getWindowVisibleDisplayFrame(rect)
+    val screenHeight = height
+    val keypadHeight = screenHeight - rect.bottom
+    return keypadHeight > screenHeight * KEYBOARD_VISIBILITY_THRESHOLD
+}
+
+private const val KEYBOARD_VISIBILITY_THRESHOLD = 0.15
