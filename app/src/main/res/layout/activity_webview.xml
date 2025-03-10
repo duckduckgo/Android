@@ -27,7 +27,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <WebView
+    <com.duckduckgo.app.browser.DuckDuckGoWebView
         android:id="@+id/simpleWebview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

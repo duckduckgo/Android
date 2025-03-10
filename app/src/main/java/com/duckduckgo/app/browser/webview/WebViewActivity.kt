@@ -17,18 +17,27 @@
 package com.duckduckgo.app.browser.webview
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.os.Message
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.lifecycle.lifecycleScope
+import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.WebMessageCompat
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserWebViewClient
+import com.duckduckgo.app.browser.DuckDuckGoWebView
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
 import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -49,6 +58,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WebViewActivityWithParams::class)
@@ -77,6 +87,15 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
+    @Inject
+    lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
+
+    @Inject
+    lateinit var blobConverterInjector: BlobConverterInjector
+
     private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
@@ -93,6 +112,8 @@ class WebViewActivity : DuckDuckGoActivity() {
         val url = params?.url
         title = params?.screenTitle.orEmpty()
         val supportNewWindows = params?.supportNewWindows ?: false
+
+        configureWebViewForBlobDownload(binding.simpleWebview)
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -182,5 +203,87 @@ class WebViewActivity : DuckDuckGoActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+        lifecycleScope.launch(dispatcherProvider.main()) {
+            if (isBlobDownloadWebViewFeatureEnabled(webView)) {
+                val script = blobDownloadScript()
+                WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+
+                webView.safeAddWebMessageListener(
+                    webViewCapabilityChecker,
+                    "ddgBlobDownloadObj",
+                    setOf("*"),
+                    object : WebViewCompat.WebMessageListener {
+                        override fun onPostMessage(
+                            view: WebView,
+                            message: WebMessageCompat,
+                            sourceOrigin: Uri,
+                            isMainFrame: Boolean,
+                            replyProxy: JavaScriptReplyProxy,
+                        ) {
+                            Timber.d(message.data)
+                        }
+                    },
+                )
+            } else {
+                blobConverterInjector.addJsInterface(webView) { url, mimeType ->
+                    Timber.d(url)
+                }
+            }
+        }
+    }
+
+    private fun blobDownloadScript(): String {
+        val script = """
+            window.__url_to_blob_collection = {};
+        
+            const original_createObjectURL = URL.createObjectURL;
+        
+            URL.createObjectURL = function () {
+                const blob = arguments[0];
+                const url = original_createObjectURL.call(this, ...arguments);
+                if (blob instanceof Blob) {
+                    __url_to_blob_collection[url] = blob;
+                }
+                return url;
+            }
+            
+            function blobToBase64DataUrl(blob) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        resolve(reader.result);
+                    }
+                    reader.onerror = function() {
+                        reject(new Error('Failed to read Blob object'));
+                    }
+                    reader.readAsDataURL(blob);
+                });
+            }
+        
+            const pingMessage = 'Ping:' + window.location.href
+            ddgBlobDownloadObj.postMessage(pingMessage)
+                    
+            ddgBlobDownloadObj.onmessage = function(event) {
+                if (event.data.startsWith('blob:')) {
+                    const blob = window.__url_to_blob_collection[event.data];
+                    if (blob) {
+                        blobToBase64DataUrl(blob).then((dataUrl) => {
+                            ddgBlobDownloadObj.postMessage(dataUrl);
+                        });
+                    }
+                }
+            }
+        """.trimIndent()
+
+        return script
+    }
+
+    private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
+        return withContext(dispatcherProvider.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
+            webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
+            webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
     }
 }
