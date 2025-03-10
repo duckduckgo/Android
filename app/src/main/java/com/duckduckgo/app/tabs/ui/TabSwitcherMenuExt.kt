@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.content.Context
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -27,10 +30,10 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackBu
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
+import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.HIDDEN
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 private const val FAB_HIDE_DELAY = 500L
@@ -69,11 +72,11 @@ fun Menu.createDynamicInterface(
             when (dynamicMenu.fabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
-                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_add_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24)
                 }
                 FabType.CLOSE_TABS -> {
                     text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24)
                 }
             }
 
@@ -87,8 +90,8 @@ fun Menu.createDynamicInterface(
     }
 
     toolbar.navigationIcon = when (dynamicMenu.backButtonType) {
-        ARROW -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_arrow_left_24)
-        CLOSE -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_close_24)
+        ARROW -> AppCompatResources.getDrawable(toolbar.context, commonR.drawable.ic_arrow_left_24)
+        CLOSE -> AppCompatResources.getDrawable(toolbar.context, commonR.drawable.ic_close_24)
     }
 
     findItem(R.id.layoutTypeMenuItem).apply {
@@ -108,4 +111,13 @@ fun Menu.createDynamicInterface(
     }
 
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
+}
+
+fun MenuItem.updateEnabledState(isEnabled: Boolean, context: Context) {
+    this.isEnabled = isEnabled
+    iconTintList = if (isEnabled) {
+        null
+    } else {
+        ContextCompat.getColorStateList(context, commonR.color.disabledColor)
+    }
 }
