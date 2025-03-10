@@ -143,7 +143,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
-            tabManagerFeatureFlags
+            tabManagerFeatureFlags,
         )
         testee.command.observeForever(mockCommandObserver)
     }
