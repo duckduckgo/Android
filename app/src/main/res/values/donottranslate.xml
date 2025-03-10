@@ -67,14 +67,17 @@
     <string name="selectAllTabsMenuItem">Select All</string>
     <string name="deselectAllTabsMenuItem">Deselect All</string>
     <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
+
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %1$d Links</item>
     </plurals>
+
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bookmark Tab</item>
         <item quantity="other">Bookmark %1$d Tabs</item>
     </plurals>
+
     <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Close Tab</item>
         <item quantity="other">Close %1$d Tabs</item>
