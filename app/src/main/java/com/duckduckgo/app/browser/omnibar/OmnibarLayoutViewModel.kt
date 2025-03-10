@@ -95,7 +95,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            experimentalIconsEnabled = experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.icons().isEnabled(),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -127,7 +126,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val experimentalIconsEnabled: Boolean = false,
     )
 
     sealed class Command {

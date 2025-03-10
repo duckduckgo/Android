@@ -64,14 +64,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     override fun render(viewState: ViewState) {
         super.render(viewState)
 
-        if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
-        } else {
-            fireIconImageView.setImageResource(R.drawable.ic_fire)
-            tabsMenu.setIcon(R.drawable.ic_tabs)
-        }
-
         minibarText.text = viewState.url.extractDomain()
     }
 

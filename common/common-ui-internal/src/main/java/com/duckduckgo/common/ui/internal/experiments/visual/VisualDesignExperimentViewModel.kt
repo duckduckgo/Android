@@ -44,7 +44,6 @@ class VisualDesignExperimentViewModel @Inject constructor(
     data class ViewState(
         val isBrowserThemingFeatureEnabled: Boolean = false,
         val useWarmColors: Boolean = false,
-        val experimentalIcons: Boolean = false,
         val selectedTheme: String = "",
     )
 
@@ -71,21 +70,12 @@ class VisualDesignExperimentViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("DenyListedApi")
-    fun onIconsFlagChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            experimentalUIThemingFeature.icons().setRawStoredState(State(checked))
-            updateCurrentState()
-        }
-    }
-
     private fun updateCurrentState() {
         viewModelScope.launch {
             viewState.update {
                 currentViewState().copy(
                     isBrowserThemingFeatureEnabled = experimentalUIThemingFeature.self().isEnabled(),
                     useWarmColors = experimentalUIThemingFeature.warmColors().isEnabled(),
-                    experimentalIcons = experimentalUIThemingFeature.icons().isEnabled(),
                     selectedTheme = themingDataStore.theme.toString(),
                 )
             }
