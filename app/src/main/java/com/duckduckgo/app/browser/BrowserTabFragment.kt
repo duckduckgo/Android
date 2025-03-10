@@ -1280,6 +1280,7 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            viewModel.resetTrackersCount()
             removeTopOmnibarOffsetChangedListener()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()

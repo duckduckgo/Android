@@ -165,6 +165,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         trackersCountAndBlockedViews.forEach {
             animations.add(
                 ValueAnimator.ofFloat(1f, 0f).apply {
+                    removeAllListeners()
                     addUpdateListener { animation ->
                         val alpha = animation.animatedValue as Float
                         it.alpha = alpha
@@ -177,6 +178,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
 
         animations.add(
             ValueAnimator.ofFloat(0f, 1f).apply {
+                removeAllListeners()
                 addUpdateListener { animation ->
                     val alpha = animation.animatedValue as Float
                     omnibarTextInput.alpha = alpha
@@ -195,6 +197,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 delayAnimator,
                 AnimatorSet().apply {
                     playTogether(animations.toList())
+                    removeAllListeners()
                     addListener(
                         object : AnimatorListener {
                             override fun onAnimationStart(animation: Animator) {}
