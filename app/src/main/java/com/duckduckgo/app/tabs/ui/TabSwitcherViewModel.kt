@@ -32,6 +32,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.FabType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -39,14 +40,17 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -79,6 +83,9 @@ class TabSwitcherViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    private val _viewState = MutableStateFlow<ViewState>(ViewState())
+    val viewState = _viewState.asStateFlow()
 
     sealed class Command {
         data object Close : Command()
@@ -204,6 +211,14 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onFabClicked() {
+        if (viewState.value.fabType == FabType.NEW_TAB) {
+            _viewState.update { it.copy(FabType.CLOSE_TABS) }
+        } else {
+            _viewState.update { it.copy(FabType.NEW_TAB) }
+        }
+    }
+
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
@@ -213,6 +228,15 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
 
             duckChat.openDuckChat()
+        }
+    }
+
+    data class ViewState(
+        val fabType: FabType = FabType.NEW_TAB,
+    ) {
+        enum class FabType {
+            NEW_TAB,
+            CLOSE_TABS,
         }
     }
 }

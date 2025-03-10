@@ -328,7 +328,7 @@ class TabSwitcherAdapter(
 
     fun getTabSwitcherItem(position: Int): TabSwitcherItem? = list.getOrNull(position)
 
-    fun adapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
+    fun getAdapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
         it is TabSwitcherItem.Tab && it.tabEntity.tabId == tabId
     }
 
