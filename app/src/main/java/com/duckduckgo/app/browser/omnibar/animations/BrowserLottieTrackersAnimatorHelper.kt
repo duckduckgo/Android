@@ -148,28 +148,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         this.shieldAnimation = shieldAnimationView
 
-        with(shieldAnimationView) {
-            this.addAnimatorListener(
-                object : AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {
-                    }
-
-                    override fun onAnimationEnd(animation: Animator) {
-                        tryToStartCookiesAnimation(context, omnibarViews)
-                        listener?.onAnimationFinished(emptyList())
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {
-                    }
-
-                    override fun onAnimationRepeat(animation: Animator) {
-                    }
-                },
-            )
-
-            this.setMaxProgress(1f)
-            this.playAnimation()
-        }
+        tryToStartCookiesAnimation(context, omnibarViews)
+        listener?.onAnimationFinished(emptyList())
     }
 
     override fun startExperimentVariant2To5Animation(
