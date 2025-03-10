@@ -225,7 +225,7 @@
     <string name="netpCustomDnsSettingText">DNS Sunucusu</string>
     <string name="netpPrivateDns">Özel DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Kötü amaçlı yazılımları engelle)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Riskli alan adlarını engelleyin)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Önerilen)</string>
     <string name="netpCustomDnsCustom">Özelleştirme</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 Adresi</string>
@@ -236,8 +236,10 @@
     <string name="netpDdgDnsByLine">DuckDuckGo, DNS sorgularını DNS sunucularımız üzerinden yönlendirir. Böylece internet sağlayıcınız hangi web sitelerini ziyaret ettiğinizi göremez.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Kötü Amaçlı Yazılımları Engelle</string>
-    <string name="netpDnsBlockMalwareByline">DNS düzeyindeki engelleme listesiyle kötü amaçlı yazılımları engelleyin. Bir web sitesi yüklenmiyorsa, engellemeyi kapatmayı deneyin.</string>
+    <string name="netpDnsBlockMalwareHeader">İçerik Engelleme ve Filtreleme</string>
+    <string name="netpDnsBlockMalwarePrimary">Riskli alan adlarını engelleyin</string>
+    <string name="netpDnsBlockMalwareByline">DNS düzeyinde bir engelleme listesiyle kötü amaçlı yazılım, kimlik avı saldırıları ve çevrimiçi dolandırıcılık barındırdığı için işaretlenmiş 150.000\'den fazla alan adını engelleyin. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS Engelleme Listeleri</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">VPN\'lerle uyumlu olmayan uygulamaları hariç tutmak ister misiniz?</string>

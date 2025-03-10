@@ -31,4 +31,9 @@
     <declare-styleable name="NewOmnibarView">
         <attr name="omnibarPosition"/>
     </declare-styleable>
+
+    <!-- LegacyOmnibarView-->
+    <declare-styleable name="FadeOmnibarLayout">
+        <attr name="omnibarPosition"/>
+    </declare-styleable>
 </resources>

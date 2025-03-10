@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Tvoje ochrana, naše priorita.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Soukromí.Ochrana.Pocit jistoty.</string>
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
     <string name="open">Otevřít</string>
@@ -127,7 +127,7 @@
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
     <string name="settingsHeadingCustomize">Přizpůsobit</string>
-    <string name="settingsHeadingAbout">Informace</string>
+    <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
@@ -232,9 +232,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Informace</string>
-    <string name="aboutHeader">Vítejte na Kačeří straně!</string>
-    <string name="aboutDescription">DuckDuckGo je nezávislá společnost založená v roce 2008, která se zabývá ochranou soukromí pro všechny, kdo už mají dost sledování na internetu a chtějí snadné řešení. Jsme důkazem, že skutečná ochrana soukromí na internetu nemusí mít kompromisy.\n\nProhlížeč DuckDuckGo má všechno, co od prohlížeče očekáváš, jako jsou záložky, karty, hesla a další funkce. A k tomu má víc než <annotation type="privacy_protection_link">desítku účinných funkcí na ochranu soukromí</annotation>, které většina oblíbených prohlížečů ve výchozím nastavení nenabízí. Tahle jedinečná komplexní sada na ochranu soukromí pomáhá chránit tvoje aktivity na internetu od vyhledávání přes prohlížení až po posílání e-mailů.\n\nAby naše ochrana soukromí fungovala, nemusíš znát technické detaily ani řešit žádná složitá nastavení. Stačí přejít na prohlížeč DuckDuckGo ve všech zařízeních a dostaneš soukromí pro všechny své aktivity.\n\nJestli chceš nahlédnout pod pokličku, víc informací o tom, jak ochrana soukromí DuckDuckGo funguje, najdeš v naší <annotation type="learn_more_link">nápovědě</annotation>.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo je nezávislá společnost založená v roce 2008, která se zabývá ochranou soukromí pro všechny, kdo už mají dost sledování na internetu a chtějí snadné řešení. Jsme důkazem, že skutečná ochrana soukromí na internetu nemusí mít kompromisy.\n\nProhlížeč DuckDuckGo má všechno, co od prohlížeče očekáváš, jako jsou záložky, karty, hesla a další funkce. A k tomu má víc než <annotation type="privacy_protection_link">desítku účinných funkcí na ochranu soukromí</annotation>, které většina oblíbených prohlížečů ve výchozím nastavení nenabízí. Tahle jedinečná komplexní sada na ochranu soukromí pomáhá chránit tvoje aktivity na internetu od vyhledávání přes prohlížení až po posílání e-mailů.\n\nAby naše ochrana soukromí fungovala, nemusíš znát technické detaily ani řešit žádná složitá nastavení. Stačí přejít na prohlížeč DuckDuckGo ve všech zařízeních a dostaneš soukromí pro všechny své aktivity.\n\nJestli chceš nahlédnout pod pokličku, víc informací o tom, jak ochrana soukromí DuckDuckGo funguje, najdeš v naší <annotation type="learn_more_link">nápovědě</annotation>.</string>
+    <string name="aboutHeaderNewTagLine">Soukromí.Ochrana.Pocit jistoty.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo je nezávislá společnost zaměřená na ochranu soukromí na internetu pro každého, kdo chce mít své osobní údaje zase pod kontrolou.\n\nVěříme, že nejlepší způsob, jak ochránit tvoje osobní údaje před hackery, podvodníky a společnostmi, co jim soukromí moc neříká, je vůbec jim přístup k tvým údajům neumožnit. Proto milióny lidí při prohlížení webu <annotation type="chart_comparison">dávají přednost DuckDuckGo před Chromem a dalšími prohlížeči</annotation>. Náš vyhledávač integrovaný v prohlížeči je jako Google, ale nikdy nesleduje, co hledáš. A naše sada funkcí na ochranu soukromí, která zahrnuje blokování reklamních trackerů a cookies, brání firmám ve sběru tvých dat. Náš prohlížeč je navíc zdarma – vyděláváme na <annotation type="privacy_respecting_ads">reklamách ve vyhledávání, které respektují soukromí</annotation> a nezneužívají tvé údaje.\n\nKromě toho nabízíme také <annotation type="ppro_help_page">Privacy Pro</annotation>, předplacenou službu „tři v jednom“, která je integrovaná v našem prohlížeči. Předplatitelé Privacy Pro získávají ještě větší ochranu soukromí díky funkci na vyhledání a vymazání tvých osobních údajů ze stránek pro vyhledávání lidí, funkci pro obnovení tvé identity v případě krádeže a rychlé a jednoduché <annotation type="vpn_help_page">VPN</annotation>, která pomáhá zabezpečit tvoje online aktivity.\n\nPřevezmi kontrolu nad svými osobními údaji a pořiď si prohlížeč navržený tak, aby tvoje data neshromažďoval, ale chránil.</string>
     <string name="no_suggestions">Žádné návrhy</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +414,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
-    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingThanks">Díky, že používáš DuckDuckGo!\nNáš prohlížeč tě chrání před hackery, podvodníky a společnostmi, které nemají osobních dat nikdy dost.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečná sledovací zařízení.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrování na webových stránkách.</string>

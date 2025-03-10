@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_STAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_VARIANT
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.FeatureSettings
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.FeatureSettingsConfigModel
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
@@ -104,7 +104,7 @@ class DefaultBrowserPromptsExperimentImplTest {
 
     @Mock private lateinit var moshiMock: Moshi
 
-    @Mock private lateinit var featureSettingsJsonAdapterMock: JsonAdapter<FeatureSettings>
+    @Mock private lateinit var featureSettingsJsonAdapterMock: JsonAdapter<FeatureSettingsConfigModel>
 
     @Mock private lateinit var systemDefaultBrowserDialogIntentMock: Intent
 
@@ -145,7 +145,7 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         whenever(featureTogglesMock.defaultBrowserAdditionalPrompts202501()).thenReturn(additionalPromptsToggleMock)
         whenever(defaultRoleBrowserDialogMock.createIntent(appContextMock)).thenReturn(systemDefaultBrowserDialogIntentMock)
-        whenever(moshiMock.adapter<FeatureSettings>(any())).thenReturn(featureSettingsJsonAdapterMock)
+        whenever(moshiMock.adapter<FeatureSettingsConfigModel>(any())).thenReturn(featureSettingsJsonAdapterMock)
         fakeUserAppStageFlow = MutableSharedFlow()
         whenever(userStageStoreMock.userAppStageFlow()).thenReturn(fakeUserAppStageFlow)
         runBlocking {
@@ -1078,15 +1078,14 @@ class DefaultBrowserPromptsExperimentImplTest {
         activeDaysUntilStage1: Int,
         activeDaysUntilStage2: Int,
         activeDaysUntilStop: Int,
-    ): FeatureSettings {
-        val settings = FeatureSettings(
-            activeDaysUntilStage1 = activeDaysUntilStage1,
-            activeDaysUntilStage2 = activeDaysUntilStage2,
-            activeDaysUntilStop = activeDaysUntilStop,
+    ) {
+        val settings = FeatureSettingsConfigModel(
+            activeDaysUntilStage1 = activeDaysUntilStage1.toString(),
+            activeDaysUntilStage2 = activeDaysUntilStage2.toString(),
+            activeDaysUntilStop = activeDaysUntilStop.toString(),
         )
         whenever(additionalPromptsToggleMock.getSettings()).thenReturn(additionalPromptsFeatureSettingsFake)
         whenever(featureSettingsJsonAdapterMock.fromJson(additionalPromptsFeatureSettingsFake)).thenReturn(settings)
-        return settings
     }
 
     private suspend fun mockStageEvaluator(

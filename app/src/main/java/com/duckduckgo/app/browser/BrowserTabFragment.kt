@@ -171,6 +171,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -230,6 +231,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -266,7 +268,6 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -531,6 +532,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
+    @Inject
+    lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -847,7 +851,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, experimentalUIThemingFeature.self().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1027,8 +1031,7 @@ class BrowserTabFragment :
                 onOmnibarNewTabRequested()
             }
             onMenuItemClicked(duckChatMenuItem) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-                duckChat.openDuckChat()
+                viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
@@ -1390,7 +1393,10 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showMaliciousWarning(url: Uri, feed: Feed) {
+    private fun showMaliciousWarning(
+        url: Uri,
+        feed: Feed,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -1436,7 +1442,10 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
 
-    private fun onBypassMaliciousWarning(url: Uri, feed: Feed) {
+    private fun onBypassMaliciousWarning(
+        url: Uri,
+        feed: Feed,
+    ) {
         showBrowser()
         webViewClient.addExemptedMaliciousSite(url, feed)
         webView?.loadUrl(url.toString())
@@ -1610,6 +1619,7 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> {
                 browserActivity?.launchNewTab()
             }
+
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
@@ -2638,6 +2648,8 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 false
             }
+
+            it.setOnScrollChangeListener(omnibar)
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
@@ -3995,19 +4007,19 @@ class BrowserTabFragment :
             } else {
                 {}
             }
+            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
+                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+                } else {
+                    null
+                }
             configuration.showOnboardingCta(
                 binding,
                 { viewModel.onUserClickCtaOkButton(configuration) },
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
+                onSuggestedOptionsSelected,
             )
-            if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                configuration.setOnOptionClicked(
-                    daxDialogInContext,
-                ) {
-                    userEnteredQuery(it.link)
-                }
-            }
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }

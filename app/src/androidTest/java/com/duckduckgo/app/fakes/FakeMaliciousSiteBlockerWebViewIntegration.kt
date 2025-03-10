@@ -41,7 +41,7 @@ class FakeMaliciousSiteBlockerWebViewIntegration : MaliciousSiteBlockerWebViewIn
         return Safe
     }
 
-    override fun onPageLoadStarted() {
+    override fun onPageLoadStarted(url: String) {
         // no-op
     }
 

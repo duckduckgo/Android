@@ -36,6 +36,10 @@ interface SubscriptionsService {
     suspend fun portal(): PortalResponse
 
     @AuthRequired
+    @GET("https://subscriptions.duckduckgo.com/api/v1/offer-status")
+    suspend fun offerStatus(): OfferStatusResponse
+
+    @AuthRequired
     @POST("https://subscriptions.duckduckgo.com/api/purchase/confirm/google")
     suspend fun confirm(
         @Body confirmationBody: ConfirmationBody,
@@ -59,11 +63,18 @@ data class SubscriptionResponse(
     val expiresOrRenewsAt: Long,
     val platform: String,
     val status: String,
+    val activeOffers: List<ActiveOfferResponse>,
+)
+
+data class ActiveOfferResponse(
+    val type: String,
 )
 
 data class ConfirmationBody(
     val packageName: String,
     val purchaseToken: String,
+    val experimentName: String?,
+    val experimentCohort: String?,
 )
 
 data class ConfirmationResponse(
@@ -99,4 +110,8 @@ data class FeedbackResponse(
 
 data class FeaturesResponse(
     val features: List<String>,
+)
+
+data class OfferStatusResponse(
+    val hadTrial: Boolean,
 )

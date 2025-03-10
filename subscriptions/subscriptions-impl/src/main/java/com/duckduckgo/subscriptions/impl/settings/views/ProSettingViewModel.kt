@@ -77,6 +77,7 @@ class ProSettingViewModel @Inject constructor(
     }
 
     fun onBuy() {
+        pixelSender.reportAppSettingsGetSubscriptionClick()
         sendCommand(OpenBuyScreen)
     }
 

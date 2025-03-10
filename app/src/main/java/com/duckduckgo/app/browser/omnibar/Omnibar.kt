@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnScrollChangeListener
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -62,17 +63,34 @@ import timber.log.Timber
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
+    val fadeBehaviourEnabled: Boolean,
     private val binding: FragmentBrowserTabBinding,
-) {
+) : OnScrollChangeListener {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.rootView.removeView(binding.newOmnibarBottom)
+                if (fadeBehaviourEnabled) {
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                } else {
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(binding.newOmnibar)
+                if (fadeBehaviourEnabled) {
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                } else {
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibar)
+                }
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
@@ -140,11 +158,19 @@ class Omnibar(
     private val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.newOmnibar
+                if (fadeBehaviourEnabled) {
+                    binding.fadeOmnibar
+                } else {
+                    binding.newOmnibar
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.newOmnibarBottom
+                if (fadeBehaviourEnabled) {
+                    binding.fadeOmnibarBottom
+                } else {
+                    binding.newOmnibarBottom
+                }
             }
         }
     }
@@ -357,5 +383,25 @@ class Omnibar(
 
     fun voiceSearchDisabled(url: String?) {
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
+    }
+
+    override fun onScrollChange(
+        view: View?,
+        p1: Int,
+        scrollY: Int,
+        p3: Int,
+        p4: Int,
+    ) {
+        if (fadeBehaviourEnabled) {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    binding.fadeOmnibar.onScrollChanged(scrollY)
+                }
+
+                OmnibarPosition.BOTTOM -> {
+                    binding.fadeOmnibarBottom.onScrollChanged(scrollY)
+                }
+            }
+        }
     }
 }

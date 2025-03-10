@@ -32,6 +32,26 @@
     "title" : "<b>VIGA:</b> vale video ID",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube ei luba Duck Playeril seda videot laadida",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube ei luba seda videot väljaspool YouTube'i vaadata.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Saate seda videot endiselt YouTube'is vaadata, kuid ilma Duck Player'i lisatud privaatsuseta.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube blokeerib selle video laadimise. Kui kasutate VPN-i, proovige see välja lülitada ning leht uuesti laadida.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Kui see ei aita, saate seda videot ikkagi YouTube'is vaadata, kuid ilma Duck Playeri lisatud privaatsuseta.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
   "tooltipInfo" : {
     "title" : "Duck Player pakub isikupärastatud reklaamidest vaba vaatamiskogemust ja takistab, et vaatamisaktiivsus mõjutaks sinu YouTube'i soovitusi."
   }

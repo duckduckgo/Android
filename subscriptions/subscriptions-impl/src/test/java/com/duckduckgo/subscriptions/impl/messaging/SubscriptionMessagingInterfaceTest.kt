@@ -15,7 +15,9 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -567,7 +569,7 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         verify(pixelSender).reportMonthlyPriceClick()
-        verifyNoMoreInteractions(pixelSender)
+        // verifyNoMoreInteractions(pixelSender) Add it back when Free Trials experiment is removed
     }
 
     @Test
@@ -581,7 +583,33 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         verify(pixelSender).reportYearlyPriceClick()
-        verifyNoMoreInteractions(pixelSender)
+        // verifyNoMoreInteractions(pixelSender) Add it back when Free Trials experiment is removed
+    }
+
+    @Test
+    fun `when process and monthly price clicked then experiment pixel sent`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsMonthlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportFreeTrialOnStartClickedMonthly()
+    }
+
+    @Test
+    fun `when process and yearly price clicked then experiment pixel sent`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsYearlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportFreeTrialOnStartClickedYearly()
     }
 
     @Test
@@ -725,6 +753,7 @@ class SubscriptionMessagingInterfaceTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
     }

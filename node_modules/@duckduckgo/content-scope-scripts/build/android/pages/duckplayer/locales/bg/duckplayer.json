@@ -32,6 +32,26 @@
     "title" : "<b>ГРЕШКА:</b> невалиден идентификатор на видеоклипа",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube няма да позволи на Duck Player да зареди това видео",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube не позволява това видео да бъде гледано извън YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Все пак можете да гледате това видео в YouTube, но без допълнителната поверителност на Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube блокира зареждането на това видео. Ако използвате VPN, опитайте да го изключите и презаредете тази страница.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Ако това не свърши работа, можете да гледате това видео в YouTube, но без допълнителната поверителност на Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
   "tooltipInfo" : {
     "title" : "Duck Player осигурява чисто изживяване без персонализирани реклами в YouTube и предотвратява влиянието на вече гледаните видеоклипове върху препоръките на YouTube."
   }

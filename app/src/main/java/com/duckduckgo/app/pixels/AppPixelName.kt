@@ -37,6 +37,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
     PROTECTION_TOGGLE_BROKEN_SITE_REPORT("m_protection-toggled-off-breakage-report"),
 
+    SPLASHSCREEN_SHOWN("m_splashscreen_shown"),
+    SPLASHSCREEN_FAILED_TO_LAUNCH("m_splashscreen_failed_to_launch"),
+
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
     PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
@@ -392,4 +395,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
     SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
+
+    MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 }

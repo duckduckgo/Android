@@ -18,6 +18,8 @@ package com.duckduckgo.malicioussiteprotection.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.FDROID
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -31,6 +33,7 @@ import org.json.JSONObject
 
 interface MaliciousSiteProtectionRCFeature {
     fun isFeatureEnabled(): Boolean
+    fun canUpdateDatasets(): Boolean
     fun getHashPrefixUpdateFrequency(): Long
     fun getFilterSetUpdateFrequency(): Long
 }
@@ -41,10 +44,12 @@ interface MaliciousSiteProtectionRCFeature {
 class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
+    private val appBuildConfig: AppBuildConfig,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MaliciousSiteProtectionRCFeature, PrivacyConfigCallbackPlugin {
     private var isFeatureEnabled = false
+    private var canUpdateDatasets = false
 
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
@@ -71,9 +76,16 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
         return isFeatureEnabled
     }
 
+    override fun canUpdateDatasets(): Boolean {
+        return canUpdateDatasets
+    }
+
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
+            // MSP is disabled in F-Droid builds, as we can't download datasets
+            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled() &&
+                maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled() && appBuildConfig.flavor != FDROID
+            canUpdateDatasets = maliciousSiteProtectionFeature.canUpdateDatasets().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     hashPrefixUpdateFrequency = settings.getLong("hashPrefixUpdateFrequency")

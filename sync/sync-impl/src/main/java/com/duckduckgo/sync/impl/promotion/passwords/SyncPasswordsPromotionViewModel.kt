@@ -47,6 +47,9 @@ class SyncPasswordsPromotionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    // want to ensure this pixel doesn't trigger repeatedly as it's scrolled in and out of the list
+    private var promoDisplayedPixelSent = false
+
     fun onUserSelectedSetUpSyncFromPromo() {
         viewModelScope.launch {
             command.send(LaunchSyncSettings)
@@ -63,7 +66,10 @@ class SyncPasswordsPromotionViewModel @Inject constructor(
     }
 
     fun onPromoShown() {
-        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, sourceMap())
+        if (!promoDisplayedPixelSent) {
+            promoDisplayedPixelSent = true
+            pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, sourceMap())
+        }
     }
 
     private fun sourceMap() = mapOf(SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE to "passwords")

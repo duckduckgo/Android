@@ -77,6 +77,7 @@ class LegacyProSettingViewModel @Inject constructor(
     }
 
     fun onBuy() {
+        pixelSender.reportAppSettingsGetSubscriptionClick()
         sendCommand(OpenBuyScreen)
     }
 

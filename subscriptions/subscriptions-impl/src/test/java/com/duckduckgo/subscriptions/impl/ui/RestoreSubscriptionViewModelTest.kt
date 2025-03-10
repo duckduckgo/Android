@@ -197,6 +197,7 @@ class RestoreSubscriptionViewModelTest {
             expiresOrRenewsAt = 10000L,
             status = AUTO_RENEWABLE,
             platform = "google",
+            activeOffers = listOf(),
         )
     }
 

@@ -30,7 +30,7 @@ import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
-import com.duckduckgo.autofill.sync.FakeSecureStorage
+import com.duckduckgo.autofill.sync.SyncFakeSecureStorage
 import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
@@ -55,7 +55,7 @@ internal class CredentialsDedupStrategyTest {
     val coroutineRule = CoroutineTestRule()
 
     private val db = inMemoryAutofillDatabase()
-    private val secureStorage = FakeSecureStorage()
+    private val secureStorage = SyncFakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
     private val credentialsSync = CredentialsSync(

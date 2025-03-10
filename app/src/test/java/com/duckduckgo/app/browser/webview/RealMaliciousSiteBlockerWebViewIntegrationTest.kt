@@ -6,8 +6,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.webview.ExemptedUrlsHolder.ExemptedUrl
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -18,6 +20,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -29,6 +32,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -41,6 +46,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     private val maliciousSiteProtection: MaliciousSiteProtection = mock(MaliciousSiteProtection::class.java)
     private val mockSettingsDataStore: SettingsDataStore = mock(SettingsDataStore::class.java)
     private val mockExemptedUrlsHolder = mock(ExemptedUrlsHolder::class.java)
+    private val mockPixel: Pixel = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val maliciousUri = "http://malicious.com".toUri()
     private val exampleUri = "http://example.com".toUri()
@@ -52,6 +58,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         appCoroutineScope = coroutineRule.testScope,
         isMainProcess = true,
         exemptedUrlsHolder = mockExemptedUrlsHolder,
+        pixel = mockPixel,
     )
 
     @Before
@@ -98,11 +105,19 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldOverrideUrlLoading returns safe when url is already processed`() = runTest {
-        testee.processedUrls.add(exampleUri.toString())
+    fun `shouldOverrideUrlLoading returns safe when url is already processed and safe`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertEquals(Safe, result)
+    }
+
+    @Test
+    fun `shouldOverrideUrlLoading returns malicious when url is already processed and malicious`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+
+        val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
+        assertEquals(MaliciousSite(exampleUri, MALWARE, false), result)
     }
 
     @Test
@@ -117,14 +132,41 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldInterceptRequest returns result when feature is enabled, setting is enabled, is malicious, and is iframe`() = runTest {
+    fun `shouldInterceptRequest returns safe when url is already processed and safe`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
         val request = mock(WebResourceRequest::class.java)
-        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.url).thenReturn(exampleUri)
         whenever(request.isForMainFrame).thenReturn(true)
-        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe"))
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
+
+        assertEquals(Safe, result)
+    }
+
+    @Test
+    fun `shouldInterceptRequest returns malicious when url is already processed and malicious`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(exampleUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+
+        assertEquals(MaliciousSite(exampleUri, MALWARE, false), result)
+    }
+
+    @Test
+    fun `shouldInterceptRequest returns result when feature is enabled, setting is enabled, is malicious, and is iframe`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(false)
+        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe", "Referer" to maliciousUri.toString()))
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+        verify(mockPixel).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
         assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result)
     }
 
@@ -175,10 +217,17 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `onPageLoadStarted clears processedUrls`() = runTest {
-        testee.processedUrls.add(exampleUri.toString())
-        testee.onPageLoadStarted()
+    fun `onPageLoadStarted with different URL clears processedUrls`() = runTest {
+        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.onPageLoadStarted("http://another.com")
         assertTrue(testee.processedUrls.isEmpty())
+    }
+
+    @Test
+    fun `onPageLoadStarted with same URL does not clear processedUrls`() = runTest {
+        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.onPageLoadStarted(exampleUri.toString())
+        assertFalse(testee.processedUrls.isEmpty())
     }
 
     @Test
@@ -215,6 +264,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val firstCallbackResult = firstCallbackDeferred.await()
         val secondCallbackResult = secondCallbackDeferred.await()
 
+        assertTrue(testee.processedUrls[maliciousUri.toString()] is Malicious)
         assertEquals(false, firstCallbackResult)
         assertEquals(true, secondCallbackResult)
     }
@@ -287,6 +337,24 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
         assertEquals(MaliciousSite(maliciousUri, MALWARE, true), result)
+    }
+
+    @Test
+    fun `shouldOverride called several times with same iframe URL without onPageStarted only fires pixel once`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(false)
+        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe", "Referer" to maliciousUri.toString()))
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result)
+
+        val result2 = testee.shouldIntercept(request, maliciousUri) {}
+        verify(mockPixel, times(1)).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
+        verify(maliciousSiteProtection, times(1)).isMalicious(eq(maliciousUri), any())
+
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result2)
     }
 
     private fun updateFeatureEnabled(enabled: Boolean) {

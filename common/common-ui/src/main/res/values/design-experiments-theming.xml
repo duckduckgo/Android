@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="Theme.DuckDuckGo.Dark.Experiment.Warm" parent="Theme.DuckDuckGo.Dark">
+        <item name="preferredStatusBarColor">@color/warm_gray90</item>
+        <item name="preferredNavigationBarColor">@color/warm_gray90</item>
+        <item name="daxColorBackground">@color/warm_gray90</item>
+        <item name="daxColorSurface">@color/gray87</item>
+        <item name="daxColorSurfaceTransparent">@color/white_12</item>
+        <item name="daxColorWindow">@color/warm_gray85</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
+
+    </style>
+
+    <style name="Theme.DuckDuckGo.Dark.Experiment.Cool" parent="Theme.DuckDuckGo.Dark">
+        <item name="preferredStatusBarColor">@color/cool_gray90</item>
+        <item name="preferredNavigationBarColor">@color/cool_gray90</item>
+        <item name="daxColorBackground">@color/cool_gray90</item>
+        <item name="daxColorSurface">@color/gray87</item>
+        <item name="daxColorSurfaceTransparent">@color/white_12</item>
+        <item name="daxColorWindow">@color/cool_gray85</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Light.Experiment.Warm" parent="Theme.DuckDuckGo.Light">
+        <item name="preferredStatusBarColor">@color/warm_gray15</item>
+        <item name="preferredNavigationBarColor">@color/warm_gray15</item>
+        <item name="daxColorBackground">@color/warm_gray15</item>
+        <item name="daxColorSurfaceTransparent">@color/white_70</item>
+        <item name="daxColorPrimaryIcon">@color/warm_gray85_84</item>
+        <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
+
+    </style>
+
+    <style name="Theme.DuckDuckGo.Light.Experiment.Cool" parent="Theme.DuckDuckGo.Light">
+        <item name="preferredStatusBarColor">@color/cool_gray15</item>
+        <item name="preferredNavigationBarColor">@color/cool_gray15</item>
+        <item name="daxColorBackground">@color/cool_gray15</item>
+        <item name="daxColorSurfaceTransparent">@color/white_70</item>
+        <item name="daxColorPrimaryIcon">@color/cool_gray85_84</item>
+        <item name="daxColorSecondaryIcon">@color/cool_gray85_50</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
+
+    </style>
+
+</resources>

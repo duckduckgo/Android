@@ -22,6 +22,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -41,6 +42,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
         worker.maliciousSiteRepository = maliciousSiteRepository
         worker.dispatcherProvider = dispatcherProvider
         worker.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
     }
 
     @Test
@@ -49,6 +51,17 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
 
         val result = worker.doWork()
 
+        verify(maliciousSiteRepository, never()).loadFilters()
+        assertEquals(success(), result)
+    }
+
+    @Test
+    fun doWork_returnsSuccessWhenCanUpdateDatasetsIsDisabled() = runTest {
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(false)
+
+        val result = worker.doWork()
+
+        verify(maliciousSiteRepository, never()).loadFilters()
         assertEquals(success(), result)
     }
 
@@ -80,12 +93,14 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
     private val scheduler = MaliciousSiteProtectionFiltersUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature)
 
     @Test
-    fun onCreate_schedulesWorkerWithUpdateFrequencyFromRCFlag() {
+    fun onPrivacyConfigDownloadedWithFeatureOn_schedulesWorkerWithUpdateFrequencyFromRCFlagAndUpdatePolicy() {
         val updateFrequencyMinutes = 15L
 
         whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
 
-        scheduler.onCreate(mock())
+        scheduler.onPrivacyConfigDownloaded()
 
         val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
         verify(workManager).enqueueUniquePeriodicWork(
@@ -99,5 +114,20 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
         val expectedInterval = TimeUnit.MINUTES.toMillis(updateFrequencyMinutes)
 
         assertEquals(expectedInterval, repeatInterval)
+    }
+
+    @Test
+    fun onPrivacyConfigDownloadedWithCanUpdateDatasetOff_cancelsWorker() {
+        val updateFrequencyMinutes = 15L
+
+        whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(false)
+
+        scheduler.onPrivacyConfigDownloaded()
+
+        verify(workManager).cancelUniqueWork(
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
+        )
     }
 }

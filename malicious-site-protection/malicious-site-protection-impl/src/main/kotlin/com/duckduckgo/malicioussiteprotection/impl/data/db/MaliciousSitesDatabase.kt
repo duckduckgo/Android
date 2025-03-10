@@ -22,8 +22,8 @@ import androidx.room.migration.Migration
 
 @Database(
     exportSchema = true,
-    entities = [RevisionEntity::class, HashPrefixEntity::class, FilterEntity::class],
-    version = 1,
+    entities = [RevisionEntity::class, HashPrefixEntity::class, FilterEntity::class, FeatureExceptionEntity::class],
+    version = 2,
 )
 abstract class MaliciousSitesDatabase : RoomDatabase() {
     abstract fun maliciousSiteDao(): MaliciousSiteDao

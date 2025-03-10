@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -38,6 +40,8 @@ interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun getShowInBrowserMenu(): Boolean
+    suspend fun registerOpened()
+    suspend fun wasOpenedBefore(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,6 +53,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     private object Keys {
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
+        val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
     }
 
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
@@ -68,5 +73,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun getShowInBrowserMenu(): Boolean {
         return duckChatShowInBrowserMenu.value
+    }
+
+    override suspend fun registerOpened() {
+        store.edit { it[DUCK_CHAT_OPENED] = true }
+    }
+
+    override suspend fun wasOpenedBefore(): Boolean {
+        return store.data.map { it[DUCK_CHAT_OPENED] }.firstOrNull() ?: false
     }
 }

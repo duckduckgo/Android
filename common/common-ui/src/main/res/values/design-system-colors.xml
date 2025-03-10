@@ -46,6 +46,7 @@
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
+    <attr name="daxColorSurfaceTransparent" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
@@ -67,6 +68,9 @@
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
+    <attr name="daxColorToolbar" format="color"/>
+    <attr name="daxColorBrowserOverlay" format="color"/>
+
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
@@ -125,6 +129,7 @@
     <color name="red70">#9A3216</color>
 
     <color name="purple50">#5132A9</color>
+    <color name="purple40">#A276FF</color>
 
     <color name="yellow50_14">#24FFCC33</color>
     <color name="yellow50">#FFCC33</color>
@@ -148,6 +153,7 @@
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
+    <color name="gray15">#F0F1F2</color>
     <color name="gray0">#FAFAFA</color>
 
     <color name="blue0">#CCDAFF</color>

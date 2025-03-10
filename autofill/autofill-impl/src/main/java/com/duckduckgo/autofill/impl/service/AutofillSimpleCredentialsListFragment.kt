@@ -32,11 +32,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillProviderListBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapterLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -85,12 +87,15 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var pixel: Pixel
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillProviderCredentialsListViewModel::class.java]
     }
 
     private val binding: FragmentAutofillProviderListBinding by viewBinding()
-    private lateinit var adapter: AutofillManagementRecyclerAdapter
+    private lateinit var adapter: AutofillManagementRecyclerAdapterLegacy
 
     private var searchMenuItem: MenuItem? = null
 
@@ -137,6 +142,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
 
     private fun initializeSearchBar() {
         searchMenuItem?.setOnMenuItemClickListener {
+            pixel.fire(AUTOFILL_SERVICE_PASSWORDS_SEARCH)
             showSearchBar()
             return@setOnMenuItemClickListener true
         }
@@ -227,7 +233,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private fun configureRecyclerView() {
-        adapter = AutofillManagementRecyclerAdapter(
+        adapter = AutofillManagementRecyclerAdapterLegacy(
             this,
             dispatchers = dispatchers,
             faviconManager = faviconManager,
@@ -235,12 +241,13 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
             initialExtractor = initialExtractor,
             suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
-            onContextMenuItemClicked = null,
+            onContextMenuItemClicked = { },
             onReportBreakageClicked = { },
         ).also { binding.logins.adapter = it }
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
+        viewModel.onCredentialSelected(credentials)
         parentActivity()?.autofillLogin(credentials) ?: run {
             activity?.finish()
         }

@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 interface AutofillLoginDeduplicator {
 
-    fun deduplicate(
+    suspend fun deduplicate(
         originalUrl: String,
         logins: List<LoginCredentials>,
     ): List<LoginCredentials>
@@ -35,7 +35,7 @@ class RealAutofillLoginDeduplicator @Inject constructor(
     private val bestMatchFinder: AutofillDeduplicationBestMatchFinder,
 ) : AutofillLoginDeduplicator {
 
-    override fun deduplicate(
+    override suspend fun deduplicate(
         originalUrl: String,
         logins: List<LoginCredentials>,
     ): List<LoginCredentials> {

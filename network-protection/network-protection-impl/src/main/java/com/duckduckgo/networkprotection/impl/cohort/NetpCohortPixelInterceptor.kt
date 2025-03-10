@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.cohort
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -84,6 +85,7 @@ class NetpCohortPixelInterceptor @Inject constructor(
             "m_netp_ev_terms_accepted",
             "m_netp_imp_geoswitching",
             "m_netp_ev_geoswitching",
+            NETP_SETTINGS_PRESSED.pixelName,
         )
     }
 }

@@ -200,6 +200,10 @@ fun View.visibilityChanged(action: (View) -> Unit) {
     }
 }
 
+fun View.fade(alpha: Float) {
+    this.alpha = alpha
+}
+
 /**
  * Executes [block] with a typed version of the View's layoutParams and reassigns the
  * layoutParams with the updated version.

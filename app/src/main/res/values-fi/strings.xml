@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="duckDuckGoTagline">Tietosuoja on ehdoton prioriteettimme.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Suojausta. Tietosuojaa. Mielenrauhaa.</string>
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>
     <string name="open">Avaa</string>
@@ -232,9 +232,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
     <string name="aboutActivityTitleNew">Tietoa meistä</string>
-    <string name="aboutHeader">Tervetuloa Duckin puolelle!</string>
-    <string name="aboutDescription">DuckDuckGo on vuonna 2008 perustettu riippumaton internetissä tietosuojaa tarjoava yritys niille, jotka ovat kyllästyneet siihen, että heitä seurataan netissä, ja haluavat yksinkertaisen ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki parhaiden selainten ominaisuudet, kuten kirjanmerkit, välilehdet, salasanat ja paljon muuta, sekä yli <annotation type="privacy_protection_link">kymmenkunta tehokasta tietosuojausta, joita</annotation> ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuoja auttaa turvaamaan haut, selaamisen, sähköpostin lähettämiseen ja muun toimintasi verkossa.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikilla laitteillasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuillamme</annotation>.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo on vuonna 2008 perustettu riippumaton internetin tietosuoja-alan yritys kaikille, jotka ovat kyllästyneet siihen, että heitä seurataan verkossa, ja haluavat helpon ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki selainten perusominaisuudet, kuten kirjanmerkit, välilehdet ja salasanat, sekä yli <annotation type="privacy_protection_link">kymmenen tehokasta tietosuojausta</annotation>, joita ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuojapaketti auttaa suojaamaan verkkoaktiviteettisi, kuten hakemisen, selaamisen ja sähköpostin lähettämisen.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikissa laitteissasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, löydät lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuiltamme</annotation>.</string>
+    <string name="aboutHeaderNewTagLine">Suojausta. Tietosuojaa. takaavat mielenrauhan.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo on riippumaton verkkosuojausta tarjoava yritys kaikille, jotka haluavat saada henkilökohtaiset tietonsa takaisin hallintaansa.\n\nUskomme, että paras tapa suojata henkilötietojasi hakkereilta, huijareilta ja tietosuojaa loukkaavilta yrityksiltä on estää niiden kerääminen kokonaan. Siksi miljoonat ihmiset <annotation type="chart_comparison">valitsevat DuckDuckGon hakeakseen ja selatakseen verkossa Chromen ja muiden selainten sijaan</annotation>. Selaimeemme sisältyvä hakukoneemme on kuin Google, mutta se ei koskaan seuraa hakujasi. Selaussuojauksemme, kuten mainosten seurannan esto ja evästeiden esto, auttavat estämään muita yrityksiä keräämästä tietojasi. Lisäksi selaimemme on ilmainen – ansaitsemme <annotation type="privacy_respecting_ads">tietosuojaa kunnioittavilla hakumainoksilla</annotation>, emme hyödyntämällä tietojasi.Lisäksi tarjoamme myös <annotation type="ppro_help_page">Privacy Pron</annotation>, selaimeemme integroidun 3-in-1-tilauspalvelun. Privacy Pron tilaajat saavat entistä paremman tietosuojan nopealla ja yksinkertaisella <annotation type="vpn_help_page">VPN</annotation>:llä, joka auttaa suojaamaan verkkotoimintaasi. Tämä palvelu etsii ja poistaa henkilökohtaiset tietosi käyttäjiä etsiviltä sivustoilta ja palauttaa henkilöllisyytesi, jos se varastetaan.\n\nOta henkilökohtaiset tietosi takaisin hallintaasi selaimella, joka on suunniteltu tietojen suojaamiseen, ei tietojen keräämiseen.</string>
     <string name="no_suggestions">Ei ehdotuksia</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +414,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
-    <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattuja.</string>
+    <string name="systemSearchOnboardingThanks">Kiitos, että valitsit DuckDuckGon!\nSelaimemme käyttö auttaa suojaamaan sinua hakkereilta, huijareilta ja tietoa janoavilta yrityksiltä.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
     <string name="systemSearchOnboardingFeatureOneText">Estää vaaralliset seurantaohjelmat.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Pakottaa verkkosivustot käyttämään salausta.</string>

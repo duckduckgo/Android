@@ -337,6 +337,9 @@ class RealDuckPlayer @Inject constructor(
                     AlwaysAsk -> "default"
                     else -> null
                 }?.let { setting ->
+                    appCoroutineScope.launch {
+                        duckPlayerFeatureRepository.setUsed()
+                    }
                     pixel.fire(
                         DUCK_PLAYER_DAILY_UNIQUE_VIEW,
                         type = Daily(),
@@ -492,5 +495,9 @@ class RealDuckPlayer @Inject constructor(
 
     override fun setDuckPlayerOrigin(origin: DuckPlayerOrigin) {
         duckPlayerOrigin = origin
+    }
+
+    override suspend fun wasUsedBefore(): Boolean {
+        return duckPlayerFeatureRepository.wasUsedBefore()
     }
 }

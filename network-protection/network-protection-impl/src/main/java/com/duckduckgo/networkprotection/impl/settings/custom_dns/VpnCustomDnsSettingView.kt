@@ -112,8 +112,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
             when (state) {
                 Idle -> {}
                 is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
-                Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
-                DefaultBlockMalware -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefaultBlockMalware))
+                Default, DefaultBlockMalware -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
             }
         }
     }

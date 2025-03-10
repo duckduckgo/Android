@@ -20,8 +20,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
+import com.duckduckgo.subscriptions.impl.freetrial.onPaywallImpression
+import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedMonthly
+import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedYearly
+import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedMonthly
+import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedYearly
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
@@ -90,6 +97,7 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
+    fun reportAppSettingsGetSubscriptionClick()
     fun reportAppSettingsRestorePurchaseClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
@@ -106,12 +114,18 @@ interface SubscriptionPixelSender {
     fun reportAuthV2MigrationFailureOther()
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
+    suspend fun reportFreeTrialExperimentOnPaywallImpression()
+    suspend fun reportFreeTrialOnStartClickedMonthly()
+    suspend fun reportFreeTrialOnStartClickedYearly()
+    suspend fun reportFreeTrialOnSubscriptionStartedMonthly()
+    suspend fun reportFreeTrialOnSubscriptionStartedYearly()
 }
 
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
+    private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -196,6 +210,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportAppSettingsIdtrClick() =
         fire(APP_SETTINGS_IDTR_CLICK)
 
+    override fun reportAppSettingsGetSubscriptionClick() =
+        fire(APP_SETTINGS_GET_SUBSCRIPTION_CLICK)
+
     override fun reportAppSettingsRestorePurchaseClick() =
         fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)
 
@@ -250,6 +267,26 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2TokenStoreError() {
         fire(AUTH_V2_TOKEN_STORE_ERROR)
+    }
+
+    override suspend fun reportFreeTrialExperimentOnPaywallImpression() {
+        freeTrialPrivacyProPixelsPlugin.onPaywallImpression()
+    }
+
+    override suspend fun reportFreeTrialOnStartClickedMonthly() {
+        freeTrialPrivacyProPixelsPlugin.onStartClickedMonthly()
+    }
+
+    override suspend fun reportFreeTrialOnStartClickedYearly() {
+        freeTrialPrivacyProPixelsPlugin.onStartClickedYearly()
+    }
+
+    override suspend fun reportFreeTrialOnSubscriptionStartedMonthly() {
+        freeTrialPrivacyProPixelsPlugin.onSubscriptionStartedMonthly()
+    }
+
+    override suspend fun reportFreeTrialOnSubscriptionStartedYearly() {
+        freeTrialPrivacyProPixelsPlugin.onSubscriptionStartedYearly()
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {

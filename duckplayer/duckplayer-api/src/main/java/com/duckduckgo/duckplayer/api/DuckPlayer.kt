@@ -199,6 +199,11 @@ interface DuckPlayer {
     fun setDuckPlayerOrigin(origin: DuckPlayerOrigin)
 
     /**
+     * Returns `true` if Duck Player was ever used before.
+     */
+    suspend fun wasUsedBefore(): Boolean
+
+    /**
      * Data class representing user preferences for Duck Player.
      *
      * @property overlayInteracted A boolean indicating whether the overlay was interacted with.

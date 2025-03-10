@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.launch
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +27,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -35,13 +40,29 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        splashScreen.setKeepOnScreenCondition { true }
 
         setContentView(R.layout.activity_launch)
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        viewModel.launchSplashScreenFailToExitJob(getLauncherPackageName())
+
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            viewModel.cancelSplashScreenFailToExitJob()
+
+            val splashScreenAnimationEndTime =
+                Instant.ofEpochMilli(splashScreenView.iconAnimationStartMillis + splashScreenView.iconAnimationDurationMillis)
+            val remainingAnimationTime = Instant.now().until(
+                splashScreenAnimationEndTime,
+                ChronoUnit.MILLIS,
+            )
+
+            lifecycleScope.launch {
+                viewModel.sendWelcomeScreenPixel()
+                delay(remainingAnimationTime)
+                viewModel.determineViewToShow()
+            }
+        }
     }
 
     private fun configureObservers() {
@@ -71,5 +92,13 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         startActivity(BrowserActivity.intent(this))
         overridePendingTransition(0, 0)
         finish()
+    }
+
+    // Temporary to track splashscreen errors
+    private fun getLauncherPackageName(): String? {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        val resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolveInfo?.activityInfo?.packageName
     }
 }

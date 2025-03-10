@@ -31,7 +31,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -63,6 +62,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -70,6 +71,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -85,7 +87,6 @@ import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -93,7 +94,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class OmnibarLayout @JvmOverloads constructor(
+open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -124,8 +125,6 @@ class OmnibarLayout @JvmOverloads constructor(
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
-
-    private val omnibarPosition: OmnibarPosition
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -187,23 +186,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
-    init {
-        val attr =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
-        omnibarPosition =
-            OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
-
-        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_new_omnibar_bottom
-        } else {
-            R.layout.view_new_omnibar
-        }
-        inflate(context, layout, this)
-
-        AndroidSupportInjection.inject(this)
-    }
-
-    private fun omnibarViews(): List<View> = listOf(
+    internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
         omnibarTextInput,
         searchIcon,
@@ -238,6 +221,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     private val viewModel: OmnibarLayoutViewModel by lazy {
@@ -249,6 +234,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
+
+    private var lastSeenPrivacyShield: PrivacyShield? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -403,7 +390,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun render(viewState: ViewState) {
+    open fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -414,7 +401,11 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        if (viewState.leadingIconState == PRIVACY_SHIELD) {
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        } else {
+            lastSeenPrivacyShield = null
+        }
         renderButtons(viewState)
     }
 
@@ -599,30 +590,6 @@ class OmnibarLayout @JvmOverloads constructor(
         viewModel.onExternalStateChange(stateChange)
     }
 
-    override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
-    }
-
     private fun renderPulseAnimation(viewState: ViewState) {
         val targetView = if (viewState.highlightFireButton.isHighlighted()) {
             fireIconImageView
@@ -679,13 +646,16 @@ class OmnibarLayout @JvmOverloads constructor(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
     ) {
-        val shieldIcon = if (viewMode is ViewMode.Browser) {
-            shieldIcon
-        } else {
-            customTabToolbarContainer.customTabShieldIcon
-        }
+        renderIfChanged(privacyShield, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = privacyShield
+            val shieldIcon = if (viewMode is ViewMode.Browser) {
+                shieldIcon
+            } else {
+                customTabToolbarContainer.customTabShieldIcon
+            }
 
-        privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+            privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+        }
     }
 
     private fun renderOutline(enabled: Boolean) {

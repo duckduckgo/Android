@@ -433,7 +433,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             systemPermissionGranted()
         } else {
             systemPermissionsHelper.requestMultiplePermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                // ACCESS_FINE_LOCATION is now considered optional, so ACCESS_COARSE_LOCATION should be first on the list,
+                // because of how systemPermissionsHelper handles showing rationale dialog in case permissions are rejected.
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
             )
         }
     }

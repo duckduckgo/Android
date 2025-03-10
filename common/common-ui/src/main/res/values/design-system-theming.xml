@@ -126,6 +126,8 @@
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
+        <item name="daxColorToolbar">?attr/daxColorSurface</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
@@ -150,6 +152,7 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
+        <item name="daxColorSurfaceTransparent">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/gray85</item>
         <item name="daxColorPrimaryText">@color/white84</item>
@@ -240,6 +243,7 @@
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
+        <item name="daxColorSurfaceTransparent">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/white</item>
         <item name="daxColorPrimaryText">@color/black84</item>
@@ -336,6 +340,7 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimationDuration">0</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
     </style>
 
@@ -362,6 +367,5 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
-
 
 </resources>

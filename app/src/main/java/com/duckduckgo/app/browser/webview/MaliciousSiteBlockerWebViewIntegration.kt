@@ -24,8 +24,10 @@ import com.duckduckgo.app.browser.webview.ExemptedUrlsHolder.ExemptedUrl
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -61,7 +63,7 @@ interface MaliciousSiteBlockerWebViewIntegration {
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData
 
-    fun onPageLoadStarted()
+    fun onPageLoadStarted(url: String)
 
     fun onSiteExempted(
         url: Uri,
@@ -97,10 +99,11 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val exemptedUrlsHolder: ExemptedUrlsHolder,
     @IsMainProcess private val isMainProcess: Boolean,
+    private val pixel: Pixel,
 ) : MaliciousSiteBlockerWebViewIntegration, PrivacyConfigCallbackPlugin {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val processedUrls = mutableListOf<String>()
+    val processedUrls = mutableMapOf<String, MaliciousStatus>()
 
     private var isFeatureEnabled = false
     private val isSettingEnabled: Boolean
@@ -137,6 +140,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         if (!isEnabled()) {
             return IsMaliciousViewData.Safe
         }
+
         val url = request.url.let {
             if (it.fragment != null) {
                 it.buildUpon().fragment(null).build()
@@ -145,37 +149,51 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             }
         }
 
-        val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
-
-        if (processedUrls.contains(decodedUrl)) {
-            processedUrls.remove(decodedUrl)
-            Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-            return IsMaliciousViewData.Safe
-        }
+        val decodedUrl = decodeUrl(url)
 
         val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
 
         if (exemptedUrl != null) {
-            Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
+            Timber.d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
             return IsMaliciousViewData.MaliciousSite(url, exemptedUrl.feed, true)
         }
 
+        processedUrls[decodedUrl]?.let {
+            processedUrls.remove(decodedUrl)
+            Timber.d("Already intercepted, skipping $decodedUrl, status: $it")
+            return when (it) {
+                is Safe -> IsMaliciousViewData.Safe
+                is Malicious -> IsMaliciousViewData.MaliciousSite(url, it.feed, false)
+            }
+        }
+
         val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
-            when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
+        val isForIframe = isForIframe(request) && belongsToCurrentPage
+        if (request.isForMainFrame || isForIframe) {
+            val result = checkMaliciousUrl(decodedUrl) {
+                if (isForIframe && it is Malicious) {
+                    firePixelForMaliciousIframe(it.feed)
+                }
+                confirmationCallback(it)
+            }
+            when (result) {
                 is ConfirmedResult -> {
+                    processedUrls[decodedUrl] = result.status
                     when (val status = result.status) {
                         is Malicious -> {
+                            if (isForIframe) {
+                                firePixelForMaliciousIframe(status.feed)
+                            }
                             return IsMaliciousViewData.MaliciousSite(url, status.feed, false)
                         }
+
                         is Safe -> {
-                            processedUrls.add(decodedUrl)
                             return IsMaliciousViewData.Safe
                         }
                     }
                 }
+
                 is WaitForConfirmation -> {
-                    processedUrls.add(decodedUrl)
                     return IsMaliciousViewData.WaitForConfirmation
                 }
             }
@@ -192,19 +210,22 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             if (!isEnabled()) {
                 return@runBlocking IsMaliciousViewData.Safe
             }
-            val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
-
-            if (processedUrls.contains(decodedUrl)) {
-                processedUrls.remove(decodedUrl)
-                Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-                return@runBlocking IsMaliciousViewData.Safe
-            }
+            val decodedUrl = decodeUrl(url)
 
             val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
 
             if (exemptedUrl != null) {
-                Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl")
+                Timber.d("Previously exempted, skipping $decodedUrl")
                 return@runBlocking IsMaliciousViewData.MaliciousSite(url, exemptedUrl.feed, true)
+            }
+
+            processedUrls[decodedUrl]?.let {
+                processedUrls.remove(decodedUrl)
+                Timber.d("Already intercepted, skipping $decodedUrl, status: $it")
+                return@runBlocking when (it) {
+                    is Safe -> IsMaliciousViewData.Safe
+                    is Malicious -> IsMaliciousViewData.MaliciousSite(url, it.feed, false)
+                }
             }
 
             // iframes always go through the shouldIntercept method, so we only need to check the main frame here
@@ -216,19 +237,22 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                                 return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, false)
                             }
                             is Safe -> {
-                                processedUrls.add(decodedUrl)
+                                processedUrls[decodedUrl] = Safe
                                 return@runBlocking IsMaliciousViewData.Safe
                             }
                         }
                     }
                     is WaitForConfirmation -> {
-                        processedUrls.add(decodedUrl)
                         return@runBlocking IsMaliciousViewData.WaitForConfirmation
                     }
                 }
             }
             IsMaliciousViewData.Safe
         }
+    }
+
+    private fun firePixelForMaliciousIframe(feed: Feed) {
+        pixel.fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to feed.name.lowercase()))
     }
 
     private suspend fun checkMaliciousUrl(
@@ -243,7 +267,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             } else {
                 Safe
             }
-            processedUrls.clear()
+            processedUrls[url] = it
             confirmationCallback(isMalicious)
         }
     }
@@ -257,18 +281,32 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         return isFeatureEnabled && isSettingEnabled
     }
 
-    override fun onPageLoadStarted() {
-        processedUrls.clear()
+    override fun onPageLoadStarted(url: String) {
+        val convertedUrl = URLDecoder.decode(url, "UTF-8").lowercase()
+        /* onPageLoadStarted is often called after shouldOverride/shouldIntercept, therefore, if the URL
+         * is already stored, we don't clear the processedUrls map to avoid re-checking the URL for the same
+         * page load.
+         */
+        if (!processedUrls.contains(convertedUrl)) {
+            processedUrls.clear()
+        }
+    }
+
+    private fun decodeUrl(url: Uri): String {
+        return try {
+            URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        } catch (e: Exception) {
+            Timber.d("decode url failed: $url")
+            url.toString().lowercase()
+        }
     }
 
     override fun onSiteExempted(
         url: Uri,
         feed: Feed,
     ) {
-        val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        val convertedUrl = decodeUrl(url)
         exemptedUrlsHolder.addExemptedMaliciousUrl(ExemptedUrl(convertedUrl.toUri(), feed))
-        Timber.tag("MaliciousSiteDetector").d(
-            "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
-        )
+        Timber.d("Added $url to exemptedUrls")
     }
 }

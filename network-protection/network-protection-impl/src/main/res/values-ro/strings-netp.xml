@@ -226,7 +226,7 @@
     <string name="netpCustomDnsSettingText">Server DNS</string>
     <string name="netpPrivateDns">DNS privat</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blochează programele malware)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blochează domeniile riscante)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recomandat)</string>
     <string name="netpCustomDnsCustom">Personalizat</string>
     <string name="netpCustomDnsInputAddressHint">Adresa IPv4</string>
@@ -237,8 +237,10 @@
     <string name="netpDdgDnsByLine">DuckDuckGo direcționează interogările DNS prin serverele noastre DNS, astfel încât furnizorul tău de internet să nu poată vedea ce site-uri web vizitezi.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Blochează programele malware</string>
-    <string name="netpDnsBlockMalwareByline">Blochează programele malware cu o listă de blocare la nivel de DNS. Dacă un site web nu se încarcă, încearcă să dezactivezi blocarea.</string>
+    <string name="netpDnsBlockMalwareHeader">Blocarea și filtrarea conținutului</string>
+    <string name="netpDnsBlockMalwarePrimary">Blochează domeniile riscante</string>
+    <string name="netpDnsBlockMalwareByline">Blochează peste 150.000 de domenii marcate pentru găzduirea de programe rău intenționate (malware), atacuri de phishing și escrocherii online cu o listă de blocare la nivel de DNS. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">Liste de blocare DNS</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Vrei să excluzi aplicațiile care nu sunt compatibile cu VPN-urile?</string>

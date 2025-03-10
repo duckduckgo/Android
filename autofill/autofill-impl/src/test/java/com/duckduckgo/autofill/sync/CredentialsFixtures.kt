@@ -77,6 +77,7 @@ object CredentialsFixtures {
             domainTitle = details.domainTitle,
             notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis,
+            lastUsedMillis = details.lastUsedInMillis,
         )
     }
     fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginDetailsWithCredentials {
@@ -87,6 +88,7 @@ object CredentialsFixtures {
                 id = id,
                 domainTitle = domainTitle,
                 lastUpdatedMillis = lastUpdatedMillis,
+                lastUsedInMillis = lastUsedMillis,
             ),
             password = password,
             notes = notes,

@@ -94,3 +94,7 @@ enum class SubscriptionStatus(val statusName: String) {
     UNKNOWN("Unknown"),
     WAITING("Waiting"),
 }
+
+enum class ActiveOfferType {
+    TRIAL, UNKNOWN
+}

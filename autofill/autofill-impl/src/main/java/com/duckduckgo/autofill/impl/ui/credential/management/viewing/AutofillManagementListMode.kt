@@ -21,23 +21,14 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CompoundButton
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.text.toSpanned
 import androidx.core.view.MenuProvider
-import androidx.core.view.children
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -48,10 +39,13 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfigura
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.AutofillToggleState
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyUsername
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loaded
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
@@ -71,24 +65,20 @@ import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.Suggesti
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.SearchBar
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.prependIconToText
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -129,12 +119,14 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var importPasswordsPixelSender: ImportPasswordsPixelSender
 
+    @Inject
+    lateinit var autofillFeature: AutofillFeature
+
+    @Inject
+    lateinit var grouper: CredentialGrouper
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
-    }
-
-    private val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.userReturnedFromSyncSettings()
     }
 
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
@@ -145,28 +137,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private var deleteAllPasswordsMenuItem: MenuItem? = null
     private var syncDesktopPasswordsMenuItem: MenuItem? = null
     private var importGooglePasswordsMenuItem: MenuItem? = null
-
-    private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
-        if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill(getAutofillSettingsLaunchSource())
-    }
-
-    private fun configureToggle() {
-        binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
-    }
-
-    private fun configureInfoText() {
-        binding.infoText.addClickableLink(
-            annotation = "learn_more_link",
-            textSequence = binding.root.context.prependIconToText(
-                R.string.credentialManagementAutofillSubtitle,
-                R.drawable.ic_lock_solid_12,
-            ).toSpanned(),
-            onClick = {
-                launchHelpPage()
-            },
-        )
-    }
 
     private fun launchHelpPage() {
         activity?.let {
@@ -185,51 +155,27 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        configureToggle()
         configureRecyclerView()
-        configureImportPasswordsButton()
         configureCurrentSiteState()
         observeViewModel()
         configureToolbar()
-        configureInfoText()
+        Timber.v("${this::class.java.simpleName} created")
     }
 
-    private fun configurePromotionsContainer() {
-        lifecycleScope.launch(dispatchers.main()) {
+    private suspend fun getPromotionView(): View? {
+        return withContext(dispatchers.main()) {
             val state = viewModel.viewState.value
 
             if (!state.canShowPromo) {
-                binding.promotionContainer.gone()
-                return@launch
+                return@withContext null
             }
 
-            val promotionView = binding.promotionContainer.getFirstEligiblePromo(numberPasswords = state.logins?.size ?: 0)
-            if (promotionView == null) {
-                binding.promotionContainer.gone()
-            } else {
-                binding.promotionContainer.showPromotion(promotionView)
+            val promotionView = context?.let { ctx ->
+                screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(ctx, numberSavedPasswords = state.logins?.size ?: 0) }
             }
+
+            return@withContext promotionView
         }
-    }
-
-    private fun ViewGroup.showPromotion(promotionView: View) {
-        val alreadyShowing = if (this.childCount == 0) {
-            false
-        } else {
-            (promotionView::class.qualifiedName == this.children.first()::class.qualifiedName) && (promotionView.tag == this.children.first().tag)
-        }
-
-        if (!alreadyShowing) {
-            this.removeAllViews()
-            this.addView(promotionView)
-        }
-
-        this.show()
-    }
-
-    private suspend fun ViewGroup.getFirstEligiblePromo(numberPasswords: Int): View? {
-        val context = this.context ?: return null
-        return screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(context, numberPasswords) }
     }
 
     private fun configureCurrentSiteState() {
@@ -239,18 +185,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     override fun onStop() {
         super.onStop()
         hideSearchBar()
-    }
-
-    private fun configureImportPasswordsButton() {
-        binding.emptyStateLayout.importPasswordsFromGoogleButton.setOnClickListener {
-            viewModel.onImportPasswordsFromGooglePasswordManager()
-            importPasswordsPixelSender.onImportPasswordsButtonTapped()
-        }
-
-        binding.emptyStateLayout.importPasswordsViaDesktopSyncButton.setOnClickListener {
-            launchImportPasswordsFromDesktopSyncScreen()
-            importPasswordsPixelSender.onImportPasswordsViaDesktopSyncButtonTapped()
-        }
     }
 
     private fun configureToolbar() {
@@ -313,7 +247,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 }
             },
             viewLifecycleOwner,
-            Lifecycle.State.RESUMED,
+            State.RESUMED,
         )
     }
 
@@ -346,36 +280,16 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(State.STARTED) {
                 viewModel.viewState.collect { state ->
-                    binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
-                    state.logins?.let {
-                        credentialsListUpdated(
-                            credentials = it,
-                            credentialSearchQuery = state.credentialSearchQuery,
-                            allowBreakageReporting = state.reportBreakageState.allowBreakageReporting,
-                            canShowImportGooglePasswordsButton = state.canImportFromGooglePasswords,
-                        )
-                        parentActivity()?.invalidateOptionsMenu()
-                    }
-
-                    val resources = binding.logins.context.resources
-                    if (state.showAutofillEnabledToggle) {
-                        binding.credentialToggleGroup.show()
-                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_empty))
-                    } else {
-                        binding.credentialToggleGroup.gone()
-                        binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
-                    }
-
-                    configurePromotionsContainer()
+                    updateWithViewState(state)
                 }
             }
         }
         observeListModeViewModelCommands()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(State.STARTED) {
                 viewModel.neverSavedSitesViewState.collect {
                     // we can just invalidate the menu as [onPrepareMenu] will handle the new visibility for resetting never saved sites menu item
                     parentActivity()?.invalidateOptionsMenu()
@@ -384,12 +298,10 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(State.STARTED) {
                 viewModel.viewState.collect {
                     // we can just invalidate the menu as [onPrepareMenu] will handle the new visibility for importing passwords menu item
                     parentActivity()?.invalidateOptionsMenu()
-
-                    configureImportPasswordsButtonVisibility(it)
                 }
             }
         }
@@ -397,12 +309,17 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         viewModel.onViewCreated()
     }
 
-    private fun configureImportPasswordsButtonVisibility(state: ViewState) {
-        if (state.canImportFromGooglePasswords) {
-            binding.emptyStateLayout.importPasswordsFromGoogleButton.show()
-        } else {
-            binding.emptyStateLayout.importPasswordsFromGoogleButton.gone()
-        }
+    private suspend fun updateWithViewState(state: ViewState) {
+        val promotionView = getPromotionView()
+        credentialsListUpdated(
+            credentials = state.logins,
+            credentialSearchQuery = state.credentialSearchQuery,
+            allowBreakageReporting = state.reportBreakageState.allowBreakageReporting,
+            canShowImportGooglePasswordsButton = state.canImportFromGooglePasswords,
+            showAutofillToggle = state.showAutofillEnabledToggle,
+            promotionView = promotionView,
+        )
+        parentActivity()?.invalidateOptionsMenu()
     }
 
     private fun observeListModeViewModelCommands() {
@@ -423,9 +340,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             is LaunchImportPasswordsFromGooglePasswordManager -> launchImportPasswordsScreen()
             is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
             is ShowUserReportSentMessage -> showUserReportSentMessage()
-            is ReevalutePromotions -> configurePromotionsContainer()
+            is ReevalutePromotions -> evaluatePromotions()
         }
         viewModel.commandProcessed(command)
+    }
+
+    private fun evaluatePromotions() {
+        lifecycleScope.launch {
+            updateWithViewState(viewModel.viewState.value)
+        }
     }
 
     private fun showUserReportSentMessage() {
@@ -480,51 +403,103 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     private suspend fun credentialsListUpdated(
-        credentials: List<LoginCredentials>,
+        credentials: List<LoginCredentials>?,
         credentialSearchQuery: String,
         allowBreakageReporting: Boolean,
         canShowImportGooglePasswordsButton: Boolean,
+        showAutofillToggle: Boolean,
+        promotionView: View?,
     ) {
-        if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
-            showEmptyCredentialsPlaceholders(canShowImportGooglePasswordsButton)
+        if (credentials == null) {
+            Timber.v("Credentials is null, meaning we haven't retrieved them yet. Don't know if empty or not yet")
+            renderCredentialList(
+                credentials = null,
+                allowBreakageReporting = allowBreakageReporting,
+                showAutofillToggle = showAutofillToggle,
+                autofillEnabled = viewModel.viewState.value.autofillEnabled,
+                promotionView = promotionView,
+                showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+            )
+        } else if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
+            showEmptyCredentialsPlaceholders(
+                canShowImportGooglePasswordsButton = canShowImportGooglePasswordsButton,
+                showAutofillToggle = showAutofillToggle,
+                promotionView = promotionView,
+            )
         } else if (credentials.isEmpty()) {
             showNoResultsPlaceholders(credentialSearchQuery)
         } else {
-            renderCredentialList(credentials, allowBreakageReporting)
+            renderCredentialList(
+                credentials = credentials,
+                allowBreakageReporting = allowBreakageReporting,
+                showAutofillToggle = showAutofillToggle,
+                autofillEnabled = viewModel.viewState.value.autofillEnabled,
+                promotionView = promotionView,
+                showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+            )
         }
     }
 
     private fun showNoResultsPlaceholders(query: String) {
-        binding.emptyStateLayout.emptyStateContainer.gone()
-        binding.logins.show()
         adapter.showNoMatchingSearchResults(query)
     }
 
-    private fun showEmptyCredentialsPlaceholders(canShowImportGooglePasswordsButton: Boolean) {
-        binding.emptyStateLayout.emptyStateContainer.show()
-        binding.logins.gone()
+    private suspend fun showEmptyCredentialsPlaceholders(
+        canShowImportGooglePasswordsButton: Boolean,
+        showAutofillToggle: Boolean,
+        promotionView: View?,
+    ) {
+        renderCredentialList(
+            credentials = emptyList(),
+            allowBreakageReporting = false,
+            showAutofillToggle = showAutofillToggle,
+            autofillEnabled = viewModel.viewState.value.autofillEnabled,
+            promotionView = promotionView,
+            showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+        )
+
         if (canShowImportGooglePasswordsButton) {
             viewModel.recordImportGooglePasswordButtonShown()
         }
     }
 
     private suspend fun renderCredentialList(
-        credentials: List<LoginCredentials>,
+        credentials: List<LoginCredentials>?,
         allowBreakageReporting: Boolean,
+        showAutofillToggle: Boolean,
+        autofillEnabled: Boolean,
+        promotionView: View?,
+        showGoogleImportPasswordsButton: Boolean,
     ) {
-        binding.emptyStateLayout.emptyStateContainer.gone()
-        binding.logins.show()
-
         withContext(dispatchers.io()) {
             val currentUrl = getCurrentSiteUrl()
-            val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
-            val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
-            adapter.updateLogins(credentials, directSuggestions, shareableCredentials, allowBreakageReporting)
+            val credentialLoadingState = if (credentials == null) {
+                Loading
+            } else {
+                val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
+                val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
+                val directSuggestionsListItems = suggestionListBuilder.build(directSuggestions, shareableCredentials, allowBreakageReporting)
+                val groupedCredentials = grouper.group(credentials)
 
-            val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()
-            if (allowBreakageReporting && hasSuggestions) {
-                viewModel.onReportBreakageShown()
+                val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()
+                if (allowBreakageReporting && hasSuggestions) {
+                    viewModel.onReportBreakageShown()
+                }
+
+                Loaded(
+                    directSuggestionsListItems = directSuggestionsListItems,
+                    groupedCredentials = groupedCredentials,
+                    showGoogleImportPasswordsButton = showGoogleImportPasswordsButton,
+                )
+            }
+
+            withContext(dispatchers.main()) {
+                adapter.showLogins(
+                    autofillToggleState = AutofillToggleState(enabled = autofillEnabled, visible = showAutofillToggle),
+                    credentialsLoadedState = credentialLoadingState,
+                    promotionView = promotionView,
+                )
             }
         }
     }
@@ -532,11 +507,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun configureRecyclerView() {
         adapter = AutofillManagementRecyclerAdapter(
             this,
-            dispatchers = dispatchers,
             faviconManager = faviconManager,
-            grouper = credentialGrouper,
             initialExtractor = initialExtractor,
-            suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = {
                 when (it) {
@@ -547,7 +519,29 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 }
             },
             onReportBreakageClicked = { viewModel.onReportBreakageClicked() },
+            launchHelpPageClicked = this::launchHelpPage,
+            onAutofillToggleClicked = this::onAutofillToggledChanged,
+            onImportFromGoogleClicked = this::onImportFromGoogleClicked,
+            onImportViaDesktopSyncClicked = this::onImportViaDesktopSyncClicked,
         ).also { binding.logins.adapter = it }
+    }
+
+    private fun onAutofillToggledChanged(isChecked: Boolean) {
+        if (isChecked) {
+            viewModel.onEnableAutofill()
+        } else {
+            viewModel.onDisableAutofill(getAutofillSettingsLaunchSource())
+        }
+    }
+
+    private fun onImportFromGoogleClicked() {
+        viewModel.onImportPasswordsFromGooglePasswordManager()
+        importPasswordsPixelSender.onImportPasswordsButtonTapped()
+    }
+
+    private fun onImportViaDesktopSyncClicked() {
+        launchImportPasswordsFromDesktopSyncScreen()
+        importPasswordsPixelSender.onImportPasswordsViaDesktopSyncButtonTapped()
     }
 
     private fun launchDeleteLoginConfirmationDialog(loginCredentials: LoginCredentials) {
@@ -675,8 +669,4 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         private const val LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/"
         private const val IMPORT_FROM_GPM_DIALOG_TAG = "IMPORT_FROM_GPM_DIALOG_TAG"
     }
-}
-
-private fun RecyclerView.updateTopMargin(marginPx: Int) {
-    updateLayoutParams<ConstraintLayout.LayoutParams> { this.updateMargins(top = marginPx) }
 }

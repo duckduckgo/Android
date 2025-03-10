@@ -285,6 +285,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -295,6 +296,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -1508,8 +1510,8 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
             showPrivacyShield = HighlightableButton.Visible(enabled = true),
-            canReportSite = domain != null,
-            canChangePrivacyProtection = domain != null,
+            canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
+            canChangePrivacyProtection = domain != null && !duckPlayer.isDuckPlayerUri(url),
             isPrivacyProtectionDisabled = false,
             canFindInPage = true,
             canChangeBrowsingMode = true,
@@ -3210,12 +3212,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        val previousSite = site
         site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
         site?.maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
+
         if (!exempted) {
+            if (currentBrowserViewState().maliciousSiteDetected && previousSite?.url == url.toString()) return
+            Timber.d("Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit")
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             loadingViewState.postValue(
@@ -3827,6 +3833,18 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
+    }
+
+    fun onDuckChatMenuClicked() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+
+            val wasUsedBefore = duckChat.wasOpenedBefore()
+            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+
+            duckChat.openDuckChat()
+        }
     }
 
     companion object {

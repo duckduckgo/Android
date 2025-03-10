@@ -13,7 +13,7 @@ concurrency:
 jobs:
   report-release-error:
     name: Create Asana Task
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Create Asana task when workflow failed

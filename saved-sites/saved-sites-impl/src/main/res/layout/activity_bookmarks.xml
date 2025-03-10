@@ -52,13 +52,16 @@
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:id="@+id/toolbar_title"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/bookmarksActivityTitle"
+                        android:singleLine="true"
+                        android:ellipsize="end"
                         app:typography="h2"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/searchMenu"/>
 
                     <FrameLayout
                         android:id="@+id/searchMenu"

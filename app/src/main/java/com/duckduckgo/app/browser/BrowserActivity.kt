@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultAppsActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
+import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
@@ -82,6 +83,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -90,6 +92,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -156,6 +159,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var tabManager: TabManager
 
+    @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
+
     private val lastActiveTabs = TabList()
 
     private var _currentTab: BrowserTabFragment? = null
@@ -197,6 +206,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
+    private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
 
     private var openMessageInNewTabJob: Job? = null
 
@@ -274,17 +284,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
-        toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
-            TOP -> {
-                binding.bottomMockupToolbar.appBarLayoutMockup.gone()
-                binding.topMockupToolbar
-            }
-
-            BOTTOM -> {
-                binding.topMockupToolbar.appBarLayoutMockup.gone()
-                binding.bottomMockupToolbar
-            }
-        }
+        bindMockupToolbars()
 
         setContentView(binding.root)
 
@@ -465,6 +465,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
             launchNewTab()
+            return
+        }
+
+        if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
+            duckChat.openDuckChat()
             return
         }
 
@@ -693,6 +698,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (this::toolbarMockupBinding.isInitialized) {
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
+                if (this::experimentalToolbarMockupBinding.isInitialized) {
+                    experimentalToolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                }
             },
             300,
         )
@@ -712,6 +720,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openExistingTabId: String? = null,
             isLaunchFromClearDataAction: Boolean = false,
             isLaunchFromDedicatedWebView: Boolean = false,
+            openDuckChat: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -724,6 +733,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(LAUNCH_FROM_DEDICATED_WEBVIEW, isLaunchFromDedicatedWebView)
+            intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             return intent
         }
 
@@ -741,6 +751,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val LAUNCH_FROM_DEDICATED_WEBVIEW = "LAUNCH_FROM_DEDICATED_WEBVIEW"
+        private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
     }
@@ -952,7 +963,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         openMessageInNewTabJob = lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 tabPagerAdapter.setMessageForNewFragment(message)
-                tabManager.openNewTab(sourceTabId)
+                tabManager.openNewTab(sourceTabId = sourceTabId)
             } else {
                 val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
                 val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
@@ -1020,6 +1031,42 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onSystemDefaultBrowserDialogShown()
         } catch (ex: Exception) {
             Timber.e(ex)
+        }
+    }
+
+    private fun bindMockupToolbars() {
+        if (experimentalUIThemingFeature.self().isEnabled()) {
+            experimentalToolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                TOP -> {
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar
+                }
+
+                BOTTOM -> {
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar
+                }
+            }
+        } else {
+            toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                TOP -> {
+                    binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupToolbar
+                }
+
+                BOTTOM -> {
+                    binding.topMockupToolbar.appBarLayoutMockup.gone()
+                    binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
+                    binding.bottomMockupToolbar
+                }
+            }
         }
     }
 }

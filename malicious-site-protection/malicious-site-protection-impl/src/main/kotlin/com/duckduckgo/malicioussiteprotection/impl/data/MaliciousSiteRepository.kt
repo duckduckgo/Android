@@ -16,11 +16,13 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.data
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
@@ -42,7 +44,9 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
@@ -52,12 +56,15 @@ interface MaliciousSiteRepository {
     suspend fun loadHashPrefixes(): Result<Unit>
 }
 
+private const val MATCHES_ENDPOINT_TIMEOUT = 1000L
+
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDao: MaliciousSiteDao,
     private val maliciousSiteService: MaliciousSiteService,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixels: Pixel,
 ) : MaliciousSiteRepository {
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
@@ -79,18 +86,23 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
-            maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
-                val feed = when (it.feed.uppercase()) {
-                    PHISHING.name -> PHISHING
-                    MALWARE.name -> MALWARE
-                    else -> null
-                }
-                if (feed != null) {
-                    Match(it.hostname, it.url, it.regex, it.hash, feed)
-                } else {
-                    null
+            withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
+                maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
+                    val feed = when (it.feed.uppercase()) {
+                        PHISHING.name -> PHISHING
+                        MALWARE.name -> MALWARE
+                        else -> null
+                    }
+                    if (feed != null) {
+                        Match(it.hostname, it.url, it.regex, it.hash, feed)
+                    } else {
+                        null
+                    }
                 }
             }
+        } catch (e: TimeoutCancellationException) {
+            pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
+            listOf()
         } catch (e: Exception) {
             listOf()
         }
