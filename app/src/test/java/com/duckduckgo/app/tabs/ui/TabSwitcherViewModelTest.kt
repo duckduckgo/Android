@@ -29,6 +29,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -97,6 +98,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var duckChatMock: DuckChat
 
+    @Mock
+    private lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -138,6 +142,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
+            tabManagerFeatureFlags
         )
         testee.command.observeForever(mockCommandObserver)
     }
