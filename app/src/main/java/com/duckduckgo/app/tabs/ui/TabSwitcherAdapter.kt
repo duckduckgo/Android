@@ -52,7 +52,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import java.io.File
-import kotlin.Int
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -290,7 +289,7 @@ class TabSwitcherAdapter(
 
     fun getTabSwitcherItem(position: Int): TabSwitcherItem? = list.getOrNull(position)
 
-    fun adapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
+    fun getAdapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
         it is TabSwitcherItem.Tab && it.tabEntity.tabId == tabId
     }
 

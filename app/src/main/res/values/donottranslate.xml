@@ -79,6 +79,9 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <string name="tabSwitcherFabNewTab">New Tab</string>
+    <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
+
     <!--    Bottom Navigation Bar Experiment-->
     <string name="refreshPage">Refresh Page</string>
 
