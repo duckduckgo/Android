@@ -242,7 +242,9 @@ class TabSwitcherViewModel @Inject constructor(
             val tabItems = tabEntities.map { Tab(it) }
 
             val tabSwitcherItems = if (isVisible) {
-                tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = true)
+                if (tabSwitcherItems.value?.first() !is TrackerAnimationTile) {
+                    tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = true)
+                }
                 val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
                 listOf(TrackerAnimationTile(trackerCountForLast7Days)) + tabItems
