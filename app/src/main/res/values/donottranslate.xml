@@ -67,6 +67,7 @@
     <string name="selectAllTabsMenuItem">Select All</string>
     <string name="deselectAllTabsMenuItem">Deselect All</string>
     <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
+    <string name="selectionStateIndicator">Selection state indicator</string>
 
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
