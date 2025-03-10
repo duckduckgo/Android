@@ -22,8 +22,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterface
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.FabType
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
@@ -40,7 +40,7 @@ fun Menu.createDynamicInterface(
 
     popupMenu.newTabMenuItem.isVisible = dynamicMenu.isNewTabVisible
     popupMenu.selectAllMenuItem.isVisible = dynamicMenu.isSelectAllVisible
-    // popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
+    popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
     popupMenu.selectionActionsDivider.isVisible = dynamicMenu.isSelectionActionsDividerVisible
     popupMenu.shareSelectedLinksMenuItem.isVisible = dynamicMenu.isShareSelectedLinksVisible
     popupMenu.bookmarkSelectedTabsMenuItem.isVisible = dynamicMenu.isBookmarkSelectedTabsVisible
@@ -72,6 +72,7 @@ fun Menu.createDynamicInterface(
                 icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
             }
         }
+        extend()
     }
 
     return layoutButton
