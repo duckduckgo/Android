@@ -265,42 +265,49 @@ class TabSwitcherViewModel @Inject constructor(
     ) {
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
-                is Normal -> DynamicInterface(
-                    isLayoutTypeButtonVisible = true,
-                    isFireButtonVisible = true,
-                    isNewTabVisible = true,
-                    isSelectAllVisible = false,
-                    isDeselectAllVisible = false,
-                    isSelectionActionsDividerVisible = false,
-                    isShareSelectedLinksVisible = false,
-                    isBookmarkSelectedTabsVisible = false,
-                    isSelectTabsDividerVisible = true,
-                    isSelectTabsVisible = true,
-                    isCloseSelectedTabsVisible = false,
-                    isCloseOtherTabsVisible = false,
-                    isCloseAllTabsVisible = true,
-                    isMoreMenuItemEnabled = items.size == 1 && (items.first() as? TabSwitcherItem.Tab)?.tabEntity?.url != null,
-                    isFabVisible = true,
-                    fabType = FabType.NEW_TAB,
-                )
-                is Mode.Selection -> DynamicInterface(
-                    isLayoutTypeButtonVisible = false,
-                    isFireButtonVisible = false,
-                    isNewTabVisible = false,
-                    isSelectAllVisible = mode.selectedTabs.size < items.size,
-                    isDeselectAllVisible = mode.selectedTabs.size == items.size,
-                    isSelectionActionsDividerVisible = mode.selectedTabs.isNotEmpty(),
-                    isShareSelectedLinksVisible = mode.selectedTabs.isNotEmpty(),
-                    isBookmarkSelectedTabsVisible = mode.selectedTabs.isNotEmpty(),
-                    isSelectTabsDividerVisible = mode.selectedTabs.isNotEmpty(),
-                    isSelectTabsVisible = false,
-                    isCloseSelectedTabsVisible = mode.selectedTabs.isNotEmpty(),
-                    isCloseOtherTabsVisible = mode.selectedTabs.isNotEmpty(),
-                    isCloseAllTabsVisible = false,
-                    isMoreMenuItemEnabled = true,
-                    isFabVisible = mode.selectedTabs.isNotEmpty(),
-                    fabType = FabType.CLOSE_TABS,
-                )
+                is Normal -> {
+                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? TabSwitcherItem.Tab)?.tabEntity?.url != null
+                    DynamicInterface(
+                        isLayoutTypeButtonVisible = true,
+                        isFireButtonVisible = true,
+                        isNewTabVisible = true,
+                        isSelectAllVisible = false,
+                        isDeselectAllVisible = false,
+                        isSelectionActionsDividerVisible = false,
+                        isShareSelectedLinksVisible = false,
+                        isBookmarkSelectedTabsVisible = false,
+                        isSelectTabsDividerVisible = true,
+                        isSelectTabsVisible = true,
+                        isCloseSelectedTabsVisible = false,
+                        isCloseOtherTabsVisible = false,
+                        isCloseAllTabsVisible = true,
+                        isMoreMenuItemEnabled = isThereNotJustNewTabPage,
+                        isFabVisible = isThereNotJustNewTabPage,
+                        fabType = FabType.NEW_TAB,
+                    )
+                }
+                is Mode.Selection -> {
+                    val areNoTabsSelected = mode.selectedTabs.isNotEmpty()
+                    val areAllTabsSelected = mode.selectedTabs.size == items.size
+                    DynamicInterface(
+                        isLayoutTypeButtonVisible = false,
+                        isFireButtonVisible = false,
+                        isNewTabVisible = false,
+                        isSelectAllVisible = !areAllTabsSelected,
+                        isDeselectAllVisible = areAllTabsSelected,
+                        isSelectionActionsDividerVisible = areNoTabsSelected,
+                        isShareSelectedLinksVisible = areNoTabsSelected,
+                        isBookmarkSelectedTabsVisible = areNoTabsSelected,
+                        isSelectTabsDividerVisible = areNoTabsSelected,
+                        isSelectTabsVisible = false,
+                        isCloseSelectedTabsVisible = areNoTabsSelected,
+                        isCloseOtherTabsVisible = areNoTabsSelected,
+                        isCloseAllTabsVisible = false,
+                        isMoreMenuItemEnabled = true,
+                        isFabVisible = areNoTabsSelected,
+                        fabType = FabType.CLOSE_TABS,
+                    )
+                }
             }
 
         data class DynamicInterface(
