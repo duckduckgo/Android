@@ -224,7 +224,7 @@ class WebViewRequestInterceptor(
                     documentUrl = documentUrl,
                     feed = result.feed,
                     exempted = result.exempted,
-                    clientSideHit = true,
+                    clientSideHit = result.clientSideHit,
                     isForMainFrame = isForMainFrame,
                 )
                 return !result.exempted
@@ -248,7 +248,7 @@ class WebViewRequestInterceptor(
                     documentUrl = documentUrl,
                     feed = isMalicious.feed,
                     exempted = false,
-                    clientSideHit = false,
+                    clientSideHit = true,
                     isForMainFrame = isForMainFrame,
                 )
             }
