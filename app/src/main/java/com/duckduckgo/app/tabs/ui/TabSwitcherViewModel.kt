@@ -269,20 +269,20 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onLayoutTypeToggled() {
-        // viewModelScope.launch(dispatcherProvider.io()) {
-        //     val newLayoutType = when (layoutType.value) {
-        //         GRID -> {
-        //             pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-        //             LIST
-        //         }
-        //         LIST -> {
-        //             pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-        //             GRID
-        //         }
-        //         else -> null
-        //     }
-        //     newLayoutType?.let { tabRepository.setTabLayoutType(it) }
-        // }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val newLayoutType = when (layoutType.value) {
+                GRID -> {
+                    pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                    LIST
+                }
+                LIST -> {
+                    pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                    GRID
+                }
+                else -> null
+            }
+            newLayoutType?.let { tabRepository.setTabLayoutType(it) }
+        }
     }
 
     fun onFabClicked() {
