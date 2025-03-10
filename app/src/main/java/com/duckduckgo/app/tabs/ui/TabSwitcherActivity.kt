@@ -59,7 +59,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.NormalTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close

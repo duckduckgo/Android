@@ -23,7 +23,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -108,7 +107,7 @@ class TabSwitcherViewModel @Inject constructor(
                 } else {
                     TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab?.tabId)
                 }
-            }
+            },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
