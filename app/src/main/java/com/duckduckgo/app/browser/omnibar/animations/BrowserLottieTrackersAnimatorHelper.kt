@@ -269,10 +269,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             totalTrackerCount = entities.size,
             trackerTextView = trackersBlockedCountAnimationView!!,
             onAnimationEnd = {
-                trackersBlockedAnimationView?.gone()
-                trackersBlockedCountAnimationView?.text = ""
-                trackersBlockedCountAnimationView?.gone()
-                animateOmnibarIn(omnibarViews).start()
                 listener?.onAnimationFinished(logos, hasKnownLogos)
 
                 conflatedJob += MainScope().launch {

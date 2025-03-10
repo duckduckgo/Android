@@ -21,17 +21,22 @@ import android.view.View
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
 interface ExperimentTrackersAnimationHelper {
 
     fun startShieldPopAnimation(
         omnibarShieldAnimationView: LottieAnimationView,
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
     )
 
     fun startTrackersBurstAnimation(
         context: Context,
         trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
         omnibarPosition: OmnibarPosition,
         minibarView: View,
         logos: List<TrackerLogo>,

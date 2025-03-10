@@ -18,9 +18,13 @@ package com.duckduckgo.app.browser.animations
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isGone
 import com.airbnb.lottie.LottieAnimationView
@@ -32,6 +36,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
@@ -51,18 +56,39 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
 
     override fun startShieldPopAnimation(
         omnibarShieldAnimationView: LottieAnimationView,
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
     ) {
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
 
-        omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
-        omnibarShieldAnimationView.setMaxProgress(1f)
-        omnibarShieldAnimationView.playAnimation()
+        with(omnibarShieldAnimationView) {
+            this.removeAllAnimatorListeners()
+            this.addAnimatorListener(
+                object : AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                        animateViews(trackersCountAndBlockedViews, omnibarTextInput, 800L)
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {}
+
+                    override fun onAnimationCancel(animation: Animator) {}
+
+                    override fun onAnimationRepeat(animation: Animator) {}
+                },
+            )
+
+            this.setAnimation(R.raw.protected_shield_experiment)
+            this.setMaxProgress(1f)
+            this.playAnimation()
+        }
     }
 
     override fun startTrackersBurstAnimation(
         context: Context,
         trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
         omnibarPosition: OmnibarPosition,
         minibarView: View,
         logos: List<TrackerLogo>,
@@ -106,6 +132,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
+                        animateViews(trackersCountAndBlockedViews, omnibarTextInput, 0L)
                         this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.gone()
                     }
 
@@ -128,5 +155,58 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         this.trackersBurstAnimationView?.cancelAnimation()
         this.omnibarShieldAnimationView?.cancelAnimation()
         conflatedJob.cancel()
+    }
+
+    private fun animateViews(
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
+        animationDuration: Long,
+    ) {
+        val animations = mutableListOf<ValueAnimator>()
+        trackersCountAndBlockedViews.forEach {
+            animations.add(
+                ValueAnimator.ofFloat(1f, 0f).apply {
+                    addUpdateListener { animation ->
+                        val alpha = animation.animatedValue as Float
+                        it.alpha = alpha
+                    }
+                    duration = animationDuration
+                    interpolator = AccelerateDecelerateInterpolator()
+                },
+            )
+        }
+
+        animations.add(
+            ValueAnimator.ofFloat(0f, 1f).apply {
+                addUpdateListener { animation ->
+                    val alpha = animation.animatedValue as Float
+                    omnibarTextInput.alpha = alpha
+                }
+                duration = animationDuration
+                interpolator = AccelerateInterpolator(3f)
+            },
+        )
+
+        AnimatorSet().apply {
+            playTogether(animations.toList())
+            addListener(
+                object : AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {}
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        // Reset everything.
+                        trackersCountAndBlockedViews.forEach {
+                            it.text = ""
+                            it.gone()
+                            it.alpha = 1f
+                        }
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {}
+                    override fun onAnimationRepeat(animation: Animator) {}
+                },
+            )
+            start()
+        }
     }
 }

@@ -821,6 +821,22 @@ class BrowserTabFragment :
             context = requireContext(),
             trackersBurstAnimationView = binding.trackersBurstAnimationView,
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.fadeOmnibar.omnibarTextInput
+            } else {
+                binding.fadeOmnibarBottom.omnibarTextInput
+            },
             omnibarPosition = omnibar.omnibarPosition,
             minibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
                 binding.fadeOmnibar.findViewById(R.id.minibar)
@@ -835,6 +851,22 @@ class BrowserTabFragment :
     private fun showExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.fadeOmnibar.omnibarTextInput
+            } else {
+                binding.fadeOmnibarBottom.omnibarTextInput
+            },
         )
     }
 
