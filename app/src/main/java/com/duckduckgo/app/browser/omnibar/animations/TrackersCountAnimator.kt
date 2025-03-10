@@ -49,8 +49,8 @@ class TrackerCountAnimator @Inject constructor() {
         this.context = context
         this.trackerTextView = trackerTextView
 
-        val endCount = (totalTrackerCount + 1)
-        val startCount = maxOf(1, endCount - 3)
+        val endCount = totalTrackerCount
+        val startCount = maxOf(1, endCount - 2)
 
         val animationDuration = TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION
 

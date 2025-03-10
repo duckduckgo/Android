@@ -870,6 +870,28 @@ class BrowserTabFragment :
         )
     }
 
+    private fun showExperimentV2ShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar.omnibarTextInput
+            } else {
+                binding.newOmnibarBottom.omnibarTextInput
+            },
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -1975,6 +1997,7 @@ class BrowserTabFragment :
             }
             is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos, it.ignoreLogos)
             is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
+            is Command.StartExperimentV2ShieldPopAnimation -> showExperimentV2ShieldPopAnimation()
             else -> {
                 // NO OP
             }

@@ -3868,7 +3868,7 @@ class BrowserTabViewModel @Inject constructor(
         if (appPersonalityFeature.self().isEnabled() &&
             (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant5().isEnabled())
         ) {
-            command.value = Command.StartExperimentShieldPopAnimation
+            command.value = Command.StartExperimentV2ShieldPopAnimation
         } else if (appPersonalityFeature.self().isEnabled() &&
             (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
         ) {

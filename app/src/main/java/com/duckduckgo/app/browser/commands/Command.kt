@@ -264,4 +264,5 @@ sealed class Command {
     data object CloseCustomTab : Command()
     data class StartExperimentTrackersBurstAnimation(val logos: List<TrackerLogo>, val ignoreLogos: Boolean) : Command()
     data object StartExperimentShieldPopAnimation : Command()
+    data object StartExperimentV2ShieldPopAnimation : Command()
 }
