@@ -20,7 +20,6 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.SelectableTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 
 class TabSwitcherItemDiffCallback(
     old: List<TabSwitcherItem>,
