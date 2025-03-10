@@ -301,7 +301,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     tabsAdapter.updateSelection(it.mode)
 
                     updateToolbarTitle(it.mode)
-                    updateTabGridItemDecorator(it.activeTab?.tabId)
+                    updateTabGridItemDecorator(it.selectedTab?.tabId)
 
                     invalidateOptionsMenu()
                 }
