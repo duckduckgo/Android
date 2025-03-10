@@ -23,6 +23,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -31,6 +32,8 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -97,38 +100,35 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabRepository.flowTabs,
         tabRepository.flowSelectedTab,
-    ) { viewState, tabs, selectedTab ->
+    ) { viewState, tabs, activeTab ->
         viewState.copy(
-            items = tabs.map { TabSwitcherItem.Tab(it, false) },
-            selectedTab = selectedTab,
+            items = tabs.map {
+                if (viewState.mode is Selection) {
+                    TabSwitcherItem.SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
+                } else {
+                    TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+                }
+            }
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-        tabRepository.flowTabs.combine(_selectionViewState) { tabEntities, viewState ->
-            tabEntities.map {
-                TabSwitcherItem.Tab(it, viewState.mode is Selection && it.tabId in viewState.mode.selectedTabs)
-            }
-        }.asLiveData()
-    } else {
-        tabRepository.flowTabs
-            .debounce(100.milliseconds)
-            .conflate()
-            .asLiveData()
-            .switchMap { tabEntities ->
-                // TODO use test framework to determine whether to show tracker animation tile
-                liveData {
-                    if (tabSwitcherAnimationFeature.self().isEnabled()) {
-                        collectTabItemsWithOptionalAnimationTile(tabEntities)
-                    } else {
-                        val tabItems = tabEntities.map {
-                            TabSwitcherItem.Tab(it, false)
-                        }
-                        emit(tabItems)
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
+        .debounce(100.milliseconds)
+        .conflate()
+        .asLiveData()
+        .switchMap { tabEntities ->
+            // TODO use test framework to determine whether to show tracker animation tile
+            liveData {
+                if (tabSwitcherAnimationFeature.self().isEnabled()) {
+                    collectTabItemsWithOptionalAnimationTile(tabEntities)
+                } else {
+                    val tabItems = tabEntities.map {
+                        TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
                     }
+                    emit(tabItems)
                 }
             }
-    }
+        }
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -377,7 +377,7 @@ class TabSwitcherViewModel @Inject constructor(
     ) {
         tabSwitcherDataStore.isAnimationTileDismissed().collect { isDismissed ->
             val tabItems = tabEntities.map {
-                TabSwitcherItem.Tab(it, viewState.mode is SelectionViewState.Mode.Selection && it.tabId in viewState.mode.selectedTabs)
+                TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
             }
 
             val tabSwitcherItems = if (!isDismissed) {
@@ -393,7 +393,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     data class SelectionViewState(
         val items: List<TabSwitcherItem> = emptyList(),
-        val selectedTab: TabEntity? = null,
         val mode: Mode = Mode.Normal,
     ) {
         val dynamicInterface: DynamicInterface
