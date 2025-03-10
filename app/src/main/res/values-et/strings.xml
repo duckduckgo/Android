@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="duckDuckGoTagline">Sinu kaitse, meie prioriteet.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Kaitse Privaatsus Meelerahu.</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
     <string name="open">Avatud</string>
@@ -232,9 +232,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
     <string name="aboutActivityTitleNew">Teave</string>
-    <string name="aboutHeader">Tere tulemast Pardipoolele!</string>
-    <string name="aboutDescription">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte igaühele, kellel on kõrini varjatud jälgimisest internetis ja kes soovib lihtsat lahendust selle vältimiseks. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse funktsiooni</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitse aitab kaitsta sinu tegevust internetis alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaks teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mis sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu – ja vaikeprivaatsus ongi tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte kõigile, kes on väsinud jälgimisest internetis ja soovivad lihtsat lahendust. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitsekomplekt aitab kaitsta sinu tegevusi internetis, alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaksid teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mida sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu ja vaikeprivaatsus on tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
+    <string name="aboutHeaderNewTagLine">Kaitse Privaatsus Meelerahu.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Tere tulemast Pardi poolele!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis teie isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel teie andmeid kogumast. Oh, ja meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte teie andmeid ära kasutades.\n\nLisaks pakume ka meie kolm-ühes tellimusteenust <annotation type="ppro_help_page">Privacy Pro</annotation>, mis on integreeritud meie brauserisse. Privacy Pro tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN</annotation> -iga, mis aitab kaitsta teie veebitegevust, teenuse, mis otsib ja eemaldab teie isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab teie identiteedi, kui see varastatakse.\n\nVõtke tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +414,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
-    <string name="systemSearchOnboardingText">Täname, et valisite DuckDuckGo!\nNüüd, kui kasutate meie otsingut või rakendust, on teie otsingud kaitstud.</string>
+    <string name="systemSearchOnboardingThanks">Aitäh, et valisite DuckDuckGo!\nMeie brauseri kasutamine aitab teid kaitsta häkkerite, petturite ja andmenäljaste ettevõtete eest.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokeerib ebaturvalised jälgijad.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Sunnib krüpteerima veebisaite.</string>
