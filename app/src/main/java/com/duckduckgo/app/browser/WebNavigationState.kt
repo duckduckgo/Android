@@ -169,7 +169,7 @@ data class ErrorNavigationState(
 
     override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
 
-    override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage && ((isMainframe && clientSideHit) || !isMainframe)
+    override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage && (!isMainframe || clientSideHit)
 
     override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
 
