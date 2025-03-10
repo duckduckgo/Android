@@ -3857,7 +3857,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
-    fun onAnimationFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
+    fun onAnimationFinished(
+        logos: List<TrackerLogo>,
+        hasKnownLogos: Boolean,
+    ) {
         if (logos.isEmpty()) {
             return
         }
@@ -3869,9 +3872,12 @@ class BrowserTabViewModel @Inject constructor(
         } else if (appPersonalityFeature.self().isEnabled() &&
             (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
         ) {
-            if (hasKnownLogos && logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD && trackersBurstAnimationPreferencesStore.fetchCount() < 3) {
+            val ignoreLogos = appPersonalityFeature.variant4().isEnabled()
+            if ((hasKnownLogos || ignoreLogos) &&
+                logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD &&
+                trackersBurstAnimationPreferencesStore.fetchCount() < 3
+            ) {
                 trackersBurstAnimationPreferencesStore.incrementCount()
-                val ignoreLogos = appPersonalityFeature.variant4().isEnabled()
                 command.value = Command.StartExperimentTrackersBurstAnimation(logos, ignoreLogos)
                 viewModelScope.launch {
                     pixel.fire(
