@@ -53,7 +53,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             app:lottie_autoPlay="true"
-            app:lottie_rawRes="@raw/tab_shield" />
+            app:lottie_rawRes="@raw/shield_tabswitcher" />
 
         <TextView
             android:id="@+id/text"
