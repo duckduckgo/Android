@@ -949,6 +949,7 @@ class BrowserTabViewModelTest {
             Feed.PHISHING,
             exempted = false,
             clientSideHit = false,
+            isMainframe = true,
         )
 
         testee.navigationStateChanged(
@@ -966,6 +967,7 @@ class BrowserTabViewModelTest {
             Feed.PHISHING,
             exempted = false,
             clientSideHit = false,
+            isMainframe = true,
         )
         testee.navigationStateChanged(
             buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
