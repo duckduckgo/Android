@@ -91,8 +91,7 @@ class TabSwitcherViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
-        val activeTabId = tabRepository.liveSelectedTab.value?.tabId
-        tabEntities.map { TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTabId) }
+        tabEntities.map { TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab.value?.tabId) }
     }
 
     val layoutType = tabRepository.tabSwitcherData
