@@ -113,8 +113,6 @@ class WebViewActivity : DuckDuckGoActivity() {
         title = params?.screenTitle.orEmpty()
         val supportNewWindows = params?.supportNewWindows ?: false
 
-        configureWebViewForBlobDownload(binding.simpleWebview)
-
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
 
@@ -180,8 +178,9 @@ class WebViewActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-        }
 
+            configureWebViewForBlobDownload(it)
+        }
         url?.let {
             binding.simpleWebview.loadUrl(it)
         }
