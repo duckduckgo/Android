@@ -26,11 +26,20 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_SERP
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -42,15 +51,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -61,6 +61,10 @@ const val DUCK_PLAYER_PAGE_FEATURE_NAME = "duckPlayerPage"
 const val DUCK_PLAYER_FEATURE_NAME = "duckPlayer"
 private const val OVERLAY_INTERACTED = "overlayInteracted"
 private const val PRIVATE_PLAYER_MODE = "privatePlayerMode"
+private const val YOUTUBE_ERROR_AGE_RESTRICTED = "age-restricted"
+private const val YOUTUBE_ERROR_SIGN_IN_REQUIRED = "sign-in-required"
+private const val YOUTUBE_ERROR_NO_EMBED = "no-embed"
+private const val YOUTUBE_ERROR_UNKNOWN = "unknown"
 
 class DuckPlayerJSHelper @Inject constructor(
     private val duckPlayer: DuckPlayer,
@@ -272,17 +276,17 @@ class DuckPlayerJSHelper @Inject constructor(
                 }
             }
             "reportYouTubeError" -> {
-                val impressionPixelName: DuckPlayerPixelName = when (data?.getString("error")) {
-                    "age-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
-                    "no-embed" -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
-                    "sign-in-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
+                val impressionPixelName: AppPixelName = when (data?.getString("error")) {
+                    YOUTUBE_ERROR_AGE_RESTRICTED -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
+                    YOUTUBE_ERROR_NO_EMBED -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
+                    YOUTUBE_ERROR_SIGN_IN_REQUIRED -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
                     else -> DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION
                 }
 
-                val dailyPixelName: DuckPlayerPixelName = when (data?.getString("error")) {
-                    "age-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
-                    "no-embed" -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
-                    "sign-in-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
+                val dailyPixelName: AppPixelName = when (data?.getString("error")) {
+                    YOUTUBE_ERROR_AGE_RESTRICTED -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
+                    YOUTUBE_ERROR_NO_EMBED -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
+                    YOUTUBE_ERROR_SIGN_IN_REQUIRED -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
                     else -> DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE
                 }
 
