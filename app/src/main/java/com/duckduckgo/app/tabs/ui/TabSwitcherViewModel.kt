@@ -281,18 +281,17 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onLayoutTypeToggled() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val newLayoutType = when (layoutType.value) {
+            when (layoutType.value) {
                 GRID -> {
-                    pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-                    LIST
+                    pixel.fire(TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                    tabRepository.setTabLayoutType(LIST)
                 }
                 LIST -> {
-                    pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-                    GRID
+                    pixel.fire(TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                    tabRepository.setTabLayoutType(GRID)
                 }
-                else -> null
+                else -> Unit
             }
-            newLayoutType?.let { tabRepository.setTabLayoutType(it) }
         }
     }
 
