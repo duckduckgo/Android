@@ -24,7 +24,6 @@ import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isGone
 import com.airbnb.lottie.LottieAnimationView
@@ -66,7 +65,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
             this.addAnimatorListener(
                 object : AnimatorListener {
                     override fun onAnimationStart(animation: Animator) {
-                        animateViews(trackersCountAndBlockedViews, omnibarTextInput, 800L)
+                        animateViews(trackersCountAndBlockedViews, omnibarTextInput, 500L)
                     }
 
                     override fun onAnimationEnd(animation: Animator) {}
@@ -170,7 +169,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                         val alpha = animation.animatedValue as Float
                         it.alpha = alpha
                     }
-                    duration = animationDuration
+                    duration = 200L
                     interpolator = AccelerateDecelerateInterpolator()
                 },
             )
@@ -182,28 +181,37 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                     val alpha = animation.animatedValue as Float
                     omnibarTextInput.alpha = alpha
                 }
-                duration = animationDuration
-                interpolator = AccelerateInterpolator(3f)
+                duration = 200L
+                interpolator = AccelerateDecelerateInterpolator()
             },
         )
 
+        val delayAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = animationDuration
+        }
+
         AnimatorSet().apply {
-            playTogether(animations.toList())
-            addListener(
-                object : AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {}
+            playSequentially(
+                delayAnimator,
+                AnimatorSet().apply {
+                    playTogether(animations.toList())
+                    addListener(
+                        object : AnimatorListener {
+                            override fun onAnimationStart(animation: Animator) {}
 
-                    override fun onAnimationEnd(animation: Animator) {
-                        // Reset everything.
-                        trackersCountAndBlockedViews.forEach {
-                            it.text = ""
-                            it.gone()
-                            it.alpha = 1f
-                        }
-                    }
+                            override fun onAnimationEnd(animation: Animator) {
+                                // Reset everything.
+                                trackersCountAndBlockedViews.forEach {
+                                    it.text = ""
+                                    it.gone()
+                                    it.alpha = 1f
+                                }
+                            }
 
-                    override fun onAnimationCancel(animation: Animator) {}
-                    override fun onAnimationRepeat(animation: Animator) {}
+                            override fun onAnimationCancel(animation: Animator) {}
+                            override fun onAnimationRepeat(animation: Animator) {}
+                        },
+                    )
                 },
             )
             start()
