@@ -62,7 +62,7 @@ class TabSwitcherTileAnimationMonitorTest {
     @Test
     fun `when animation tile has been seen then animation tile shown`() = runTest {
         fakeTabSwitcherPrefsDataStore.setIsAnimationTileDismissed(false)
-        fakeTabSwitcherPrefsDataStore.setAnimationTileSeen()
+        fakeTabSwitcherPrefsDataStore.setAnimationTileSeen(true)
 
         testee.observeAnimationTileVisibility().test {
             assertEquals(true, awaitItem())
@@ -132,7 +132,7 @@ class TabSwitcherTileAnimationMonitorTest {
     @Test
     fun `when animation tile not dismissed and has been seen and tracker count tab count below minimum then animation tile shown`() = runTest {
         fakeTabSwitcherPrefsDataStore.setIsAnimationTileDismissed(false)
-        fakeTabSwitcherPrefsDataStore.setAnimationTileSeen()
+        fakeTabSwitcherPrefsDataStore.setAnimationTileSeen(true)
 
         whenever(mockTabDataRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(10)
@@ -166,7 +166,7 @@ class TabSwitcherTileAnimationMonitorTest {
 
         override fun hasAnimationTileBeenSeen(): Flow<Boolean> = _hasAnimationTileBeenSeenFlow
 
-        override suspend fun setAnimationTileSeen() {
+        override suspend fun setAnimationTileSeen(isSeen: Boolean) {
             _hasAnimationTileBeenSeenFlow.value = true
         }
     }
