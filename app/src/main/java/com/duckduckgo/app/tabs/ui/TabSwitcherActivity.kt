@@ -78,6 +78,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.google.android.material.R as materialR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -87,7 +88,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.google.android.material.R as materialR
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -526,11 +526,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
-        return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            viewModel.selectionViewState.value.dynamicInterface.isMoreMenuItemEnabled
-        } else {
-            super.onPrepareOptionsMenu(menu)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            layoutTypeMenuItem?.isVisible = viewModel.selectionViewState.value.dynamicInterface.isLayoutTypeButtonVisible
+            popupMenuItem?.updateEnabledState(viewModel.selectionViewState.value.dynamicInterface.isMoreMenuItemEnabled, this)
         }
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
