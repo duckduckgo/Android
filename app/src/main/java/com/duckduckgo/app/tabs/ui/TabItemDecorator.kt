@@ -29,15 +29,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
-class TabItemDecorator(
-    context: Context,
-    tabSwitcherItemId: String?,
-    mode: Mode,
-) : RecyclerView.ItemDecoration() {
-
-    var highlightedTabId: String? = tabSwitcherItemId
-    var selectionMode: Mode = mode
-
+class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
     private val activeTabBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
@@ -67,12 +59,13 @@ class TabItemDecorator(
         recyclerView.children.forEach { child ->
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
-                if (selectionMode is Mode.Selection) {
-                    if (tabSwitcherItem is TabSwitcherItem.Tab && tabSwitcherItem.isSelected) {
+                when {
+                    tabSwitcherItem is TabSwitcherItem.SelectableTab && tabSwitcherItem.isSelected -> {
                         drawTabDecoration(child, canvas, selectionBorderStroke)
                     }
-                } else if (tabSwitcherItem.id == highlightedTabId) {
-                    drawTabDecoration(child, canvas, activeTabBorderStroke)
+                    tabSwitcherItem is TabSwitcherItem.NormalTab && tabSwitcherItem.isActive -> {
+                        drawTabDecoration(child, canvas, activeTabBorderStroke)
+                    }
                 }
             }
         }

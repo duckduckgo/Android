@@ -19,13 +19,12 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 
 class TabSwitcherItemDiffCallback(
     old: List<TabSwitcherItem>,
     new: List<TabSwitcherItem>,
-    private val oldMode: Mode = Mode.Normal,
-    private val newMode: Mode = Mode.Normal,
 ) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
@@ -49,8 +48,7 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
-                    oldItem.isSelected == newItem.isSelected &&
-                    oldMode == newMode
+                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
             }
             else -> false
         }
@@ -80,8 +78,8 @@ class TabSwitcherItemDiffCallback(
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
                 }
 
-                if (oldItem.isSelected != newItem.isSelected || oldMode != newMode) {
-                    diffBundle.putBoolean(DIFF_KEY_SELECTION, newItem.isSelected)
+                if ((oldItem as? SelectableTab)?.isSelected != (newItem as? SelectableTab)?.isSelected) {
+                    diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
             }
         }
