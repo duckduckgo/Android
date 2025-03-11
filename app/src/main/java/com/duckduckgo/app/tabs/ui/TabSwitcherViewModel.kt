@@ -224,22 +224,34 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
 
             // Trigger a normal mode when there are no tabs
-            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+            _selectionViewState.update { it.copy(mode = Normal) }
         }
     }
 
     fun onEmptyAreaClicked() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+            _selectionViewState.update { it.copy(mode = Normal) }
         }
     }
 
-    fun onUpButtonPressed() {
+    fun onUpButtonPressed(): Boolean {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
+
+        return cancelSelectionOrExit()
     }
 
-    fun onBackButtonPressed() {
+    fun onBackButtonPressed(): Boolean {
         pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+
+        return cancelSelectionOrExit()
+    }
+
+    private fun cancelSelectionOrExit(): Boolean {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+            _selectionViewState.update { it.copy(mode = Normal) }
+            return false
+        }
+        return true
     }
 
     fun onMenuOpened() {
