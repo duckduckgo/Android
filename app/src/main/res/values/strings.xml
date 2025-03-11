@@ -62,9 +62,10 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection enabled for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection disabled for %1$s</string>
     <string name="undoSnackbarAction">Undo</string>
+    <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
         <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Tracker Blocked</item>
-        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Tracker Blocked">Trackers Blocked</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Trackers Blocked</item>
     </plurals>
 
     <!-- Downloading files -->
