@@ -9,6 +9,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchesResponse
@@ -37,10 +38,12 @@ class RealMaliciousSiteRepositoryTest {
 
     private val maliciousSiteDao: MaliciousSiteDao = mock()
     private val maliciousSiteService: MaliciousSiteService = mock()
+    private val maliciousSiteDatasetService: MaliciousSiteDatasetService = mock()
     private val mockPixel: Pixel = mock()
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
+        maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
     )
@@ -53,11 +56,11 @@ class RealMaliciousSiteRepositoryTest {
 
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
-        whenever(maliciousSiteService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
+        whenever(maliciousSiteDatasetService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
 
         repository.loadFilters()
 
-        verify(maliciousSiteService).getPhishingFilterSet(latestRevision.first().revision)
+        verify(maliciousSiteDatasetService).getPhishingFilterSet(latestRevision.first().revision)
         verify(maliciousSiteDao).updateFilters(any<PhishingFilterSetWithRevision>())
     }
 
@@ -71,7 +74,7 @@ class RealMaliciousSiteRepositoryTest {
 
         repository.loadFilters()
 
-        verify(maliciousSiteService, never()).getPhishingFilterSet(any())
+        verify(maliciousSiteDatasetService, never()).getPhishingFilterSet(any())
         verify(maliciousSiteDao, never()).updateFilters(any())
     }
 
@@ -83,11 +86,11 @@ class RealMaliciousSiteRepositoryTest {
 
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
-        whenever(maliciousSiteService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
+        whenever(maliciousSiteDatasetService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
 
         repository.loadHashPrefixes()
 
-        verify(maliciousSiteService).getPhishingHashPrefixes(latestRevision.first().revision)
+        verify(maliciousSiteDatasetService).getPhishingHashPrefixes(latestRevision.first().revision)
         verify(maliciousSiteDao).updateHashPrefixes(any<PhishingHashPrefixesWithRevision>())
     }
 
@@ -101,7 +104,7 @@ class RealMaliciousSiteRepositoryTest {
 
         repository.loadHashPrefixes()
 
-        verify(maliciousSiteService, never()).getPhishingHashPrefixes(any())
+        verify(maliciousSiteDatasetService, never()).getPhishingHashPrefixes(any())
         verify(maliciousSiteDao, never()).updateHashPrefixes(any())
     }
 
