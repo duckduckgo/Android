@@ -20,12 +20,15 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+
+private const val FAB_HIDE_DELAY = 500L
 
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
@@ -61,18 +64,25 @@ fun Menu.createDynamicInterface(
     }
 
     fab.apply {
-        isVisible = dynamicMenu.isFabVisible
-        when (dynamicMenu.fabType) {
-            FabType.NEW_TAB -> {
-                text = resources.getString(R.string.newTabMenuItem)
-                icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_add_24)
+        if (dynamicMenu.isFabVisible) {
+            when (dynamicMenu.fabType) {
+                FabType.NEW_TAB -> {
+                    text = resources.getString(R.string.newTabMenuItem)
+                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_add_24)
+                }
+                FabType.CLOSE_TABS -> {
+                    text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
+                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
+                }
             }
-            FabType.CLOSE_TABS -> {
-                text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-                icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
+
+            show()
+            extend()
+        } else {
+            fab.postDelayed(FAB_HIDE_DELAY) {
+                hide()
             }
         }
-        extend()
     }
 
     return layoutButton
