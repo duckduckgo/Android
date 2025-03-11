@@ -212,8 +212,10 @@ open class OmnibarLayout @JvmOverloads constructor(
                 Fade().apply {
                     duration = 200
                     addTarget(clearTextButton)
+                    addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
                     addTarget(tabsMenu)
+                    addTarget(aiChatMenu)
                     addTarget(browserMenu)
                 },
             )
@@ -568,7 +570,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = viewState.showBrowserMenu
         browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
         spacer.isVisible = viewState.showVoiceSearch || viewState.showClearButton
-        aiChatMenu.isVisible = duckChat.showInAddressBar() && (viewState.viewMode is NewTab || viewState.showChatMenu)
+        aiChatMenu.isVisible = duckChat.showInAddressBar() && viewState.viewMode is NewTab || !viewState.showTabsMenu
         toolbarContainer.requestLayout()
 
         isInitialRender = false
