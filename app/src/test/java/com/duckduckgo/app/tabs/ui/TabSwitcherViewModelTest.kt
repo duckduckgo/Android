@@ -21,6 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.liveData
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
@@ -135,7 +136,7 @@ class TabSwitcherViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
@@ -149,6 +150,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
         whenever(mockTabRepository.flowTabs).thenReturn(flowTabs)
         whenever(statisticsDataStore.variant).thenReturn("")
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(liveData { null })
     }
 
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
