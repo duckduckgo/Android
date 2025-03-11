@@ -27,7 +27,6 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -179,9 +178,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureFab() {
         tabsFab = binding.tabsFab
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            tabsFab.show()
-            tabsFab.setOnClickListener {
-                viewModel.onFabClicked()
+            tabsFab.apply {
+                show()
+                extend()
+                setOnClickListener {
+                    viewModel.onFabClicked()
+                }
             }
         } else {
             tabsFab.hide()
@@ -486,8 +488,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
             android.R.id.home -> {
-                viewModel.onUpButtonPressed()
-                finish()
+                if (viewModel.onUpButtonPressed()) {
+                    finish()
+                }
                 return true
             }
         }
@@ -617,6 +620,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     }
                 },
             )
+            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
             .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
             .show()
     }
@@ -675,8 +679,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    viewModel.onBackButtonPressed()
-                    finish()
+                    if (viewModel.onBackButtonPressed()) {
+                        finish()
+                    }
                 }
             },
         )
