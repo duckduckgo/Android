@@ -94,25 +94,24 @@ class ThemingSharedPreferences @Inject constructor(
                     DuckDuckGoTheme.DARK
                 }
 
-                THEME_SYSTEM_DEFAULT -> if (isExperimentEnabled) {
-                    if (isInNightMode) {
-                        if (warmColors) {
-                            DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+                else ->
+                    if (isExperimentEnabled) {
+                        if (isInNightMode) {
+                            if (warmColors) {
+                                DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+                            } else {
+                                DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+                            }
                         } else {
-                            DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+                            if (warmColors) {
+                                DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
+                            } else {
+                                DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+                            }
                         }
                     } else {
-                        if (warmColors) {
-                            DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
-                        } else {
-                            DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-                        }
+                        DuckDuckGoTheme.SYSTEM_DEFAULT
                     }
-                } else {
-                    DuckDuckGoTheme.SYSTEM_DEFAULT
-                }
-
-                else -> defValue
             }
     }
 
