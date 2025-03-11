@@ -16,9 +16,7 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.data.network
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApiWithTimeout
 import com.duckduckgo.common.utils.AppUrl.Url.API
-import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -29,7 +27,6 @@ private const val CATEGORY = "category"
 private const val PHISHING = "phishing"
 private const val MALWARE = "malware"
 
-@ContributesServiceApiWithTimeout(AppScope::class, timeoutMillis = 120000)
 interface MaliciousSiteDatasetService {
     @AuthRequired
     @GET("$BASE_URL$HASH_PREFIX_PATH?$CATEGORY=$PHISHING")

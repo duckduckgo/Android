@@ -16,16 +16,13 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.data.network
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApiWithTimeout
 import com.duckduckgo.common.utils.AppUrl.Url.API
-import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 private const val BASE_URL = "$API/api/protection/v1/android"
 
-@ContributesServiceApiWithTimeout(AppScope::class, timeoutMillis = 5000)
 interface MaliciousSiteService {
 
     @AuthRequired
