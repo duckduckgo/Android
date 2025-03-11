@@ -44,6 +44,7 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
@@ -103,6 +104,9 @@ class RealMaliciousSiteRepository @Inject constructor(
                 }
             }
         } catch (e: TimeoutCancellationException) {
+            pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
+            listOf()
+        } catch (e: SocketTimeoutException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
             listOf()
         } catch (e: Exception) {
