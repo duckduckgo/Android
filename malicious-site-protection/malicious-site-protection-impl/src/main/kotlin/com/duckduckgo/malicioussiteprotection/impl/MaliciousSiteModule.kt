@@ -16,21 +16,40 @@
 
 package com.duckduckgo.malicioussiteprotection.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase.Companion.ALL_MIGRATIONS
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.io.File
 import java.security.MessageDigest
+import java.util.concurrent.TimeUnit.SECONDS
+import javax.inject.Named
+import javax.inject.Qualifier
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 
 @Module
 @ContributesTo(AppScope::class)
 class MaliciousSiteModule {
+
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    private annotation class InternalDatasetClient
+
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    private annotation class InternalClient
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -51,5 +70,65 @@ class MaliciousSiteModule {
     @SingleInstanceIn(AppScope::class)
     fun provideMessageDigest(): MessageDigest {
         return MessageDigest.getInstance("SHA-256")
+    }
+
+    @Provides
+    @InternalDatasetClient
+    @SingleInstanceIn(AppScope::class)
+    fun provideInternalDatasetCustomHttpClient(
+        context: Context,
+        @Named("api") okHttpClient: OkHttpClient,
+    ): OkHttpClient {
+        val cacheLocation = File(context.cacheDir, "datasetsCache")
+        val cacheSize: Long = 20 * 1024 * 1024 // 20MB
+        val cache = Cache(cacheLocation, cacheSize)
+        return okHttpClient.newBuilder()
+            .callTimeout(100, SECONDS)
+            .cache(cache)
+            .build()
+    }
+
+    @Provides
+    @InternalClient
+    @SingleInstanceIn(AppScope::class)
+    fun provideInternalCustomHttpClient(
+        context: Context,
+        @Named("api") okHttpClient: OkHttpClient,
+    ): OkHttpClient {
+        val cacheLocation = File(context.cacheDir, "datasetsCache")
+        val cacheSize: Long = 5 * 1024 * 1024 // 5MB
+        val cache = Cache(cacheLocation, cacheSize)
+        return okHttpClient.newBuilder()
+            .callTimeout(5, SECONDS)
+            .cache(cache)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @SuppressLint("NoRetrofitCreateMethodCallDetector")
+    fun providesMaliciousSiteDatasetService(
+        @Named(value = "api") retrofit: Retrofit,
+        @InternalDatasetClient customClient: Lazy<OkHttpClient>,
+    ): MaliciousSiteDatasetService {
+        val customRetrofit = retrofit.newBuilder()
+            .callFactory { customClient.get().newCall(it) }
+            .build()
+
+        return customRetrofit.create(MaliciousSiteDatasetService::class.java)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @SuppressLint("NoRetrofitCreateMethodCallDetector")
+    fun providesMaliciousSiteService(
+        @Named(value = "api") retrofit: Retrofit,
+        @InternalClient customClient: Lazy<OkHttpClient>,
+    ): MaliciousSiteService {
+        val customRetrofit = retrofit.newBuilder()
+            .callFactory { customClient.get().newCall(it) }
+            .build()
+
+        return customRetrofit.create(MaliciousSiteService::class.java)
     }
 }

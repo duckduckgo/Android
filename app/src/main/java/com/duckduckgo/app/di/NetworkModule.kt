@@ -65,16 +65,6 @@ class NetworkModule {
         apiRequestInterceptor: ApiRequestInterceptor,
         apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>,
     ): OkHttpClient {
-        return apiWithTimeoutOkHttpClientBuilder(context, apiRequestInterceptor, apiInterceptorPlugins).build()
-    }
-
-    @Provides
-    @Named("apiWithTimeout")
-    fun apiWithTimeoutOkHttpClientBuilder(
-        context: Context,
-        apiRequestInterceptor: ApiRequestInterceptor,
-        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>,
-    ): OkHttpClient.Builder {
         val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
@@ -101,6 +91,7 @@ class NetworkModule {
                     }
                 },
             )
+            .build()
     }
 
     @Provides
@@ -139,18 +130,6 @@ class NetworkModule {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
-    }
-
-    @Provides
-    @Named("apiWithTimeout")
-    fun apiWithTimeoutRetrofitBuilder(
-        moshi: Moshi,
-    ): Retrofit.Builder {
-        return Retrofit.Builder()
-            .baseUrl(Url.API)
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
     }
 
     @Provides
