@@ -130,6 +130,7 @@ class RealPirScan @Inject constructor(
             repository.deleteAllResults()
             repository.getUserProfiles().also {
                 if (it.isNotEmpty()) {
+                    // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
                     val storedProfile = it[0]
                     profileQuery = ProfileQuery(
                         firstName = storedProfile.userName.firstName,

@@ -21,7 +21,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -62,36 +61,8 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun userProfileDao(): UserProfileDao
 
     companion object {
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                // Drop column is not supported by SQLite, so the data must be moved manually.
-                with(database) {
-                    execSQL(
-                        """ 
-                        CREATE TABLE IF NOT EXISTS pir_user_profile (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                            -- UserName fields
-                            user_firstName TEXT NOT NULL,
-                            user_lastName TEXT NOT NULL,
-                            user_middleName TEXT,
-                            user_suffix TEXT,
-                            -- Address fields
-                            address_city TEXT NOT NULL,
-                            address_state TEXT NOT NULL,
-                            address_street TEXT,
-                            address_zip TEXT,
-                            -- Other fields
-                            birthYear INTEGER NOT NULL,
-                            phone TEXT,
-                            age INTEGER NOT NULL
-                        )    
-                        """.trimIndent(),
-                    )
-                }
-            }
-        }
         val ALL_MIGRATIONS: List<Migration>
-            get() = listOf(MIGRATION_1_2)
+            get() = emptyList()
     }
 }
 
