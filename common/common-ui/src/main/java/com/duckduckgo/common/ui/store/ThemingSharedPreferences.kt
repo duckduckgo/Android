@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.isInNightMode
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
@@ -42,6 +43,7 @@ class ThemingSharedPreferences @Inject constructor(
         return themePrefMapper.themeFrom(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
+            context.isInNightMode(),
             experimentalUIThemingFeature.self().isEnabled(),
             experimentalUIThemingFeature.warmColors().isEnabled(),
         )
@@ -67,6 +69,7 @@ class ThemingSharedPreferences @Inject constructor(
         fun themeFrom(
             value: String?,
             defValue: DuckDuckGoTheme,
+            isInNightMode: Boolean,
             isExperimentEnabled: Boolean,
             warmColors: Boolean,
         ) =
@@ -91,7 +94,24 @@ class ThemingSharedPreferences @Inject constructor(
                     DuckDuckGoTheme.DARK
                 }
 
-                THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                THEME_SYSTEM_DEFAULT -> if (isExperimentEnabled) {
+                    if (isInNightMode) {
+                        if (warmColors) {
+                            DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+                        } else {
+                            DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+                        }
+                    } else {
+                        if (warmColors) {
+                            DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
+                        } else {
+                            DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+                        }
+                    }
+                } else {
+                    DuckDuckGoTheme.SYSTEM_DEFAULT
+                }
+
                 else -> defValue
             }
     }
