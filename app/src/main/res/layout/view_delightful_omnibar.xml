@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:background="?daxColorSurface">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/minibar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +50,10 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
                 android:layout_marginEnd="@dimen/keyline_1"
-                android:src="@drawable/ic_shield_exploration" />
+                android:src="@drawable/ic_shield_exploration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/trackersText"
@@ -61,22 +64,33 @@
                 android:gravity="center"
                 android:visibility="visible"
                 android:text="2"
-                tools:ignore="HardcodedText"/>
+                tools:ignore="HardcodedText"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/minibarShield"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/domainText"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/keyline_1"
-                android:layout_marginEnd="40dp"
                 android:maxLines="1"
+                android:ellipsize="end"
                 app:typography="body2"
                 android:gravity="center_horizontal"
                 android:visibility="visible"
                 android:text="domain.com"
-                tools:ignore="HardcodedText"/>
+                tools:ignore="HardcodedText"
+                android:paddingStart="@dimen/keyline_7"
+                android:paddingEnd="@dimen/keyline_7"
+                android:layout_marginStart="@dimen/keyline_7"
+                android:layout_marginEnd="@dimen/keyline_7"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
