@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
+import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -38,8 +39,11 @@ import kotlinx.coroutines.flow.stateIn
 
 interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+    suspend fun setShowInAddressBar(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
+    fun observeShowInAddressBar(): Flow<Boolean>
     fun getShowInBrowserMenu(): Boolean
+    fun getShowInAddressBar(): Boolean
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
 }
@@ -53,6 +57,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     private object Keys {
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
+        val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
     }
 
@@ -63,16 +68,35 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
+    private val duckChatShowInAddressBar: StateFlow<Boolean> = store.data
+        .map { prefs ->
+            prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] ?: true
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
+    }
+
+    override suspend fun setShowInAddressBar(showDuckChat: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = showDuckChat }
     }
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
         return duckChatShowInBrowserMenu
     }
 
+    override fun observeShowInAddressBar(): Flow<Boolean> {
+        return duckChatShowInAddressBar
+    }
+
     override fun getShowInBrowserMenu(): Boolean {
         return duckChatShowInBrowserMenu.value
+    }
+
+    override fun getShowInAddressBar(): Boolean {
+        return duckChatShowInAddressBar.value
     }
 
     override suspend fun registerOpened() {

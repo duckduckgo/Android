@@ -24,8 +24,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface DuckChatFeatureRepository {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+    suspend fun setShowInAddressBar(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
+    fun observeShowInAddressBar(): Flow<Boolean>
     fun shouldShowInBrowserMenu(): Boolean
+    fun shouldShowInAddressBar(): Boolean
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
 }
@@ -40,12 +43,24 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInBrowserMenu(showDuckChat)
     }
 
+    override suspend fun setShowInAddressBar(showDuckChat: Boolean) {
+        duckChatDataStore.setShowInAddressBar(showDuckChat)
+    }
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
         return duckChatDataStore.observeShowInBrowserMenu()
     }
 
+    override fun observeShowInAddressBar(): Flow<Boolean> {
+        return duckChatDataStore.observeShowInAddressBar()
+    }
+
     override fun shouldShowInBrowserMenu(): Boolean {
         return duckChatDataStore.getShowInBrowserMenu()
+    }
+
+    override fun shouldShowInAddressBar(): Boolean {
+        return duckChatDataStore.getShowInAddressBar()
     }
 
     override suspend fun registerOpened() {

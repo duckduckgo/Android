@@ -49,9 +49,20 @@ interface DuckChatInternal : DuckChat {
     suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
 
     /**
+     * Set user setting to determine whether DuckChat should be shown in address bar.
+     * Sets IO dispatcher.
+     */
+    suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean)
+
+    /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
      */
     fun observeShowInBrowserMenuUserSetting(): Flow<Boolean>
+
+    /**
+     * Observes whether DuckChat should be shown in address bar based on user settings only.
+     */
+    fun observeShowInAddressBarUserSetting(): Flow<Boolean>
 }
 
 data class DuckChatSettingJson(
@@ -85,19 +96,22 @@ class RealDuckChat @Inject constructor(
     /** Cached value of whether we should show DuckChat in the menu or not */
     private var showInBrowserMenu = false
 
+    /** Cached value of whether we should show DuckChat in the address bar or not */
+    private var showInAddressBar = false
+
     /** Cached DuckChat web link */
     private var duckChatLink = DUCK_CHAT_WEB_LINK
 
     init {
         if (isMainProcess) {
             cacheDuckChatLink()
-            cacheShowInBrowser()
+            cacheValues()
         }
     }
 
     override fun onPrivacyConfigDownloaded() {
         cacheDuckChatLink()
-        cacheShowInBrowser()
+        cacheValues()
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
@@ -108,7 +122,12 @@ class RealDuckChat @Inject constructor(
         }
 
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
-        cacheShowInBrowser()
+        cacheValues()
+    }
+
+    override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) {
+        duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
+        cacheValues()
     }
 
     override fun isEnabled(): Boolean {
@@ -119,8 +138,16 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.observeShowInBrowserMenu()
     }
 
+    override fun observeShowInAddressBarUserSetting(): Flow<Boolean> {
+        return duckChatFeatureRepository.observeShowInAddressBar()
+    }
+
     override fun showInBrowserMenu(): Boolean {
         return showInBrowserMenu
+    }
+
+    override fun showInAddressBar(): Boolean {
+        return showInAddressBar
     }
 
     override fun openDuckChat(query: String?) {
@@ -206,10 +233,11 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    private fun cacheShowInBrowser() {
+    private fun cacheValues() {
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
             showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
+            showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
         }
     }
 

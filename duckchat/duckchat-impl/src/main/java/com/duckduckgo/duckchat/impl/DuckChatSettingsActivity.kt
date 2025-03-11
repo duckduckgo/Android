@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
@@ -72,12 +73,15 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.showDuckChatInMenuToggle.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onShowDuckChatInMenuToggled(isChecked)
         }
+        binding.showDuckChatInAddressBarToggle.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowDuckChatInAddressBarToggled(isChecked)
+        }
     }
 
     private fun observeViewModel() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { renderViewState(it.showInBrowserMenu) }
+            .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
 
         viewModel.commands
@@ -86,8 +90,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun renderViewState(showInBrowserMenu: Boolean) {
-        binding.showDuckChatInMenuToggle.setIsChecked(showInBrowserMenu)
+    private fun renderViewState(viewState: ViewState) {
+        binding.showDuckChatInMenuToggle.setIsChecked(viewState.showInBrowserMenu)
+        binding.showDuckChatInAddressBarToggle.setIsChecked(viewState.showInAddressBar)
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {

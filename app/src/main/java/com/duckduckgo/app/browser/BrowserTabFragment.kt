@@ -895,6 +895,14 @@ class BrowserTabFragment :
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
         }
+
+        binding.includeNewBrowserTab.newTabLayout.apply {
+            setOnClickListener {
+                if (omnibar.omnibarTextInput.isFocused) {
+                    binding.focusDummy.requestFocus()
+                }
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -2512,6 +2520,10 @@ class BrowserTabFragment :
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
                 }
+
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
+                }
             },
         )
     }
@@ -3298,6 +3310,14 @@ class BrowserTabFragment :
             Timber.v("Keyboard now showing")
             showKeyboard(omnibar.omnibarTextInput)
             omnibar.showOutline(true)
+            omnibar.textInputRootView.post {
+                val rootView = omnibar.textInputRootView
+                val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
+                keyboardVisibilityUtil.addKeyboardHiddenListener {
+                    binding.focusDummy.requestFocus()
+                    omnibar.showOutline(false)
+                }
+            }
         }
     }
 
@@ -4206,6 +4226,10 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+
+    private fun onOmnibarDuckChatPressed(query: String) {
+        viewModel.openDuckChat(query)
     }
 }
 

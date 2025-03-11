@@ -35,6 +35,17 @@ class KeyboardVisibilityUtil(private val rootView: View) {
         )
     }
 
+    fun addKeyboardHiddenListener(onKeyboardHidden: () -> Unit) {
+        var wasKeyboardVisible = isKeyboardVisible()
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val isVisible = isKeyboardVisible()
+            if (wasKeyboardVisible && !isVisible) {
+                onKeyboardHidden()
+            }
+            wasKeyboardVisible = isVisible
+        }
+    }
+
     private fun isKeyboardVisible(): Boolean {
         val rect = Rect()
         rootView.getWindowVisibleDisplayFrame(rect)

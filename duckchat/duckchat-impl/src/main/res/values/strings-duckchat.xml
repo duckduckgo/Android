@@ -19,4 +19,5 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party Al chat models. Your chats are not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_chat_visibility_setting">Show Duck.ai in Browser Menu</string>
+    <string name="duck_chat_address_bar_visibility_setting">Show Duck.ai in Address Bar</string>
 </resources>
