@@ -187,7 +187,6 @@
                     android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                     android:inputType="textUri|textNoSuggestions"
                     android:maxLines="1"
-                    android:paddingStart="5dp"
                     android:selectAllOnFocus="true"
                     android:textColor="?attr/daxColorPrimaryText"
                     android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
