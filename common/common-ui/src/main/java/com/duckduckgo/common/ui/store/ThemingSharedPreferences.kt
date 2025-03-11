@@ -75,21 +75,13 @@ class ThemingSharedPreferences @Inject constructor(
         ) =
             when (value) {
                 THEME_LIGHT -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-                    }
+                    DuckDuckGoTheme.EXPERIMENT_LIGHT
                 } else {
                     DuckDuckGoTheme.LIGHT
                 }
 
                 THEME_DARK -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-                    }
+                    DuckDuckGoTheme.EXPERIMENT_DARK
                 } else {
                     DuckDuckGoTheme.DARK
                 }
@@ -97,17 +89,9 @@ class ThemingSharedPreferences @Inject constructor(
                 else ->
                     if (isExperimentEnabled) {
                         if (isInNightMode) {
-                            if (warmColors) {
-                                DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-                            } else {
-                                DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-                            }
+                            DuckDuckGoTheme.EXPERIMENT_DARK
                         } else {
-                            if (warmColors) {
-                                DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
-                            } else {
-                                DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-                            }
+                            DuckDuckGoTheme.EXPERIMENT_LIGHT
                         }
                     } else {
                         DuckDuckGoTheme.SYSTEM_DEFAULT
