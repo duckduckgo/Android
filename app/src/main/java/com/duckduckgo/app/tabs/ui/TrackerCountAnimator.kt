@@ -23,6 +23,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
+import java.text.NumberFormat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -39,6 +40,7 @@ class TrackerCountAnimator @Inject constructor() {
     @StringRes private var stringRes: Int? = null
     private var trackerTextView: TextView? = null
     private lateinit var context: Context
+    private val trackerCountNumberFormatter by lazy(LazyThreadSafetyMode.NONE) { NumberFormat.getNumberInstance() }
 
     private val animator = ValueAnimator().apply {
         interpolator = AccelerateDecelerateInterpolator()
@@ -82,7 +84,8 @@ class TrackerCountAnimator @Inject constructor() {
     }
 
     private fun getFormattedText(context: Context, @StringRes stringRes: Int, trackerCount: Int): Spanned {
-        val text = context.getString(stringRes, trackerCount)
+        val formattedTrackerCount = trackerCountNumberFormatter.format(trackerCount)
+        val text = context.getString(stringRes, formattedTrackerCount)
         return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 }
