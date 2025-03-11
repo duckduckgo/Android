@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/devSettingsTabsScreenAddTabsButtonText"
-                app:buttonSize="large" />
+                app:daxButtonSize="large" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/clearTabsButton"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/devSettingsTabsScreenClearTabsButtonText"
-                app:buttonSize="large" />
+                app:daxButtonSize="large" />
 
             <androidx.constraintlayout.helper.widget.Flow
                 android:id="@+id/flowView"
