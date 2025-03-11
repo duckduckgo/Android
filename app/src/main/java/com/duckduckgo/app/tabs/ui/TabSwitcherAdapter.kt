@@ -18,12 +18,12 @@ package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ImageView.ScaleType
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
@@ -34,6 +34,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.Transformation
+import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
@@ -50,13 +52,17 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.mobile.android.R as AndroidR
 import java.io.File
+import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+private const val GRID_ITEM_HEIGHT_DP = 170
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -205,6 +211,10 @@ class TabSwitcherAdapter(
                 loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview)
             }
 
+            bundle.getString(DIFF_KEY_URL)?.let {
+                loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon)
+            }
+
             bundle.getString(DIFF_KEY_TITLE)?.let {
                 viewHolder.title.text = it
             }
@@ -229,6 +239,7 @@ class TabSwitcherAdapter(
             bundle.getString(DIFF_KEY_URL)?.let {
                 viewHolder.url.show()
                 viewHolder.url.text = it
+                loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon)
             }
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
@@ -242,42 +253,55 @@ class TabSwitcherAdapter(
     }
 
     private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
-        if (tab.url == null) {
+        val url = tab.url
+        if (url == null) {
+            glide.clear(view)
             glide.load(AndroidR.drawable.ic_dax_icon).into(view)
         } else {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, tab.url!!, view)
+                faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
             }
         }
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, tabPreview: ImageView) {
-        if (tab.url == null) {
-            tabPreview.scaleType = ScaleType.CENTER
-            glide.load(AndroidR.drawable.ic_dax_icon_72)
-                .into(tabPreview)
-            return
-        } else {
-            tabPreview.scaleType = ScaleType.MATRIX
+        fun fitAndClipBottom() = object : Transformation<Bitmap> {
+            override fun transform(
+                context: Context,
+                resource: Resource<Bitmap>,
+                outWidth: Int,
+                outHeight: Int,
+            ): Resource<Bitmap> {
+                resource.get().height = GRID_ITEM_HEIGHT_DP.toPx()
+                return resource
+            }
+
+            override fun updateDiskCacheKey(messageDigest: MessageDigest) {
+            }
         }
 
-        val previewFile = tab.tabPreviewFile ?: return glide.clear(tabPreview)
-
-        lifecycleOwner.lifecycleScope.launch {
-            val cachedWebViewPreview = withContext(dispatchers.io()) {
-                File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
-            }
-
-            if (cachedWebViewPreview == null) {
-                glide.clear(tabPreview)
-                return@launch
-            }
-
-            glide.load(cachedWebViewPreview)
-                .transition(DrawableTransitionOptions.withCrossFade())
+        val previewFile = tab.tabPreviewFile
+        if (tab.url == null) {
+            glide.load(AndroidR.drawable.ic_dax_icon_72)
                 .into(tabPreview)
+        } else if (previewFile != null) {
+            lifecycleOwner.lifecycleScope.launch {
+                val cachedWebViewPreview = withContext(dispatchers.io()) {
+                    File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+                }
 
-            tabPreview.show()
+                if (cachedWebViewPreview == null) {
+                    glide.clear(tabPreview)
+                    return@launch
+                }
+
+                glide.load(cachedWebViewPreview)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .optionalTransform(fitAndClipBottom())
+                    .into(tabPreview)
+            }
+        } else {
+            glide.clear(tabPreview)
         }
     }
 
