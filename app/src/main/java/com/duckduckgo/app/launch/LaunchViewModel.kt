@@ -67,12 +67,12 @@ class LaunchViewModel @Inject constructor(
         }
     }
 
-    fun launchSplashScreenFailToExitJob() {
+    fun launchSplashScreenFailToExitJob(launcherPackageName: String?) {
         splashScreenFailToExitJob = viewModelScope.launch {
             delay(1.5.seconds)
             sendWelcomeScreenPixel()
             determineViewToShow()
-            pixel.fire(SPLASHSCREEN_FAILED_TO_LAUNCH)
+            sendSplashScreenFailedToLaunchPixel(launcherPackageName)
         }
     }
 
@@ -89,5 +89,15 @@ class LaunchViewModel @Inject constructor(
         }
 
         Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
+    }
+
+    // Temporary to track splashscreen errors
+    private fun sendSplashScreenFailedToLaunchPixel(launcherPackageName: String?) {
+        val resolvedLauncherPackageName = launcherPackageName ?: "unknown"
+        val params = mapOf(
+            "launcherPackageName" to resolvedLauncherPackageName,
+            "api" to android.os.Build.VERSION.SDK_INT.toString(),
+        )
+        pixel.fire(pixel = SPLASHSCREEN_FAILED_TO_LAUNCH, parameters = params)
     }
 }

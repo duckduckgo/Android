@@ -39,6 +39,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -92,6 +94,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var statisticsDataStore: StatisticsDataStore
 
+    @Mock
+    private lateinit var duckChatMock: DuckChat
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -132,6 +137,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testDispatcherProvider,
             mockPixel,
             swipingTabsFeatureProvider,
+            duckChatMock,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -392,5 +398,27 @@ class TabSwitcherViewModelTest {
         testee.onLayoutTypeToggled()
 
         verify(mockTabRepository).setTabLayoutType(GRID)
+    }
+
+    @Test
+    fun `when Duck Chat menu item clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "0"))
+        verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Duck Chat menu item clicked and it was used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
+        verify(duckChatMock).openDuckChat()
     }
 }

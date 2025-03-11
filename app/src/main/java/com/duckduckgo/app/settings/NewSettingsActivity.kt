@@ -95,7 +95,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
-private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
+private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app/devices"
 
 @InjectWith(ActivityScope::class)
 class NewSettingsActivity : DuckDuckGoActivity() {

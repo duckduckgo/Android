@@ -31,7 +31,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
@@ -39,7 +38,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
@@ -106,6 +104,7 @@ class NewSettingsViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val settingsPixelDispatcher: SettingsPixelDispatcher,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -281,7 +280,7 @@ class NewSettingsViewModel @Inject constructor(
             }
             this@NewSettingsViewModel.command.send(command)
         }
-        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
+        settingsPixelDispatcher.fireEmailPressed()
     }
 
     fun onAppTPSettingClicked() {
@@ -301,7 +300,7 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(LaunchSyncSettings) }
-        pixel.fire(SETTINGS_SYNC_PRESSED)
+        settingsPixelDispatcher.fireSyncPressed()
     }
 
     fun onFireButtonSettingClicked() {
@@ -316,6 +315,7 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onDuckChatSettingClicked() {
         viewModelScope.launch { command.send(LaunchDuckChatScreen) }
+        settingsPixelDispatcher.fireDuckChatPressed()
     }
 
     fun onAppearanceSettingClicked() {
