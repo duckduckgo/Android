@@ -41,6 +41,7 @@ interface InternalFeaturePlugin {
         const val APPTP_SETTINGS_PRIO_KEY = 300
         const val VPN_SETTINGS_PRIO_KEY = 400
         const val SUBS_SETTINGS_PRIO_KEY = 500
+        const val PIR_SETTINGS_PRIO_KEY = 550
         const val AUTOFILL_SETTINGS_PRIO_KEY = 600
         const val RMF_SETTINGS_PRIO_KEY = 650
         const val AUDIT_SETTINGS_PRIO_KEY = 700
