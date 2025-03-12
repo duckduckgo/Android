@@ -19,10 +19,13 @@ package com.duckduckgo.app.tabs.ui
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.mobile.android.R as CommonR
@@ -34,6 +37,7 @@ fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
     fab: ExtendedFloatingActionButton,
+    toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ): MenuItem {
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
@@ -83,6 +87,11 @@ fun Menu.createDynamicInterface(
                 hide()
             }
         }
+    }
+
+    toolbar.navigationIcon = when (dynamicMenu.backButtonType) {
+        ARROW -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_arrow_left_24)
+        CLOSE -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_close_24)
     }
 
     return layoutButton
