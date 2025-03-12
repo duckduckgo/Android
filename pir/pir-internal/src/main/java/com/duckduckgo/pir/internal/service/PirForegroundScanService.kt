@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.scan
+package com.duckduckgo.pir.internal.service
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -28,23 +28,32 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
-import com.duckduckgo.pir.internal.settings.PirDevSettings
-import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_CHANNEL_ID
-import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_ID_STATUS_COMPLETE
+import com.duckduckgo.pir.internal.scan.PirScan
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
+import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
+import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
 import logcat.logcat
 
 @InjectWith(scope = ServiceScope::class)
-class PirForegroundScanService : Service() {
+class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var pirScan: PirScan
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     override fun onCreate() {
         super.onCreate()
@@ -67,67 +76,23 @@ class PirForegroundScanService : Service() {
             createNotification(getString(R.string.pirNotificationMessageInProgress))
         startForeground(1, notification)
 
-        val supportedBrokers = listOf(
-            "AdvancedBackgroundChecks",
-            "backgroundcheck.run",
-            "Centeda",
-            "Clubset",
-            "ClustrMaps",
-            "Councilon",
-            "CurAdvisor",
-            "Cyber Background Checks",
-            "Dataveria",
-            "FastBackgroundCheck.com",
-            "FastPeopleSearch",
-            "FreePeopleDirectory",
-            "Inforver",
-            "Kwold",
-            "mylife",
-            "Neighbor Report",
-            "New England Facts",
-            "OfficialUSA",
-            "People Background Check",
-            "People-Wizard.com",
-            "PeopleFinders",
-            "People Search Now",
-            "PeoplesWhizr",
-            "PeoplesWiz",
-            "PeoplesWizard",
-            "PeopleWhiz.com",
-            "PeopleWhiz.net",
-            "PeopleWhized.com",
-            "PeopleWhized.net",
-            "PeopleWhizr.com",
-            "PeopleWhizr.net",
-            "PeopleWiz",
-            "PeopleWizard.net",
-            "PeopleWizr",
-            "Pub360",
-            "PublicReports",
-            "Quick People Trace",
-            "Search People FREE",
-            "SmartBackgroundChecks",
-            "Spokeo",
-            "TruePeopleSearch",
-            "Verecor",
-            "USA People Search",
-            "USA Trace",
-            "USPhoneBook",
-            "Vericora",
-            "Veriforia",
-            "Veripages",
-            "Virtory",
-            "Wellnut",
-        )
-        pirScan.execute(supportedBrokers, this) {
-            notificationManagerCompat.checkPermissionAndNotify(
-                applicationContext,
-                NOTIF_ID_STATUS_COMPLETE,
-                createNotification(getString(R.string.pirNotificationMessageComplete)),
-            )
-            stopSelf()
+        synchronized(this) {
+            launch(serviceDispatcher) {
+                async {
+                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService)
+                    if (result.isSuccess) {
+                        notificationManagerCompat.checkPermissionAndNotify(
+                            applicationContext,
+                            NOTIF_ID_STATUS_COMPLETE,
+                            createNotification(getString(R.string.pirNotificationMessageComplete)),
+                        )
+                    }
+                    stopSelf()
+                }.await()
+            }
         }
 
+        logcat { "PIR-SCAN: START_NOT_STICKY" }
         return START_NOT_STICKY
     }
 
@@ -139,7 +104,7 @@ class PirForegroundScanService : Service() {
     private fun createNotification(message: String): Notification {
         val notificationIntent = Intent(
             this,
-            PirDevSettings::class.java,
+            PirDevSettingsActivity::class.java,
         )
         val pendingIntent = PendingIntent.getActivity(
             this,

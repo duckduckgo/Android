@@ -50,4 +50,8 @@ dependencies {
     implementation Square.moshi
     ksp AndroidX.room.compiler
 
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
+
 }

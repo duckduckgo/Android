@@ -18,7 +18,7 @@ package com.duckduckgo.pir.internal.scripts
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.BufferedReader
 import java.util.Locale
@@ -32,7 +32,7 @@ interface PirCssScriptLoader {
     suspend fun getScript(): String
 }
 
-@ContributesBinding(ServiceScope::class)
+@ContributesBinding(AppScope::class)
 class RealPirCssScriptLoader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,

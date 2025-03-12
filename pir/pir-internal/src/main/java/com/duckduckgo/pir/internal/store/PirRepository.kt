@@ -37,6 +37,8 @@ import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.UserProfile
+import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -85,6 +87,12 @@ interface PirRepository {
 
     suspend fun deleteAllResults()
 
+    suspend fun getUserProfiles(): List<UserProfile>
+
+    suspend fun deleteAllUserProfiles()
+
+    suspend fun replaceUserProfile(userProfile: UserProfile)
+
     data class BrokerJson(
         val fileName: String,
         val etag: String,
@@ -120,13 +128,14 @@ interface PirRepository {
 }
 
 class RealPirRepository(
+    val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val pirDataStore: PirDataStore,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val brokerJsonDao: BrokerJsonDao,
     private val brokerDao: BrokerDao,
     private val scanResultsDao: ScanResultsDao,
-    private val currentTimeProvider: CurrentTimeProvider,
-    private val moshi: Moshi,
+    private val userProfileDao: UserProfileDao,
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
@@ -309,6 +318,23 @@ class RealPirRepository(
             scanResultsDao.deleteAllNavigateResults()
             scanResultsDao.deleteAllScanErrorResults()
             scanResultsDao.deleteAllExtractProfileResult()
+        }
+    }
+
+    override suspend fun getUserProfiles(): List<UserProfile> = withContext(dispatcherProvider.io()) {
+        userProfileDao.getUserProfiles()
+    }
+
+    override suspend fun deleteAllUserProfiles() {
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.deleteAllProfiles()
+        }
+    }
+
+    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.deleteAllProfiles()
+            userProfileDao.insertUserProfile(userProfile)
         }
     }
 }

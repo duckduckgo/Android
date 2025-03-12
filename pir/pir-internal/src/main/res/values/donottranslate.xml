@@ -17,13 +17,20 @@
 <resources>
     <string name="pirDevSettings">Pir Dev Settings</string>
     <string name="pirDevRunSimpleScan">Run simple scan</string>
-    <string name="pirDevForceKill">Force Kill</string>
-    <string name="pirDevSimpleScanHeader">Simple Scan Results:</string>
+    <string name="pirDevForceKill">Clear ALL services</string>
+    <string name="pirDevViewResults">View Full Results</string>
+    <string name="pirDevSchedule">Schedule Scan</string>
+    <string name="pirDevSimpleScanHeader">Simple Scan Results</string>
     <string name="pirDevHeader">Test Actions</string>
-    <string name="pirStatsTotalHeader">Total to process: </string>
-    <string name="pirStatsStatusHeader">Completion status: </string>
-    <string name="pirStatsStatus" instruction="Placeholder are both integers"><b>Found:</b> %1$d    <b>Error:</b> %2$d </string>
+    <string name="pirDevProfileQueryHeader">Scan (if empty uses default)</string>
+    <string name="pirStatsStatusHeader">Completion summary: </string>
+    <string name="pirStatsStatusScanned" instruction="Placeholder is an integer">Sites Scanned: %1$d</string>
+    <string name="pirStatsStatusRecords" instruction="Placeholder is an integer">Total extracted profiles: %1$d</string>
+    <string name="pirStatsStatusBrokerFound" instruction="Placeholder is an integer">Brokers with records: %1$d</string>
+    <string name="pirStatsStatusAllClear" instruction="Placeholder is an integer">Brokers with NO records: %1$d</string>
+    <string name="pirStatsStatusError" instruction="Placeholder is an integer">Errors: %1$d</string>
     <string name="pirNotificationTitle">Pir Manual Scan</string>
-    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress...</string>
+    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress…</string>
     <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
+    <string name="pirMessageSchedule">Successfully schedule background scan!</string>
 </resources>
