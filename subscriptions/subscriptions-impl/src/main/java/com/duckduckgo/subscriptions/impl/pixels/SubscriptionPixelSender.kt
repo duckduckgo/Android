@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_R
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_INVALID_TOKEN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_IO
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_OTHER
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
@@ -111,6 +112,7 @@ interface SubscriptionPixelSender {
     fun reportAuthV2InvalidRefreshTokenRecovered()
     fun reportAuthV2MigrationSuccess()
     fun reportAuthV2MigrationFailureIo()
+    fun reportAuthV2MigrationFailureInvalidToken()
     fun reportAuthV2MigrationFailureOther()
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
@@ -255,6 +257,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2MigrationFailureIo() {
         fire(AUTH_V2_MIGRATION_FAILURE_IO)
+    }
+
+    override fun reportAuthV2MigrationFailureInvalidToken() {
+        fire(AUTH_V2_MIGRATION_FAILURE_INVALID_TOKEN)
     }
 
     override fun reportAuthV2MigrationFailureOther() {

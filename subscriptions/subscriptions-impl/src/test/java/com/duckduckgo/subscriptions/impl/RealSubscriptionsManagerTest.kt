@@ -841,6 +841,24 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetAccessTokenIfSignedInWithV1AndMigrationToV2FailsOnUnknownAccountErrorThenSignsOut() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn(useAuthV2 = false)
+        givenV1AccessTokenExchangeFailsWithInvalidTokenError()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertFalse(subscriptionsManager.isSignedIn())
+        assertNull(authRepository.getAccessTokenV2())
+        assertNull(authRepository.getRefreshTokenV2())
+        assertNull(authRepository.getAccount())
+        assertNull(authRepository.getSubscription())
+        verify(pixelSender).reportAuthV2MigrationFailureInvalidToken()
+    }
+
+    @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenSucceedsWithEntitlements()
@@ -1559,6 +1577,13 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(authClient.getTokens(any(), any(), any())).thenReturn(TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2))
         whenever(authClient.getJwks()).thenReturn("fake jwks")
         givenValidateV2TokensSucceeds()
+    }
+
+    private suspend fun givenV1AccessTokenExchangeFailsWithInvalidTokenError() {
+        whenever(authClient.getJwks()).thenReturn("fake jwks")
+        whenever(authClient.authorize(any())).thenReturn("fake session id")
+        val errorResponseBody = """{"error":"invalid_token"}""".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(authClient.exchangeV1AccessToken(any(), any())).thenThrow(HttpException(Response.error<String>(400, errorResponseBody)))
     }
 
     private suspend fun givenAccessTokenSucceeds() {
