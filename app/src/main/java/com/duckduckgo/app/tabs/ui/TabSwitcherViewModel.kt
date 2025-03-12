@@ -35,6 +35,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
@@ -88,9 +91,9 @@ class TabSwitcherViewModel @Inject constructor(
         viewState.copy(
             items = tabs.map {
                 if (viewState.mode is Selection) {
-                    TabSwitcherItem.SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
+                    SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
                 } else {
-                    TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+                    NormalTab(it, isActive = it.tabId == activeTab?.tabId)
                 }
             },
         )
@@ -102,7 +105,7 @@ class TabSwitcherViewModel @Inject constructor(
         .map { tabEntities ->
             val activeTabId = activeTab.value?.tabId
             tabEntities.map {
-                TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTabId)
+                NormalTab(it, isActive = it.tabId == activeTabId)
             }
         }.asLiveData()
 
@@ -117,7 +120,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
         if (swipingTabsFeature.isEnabled) {
-            val tabItemList = tabSwitcherItems.value?.filterIsInstance<TabSwitcherItem.Tab>()
+            val tabItemList = tabSwitcherItems.value?.filterIsInstance<Tab>()
             val emptyTabItem = tabItemList?.firstOrNull { tabItem -> tabItem.tabEntity.url.isNullOrBlank() }
             val emptyTabId = emptyTabItem?.tabEntity?.tabId
 
@@ -228,7 +231,7 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
-                    is TabSwitcherItem.Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
+                    is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
@@ -337,7 +340,7 @@ class TabSwitcherViewModel @Inject constructor(
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
                 is Normal -> {
-                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? TabSwitcherItem.Tab)?.tabEntity?.url != null
+                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? Tab)?.tabEntity?.url != null
                     DynamicInterface(
                         isLayoutTypeButtonVisible = true,
                         isFireButtonVisible = true,
