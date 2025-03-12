@@ -246,24 +246,22 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onUpButtonPressed(): Boolean {
+    fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
 
-        return cancelSelectionOrExit()
-    }
-
-    fun onBackButtonPressed(): Boolean {
-        pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
-
-        return cancelSelectionOrExit()
-    }
-
-    private fun cancelSelectionOrExit(): Boolean {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             _selectionViewState.update { it.copy(mode = Normal) }
-            return false
         }
-        return true
+        command.value = Command.Close
+    }
+
+    fun onBackButtonPressed() {
+        pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+            _selectionViewState.update { it.copy(mode = Normal) }
+        }
+        command.value = Command.Close
     }
 
     fun onMenuOpened() {
