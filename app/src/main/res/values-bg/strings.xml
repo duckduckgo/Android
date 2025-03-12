@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е активирана за %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е деактивирана за %1$s</string>
     <string name="undoSnackbarAction">Отмяна</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Блокиран тракер</item>
+        <item quantity="other">Блокирани тракери</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Изтегляне на изображение</string>
