@@ -483,9 +483,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
             android.R.id.home -> {
-                if (viewModel.onUpButtonPressed()) {
-                    finish()
-                }
+                viewModel.onUpButtonPressed()
                 return true
             }
         }
@@ -674,9 +672,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (viewModel.onBackButtonPressed()) {
-                        finish()
-                    }
+                    viewModel.onBackButtonPressed()
                 }
             },
         )
