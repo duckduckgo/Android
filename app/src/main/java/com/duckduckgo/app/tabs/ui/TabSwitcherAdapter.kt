@@ -92,6 +92,7 @@ class TabSwitcherAdapter(
 
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
+    private var layoutType: LayoutType = GRID
     private var layoutType: LayoutType = LayoutType.GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -138,10 +139,10 @@ class TabSwitcherAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (holder) {
             is TabSwitcherViewHolder.GridTabViewHolder -> {
-                bindGridTab(holder, list[position])
+                bindGridTab(holder, list[position] as Tab)
             }
             is TabSwitcherViewHolder.ListTabViewHolder -> {
-                bindListTab(holder, list[position])
+                bindListTab(holder, list[position] as Tab)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
@@ -173,43 +174,35 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tabItem: TabSwitcherItem) {
+    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tabItem: Tab) {
         val context = holder.binding.root.context
         val glide = Glide.with(context)
-        when (tabItem) {
-            is Tab -> {
-                holder.title.text = extractTabTitle(tabItem.tabEntity, context)
-                holder.url.text = tabItem.tabEntity.url ?: ""
-                holder.url.visibility = if (tabItem.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
-                updateUnreadIndicator(holder, tabItem.tabEntity)
-                loadFavicon(tabItem.tabEntity, glide, holder.favicon)
-                loadSelectionState(holder, tabItem)
-                attachTabClickListeners(
-                    tabViewHolder = holder,
-                    bindingAdapterPosition = { holder.bindingAdapterPosition },
-                    tab = tabItem.tabEntity,
-                )
-            }
-        }
+        holder.title.text = extractTabTitle(tabItem.tabEntity, context)
+        holder.url.text = tabItem.tabEntity.url ?: ""
+        holder.url.visibility = if (tabItem.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
+        updateUnreadIndicator(holder, tabItem.tabEntity)
+        loadFavicon(tabItem.tabEntity, glide, holder.favicon)
+        loadSelectionState(holder, tabItem)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tab = tabItem.tabEntity,
+        )
     }
 
-    private fun bindGridTab(holder: TabSwitcherViewHolder.GridTabViewHolder, tabItem: TabSwitcherItem) {
+    private fun bindGridTab(holder: TabSwitcherViewHolder.GridTabViewHolder, tab: Tab) {
         val context = holder.binding.root.context
         val glide = Glide.with(context)
-        when (tabItem) {
-            is Tab -> {
-                holder.title.text = extractTabTitle(tabItem.tabEntity, context)
-                updateUnreadIndicator(holder, tabItem.tabEntity)
-                loadFavicon(tabItem.tabEntity, glide, holder.favicon)
-                loadTabPreviewImage(tabItem.tabEntity, glide, holder.tabPreview)
-                loadSelectionState(holder, tabItem)
-                attachTabClickListeners(
-                    tabViewHolder = holder,
-                    bindingAdapterPosition = { holder.bindingAdapterPosition },
-                    tab = tabItem.tabEntity,
-                )
-            }
-        }
+        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        updateUnreadIndicator(holder, tab.tabEntity)
+        loadFavicon(tab.tabEntity, glide, holder.favicon)
+        loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview)
+        loadSelectionState(holder, tab)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tab = tab.tabEntity,
+        )
     }
 
     private fun loadSelectionState(holder: TabViewHolder, tab: Tab) {
