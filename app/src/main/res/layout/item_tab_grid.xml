@@ -63,7 +63,7 @@
 
         <ImageView
             android:id="@+id/selectionIndicator"
-            android:contentDescription="@string/selectionStateIndicator"
+            android:contentDescription="@string/tabNotSelectedIndicator"
             android:padding="@dimen/keyline_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
