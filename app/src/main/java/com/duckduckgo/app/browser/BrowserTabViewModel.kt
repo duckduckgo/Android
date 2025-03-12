@@ -1926,7 +1926,6 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-
             Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
@@ -3259,10 +3258,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateTabTitle(
-        tabId: String,
-        newTitle: String,
-    ) {
+    suspend fun updateTabTitle(tabId: String, newTitle: String) {
         getSite()?.let { site ->
             site.title = newTitle
             tabRepository.update(tabId, site)
@@ -3915,11 +3911,6 @@ class BrowserTabViewModel @Inject constructor(
         site?.resetTrackingEvents()
     }
 
-    fun isSiteProtected(): Boolean {
-        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
-        return shield == PrivacyShield.PROTECTED
-    }
-
     companion object {
         private const val FIXED_PROGRESS = 50
 
@@ -3936,7 +3927,7 @@ class BrowserTabViewModel @Inject constructor(
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
-        private const val TRACKER_LOGO_ANIMATION_THRESHOLD = 2
+        internal const val TRACKER_LOGO_ANIMATION_THRESHOLD = 2
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(

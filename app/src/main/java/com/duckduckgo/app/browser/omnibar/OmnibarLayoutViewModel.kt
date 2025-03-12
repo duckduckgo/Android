@@ -346,6 +346,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
         Timber.d("Omnibar: onPrivacyShieldChanged $privacyShield")
+        _viewState.update {
+            it.copy(
+                privacyShield = privacyShield,
+            )
+        }
     }
 
     fun onOutlineEnabled(enabled: Boolean) {
