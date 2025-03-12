@@ -256,8 +256,9 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             _selectionViewState.update { it.copy(mode = Normal) }
+        } else {
+            command.value = Command.Close
         }
-        command.value = Command.Close
     }
 
     fun onBackButtonPressed() {
@@ -265,8 +266,9 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             _selectionViewState.update { it.copy(mode = Normal) }
+        } else {
+            command.value = Command.Close
         }
-        command.value = Command.Close
     }
 
     fun onMenuOpened() {
@@ -360,7 +362,7 @@ class TabSwitcherViewModel @Inject constructor(
                         isMoreMenuItemEnabled = isThereNotJustNewTabPage,
                         isFabVisible = isThereNotJustNewTabPage,
                         fabType = FabType.NEW_TAB,
-                        backButtonType = ARROW
+                        backButtonType = ARROW,
                     )
                 }
                 is Selection -> {
@@ -383,7 +385,7 @@ class TabSwitcherViewModel @Inject constructor(
                         isMoreMenuItemEnabled = true,
                         isFabVisible = areNoTabsSelected,
                         fabType = FabType.CLOSE_TABS,
-                        backButtonType = CLOSE
+                        backButtonType = CLOSE,
                     )
                 }
             }
