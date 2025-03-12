@@ -43,12 +43,14 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -71,7 +73,8 @@ class DuckPlayerJSHelper @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-) {
+    private val pagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin>,
+    ) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
 
@@ -113,7 +116,6 @@ class DuckPlayerJSHelper @Inject constructor(
     private fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
         val privatePlayerMode = if (duckPlayer.getDuckPlayerState() == ENABLED) userValues.privatePlayerMode else PrivatePlayerMode.Disabled
-
         val jsonObject = JSONObject(
             """
                 {
@@ -143,7 +145,9 @@ class DuckPlayerJSHelper @Inject constructor(
                 jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
 
                 // Custom Error Settings
-                jsonObject.getJSONObject("settings").put("customError", getCustomErrorSettings())
+                pagesSettingPlugin.getPlugins().forEach {
+                    jsonObject.getJSONObject("settings").put(it.getName(), JSONObject(it.getSettings()))
+                }
             }
             DUCK_PLAYER_FEATURE_NAME -> {
                 jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
@@ -157,17 +161,6 @@ class DuckPlayerJSHelper @Inject constructor(
             method,
             id,
         )
-    }
-
-    private fun getCustomErrorSettings(): JSONObject {
-        val customErrorObject = JSONObject()
-        customErrorObject.put("state", if (duckPlayer.shouldShowCustomError()) "enabled" else "disabled")
-
-        duckPlayer.customErrorSettings()?.let { settings ->
-            customErrorObject.put("signInRequiredSelector", settings.signInRequiredSelector.takeIf { it.isNotEmpty() } ?: "")
-        }
-
-        return customErrorObject
     }
 
     private suspend fun setUserPreferences(data: JSONObject) {

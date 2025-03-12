@@ -482,24 +482,6 @@ class RealDuckPlayer @Inject constructor(
         return if (duckPlayerFeatureRepository.shouldOpenInNewTab()) On else Off
     }
 
-    override fun shouldShowCustomError(): Boolean {
-        return duckPlayerFeature.customError().isEnabled()
-    }
-
-    override fun customErrorSettings(): CustomErrorSettings? {
-        val settings = duckPlayerFeature.customError().getSettings()
-        return if (settings != null) {
-            try {
-                val adapter = moshi.adapter(CustomErrorSettings::class.java)
-                adapter.fromJson(settings)
-            } catch (e: Exception) {
-                null
-            }
-        } else {
-            null
-        }
-    }
-
     override fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab> {
         return duckPlayerFeatureRepository.observeOpenInNewTab().map {
             (if (!duckPlayerFeature.openInNewTab().isEnabled()) Unavailable else if (it) On else Off)
