@@ -22,12 +22,12 @@ sealed class TabSwitcherItem(val id: String) {
     sealed class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId) {
         data class NormalTab(
             private val entity: TabEntity,
-            val isActive: Boolean
+            val isActive: Boolean,
         ) : Tab(entity)
 
         data class SelectableTab(
             private val entity: TabEntity,
-            val isSelected: Boolean
+            val isSelected: Boolean,
         ) : Tab(entity)
     }
     data class TrackerAnimationInfoPanel(val trackerCount: Int) : TabSwitcherItem("TrackerAnimationInfoPanel") {
