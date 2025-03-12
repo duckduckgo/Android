@@ -589,8 +589,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
-            R.id.shareLinkMenuItem -> viewModel.onShareSelectedTabs()
-            R.id.bookmarkMenuItem -> viewModel.onBookmarkSelectedTabs()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true
