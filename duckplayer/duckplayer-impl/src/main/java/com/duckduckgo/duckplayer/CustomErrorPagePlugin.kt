@@ -20,13 +20,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.impl.DuckPlayerFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
 class CustomErrorPagePlugin @Inject constructor(
     private val duckPlayerFeature: DuckPlayerFeature,
-): DuckPlayerPageSettingsPlugin {
+) : DuckPlayerPageSettingsPlugin {
     override fun getSettings(): String {
         val customErrorObject = JSONObject()
         customErrorObject.put("state", if (duckPlayerFeature.customError().isEnabled()) "enabled" else "disabled")
@@ -34,9 +34,8 @@ class CustomErrorPagePlugin @Inject constructor(
             customErrorObject.put("settings", JSONObject(settings))
         }
 
-        return customErrorObject.toString();
+        return customErrorObject.toString()
     }
 
     override fun getName(): String = "customError"
 }
-
