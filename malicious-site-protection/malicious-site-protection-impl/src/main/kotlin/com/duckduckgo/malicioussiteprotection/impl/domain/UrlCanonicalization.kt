@@ -17,6 +17,7 @@
 package com.duckduckgo.malicioussiteprotection.impl.domain
 
 import android.net.Uri
+import android.util.Patterns.IP_ADDRESS
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
@@ -31,9 +32,6 @@ interface UrlCanonicalization {
 class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
 
     private val multipleDotsRegex = Regex("\\.{2,}")
-    private val ipv4Regex = Regex(
-        "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",
-    )
     private val multipleSlashesRegex = Regex("/+")
 
     private fun String.canonicalizeDomain(): String {
@@ -53,7 +51,7 @@ class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
         return runCatching {
             Uri.Builder()
                 .scheme(uri.scheme?.clean())
-                .encodedAuthority(uri.authority?.clean()?.canonicalizeDomain())
+                .encodedAuthority(uri.host?.clean()?.canonicalizeDomain())
                 .encodedPath(uri.path?.clean().canonicalizePath())
                 .encodedQuery(uri.query?.clean())
                 .build()
@@ -96,7 +94,13 @@ class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
     }
 
     private fun String.normalizeIpAddress(): String {
-        if (!ipv4Regex.matches(this)) return this
+        // If not an IP address, return host as is
+
+        /* TODO (cbarreiro) IP_ADDRESS is deprecated and InetAddresses.isNumericAddress should be used above API 29 instead,
+         *  but it's broken in Robolectric
+         */
+        if (!IP_ADDRESS.matcher(this).matches()) return this
+
         return runCatching {
             (InetAddress.getByName(this) as Inet4Address).hostAddress
         }.getOrDefault(this)
