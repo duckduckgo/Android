@@ -434,9 +434,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
             val isTrackerAnimationTileVisible = viewModel.tabSwitcherItems.value?.get(0) is TabSwitcherItem.TrackerAnimationTile
             val canSwapFromIndex = if (isTrackerAnimationTileVisible) 1 else 0
-            val tabItemCount = viewModel.tabSwitcherItems.value?.count { it is TabSwitcherItem.Tab } ?: 0
+            val tabSwitcherItemCount = viewModel.tabSwitcherItems.value?.count() ?: 0
 
-            val canSwap = from in canSwapFromIndex..<tabItemCount && to in canSwapFromIndex..<tabItemCount
+            val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
             if (canSwap) {
                 tabsAdapter.onTabMoved(from, to)
                 // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
