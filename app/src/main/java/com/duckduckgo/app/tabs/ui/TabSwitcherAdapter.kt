@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -73,7 +74,7 @@ class TabSwitcherAdapter(
 
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
-    private var layoutType: LayoutType = LayoutType.GRID
+    private var layoutType: LayoutType = GRID
 
     init {
         setHasStableIds(true)
@@ -113,10 +114,10 @@ class TabSwitcherAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (holder) {
             is TabSwitcherViewHolder.GridTabViewHolder -> {
-                bindGridTab(holder, list[position])
+                bindGridTab(holder, list[position] as Tab)
             }
             is TabSwitcherViewHolder.ListTabViewHolder -> {
-                bindListTab(holder, list[position])
+                bindListTab(holder, list[position] as Tab)
             }
         }
     }
@@ -134,42 +135,34 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tabItem: TabSwitcherItem) {
+    private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tabItem: Tab) {
         val context = holder.binding.root.context
-        when (tabItem) {
-            is Tab -> {
-                holder.title.text = extractTabTitle(tabItem.tabEntity, context)
-                holder.url.text = tabItem.tabEntity.url ?: ""
-                holder.url.visibility = if (tabItem.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
-                updateUnreadIndicator(holder, tabItem.tabEntity)
-                loadFavicon(tabItem.tabEntity, holder.favicon)
-                loadSelectionState(holder, tabItem)
-                attachTabClickListeners(
-                    tabViewHolder = holder,
-                    bindingAdapterPosition = { holder.bindingAdapterPosition },
-                    tab = tabItem.tabEntity,
-                )
-            }
-        }
+        holder.title.text = extractTabTitle(tabItem.tabEntity, context)
+        holder.url.text = tabItem.tabEntity.url ?: ""
+        holder.url.visibility = if (tabItem.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
+        updateUnreadIndicator(holder, tabItem.tabEntity)
+        loadFavicon(tabItem.tabEntity, holder.favicon)
+        loadSelectionState(holder, tabItem)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tab = tabItem.tabEntity,
+        )
     }
 
-    private fun bindGridTab(holder: TabSwitcherViewHolder.GridTabViewHolder, tabItem: TabSwitcherItem) {
-        when (tabItem) {
-            is Tab -> {
-                val context = holder.binding.root.context
-                val glide = Glide.with(context)
-                holder.title.text = extractTabTitle(tabItem.tabEntity, context)
-                updateUnreadIndicator(holder, tabItem.tabEntity)
-                loadFavicon(tabItem.tabEntity, holder.favicon)
-                loadTabPreviewImage(tabItem.tabEntity, glide, holder)
-                loadSelectionState(holder, tabItem)
-                attachTabClickListeners(
-                    tabViewHolder = holder,
-                    bindingAdapterPosition = { holder.bindingAdapterPosition },
-                    tab = tabItem.tabEntity,
-                )
-            }
-        }
+    private fun bindGridTab(holder: TabSwitcherViewHolder.GridTabViewHolder, tab: Tab) {
+        val context = holder.binding.root.context
+        val glide = Glide.with(context)
+        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        updateUnreadIndicator(holder, tab.tabEntity)
+        loadFavicon(tab.tabEntity, holder.favicon)
+        loadTabPreviewImage(tab.tabEntity, glide, holder)
+        loadSelectionState(holder, tab)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tab = tab.tabEntity,
+        )
     }
 
     private fun loadSelectionState(holder: TabViewHolder, tab: Tab) {
