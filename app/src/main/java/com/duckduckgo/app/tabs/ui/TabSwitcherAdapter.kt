@@ -55,8 +55,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
