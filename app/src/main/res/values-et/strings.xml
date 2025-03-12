@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks lubatud</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks keelatud</string>
     <string name="undoSnackbarAction">Võta tagasi</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jälgija blokeeritud</item>
+        <item quantity="other">Jälgijat blokeeritud</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Laadi pilt alla</string>
