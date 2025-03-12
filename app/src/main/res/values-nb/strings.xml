@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Personvern aktivert for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Personvern deaktivert for %1$s</string>
     <string name="undoSnackbarAction">Angre</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Blokkert sporer</item>
+        <item quantity="other">Blokkerte sporere</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Last ned bilde</string>
