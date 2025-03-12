@@ -63,6 +63,12 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Iespējota %1$s privātuma aizsardzība</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Atspējota %1$s privātuma aizsardzība</string>
     <string name="undoSnackbarAction">Atsaukt</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Bloķētie izsekotāji</item>
+        <item quantity="one">Bloķētais izsekotājs</item>
+        <item quantity="other">Bloķētie izsekotāji</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lejupielādēt attēlu</string>
