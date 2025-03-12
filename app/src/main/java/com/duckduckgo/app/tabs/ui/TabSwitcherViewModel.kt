@@ -38,6 +38,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
@@ -323,7 +325,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     data class SelectionViewState(
         val items: List<TabSwitcherItem> = emptyList(),
-        val mode: Mode = Mode.Normal,
+        val mode: Mode = Normal,
     ) {
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
@@ -346,9 +348,10 @@ class TabSwitcherViewModel @Inject constructor(
                         isMoreMenuItemEnabled = isThereNotJustNewTabPage,
                         isFabVisible = isThereNotJustNewTabPage,
                         fabType = FabType.NEW_TAB,
+                        backButtonType = ARROW
                     )
                 }
-                is Mode.Selection -> {
+                is Selection -> {
                     val areNoTabsSelected = mode.selectedTabs.isNotEmpty()
                     val areAllTabsSelected = mode.selectedTabs.size == items.size
                     DynamicInterface(
@@ -368,6 +371,7 @@ class TabSwitcherViewModel @Inject constructor(
                         isMoreMenuItemEnabled = true,
                         isFabVisible = areNoTabsSelected,
                         fabType = FabType.CLOSE_TABS,
+                        backButtonType = CLOSE
                     )
                 }
             }
@@ -389,11 +393,17 @@ class TabSwitcherViewModel @Inject constructor(
             val isMoreMenuItemEnabled: Boolean,
             val isFabVisible: Boolean,
             val fabType: FabType,
+            val backButtonType: BackButtonType,
         )
 
         enum class FabType {
             NEW_TAB,
             CLOSE_TABS,
+        }
+
+        enum class BackButtonType {
+            ARROW,
+            CLOSE,
         }
 
         sealed interface Mode {
