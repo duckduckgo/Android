@@ -52,12 +52,12 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
@@ -185,9 +185,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private var popupMenuItem: MenuItem? = null
     private var layoutTypeMenuItem: MenuItem? = null
-
     private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
-
     private var isTrackerAnimationPanelVisible = false
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
@@ -396,16 +394,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
                 tabsAdapter.updateData(tabSwitcherItems)
 
-<<<<<<< HEAD
-            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
-            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                updateTabGridItemDecorator(tabSwitcherItems.last().id)
-=======
                 val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
                 if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                     updateTabGridItemDecorator()
                 }
->>>>>>> 503ddbfe9 (Avoid passing around the selection mode)
             }
 
             if (firstTimeLoadingTabsList) {
