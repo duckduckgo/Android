@@ -215,8 +215,8 @@ class RealDuckChat @Inject constructor(
 
     companion object {
         /** Default link to DuckChat that identifies Android as the source */
-        private const val DUCK_CHAT_WEB_LINK = "https://use-devtesting28.duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        private const val DUCKDUCKGO_HOST = "use-devtesting28.duckduckgo.com"
+        private const val DUCK_CHAT_WEB_LINK = "https://mtsoy.duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCKDUCKGO_HOST = "mtsoy.duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"

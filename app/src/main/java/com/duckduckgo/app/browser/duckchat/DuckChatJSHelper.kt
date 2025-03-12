@@ -24,6 +24,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.json.JSONObject
+import timber.log.Timber
 
 interface DuckChatJSHelper {
     suspend fun processJsCallbackMessage(
@@ -58,6 +59,13 @@ class RealDuckChatJSHelper @Inject constructor(
             duckChat.openDuckChat()
             null
         }
+        METHOD_CHAT_EXPORT -> {
+            val chatData = extractChatData(data)
+            val filename = extractChatFilename(data)
+            Timber.d("Chat export received for $filename: $chatData")
+            // TODO: prompt to save the file here
+            null
+        }
         else -> null
     }
 
@@ -84,11 +92,26 @@ class RealDuckChatJSHelper @Inject constructor(
         }?.optString(PAYLOAD)
     }
 
+    private fun extractChatData(data: JSONObject?): String? {
+        return data?.takeIf {
+            it.opt(CHAT_EXPORT_DATA) != JSONObject.NULL
+        }?.optString(CHAT_EXPORT_DATA)
+    }
+
+    private fun extractChatFilename(data: JSONObject?): String? {
+        return data?.takeIf {
+            it.opt(CHAT_EXPORT_FILENAME) != JSONObject.NULL
+        }?.optString(CHAT_EXPORT_FILENAME)
+    }
+
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
+        private const val METHOD_CHAT_EXPORT = "chatExport"
+        private const val CHAT_EXPORT_DATA = "data"
+        private const val CHAT_EXPORT_FILENAME = "filename"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
         private const val PLATFORM = "platform"
