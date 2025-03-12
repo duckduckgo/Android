@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Luettelonäkymä</string>
     <string name="tabSwitcherGridViewMenu">Ruudukkonäkymä</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt; edellisen seitsemän päivän aikana</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt;</string>
+    <string name="inTheLast7Days">viimeisten 7 päivän aikana</string>
+
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
