@@ -817,55 +817,11 @@ class RealDuckPlayerTest {
         verify(mockPixel).fire(DUCK_PLAYER_NEWTAB_SETTING_OFF)
     }
 
-    // region shouldShowCustomError
-
-    @Test
-    fun whenDuckPlayerCustomErrorIsEnabled_shouldShowCustomErrorReturnsTrue() = runTest {
-        setCustomError(true, null)
-
-        val result = testee.shouldShowCustomError()
-
-        assertEquals(true, result)
-    }
-
-    @Test
-    fun whenDuckPlayerCustomErrorIsDisabled_shouldShowCustomErrorReturnsFalse() = runTest {
-        setCustomError(false, null)
-
-        val result = testee.shouldShowCustomError()
-
-        assertEquals(false, result)
-    }
-
-    @Test
-    fun whenDuckPlayerCustomErrorSettingsDoNotExist_signInRequiredSelectorReturnsNull() = runTest {
-        setCustomError(true, "")
-
-        val settings = testee.customErrorSettings()
-
-        assertEquals(settings?.signInRequiredSelector, null)
-    }
-
-    @Test
-    fun whenDuckPlayerCustomErrorSettingsExist_customErrorSettingsReturnsString() = runTest {
-        setCustomError(true, "{\"signInRequiredSelector\":\"[href*=\\\"//support.google.com/youtube/answer/3037019\\\"]\"}")
-
-        val settings = testee.customErrorSettings()
-
-        assertEquals(settings?.signInRequiredSelector, "[href*=\"//support.google.com/youtube/answer/3037019\"]")
-    }
-
     // endregion
 
     private fun setFeatureToggle(enabled: Boolean) {
         duckPlayerFeature.self().setRawStoredState(State(enabled))
         duckPlayerFeature.enableDuckPlayer().setRawStoredState(State(enabled))
-        testee.onPrivacyConfigDownloaded()
-    }
-
-    private fun setCustomError(isEnabled: Boolean, customSettings: String?) {
-        val newState = State(enable = isEnabled, settings = customSettings)
-        duckPlayerFeature.customError().setRawStoredState(newState)
         testee.onPrivacyConfigDownloaded()
     }
 }
