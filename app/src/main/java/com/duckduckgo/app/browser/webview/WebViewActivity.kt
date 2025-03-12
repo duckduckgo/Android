@@ -23,6 +23,7 @@ import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -49,6 +50,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WebViewActivityWithParams::class)
@@ -159,8 +161,14 @@ class WebViewActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-        }
 
+            it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+                lifecycleScope.launch(dispatcherProvider.main()) {
+                    Timber.d("download listener called with $url, $contentDisposition, $mimeType")
+                    // send RequestFileDownload command here
+                }
+            }
+        }
         url?.let {
             binding.simpleWebview.loadUrl(it)
         }
