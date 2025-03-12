@@ -36,7 +36,9 @@ import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -84,6 +86,8 @@ object PrivacyModule {
         privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
+        tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+        tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -102,6 +106,8 @@ object PrivacyModule {
             privacyProtectionsPopupDataClearer,
             navigationHistory,
             dispatcherProvider,
+            tabSwitcherAnimationFeature,
+            tabSwitcherPrefsDataStore,
         )
     }
 

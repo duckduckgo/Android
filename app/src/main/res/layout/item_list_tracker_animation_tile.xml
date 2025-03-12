@@ -22,7 +22,6 @@
     android:layout_marginTop="6dp"
     android:layout_marginEnd="7dp"
     android:layout_marginBottom="10dp"
-    app:cardBackgroundColor="@color/green0"
     app:cardCornerRadius="10dp"
     tools:ignore="InvalidColorAttribute">
 
@@ -31,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingStart="0dp"
+        android:background="@drawable/background_animated_tile"
         android:paddingTop="@dimen/twoLineItemVerticalPadding"
         android:paddingEnd="@dimen/twoLineItemVerticalPadding"
         android:paddingBottom="@dimen/twoLineItemVerticalPadding">
@@ -45,7 +45,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/title"
             app:lottie_autoPlay="true"
-            app:lottie_rawRes="@raw/tab_shield" />
+            app:lottie_rawRes="@raw/shield_tabswitcher" />
 
         <TextView
             android:id="@+id/title"
@@ -53,41 +53,46 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/keyline_1"
             android:ellipsize="end"
+            android:lineSpacingExtra="2sp"
             android:lines="1"
             android:textColor="@color/green80"
             android:textIsSelectable="false"
             android:textSize="16dp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/subtitle"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintStart_toEndOf="@id/shieldAnimation"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="DeprecatedWidgetInXml,SpUsage"
-            tools:text="93 Trackers blocked" />
+            tools:ignore="DeprecatedWidgetInXml,SpUsage,UnusedAttribute"
+            tools:text="93 Trackers blocked"
+            tools:textStyle="bold" />
 
         <TextView
             android:id="@+id/subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:lineSpacingExtra="6sp"
             android:lines="1"
+            android:lineHeight="20sp"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/inTheLast7Days"
             android:textColor="@color/green70"
             android:textIsSelectable="false"
-            android:textSize="16dp"
+            android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintTop_toBottomOf="@id/title"
-            tools:ignore="DeprecatedWidgetInXml,SpUsage" />
+            tools:ignore="DeprecatedWidgetInXml,SpUsage,UnusedAttribute" />
 
         <ImageView
             android:id="@+id/close"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="@drawable/selectable_circular_ripple"
+            android:background="@drawable/selectable_circular_ripple_dark"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
+            app:tint="?attr/daxColorBlack"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

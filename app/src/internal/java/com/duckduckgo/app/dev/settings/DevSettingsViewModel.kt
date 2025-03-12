@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
+import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -45,6 +46,7 @@ class DevSettingsViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val surveyEndpointDataStore: SurveyEndpointDataStore,
+    private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -62,6 +64,7 @@ class DevSettingsViewModel @Inject constructor(
         object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
+        data class Toast(val message: String) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -146,5 +149,13 @@ class DevSettingsViewModel @Inject constructor(
 
     fun tabsClicked() {
         viewModelScope.launch { command.send(Command.Tabs) }
+    }
+
+    fun showAnimatedTileClicked() {
+        viewModelScope.launch {
+            tabSwitcherPrefsDataStore.setIsAnimationTileDismissed(isDismissed = false)
+            tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = false)
+            command.send(Command.Toast("Animated tile dismissal has been reset"))
+        }
     }
 }
