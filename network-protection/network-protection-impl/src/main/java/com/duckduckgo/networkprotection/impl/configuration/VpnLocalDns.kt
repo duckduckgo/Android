@@ -31,6 +31,10 @@ import okhttp3.Dns
 
 interface VpnLocalDns : Dns
 
+internal const val CONTROLLER_NETP_DUCKDUCKGO_COM = "controller.netp.duckduckgo.com"
+private const val VPN_EUN_CONTROLLER = "20.93.77.32"
+private const val VPN_USE_CONTROLLER = "20.253.26.112"
+
 private class VpnLocalDnsImpl(
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     moshi: Moshi,
@@ -48,9 +52,9 @@ private class VpnLocalDnsImpl(
     }
 
     private val fallbackDomains: Map<String, List<DnsEntry>> = mapOf(
-        "controller.netp.duckduckgo.com" to listOf(
-            DnsEntry("20.253.26.112", "use"),
-            DnsEntry("20.93.77.32", "eun"),
+        CONTROLLER_NETP_DUCKDUCKGO_COM to listOf(
+            DnsEntry(VPN_USE_CONTROLLER, "use"),
+            DnsEntry(VPN_EUN_CONTROLLER, "eun"),
         ),
     )
 

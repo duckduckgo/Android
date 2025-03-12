@@ -54,6 +54,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(false)
     fun localDNS(): Toggle
+
+    @DefaultValue(true)
+    fun runtimeIpRouteGeneration(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
