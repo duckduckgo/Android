@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -27,7 +28,10 @@ import com.duckduckgo.pir.internal.store.RealPirDataStore
 import com.duckduckgo.pir.internal.store.RealPirRepository
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
+import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.anvil.annotations.ContributesTo
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -58,6 +62,18 @@ class PirModule {
         return database.brokerDao()
     }
 
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideScanResultsDao(database: PirDatabase): ScanResultsDao {
+        return database.scanResultsDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideUserProfileDao(database: PirDatabase): UserProfileDao {
+        return database.userProfileDao()
+    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePirRepository(
@@ -65,10 +81,18 @@ class PirModule {
         dispatcherProvider: DispatcherProvider,
         brokerJsonDao: BrokerJsonDao,
         brokerDao: BrokerDao,
+        scanResultsDao: ScanResultsDao,
+        currentTimeProvider: CurrentTimeProvider,
+        moshi: Moshi,
+        userProfileDao: UserProfileDao,
     ): PirRepository = RealPirRepository(
+        moshi,
         dispatcherProvider,
         RealPirDataStore(sharedPreferencesProvider),
+        currentTimeProvider,
         brokerJsonDao,
         brokerDao,
+        scanResultsDao,
+        userProfileDao,
     )
 }

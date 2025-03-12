@@ -45,7 +45,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -64,7 +63,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelT
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2To5Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -72,6 +70,7 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState

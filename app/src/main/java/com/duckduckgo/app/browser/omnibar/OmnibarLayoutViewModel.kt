@@ -105,7 +105,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            experimentalIconsEnabled = experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.icons().isEnabled(),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 

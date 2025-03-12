@@ -321,7 +321,7 @@
                 android:src="@drawable/ic_fire" />
         </FrameLayout>
 
-        <com.duckduckgo.app.browser.TabSwitcherButton
+        <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton
             android:id="@+id/tabsMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
