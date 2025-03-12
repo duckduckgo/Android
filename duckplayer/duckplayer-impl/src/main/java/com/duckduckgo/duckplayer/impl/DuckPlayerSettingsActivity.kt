@@ -41,7 +41,6 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState
 import com.duckduckgo.duckplayer.impl.databinding.ActivityDuckPlayerSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
