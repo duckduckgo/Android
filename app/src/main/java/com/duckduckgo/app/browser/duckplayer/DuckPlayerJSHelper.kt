@@ -74,7 +74,7 @@ class DuckPlayerJSHelper @Inject constructor(
     private val pixel: Pixel,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val pagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin>,
-    ) {
+) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
 
