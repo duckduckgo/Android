@@ -76,7 +76,9 @@ class RealUserAgentProvider @Inject constructor(
 
         val isDomainInUserAllowList = isHostInUserAllowedList(host)
 
-        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value) || shouldUseDefaultUserAgent) {
+        if (
+            true || // shortcut to allow duckai view work with DUO (it requires default UA)
+            isDomainInUserAllowList || !toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
                 defaultUserAgent.get().replace(AgentRegex.platform, fallbackDesktopPrefix)
             } else {
