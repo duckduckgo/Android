@@ -17,7 +17,6 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -28,6 +27,9 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackBu
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.GRID
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.HIDDEN
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
@@ -39,12 +41,7 @@ fun Menu.createDynamicInterface(
     fab: ExtendedFloatingActionButton,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
-): MenuItem {
-    findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
-    val layoutButton = findItem(R.id.layoutTypeMenuItem).apply {
-        isVisible = dynamicMenu.isLayoutTypeButtonVisible
-    }
-
+) {
     popupMenu.newTabMenuItem.isVisible = dynamicMenu.isNewTabVisible
     popupMenu.selectAllMenuItem.isVisible = dynamicMenu.isSelectAllVisible
     popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
@@ -94,5 +91,21 @@ fun Menu.createDynamicInterface(
         CLOSE -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_close_24)
     }
 
-    return layoutButton
+    findItem(R.id.layoutTypeMenuItem).apply {
+        when (dynamicMenu.layoutButtonType) {
+            GRID -> {
+                setIcon(R.drawable.ic_grid_view_24)
+                title = actionView?.resources?.getString(R.string.tabSwitcherGridViewMenu)
+                isVisible = true
+            }
+            LIST -> {
+                setIcon(R.drawable.ic_list_view_24)
+                title = actionView?.resources?.getString(R.string.tabSwitcherListViewMenu)
+                isVisible = true
+            }
+            HIDDEN -> isVisible = false
+        }
+    }
+
+    findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 }

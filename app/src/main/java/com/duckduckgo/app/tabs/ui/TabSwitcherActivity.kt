@@ -91,6 +91,7 @@ import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -408,15 +409,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }
 
-        viewModel.deletableTabs.observe(this) {
-            if (it.isNotEmpty()) {
-                onDeletableTab(it.last())
-            }
-        }
-
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
                 updateLayoutType(it)
+            }
+        }
+
+        viewModel.deletableTabs.observe(this) {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
             }
         }
 
@@ -437,11 +438,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                 val gridLayoutManager = getGridLayoutManager(columnCount)
                 tabsRecycler.layoutManager = gridLayoutManager
-                showListLayoutButton()
+
+                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                    showListLayoutButton()
+                }
             }
             LayoutType.LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
-                showGridLayoutButton()
+
+                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                    showGridLayoutButton()
+                }
             }
         }
 
@@ -549,16 +556,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val viewState = viewModel.selectionViewState.value
             val numSelectedTabs = (viewModel.selectionViewState.value.mode as? Selection)?.selectedTabs?.size ?: 0
 
-            layoutTypeMenuItem = menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
+            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
+
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
-        }
 
-        when (viewModel.layoutType.value) {
-            LayoutType.GRID -> showListLayoutButton()
-            LayoutType.LIST -> showGridLayoutButton()
-            null -> layoutTypeMenuItem?.isVisible = false
+            when (viewModel.layoutType.value) {
+                LayoutType.GRID -> showListLayoutButton()
+                LayoutType.LIST -> showGridLayoutButton()
+                null -> layoutTypeMenuItem?.isVisible = false
+            }
         }
 
         return true
