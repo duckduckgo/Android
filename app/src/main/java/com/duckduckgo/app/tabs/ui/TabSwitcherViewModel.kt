@@ -33,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
@@ -85,7 +86,8 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabRepository.flowTabs,
         tabRepository.flowSelectedTab,
-    ) { viewState, tabs, activeTab ->
+        tabRepository.tabSwitcherData,
+    ) { viewState, tabs, activeTab, tabSwitcherData ->
         viewState.copy(
             items = tabs.map {
                 if (viewState.mode is Selection) {
@@ -94,6 +96,7 @@ class TabSwitcherViewModel @Inject constructor(
                     NormalTab(it, isActive = it.tabId == activeTab?.tabId)
                 }
             },
+            layoutType = tabSwitcherData.layoutType,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
@@ -355,13 +358,13 @@ class TabSwitcherViewModel @Inject constructor(
     data class SelectionViewState(
         val items: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
+        private val layoutType: LayoutType? = null,
     ) {
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
                 is Normal -> {
                     val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? Tab)?.tabEntity?.url != null
                     DynamicInterface(
-                        isLayoutTypeButtonVisible = true,
                         isFireButtonVisible = true,
                         isNewTabVisible = true,
                         isSelectAllVisible = false,
@@ -378,13 +381,17 @@ class TabSwitcherViewModel @Inject constructor(
                         isFabVisible = isThereNotJustNewTabPage,
                         fabType = FabType.NEW_TAB,
                         backButtonType = ARROW,
+                        layoutButtonType = when (layoutType) {
+                            GRID -> LayoutButtonType.LIST
+                            LIST -> LayoutButtonType.GRID
+                            else -> LayoutButtonType.HIDDEN
+                        },
                     )
                 }
                 is Selection -> {
                     val areNoTabsSelected = mode.selectedTabs.isNotEmpty()
                     val areAllTabsSelected = mode.selectedTabs.size == items.size
                     DynamicInterface(
-                        isLayoutTypeButtonVisible = false,
                         isFireButtonVisible = false,
                         isNewTabVisible = false,
                         isSelectAllVisible = !areAllTabsSelected,
@@ -401,12 +408,12 @@ class TabSwitcherViewModel @Inject constructor(
                         isFabVisible = areNoTabsSelected,
                         fabType = FabType.CLOSE_TABS,
                         backButtonType = CLOSE,
+                        layoutButtonType = LayoutButtonType.HIDDEN,
                     )
                 }
             }
 
         data class DynamicInterface(
-            val isLayoutTypeButtonVisible: Boolean,
             val isFireButtonVisible: Boolean,
             val isNewTabVisible: Boolean,
             val isSelectAllVisible: Boolean,
@@ -423,6 +430,7 @@ class TabSwitcherViewModel @Inject constructor(
             val isFabVisible: Boolean,
             val fabType: FabType,
             val backButtonType: BackButtonType,
+            val layoutButtonType: LayoutButtonType,
         )
 
         enum class FabType {
@@ -433,6 +441,12 @@ class TabSwitcherViewModel @Inject constructor(
         enum class BackButtonType {
             ARROW,
             CLOSE,
+        }
+
+        enum class LayoutButtonType {
+            GRID,
+            LIST,
+            HIDDEN
         }
 
         sealed interface Mode {
