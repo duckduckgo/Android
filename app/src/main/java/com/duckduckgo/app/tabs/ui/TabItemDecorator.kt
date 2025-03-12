@@ -25,6 +25,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -59,10 +61,10 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
                 when {
-                    tabSwitcherItem is TabSwitcherItem.SelectableTab && tabSwitcherItem.isSelected -> {
+                    tabSwitcherItem is SelectableTab && tabSwitcherItem.isSelected -> {
                         drawTabDecoration(child, canvas, selectionBorderStroke)
                     }
-                    tabSwitcherItem is TabSwitcherItem.NormalTab && tabSwitcherItem.isActive -> {
+                    tabSwitcherItem is NormalTab && tabSwitcherItem.isActive -> {
                         drawTabDecoration(child, canvas, activeTabBorderStroke)
                     }
                 }
