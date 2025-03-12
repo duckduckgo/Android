@@ -334,9 +334,10 @@
 
         <LinearLayout
             android:id="@+id/minibar"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -347,6 +348,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
                 android:layout_marginEnd="@dimen/keyline_1"
@@ -354,12 +356,12 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/minibarText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/keyline_1"
                 app:typography="caption"
-                android:gravity="center"
-                android:visibility="visible"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:text="domain.com"
                 tools:ignore="HardcodedText"/>
 
