@@ -40,10 +40,8 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
@@ -138,10 +136,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 DARK -> R.string.settingsDarkTheme
                 LIGHT -> R.string.settingsLightTheme
                 SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-                EXPERIMENT_DARK_COOL -> R.string.settingsDarkTheme
-                EXPERIMENT_DARK_WARM -> R.string.settingsDarkTheme
-                EXPERIMENT_LIGHT_WARM -> R.string.settingsLightTheme
-                EXPERIMENT_LIGHT_COOL -> R.string.settingsLightTheme
+                EXPERIMENT_DARK -> R.string.settingsDarkTheme
+                EXPERIMENT_LIGHT -> R.string.settingsLightTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)

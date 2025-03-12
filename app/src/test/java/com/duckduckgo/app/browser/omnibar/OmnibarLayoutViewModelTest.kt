@@ -83,8 +83,6 @@ class OmnibarLayoutViewModelTest {
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(experimentalUIThemingFeature.self()).thenReturn(mockToggle)
         whenever(experimentalUIThemingFeature.self().isEnabled()).thenReturn(false)
-        whenever(experimentalUIThemingFeature.icons()).thenReturn(mockToggle)
-        whenever(experimentalUIThemingFeature.icons().isEnabled()).thenReturn(false)
 
         initializeViewModel()
     }

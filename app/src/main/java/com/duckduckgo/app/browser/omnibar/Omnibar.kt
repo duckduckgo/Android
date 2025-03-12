@@ -137,6 +137,10 @@ class Omnibar(
         fun onShowSuggestions(state: OmnibarTextState)
     }
 
+    interface ScrollListener {
+        fun onScrollChanged(scrollY: Int, showImmediate: Boolean = false)
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
@@ -400,6 +404,20 @@ class Omnibar(
 
                 OmnibarPosition.BOTTOM -> {
                     binding.fadeOmnibarBottom.onScrollChanged(scrollY)
+                }
+            }
+        }
+    }
+
+    fun resetScrollPosition() {
+        if (fadeBehaviourEnabled) {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    binding.fadeOmnibar.onScrollChanged(0, true)
+                }
+
+                OmnibarPosition.BOTTOM -> {
+                    binding.fadeOmnibarBottom.onScrollChanged(0, true)
                 }
             }
         }

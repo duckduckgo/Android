@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
@@ -41,7 +42,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
 
-    private val scrollThreshold = 200
+    private var previousScrollY = 0
+    private var targetHeight: Int = 0
+    private var currentHeight: Int = 0
+    private var targetToolbarAlpha: Float = 1f
+    private var currentToolbarAlpha: Float = 1f
+    private var targetTextAlpha: Float = 0f
+    private var currentTextAlpha: Float = 0f
 
     init {
         val attr =
@@ -56,7 +63,16 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         inflate(context, layout, this)
 
-        minibar.setOnClickListener { }
+        minibar.setOnClickListener {
+            revealToolbar()
+            fadeToolbar(targetToolbarAlpha)
+            fadeMinibar(targetTextAlpha)
+
+            targetHeight = toolbar.height
+            currentHeight = toolbar.height
+            layoutParams.height = currentHeight
+            this.layoutParams = layoutParams
+        }
 
         AndroidSupportInjection.inject(this)
     }
@@ -64,29 +80,80 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     override fun render(viewState: ViewState) {
         super.render(viewState)
 
-        if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
-        } else {
-            fireIconImageView.setImageResource(R.drawable.ic_fire)
-            tabsMenu.setIcon(R.drawable.ic_tabs)
-        }
-
         minibarText.text = viewState.url.extractDomain()
     }
 
-    fun onScrollChanged(scrollY: Int) {
-        val scrollRatio = (scrollY.toFloat() / scrollThreshold).coerceIn(0f, 1f)
-        fadeToolbar(1f - scrollRatio)
-        fadeMinibar(scrollRatio)
+    fun onScrollChanged(
+        scrollY: Int,
+        showImmediate: Boolean = false,
+    ) {
+        if (showImmediate) {
+            postDelayed(100, {
+                revealToolbar()
+                fadeToolbar(targetToolbarAlpha)
+                fadeMinibar(targetTextAlpha)
 
-        // Calculate the new height for the AppBarLayout
-        val toolbarHeight = toolbar.height
-        val textHeight = minibar.height
-        val newHeight = (toolbarHeight * (1f - scrollRatio) + textHeight * scrollRatio).toInt()
+                targetHeight = toolbar.height
+                currentHeight = toolbar.height
+                layoutParams.height = currentHeight
+                this.layoutParams = layoutParams
+            },)
+        } else {
+            val isScrollingDown = scrollY > previousScrollY
+            previousScrollY = scrollY
 
-        // Update the AppBarLayout's height
-        val layoutParams = layoutParams
+            if (isScrollingDown) {
+                targetToolbarAlpha = 0f
+                targetTextAlpha = 1f
+                targetHeight = minibar.height
+            } else {
+                targetToolbarAlpha = 1f
+                targetTextAlpha = 0f
+                targetHeight = toolbar.height
+            }
+
+            // top of the page condition
+            if (scrollY == 0) {
+                revealToolbar()
+            }
+
+            // smooth alpha transition
+            val toolbarAlphaDifference = (targetToolbarAlpha - currentToolbarAlpha)
+            val toolbarAlphaChange = (toolbarAlphaDifference * 0.1f)
+            currentToolbarAlpha += toolbarAlphaChange
+            fadeToolbar(currentToolbarAlpha)
+
+            val textAlphaDifference = (targetTextAlpha - currentTextAlpha)
+            val textAlphaChange = (textAlphaDifference * 0.1f)
+            currentTextAlpha += textAlphaChange
+            fadeMinibar(currentTextAlpha)
+
+            // Calculate the new height for the AppBarLayout
+            val layoutParams = layoutParams
+
+            if (currentHeight == 0) {
+                currentHeight = layoutParams.height
+            }
+
+            if (targetHeight != currentHeight) {
+                updateLayoutHeight()
+            }
+        }
+    }
+
+    private fun revealToolbar() {
+        targetToolbarAlpha = 1f
+        targetTextAlpha = 0f
+        currentToolbarAlpha = 1f
+        currentTextAlpha = 0f
+        previousScrollY = Int.MAX_VALUE
+    }
+
+    private fun updateLayoutHeight() {
+        val heightDifference = targetHeight - currentHeight
+        val heightChange = (heightDifference * 0.1f).toInt() // Adjust the factor (0.1f) for faster/slower change
+        val newHeight = currentHeight + heightChange
+        currentHeight = newHeight
         layoutParams.height = newHeight
         this.layoutParams = layoutParams
     }

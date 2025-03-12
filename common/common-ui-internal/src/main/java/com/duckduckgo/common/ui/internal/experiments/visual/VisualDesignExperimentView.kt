@@ -56,14 +56,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         viewModel.onExperimentalUIModeChanged(isChecked)
     }
 
-    private val warmColorsPaletteToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onWarmColorsFlagChanged(isChecked)
-    }
-
-    private val iconsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onIconsFlagChanged(isChecked)
-    }
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -77,8 +69,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
-        binding.experimentalUIColorPalette.quietlySetIsChecked(viewState.useWarmColors, warmColorsPaletteToggleListener)
-        binding.experimentalUIIcons.quietlySetIsChecked(viewState.experimentalIcons, iconsToggleListener)
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }
 }

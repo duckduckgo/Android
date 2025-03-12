@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.tabswitcher
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import androidx.annotation.DrawableRes
-import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
-import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.app.browser.R
 
-class TabSwitcherButton @JvmOverloads constructor(
+open class TabSwitcherButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewTabSwitcherButtonBinding by viewBinding()
+    open var count: Int = 0
 
-    var count = 0
-        set(value) {
-            field = value
-            val text = if (count < 100) "$count" else "~"
-            binding.tabCount.text = text
-        }
+    open var hasUnread = false
 
-    var hasUnread = false
+    internal val tabCount: FrameLayout by lazy { findViewById(R.id.tabCount) }
 
     fun increment(callback: () -> Unit) {
         fadeOutCount {
@@ -50,26 +43,16 @@ class TabSwitcherButton @JvmOverloads constructor(
         }
     }
 
-    fun animateCount() {
-        fadeOutCount {
-            fadeInCount()
-        }
-    }
-
-    fun setIcon(@DrawableRes icon: Int) {
-        binding.tabCount.setBackgroundResource(icon)
-    }
-
     private fun fadeOutCount(callback: () -> Unit) {
         val listener = object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 // otherwise on end keeps being called repeatedly
-                binding.tabCount.animate().setListener(null)
+                tabCount.animate().setListener(null)
                 callback()
             }
         }
 
-        binding.tabCount.animate()
+        tabCount.animate()
             .setDuration(300)
             .alpha(0.0f)
             .setListener(listener)
@@ -77,7 +60,7 @@ class TabSwitcherButton @JvmOverloads constructor(
     }
 
     private fun fadeInCount() {
-        binding.tabCount.animate()
+        tabCount.animate()
             .setDuration(300)
             .alpha(1.0f)
             .start()

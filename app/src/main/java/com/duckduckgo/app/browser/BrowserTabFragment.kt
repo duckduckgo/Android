@@ -2650,6 +2650,7 @@ class BrowserTabFragment :
             }
 
             it.setOnScrollChangeListener(omnibar)
+            omnibar.resetScrollPosition()
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
