@@ -208,10 +208,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.comparisonChart.root.show()
                     binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
 
-                    binding.daxDialogCta.comparisonChart.feature3.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem3)
-                    binding.daxDialogCta.comparisonChart.feature4.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem4)
-                    binding.daxDialogCta.comparisonChart.feature5.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem5)
-
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
