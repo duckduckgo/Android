@@ -41,6 +41,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
@@ -103,9 +106,9 @@ class TabSwitcherViewModel @Inject constructor(
         viewState.copy(
             items = tabs.map {
                 if (viewState.mode is Selection) {
-                    TabSwitcherItem.SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
+                    SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
                 } else {
-                    TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+                    NormalTab(it, isActive = it.tabId == activeTab?.tabId)
                 }
             },
         )
@@ -122,7 +125,7 @@ class TabSwitcherViewModel @Inject constructor(
                     collectTabItemsWithOptionalAnimationTile(tabEntities)
                 } else {
                     val tabItems = tabEntities.map {
-                        TabSwitcherItem.NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
+                        NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
                     }
                     emit(tabItems)
                 }
@@ -407,7 +410,7 @@ class TabSwitcherViewModel @Inject constructor(
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
                 is Normal -> {
-                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? TabSwitcherItem.Tab)?.tabEntity?.url != null
+                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? Tab)?.tabEntity?.url != null
                     DynamicInterface(
                         isLayoutTypeButtonVisible = true,
                         isFireButtonVisible = true,
