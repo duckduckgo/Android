@@ -185,20 +185,6 @@ interface DuckPlayer {
     fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
 
     /**
-     * Checks whether Duck Player should show a custom error view based on RC flag
-     *
-     * @return True if should show a custom error view, false otherwise.
-     */
-    fun shouldShowCustomError(): Boolean
-
-    /**
-     * Retrieves settings for the Custom Error feature from RC
-     *
-     * @return A CustomErrorSettings Object with the settings or null if not settings are available
-     */
-    fun customErrorSettings(): CustomErrorSettings?
-
-    /**
      * Observes whether a duck Player will be opened in a new tab based on RC flag and user settings
      *
      * @return Flow. True if should open Duck Player in a new tab, false otherwise.
@@ -226,15 +212,6 @@ interface DuckPlayer {
     data class UserPreferences(
         val overlayInteracted: Boolean,
         val privatePlayerMode: PrivatePlayerMode,
-    )
-
-    /**
-     * Data class representing custom error settings for Duck Player.
-     *
-     * @property signInRequiredSelector A a CSS selector used in detecting a client-side sign-in error
-     */
-    data class CustomErrorSettings(
-        val signInRequiredSelector: String,
     )
 
     enum class DuckPlayerState {
