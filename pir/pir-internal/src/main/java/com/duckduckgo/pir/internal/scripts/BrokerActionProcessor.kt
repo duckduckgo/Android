@@ -17,9 +17,6 @@
 package com.duckduckgo.pir.internal.scripts
 
 import android.webkit.WebView
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -42,16 +39,9 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaI
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
-import javax.inject.Named
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import org.json.JSONObject
@@ -74,7 +64,6 @@ interface BrokerActionProcessor {
     fun pushAction(
         profileQuery: ProfileQuery,
         action: BrokerAction,
-        webView: WebView,
     )
 
     interface ActionResultListener {
@@ -83,11 +72,8 @@ interface BrokerActionProcessor {
     }
 }
 
-@ContributesBinding(ServiceScope::class)
-class RealBrokerActionProcessor @Inject constructor(
-    @Named("BrokerProtection") private val pirMessagingInterface: JsMessaging,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+class RealBrokerActionProcessor(
+    private val pirMessagingInterface: JsMessaging,
 ) : BrokerActionProcessor {
     private val requestAdapter by lazy {
         Moshi.Builder()
@@ -123,15 +109,11 @@ class RealBrokerActionProcessor @Inject constructor(
             .build().adapter(PirResult::class.java)
     }
     private var registeredActionResultListener: ActionResultListener? = null
-    private var timerJob: Job? = null
-    private var actionPushed: BrokerAction? = null
-    private var resultReceived: Boolean = false
 
     override fun register(
         webView: WebView,
         actionResultListener: ActionResultListener,
     ) {
-        actionPushed = null
         registeredActionResultListener = actionResultListener
         pirMessagingInterface.register(
             webView,
@@ -151,27 +133,9 @@ class RealBrokerActionProcessor @Inject constructor(
     override fun pushAction(
         profileQuery: ProfileQuery,
         action: BrokerAction,
-        webView: WebView,
     ) {
         logcat { "PIR-CSS: pushAction action: $action" }
-        resultReceived = false
-        timerJob?.cancel()
-        timerJob = coroutineScope.launch(dispatcherProvider.io()) {
-            logcat { "PIR-CSS: run timer for $action" }
-            delay(70000) // 1 minute + 10 seconds
-            logcat { "PIR-CSS: delay done" }
-            if (!resultReceived) {
-                logcat { "PIR-CSS: NO result for $action" }
-                // TODO : Might be better to retry?
-                handleError(
-                    PirErrorReponse(
-                        actionID = actionPushed?.id ?: "no-id",
-                        message = "Local timeout",
-                    ),
-                )
-                timerJob?.cancel()
-            }
-        }
+
         /**
          * 1. Transform action to ActionRequest
          * 2. Create action to SubscriptionEvent
@@ -193,23 +157,18 @@ class RealBrokerActionProcessor @Inject constructor(
                 JSONObject(this)
             },
         ).also {
-            actionPushed = action
             sendJsEvent(it)
         }
     }
 
     private fun handleError(result: PirErrorReponse) {
-        logcat { "PIR-CSS: handleError: $result for action: $actionPushed" }
-        if (actionPushed?.id == result.actionID) {
-            registeredActionResultListener?.onError(result)
-        }
+        logcat { "PIR-CSS: handleError: $result" }
+        registeredActionResultListener?.onError(result)
     }
 
     private fun handleSuccess(result: PirSuccessResponse) {
-        logcat { "PIR-CSS: handleSuccess: $result for action: $actionPushed" }
-        if (actionPushed?.id == result.actionID) {
-            registeredActionResultListener?.onSuccess(result)
-        }
+        logcat { "PIR-CSS: handleSuccess: $result for action" } // :" $actionPushed" }
+        registeredActionResultListener?.onSuccess(result)
     }
 
     private fun processJsCallbackMessage(
@@ -224,13 +183,10 @@ class RealBrokerActionProcessor @Inject constructor(
             }.onFailure {
                 logcat(ERROR) { "PIR-CSS: Failed to parse JS callback message $it " }
             }.getOrNull()
-            resultReceived = true
             logcat { "PIR-CSS: JsCallback response $result " }
             if (result?.result?.success != null) {
-                timerJob?.cancel()
                 handleSuccess(result.result.success)
             } else if (result?.result?.error != null) {
-                timerJob?.cancel()
                 handleError(result.result.error)
             }
         }

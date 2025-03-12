@@ -18,15 +18,26 @@ package com.duckduckgo.pir.internal.settings
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
+import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import androidx.work.multiprocess.RemoteListenableWorker
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,7 +46,10 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
-import com.duckduckgo.pir.internal.scan.PirForegroundScanService
+import com.duckduckgo.pir.internal.service.PirForegroundScanService
+import com.duckduckgo.pir.internal.service.PirRemoteWorkerService
+import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
@@ -44,6 +58,7 @@ import com.duckduckgo.pir.internal.store.db.Address
 import com.duckduckgo.pir.internal.store.db.UserName
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -65,6 +80,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var workManager: WorkManager
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +104,17 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 render(it)
             }
             .launchIn(lifecycleScope)
+
+        workManager.getWorkInfosForUniqueWorkLiveData(TAG_SCHEDULED_SCAN)
+            .observe(
+                this,
+                Observer { workInfoList ->
+                    workInfoList.forEach { workInfo ->
+                        logcat { "PIR-DEV: Work State: ${workInfo.state}" }
+                        logcat { "PIR-DEV: Work State: ${workInfo.runAttemptCount}" }
+                    }
+                },
+            )
     }
 
     private fun render(results: List<ScanResult>) {
@@ -103,10 +135,14 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(binding) {
-            this.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, totalSitesScanned)
-            this.statusTotalRecords.text = getString(R.string.pirStatsStatusRecords, totalRecordCount)
-            this.statusTotalBrokersFound.text = getString(R.string.pirStatsStatusBrokerFound, brokersWithRecordsCount)
-            this.statusTotalAllClear.text = getString(R.string.pirStatsStatusAllClear, brokersWithNoRecords)
+            this.statusSitesScanned.text =
+                getString(R.string.pirStatsStatusScanned, totalSitesScanned)
+            this.statusTotalRecords.text =
+                getString(R.string.pirStatsStatusRecords, totalRecordCount)
+            this.statusTotalBrokersFound.text =
+                getString(R.string.pirStatsStatusBrokerFound, brokersWithRecordsCount)
+            this.statusTotalAllClear.text =
+                getString(R.string.pirStatsStatusAllClear, brokersWithNoRecords)
         }
     }
 
@@ -145,11 +181,50 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 repository.deleteAllUserProfiles()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
+            stopService(Intent(this, PirRemoteWorkerService::class.java))
         }
 
         binding.viewResults.setOnClickListener {
             globalActivityStarter.start(this, PirResultsScreenNoParams)
         }
+
+        binding.scheduleScan.setOnClickListener {
+            schedulePeriodicScan()
+            Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun schedulePeriodicScan() {
+        logcat { "PIR-SCHEDULED: Scheduling periodic scan appId: ${appBuildConfig.applicationId}" }
+
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest =
+            PeriodicWorkRequest.Builder(PirScheduledScanRemoteWorker::class.java, 12, TimeUnit.HOURS)
+                .boundToPirProcess(appBuildConfig.applicationId)
+                .setConstraints(constraints)
+                .setInitialDelay(1, TimeUnit.MINUTES)
+                .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            TAG_SCHEDULED_SCAN,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            periodicWorkRequest,
+        )
+    }
+
+    private fun PeriodicWorkRequest.Builder.boundToPirProcess(applicationId: String): PeriodicWorkRequest.Builder {
+        val componentName = ComponentName(applicationId, PirRemoteWorkerService::class.java.name)
+        val data = Data.Builder()
+            .putString(RemoteListenableWorker.ARGUMENT_PACKAGE_NAME, componentName.packageName)
+            .putString(RemoteListenableWorker.ARGUMENT_CLASS_NAME, componentName.className)
+            .build()
+
+        return this.setInputData(data)
     }
 
     private fun useUserInput(): Boolean {

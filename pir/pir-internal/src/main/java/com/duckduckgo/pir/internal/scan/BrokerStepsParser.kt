@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.internal.scan
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.squareup.anvil.annotations.ContributesBinding
@@ -34,18 +34,23 @@ interface BrokerStepsParser {
     /**
      * This method parses the given json into BrokerStep that contains the actions needed to execute whatever step type.
      *
+     * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
      */
-    suspend fun parseStep(stepsJson: String): BrokerStep?
+    suspend fun parseStep(
+        brokerName: String,
+        stepsJson: String,
+    ): BrokerStep?
 
     data class BrokerStep(
+        var brokerName: String? = null,
         val stepType: String,
         val scanType: String,
         val actions: List<BrokerAction>,
     )
 }
 
-@ContributesBinding(ServiceScope::class)
+@ContributesBinding(AppScope::class)
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : BrokerStepsParser {
@@ -66,9 +71,14 @@ class RealBrokerStepsParser @Inject constructor(
             .adapter(BrokerStep::class.java)
     }
 
-    override suspend fun parseStep(stepsJson: String): BrokerStep? = withContext(dispatcherProvider.io()) {
+    override suspend fun parseStep(
+        brokerName: String,
+        stepsJson: String,
+    ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            adapter.fromJson(stepsJson)
+            adapter.fromJson(stepsJson)?.apply {
+                this.brokerName = brokerName
+            }
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
         }.getOrNull()
