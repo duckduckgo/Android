@@ -1,0 +1,152 @@
+{
+    "urlTests": {
+        "name": "Should normalize URLs",
+        "desc": "All browser platforms should sufficiently canonicalize URLs consitently.",
+        "tests": [
+            {
+                "name": "fragment in URL",
+                "siteURL": "https://broken.third-party.site/path/to/resource#fragment",
+                "expectURL": "https://broken.third-party.site/path/to/resource",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "double slashes in path",
+                "siteURL": "https://broken.third-party.site//path//to//resource",
+                "expectURL": "https://broken.third-party.site/path/to/resource",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "trailing spaces in path",
+                "siteURL": "https://broken.third-party.site/path/to/resource%20with%20spaces%20%20%20%20",
+                "expectURL": "https://broken.third-party.site/path/to/resource%20with%20spaces%20%20%20%20",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "encoded fragment",
+                "siteURL": "https://broken.third-party.site/path/to/resource%23encodedfragment",
+                "expectURL": "https://broken.third-party.site/path/to/resource%23encodedfragment",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "dot segments in path",
+                "siteURL": "https://broken.third-party.site/path/./to/./resource",
+                "expectURL": "https://broken.third-party.site/path/to/resource",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "spaces in path without trailing spaces",
+                "siteURL": "https://broken.third-party.site/path/to/resource%20with%20spaces",
+                "expectURL": "https://broken.third-party.site/path/to/resource%20with%20spaces",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "encoded dot segments in path",
+                "siteURL": "https://broken.third-party.site/path/to/%2E%2E/%2E%2E/resource",
+                "expectURL": "https://broken.third-party.site/resource",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "multiple encoded slashes in path",
+                "siteURL": "https://broken.third-party.site/path/to/%2F%2F%2F%2F%2F%2F%2F%2F%2F",
+                "expectURL": "https://broken.third-party.site/path/to",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            }
+        ]
+    },
+    "domainTests": {
+        "name": "Domain Canonicalization",
+        "desc": "Domain Canonicalization - tests provide input URI, with expected output",
+        "tests": [
+            {
+                "name": "Simple domain - extract hostname portion from the URL",
+                "siteURL": "http://www.somesite.com",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Simple domain with a port",
+                "siteURL": "http://www.somesite.com:8000/",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Simple domain with a username",
+                "siteURL": "http://user:pass@www.somesite.com",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Simple domain with a fragment",
+                "siteURL": "http://www.somesite.com#fragment",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Simple domain with a query string",
+                "siteURL": "http://www.somesite.com?some=value",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Decode any %XX escapes present in the hostname",
+                "siteURL": "http://www.%73ome%73ite.com",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Discard any leading and/or trailing full-stops",
+                "siteURL": "http://.www.somesite.com.",
+                "expectDomain": "www.somesite.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Replace sequences of two or more full-stops with a single full-stop.",
+                "siteURL": "http://www..example...com",
+                "expectDomain": "www.example.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "If the hostname is a numeric IPv4 address, reduce it to the canonical dotted quad form.",
+                "siteURL": "http://192.168.000.001:8000/",
+                "expectDomain": "192.168.0.1",
+                "exceptPlatforms": []
+            },                        
+            {
+                "name": "If there are more than six components in the resulting hostname, discard all but the rightmost six components.",
+                "siteURL": "http://a.b.c.d.e.f.g.h.i.j.example.com",
+                "expectDomain": "g.h.i.j.example.com",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "If the hostname is a numeric IPv4 address, reduce it to the canonical dotted quad form.",
+                "siteURL": "http://192.168.001.001:8080/",
+                "expectDomain": "192.168.1.1",
+                "exceptPlatforms": []
+            }            
+        ]
+    }
+}
