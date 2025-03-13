@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.scan
+package com.duckduckgo.pir.internal.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -42,12 +44,25 @@ interface BrokerStepsParser {
         stepsJson: String,
     ): BrokerStep?
 
-    data class BrokerStep(
-        var brokerName: String? = null,
-        val stepType: String,
-        val scanType: String,
-        val actions: List<BrokerAction>,
-    )
+    sealed class BrokerStep(
+        open var brokerName: String? = null,
+        open val stepType: String,
+        open val actions: List<BrokerAction>,
+    ) {
+        data class ScanStep(
+            override var brokerName: String? = null,
+            override val stepType: String,
+            override val actions: List<BrokerAction>,
+            val scanType: String,
+        ) : BrokerStep(brokerName, stepType, actions)
+
+        data class OptOutStep(
+            override var brokerName: String? = null,
+            override val stepType: String,
+            override val actions: List<BrokerAction>,
+            val optOutType: String,
+        ) : BrokerStep(brokerName, stepType, actions)
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -66,7 +81,13 @@ class RealBrokerStepsParser @Inject constructor(
                     .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
-            ).add(KotlinJsonAdapterFactory())
+            )
+            .add(
+                PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
+                    .withSubtype(ScanStep::class.java, "scan")
+                    .withSubtype(OptOutStep::class.java, "optOut"),
+            )
+            .add(KotlinJsonAdapterFactory())
             .build()
             .adapter(BrokerStep::class.java)
     }

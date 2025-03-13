@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.component
+package com.duckduckgo.pir.internal.common
 
 import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.BrokerCompleted
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.CompleteExecution
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.ExecuteBrokerAction
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.HandleBroker
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.Idle
-import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.LoadUrl
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.BrokerCompleted
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.CompleteExecution
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.ExecuteBrokerAction
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.HandleBroker
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.Idle
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.LoadUrl
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
-import com.duckduckgo.pir.internal.scan.PirScan.RunType
-import com.duckduckgo.pir.internal.scan.PirScan.RunType.MANUAL
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
@@ -83,7 +81,7 @@ internal class RealPirActionsRunner(
     private val context: Context,
     private val pirScriptToLoad: String,
     private val pirPixelSender: PirPixelSender,
-    private val runType: RunType,
+    private val runType: PirActionsRunnerFactory.RunType,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : PirActionsRunner, ActionResultListener {
     private val timerCoroutineScope: CoroutineScope
@@ -241,7 +239,7 @@ internal class RealPirActionsRunner(
     }
 
     private suspend fun emitBrokerStartPixel(brokerName: String) {
-        if (runType == MANUAL) {
+        if (runType == PirActionsRunnerFactory.RunType.MANUAL) {
             pirPixelSender.reportManualScanBrokerStarted(brokerName)
         } else {
             pirPixelSender.reportScheduledScanBrokerStarted(brokerName)
@@ -260,7 +258,7 @@ internal class RealPirActionsRunner(
         totalTimeMillis: Long,
         isSuccess: Boolean,
     ) {
-        if (runType == MANUAL) {
+        if (runType == PirActionsRunnerFactory.RunType.MANUAL) {
             pirPixelSender.reportManualScanBrokerCompleted(
                 brokerName = brokerName,
                 totalTimeInMillis = totalTimeMillis,

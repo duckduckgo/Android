@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.component
+package com.duckduckgo.pir.internal.common
 
 import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.scan.PirScan.RunType
 import com.duckduckgo.pir.internal.scripts.PirMessagingInterface
 import com.duckduckgo.pir.internal.scripts.RealBrokerActionProcessor
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -58,5 +57,11 @@ class PirActionsRunnerFactory @Inject constructor(
             runType,
             currentTimeProvider,
         )
+    }
+
+    enum class RunType {
+        MANUAL,
+        SCHEDULED,
+        OPTOUT,
     }
 }

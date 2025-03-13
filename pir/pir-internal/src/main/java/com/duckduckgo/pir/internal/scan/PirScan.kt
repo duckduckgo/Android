@@ -19,10 +19,12 @@ package com.duckduckgo.pir.internal.scan
 import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.component.PirActionsRunner
-import com.duckduckgo.pir.internal.component.PirActionsRunnerFactory
+import com.duckduckgo.pir.internal.common.BrokerStepsParser
+import com.duckduckgo.pir.internal.common.PirActionsRunner
+import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
+import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.scan.PirScan.RunType
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -30,7 +32,6 @@ import com.duckduckgo.pir.internal.store.db.PirScanLog
 import com.duckduckgo.pir.internal.store.db.ScanEventType
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -68,11 +69,6 @@ interface PirScan {
      * This method takes care of stopping the scan and cleaning up resources used.
      */
     fun stop()
-
-    enum class RunType {
-        MANUAL,
-        SCHEDULED,
-    }
 }
 
 @ContributesBinding(
@@ -184,19 +180,6 @@ class RealPirScan @Inject constructor(
         }
     }
 
-    private fun getMaximumParallelRunners(): Int {
-        return try {
-            // Get the directory containing CPU info
-            val cpuDir = File("/sys/devices/system/cpu/")
-            // Filter folders matching the pattern "cpu[0-9]+"
-            val cpuFiles = cpuDir.listFiles { file -> file.name.matches(Regex("cpu[0-9]+")) }
-            cpuFiles?.size ?: Runtime.getRuntime().availableProcessors()
-        } catch (e: Exception) {
-            // In case of an error, fall back to availableProcessors
-            Runtime.getRuntime().availableProcessors()
-        }
-    }
-
     private fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
         val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
         return this.chunked(chunkSize)
@@ -206,9 +189,7 @@ class RealPirScan @Inject constructor(
         context: Context,
         runType: RunType,
     ): Result<Unit> {
-        val brokers = runBlocking {
-            repository.getAllBrokersForScan()
-        }
+        val brokers = repository.getAllBrokersForScan()
         return execute(brokers, context, runType)
     }
 

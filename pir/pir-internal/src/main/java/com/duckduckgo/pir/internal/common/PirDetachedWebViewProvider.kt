@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.component
+package com.duckduckgo.pir.internal.common
 
 import android.annotation.SuppressLint
 import android.content.Context
