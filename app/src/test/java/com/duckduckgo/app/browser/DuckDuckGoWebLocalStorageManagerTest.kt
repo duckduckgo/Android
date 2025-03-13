@@ -173,7 +173,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenFireproofedLocalStorageFeatureIsEnabledThenDoNotClearLocalStorageForFireproofedDomains() = runTest {
+    fun whenFireproofedWebLocalStorageFeatureIsEnabledThenDoNotClearLocalStorageForFireproofedDomains() = runTest {
         whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(true)
         whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
 
@@ -195,7 +195,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenFireproofedLocalStorageFeatureIsDisabledThenClearLocalStorageForFireproofedDomains() = runTest {
+    fun whenFireproofedWebLocalStorageFeatureIsDisabledThenClearLocalStorageForFireproofedDomains() = runTest {
         whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(false)
         whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
 
