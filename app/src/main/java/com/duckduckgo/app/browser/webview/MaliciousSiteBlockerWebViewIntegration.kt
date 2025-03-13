@@ -131,6 +131,11 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         data class Safe(val isForMainFrame: Boolean) : IsMaliciousViewData()
         data object WaitForConfirmation : IsMaliciousViewData()
         data object Ignored : IsMaliciousViewData()
+
+        /**
+         * @param exempted true if the site was exempted from blocking by the user
+         * @param clientSideHit true if the site was blocked entirely by the client side
+         */
         data class MaliciousSite(val url: Uri, val feed: Feed, val exempted: Boolean, val clientSideHit: Boolean) : IsMaliciousViewData()
     }
 
@@ -160,13 +165,13 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             }
             when (result) {
                 is ConfirmedResult -> {
-                    processedUrls[url] = ProcessedUrlStatus(result.status, clientSideHit = false)
+                    processedUrls[url] = ProcessedUrlStatus(result.status, clientSideHit = true)
                     when (val status = result.status) {
                         is Malicious -> {
                             if (isForIframe) {
                                 firePixelForMaliciousIframe(status.feed)
                             }
-                            return IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = false)
+                            return IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
                         }
 
                         is Safe -> {
@@ -194,7 +199,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
         if (exemptedUrl != null) {
             Timber.d("Previously exempted, skipping $requestUrl as ${exemptedUrl.feed}")
-            return IsMaliciousViewData.MaliciousSite(requestUrl, exemptedUrl.feed, true, clientSideHit = false)
+            return IsMaliciousViewData.MaliciousSite(requestUrl, exemptedUrl.feed, true, clientSideHit = true)
         }
 
         processedUrls[requestUrl]?.let {
@@ -226,10 +231,10 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                 when (val result = checkMaliciousUrl(url, confirmationCallback)) {
                     is ConfirmedResult -> {
                         val status = result.status
-                        processedUrls[url] = ProcessedUrlStatus(status, clientSideHit = false)
+                        processedUrls[url] = ProcessedUrlStatus(status, clientSideHit = true)
                         when (status) {
                             is Malicious -> {
-                                return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = false)
+                                return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
                             }
                             is Safe -> {
                                 return@runBlocking IsMaliciousViewData.Safe(true)
@@ -261,7 +266,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             } else {
                 Safe
             }
-            processedUrls[url] = ProcessedUrlStatus(it, clientSideHit = true)
+            processedUrls[url] = ProcessedUrlStatus(it, clientSideHit = false)
             confirmationCallback(isMalicious)
         }
     }
