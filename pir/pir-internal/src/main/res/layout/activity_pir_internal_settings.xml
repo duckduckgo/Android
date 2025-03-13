@@ -147,6 +147,13 @@
                 android:text="@string/pirDevSchedule" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/viewScanResults"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevViewScanResults" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/viewResults"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"

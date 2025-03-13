@@ -34,7 +34,10 @@ import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
+import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
+import com.duckduckgo.pir.internal.store.db.PirScanLog
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
+import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.UserProfile
@@ -85,6 +88,10 @@ interface PirRepository {
 
     fun getAllResultsFlow(): Flow<List<ScanResult>>
 
+    suspend fun getErrorResultsCount(): Int
+
+    suspend fun getSuccessResultsCount(): Int
+
     suspend fun deleteAllResults()
 
     suspend fun getUserProfiles(): List<UserProfile>
@@ -92,6 +99,16 @@ interface PirRepository {
     suspend fun deleteAllUserProfiles()
 
     suspend fun replaceUserProfile(userProfile: UserProfile)
+
+    fun getAllScanEventsFlow(): Flow<List<PirScanLog>>
+
+    fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
+
+    suspend fun saveScanLog(pirScanLog: PirScanLog)
+
+    suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
+
+    suspend fun deleteAllScanLogs()
 
     data class BrokerJson(
         val fileName: String,
@@ -136,6 +153,7 @@ class RealPirRepository(
     private val brokerDao: BrokerDao,
     private val scanResultsDao: ScanResultsDao,
     private val userProfileDao: UserProfileDao,
+    private val scanLogDao: ScanLogDao,
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
@@ -275,9 +293,9 @@ class RealPirRepository(
 
     override fun getAllResultsFlow(): Flow<List<ScanResult>> {
         return combine(
-            scanResultsDao.getAllNavigateResults(),
-            scanResultsDao.getAllScanErrorResults(),
-            scanResultsDao.getAllExtractProfileResult(),
+            scanResultsDao.getAllNavigateResultsFlow(),
+            scanResultsDao.getAllScanErrorResultsFlow(),
+            scanResultsDao.getAllExtractProfileResultFlow(),
         ) { navigateResults, errorResults, profileResults ->
             val navScanResult = navigateResults.map {
                 ScanResult.NavigateResult(
@@ -325,6 +343,14 @@ class RealPirRepository(
         userProfileDao.getUserProfiles()
     }
 
+    override suspend fun getErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanResultsDao.getAllScanErrorResults().size
+    }
+
+    override suspend fun getSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanResultsDao.getAllExtractProfileResult().size
+    }
+
     override suspend fun deleteAllUserProfiles() {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
@@ -335,6 +361,33 @@ class RealPirRepository(
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
             userProfileDao.insertUserProfile(userProfile)
+        }
+    }
+
+    override fun getAllScanEventsFlow(): Flow<List<PirScanLog>> {
+        return scanLogDao.getAllScanEventsFlow()
+    }
+
+    override fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>> {
+        return scanLogDao.getAllBrokerScanEventsFlow()
+    }
+
+    override suspend fun saveScanLog(pirScanLog: PirScanLog) {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.insertScanEvent(pirScanLog)
+        }
+    }
+
+    override suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog) {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.insertBrokerScanEvent(pirBrokerScanLog)
+        }
+    }
+
+    override suspend fun deleteAllScanLogs() {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.deleteAllScanEvents()
+            scanLogDao.deleteAllBrokerScanEvents()
         }
     }
 }

@@ -19,13 +19,18 @@ package com.duckduckgo.pir.internal.component
 import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.BrokerCompleted
 import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.CompleteExecution
 import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.ExecuteBrokerAction
 import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.HandleBroker
 import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.Idle
 import com.duckduckgo.pir.internal.component.RealPirActionsRunner.Command.LoadUrl
+import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.scan.PirScan.RunType
+import com.duckduckgo.pir.internal.scan.PirScan.RunType.MANUAL
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
@@ -35,6 +40,10 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateRes
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import com.duckduckgo.pir.internal.store.PirRepository
+import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_ERROR
+import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_STARTED
+import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_SUCCESS
+import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -73,6 +82,9 @@ internal class RealPirActionsRunner(
     private val brokerActionProcessor: BrokerActionProcessor,
     private val context: Context,
     private val pirScriptToLoad: String,
+    private val pirPixelSender: PirPixelSender,
+    private val runType: RunType,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirActionsRunner, ActionResultListener {
     private val timerCoroutineScope: CoroutineScope
         get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
@@ -158,7 +170,7 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private fun handleCommand(
+    private suspend fun handleCommand(
         command: Command,
         continuationResult: Continuation<Result<Unit>>,
     ) {
@@ -175,6 +187,8 @@ internal class RealPirActionsRunner(
             is LoadUrl -> commandCoroutineScope.launch(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
+
+            is BrokerCompleted -> handleBrokerCompleted(command.state, command.isSuccess)
         }
     }
 
@@ -184,29 +198,95 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private fun handleBrokerAction(state: State) {
+    private suspend fun handleBrokerAction(state: State) {
         if (state.currentBrokerIndex >= brokersToExecute.size) {
             nextCommand(CompleteExecution)
         } else {
+            // Entry point of execution for a Blocker
+            brokersToExecute[state.currentBrokerIndex].brokerName?.let {
+                emitBrokerStartPixel(it)
+            }
+
             nextCommand(
                 ExecuteBrokerAction(
                     commandsFlow.value.state.copy(
                         currentActionIndex = 0,
+                        brokerStartTime = currentTimeProvider.currentTimeMillis(),
                     ),
                 ),
             )
         }
     }
 
+    private suspend fun handleBrokerCompleted(
+        state: State,
+        isSuccess: Boolean,
+    ) {
+        // Exit point of execution for a Blocker
+        brokersToExecute[state.currentBrokerIndex].brokerName?.let {
+            emitBrokerCompletePixel(
+                brokerName = it,
+                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
+                isSuccess = isSuccess,
+            )
+        }
+
+        nextCommand(
+            HandleBroker(
+                state = state.copy(
+                    currentBrokerIndex = state.currentBrokerIndex + 1,
+                ),
+            ),
+        )
+    }
+
+    private suspend fun emitBrokerStartPixel(brokerName: String) {
+        if (runType == MANUAL) {
+            pirPixelSender.reportManualScanBrokerStarted(brokerName)
+        } else {
+            pirPixelSender.reportScheduledScanBrokerStarted(brokerName)
+        }
+        repository.saveBrokerScanLog(
+            PirBrokerScanLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                brokerName = brokerName,
+                eventType = BROKER_STARTED,
+            ),
+        )
+    }
+
+    private suspend fun emitBrokerCompletePixel(
+        brokerName: String,
+        totalTimeMillis: Long,
+        isSuccess: Boolean,
+    ) {
+        if (runType == MANUAL) {
+            pirPixelSender.reportManualScanBrokerCompleted(
+                brokerName = brokerName,
+                totalTimeInMillis = totalTimeMillis,
+                isSuccess = isSuccess,
+            )
+        } else {
+            pirPixelSender.reportScheduledScanBrokerCompleted(
+                brokerName = brokerName,
+                totalTimeInMillis = totalTimeMillis,
+                isSuccess = isSuccess,
+            )
+        }
+        repository.saveBrokerScanLog(
+            PirBrokerScanLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                brokerName = brokerName,
+                eventType = if (isSuccess) BROKER_SUCCESS else BROKER_ERROR,
+            ),
+        )
+    }
+
     private fun executeBrokerAction(state: State) {
         val currentBroker = brokersToExecute[state.currentBrokerIndex]
         if (state.currentActionIndex == currentBroker.actions.size) {
             nextCommand(
-                HandleBroker(
-                    state.copy(
-                        currentBrokerIndex = state.currentBrokerIndex + 1,
-                    ),
-                ),
+                BrokerCompleted(state, true),
             )
         } else {
             val actionToExecute = currentBroker.actions[state.currentActionIndex]
@@ -312,11 +392,7 @@ internal class RealPirActionsRunner(
                 )
                 // If error happens we skip to next Broker as next steps will not make sense
                 nextCommand(
-                    HandleBroker(
-                        state = lastState.copy(
-                            currentBrokerIndex = lastState.currentBrokerIndex + 1,
-                        ),
-                    ),
+                    BrokerCompleted(lastState, isSuccess = false),
                 )
             } else {
                 logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirErrorReponse" }
@@ -339,12 +415,18 @@ internal class RealPirActionsRunner(
             val urlToLoad: String,
         ) : Command(State())
 
+        data class BrokerCompleted(
+            override val state: State,
+            val isSuccess: Boolean,
+        ) : Command(state)
+
         data object CompleteExecution : Command(State())
     }
 
     data class State(
         val currentBrokerIndex: Int = 0,
         val currentActionIndex: Int = 0,
+        val brokerStartTime: Long = -1L,
     )
 
     companion object {
