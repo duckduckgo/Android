@@ -460,7 +460,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val numActionableTabs = viewModel.selectionViewState.value.numActionableSelectedTabs
 
             menu.createDynamicInterface(numClosableTabs, numActionableTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
-
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
