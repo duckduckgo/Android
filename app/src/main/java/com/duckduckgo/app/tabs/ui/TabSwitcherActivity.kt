@@ -682,7 +682,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
             val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.value?.get(0) is TrackerAnimationInfoPanel
             val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
-            val tabSwitcherItemCount = viewModel.tabSwitcherItems.value?.count() ?: 0
+            val tabSwitcherItemCount = viewModel.tabSwitcherItems.value?.size ?: 0
 
             val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
             if (canSwap) {
@@ -691,7 +691,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
             }
         } else {
-            val tabCount = viewModel.tabSwitcherItems.value?.size ?: 0
+            val tabCount = viewModel.tabItems.size
             val canSwap = from in 0..<tabCount && to in 0..<tabCount
             if (canSwap) {
                 tabsAdapter.onTabMoved(from, to)
