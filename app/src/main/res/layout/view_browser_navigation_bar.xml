@@ -114,7 +114,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:padding="@dimen/keyline_2"
-            android:src="@drawable/ic_menu_hamburger_24e" />
+            android:src="@drawable/ic_menu_vertical_24" />
     </FrameLayout>
 
 </LinearLayout>
