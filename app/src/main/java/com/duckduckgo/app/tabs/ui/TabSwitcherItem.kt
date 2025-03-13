@@ -29,6 +29,9 @@ sealed class TabSwitcherItem(val id: String) {
             private val entity: TabEntity,
             val isSelected: Boolean,
         ) : Tab(entity)
+
+        val isNewTabPage: Boolean
+            get() = tabEntity.url == null
     }
     data class TrackerAnimationInfoPanel(val trackerCount: Int) : TabSwitcherItem("TrackerAnimationInfoPanel") {
         companion object {
