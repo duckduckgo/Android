@@ -50,6 +50,8 @@ interface SyncFeatureToggle {
     fun allowCreateAccount(): Boolean
 
     fun allowCreateAccountOnNewerVersion(): Boolean
+
+    fun automaticallyUpdateSyncSettings(): Boolean
 }
 
 @ContributesBinding(
@@ -109,6 +111,10 @@ class SyncRemoteFeatureToggle @Inject constructor(
 
     override fun allowCreateAccountOnNewerVersion(): Boolean {
         return isToggleEnabledOnNewerVersion(syncFeature.level3AllowCreateAccount())
+    }
+
+    override fun automaticallyUpdateSyncSettings(): Boolean {
+        return syncFeature.automaticallyUpdateSyncSettings().isEnabled()
     }
 
     private fun isToggleEnabledOnNewerVersion(toggle: Toggle): Boolean {

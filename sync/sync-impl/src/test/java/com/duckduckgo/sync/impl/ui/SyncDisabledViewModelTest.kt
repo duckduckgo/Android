@@ -262,6 +262,7 @@ class FakeSyncFeatureToggle : SyncFeatureToggle {
     var allowSetupFlowsOnNewerVersion: Boolean = true
     var allowCreateAccount: Boolean = true
     var allowCreateAccountOnNewerVersion: Boolean = true
+    var automaticallyUpdateSyncSettings: Boolean = true
     override fun showSync() = showSync
     override fun allowDataSyncing() = allowDataSyncing
     override fun allowDataSyncingOnNewerVersion() = allowDataSyncingOnNewerVersion
@@ -269,4 +270,5 @@ class FakeSyncFeatureToggle : SyncFeatureToggle {
     override fun allowSetupFlowsOnNewerVersion() = allowSetupFlowsOnNewerVersion
     override fun allowCreateAccount() = allowCreateAccount
     override fun allowCreateAccountOnNewerVersion() = allowCreateAccountOnNewerVersion
+    override fun automaticallyUpdateSyncSettings() = automaticallyUpdateSyncSettings
 }
