@@ -248,7 +248,7 @@ class WebViewRequestInterceptor(
                     documentUrl = documentUrl,
                     feed = isMalicious.feed,
                     exempted = false,
-                    clientSideHit = true,
+                    clientSideHit = false,
                     isForMainFrame = isForMainFrame,
                 )
             }
