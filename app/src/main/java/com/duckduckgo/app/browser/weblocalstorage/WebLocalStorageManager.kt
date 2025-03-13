@@ -47,7 +47,6 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
     private val fireproofRepository: FireproofRepository,
-    private val fireproofedLocalStorageFeature: FireproofedLocalStorageFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : WebLocalStorageManager {
 
@@ -58,7 +57,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
         val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-        val fireproofedDomains = if (fireproofedLocalStorageFeature.self().isEnabled()) {
+        val fireproofedDomains = if (androidBrowserConfigFeature.fireproofedWebLocalStorage().isEnabled()) {
             withContext(dispatcherProvider.io()) {
                 fireproofRepository.fireproofWebsites()
             }
