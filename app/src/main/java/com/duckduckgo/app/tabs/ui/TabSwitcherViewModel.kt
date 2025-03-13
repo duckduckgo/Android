@@ -473,7 +473,7 @@ class TabSwitcherViewModel @Inject constructor(
         enum class LayoutButtonType {
             GRID,
             LIST,
-            HIDDEN
+            HIDDEN,
         }
 
         sealed interface Mode {
