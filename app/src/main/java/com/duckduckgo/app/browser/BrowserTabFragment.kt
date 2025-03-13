@@ -2597,7 +2597,7 @@ class BrowserTabFragment :
                 }
             },
         )
-        omnibar.configureFadelOmnibarItemPressedListeners(
+        omnibar.configureFadeOmnibarItemPressedListeners(
             object : FadeOmnibarItemPressedListener {
                 override fun onDuckChatButtonPressed() {
                     onOmnibarDuckChatPressed(omnibar.getText())

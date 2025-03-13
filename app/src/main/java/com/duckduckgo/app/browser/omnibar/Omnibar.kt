@@ -268,7 +268,7 @@ class Omnibar(
         newOmnibar.setOmnibarItemPressedListener(listener)
     }
 
-    fun configureFadelOmnibarItemPressedListeners(listener: FadeOmnibarItemPressedListener) {
+    fun configureFadeOmnibarItemPressedListeners(listener: FadeOmnibarItemPressedListener) {
         val omnibar = newOmnibar
         if (omnibar is FadeOmnibarLayout) {
             omnibar.setFadeOmnibarItemPressedListener(listener)
