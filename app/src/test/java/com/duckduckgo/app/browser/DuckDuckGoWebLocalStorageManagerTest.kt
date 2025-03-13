@@ -21,7 +21,8 @@ import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManag
 import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
-import com.duckduckgo.app.fire.FireproofRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -50,13 +51,13 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockWebLocalStorageToggle: Toggle = mock()
     private val mockFireproofedWebLocalStorageToggle: Toggle = mock()
-    private val mockFireproofRepository: FireproofRepository = mock()
+    private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
 
     private val testee = DuckDuckGoWebLocalStorageManager(
         mockDatabaseProvider,
         mockAndroidBrowserConfigFeature,
         mockWebLocalStorageSettingsJsonParser,
-        mockFireproofRepository,
+        mockFireproofWebsiteRepository,
         coroutineRule.testDispatcherProvider,
     )
 
@@ -175,7 +176,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     @Test
     fun whenFireproofedWebLocalStorageFeatureIsEnabledThenDoNotClearLocalStorageForFireproofedDomains() = runTest {
         whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(true)
-        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(listOf(FireproofWebsiteEntity("example.com")))
 
         val key1 = bytes("_https://example.com\u0000\u0001key1")
         val key2 = bytes("_https://foo.com\u0000\u0001key2")
@@ -188,7 +189,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
 
         testee.clearWebLocalStorage()
 
-        verify(mockFireproofRepository).fireproofWebsites()
+        verify(mockFireproofWebsiteRepository).fireproofWebsitesSync()
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB).delete(key2)
@@ -197,7 +198,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     @Test
     fun whenFireproofedWebLocalStorageFeatureIsDisabledThenClearLocalStorageForFireproofedDomains() = runTest {
         whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(false)
-        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(listOf(FireproofWebsiteEntity("example.com")))
 
         val key1 = bytes("_https://example.com\u0000\u0001key1")
         val key2 = bytes("_https://foo.com\u0000\u0001key2")
@@ -210,7 +211,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
 
         testee.clearWebLocalStorage()
 
-        verify(mockFireproofRepository, never()).fireproofWebsites()
+        verify(mockFireproofWebsiteRepository, never()).fireproofWebsitesSync()
 
         verify(mockDB).delete(key1)
         verify(mockDB).delete(key2)

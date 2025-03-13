@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.weblocalstorage
 
 import android.content.Context
-import com.duckduckgo.app.fire.FireproofRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -46,7 +46,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val databaseProvider: Lazy<DB>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
-    private val fireproofRepository: FireproofRepository,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : WebLocalStorageManager {
 
@@ -59,7 +59,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
         val fireproofedDomains = if (androidBrowserConfigFeature.fireproofedWebLocalStorage().isEnabled()) {
             withContext(dispatcherProvider.io()) {
-                fireproofRepository.fireproofWebsites()
+                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             }
         } else {
             emptyList()
