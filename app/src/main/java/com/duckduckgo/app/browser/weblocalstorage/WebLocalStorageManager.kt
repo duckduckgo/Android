@@ -34,6 +34,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
+import org.iq80.leveldb.impl.Iq80DBFactory.asString
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
 import timber.log.Timber
 
@@ -78,10 +79,13 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
             while (iterator.hasNext()) {
                 val entry = iterator.next()
                 val key = String(entry.key, StandardCharsets.UTF_8)
+                val value = String(entry.value, StandardCharsets.UTF_16)
 
                 if (!isAllowedKey(key)) {
                     db.delete(entry.key)
                     Timber.d("WebLocalStorageManager: Deleted key: $key")
+                } else {
+                    Timber.d("WebLocalStorageManager value: $value")
                 }
             }
         }
