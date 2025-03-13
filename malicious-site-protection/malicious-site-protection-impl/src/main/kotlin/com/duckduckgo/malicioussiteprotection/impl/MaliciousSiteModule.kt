@@ -95,7 +95,7 @@ class MaliciousSiteModule {
         context: Context,
         @Named("api") okHttpClient: OkHttpClient,
     ): OkHttpClient {
-        val cacheLocation = File(context.cacheDir, "datasetsCache")
+        val cacheLocation = File(context.cacheDir, "mspCache")
         val cacheSize: Long = 5 * 1024 * 1024 // 5MB
         val cache = Cache(cacheLocation, cacheSize)
         return okHttpClient.newBuilder()
