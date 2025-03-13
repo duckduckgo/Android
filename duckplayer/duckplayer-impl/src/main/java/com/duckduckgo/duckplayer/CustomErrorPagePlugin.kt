@@ -27,14 +27,14 @@ import org.json.JSONObject
 class CustomErrorPagePlugin @Inject constructor(
     private val duckPlayerFeature: DuckPlayerFeature,
 ) : DuckPlayerPageSettingsPlugin {
-    override fun getSettings(): String {
+    override fun getSettings(): JSONObject {
         val customErrorObject = JSONObject()
         customErrorObject.put("state", if (duckPlayerFeature.customError().isEnabled()) "enabled" else "disabled")
         duckPlayerFeature.customError().getSettings()?.let { settings ->
             customErrorObject.put("settings", JSONObject(settings))
         }
 
-        return customErrorObject.toString()
+        return customErrorObject
     }
 
     override fun getName(): String = "customError"

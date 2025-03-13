@@ -146,7 +146,7 @@ class DuckPlayerJSHelper @Inject constructor(
 
                 // Custom Error Settings
                 pagesSettingPlugin.getPlugins().forEach {
-                    jsonObject.getJSONObject("settings").put(it.getName(), JSONObject(it.getSettings()))
+                    jsonObject.getJSONObject("settings").put(it.getName(), it.getSettings())
                 }
             }
             DUCK_PLAYER_FEATURE_NAME -> {
