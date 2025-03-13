@@ -102,7 +102,9 @@ class RealAutofillService : AutofillService() {
 
                 callback.onSuccess(response)
             }.onFailure {
-                pixel.fire(AutofillPixelNames.AUTOFILL_SERVICE_CRASH, mapOf("message" to it.extractExceptionCause()))
+                if (it !is kotlinx.coroutines.CancellationException) {
+                    pixel.fire(AutofillPixelNames.AUTOFILL_SERVICE_CRASH, mapOf("message" to it.extractExceptionCause()))
+                }
                 callback.onSuccess(null)
             }
         }
