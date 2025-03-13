@@ -36,8 +36,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 private const val FAB_HIDE_DELAY = 500L
 
 fun Menu.createDynamicInterface(
-    numClosableTabs: Int,
-    numActionableTabs: Int,
+    numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
     fab: ExtendedFloatingActionButton,
     toolbar: Toolbar,
@@ -56,13 +55,13 @@ fun Menu.createDynamicInterface(
     popupMenu.closeAllTabsMenuItem.isVisible = dynamicMenu.isCloseAllTabsVisible
 
     popupMenu.shareSelectedLinksMenuItem.apply {
-        setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, numActionableTabs, numActionableTabs))
+        setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs))
     }
     popupMenu.bookmarkSelectedTabsMenuItem.apply {
-        setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numActionableTabs, numActionableTabs))
+        setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
     popupMenu.closeSelectedTabsMenuItem.apply {
-        setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numClosableTabs, numClosableTabs))
+        setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
 
     fab.apply {
@@ -73,7 +72,7 @@ fun Menu.createDynamicInterface(
                     icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_add_24)
                 }
                 FabType.CLOSE_TABS -> {
-                    text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numClosableTabs, numClosableTabs)
+                    text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
                     icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
                 }
             }
