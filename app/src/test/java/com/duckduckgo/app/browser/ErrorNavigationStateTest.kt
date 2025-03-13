@@ -11,10 +11,10 @@ import org.junit.runner.RunWith
 class ErrorNavigationStateTest {
 
     @Test
-    fun whenStackContainsBackItemsAndErrorNavigationStateWithClientSideHitAndMainFrame_canGoBack_returnsTrue() {
+    fun whenStackContainsBackItemsAndErrorNavigationStateWithClientSideHitAndMainFrame_canGoBack_returnsFalse() {
         val testee = createErrorNavigationState(clientSideHit = true, isMainframe = true)
 
-        assertTrue(testee.canGoBack)
+        assertFalse(testee.canGoBack)
     }
 
     @Test
@@ -25,10 +25,10 @@ class ErrorNavigationStateTest {
     }
 
     @Test
-    fun whenStackContainsBackItemsAndErrorNavigationStateWithClientSideHitFalseAndMainFrame_canGoBack_returnsFalse() {
+    fun whenStackContainsBackItemsAndErrorNavigationStateWithClientSideHitFalseAndMainFrame_canGoBack_returnsTrue() {
         val testee = createErrorNavigationState(clientSideHit = false, isMainframe = true)
 
-        assertFalse(testee.canGoBack)
+        assertTrue(testee.canGoBack)
     }
 
     @Test

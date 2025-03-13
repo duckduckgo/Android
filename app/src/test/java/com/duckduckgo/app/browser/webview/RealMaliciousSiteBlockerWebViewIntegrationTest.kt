@@ -132,7 +132,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result)
     }
 
     @Test
@@ -171,7 +171,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         verify(mockPixel).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result)
     }
 
     @Test
@@ -198,7 +198,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result)
     }
 
     @Test
@@ -331,7 +331,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(mockExemptedUrlsHolder.exemptedMaliciousUrls).thenReturn(setOf(ExemptedUrl(maliciousUri, MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = true, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = true, clientSideHit = true), result)
     }
 
     @Test
@@ -340,7 +340,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(mockExemptedUrlsHolder.exemptedMaliciousUrls).thenReturn(setOf(ExemptedUrl(maliciousUri, MALWARE)))
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = true, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = true, clientSideHit = true), result)
     }
 
     @Test
@@ -352,13 +352,13 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = false), result)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result)
 
         val result2 = testee.shouldIntercept(request, maliciousUri) {}
         verify(mockPixel, times(1)).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
         verify(maliciousSiteProtection, times(1)).isMalicious(eq(maliciousUri), any())
 
-        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = false), result2)
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result2)
     }
 
     private fun updateFeatureEnabled(enabled: Boolean) {
