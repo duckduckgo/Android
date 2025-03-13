@@ -48,7 +48,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockDatabaseProvider: Lazy<DB> = mock()
     private val mockWebLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val mockAndroidBrowserConfigToggle: Toggle = mock()
+    private val mockWebLocalStorageToggle: Toggle = mock()
     private val mockFireproofedWebLocalStorageToggle: Toggle = mock()
     private val mockFireproofRepository: FireproofRepository = mock()
 
@@ -63,9 +63,9 @@ class DuckDuckGoWebLocalStorageManagerTest {
     @Before
     fun setup() = runTest {
         whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
-        whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockAndroidBrowserConfigToggle)
+        whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockWebLocalStorageToggle)
         whenever(mockAndroidBrowserConfigFeature.fireproofedWebLocalStorage()).thenReturn(mockFireproofedWebLocalStorageToggle)
-        whenever(mockAndroidBrowserConfigToggle.getSettings()).thenReturn("settings")
+        whenever(mockWebLocalStorageToggle.getSettings()).thenReturn("settings")
 
         val domains = Domains(list = listOf("duckduckgo.com"))
         val matchingRegex = MatchingRegex(
