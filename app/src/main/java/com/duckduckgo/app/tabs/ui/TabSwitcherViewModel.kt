@@ -376,69 +376,63 @@ class TabSwitcherViewModel @Inject constructor(
         val mode: Mode = Normal,
         private val layoutType: LayoutType? = null,
     ) {
-        val dynamicInterface: DynamicInterface
-            get() = when (mode) {
-                is Normal -> {
-                    val isThereOnlyNewTapPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
-                    DynamicInterface(
-                        isFireButtonVisible = true,
-                        isNewTabVisible = true,
-                        isSelectAllVisible = false,
-                        isDeselectAllVisible = false,
-                        isSelectionActionsDividerVisible = false,
-                        isShareSelectedLinksVisible = false,
-                        isBookmarkSelectedTabsVisible = false,
-                        isSelectTabsDividerVisible = true,
-                        isSelectTabsVisible = true,
-                        isCloseSelectedTabsVisible = false,
-                        isCloseOtherTabsVisible = false,
-                        isCloseAllTabsVisible = true,
-                        isMoreMenuItemEnabled = !isThereOnlyNewTapPage,
-                        isFabVisible = !isThereOnlyNewTapPage,
-                        fabType = FabType.NEW_TAB,
-                        backButtonType = ARROW,
-                        layoutButtonType = when (layoutType) {
-                            GRID -> LayoutButtonType.LIST
-                            LIST -> LayoutButtonType.GRID
-                            else -> LayoutButtonType.HIDDEN
-                        },
-                    )
-                }
-                is Selection -> {
-                    val areAllTabsSelected = mode.selectedTabs.size == tabItems.size
-                    val isSomethingSelected = mode.selectedTabs.isNotEmpty()
-                    val isNtpTheOnlySelectedTab = mode.selectedTabs.size == 1 &&
-                        tabItems.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
-                    val isSelectionActionable = isSomethingSelected && !isNtpTheOnlySelectedTab
-                    DynamicInterface(
-                        isFireButtonVisible = false,
-                        isNewTabVisible = false,
-                        isSelectAllVisible = !areAllTabsSelected,
-                        isDeselectAllVisible = areAllTabsSelected,
-                        isSelectionActionsDividerVisible = isSelectionActionable,
-                        isShareSelectedLinksVisible = isSelectionActionable,
-                        isBookmarkSelectedTabsVisible = isSelectionActionable,
-                        isSelectTabsDividerVisible = false,
-                        isSelectTabsVisible = false,
-                        isCloseSelectedTabsVisible = isSomethingSelected,
-                        isCloseOtherTabsVisible = isSomethingSelected && !areAllTabsSelected,
-                        isCloseAllTabsVisible = false,
-                        isMoreMenuItemEnabled = true,
-                        isFabVisible = isSomethingSelected,
-                        fabType = FabType.CLOSE_TABS,
-                        backButtonType = CLOSE,
-                        layoutButtonType = LayoutButtonType.HIDDEN,
-                    )
-                }
+        val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
+
+        val dynamicInterface = when (mode) {
+            is Normal -> {
+                val isThereOnlyNewTapPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
+                DynamicInterface(
+                    isFireButtonVisible = true,
+                    isNewTabVisible = true,
+                    isSelectAllVisible = false,
+                    isDeselectAllVisible = false,
+                    isSelectionActionsDividerVisible = false,
+                    isShareSelectedLinksVisible = false,
+                    isBookmarkSelectedTabsVisible = false,
+                    isSelectTabsDividerVisible = true,
+                    isSelectTabsVisible = true,
+                    isCloseSelectedTabsVisible = false,
+                    isCloseOtherTabsVisible = false,
+                    isCloseAllTabsVisible = true,
+                    isMoreMenuItemEnabled = !isThereOnlyNewTapPage,
+                    isFabVisible = !isThereOnlyNewTapPage,
+                    fabType = FabType.NEW_TAB,
+                    backButtonType = ARROW,
+                    layoutButtonType = when (layoutType) {
+                        GRID -> LayoutButtonType.LIST
+                        LIST -> LayoutButtonType.GRID
+                        else -> LayoutButtonType.HIDDEN
+                    },
+                )
             }
 
-        val numClosableSelectedTabs: Int
-            get() = (mode as? Selection)?.selectedTabs?.size ?: 0
-
-        val numActionableSelectedTabs: Int
-            get() = tabItems
-                .filterIsInstance<SelectableTab>()
-                .count { it.isSelected && !it.isNewTabPage }
+            is Selection -> {
+                val areAllTabsSelected = numSelectedTabs == tabItems.size
+                val isSomethingSelected = numSelectedTabs > 0
+                val isNtpTheOnlySelectedTab = numSelectedTabs == 1 &&
+                    tabItems.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
+                val isSelectionActionable = isSomethingSelected && !isNtpTheOnlySelectedTab
+                DynamicInterface(
+                    isFireButtonVisible = false,
+                    isNewTabVisible = false,
+                    isSelectAllVisible = !areAllTabsSelected,
+                    isDeselectAllVisible = areAllTabsSelected,
+                    isSelectionActionsDividerVisible = isSelectionActionable,
+                    isShareSelectedLinksVisible = isSelectionActionable,
+                    isBookmarkSelectedTabsVisible = isSelectionActionable,
+                    isSelectTabsDividerVisible = false,
+                    isSelectTabsVisible = false,
+                    isCloseSelectedTabsVisible = isSomethingSelected,
+                    isCloseOtherTabsVisible = isSomethingSelected && !areAllTabsSelected,
+                    isCloseAllTabsVisible = false,
+                    isMoreMenuItemEnabled = true,
+                    isFabVisible = isSomethingSelected,
+                    fabType = FabType.CLOSE_TABS,
+                    backButtonType = CLOSE,
+                    layoutButtonType = LayoutButtonType.HIDDEN,
+                )
+            }
+        }
 
         data class DynamicInterface(
             val isFireButtonVisible: Boolean,

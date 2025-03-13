@@ -60,7 +60,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -461,10 +460,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
             val viewState = viewModel.selectionViewState.value
 
-            val numClosableTabs = viewModel.selectionViewState.value.numClosableSelectedTabs
-            val numActionableTabs = viewModel.selectionViewState.value.numActionableSelectedTabs
-
-            menu.createDynamicInterface(numClosableTabs, numActionableTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
+            val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
+            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
