@@ -120,6 +120,15 @@ class TabSwitcherViewModel @Inject constructor(
         .map { it.layoutType }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    val tabItems: List<TabSwitcherItem>
+        get() {
+            return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                selectionViewState.value.tabItems
+            } else {
+                tabSwitcherItems.value.orEmpty()
+            }
+        }
+
     sealed class Command {
         data object Close : Command()
         data object CloseAllTabsRequest : Command()
@@ -129,12 +138,12 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
         if (swipingTabsFeature.isEnabled) {
-            val tabItemList = tabSwitcherItems.value?.filterIsInstance<Tab>()
-            val emptyTabItem = tabItemList?.firstOrNull { tabItem -> tabItem.tabEntity.url.isNullOrBlank() }
-            val emptyTabId = emptyTabItem?.tabEntity?.tabId
+            val newTab = tabItems
+                .filterIsInstance<Tab>()
+                .firstOrNull { tabItem -> tabItem.isNewTabPage }
 
-            if (emptyTabId != null) {
-                tabRepository.select(tabId = emptyTabId)
+            if (newTab != null) {
+                tabRepository.select(tabId = newTab.id)
             } else {
                 tabRepository.add()
             }
@@ -213,11 +222,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = Selection(tabSwitcherItems.value?.map { it.id } ?: emptyList())) }
+        _selectionViewState.update { it.copy(mode = Selection(tabItems.map { tab -> tab.id })) }
     }
 
     fun onDeselectAllTabs() {
-        _selectionViewState.update { it.copy(mode = Selection(emptyList())) }
+        triggerEmptySelectionMode()
     }
 
     fun onShareSelectedTabs() {
@@ -250,6 +259,10 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
+        triggerEmptySelectionMode()
+    }
+
+    private fun triggerEmptySelectionMode() {
         _selectionViewState.update { it.copy(mode = Selection(emptyList())) }
     }
 

@@ -82,7 +82,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -305,7 +304,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             lifecycleScope.launch {
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateData(it.items)
+                    tabsAdapter.updateData(it.tabItems)
 
                     updateToolbarTitle(it.mode)
                     updateTabGridItemDecorator()
@@ -585,7 +584,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        val tabCount = viewModel.tabSwitcherItems.value?.size ?: 0
+        val tabCount = viewModel.tabItems.size
         val canSwap = from in 0..< tabCount && to in 0..< tabCount
         if (canSwap) {
             tabsAdapter.onTabMoved(from, to)
