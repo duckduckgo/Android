@@ -58,7 +58,7 @@ interface MaliciousSiteRepository {
     suspend fun loadHashPrefixes(): Result<Unit>
 }
 
-private const val MATCHES_ENDPOINT_TIMEOUT = 1000L
+private const val MATCHES_ENDPOINT_TIMEOUT = 5000L
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
