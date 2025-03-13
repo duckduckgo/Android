@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.service
+package com.duckduckgo.pir.internal.scan
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -29,7 +29,6 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.MANUAL
-import com.duckduckgo.pir.internal.scan.PirScan
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.service
+package com.duckduckgo.pir.internal.scan
 
 import android.content.Context
 import android.os.Process
@@ -24,7 +24,6 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.SCHEDULED
-import com.duckduckgo.pir.internal.scan.PirScan
 import javax.inject.Inject
 import logcat.logcat
 

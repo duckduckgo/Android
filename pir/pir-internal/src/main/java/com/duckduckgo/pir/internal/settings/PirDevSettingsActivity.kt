@@ -48,10 +48,10 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.service.PirForegroundScanService
-import com.duckduckgo.pir.internal.service.PirRemoteWorkerService
-import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker
-import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
+import com.duckduckgo.pir.internal.scan.PirForegroundScanService
+import com.duckduckgo.pir.internal.scan.PirRemoteWorkerService
+import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
