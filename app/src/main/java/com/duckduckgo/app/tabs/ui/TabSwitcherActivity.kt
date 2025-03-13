@@ -379,7 +379,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             lifecycleScope.launch {
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateData(it.items)
+                    tabsAdapter.updateData(it.tabItems)
 
                     updateToolbarTitle(it.mode)
                     updateTabGridItemDecorator()
@@ -555,10 +555,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
             val viewState = viewModel.selectionViewState.value
 
-            val numClosableTabs = viewModel.selectionViewState.value.numClosableSelectedTabs
-            val numActionableTabs = viewModel.selectionViewState.value.numActionableSelectedTabs
-
-            menu.createDynamicInterface(numClosableTabs, numActionableTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
+            val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
+            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
