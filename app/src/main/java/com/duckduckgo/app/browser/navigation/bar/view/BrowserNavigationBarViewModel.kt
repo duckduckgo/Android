@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class BrowserNavigationBarViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
