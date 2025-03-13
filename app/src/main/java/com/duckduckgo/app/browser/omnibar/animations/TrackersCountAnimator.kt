@@ -23,8 +23,15 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import javax.inject.Inject
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.seconds
 
-private const val TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION = 500L
+private const val TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE = 0.75f
+private const val TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE = 0.85f
+private const val TRACKER_COUNT_UPPER_THRESHOLD = 40
+private const val TRACKER_TOTAL_MAX_LIMIT = 9999
+private val TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION = 0.5.seconds
+private val TRACKER_COUNT_UPPER_THRESHOLD_ANIMATION_DURATION = 0.5.seconds
 
 class TrackerCountAnimator @Inject constructor() {
 
@@ -48,8 +55,21 @@ class TrackerCountAnimator @Inject constructor() {
         this.context = context
         this.trackerTextView = trackerTextView
 
-        val endCount = totalTrackerCount
-        val startCount = maxOf(1, endCount - 2)
+        val endCount = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
+
+        val startPercentage = if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
+            TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE
+        } else {
+            TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE
+        }
+
+        val startCount = (endCount * startPercentage).roundToInt()
+
+        val animationDuration = if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
+            TRACKER_COUNT_UPPER_THRESHOLD_ANIMATION_DURATION
+        } else {
+            TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION
+        }
 
         trackerTextView.text = startCount.toString()
 
@@ -67,7 +87,7 @@ class TrackerCountAnimator @Inject constructor() {
         )
 
         animator.setIntValues(startCount, endCount)
-        animator.duration = TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION / (endCount - startCount + 1)
+        animator.duration = animationDuration.inWholeMilliseconds
         animator.start()
     }
 }
