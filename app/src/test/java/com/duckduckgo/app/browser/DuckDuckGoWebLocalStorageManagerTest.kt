@@ -21,7 +21,9 @@ import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManag
 import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
@@ -29,6 +31,7 @@ import org.iq80.leveldb.DB
 import org.iq80.leveldb.DBIterator
 import org.iq80.leveldb.impl.Iq80DBFactory.bytes
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.never
@@ -37,24 +40,32 @@ import org.mockito.kotlin.whenever
 
 class DuckDuckGoWebLocalStorageManagerTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val mockDB: DB = mock()
     private val mockIterator: DBIterator = mock()
     private val mockDatabaseProvider: Lazy<DB> = mock()
     private val mockWebLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val mockToggle: Toggle = mock()
+    private val mockWebLocalStorageToggle: Toggle = mock()
+    private val mockFireproofedWebLocalStorageToggle: Toggle = mock()
+    private val mockFireproofRepository: FireproofRepository = mock()
 
     private val testee = DuckDuckGoWebLocalStorageManager(
         mockDatabaseProvider,
         mockAndroidBrowserConfigFeature,
         mockWebLocalStorageSettingsJsonParser,
+        mockFireproofRepository,
+        coroutineRule.testDispatcherProvider,
     )
 
     @Before
     fun setup() = runTest {
         whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
-        whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockToggle)
-        whenever(mockToggle.getSettings()).thenReturn("settings")
+        whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockWebLocalStorageToggle)
+        whenever(mockAndroidBrowserConfigFeature.fireproofedWebLocalStorage()).thenReturn(mockFireproofedWebLocalStorageToggle)
+        whenever(mockWebLocalStorageToggle.getSettings()).thenReturn("settings")
 
         val domains = Domains(list = listOf("duckduckgo.com"))
         val matchingRegex = MatchingRegex(
@@ -159,6 +170,50 @@ class DuckDuckGoWebLocalStorageManagerTest {
         testee.clearWebLocalStorage()
 
         verify(mockIterator).close()
+    }
+
+    @Test
+    fun whenFireproofedWebLocalStorageFeatureIsEnabledThenDoNotClearLocalStorageForFireproofedDomains() = runTest {
+        whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(true)
+        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
+
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://foo.com\u0000\u0001key2")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage()
+
+        verify(mockFireproofRepository).fireproofWebsites()
+
+        verify(mockDB, never()).delete(key1)
+        verify(mockDB).delete(key2)
+    }
+
+    @Test
+    fun whenFireproofedWebLocalStorageFeatureIsDisabledThenClearLocalStorageForFireproofedDomains() = runTest {
+        whenever(mockFireproofedWebLocalStorageToggle.isEnabled()).thenReturn(false)
+        whenever(mockFireproofRepository.fireproofWebsites()).thenReturn(listOf("example.com"))
+
+        val key1 = bytes("_https://example.com\u0000\u0001key1")
+        val key2 = bytes("_https://foo.com\u0000\u0001key2")
+        val entry1 = createMockDBEntry(key1)
+        val entry2 = createMockDBEntry(key2)
+
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(true, true, false)
+        whenever(mockIterator.next()).thenReturn(entry1, entry2)
+
+        testee.clearWebLocalStorage()
+
+        verify(mockFireproofRepository, never()).fireproofWebsites()
+
+        verify(mockDB).delete(key1)
+        verify(mockDB).delete(key2)
     }
 
     private fun createMockDBEntry(key: ByteArray): MutableMap.MutableEntry<ByteArray, ByteArray> {

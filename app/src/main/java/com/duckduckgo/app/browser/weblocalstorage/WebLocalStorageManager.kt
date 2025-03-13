@@ -17,7 +17,9 @@
 package com.duckduckgo.app.browser.weblocalstorage
 
 import android.content.Context
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -29,6 +31,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
@@ -43,6 +46,8 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val databaseProvider: Lazy<DB>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
+    private val fireproofRepository: FireproofRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -52,7 +57,15 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
         val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-        domains = webLocalStorageSettings.domains.list
+        val fireproofedDomains = if (androidBrowserConfigFeature.fireproofedWebLocalStorage().isEnabled()) {
+            withContext(dispatcherProvider.io()) {
+                fireproofRepository.fireproofWebsites()
+            }
+        } else {
+            emptyList()
+        }
+
+        domains = webLocalStorageSettings.domains.list + fireproofedDomains
         matchingRegex = webLocalStorageSettings.matchingRegex.list
 
         Timber.d("WebLocalStorageManager: Allowed domains: $domains")
