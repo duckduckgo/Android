@@ -95,7 +95,7 @@ class TabSwitcherViewModel @Inject constructor(
         tabRepository.tabSwitcherData,
     ) { viewState, tabs, activeTab, tabSwitcherData ->
         viewState.copy(
-            items = tabs.map {
+            tabItems = tabs.map {
                 if (viewState.mode is Selection) {
                     SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
                 } else {
@@ -230,28 +230,19 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onShareSelectedTabs() {
-        when (val mode = selectionViewState.value.mode) {
-            is SelectionViewState.Mode.Selection -> {
-                if (mode.selectedTabs.size == 1) {
-                    val entity = (tabSwitcherItems.value?.firstOrNull { it.id == mode.selectedTabs.first() } as? TabSwitcherItem.Tab)?.tabEntity
-                    command.value = ShareLink(
-                        link = entity?.url ?: "",
-                        title = entity?.title ?: "",
-                    )
-                } else if (mode.selectedTabs.size > 1) {
-                    val links = tabSwitcherItems.value
-                        ?.filter { it.id in mode.selectedTabs }
-                        ?.mapNotNull { (it as? TabSwitcherItem.Tab)?.tabEntity?.url }
-                    command.value = ShareLinks(links ?: emptyList())
-                }
-            }
-            SelectionViewState.Mode.Normal -> {
-                val entity = activeTab.value
-                command.value = ShareLink(
-                    link = entity?.url ?: "",
-                    title = entity?.title ?: "",
-                )
-            }
+        val selectedTabs = tabItems
+            .filterIsInstance<SelectableTab>()
+            .filter { it.isSelected && !it.isNewTabPage }
+
+        if (selectedTabs.size == 1) {
+            val entity = selectedTabs.first().tabEntity
+            command.value = ShareLink(
+                link = entity.url.orEmpty(),
+                title = entity.title.orEmpty(),
+            )
+        } else if (selectedTabs.isNotEmpty()) {
+            val links = selectedTabs.map { it.tabEntity.url.orEmpty() }
+            command.value = ShareLinks(links)
         }
     }
 
@@ -274,7 +265,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseAllTabsConfirmed() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabSwitcherItems.value?.forEach { tabSwitcherItem ->
+            tabItems.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
                     is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
                 }
@@ -381,14 +372,14 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class SelectionViewState(
-        val items: List<TabSwitcherItem> = emptyList(),
+        val tabItems: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
         private val layoutType: LayoutType? = null,
     ) {
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
                 is Normal -> {
-                    val isThereNotJustNewTabPage = items.size != 1 || (items.first() as? Tab)?.tabEntity?.url != null
+                    val isThereOnlyNewTapPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
                     DynamicInterface(
                         isFireButtonVisible = true,
                         isNewTabVisible = true,
@@ -402,8 +393,8 @@ class TabSwitcherViewModel @Inject constructor(
                         isCloseSelectedTabsVisible = false,
                         isCloseOtherTabsVisible = false,
                         isCloseAllTabsVisible = true,
-                        isMoreMenuItemEnabled = isThereNotJustNewTabPage,
-                        isFabVisible = isThereNotJustNewTabPage,
+                        isMoreMenuItemEnabled = !isThereOnlyNewTapPage,
+                        isFabVisible = !isThereOnlyNewTapPage,
                         fabType = FabType.NEW_TAB,
                         backButtonType = ARROW,
                         layoutButtonType = when (layoutType) {
@@ -414,29 +405,40 @@ class TabSwitcherViewModel @Inject constructor(
                     )
                 }
                 is Selection -> {
-                    val areNoTabsSelected = mode.selectedTabs.isNotEmpty()
-                    val areAllTabsSelected = mode.selectedTabs.size == items.size
+                    val areAllTabsSelected = mode.selectedTabs.size == tabItems.size
+                    val isSomethingSelected = mode.selectedTabs.isNotEmpty()
+                    val isNtpTheOnlySelectedTab = mode.selectedTabs.size == 1 &&
+                        tabItems.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
+                    val isSelectionActionable = isSomethingSelected && !isNtpTheOnlySelectedTab
                     DynamicInterface(
                         isFireButtonVisible = false,
                         isNewTabVisible = false,
                         isSelectAllVisible = !areAllTabsSelected,
                         isDeselectAllVisible = areAllTabsSelected,
-                        isSelectionActionsDividerVisible = areNoTabsSelected,
-                        isShareSelectedLinksVisible = areNoTabsSelected,
-                        isBookmarkSelectedTabsVisible = areNoTabsSelected,
-                        isSelectTabsDividerVisible = areNoTabsSelected,
+                        isSelectionActionsDividerVisible = isSelectionActionable,
+                        isShareSelectedLinksVisible = isSelectionActionable,
+                        isBookmarkSelectedTabsVisible = isSelectionActionable,
+                        isSelectTabsDividerVisible = isSelectionActionable,
                         isSelectTabsVisible = false,
-                        isCloseSelectedTabsVisible = areNoTabsSelected,
-                        isCloseOtherTabsVisible = areNoTabsSelected,
+                        isCloseSelectedTabsVisible = isSomethingSelected,
+                        isCloseOtherTabsVisible = isSomethingSelected,
                         isCloseAllTabsVisible = false,
                         isMoreMenuItemEnabled = true,
-                        isFabVisible = areNoTabsSelected,
+                        isFabVisible = isSomethingSelected,
                         fabType = FabType.CLOSE_TABS,
                         backButtonType = CLOSE,
                         layoutButtonType = LayoutButtonType.HIDDEN,
                     )
                 }
             }
+
+        val numClosableSelectedTabs: Int
+            get() = (mode as? Selection)?.selectedTabs?.size ?: 0
+
+        val numActionableSelectedTabs: Int
+            get() = tabItems
+                .filterIsInstance<SelectableTab>()
+                .count { it.isSelected && !it.isNewTabPage }
 
         data class DynamicInterface(
             val isFireButtonVisible: Boolean,
