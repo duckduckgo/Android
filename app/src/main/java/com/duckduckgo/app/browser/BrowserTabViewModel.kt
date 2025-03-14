@@ -3361,7 +3361,7 @@ class BrowserTabViewModel @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
     ) {
-        if (isForMainFrame) {
+        if (isForMainFrame && currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch(dispatchers.main()) {
                 browserViewState.value =
                     browserStateModifier.copyForBrowserShowing(currentBrowserViewState())

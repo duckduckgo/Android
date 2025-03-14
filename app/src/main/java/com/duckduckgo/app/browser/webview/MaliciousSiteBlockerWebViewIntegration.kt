@@ -145,7 +145,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
         if (!isEnabled()) {
-            return IsMaliciousViewData.Safe(request.isForMainFrame)
+            return IsMaliciousViewData.Ignored
         }
 
         val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
@@ -220,7 +220,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     ): IsMaliciousViewData {
         return runBlocking {
             if (!isEnabled()) {
-                return@runBlocking IsMaliciousViewData.Safe(isForMainFrame)
+                return@runBlocking IsMaliciousViewData.Ignored
             }
             // iframes always go through the shouldIntercept method, so we only need to check the main frame here
             if (isForMainFrame) {
