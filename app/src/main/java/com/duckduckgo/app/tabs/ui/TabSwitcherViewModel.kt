@@ -142,8 +142,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     sealed class Command {
         data object Close : Command()
-        data class CloseTabsRequest(val tabIds: List<String>) : Command()
-        data object CloseAllTabsRequest : Command()
+        data class CloseTabsRequest(val tabIds: List<String>, val isClosingOtherTabs: Boolean = false) : Command()
+        data class CloseAllTabsRequest(val numTabs: Int) : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
         data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
@@ -230,7 +230,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseAllTabsRequested() {
-        command.value = Command.CloseAllTabsRequest
+        command.value = Command.CloseAllTabsRequest(tabItems.size)
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
     }
 
@@ -314,7 +314,7 @@ class TabSwitcherViewModel @Inject constructor(
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val allTabsCount = tabItems.size
             command.value = if (allTabsCount == selectedTabs.size) {
-                Command.CloseAllTabsRequest
+                Command.CloseAllTabsRequest(allTabsCount)
             } else {
                 Command.CloseTabsRequest(selectedTabs)
             }
@@ -325,7 +325,7 @@ class TabSwitcherViewModel @Inject constructor(
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
             if (otherTabsIds.isNotEmpty()) {
-                command.value = Command.CloseTabsRequest(otherTabsIds)
+                command.value = Command.CloseTabsRequest(otherTabsIds, isClosingOtherTabs = true)
             }
         }
     }
