@@ -538,18 +538,8 @@ sealed class DaxBubbleCta(
         }
 
         options?.let {
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption1)?.show()
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.show()
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.show()
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.show()
-
-            val optionsViews = listOf<DaxButton>(
-                view.findViewById(R.id.daxDialogOption1),
-                view.findViewById(R.id.daxDialogOption2),
-                view.findViewById(R.id.daxDialogOption3),
-                view.findViewById(R.id.daxDialogOption4),
-            )
             optionsViews.forEachIndexed { index, buttonView ->
+                buttonView.show()
                 if (it.size > index) {
                     it[index].setOptionView(buttonView)
                 } else {
