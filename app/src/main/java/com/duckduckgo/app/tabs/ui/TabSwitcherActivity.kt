@@ -56,8 +56,13 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -73,6 +78,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.google.android.material.R as materialR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -284,15 +290,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         )
     }
 
-    private fun updateToolbarTitle(mode: Mode) {
-        toolbar.title = if (mode is Mode.Selection) {
+    private fun updateToolbarTitle(mode: Mode, tabCount: Int) {
+        toolbar.title = if (mode is Selection) {
             if (mode.selectedTabs.isEmpty()) {
                 getString(R.string.selectTabsMenuItem)
             } else {
                 getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
             }
         } else {
-            getString(R.string.tabActivityTitle)
+            resources.getQuantityString(R.plurals.tabSwitcherTitle, tabCount, tabCount)
         }
     }
 
@@ -303,7 +309,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     tabsRecycler.invalidateItemDecorations()
                     tabsAdapter.updateData(it.tabItems)
 
-                    updateToolbarTitle(it.mode)
+                    updateToolbarTitle(it.mode, it.tabItems.size)
                     updateTabGridItemDecorator()
 
                     invalidateOptionsMenu()
@@ -435,10 +441,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
-            is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
-            is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
-            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
-            is Command.ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
+            is ShareLinks -> launchShareMultipleLinkChooser(command.links)
+            is ShareLink -> launchShareLinkChooser(command.link, command.title)
+            is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
+            is ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
+            is CloseTabsRequest -> showCloseTabsConfirmation(command.tabIds)
         }
     }
 
@@ -520,11 +527,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
-        return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            viewModel.selectionViewState.value.dynamicInterface.isMoreMenuItemEnabled
-        } else {
-            super.onPrepareOptionsMenu(menu)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            layoutTypeMenuItem?.isVisible = viewModel.selectionViewState.value.dynamicInterface.isLayoutTypeButtonVisible
+            popupMenuItem?.updateEnabledState(viewModel.selectionViewState.value.dynamicInterface.isMoreMenuItemEnabled, this)
         }
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
@@ -559,9 +567,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         launch { viewModel.onNewTabRequested(fromOverflowMenu) }
     }
 
-    override fun onTabSelected(tab: TabEntity) {
-        selectedTabId = tab.tabId
-        launch { viewModel.onTabSelected(tab) }
+    override fun onTabSelected(tabId: String) {
+        launch { viewModel.onTabSelected(tabId) }
     }
 
     private fun updateTabGridItemDecorator() {
@@ -696,6 +703,25 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onCloseAllTabsConfirmed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showCloseTabsConfirmation(tabIds: List<String>) {
+        val numTabs = tabIds.size
+        val title = resources.getQuantityString(R.plurals.closeTabsMenuItem, numTabs, numTabs)
+        val description = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsDialogDescription, numTabs, numTabs)
+        TextAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(description)
+            .setPositiveButton(R.string.closeAppTabsConfirmationDialogClose, DESTRUCTIVE)
+            .setNegativeButton(R.string.closeAppTabsConfirmationDialogCancel, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onCloseTabsConfirmed(tabIds)
                     }
                 },
             )

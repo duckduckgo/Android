@@ -131,6 +131,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     sealed class Command {
         data object Close : Command()
+        data class CloseTabsRequest(val tabIds: List<String>) : Command()
         data object CloseAllTabsRequest : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
@@ -161,27 +162,36 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onTabSelected(tab: TabEntity) {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update {
-                val selectionMode = it.mode as Selection
-                if (tab.tabId in selectionMode.selectedTabs) {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
-                } else {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
-                }
+    suspend fun onTabSelected(tabId: String) {
+        val mode = _selectionViewState.value.mode as? Selection ?: Normal
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
+            if (tabId in mode.selectedTabs) {
+                unselectTab(tabId)
+            } else {
+                selectTab(tabId)
             }
         } else {
-            tabRepository.select(tab.tabId)
+            tabRepository.select(tabId)
             command.value = Command.Close
             pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         }
     }
 
-    suspend fun onTabDeleted(tab: TabEntity) {
-        tabRepository.delete(tab)
-        adClickManager.clearTabId(tab.tabId)
-        webViewSessionStorage.deleteSession(tab.tabId)
+    suspend fun onTabDeleted(tabId: String) {
+        tabRepository.getTab(tabId)?.let { tab ->
+            tabRepository.delete(tab)
+            adClickManager.clearTabId(tabId)
+            webViewSessionStorage.deleteSession(tabId)
+        }
+    }
+
+    private suspend fun deleteTabs(tabIds: List<String>) {
+        tabRepository.deleteTabs(tabIds)
+
+        tabIds.forEach { tabId ->
+            adClickManager.clearTabId(tabId)
+            webViewSessionStorage.deleteSession(tabId)
+        }
     }
 
     suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
@@ -192,23 +202,13 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
         }
 
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
-            if (tab.tabId in selectionMode.selectedTabs) {
-                _selectionViewState.update {
-                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
-                }
-            }
-        }
+        unselectTab(tab.tabId)
     }
 
     suspend fun undoDeletableTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
 
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
-            _selectionViewState.update {
-                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
-            }
-        }
+        selectTab(tab.tabId)
     }
 
     suspend fun purgeDeletableTabs() {
@@ -255,7 +255,6 @@ class TabSwitcherViewModel @Inject constructor(
                     command.value = BookmarkTabsRequest(listOf(tabId))
                 }
             }
-
             is Selection -> {
                 command.value = BookmarkTabsRequest(mode.selectedTabs)
             }
@@ -300,25 +299,66 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseSelectedTabs() {
+        (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
+            val allTabsCount = tabItems.size
+            command.value = if (allTabsCount == selectedTabs.size) {
+                Command.CloseAllTabsRequest
+            } else {
+                Command.CloseTabsRequest(selectedTabs)
+            }
+        }
     }
 
     fun onCloseOtherTabs() {
+        (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
+            val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
+            if (otherTabsIds.isNotEmpty()) {
+                command.value = Command.CloseTabsRequest(otherTabsIds)
+            }
+        }
+    }
+
+    fun onCloseTabsConfirmed(tabIds: List<String>) {
+        val allTabsCount = tabItems.size
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            deleteTabs(tabIds)
+
+            if (allTabsCount == tabIds.size) {
+                pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+
+                // Close the tab switcher when there are no tabs
+                withContext(dispatcherProvider.main()) {
+                    command.value = Command.Close
+                }
+            } else {
+                unselectTabs(tabIds)
+            }
+        }
+    }
+
+    private fun unselectTab(tabId: String) = unselectTabs(listOf(tabId))
+
+    private fun selectTab(tabId: String) = selectTabs(listOf(tabId))
+
+    private fun unselectTabs(tabIds: List<String>) {
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tabIds.toSet()))
+            }
+        }
+    }
+
+    private fun selectTabs(tabIds: List<String>) {
+        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tabIds.toSet()))
+            }
+        }
     }
 
     fun onCloseAllTabsConfirmed() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            tabItems.forEach { tabSwitcherItem ->
-                when (tabSwitcherItem) {
-                    is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                }
-            }
-            // Make sure all exemptions are removed as all tabs are deleted.
-            adClickManager.clearAll()
-            pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
-
-            // Trigger a normal mode when there are no tabs
-            triggerNormalMode()
-        }
+        onCloseTabsConfirmed(tabItems.map { it.id })
     }
 
     fun onEmptyAreaClicked() {

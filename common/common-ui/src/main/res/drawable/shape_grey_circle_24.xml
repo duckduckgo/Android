@@ -21,5 +21,5 @@
         android:height="24dp"/>
     <stroke
         android:width="2dp"
-        android:color="#3D000000"/>
+        android:color="?attr/daxColorTextInputEnabledOutline"/>
 </shape>

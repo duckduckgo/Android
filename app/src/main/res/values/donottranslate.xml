@@ -102,6 +102,10 @@
         <item quantity="other">%1$d bookmarks added</item>
     </plurals>
     <string name="tabSwitcherBookmarkDialogDescription">Existing bookmarks will not be duplicated.</string>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Are you sure you want to close this tab?</item>
+        <item quantity="other">Are you sure you want to close these tabs?</item>
+    </plurals>
     <string name="tabSwitcherBookmarkDialogPositiveButton">Bookmark</string>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Bookmark Tab</item>
@@ -113,6 +117,11 @@
         <item quantity="other">Close %1$d Tabs</item>
     </plurals>
     <string name="closeOtherTabsMenuItem">Close Other Tabs</string>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 Private Tab</item>
+        <item quantity="other">%1$d Private Tabs</item>
+    </plurals>
 
     <!--    Default Browser Popup Menu Item-->
     <string name="defaultBrowserPopupMenuItem">Set As Default Browser</string>

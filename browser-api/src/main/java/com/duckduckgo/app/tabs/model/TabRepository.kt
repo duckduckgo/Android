@@ -86,6 +86,8 @@ interface TabRepository {
 
     suspend fun undoDeletable(tab: TabEntity)
 
+    suspend fun deleteTabs(tabIds: List<String>)
+
     /**
      * Deletes from the DB all tabs that are marked as "deletable"
      */
