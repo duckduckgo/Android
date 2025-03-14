@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.ui
 
 import android.view.View
 import android.widget.TextView
+import com.google.android.material.R as materialR
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
@@ -62,7 +63,7 @@ class TabSwitcherSnackbar(
             },
         )
         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
-        .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
+        .apply { view.findViewById<TextView>(materialR.id.snackbar_text).maxLines = 1 }
 
     fun show() {
         snackbar.show()
