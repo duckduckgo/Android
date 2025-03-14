@@ -17,32 +17,39 @@
 package com.duckduckgo.app.browser.animations.store
 
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface TrackersBurstAnimationPreferencesStore {
-    fun fetchCount(): Int
-    fun incrementCount()
+    suspend fun fetchCount(): Int
+    suspend fun incrementCount()
 }
 
 @ContributesBinding(AppScope::class)
 class RealTrackersBurstAnimationPreferencesStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val dispatcher: DispatcherProvider,
 ) : TrackersBurstAnimationPreferencesStore {
 
     private val preferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(FILENAME)
     }
 
-    override fun fetchCount(): Int =
-        preferences.getInt(TRACKERS_BURST_COUNT, 0)
+    override suspend fun fetchCount(): Int =
+        withContext(dispatcher.io()) {
+            preferences.getInt(TRACKERS_BURST_COUNT, 0)
+        }
 
-    override fun incrementCount() {
-        val count = fetchCount() + 1
-        preferences.edit {
-            putInt(TRACKERS_BURST_COUNT, count)
+    override suspend fun incrementCount() {
+        withContext(dispatcher.io()) {
+            val count = fetchCount() + 1
+            preferences.edit {
+                putInt(TRACKERS_BURST_COUNT, count)
+            }
         }
     }
 
