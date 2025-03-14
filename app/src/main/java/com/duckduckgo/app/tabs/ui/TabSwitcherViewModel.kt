@@ -240,8 +240,8 @@ class TabSwitcherViewModel @Inject constructor(
                 link = entity.url.orEmpty(),
                 title = entity.title.orEmpty(),
             )
-        } else if (selectedTabs.isNotEmpty()) {
-            val links = selectedTabs.map { it.tabEntity.url.orEmpty() }
+        } else {
+            val links = selectedTabs.mapNotNull { it.tabEntity.url }
             command.value = ShareLinks(links)
         }
     }
