@@ -110,14 +110,6 @@ fun Menu.createDynamicInterface(
         }
     }
 
-    findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
-}
 
-fun MenuItem.updateEnabledState(isEnabled: Boolean, context: Context) {
-    this.isEnabled = isEnabled
-    iconTintList = if (isEnabled) {
-        null
-    } else {
-        ContextCompat.getColorStateList(context, commonR.color.disabledColor)
-    }
+    findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 }
