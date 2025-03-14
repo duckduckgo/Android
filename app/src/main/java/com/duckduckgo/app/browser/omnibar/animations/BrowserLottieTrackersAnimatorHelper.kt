@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -48,6 +49,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.MainScope
@@ -58,6 +60,7 @@ import kotlinx.coroutines.launch
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
     private val trackerCountAnimator: TrackerCountAnimator,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -149,7 +152,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.shieldAnimation = shieldAnimationView
 
         tryToStartCookiesAnimation(context, omnibarViews)
-        listener?.onAnimationFinished(emptyList())
+
+        privacyDashboardExternalPixelParams.setPixelParams(PixelParameter.NO_ANIMATION, "true")
     }
 
     override fun startExperimentVariant2To5Animation(

@@ -398,6 +398,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 
-    TRACKERS_CIRCLES_ANIMATION_SHOWN("m_trackers_circles_animation_shown"),
-    TRACKERS_BURST_ANIMATION_SHOWN("m_trackers_burst_animation_shown"),
+    // Used for AppPersonalityFeature Variant 3
+    TRACKERS_LOGOS_BURST_ANIMATION_SHOWN("m_trackers_logos_burst_animation_shown"),
+
+    // Used for AppPersonalityFeature Variant 4
+    TRACKERS_GREEN_BURST_ANIMATION_SHOWN("m_trackers_green_burst_animation_shown"),
 }

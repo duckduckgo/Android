@@ -17,12 +17,10 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1047,30 +1045,6 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.showBrowserMenuHighlight)
         }
-    }
-
-    @Test
-    fun whenOnTrackersAnimationStartedCalledAfterOnboardingThenPixelSentWithParamFalse() = runTest {
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-
-        testee.onTrackersAnimationStarted()
-
-        verify(pixel).fire(
-            AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
-            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "false"),
-        )
-    }
-
-    @Test
-    fun whenOnTrackersAnimationStartedCalledDuringOnboardingThenPixelSentWithParamTrue() = runTest {
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-
-        testee.onTrackersAnimationStarted()
-
-        verify(pixel).fire(
-            AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
-            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "true"),
-        )
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {

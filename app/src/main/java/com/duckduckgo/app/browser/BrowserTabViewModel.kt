@@ -261,7 +261,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.AFTER_BURST_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_BURST
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT_MINIBAR
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOGOS_BURST
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -3878,9 +3881,11 @@ class BrowserTabViewModel @Inject constructor(
         when {
             appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled() -> {
                 command.value = Command.StartExperimentV2ShieldPopAnimation
+                privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
             }
             appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant5().isEnabled() -> {
                 command.value = Command.StartExperimentShieldPopAnimation
+                privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT_MINIBAR, "true")
             }
             appPersonalityFeature.self().isEnabled() &&
                 (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled()) -> {
@@ -3891,16 +3896,28 @@ class BrowserTabViewModel @Inject constructor(
                 ) {
                     trackersBurstAnimationPreferencesStore.incrementCount()
                     command.value = Command.StartExperimentTrackersBurstAnimation(logos, ignoreLogos)
-                    viewModelScope.launch {
-                        pixel.fire(
-                            AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
-                            mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
-                        )
-                        privacyDashboardExternalPixelParams.setPixelParams(AFTER_BURST_ANIMATION, "true")
-                    }
+                    sendTrackersAnimationPixels(hasKnownLogos, ignoreLogos)
                 } else {
                     command.value = Command.StartExperimentShieldPopAnimation
                 }
+            }
+        }
+    }
+
+    private fun sendTrackersAnimationPixels(hasKnownLogos: Boolean, ignoreLogos: Boolean) {
+        viewModelScope.launch {
+            if (hasKnownLogos) {
+                pixel.fire(
+                    AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
+                    mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
+                )
+                privacyDashboardExternalPixelParams.setPixelParams(LOGOS_BURST, "true")
+            } else if (ignoreLogos) {
+                pixel.fire(
+                    AppPixelName.TRACKERS_GREEN_BURST_ANIMATION_SHOWN,
+                    mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
+                )
+                privacyDashboardExternalPixelParams.setPixelParams(GREEN_BURST, "true")
             }
         }
     }

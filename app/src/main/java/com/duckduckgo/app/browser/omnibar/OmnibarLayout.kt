@@ -688,8 +688,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             omnibarViews = omnibarViews(),
             entities = events,
         )
-
-        viewModel.onTrackersAnimationStarted()
     }
 
     private fun startExperimentVariant1Animation() {

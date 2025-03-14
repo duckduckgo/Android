@@ -5889,7 +5889,7 @@ class BrowserTabViewModelTest {
             assertEquals(false, this.ignoreLogos)
         }
         verify(mockPixel).fire(
-            AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
+            AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
             mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${mockUserStageStore.getUserAppStage() != ESTABLISHED}"),
         )
         verify(mockPrivacyDashboardExternalPixelParams).setPixelParams(PixelParameter.AFTER_BURST_ANIMATION, "true")

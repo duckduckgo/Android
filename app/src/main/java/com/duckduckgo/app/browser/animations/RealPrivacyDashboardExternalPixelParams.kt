@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.animations
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.squareup.anvil.annotations.ContributesBinding
@@ -26,29 +24,18 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealPrivacyDashboardExternalPixelParams @Inject constructor(
-    private val appPersonalityFeature: AppPersonalityFeature,
-) : PrivacyDashboardExternalPixelParams {
+class RealPrivacyDashboardExternalPixelParams @Inject constructor() : PrivacyDashboardExternalPixelParams {
 
     private val pixelParams = mutableMapOf<String, String>()
 
     @Synchronized
     override fun getPixelParams(): Map<String, String> {
-        if (pixelParams.isEmpty()) {
-            val key = if (appPersonalityFeature.self().isEnabled() &&
-                (appPersonalityFeature.variant3().isEnabled() || appPersonalityFeature.variant4().isEnabled())
-            ) {
-                PixelParameter.AFTER_BURST_ANIMATION
-            } else {
-                PixelParameter.AFTER_CIRCLES_ANIMATION
-            }
-            setPixelParams(key, "false")
-        }
         return pixelParams.toMap()
     }
 
     @Synchronized
     override fun setPixelParams(key: String, value: String) {
+        clearPixelParams()
         pixelParams[key] = value
     }
 

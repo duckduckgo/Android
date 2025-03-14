@@ -96,6 +96,7 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/daxColorSurface"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             android:layout_marginHorizontal="@dimen/toolbar_horizontal_margin"

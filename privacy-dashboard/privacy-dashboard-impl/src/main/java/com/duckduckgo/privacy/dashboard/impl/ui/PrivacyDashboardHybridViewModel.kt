@@ -237,6 +237,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch {
             val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams() + privacyDashboardExternalPixelParams.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = Count)
+            privacyDashboardExternalPixelParams.clearPixelParams()
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
                 parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),

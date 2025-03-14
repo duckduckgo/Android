@@ -67,7 +67,11 @@ interface Pixel {
         const val TAB_INACTIVE_2W = "tab_inactive_2w"
         const val TAB_INACTIVE_3W = "tab_inactive_3w"
         const val TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING = "duringOnboarding"
-        const val AFTER_CIRCLES_ANIMATION = "after_circles_animation"
+        const val NO_ANIMATION = "no_animation"
+        const val GREEN_SHIELD_COUNT = "greenshield_count"
+        const val LOGOS_BURST = "logos_burst"
+        const val GREEN_BURST = "green_burst"
+        const val GREEN_SHIELD_COUNT_MINIBAR = "greenshield_count_minibar"
         const val AFTER_BURST_ANIMATION = "after_burst_animation"
     }
 
