@@ -25,6 +25,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Ignored
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
@@ -61,12 +62,12 @@ class RealMaliciousSiteProtection @Inject constructor(
     ): IsMaliciousResult {
         timber.d("isMalicious $url")
 
-        val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
-
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
-            timber.d("should not block (feature disabled) $canonicalUri")
-            return ConfirmedResult(Safe)
+            timber.d("should not block (feature disabled) $url")
+            return ConfirmedResult(Ignored)
         }
+
+        val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
@@ -100,6 +101,7 @@ class RealMaliciousSiteProtection @Inject constructor(
                 when (result) {
                     is Malicious -> timber.d("should block (matches) $canonicalUri")
                     is Safe -> timber.d("should not block (no match) $canonicalUri")
+                    is Ignored -> timber.d("should not block (ignored) $canonicalUri")
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
