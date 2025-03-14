@@ -19,6 +19,8 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Ignored
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.test.runTest
@@ -142,22 +144,26 @@ class RealMaliciousSiteRepositoryTest {
             ),
         )
 
+        val expected = matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }.let { matches ->
+            MatchesResult.Result(matches)
+        }
+
         whenever(maliciousSiteService.getMatches(hashPrefix)).thenReturn(matchesResponse)
 
         val result = repository.matches(hashPrefix)
 
-        assertEquals(matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }, result)
+        assertEquals(expected, result)
     }
 
     @Test
-    fun matches_returnsEmptyListOnTimeout() = runTest {
+    fun matches_returnsIgnoredOnTimeout() = runTest {
         val hashPrefix = "testPrefix"
 
         whenever(maliciousSiteService.getMatches(hashPrefix)).thenThrow(TimeoutCancellationException::class.java)
 
         val result = repository.matches(hashPrefix)
 
-        assertTrue(result.isEmpty())
+        assertTrue(result is Ignored)
         verify(mockPixel).fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
     }
 }

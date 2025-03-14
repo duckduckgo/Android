@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Ignored
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
@@ -29,6 +30,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import java.security.MessageDigest
 import kotlinx.coroutines.test.runTest
@@ -108,7 +110,7 @@ class RealMaliciousSiteProtectionTest {
     }
 
     @Test
-    fun isMalicious_returnsSafe_whenUrlIsMaliciousButRCFeatureDisabled() = runTest {
+    fun isMalicious_returnsIgnored_whenUrlIsMaliciousButRCFeatureDisabled() = runTest {
         val url = Uri.parse("https://malicious.com")
         val hostname = url.host!!
         val hash = messageDigest.digest(hostname.toByteArray()).joinToString("") { "%02x".format(it) }
@@ -121,7 +123,7 @@ class RealMaliciousSiteProtectionTest {
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(ConfirmedResult(Safe), result)
+        assertEquals(ConfirmedResult(Ignored), result)
     }
 
     @Test
@@ -169,7 +171,7 @@ class RealMaliciousSiteProtectionTest {
         whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
         whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
         whenever(mockMaliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
-            .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash, PHISHING)))
+            .thenReturn(Result(listOf(Match(hostname, url.toString(), ".*malicious.*", hash, PHISHING))))
 
         realMaliciousSiteProtection.isMalicious(url) {
             onSiteBlockedAsyncCalled = true

@@ -36,6 +36,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WaitForConfirmation
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Ignored
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -173,10 +174,8 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                             }
                             return IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
                         }
-
-                        is Safe -> {
-                            return IsMaliciousViewData.Safe(request.isForMainFrame)
-                        }
+                        is Safe -> return IsMaliciousViewData.Safe(request.isForMainFrame)
+                        is Ignored -> return IsMaliciousViewData.Ignored
                     }
                 }
 
@@ -208,6 +207,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return when (it.status) {
                 is Safe -> IsMaliciousViewData.Safe(isForMainFrame)
                 is Malicious -> IsMaliciousViewData.MaliciousSite(requestUrl, it.status.feed, false, it.clientSideHit)
+                is Ignored -> IsMaliciousViewData.Ignored
             }
         }
         return null
@@ -233,12 +233,14 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                         val status = result.status
                         processedUrls[url] = ProcessedUrlStatus(status, clientSideHit = true)
                         when (status) {
-                            is Malicious -> {
-                                return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
-                            }
-                            is Safe -> {
-                                return@runBlocking IsMaliciousViewData.Safe(true)
-                            }
+                            is Malicious -> return@runBlocking IsMaliciousViewData.MaliciousSite(
+                                url,
+                                status.feed,
+                                exempted = false,
+                                clientSideHit = true,
+                            )
+                            is Safe -> return@runBlocking IsMaliciousViewData.Safe(true)
+                            is Ignored -> return@runBlocking IsMaliciousViewData.Ignored
                         }
                     }
                     is WaitForConfirmation -> {
