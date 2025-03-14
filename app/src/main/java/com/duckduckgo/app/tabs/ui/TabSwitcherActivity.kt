@@ -24,7 +24,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -63,6 +62,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -74,8 +74,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -437,14 +435,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
-            is Command.ShareLinks -> {
-                launchShareMultipleLinkChooser(command.links)
-            }
-
-            is Command.ShareLink -> {
-                launchShareLinkChooser(command.link, command.title)
-            }
+            is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
+            is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
+            is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
+            is Command.ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
         }
+    }
+
+    private fun showBookmarkSnackbarWithUndo(numBookmarks: Int) {
+        val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
+        TabSwitcherSnackbar(
+            anchorView = toolbar,
+            message = message,
+            action = getString(R.string.undoSnackbarAction),
+            showAction = numBookmarks > 0,
+            onAction = viewModel::undoBookmarkAction,
+            onDismiss = viewModel::finishBookmarkAction,
+        ).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -602,34 +609,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onDeletableTab(tab: TabEntity) {
-        Snackbar.make(toolbar, getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
-            .setDuration(3500) // 3.5 seconds
-            .setAction(R.string.tabClosedUndo) {
-                // noop, handled in onDismissed callback
-            }
-            .addCallback(
-                object : Snackbar.Callback() {
-                    override fun onDismissed(
-                        transientBottomBar: Snackbar?,
-                        event: Int,
-                    ) {
-                        when (event) {
-                            // handle the UNDO action here as we only have one
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT,
-                            -> launch { viewModel.purgeDeletableTabs() }
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
-                            -> { /* noop */
-                            }
-                        }
-                    }
-                },
-            )
-            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
-            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
-            .show()
+        TabSwitcherSnackbar(
+            anchorView = toolbar,
+            message = getString(R.string.tabClosed),
+            action = getString(R.string.tabClosedUndo),
+            showAction = true,
+            onAction = { launch { viewModel.undoDeletableTab(tab) } },
+            onDismiss = { launch { viewModel.purgeDeletableTabs() } },
+        ).show()
     }
 
     private fun launchShareLinkChooser(
@@ -709,6 +696,24 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onCloseAllTabsConfirmed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showBookmarkTabsConfirmation(tabIds: List<String>) {
+        val numTabs = tabIds.size
+        val title = resources.getQuantityString(R.plurals.tabSwitcherBookmarkDialogTitle, numTabs, numTabs)
+        TextAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(R.string.tabSwitcherBookmarkDialogDescription)
+            .setPositiveButton(R.string.tabSwitcherBookmarkDialogPositiveButton, ButtonType.PRIMARY)
+            .setNegativeButton(R.string.cancel, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onBookmarkTabsConfirmed(tabIds)
                     }
                 },
             )

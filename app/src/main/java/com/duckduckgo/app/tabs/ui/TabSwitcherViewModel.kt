@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
@@ -39,8 +40,10 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
@@ -52,7 +55,11 @@ import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -61,6 +68,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -72,6 +80,8 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val faviconManager: FaviconManager,
+    private val savedSitesRepository: SavedSitesRepository,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -117,11 +127,15 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
+    private val recentlySavedBookmarks = mutableListOf<Bookmark>()
+
     sealed class Command {
         data object Close : Command()
         data object CloseAllTabsRequest : Command()
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
+        data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
+        data class ShowUndoBookmarkMessage(val numBookmarks: Int) : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -152,9 +166,9 @@ class TabSwitcherViewModel @Inject constructor(
             _selectionViewState.update {
                 val selectionMode = it.mode as Selection
                 if (tab.tabId in selectionMode.selectedTabs) {
-                    it.copy(mode = Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 } else {
-                    it.copy(mode = Selection(selectionMode.selectedTabs + tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
                 }
             }
         } else {
@@ -181,7 +195,7 @@ class TabSwitcherViewModel @Inject constructor(
         (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             if (tab.tabId in selectionMode.selectedTabs) {
                 _selectionViewState.update {
-                    it.copy(mode = Selection(selectionMode.selectedTabs - tab.tabId))
+                    it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tab.tabId))
                 }
             }
         }
@@ -192,7 +206,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             _selectionViewState.update {
-                it.copy(mode = Selection(selectionMode.selectedTabs + tab.tabId))
+                it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tab.tabId))
             }
         }
     }
@@ -210,7 +224,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
-        _selectionViewState.update { it.copy(mode = Selection(tabItems.map { tab -> tab.id })) }
+        _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabItems.map { tab -> tab.id })) }
     }
 
     fun onDeselectAllTabs() {
@@ -235,6 +249,46 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBookmarkSelectedTabs() {
+        when (val mode = selectionViewState.value.mode) {
+            is Normal -> {
+                activeTab.value?.tabId?.let { tabId ->
+                    command.value = BookmarkTabsRequest(listOf(tabId))
+                }
+            }
+
+            is Selection -> {
+                command.value = BookmarkTabsRequest(mode.selectedTabs)
+            }
+        }
+    }
+
+    fun undoBookmarkAction() {
+        recentlySavedBookmarks.forEach { bookmark ->
+            viewModelScope.launch(dispatcherProvider.io()) {
+                savedSitesRepository.delete(bookmark)
+            }
+        }
+        recentlySavedBookmarks.clear()
+    }
+
+    fun finishBookmarkAction() {
+        recentlySavedBookmarks.clear()
+    }
+
+    fun onBookmarkTabsConfirmed(tabIds: List<String>) {
+        viewModelScope.launch {
+            recentlySavedBookmarks.addAll(bookmarkTabs(tabIds))
+            command.value = ShowUndoBookmarkMessage(recentlySavedBookmarks.size)
+        }
+    }
+
+    private suspend fun bookmarkTabs(tabIds: List<String>): List<Bookmark> {
+        val results = tabIds.map { tabId ->
+            viewModelScope.async {
+                saveSiteBookmark(tabId)
+            }
+        }
+        return results.awaitAll().filterNotNull()
     }
 
     fun onSelectionModeRequested() {
@@ -263,21 +317,25 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
 
             // Trigger a normal mode when there are no tabs
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         }
     }
 
     fun onEmptyAreaClicked() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         }
+    }
+
+    private fun triggerNormalMode() {
+        _selectionViewState.update { it.copy(mode = Normal) }
     }
 
     fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         } else {
             command.value = Command.Close
         }
@@ -287,7 +345,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
-            _selectionViewState.update { it.copy(mode = Normal) }
+            triggerNormalMode()
         } else {
             command.value = Command.Close
         }
@@ -345,6 +403,22 @@ class TabSwitcherViewModel @Inject constructor(
                 onCloseSelectedTabs()
             }
         }
+    }
+
+    private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
+        var bookmark: Bookmark? = null
+        (tabItems.firstOrNull { it.id == tabId } as? Tab)?.let { tab ->
+            tab.tabEntity.url?.let { url ->
+                if (url.isNotBlank()) {
+                    // Only bookmark new sites
+                    if (savedSitesRepository.getBookmark(url) == null) {
+                        faviconManager.persistCachedFavicon(tabId, url)
+                        bookmark = savedSitesRepository.insertBookmark(url, tab.tabEntity.title.orEmpty())
+                    }
+                }
+            }
+        }
+        return@withContext bookmark
     }
 
     fun onDuckChatMenuClicked() {
