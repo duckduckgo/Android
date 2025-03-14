@@ -380,7 +380,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTapPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
+                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,
@@ -394,8 +394,8 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseSelectedTabsVisible = false,
                     isCloseOtherTabsVisible = false,
                     isCloseAllTabsVisible = true,
-                    isMoreMenuItemEnabled = !isThereOnlyNewTapPage,
-                    isFabVisible = !isThereOnlyNewTapPage,
+                    isMoreMenuItemEnabled = !isThereOnlyNewTabPage,
+                    isFabVisible = !isThereOnlyNewTabPage,
                     fabType = FabType.NEW_TAB,
                     backButtonType = ARROW,
                     layoutButtonType = when (layoutType) {
