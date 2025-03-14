@@ -46,15 +46,15 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowBookmarkToast
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
@@ -161,6 +161,8 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
+    private val recentlySavedBookmarks = mutableListOf<Bookmark>()
+
     sealed class Command {
         data object Close : Command()
         data object CloseAllTabsRequest : Command()
@@ -169,7 +171,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShareLink(val link: String, val title: String) : Command()
         data class ShareLinks(val links: List<String>) : Command()
         data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
-        data class ShowBookmarkToast(val numBookmarks: Int) : Command()
+        data class ShowUndoBookmarkMessage(val numBookmarks: Int) : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -296,6 +298,35 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun undoBookmarkAction() {
+        recentlySavedBookmarks.forEach { bookmark ->
+            viewModelScope.launch(dispatcherProvider.io()) {
+                savedSitesRepository.delete(bookmark)
+            }
+        }
+        recentlySavedBookmarks.clear()
+    }
+
+    fun finishBookmarkAction() {
+        recentlySavedBookmarks.clear()
+    }
+
+    fun onBookmarkTabsConfirmed(tabIds: List<String>) {
+        viewModelScope.launch {
+            recentlySavedBookmarks.addAll(bookmarkTabs(tabIds))
+            command.value = ShowUndoBookmarkMessage(recentlySavedBookmarks.size)
+        }
+    }
+
+    private suspend fun bookmarkTabs(tabIds: List<String>): List<Bookmark> {
+        val results = tabIds.map { tabId ->
+            viewModelScope.async {
+                saveSiteBookmark(tabId)
+            }
+        }
+        return results.awaitAll().filterNotNull()
+    }
+
     fun onSelectionModeRequested() {
         triggerEmptySelectionMode()
     }
@@ -308,22 +339,6 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseOtherTabs() {
-    }
-
-    fun onBookmarkTabsConfirmed(tabIds: List<String>) {
-        viewModelScope.launch {
-            val numBookmarkedTabs = bookmarkTabs(tabIds)
-            command.value = ShowBookmarkToast(numBookmarkedTabs)
-        }
-    }
-
-    private suspend fun bookmarkTabs(tabIds: List<String>): Int {
-        val results = tabIds.map { tabId ->
-            viewModelScope.async {
-                saveSiteBookmark(tabId)
-            }
-        }
-        return results.awaitAll().count { it != null }
     }
 
     fun onCloseAllTabsConfirmed() {
@@ -429,7 +444,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
         var bookmark: Bookmark? = null
-        (tabSwitcherItems.value?.firstOrNull { it.id == tabId } as? Tab)?.let { tab ->
+        (tabItems.firstOrNull { it.id == tabId } as? Tab)?.let { tab ->
             tab.tabEntity.url?.let { url ->
                 if (url.isNotBlank()) {
                     // Only bookmark new sites

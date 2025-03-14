@@ -544,19 +544,22 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             is Command.ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is Command.ShareLink -> launchShareLinkChooser(command.link, command.title)
             is Command.BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
-            is Command.ShowBookmarkToast -> showBookmarkToast(command.numBookmarks)
+            is Command.ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
             ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
         }
     }
 
-    private fun showBookmarkToast(numBookmarks: Int) {
-        val message = if (numBookmarks == 0) {
-            getString(R.string.tabSwitcherBookmarkToastZero)
-        } else {
-            resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
-        }
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun showBookmarkSnackbarWithUndo(numBookmarks: Int) {
+        val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
+        TabSwitcherSnackbar(
+            anchorView = toolbar,
+            message = message,
+            action = getString(R.string.undoSnackbarAction),
+            showAction = numBookmarks > 0,
+            onAction = viewModel::undoBookmarkAction,
+            onDismiss = viewModel::finishBookmarkAction,
+        ).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -703,7 +706,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         } else {
             val tabCount = viewModel.tabItems.size
-            val canSwap = from in 0..<tabCount && to in 0..<tabCount
+            val canSwap = from in 0..< tabCount && to in 0..< tabCount
             if (canSwap) {
                 tabsAdapter.onTabMoved(from, to)
                 viewModel.onTabMoved(from, to)
@@ -728,34 +731,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onDeletableTab(tab: TabEntity) {
-        Snackbar.make(toolbar, getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
-            .setDuration(3500) // 3.5 seconds
-            .setAction(R.string.tabClosedUndo) {
-                // noop, handled in onDismissed callback
-            }
-            .addCallback(
-                object : Snackbar.Callback() {
-                    override fun onDismissed(
-                        transientBottomBar: Snackbar?,
-                        event: Int,
-                    ) {
-                        when (event) {
-                            // handle the UNDO action here as we only have one
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT,
-                            -> launch { viewModel.purgeDeletableTabs() }
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
-                            -> { /* noop */
-                            }
-                        }
-                    }
-                },
-            )
-            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
-            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
-            .show()
+        TabSwitcherSnackbar(
+            anchorView = toolbar,
+            message = getString(R.string.tabClosed),
+            action = getString(R.string.tabClosedUndo),
+            showAction = true,
+            onAction = { launch { viewModel.undoDeletableTab(tab) } },
+            onDismiss = { launch { viewModel.purgeDeletableTabs() } },
+        ).show()
     }
 
     private fun launchShareLinkChooser(
@@ -841,6 +824,24 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .show()
     }
 
+    private fun showBookmarkTabsConfirmation(tabIds: List<String>) {
+        val numTabs = tabIds.size
+        val title = resources.getQuantityString(R.plurals.tabSwitcherBookmarkDialogTitle, numTabs, numTabs)
+        TextAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(R.string.tabSwitcherBookmarkDialogDescription)
+            .setPositiveButton(R.string.tabSwitcherBookmarkDialogPositiveButton, ButtonType.PRIMARY)
+            .setNegativeButton(R.string.cancel, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onBookmarkTabsConfirmed(tabIds)
+                    }
+                },
+            )
+            .show()
+    }
+
     private fun showAnimatedTileDismissalDialog() {
         tabSwitcherAnimationTileRemovalDialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.tabSwitcherAnimationTileRemovalDialogTitle)
@@ -863,41 +864,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .also { dialog ->
                 dialog.show()
             }
-    }
-
-    private fun showBookmarkTabsConfirmation(numTabs: Int) {
-        val title = resources.getQuantityString(R.plurals.tabSwitcherBookmarkDialogTitle, numTabs, numTabs)
-        TextAlertDialogBuilder(this)
-            .setTitle(title)
-            .setMessage(R.string.tabSwitcherBookmarkDialogDescription)
-            .setPositiveButton(R.string.tabSwitcherBookmarkDialogPositiveButton, ButtonType.PRIMARY)
-            .setNegativeButton(R.string.cancel, GHOST_ALT)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onBookmarkTabsConfirmed(numTabs)
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun showBookmarkTabsConfirmation(tabIds: List<String>) {
-        val numTabs = tabIds.size
-        val title = resources.getQuantityString(R.plurals.tabSwitcherBookmarkDialogTitle, numTabs, numTabs)
-        TextAlertDialogBuilder(this)
-            .setTitle(title)
-            .setMessage(R.string.tabSwitcherBookmarkDialogDescription)
-            .setPositiveButton(R.string.tabSwitcherBookmarkDialogPositiveButton, ButtonType.PRIMARY)
-            .setNegativeButton(R.string.cancel, GHOST_ALT)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onBookmarkTabsConfirmed(tabIds)
-                    }
-                },
-            )
-            .show()
     }
 
     private fun configureOnBackPressedListener() {
