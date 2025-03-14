@@ -27,6 +27,7 @@ interface MaliciousSiteProtection {
     sealed class MaliciousStatus {
         data class Malicious(val feed: Feed) : MaliciousStatus()
         data object Safe : MaliciousStatus()
+        data object Ignored : MaliciousStatus()
     }
 
     enum class Feed {

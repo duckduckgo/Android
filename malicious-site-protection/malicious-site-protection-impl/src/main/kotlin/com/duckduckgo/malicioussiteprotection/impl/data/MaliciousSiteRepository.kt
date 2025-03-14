@@ -39,6 +39,7 @@ import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevisi
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
@@ -53,7 +54,7 @@ import kotlinx.coroutines.withTimeout
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
     suspend fun getFilters(hash: String): List<FilterSet>?
-    suspend fun matches(hashPrefix: String): List<Match>
+    suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
     suspend fun loadHashPrefixes(): Result<Unit>
 }
@@ -87,7 +88,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 
-    override suspend fun matches(hashPrefix: String): List<Match> {
+    override suspend fun matches(hashPrefix: String): MatchesResult {
         return try {
             withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
                 maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
@@ -102,15 +103,15 @@ class RealMaliciousSiteRepository @Inject constructor(
                         null
                     }
                 }
-            }
+            }.let { MatchesResult.Result(it) }
         } catch (e: TimeoutCancellationException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
-            listOf()
+            MatchesResult.Ignored
         } catch (e: SocketTimeoutException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
-            listOf()
+            MatchesResult.Ignored
         } catch (e: Exception) {
-            listOf()
+            MatchesResult.Ignored
         }
     }
 

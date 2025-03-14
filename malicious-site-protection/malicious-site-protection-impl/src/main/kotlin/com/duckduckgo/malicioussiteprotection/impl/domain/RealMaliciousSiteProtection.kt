@@ -25,10 +25,13 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Ignored
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.MessageDigest
@@ -61,12 +64,12 @@ class RealMaliciousSiteProtection @Inject constructor(
     ): IsMaliciousResult {
         timber.d("isMalicious $url")
 
-        val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
-
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
-            timber.d("should not block (feature disabled) $canonicalUri")
-            return ConfirmedResult(Safe)
+            timber.d("should not block (feature disabled) $url")
+            return ConfirmedResult(Ignored)
         }
+
+        val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
@@ -94,12 +97,21 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
-                val result = matches(hashPrefix, canonicalUri, hostname, hash)?.let { feed: Feed ->
-                    Malicious(feed)
-                } ?: Safe
+                val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
+                    is Result -> matches.matches.firstOrNull { match ->
+                        Pattern.compile(match.regex).matcher(url.toString()).find() &&
+                            (hostname == match.hostname) &&
+                            (hash == match.hash)
+                    }?.feed?.let { feed: Feed ->
+                        Malicious(feed)
+                    } ?: Safe
+                    is MatchesResult.Ignored -> Ignored
+                }
+
                 when (result) {
                     is Malicious -> timber.d("should block (matches) $canonicalUri")
                     is Safe -> timber.d("should not block (no match) $canonicalUri")
+                    is Ignored -> timber.d("should not block (ignored) $canonicalUri")
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
@@ -109,19 +121,5 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
         timber.d("wait for confirmation $canonicalUri")
         return IsMaliciousResult.WaitForConfirmation
-    }
-
-    private suspend fun matches(
-        hashPrefix: String,
-        url: Uri,
-        hostname: String,
-        hash: String,
-    ): Feed? {
-        val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))
-        return matches.firstOrNull { match ->
-            Pattern.compile(match.regex).matcher(url.toString()).find() &&
-                (hostname == match.hostname) &&
-                (hash == match.hash)
-        }?.feed
     }
 }
