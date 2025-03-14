@@ -151,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_2"
                     android:visibility="gone"
-                    app:buttonSize="large"
+                    app:daxButtonSize="large"
                     tools:text="Primary Cta"
                     tools:visibility="visible" />
 
@@ -160,7 +160,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:buttonSize="large"
+                    app:daxButtonSize="large"
                     tools:text="Secondary Cta"
                     tools:visibility="visible" />
 

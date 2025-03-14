@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             android:text="@string/sync_internal_recovery_code_cta"/>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             android:text="@string/sync_internal_favicons_prompt_cta"/>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider

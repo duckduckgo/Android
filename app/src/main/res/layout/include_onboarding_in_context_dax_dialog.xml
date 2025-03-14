@@ -118,7 +118,7 @@
                             android:layout_marginEnd="@dimen/keyline_2"
                             android:layout_weight="0.5"
                             android:visibility="gone"
-                            app:buttonSize="small"
+                            app:daxButtonSize="small"
                             tools:text="Skip"
                             tools:visibility="visible" />
 
@@ -129,7 +129,7 @@
                             android:layout_marginTop="@dimen/daxDialogButtonSpacing"
                             android:layout_weight="0.5"
                             android:alpha="0"
-                            app:buttonSize="small"
+                            app:daxButtonSize="small"
                             tools:alpha="1"
                             tools:text="Try it" />
 

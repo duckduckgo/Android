@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bodyText"
         android:layout_marginTop="@dimen/keyline_2"
-        app:buttonSize="small" />
+        app:daxButtonSize="small" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dismissButton"
@@ -66,7 +66,7 @@
         android:layout_marginStart="@dimen/keyline_2"
         app:layout_constraintStart_toEndOf="@id/reportButton"
         app:layout_constraintTop_toTopOf="@id/reportButton"
-        app:buttonSize="small" />
+        app:daxButtonSize="small" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
