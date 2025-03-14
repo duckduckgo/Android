@@ -30,6 +30,8 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.MessageDigest
@@ -95,9 +97,17 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
-                val result = matches(hashPrefix, canonicalUri, hostname, hash)?.let { feed: Feed ->
-                    Malicious(feed)
-                } ?: Safe
+                val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
+                    is Result -> matches.matches.firstOrNull { match ->
+                        Pattern.compile(match.regex).matcher(url.toString()).find() &&
+                            (hostname == match.hostname) &&
+                            (hash == match.hash)
+                    }?.feed?.let { feed: Feed ->
+                        Malicious(feed)
+                    } ?: Safe
+                    is MatchesResult.Ignored -> Ignored
+                }
+
                 when (result) {
                     is Malicious -> timber.d("should block (matches) $canonicalUri")
                     is Safe -> timber.d("should not block (no match) $canonicalUri")
@@ -111,19 +121,5 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
         timber.d("wait for confirmation $canonicalUri")
         return IsMaliciousResult.WaitForConfirmation
-    }
-
-    private suspend fun matches(
-        hashPrefix: String,
-        url: Uri,
-        hostname: String,
-        hash: String,
-    ): Feed? {
-        val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))
-        return matches.firstOrNull { match ->
-            Pattern.compile(match.regex).matcher(url.toString()).find() &&
-                (hostname == match.hostname) &&
-                (hash == match.hash)
-        }?.feed
     }
 }

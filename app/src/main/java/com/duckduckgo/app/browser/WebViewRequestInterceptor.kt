@@ -255,6 +255,7 @@ class WebViewRequestInterceptor(
             is MaliciousStatus.Safe -> {
                 handleSiteSafe(webViewClientListener = webViewClientListener, uri = url, isForMainFrame = isForMainFrame)
             }
+            is MaliciousStatus.Ignored -> { /* Do nothing */ }
         }
     }
 

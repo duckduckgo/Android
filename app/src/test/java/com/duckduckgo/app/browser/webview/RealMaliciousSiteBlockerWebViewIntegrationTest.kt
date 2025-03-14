@@ -71,41 +71,41 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldOverrideUrlLoading returns safe when feature is disabled`() = runTest {
+    fun `shouldOverrideUrlLoading returns ignored when feature is disabled`() = runTest {
         updateFeatureEnabled(false)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
-        assertEquals(Safe(true), result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldOverrideUrlLoading returns safe when setting is disabled by user`() = runTest {
+    fun `shouldOverrideUrlLoading returns ignored when setting is disabled by user`() = runTest {
         whenever(mockSettingsDataStore.maliciousSiteProtectionEnabled).thenReturn(false)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
-        assertEquals(Safe(true), result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldInterceptRequest returns safe when feature is disabled`() = runTest {
+    fun `shouldInterceptRequest returns ignored when feature is disabled`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
         whenever(request.isForMainFrame).thenReturn(false)
         updateFeatureEnabled(false)
 
         val result = testee.shouldIntercept(request, null) {}
-        assertEquals(Safe(false), result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldInterceptRequest returns safe when setting is disabled by user`() = runTest {
+    fun `shouldInterceptRequest returns ignored when setting is disabled by user`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
         whenever(mockSettingsDataStore.maliciousSiteProtectionEnabled).thenReturn(false)
         whenever(request.isForMainFrame).thenReturn(false)
 
         val result = testee.shouldIntercept(request, null) {}
-        assertEquals(Safe(false), result)
+        assertEquals(Ignored, result)
     }
 
     @Test
