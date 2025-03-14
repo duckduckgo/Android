@@ -31,7 +31,7 @@ sealed class TabSwitcherItem(val id: String) {
         ) : Tab(entity)
 
         val isNewTabPage: Boolean
-            get() = tabEntity.url == null
+            get() = tabEntity.url.isNullOrBlank()
     }
     data class TrackerAnimationInfoPanel(val trackerCount: Int) : TabSwitcherItem("TrackerAnimationInfoPanel") {
         companion object {
