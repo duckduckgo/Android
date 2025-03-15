@@ -19,6 +19,18 @@ package com.duckduckgo.app.tabs.ui
 import com.duckduckgo.app.tabs.model.TabEntity
 
 sealed class TabSwitcherItem(val id: String) {
+    sealed class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId) {
+        data class NormalTab(
+            private val entity: TabEntity,
+            val isActive: Boolean,
+        ) : Tab(entity)
 
-    data class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId)
+        data class SelectableTab(
+            private val entity: TabEntity,
+            val isSelected: Boolean,
+        ) : Tab(entity)
+
+        val isNewTabPage: Boolean
+            get() = tabEntity.url.isNullOrBlank()
+    }
 }

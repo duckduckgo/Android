@@ -21,6 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.liveData
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
@@ -29,6 +30,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -97,23 +99,26 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var duckChatMock: DuckChat
 
-    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
 
+    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
     private lateinit var testee: TabSwitcherViewModel
 
+    private val tabList = listOf(TabEntity("1", position = 1), TabEntity("2", position = 2))
     private val repoDeletableTabs = Channel<List<TabEntity>>()
-    private val tabs = MutableLiveData<List<TabEntity>>()
+    private val tabs = MutableLiveData<List<TabEntity>>(tabList)
 
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
-    private val flowTabs = flowOf(listOf(TabEntity("1", position = 1), TabEntity("2", position = 2)))
+    private val flowTabs = flowOf(tabList)
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
 
         whenever(mockTabRepository.flowDeletableTabs)
             .thenReturn(repoDeletableTabs.consumeAsFlow())
@@ -125,6 +130,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
         whenever(mockTabRepository.flowTabs).thenReturn(flowTabs)
         whenever(statisticsDataStore.variant).thenReturn("")
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(liveData { null })
 
         initializeViewModel()
     }
@@ -138,6 +144,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
+            tabManagerFeatureFlags,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -263,16 +270,13 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
-        val tab = TabEntity("ID", position = 0)
-        tabs.value = listOf(tab)
-
         testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
-        verify(mockTabRepository).delete(tab)
-        verify(mockAdClickManager).clearTabId(tab.tabId)
-        verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        verify(mockTabRepository).delete(tabList.first())
+        verify(mockAdClickManager).clearTabId(tabList.first().tabId)
+        verify(mockWebViewSessionStorage).deleteSession(tabList.first().tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
