@@ -2016,20 +2016,53 @@
      * @param {{state: 'enabled' | 'disabled'}} [params.pip]
      * @param {{state: 'enabled' | 'disabled'}} [params.autoplay]
      * @param {{state: 'enabled' | 'disabled'}} [params.focusMode]
-     * @param {import("../types/duckplayer.js").InitialSetupResponse['settings']['customError']} [params.customError]
+     * @param {import("../types/duckplayer.js").DuckPlayerPageSettings['customError']} [params.customError]
      */
     constructor({
       platform = { name: "macos" },
       pip = { state: "disabled" },
       autoplay = { state: "enabled" },
       focusMode = { state: "enabled" },
-      customError = { state: "disabled", signInRequiredSelector: "" }
+      customError = { state: "disabled", settings: {}, signInRequiredSelector: "" }
     }) {
       this.platform = platform;
       this.pip = pip;
       this.autoplay = autoplay;
       this.focusMode = focusMode;
-      this.customError = customError;
+      this.customError = this.parseLegacyCustomError(customError);
+    }
+    /**
+     * Parses custom error settings so that both old and new schemas are accepted.
+     *
+     * Old schema:
+     * {
+     *   state: "enabled",
+     *   signInRequiredSelector: "div"
+     * }
+     *
+     * New schema:
+     * {
+     *   state: "disabled",
+     *   settings: {
+     *     signInRequiredSelector: "div"
+     *   }
+     * }
+     *
+     * @param {import("../types/duckplayer.js").DuckPlayerPageSettings['customError']} initialSettings
+     * @return {import("../types/duckplayer.js").CustomErrorSettings}
+     */
+    parseLegacyCustomError(initialSettings) {
+      if (initialSettings?.state !== "enabled") {
+        return { state: "disabled" };
+      }
+      const { settings, signInRequiredSelector } = initialSettings;
+      return {
+        state: "enabled",
+        settings: {
+          ...settings,
+          ...signInRequiredSelector && { signInRequiredSelector }
+        }
+      };
     }
     /**
      * @param {keyof import("../types/duckplayer.js").DuckPlayerPageSettings} named
@@ -3025,7 +3058,6 @@
     }
     const [error, setError] = h2(initialError);
     const messaging2 = useMessaging();
-    const platformName = usePlatformName();
     const setFocusMode = useSetFocusMode();
     y2(() => {
       const errorEventHandler = (event) => {
@@ -3033,9 +3065,7 @@
         if (YOUTUBE_ERROR_IDS.includes(eventError) || eventError === null) {
           if (eventError && eventError !== error) {
             setFocusMode("paused");
-            if (platformName === "macos" || platformName === "ios") {
-              messaging2.reportYouTubeError({ error: eventError });
-            }
+            messaging2.reportYouTubeError({ error: eventError });
           } else {
             setFocusMode("enabled");
           }
@@ -3055,10 +3085,10 @@
   var ErrorDetection = class {
     /** @type {HTMLIFrameElement} */
     iframe;
-    /** @type {CustomErrorOptions} */
+    /** @type {CustomErrorSettings} */
     options;
     /**
-     * @param {CustomErrorOptions} options
+     * @param {CustomErrorSettings} options
      */
     constructor(options) {
       this.options = options;
@@ -3068,8 +3098,8 @@
      */
     iframeDidLoad(iframe) {
       this.iframe = iframe;
-      if (!this.options || !this.options.signInRequiredSelector) {
-        console.log("Missing Custom Error options");
+      if (this.options?.state !== "enabled") {
+        console.log("Error detection disabled");
         return null;
       }
       const documentBody = iframe.contentWindow?.document?.body;
@@ -3135,7 +3165,8 @@
           return YOUTUBE_ERRORS.noEmbed;
         }
         try {
-          if (this.options?.signInRequiredSelector && !!iframeWindow.document.querySelector(this.options.signInRequiredSelector)) {
+          const { settings } = this.options;
+          if (settings?.signInRequiredSelector && !!iframeWindow.document.querySelector(settings.signInRequiredSelector)) {
             return YOUTUBE_ERRORS.signInRequired;
           }
         } catch (e3) {
