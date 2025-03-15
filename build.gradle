@@ -6,7 +6,7 @@ buildscript {
     ext {
         min_sdk = 26
         target_sdk = 34
-        compile_sdk = 34
+        compile_sdk = 35
 
         // Calculate lint_version (must always be gradle_plugin + 23)
         def gradle_plugin_version = versionFor(project, Android.tools.build.gradlePlugin)
