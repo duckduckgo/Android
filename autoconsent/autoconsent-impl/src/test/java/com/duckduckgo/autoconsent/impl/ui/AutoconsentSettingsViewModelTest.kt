@@ -134,7 +134,7 @@ class AutoconsentSettingsViewModelTest {
     }
 
     private fun initViewModel() {
-        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel, newSettingsFeature)
+        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel)
     }
 
     internal class FakeAutoconsent : Autoconsent {
@@ -224,60 +224,6 @@ class AutoconsentSettingsViewModelTest {
 
             override fun featureName(): FeatureName {
                 return FeatureName(null, "FakeSettingsPageFeature")
-            }
-
-            override fun isEnabled(cohort: CohortName): Boolean {
-                return enabled
-            }
-
-            override fun setRawStoredState(state: State) {
-                // NO OP
-            }
-
-            override fun getRawStoredState(): State? {
-                return null
-            }
-
-            override fun getSettings(): String? {
-                return null
-            }
-
-            override fun getCohort(): Cohort? {
-                return null
-            }
-        }
-
-        override fun newSettingsPage() = object : Toggle {
-
-            override fun featureName(): FeatureName {
-                return FeatureName(null, "FakeNewSettingsScreen")
-            }
-
-            override fun isEnabled(cohort: CohortName): Boolean {
-                return enabled
-            }
-
-            override fun setRawStoredState(state: State) {
-                // NO OP
-            }
-
-            override fun getRawStoredState(): State? {
-                return null
-            }
-
-            override fun getSettings(): String? {
-                return null
-            }
-
-            override fun getCohort(): Cohort? {
-                return null
-            }
-        }
-
-        override fun newPrivacyProSection() = object : Toggle {
-
-            override fun featureName(): FeatureName {
-                return FeatureName(null, "FakePrivacyProSection")
             }
 
             override fun isEnabled(cohort: CohortName): Boolean {

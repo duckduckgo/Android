@@ -39,7 +39,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
-class NewSettingsViewModelTest {
+class SettingsViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -86,13 +86,13 @@ class NewSettingsViewModelTest {
     @Mock
     private lateinit var settingsPixelDispatcherMock: SettingsPixelDispatcher
 
-    private lateinit var testee: NewSettingsViewModel
+    private lateinit var testee: SettingsViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        testee = NewSettingsViewModel(
+        testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
             appTrackingProtection = appTrackingProtectionMock,
             pixel = pixelMock,

@@ -35,7 +35,6 @@ import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
@@ -121,9 +120,6 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
-
     private val syncIntroLauncher = registerForActivityResult(
         SyncIntroContract(),
     ) { resultOk ->
@@ -153,9 +149,7 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
-        }
+        binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
 
         observeUiEvents()
         registerForPermission()

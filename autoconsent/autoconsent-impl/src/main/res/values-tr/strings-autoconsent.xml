@@ -18,7 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Çerez Açılır Pencere Engelleyici</string>
-    <string name="autoconsentDescription"><![CDATA[DuckDuckGo, ziyaret ettiğiniz sitelerde çerez açılır pencereleri algılarsa çerez tercihlerinizi çerezleri en aza indirecek ve gizliliği en üst düzeye çıkaracak şekilde otomatik olarak ayarlayabilir ve ardından açılır pencereleri kapatabiliriz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo, mevcut en gizli ayarları seçmeye ve bu açılır pencereleri gizlemeye çalışacaktır.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="autoconsentDescription"><![CDATA[DuckDuckGo, mevcut en gizli ayarları seçmeye ve bu açılır pencereleri gizlemeye çalışacaktır.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="autoconsentToggle">DuckDuckGo\'nun çerez açılır pencereleri için gereken işlemi yapmasına izin verin</string>
 </resources>
