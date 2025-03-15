@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">%1$s için Gizlilik Koruması etkin</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">%1$s için Gizlilik Koruması devre dışı</string>
     <string name="undoSnackbarAction">Geri al</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">İzleyici Engellendi</item>
+        <item quantity="other">İzleyici Engellendi</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Resmi İndir</string>
