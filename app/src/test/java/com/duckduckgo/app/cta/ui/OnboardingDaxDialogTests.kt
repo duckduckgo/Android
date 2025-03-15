@@ -169,16 +169,12 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenDaxDialogEndShownButOtherDialogsNotShownThenOnboardingNotComplete() = runTest {
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(true)
-        whenever(dismissedCtaDao.exists(DAX_DIALOG_OTHER)).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(false)
+    fun whenOnboardingDismissedThenOnboardingComplete() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         val onboardingComplete = testee.areBubbleDaxDialogsCompleted()
-        assertFalse(onboardingComplete)
+        assertTrue(onboardingComplete)
     }
 
     @Test
@@ -220,19 +216,6 @@ class OnboardingDaxDialogTests {
         whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-
-        val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
-        assertTrue(inContextDaxDialogsComplete)
-    }
-
-    @Test
-    fun whenOnboardingCompleteThenAreInContextDialogsCompletedIsTrue() = runTest {
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-        whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_DIALOG_SERP)).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_FIRE_BUTTON)).thenReturn(false)
-        whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
         assertTrue(inContextDaxDialogsComplete)

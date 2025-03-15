@@ -245,19 +245,19 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() = runTest {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroVisitSiteCtaThenDatabaseNotified() = runTest {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_VISIT_SITE))
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() = runTest {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
@@ -265,7 +265,7 @@ class CtaViewModelTest {
     fun whenRegisterCtaAndUserHasPendingOnboardingCtasThenStageNotCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore, times(0)).stageCompleted(any())
     }
 
@@ -273,7 +273,7 @@ class CtaViewModelTest {
     fun whenRegisterCtaAndAllDaxOnboardingCtasShownThenStageCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
@@ -666,7 +666,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDismissedDaxIntroVisitSiteCtaThenDatabaseNotified() = runTest {
-        testee.registerDaxBubbleCtaDismissed(
+        testee.onUserDismissedCta(
             DaxBubbleCta.DaxIntroVisitSiteOptionsCta(
                 mockOnboardingStore,
                 mockAppInstallStore,

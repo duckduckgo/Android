@@ -1515,7 +1515,6 @@ class BrowserTabFragment :
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         omnibar.hideFindInPage()
-        viewModel.registerDaxBubbleCtaDismissed()
         webView?.loadUrl(url, headers)
     }
 

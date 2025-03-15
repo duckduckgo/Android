@@ -139,7 +139,7 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+            if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
             if (cta is BrokenSitePromptDialogCta) {
@@ -156,15 +156,6 @@ class CtaViewModel @Inject constructor(
                 } else {
                     onboardingStore.clearVisitSiteCtaDisplayCount()
                 }
-            }
-        }
-    }
-
-    suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta) {
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                completeStageIfDaxOnboardingCompleted()
             }
         }
     }
@@ -282,19 +273,14 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
         daxOnboardingActive() && daxDialogIntroShown() && !hideTips() &&
-            !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
+            !(daxDialogIntroVisitSiteShown() || daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread
-    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
-        !daxDialogEndShown() &&
-        daxDialogIntroShown() &&
-        !hideTips() &&
-        (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
+    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() && !daxDialogEndShown() && daxDialogIntroShown() && !hideTips()
 
-    private suspend fun canShowPrivacyProCta(): Boolean {
-        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
-            subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
-    }
+    @WorkerThread
+    private suspend fun canShowPrivacyProCta(): Boolean = daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
+        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     @WorkerThread
     private suspend fun getBrowserCta(site: Site?): Cta? {
@@ -375,13 +361,14 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
+    private fun daxDialogIntroVisitSiteShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)
+
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
-            noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+            noBrowserCtaExperiment || daxDialogEndShown() || hideTips()
         }
     }
 
@@ -389,7 +376,7 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
-            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips()
         }
     }
 
