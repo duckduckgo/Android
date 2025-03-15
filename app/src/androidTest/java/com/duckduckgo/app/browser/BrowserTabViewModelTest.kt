@@ -192,6 +192,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -509,6 +511,10 @@ class BrowserTabViewModelTest {
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
 
+    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -613,6 +619,12 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+            defaultVisualExperimentStateFlow,
+        )
+        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(
+            defaultVisualExperimentNavBarStateFlow,
+        )
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -681,6 +693,7 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
+            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
         )
 
         testee.loadData("abc", null, false, false)

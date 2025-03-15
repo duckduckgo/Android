@@ -52,6 +52,13 @@ class BrowserPopupMenu(
         }
     }
 
+    internal val navigationButtonsContainer: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.navigationButtonsContainer
+            BOTTOM -> bottomBinding.navigationButtonsContainer
+        }
+    }
+
     internal val backMenuItem: View by lazy {
         when (omnibarPosition) {
             TOP -> topBinding.backMenuItem
@@ -70,6 +77,20 @@ class BrowserPopupMenu(
         when (omnibarPosition) {
             TOP -> topBinding.refreshMenuItem
             BOTTOM -> bottomBinding.refreshMenuItem
+        }
+    }
+
+    internal val navigationButtonsSectionDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.navigationButtonsSectionDivider
+            BOTTOM -> bottomBinding.navigationButtonsSectionDivider
+        }
+    }
+
+    internal val refreshLongMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.refreshLongMenuItem
+            BOTTOM -> bottomBinding.refreshLongMenuItem
         }
     }
 
@@ -249,6 +270,10 @@ class BrowserPopupMenu(
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         refreshMenuItem.isEnabled = browserShowing
+        navigationButtonsContainer.isVisible = viewState.navigationButtonsVisible
+        navigationButtonsSectionDivider.isVisible = viewState.navigationButtonsVisible
+        refreshLongMenuItem.isVisible = !viewState.navigationButtonsVisible && browserShowing
+
         printPageMenuItem.isEnabled = browserShowing
 
         newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen

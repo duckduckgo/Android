@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="24dp"
+    android:viewportWidth="25"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M11.623,2C8.861,2 6.623,4.239 6.623,7V13C6.623,15.762 8.861,18 11.623,18H17.623C20.384,18 22.623,15.762 22.623,13V7C22.623,4.239 20.384,2 17.623,2H11.623ZM8.123,7C8.123,5.067 9.69,3.5 11.623,3.5H17.623C19.556,3.5 21.123,5.067 21.123,7V13C21.123,14.933 19.556,16.5 17.623,16.5H11.623C9.69,16.5 8.123,14.933 8.123,13V7Z"
+      android:fillColor="?attr/daxColorNavigationBarIconEnabled"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M3.94,7.119C4.397,6.62 5.123,7.015 5.123,7.692C5.123,7.922 5.029,8.139 4.885,8.319C4.408,8.917 4.123,9.675 4.123,10.5V15.75C4.123,18.373 6.25,20.5 8.873,20.5H14.123C15.156,20.5 16.084,20.053 16.725,19.341C16.907,19.138 17.158,19 17.431,19C18.033,19 18.425,19.619 18.053,20.091C17.137,21.254 15.717,22 14.123,22H8.873C5.421,22 2.623,19.202 2.623,15.75V10.5C2.623,9.196 3.122,8.009 3.94,7.119Z"
+      android:fillColor="?attr/daxColorNavigationBarIconEnabled"/>
+</vector>
