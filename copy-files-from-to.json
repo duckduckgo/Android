@@ -99,6 +99,30 @@
     {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/expire-first-party-js-cookies/tests.json",
       "to": "app/src/androidTest/resources/reference_tests/firstpartycookies/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/canonicalization_tests.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/canonicalization/canonicalization_tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/block_tests.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/block_tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/reference_phishing_filterSet.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/reference_phishing_filterSet.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/reference_malware_filterSet.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/reference_malware_filterSet.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/reference_phishing_hashPrefixes.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/reference_phishing_hashPrefixes.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/reference_malware_hashPrefixes.json",
+      "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/reference_malware_hashPrefixes.json"
     }
   ],
   "copyFilesSettings": {

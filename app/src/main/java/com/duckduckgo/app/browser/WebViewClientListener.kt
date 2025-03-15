@@ -35,9 +35,11 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 interface WebViewClientListener {
 
     fun onPageContentStart(url: String)
-    fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
-    fun progressChanged(newProgress: Int)
+    fun progressChanged(
+        newProgress: Int,
+        webViewNavigationState: WebViewNavigationState,
+    )
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
@@ -96,7 +98,17 @@ interface WebViewClientListener {
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
-    fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean)
+    fun onReceivedMaliciousSiteWarning(
+        url: Uri,
+        feed: Feed,
+        exempted: Boolean,
+        clientSideHit: Boolean,
+        isMainframe: Boolean,
+    )
+    fun onReceivedMaliciousSiteSafe(
+        url: Uri,
+        isForMainFrame: Boolean,
+    )
     fun recordErrorCode(error: String, url: String)
     fun recordHttpErrorCode(statusCode: Int, url: String)
 
@@ -108,4 +120,15 @@ interface WebViewClientListener {
         errorResponse: SslErrorResponse,
     )
     fun onShouldOverride()
+    fun pageFinished(
+        webViewNavigationState: WebViewNavigationState,
+        url: String?,
+    )
+
+    fun onPageCommitVisible(
+        webViewNavigationState: WebViewNavigationState,
+        url: String,
+    )
+
+    fun pageStarted(webViewNavigationState: WebViewNavigationState)
 }

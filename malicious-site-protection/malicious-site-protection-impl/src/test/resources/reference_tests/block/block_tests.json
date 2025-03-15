@@ -1,0 +1,140 @@
+{
+    "phishingDetectionTests": {
+        "name": "Should block phishing pages",
+        "desc": "All browser platforms should block pages in the phishing datasets, and not block pages not in the dataset.",
+        "tests": [
+            {
+                "name": "phishing wildcard regex test",
+                "siteURL": "https://malicious.example.com/all/paths/should/match/phishing",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "phishing wildcard regex test 2",
+                "siteURL": "https://malicious.example.com/all/other/paths/should/match/phishing/too",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "multiple path phishing match",
+                "siteURL": "https://phishing-site.com/download/transaction/safety/check",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "multiple subdomain phishing match",
+                "siteURL": "https://stealing.your.data.co.uk/loading/login/connect/alert/download/information/your/transaction",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "phishing wildcard and subdomain regex test",
+                "siteURL": "https://impersonating-gov-uk.co.uk/login/protect/account/account/data/account/urgent/service/install/support",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "exclusively not in phishing dataset",
+                "siteURL": "https://not-in-dataset.com/anything.html",
+                "expectBlock": false,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "hash match in malware dataset, but not regex",
+                "siteURL": "https://impersonating-gov-uk.co.uk/path/not/in/dataset",
+                "expectBlock": false,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            }
+        ]
+    },
+    "malwareDetectionTests": {
+        "name": "Should block malware pages",
+        "desc": "All browser platforms should block pages in the malware datasets, and not block pages not in the dataset.",
+        "tests": [
+            {
+                "name": "malware wildcard regex test",
+                "siteURL": "https://drive-by-attack.com/anything.html",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "malware wildcard regex test 2",
+                "siteURL": "https://drive-by-attack.com/anything/else/should/match/too",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "multiple path malware match",
+                "siteURL": "https://malicious.example.com/login/safe/urgent/notification",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "multiple subdomain malware match",
+                "siteURL": "https://stealing.your.data.co.uk/loading/login/connect/alert/download/information/your/transaction",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "malware wildcard and subdomain regex test",
+                "siteURL": "https://danger.malware.distribution.com/support/confirm/safety/login/notification/password/password/information/information",
+                "expectBlock": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "exclusively not in malware dataset",
+                "siteURL": "https://not-in-dataset.com/anything.html",
+                "expectBlock": false,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            },
+            {
+                "name": "hash match in malware dataset, but not regex",
+                "siteURL": "https://danger.malware.distribution.com/path/not/in/dataset",
+                "expectBlock": false,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension"
+                ]
+            }
+        ]
+    }
+}

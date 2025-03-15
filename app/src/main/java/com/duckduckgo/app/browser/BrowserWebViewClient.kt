@@ -162,7 +162,7 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-            if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, isForMainFrame)) {
+            if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
             }
 
@@ -383,8 +383,7 @@ class BrowserWebViewClient @Inject constructor(
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-            webViewClientListener?.onPageContentStart(url)
+            webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
         }
     }
 
@@ -430,7 +429,7 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList))
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
@@ -469,8 +468,7 @@ class BrowserWebViewClient @Inject constructor(
 
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
-                navigationStateChanged(WebViewNavigationState(navigationList))
-                url?.let { prefetchFavicon(url) }
+                pageFinished(WebViewNavigationState(navigationList), url)
             }
             flushCookies()
             printInjector.injectPrint(webView)
