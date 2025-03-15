@@ -25,7 +25,7 @@ import com.duckduckgo.common.utils.AppUrl
 
 fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {
-        return context.getString(R.string.homeTab)
+        return context.getString(R.string.newTabMenuItem)
     }
 
     return title ?: Uri.parse(resolvedUrl()).host ?: ""
