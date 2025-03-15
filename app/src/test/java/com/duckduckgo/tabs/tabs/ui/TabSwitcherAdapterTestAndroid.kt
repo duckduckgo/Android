@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter
 import com.duckduckgo.app.tabs.ui.TabSwitcherListener
+import com.duckduckgo.app.tabs.ui.TrackerCountAnimator
 import com.duckduckgo.common.utils.DispatcherProvider
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +52,7 @@ class TabSwitcherAdapterTestAndroid {
         verify(mockTabSwitchListener).onTabDeleted(3, false)
     }
 
-    fun createMockTabSwitcherAdapter(
+    private fun createMockTabSwitcherAdapter(
         listener: TabSwitcherListener,
     ): TabSwitcherAdapter {
         return TabSwitcherAdapter(
@@ -60,6 +61,7 @@ class TabSwitcherAdapterTestAndroid {
             lifecycleOwner = mock(),
             faviconManager = mock<FaviconManager>(),
             dispatchers = mock<DispatcherProvider>(),
+            trackerCountAnimator = mock<TrackerCountAnimator>(),
         )
     }
 }

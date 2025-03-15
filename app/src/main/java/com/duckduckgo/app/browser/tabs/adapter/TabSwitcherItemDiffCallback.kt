@@ -19,8 +19,14 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_NO_REPLACE_ALPHA
 
-class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitcherItem>) : DiffUtil.Callback() {
+class TabSwitcherItemDiffCallback(
+    old: List<TabSwitcherItem>,
+    new: List<TabSwitcherItem>,
+    private val isDragging: Boolean,
+) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
     private val oldList = old.toList()
@@ -72,6 +78,12 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
                 }
             }
+            oldItem is TabSwitcherItem.TrackerAnimationTile && newItem is TabSwitcherItem.TrackerAnimationTile -> {
+                diffBundle.putFloat(
+                    DIFF_ALPHA,
+                    if (isDragging) ANIMATED_TILE_NO_REPLACE_ALPHA else ANIMATED_TILE_DEFAULT_ALPHA,
+                )
+            }
         }
 
         return diffBundle
@@ -114,5 +126,6 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
         const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
+        const val DIFF_ALPHA = "alpha"
     }
 }
