@@ -17,12 +17,17 @@
 package com.duckduckgo.pir.internal.scan
 
 import android.content.Context
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.component.PirActionsRunner
 import com.duckduckgo.pir.internal.component.PirActionsRunnerFactory
+import com.duckduckgo.pir.internal.pixels.PirPixelSender
+import com.duckduckgo.pir.internal.scan.PirScan.RunType
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
+import com.duckduckgo.pir.internal.store.db.PirScanLog
+import com.duckduckgo.pir.internal.store.db.ScanEventType
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.File
@@ -46,6 +51,7 @@ interface PirScan {
     suspend fun execute(
         brokers: List<String>,
         context: Context,
+        runType: RunType,
     ): Result<Unit>
 
     /**
@@ -55,12 +61,18 @@ interface PirScan {
      */
     suspend fun executeAllBrokers(
         context: Context,
+        runType: RunType,
     ): Result<Unit>
 
     /**
      * This method takes care of stopping the scan and cleaning up resources used.
      */
     fun stop()
+
+    enum class RunType {
+        MANUAL,
+        SCHEDULED,
+    }
 }
 
 @ContributesBinding(
@@ -73,6 +85,8 @@ class RealPirScan @Inject constructor(
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
+    private val pixelSender: PirPixelSender,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirScan {
 
     private var profileQuery: ProfileQuery = ProfileQuery(
@@ -93,7 +107,10 @@ class RealPirScan @Inject constructor(
     override suspend fun execute(
         brokers: List<String>,
         context: Context,
+        runType: RunType,
     ): Result<Unit> {
+        val startTimeMillis = currentTimeProvider.currentTimeMillis()
+        emitScanStartPixel(runType)
         // Clean up previous run's results
         runBlocking {
             if (runners.isNotEmpty()) {
@@ -114,7 +131,8 @@ class RealPirScan @Inject constructor(
                         birthYear = storedProfile.birthYear,
                         fullName = storedProfile.userName.middleName?.run {
                             "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                        } ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                        }
+                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
                         age = storedProfile.age,
                         deprecated = false,
                     )
@@ -137,6 +155,7 @@ class RealPirScan @Inject constructor(
                 pirActionsRunnerFactory.getInstance(
                     context,
                     script,
+                    runType,
                 ),
             )
             createCount++
@@ -156,6 +175,11 @@ class RealPirScan @Inject constructor(
                 }.awaitAll()
 
             logcat { "PIR-SCAN: Scan completed for all runners" }
+            emitScanCompletedPixel(
+                runType,
+                startTimeMillis - currentTimeProvider.currentTimeMillis(),
+                maxWebViewCount,
+            )
             Result.success(Unit)
         }
     }
@@ -180,17 +204,72 @@ class RealPirScan @Inject constructor(
 
     override suspend fun executeAllBrokers(
         context: Context,
+        runType: RunType,
     ): Result<Unit> {
         val brokers = runBlocking {
             repository.getAllBrokersForScan()
         }
-        return execute(brokers, context)
+        return execute(brokers, context, runType)
     }
 
     override fun stop() {
         logcat { "PIR-SCAN: Stopping all runners" }
         runners.forEach {
             runBlocking { it.stop() }
+        }
+    }
+
+    private suspend fun emitScanStartPixel(runType: RunType) {
+        if (runType == RunType.MANUAL) {
+            pixelSender.reportManualScanStarted()
+            repository.saveScanLog(
+                PirScanLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = ScanEventType.MANUAL_SCAN_STARTED,
+                ),
+            )
+        } else {
+            pixelSender.reportScheduledScanStarted()
+            repository.saveScanLog(
+                PirScanLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = ScanEventType.SCHEDULED_SCAN_STARTED,
+                ),
+            )
+        }
+    }
+
+    private suspend fun emitScanCompletedPixel(
+        runType: RunType,
+        totalTimeInMillis: Long,
+        totalParallelWebViews: Int,
+    ) {
+        if (runType == RunType.MANUAL) {
+            pixelSender.reportManualScanCompleted(
+                totalTimeInMillis = totalTimeInMillis,
+                totalParallelWebViews = totalParallelWebViews,
+                totalBrokerSuccess = repository.getSuccessResultsCount(),
+                totalBrokerFailed = repository.getErrorResultsCount(),
+            )
+            repository.saveScanLog(
+                PirScanLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = ScanEventType.MANUAL_SCAN_COMPLETED,
+                ),
+            )
+        } else {
+            pixelSender.reportScheduledScanCompleted(
+                totalTimeInMillis = totalTimeInMillis,
+                totalParallelWebViews = totalParallelWebViews,
+                totalBrokerSuccess = repository.getSuccessResultsCount(),
+                totalBrokerFailed = repository.getErrorResultsCount(),
+            )
+            repository.saveScanLog(
+                PirScanLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = ScanEventType.SCHEDULED_SCAN_COMPLETED,
+                ),
+            )
         }
     }
 }

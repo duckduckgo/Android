@@ -17,8 +17,11 @@
 package com.duckduckgo.pir.internal.component
 
 import android.content.Context
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.JsMessageHelper
+import com.duckduckgo.pir.internal.pixels.PirPixelSender
+import com.duckduckgo.pir.internal.scan.PirScan.RunType
 import com.duckduckgo.pir.internal.scripts.PirMessagingInterface
 import com.duckduckgo.pir.internal.scripts.RealBrokerActionProcessor
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -29,6 +32,8 @@ class PirActionsRunnerFactory @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val repository: PirRepository,
     private val jsMessageHelper: JsMessageHelper,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val pixelSender: PirPixelSender,
 ) {
     /**
      * Every instance of PirActionsRunner is created with its own instance of [PirMessagingInterface] and [RealBrokerActionProcessor]
@@ -36,6 +41,7 @@ class PirActionsRunnerFactory @Inject constructor(
     fun getInstance(
         context: Context,
         pirScriptToLoad: String,
+        runType: RunType,
     ): PirActionsRunner {
         return RealPirActionsRunner(
             dispatcherProvider,
@@ -48,6 +54,9 @@ class PirActionsRunnerFactory @Inject constructor(
             ),
             context,
             pirScriptToLoad,
+            pixelSender,
+            runType,
+            currentTimeProvider,
         )
     }
 }

@@ -40,12 +40,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
+import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.service.PirForegroundScanService
 import com.duckduckgo.pir.internal.service.PirRemoteWorkerService
 import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker
@@ -55,6 +57,8 @@ import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.db.Address
+import com.duckduckgo.pir.internal.store.db.PirScanLog
+import com.duckduckgo.pir.internal.store.db.ScanEventType.SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.internal.store.db.UserName
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import java.time.LocalDate
@@ -85,6 +89,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var pixelSender: PirPixelSender
+
+    @Inject
+    lateinit var currentTimeProvider: CurrentTimeProvider
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -174,11 +184,13 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             startForegroundService(Intent(this, PirForegroundScanService::class.java))
             globalActivityStarter.start(this, PirResultsScreenNoParams)
         }
+
         binding.debugForceKill.setOnClickListener {
             stopService(Intent(this, PirForegroundScanService::class.java))
             lifecycleScope.launch(dispatcherProvider.io()) {
                 repository.deleteAllResults()
                 repository.deleteAllUserProfiles()
+                repository.deleteAllScanLogs()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
@@ -192,6 +204,10 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         binding.scheduleScan.setOnClickListener {
             schedulePeriodicScan()
             Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.viewScanResults.setOnClickListener {
+            globalActivityStarter.start(this, PirScanResultsScreenNoParams)
         }
     }
 
@@ -209,6 +225,16 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 .setConstraints(constraints)
                 .setInitialDelay(1, TimeUnit.MINUTES)
                 .build()
+
+        pixelSender.reportScheduledScanScheduled()
+        lifecycleScope.launch {
+            repository.saveScanLog(
+                PirScanLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = SCHEDULED_SCAN_SCHEDULED,
+                ),
+            )
+        }
 
         workManager.enqueueUniquePeriodicWork(
             TAG_SCHEDULED_SCAN,

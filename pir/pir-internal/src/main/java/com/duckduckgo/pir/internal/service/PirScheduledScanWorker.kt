@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.scan.PirScan
+import com.duckduckgo.pir.internal.scan.PirScan.RunType.SCHEDULED
 import javax.inject.Inject
 import logcat.logcat
 
@@ -40,7 +41,7 @@ class PirScheduledScanRemoteWorker(
 
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
-        val result = pirScan.execute(supportedBrokers, context.applicationContext)
+        val result = pirScan.execute(supportedBrokers, context.applicationContext, SCHEDULED)
 
         return if (result.isSuccess) {
             logcat { "PIR-WORKER ($this}: Successfully completed!" }
