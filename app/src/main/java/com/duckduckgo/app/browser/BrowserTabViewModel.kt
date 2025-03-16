@@ -3603,7 +3603,7 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(cta)
         return when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> {
-                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri())
+                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_onboarding_android".toUri())
             }
 
             is DaxBubbleCta.DaxEndCta -> {
