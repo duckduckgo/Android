@@ -90,11 +90,30 @@ abstract class TabsDao {
     }
 
     @Transaction
+    open fun markTabsAsDeletable(tabIds: List<String>) {
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = true))
+            }
+        }
+    }
+
+    @Transaction
     open fun undoDeletableTab(tab: TabEntity) {
         // ensure the tab is in the DB
         val dbTab = tab(tab.tabId)
         dbTab?.let {
             updateTab(dbTab.copy(deletable = false))
+        }
+    }
+
+    @Transaction
+    open fun undoDeletableTabs(tabIds: List<String>) {
+        // ensure the tab is in the DB
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = false))
+            }
         }
     }
 

@@ -84,7 +84,11 @@ interface TabRepository {
 
     suspend fun markDeletable(tab: TabEntity)
 
+    suspend fun markDeletable(tabIds: List<String>)
+
     suspend fun undoDeletable(tab: TabEntity)
+
+    suspend fun undoDeletable(tabIds: List<String>)
 
     suspend fun deleteTabs(tabIds: List<String>)
 
