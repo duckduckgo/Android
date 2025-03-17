@@ -199,7 +199,7 @@
                     android:textSize="16sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                    app:layout_constraintEnd_toStartOf="@id/clearTextButton"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
 
