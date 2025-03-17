@@ -199,14 +199,29 @@
                     android:textSize="16sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                    app:layout_constraintEnd_toStartOf="@id/clearTextButton"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/voiceSearchButton"
+                    android:id="@+id/clearTextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/clearButtonContentDescription"
+                    android:padding="@dimen/toolbarIconPadding"
+                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:src="@drawable/ic_close_24"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/voiceSearchButton"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
                     android:background="?selectableItemBackgroundBorderless"
                     android:contentDescription="@string/voiceSearchIconContentDescription"
                     android:padding="@dimen/toolbarIconPadding"
@@ -221,26 +236,38 @@
                     android:id="@+id/spacer"
                     android:layout_width="10dp"
                     android:layout_height="0dp"
-                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
                     app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
-                    app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
-                    app:layout_constraintStart_toStartOf="@id/clearTextButton"
+                    app:layout_constraintEnd_toStartOf="@id/aiChat"
+                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
                     android:importantForAccessibility="no"/>
 
+                <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                    android:id="@+id/verticalDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:layout_marginVertical="@dimen/keyline_2"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/aiChat"
+                    app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <ImageView
-                    android:id="@+id/clearTextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/clearButtonContentDescription"
-                    android:padding="@dimen/toolbarIconPadding"
+                    android:id="@+id/aiChat"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
                     android:layout_marginEnd="@dimen/keyline_1"
-                    android:src="@drawable/ic_close_24"
+                    android:scaleType="center"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/toolbarIconPadding"
                     android:visibility="gone"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    android:contentDescription="@string/browserPopupMenu"
+                    tools:visibility="visible"
+                    android:src="@drawable/ic_ai_chat_outline_24" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -268,27 +295,6 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
-                android:id="@+id/aiChat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/keyline_2"
-                android:padding="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/aiChatIconImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_ai_chat_outline_24" />
-            </FrameLayout>
-
-            <FrameLayout
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -298,8 +304,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/fireIconImageView"
@@ -333,8 +338,7 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/browserMenuImageView"

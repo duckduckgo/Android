@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,15 +14,7 @@
   ~ limitations under the License.
   -->
 
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="25dp"
-    android:height="24dp"
-    android:viewportWidth="25"
-    android:viewportHeight="24">
-  <path
-      android:pathData="M4.623,5.25H20.623M4.623,18.75H20.623M4.623,12H20.623"
-      android:strokeWidth="1.5"
-      android:fillColor="#00000000"
-      android:strokeColor="?attr/daxColorNavigationBarIconEnabled"
-      android:strokeLineCap="round"/>
-</vector>
+<resources>
+    <!-- Experimental Toolbar -->
+    <dimen name="toolbarIcon">40dp</dimen>
+</resources>

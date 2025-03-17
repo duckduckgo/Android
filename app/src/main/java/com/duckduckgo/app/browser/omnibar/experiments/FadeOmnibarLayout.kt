@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -46,7 +46,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
-    private val aiChat: FrameLayout by lazy { findViewById(R.id.aiChat) }
+    private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
+    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -79,14 +80,16 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override fun render(viewState: ViewState) {
         val experimentalViewState = viewState.copy(
-            showBrowserMenu = !viewState.isNavigationBarEnabled && viewState.showBrowserMenu,
-            showFireIcon = !viewState.isNavigationBarEnabled && viewState.showFireIcon,
-            showTabsMenu = !viewState.isNavigationBarEnabled && viewState.showTabsMenu,
+            showBrowserMenu = false,
+            showFireIcon = false,
+            showTabsMenu = false,
         )
         super.render(experimentalViewState)
 
-        val showChatMenu = viewState.isNavigationBarEnabled && viewState.viewMode !is ViewMode.CustomTab
+        val showChatMenu = viewState.viewMode !is ViewMode.CustomTab
         aiChat.isVisible = showChatMenu
+        aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
+        spacer.isVisible = false
 
         minibarText.text = viewState.url.extractDomain()
     }

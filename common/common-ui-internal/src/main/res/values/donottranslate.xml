@@ -24,8 +24,4 @@
     <string name="experimentalUIWarmColorsMessage">When disabled, it uses Cool colors instead.</string>
     <string name="experimentalUIIconsTitle">Use colorful icons</string>
     <string name="experimentalUIIconsMessage">When enabled, colorful icons will be shown in the toolbar.</string>
-
-    <!--    Bottom Navigation Bar Experiment-->
-    <string name="navigationBarExperimentEnableTitle">Enable navigation bar</string>
-    <string name="navigationBarExperimentEnableMessage">Enables the bottom navigation bar and adjusts relevant functionality in the address bar and browser menu.</string>
 </resources>

@@ -33,6 +33,6 @@ class ExperimentalTabSwitcherButton @JvmOverloads constructor(
         set(value) {
             field = value
             val text = if (count < 100) "$count" else "~"
-            binding.tabCount.text = text
+            // binding.tabCount.text = text
         }
 }

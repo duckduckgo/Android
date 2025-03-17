@@ -28,40 +28,45 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
 class BrowserNavigationBarViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val tabRepository: TabRepository,
+    private val dispatcherProvider: DispatcherProvider,
+
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            visualDesignExperimentDataStore.navigationBarState.collect { navigationBarState ->
-                _viewState.update {
-                    it.copy(
-                        isVisible = navigationBarState.isEnabled,
-                    )
-                }
-            }
-        }
-    }
+    val viewState = combine(
+        _viewState.asStateFlow(),
+        tabRepository.flowTabs,
+        visualDesignExperimentDataStore.navigationBarState,
+    ) { state, tabs, navigationBarState ->
+        state.copy(
+            isVisible = navigationBarState.isEnabled,
+            tabsCount = tabs.size,
+            shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
+        )
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     fun onFireButtonClicked() {
         _commands.trySend(NotifyFireButtonClicked)
@@ -128,5 +133,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val forwardArrowButtonEnabled: Boolean = false,
         val fireButtonVisible: Boolean = true,
         val tabsButtonVisible: Boolean = true,
+        val tabsCount: Int = 0,
+        val shouldUpdateTabsCount: Boolean = false,
     )
 }

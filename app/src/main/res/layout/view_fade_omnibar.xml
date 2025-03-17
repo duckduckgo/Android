@@ -42,7 +42,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iconsContainer"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
@@ -113,8 +113,9 @@
 
                     <ImageView
                         android:id="@+id/searchIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:scaleType="center"
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="6dp"
@@ -198,14 +199,30 @@
                     android:textSize="16sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                    app:layout_constraintEnd_toStartOf="@id/clearTextButton"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/voiceSearchButton"
+                    android:id="@+id/clearTextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/clearButtonContentDescription"
+                    android:padding="@dimen/toolbarIconPadding"
+                    android:layout_marginEnd="@dimen/keyline_1"
+                    android:src="@drawable/ic_close_24"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/voiceSearchButton"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
+                    android:scaleType="center"
                     android:background="?selectableItemBackgroundBorderless"
                     android:contentDescription="@string/voiceSearchIconContentDescription"
                     android:padding="@dimen/toolbarIconPadding"
@@ -222,24 +239,36 @@
                     android:layout_height="0dp"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
-                    app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
-                    app:layout_constraintStart_toStartOf="@id/clearTextButton"
+                    app:layout_constraintEnd_toStartOf="@id/aiChat"
                     app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
 
+                <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                    android:id="@+id/verticalDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:layout_marginVertical="@dimen/keyline_2"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/aiChat"
+                    app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <ImageView
-                    android:id="@+id/clearTextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/clearButtonContentDescription"
-                    android:padding="@dimen/toolbarIconPadding"
+                    android:id="@+id/aiChat"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
                     android:layout_marginEnd="@dimen/keyline_1"
-                    android:src="@drawable/ic_close_24"
+                    android:scaleType="center"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/toolbarIconPadding"
                     android:visibility="gone"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    android:contentDescription="@string/browserPopupMenu"
+                    tools:visibility="visible"
+                    android:src="@drawable/ic_ai_chat_outline_24" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -258,104 +287,70 @@
             tools:progress="50"
             tools:visibility="visible" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/iconsContainer"
+        <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
+            android:id="@+id/tabsMenu"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_0"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="@dimen/keyline_2"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/browserMenu"
+            app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <FrameLayout
+            android:id="@+id/browserMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/keyline_0"
+            android:padding="@dimen/keyline_2"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
-                android:id="@+id/aiChat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/keyline_2"
-                android:padding="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/aiChatIconImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_ai_chat_outline_24" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/fireIconMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:padding="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tabsMenu"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/fireIconImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_fire" />
-            </FrameLayout>
-
-            <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
-                android:id="@+id/tabsMenu"
+            <ImageView
+                android:id="@+id/browserMenuImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_0"
-                android:background="?selectableItemBackgroundBorderless"
-                android:padding="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/browserMenu"
-                app:layout_constraintStart_toEndOf="@id/fireIconMenu"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_menu_vertical_24" />
 
-            <FrameLayout
-                android:id="@+id/browserMenu"
+            <View
+                android:id="@+id/browserMenuHighlight"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_gravity="end"
+                android:background="@drawable/ic_circle_7_accent_blue"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fireIconMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="6dp"
+            android:padding="@dimen/keyline_2"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/fireIconImageView"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/keyline_0"
-                android:padding="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/browserMenuImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_menu_vertical_24" />
-
-                <View
-                    android:id="@+id/browserMenuHighlight"
-                    android:layout_width="7dp"
-                    android:layout_height="7dp"
-                    android:layout_gravity="end"
-                    android:background="@drawable/ic_circle_7_accent_blue"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_fire" />
+        </FrameLayout>
 
         <include
             android:id="@+id/findInPage"
