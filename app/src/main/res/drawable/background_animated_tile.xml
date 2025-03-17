@@ -19,4 +19,5 @@
         android:startColor="#C2F4BB"
         android:endColor="@color/green0"
         />
+    <corners android:radius="@dimen/smallShapeCornerRadius"/>
 </shape>

@@ -38,10 +38,9 @@ import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ItemGridTrackerAnimationTileBinding
-import com.duckduckgo.app.browser.databinding.ItemListTrackerAnimationTileBinding
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
+import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
@@ -53,9 +52,8 @@ import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Compa
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TRACKER_ANIMATION_TILE
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
@@ -106,13 +104,9 @@ class TabSwitcherAdapter(
                 val binding = ItemTabListBinding.inflate(inflater, parent, false)
                 return TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
-            GRID_TRACKER_ANIMATION_TILE -> {
-                val binding = ItemGridTrackerAnimationTileBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder(binding)
-            }
-            LIST_TRACKER_ANIMATION_TILE -> {
-                val binding = ItemListTrackerAnimationTileBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder(binding)
+            TRACKER_ANIMATION_TILE_INFO_PANEL -> {
+                val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
+                return TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
             }
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
@@ -126,12 +120,7 @@ class TabSwitcherAdapter(
                     LayoutType.LIST -> LIST_TAB
                 }
             }
-            is TabSwitcherItem.TrackerAnimationTile -> {
-                when (layoutType) {
-                    LayoutType.GRID -> GRID_TRACKER_ANIMATION_TILE
-                    LayoutType.LIST -> LIST_TRACKER_ANIMATION_TILE
-                }
-            }
+            is TabSwitcherItem.TrackerAnimationTile -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
 
     override fun getItemCount(): Int = list.size
@@ -146,29 +135,16 @@ class TabSwitcherAdapter(
                 val tab = (list[position] as TabSwitcherItem.Tab).tabEntity
                 bindListTab(holder, tab)
             }
-            is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder -> {
+            is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
 
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = R.string.trackersBlockedInTheLast7days,
                     totalTrackerCount = trackerAnimationTile.trackerCount,
-                    trackerTextView = holder.binding.text,
+                    trackerTextView = holder.binding.infoPanelText,
                 )
-                holder.binding.close.setOnClickListener {
-                    onAnimationTileCloseClickListener?.invoke()
-                }
-            }
-            is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder -> {
-                val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
-
-                trackerCountAnimator.animateTrackersBlockedCountView(
-                    context = holder.binding.root.context,
-                    stringRes = R.string.trackersBlocked,
-                    totalTrackerCount = trackerAnimationTile.trackerCount,
-                    trackerTextView = holder.binding.title,
-                )
-                holder.binding.close.setOnClickListener {
+                holder.binding.root.setOnClickListener {
                     onAnimationTileCloseClickListener?.invoke()
                 }
             }
@@ -245,7 +221,7 @@ class TabSwitcherAdapter(
                 tab = list[position] as TabSwitcherItem.Tab,
                 payloads = payloads,
             )
-            GRID_TRACKER_ANIMATION_TILE, LIST_TRACKER_ANIMATION_TILE -> {
+            TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 for (payload in payloads) {
                     val bundle = payload as Bundle
                     holder.itemView.alpha = bundle.getFloat(DIFF_ALPHA, ANIMATED_TILE_DEFAULT_ALPHA)
@@ -436,8 +412,7 @@ class TabSwitcherAdapter(
         companion object {
             const val GRID_TAB = 0
             const val LIST_TAB = 1
-            const val GRID_TRACKER_ANIMATION_TILE = 2
-            const val LIST_TRACKER_ANIMATION_TILE = 3
+            const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
         }
 
         interface TabViewHolder {
@@ -468,12 +443,8 @@ class TabSwitcherAdapter(
             val url: TextView = binding.url,
         ) : TabSwitcherViewHolder(binding.root), TabViewHolder
 
-        data class GridTrackerAnimationTileViewHolder(
-            val binding: ItemGridTrackerAnimationTileBinding,
-        ) : TabSwitcherViewHolder(binding.root)
-
-        data class ListTrackerAnimationTileViewHolder(
-            val binding: ItemListTrackerAnimationTileBinding,
+        data class TrackerAnimationInfoPanelViewHolder(
+            val binding: ItemTabSwitcherAnimationInfoPanelBinding,
         ) : TabSwitcherViewHolder(binding.root)
     }
 }
