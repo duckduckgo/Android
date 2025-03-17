@@ -41,6 +41,10 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
     }
 
+    override suspend fun deleteAll() {
+        dao.deleteAll()
+    }
+
     // TODO move to public API if experiment kept
     suspend fun getTrackerCountForLast7Days(): Int {
         return getTrackersCountBetween(
