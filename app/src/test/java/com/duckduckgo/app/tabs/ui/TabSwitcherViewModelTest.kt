@@ -107,9 +107,6 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
 
-    @Mock
-    private lateinit var mockTabSwitcherTileAnimationMonitor: TabSwitcherTileAnimationMonitor
-
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
@@ -155,7 +152,6 @@ class TabSwitcherViewModelTest {
             tabSwitcherAnimationFeature,
             mockWebTrackersBlockedAppRepository,
             mockTabSwitcherPrefsDataStore,
-            mockTabSwitcherTileAnimationMonitor,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -448,7 +444,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabs.value = listOf(tab1, tab2)
 
-        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(true))
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         initializeViewModel()
@@ -469,7 +465,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabs.value = listOf(tab1, tab2)
 
-        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(false))
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
 
         initializeViewModel()
 
@@ -489,7 +485,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabs.value = listOf(tab1, tab2)
 
-        whenever(mockTabSwitcherTileAnimationMonitor.observeAnimationTileVisibility()).thenReturn(flowOf(true))
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
 
         initializeViewModel()
 

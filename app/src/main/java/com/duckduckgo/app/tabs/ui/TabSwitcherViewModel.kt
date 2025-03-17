@@ -35,7 +35,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
-import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
@@ -68,8 +68,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
-    private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
-    private val tabSwitcherTileAnimationMonitor: TabSwitcherTileAnimationMonitor,
+    private val tabSwitcherDataStore: TabSwitcherDataStore,
 ) : ViewModel() {
 
     val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
@@ -169,9 +168,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
                     is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                    is TrackerAnimationTile -> {
-                        tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = false)
-                    }
+                    is TrackerAnimationTile -> Unit // No action needed
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
@@ -240,20 +237,17 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onTrackerAnimationTileCloseClicked() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabSwitcherPrefsDataStore.setIsAnimationTileDismissed(isDismissed = true)
+            tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
         }
     }
 
     private suspend fun LiveDataScope<List<TabSwitcherItem>>.collectTabItemsWithOptionalAnimationTile(
         tabEntities: List<TabEntity>,
     ) {
-        tabSwitcherTileAnimationMonitor.observeAnimationTileVisibility().collect { isVisible ->
+        tabSwitcherDataStore.isAnimationTileDismissed().collect { isDismissed ->
             val tabItems = tabEntities.map { Tab(it) }
 
-            val tabSwitcherItems = if (isVisible) {
-                if (tabSwitcherItems.value?.first() !is TrackerAnimationTile) {
-                    tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = true)
-                }
+            val tabSwitcherItems = if (!isDismissed) {
                 val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
                 listOf(TrackerAnimationTile(trackerCountForLast7Days)) + tabItems
