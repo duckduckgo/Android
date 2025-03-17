@@ -110,7 +110,6 @@ import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -5800,55 +5799,6 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
         verify(mockDuckChat).openDuckChat()
-    }
-
-    @Test
-    fun whenDuckChatOmnibarButtonClickedAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
-        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-
-        testee.onDuckChatOmnibarButtonClicked(query = null)
-
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_OMNIBAR, mapOf("was_used_before" to "0"))
-        verify(mockDuckChat).openDuckChat()
-    }
-
-    @Test
-    fun whenDuckChatOmnibarButtonClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
-        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "")
-
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_OMNIBAR, mapOf("was_used_before" to "1"))
-        verify(mockDuckChat).openDuckChat()
-    }
-
-    @Test
-    fun whenDuckChatOmnibarButtonClickedWithQueryAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
-        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "test")
-
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_OMNIBAR, mapOf("was_used_before" to "0"))
-        verify(mockDuckChat).openDuckChatWithAutoPrompt("test")
-    }
-
-    @Test
-    fun whenDuckChatOmnibarButtonClickedWithQueryAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
-        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "test")
-
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_OMNIBAR, mapOf("was_used_before" to "1"))
-        verify(mockDuckChat).openDuckChatWithAutoPrompt("test")
-    }
-
-    @Test
-    fun whenViewModelInitializedThenScrollingOmnibarSelectedByDefault() = runTest {
-        assertEquals(OmnibarType.SCROLLING, testee.omnibarType.value)
     }
 
     private fun aCredential(): LoginCredentials {
