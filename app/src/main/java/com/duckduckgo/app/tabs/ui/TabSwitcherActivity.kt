@@ -63,6 +63,11 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -311,6 +316,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     updateToolbarTitle(it.mode, it.tabItems.size)
                     updateTabGridItemDecorator()
 
+                    tabTouchHelper.mode = it.mode
+
                     invalidateOptionsMenu()
                 }
             }
@@ -335,21 +342,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 }
             }
 
-            lifecycleScope.launch {
-                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                    updateLayoutType(it)
-                }
-            }
-
             viewModel.deletableTabs.observe(this) {
                 if (it.isNotEmpty()) {
-                    onDeletableTab(it.last())
+                    showTabDeletedSnackbar(it.last())
                 }
             }
+        }
 
-            viewModel.command.observe(this) {
-                processCommand(it)
+        lifecycleScope.launch {
+            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                updateLayoutType(it)
             }
+        }
+
+        viewModel.command.observe(this) {
+            processCommand(it)
         }
     }
 
@@ -450,6 +457,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
             is ShowUndoBookmarkMessage -> showBookmarkSnackbarWithUndo(command.numBookmarks)
             is CloseTabsRequest -> showCloseSelectedTabsConfirmation(command.tabIds, command.isClosingOtherTabs)
+            is ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
         }
     }
 
@@ -495,8 +503,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectTabsMenuItem)) { viewModel.onSelectionModeRequested() }
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeSelectedTabsMenuItem)) { viewModel.onCloseSelectedTabs() }
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeOtherTabsMenuItem)) { viewModel.onCloseOtherTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeSelectedTabsMenuItem)) { viewModel.onCloseSelectedTabsRequested() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeOtherTabsMenuItem)) { viewModel.onCloseOtherTabsRequested() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeAllTabsMenuItem)) { viewModel.onCloseAllTabsRequested() }
     }
 
@@ -577,12 +585,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
             when (tab) {
                 is Tab -> {
-                    launch {
-                        viewModel.onMarkTabAsDeletable(
-                            tab = tab.tabEntity,
-                            swipeGestureUsed = deletedBySwipe,
-                        )
-                    }
+                    viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
             }
         }
@@ -613,13 +616,24 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.addItemDecoration(tabItemDecorator)
     }
 
-    private fun onDeletableTab(tab: TabEntity) {
+    private fun showTabDeletedSnackbar(tab: TabEntity) {
         TabSwitcherSnackbar(
             anchorView = toolbar,
             message = getString(R.string.tabClosed),
             action = getString(R.string.tabClosedUndo),
             showAction = true,
             onAction = { launch { viewModel.undoDeletableTab(tab) } },
+            onDismiss = { launch { viewModel.purgeDeletableTabs() } },
+        ).show()
+    }
+
+    private fun showTabsDeletedSnackbar(tabIds: List<String>) {
+        TabSwitcherSnackbar(
+            anchorView = toolbar,
+            message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+            action = getString(R.string.tabClosedUndo),
+            showAction = true,
+            onAction = { viewModel.undoDeletableTabs(tabIds) },
             onDismiss = { launch { viewModel.purgeDeletableTabs() } },
         ).show()
     }
