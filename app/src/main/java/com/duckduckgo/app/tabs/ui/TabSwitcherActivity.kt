@@ -637,6 +637,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun showPopupMenu(itemId: Int) {
         val anchorView = findViewById<View>(itemId)
         popupMenu.show(binding.root, anchorView)
+        viewModel.onMenuOpened()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
