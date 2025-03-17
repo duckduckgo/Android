@@ -18,7 +18,13 @@ package com.duckduckgo.duckchat.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-/**
- * Use this model to launch the Duck Player Settings screen
- */
-object DuckChatSettingsNoParams : GlobalActivityStarter.ActivityParams
+sealed class DuckChatScreens {
+    /**
+     * Use this model to launch the Duck Player Settings screen
+     */
+    object DuckChatSettingsNoParams : GlobalActivityStarter.ActivityParams
+
+    data class DuckChatWebViewActivityWithParams(
+        val url: String,
+    ) : GlobalActivityStarter.ActivityParams
+}

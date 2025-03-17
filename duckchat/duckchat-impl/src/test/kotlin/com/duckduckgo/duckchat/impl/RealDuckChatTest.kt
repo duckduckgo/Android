@@ -21,7 +21,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.duckchat.api.DuckChatScreens.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -73,7 +73,7 @@ class RealDuckChatTest {
         whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         setFeatureToggle(true)
-        whenever(mockGlobalActivityStarter.startIntent(any(), any<WebViewActivityWithParams>())).thenReturn(mockIntent)
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
     }
 
     @Test
@@ -130,10 +130,8 @@ class RealDuckChatTest {
         testee.openDuckChat()
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
-            WebViewActivityWithParams(
+            DuckChatWebViewActivityWithParams(
                 url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-                screenTitle = "Duck.ai",
-                supportNewWindows = true,
             ),
         )
         verify(mockContext).startActivity(any())
@@ -145,10 +143,8 @@ class RealDuckChatTest {
         testee.openDuckChat(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
-            WebViewActivityWithParams(
+            DuckChatWebViewActivityWithParams(
                 url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
-                screenTitle = "Duck.ai",
-                supportNewWindows = true,
             ),
         )
         verify(mockContext).startActivity(any())
@@ -160,10 +156,8 @@ class RealDuckChatTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
-            WebViewActivityWithParams(
+            DuckChatWebViewActivityWithParams(
                 url = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
-                screenTitle = "Duck.ai",
-                supportNewWindows = true,
             ),
         )
         verify(mockContext).startActivity(any())

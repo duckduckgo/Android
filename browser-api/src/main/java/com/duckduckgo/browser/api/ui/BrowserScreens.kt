@@ -22,12 +22,27 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  * Model that represents the Browser Screens hosted inside :app module that can be launched from other modules.
  */
 sealed class BrowserScreens {
-    object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the Browser screen
+     */
+    data class BrowserActivityWithParams(
+        val url: String,
+    ) : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the standalone WebView
+     */
     data class WebViewActivityWithParams(
         val url: String,
         val screenTitle: String,
         val supportNewWindows: Boolean = false,
     ) : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the Feedback screen
+     */
+    object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
 
     /**
      * Use this model to launch the Bookmarks screen
