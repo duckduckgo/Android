@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
@@ -59,6 +60,7 @@ class TabDataRepository @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -274,11 +276,15 @@ class TabDataRepository @Inject constructor(
     override suspend fun deleteTabs(tabIds: List<String>) {
         databaseExecutor().scheduleDirect {
             tabsDao.deleteTabsAndUpdateSelection(tabIds)
-            tabIds.forEach { tabId ->
-                deleteOldPreviewImages(tabId)
-                deleteOldFavicon(tabId)
-                siteData.remove(tabId)
-            }
+            clearAllSiteData(tabIds)
+        }
+    }
+
+    private fun clearAllSiteData(tabIds: List<String>) {
+        tabIds.forEach { tabId ->
+            deleteOldPreviewImages(tabId)
+            deleteOldFavicon(tabId)
+            siteData.remove(tabId)
         }
     }
 
@@ -288,13 +294,28 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun markDeletable(tabIds: List<String>) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.markTabsAsDeletable(tabIds)
+        }
+    }
+
     override suspend fun undoDeletable(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
             tabsDao.undoDeletableTab(tab)
         }
     }
 
+    override suspend fun undoDeletable(tabIds: List<String>) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.undoDeletableTabs(tabIds)
+        }
+    }
+
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            clearAllSiteData(getDeletableTabIds())
+        }
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }
