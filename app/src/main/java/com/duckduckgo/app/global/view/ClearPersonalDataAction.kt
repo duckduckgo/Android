@@ -29,7 +29,9 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -73,6 +75,8 @@ class ClearPersonalDataAction(
     private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+    private val tabSwitcherDataStore: TabSwitcherDataStore,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -121,6 +125,9 @@ class ClearPersonalDataAction(
             dataManager.clearWebViewSessions()
             tabRepository.deleteAll()
             adClickManager.clearAll()
+            if (tabSwitcherAnimationFeature.self().isEnabled()) {
+                tabSwitcherDataStore.setAnimationTileSeen(isSeen = false)
+            }
             setAppUsedSinceLastClearFlag(appInForeground)
             Timber.d("Finished clearing tabs")
         }

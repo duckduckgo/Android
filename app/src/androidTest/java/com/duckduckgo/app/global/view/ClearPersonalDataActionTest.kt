@@ -27,7 +27,9 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
@@ -38,6 +40,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -63,6 +66,10 @@ class ClearPersonalDataActionTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockPrivacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
+    private val mockTabSwitcherAnimationFeature: TabSwitcherAnimationFeature = mock {
+        on { self() } doReturn mock()
+    }
+    private val mockTabSwitcherDataStore: TabSwitcherDataStore = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -84,6 +91,8 @@ class ClearPersonalDataActionTest {
             privacyProtectionsPopupDataClearer = mockPrivacyProtectionsPopupDataClearer,
             sitePermissionsManager = mockSitePermissionsManager,
             navigationHistory = mockNavigationHistory,
+            tabSwitcherAnimationFeature = mockTabSwitcherAnimationFeature,
+            tabSwitcherDataStore = mockTabSwitcherDataStore,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -154,5 +163,22 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenPrivacyProtectionsPopupDataClearerIsInvoked() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockPrivacyProtectionsPopupDataClearer).clearPersonalData()
+    }
+
+    @Test
+    fun whenClearCalledAndAnimationTileEnabledThenAnimationTileIsReset() = runTest {
+        whenever(mockTabSwitcherAnimationFeature.self().isEnabled(any())).thenReturn(true)
+
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockTabSwitcherDataStore, never()).setIsAnimationTileDismissed(false)
+        verify(mockTabSwitcherDataStore).setAnimationTileSeen(false)
+    }
+
+    @Test
+    fun whenClearCalledAndAnimationTileDisabledThenAnimationTileIsNotReset() = runTest {
+        whenever(mockTabSwitcherAnimationFeature.self().isEnabled(any())).thenReturn(false)
+
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verifyNoInteractions(mockTabSwitcherDataStore)
     }
 }
