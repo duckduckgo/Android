@@ -19,9 +19,8 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
-import androidx.core.view.isInvisible
 import android.widget.ImageView
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.anvil.annotations.InjectWith
