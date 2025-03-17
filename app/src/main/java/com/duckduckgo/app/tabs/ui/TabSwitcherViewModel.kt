@@ -299,12 +299,13 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun undoBookmarkAction() {
-        recentlySavedBookmarks.forEach { bookmark ->
-            viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            recentlySavedBookmarks.forEach { bookmark ->
                 savedSitesRepository.delete(bookmark)
             }
+
+            recentlySavedBookmarks.clear()
         }
-        recentlySavedBookmarks.clear()
     }
 
     fun finishBookmarkAction() {
