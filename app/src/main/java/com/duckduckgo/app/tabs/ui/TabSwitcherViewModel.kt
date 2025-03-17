@@ -317,6 +317,9 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has indicated they want to close selected tabs
     fun onCloseSelectedTabsRequested() {
+        pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_DAILY, type = Daily())
+
         val selectedTabs = selectionMode.selectedTabs
         val allTabsCount = tabItems.size
         command.value = if (allTabsCount == selectedTabs.size) {
