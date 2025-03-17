@@ -31,7 +31,6 @@
         android:gravity="center"
         android:paddingBottom="3dp"
         android:paddingStart="3dp"
-        android:visibility="gone"
         android:background="@drawable/ic_tab_switcher_experiment"
         tools:text="66" />
 
