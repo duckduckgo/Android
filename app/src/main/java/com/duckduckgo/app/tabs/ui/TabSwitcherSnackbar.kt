@@ -35,7 +35,7 @@ class TabSwitcherSnackbar(
     }
 
     private val snackbar = Snackbar.make(anchorView, message, Snackbar.LENGTH_LONG)
-        .setDuration(SNACKBAR_DISPLAY_TIME_MS) // 3.5 seconds
+        .setDuration(SNACKBAR_DISPLAY_TIME_MS)
         .apply {
             if (showAction) {
                 setAction(action) {
