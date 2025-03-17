@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.experiments.visual
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -26,8 +27,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface ExperimentalUIThemingFeature {
     @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
     fun browserNavigationBar(): Toggle
 }
