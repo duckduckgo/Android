@@ -54,10 +54,14 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -152,6 +156,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
 
+    private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
@@ -160,7 +166,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
             tabsAdapter.setAnimationTileCloseClickListener {
-                viewModel.onTrackerAnimationTileCloseClicked()
+                viewModel.onTrackerAnimationInfoPanelClicked()
             }
         }
 
@@ -348,6 +354,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
+            ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
+            DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
         }
     }
 
@@ -568,6 +576,30 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 },
             )
             .show()
+    }
+
+    private fun showAnimatedTileDismissalDialog() {
+        tabSwitcherAnimationTileRemovalDialog = TextAlertDialogBuilder(this)
+            .setTitle(R.string.tabSwitcherAnimationTileRemovalDialogTitle)
+            .setMessage(R.string.tabSwitcherAnimationTileRemovalDialogBody)
+            .setPositiveButton(R.string.daxDialogGotIt)
+            .setNegativeButton(R.string.tabSwitcherAnimationTileRemovalDialogNegativeButton, GHOST)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onTrackerAnimationTileNegativeButtonClicked()
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTrackerAnimationTilePositiveButtonClicked()
+                    }
+                },
+            )
+            .build()
+            .also { dialog ->
+                dialog.show()
+            }
     }
 
     private fun configureOnBackPressedListener() {

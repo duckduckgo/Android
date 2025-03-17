@@ -38,6 +38,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -101,6 +103,8 @@ class TabSwitcherViewModel @Inject constructor(
     sealed class Command {
         data object Close : Command()
         data object CloseAllTabsRequest : Command()
+        data object ShowAnimatedTileDismissalDialog : Command()
+        data object DismissAnimatedTileDismissalDialog : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -235,8 +239,18 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onTrackerAnimationTileCloseClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+    fun onTrackerAnimationInfoPanelClicked() {
+        command.value = ShowAnimatedTileDismissalDialog
+    }
+
+    fun onTrackerAnimationTilePositiveButtonClicked() {
+        viewModelScope.launch {
+            command.value = DismissAnimatedTileDismissalDialog
+        }
+    }
+
+    fun onTrackerAnimationTileNegativeButtonClicked() {
+        viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
         }
     }
