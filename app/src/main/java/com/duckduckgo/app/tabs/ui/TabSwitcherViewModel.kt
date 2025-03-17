@@ -443,19 +443,20 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
-        var bookmark: Bookmark? = null
-        (tabItems.firstOrNull { it.id == tabId } as? Tab)?.let { tab ->
-            tab.tabEntity.url?.let { url ->
-                if (url.isNotBlank()) {
-                    // Only bookmark new sites
-                    if (savedSitesRepository.getBookmark(url) == null) {
-                        faviconManager.persistCachedFavicon(tabId, url)
-                        bookmark = savedSitesRepository.insertBookmark(url, tab.tabEntity.title.orEmpty())
-                    }
-                }
+        val targetTabItem = tabItems.firstOrNull { it.id == tabId }
+        val targetTab = targetTabItem?.takeIf { it is Tab }?.let { it as Tab }
+
+        val targetTabUrl = targetTab?.tabEntity?.url
+        val isUrlNotBlank = targetTabUrl?.isNotBlank() ?: false
+
+        if (isUrlNotBlank) {
+            // Only bookmark new sites
+            savedSitesRepository.getBookmark(targetTabUrl!!) ?: run {
+                faviconManager.persistCachedFavicon(tabId, targetTabUrl)
+                return@withContext savedSitesRepository.insertBookmark(targetTabUrl, targetTab.tabEntity.title.orEmpty())
             }
         }
-        return@withContext bookmark
+        return@withContext null
     }
 
     fun onDuckChatMenuClicked() {
