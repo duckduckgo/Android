@@ -148,6 +148,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShareLinks(val links: List<String>) : Command()
         data class BookmarkTabsRequest(val tabIds: List<String>) : Command()
         data class ShowUndoBookmarkMessage(val numBookmarks: Int) : Command()
+        data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -188,15 +189,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onTabDeleted(tabId: String) {
-        tabRepository.getTab(tabId)?.let { tab ->
-            tabRepository.delete(tab)
-            adClickManager.clearTabId(tabId)
-            webViewSessionStorage.deleteSession(tabId)
-        }
-    }
-
-    private suspend fun deleteTabs(tabIds: List<String>) {
+    private suspend fun deleteTabs(tabIds: List<String>) = withContext(dispatcherProvider.io()) {
         tabRepository.deleteTabs(tabIds)
 
         tabIds.forEach { tabId ->
@@ -205,33 +198,12 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
-        tabRepository.markDeletable(tab)
-        if (swipeGestureUsed) {
-            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
-        } else {
-            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
-        }
-
-        unselectTab(tab.tabId)
+    private fun triggerEmptySelectionMode() {
+        _selectionViewState.update { it.copy(mode = Selection(emptyList())) }
     }
 
-    suspend fun undoDeletableTab(tab: TabEntity) {
-        tabRepository.undoDeletable(tab)
-
-        selectTab(tab.tabId)
-    }
-
-    suspend fun purgeDeletableTabs() {
-        tabRepository.getDeletableTabIds().forEach {
-            adClickManager.clearTabId(it)
-        }
-        tabRepository.purgeDeletableTabs()
-    }
-
-    fun onCloseAllTabsRequested() {
-        command.value = Command.CloseAllTabsRequest(tabItems.size)
-        pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
+    private fun triggerNormalMode() {
+        _selectionViewState.update { it.copy(mode = Normal) }
     }
 
     fun onSelectAllTabs() {
@@ -306,11 +278,14 @@ class TabSwitcherViewModel @Inject constructor(
         triggerEmptySelectionMode()
     }
 
-    private fun triggerEmptySelectionMode() {
-        _selectionViewState.update { it.copy(mode = Selection(emptyList())) }
+    // user has indicated they want to close all tabs
+    fun onCloseAllTabsRequested() {
+        command.value = Command.CloseAllTabsRequest(tabItems.size)
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
     }
 
-    fun onCloseSelectedTabs() {
+    // user has indicated they want to close selected tabs
+    fun onCloseSelectedTabsRequested() {
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val allTabsCount = tabItems.size
             command.value = if (allTabsCount == selectedTabs.size) {
@@ -321,7 +296,8 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onCloseOtherTabs() {
+    // user has indicated they want to close all tabs except the selected ones
+    fun onCloseOtherTabsRequested() {
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
             if (otherTabsIds.isNotEmpty()) {
@@ -330,23 +306,79 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    // user has confirmed they want to close tabs based on a selection
     fun onCloseTabsConfirmed(tabIds: List<String>) {
-        val allTabsCount = tabItems.size
-
-        viewModelScope.launch(dispatcherProvider.io()) {
-            deleteTabs(tabIds)
-
-            if (allTabsCount == tabIds.size) {
-                pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
-
-                // Close the tab switcher when there are no tabs
-                withContext(dispatcherProvider.main()) {
-                    command.value = Command.Close
-                }
-            } else {
+        viewModelScope.launch {
+            if (selectionViewState.value.mode is Selection) {
                 unselectTabs(tabIds)
             }
+
+            if (tabItems.size == tabIds.size) {
+                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
+                pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+                deleteTabs(tabIds)
+                command.value = Command.Close
+            } else {
+                // mark tabs as deletable and show undo snackbar
+                tabRepository.markDeletable(tabIds)
+                command.value = Command.ShowUndoDeleteTabsMessage(tabIds)
+            }
         }
+    }
+
+    // user has confirmed they want to close all tabs -> mark all tabs as deletable and show undo snackbar
+    fun onCloseAllTabsConfirmed() {
+        onCloseTabsConfirmed(tabItems.map { it.id })
+    }
+
+    fun onTabCloseInNormalModeRequested(tab: Tab, swipeGestureUsed: Boolean = false) {
+        viewModelScope.launch {
+            if (tabItems.size == 1) {
+                // the last tab can be deleted immediately because no snackbar is needed and the tab switcher will be closed
+                deleteTabs(listOf(tab.id))
+                command.value = Command.Close
+            } else {
+                markTabAsDeletable(tab, swipeGestureUsed)
+
+                // when the feature flag is disabled, the undo snackbar is shown via deletable tabs observer
+                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                    command.value = Command.ShowUndoDeleteTabsMessage(listOf(tab.id))
+                }
+            }
+        }
+    }
+
+    private suspend fun markTabAsDeletable(tab: Tab, swipeGestureUsed: Boolean) {
+        tabRepository.markDeletable(tab.tabEntity)
+        if (swipeGestureUsed) {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+        }
+
+        if (selectionViewState.value.mode is Selection) {
+            unselectTab(tab.id)
+        }
+    }
+
+    // user has tapped the Undo action -> restore the closed tab
+    suspend fun undoDeletableTab(tab: TabEntity) {
+        tabRepository.undoDeletable(tab)
+    }
+
+    // user has tapped the Undo action -> restore the closed tabs
+    fun undoDeletableTabs(tabIds: List<String>) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.undoDeletable(tabIds)
+        }
+    }
+
+    // user has not tapped the Undo action -> purge the deletable tabs and remove all data
+    suspend fun purgeDeletableTabs() {
+        tabRepository.getDeletableTabIds().forEach {
+            adClickManager.clearTabId(it)
+        }
+        tabRepository.purgeDeletableTabs()
     }
 
     private fun unselectTab(tabId: String) = unselectTabs(listOf(tabId))
@@ -369,18 +401,10 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onCloseAllTabsConfirmed() {
-        onCloseTabsConfirmed(tabItems.map { it.id })
-    }
-
     fun onEmptyAreaClicked() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         }
-    }
-
-    private fun triggerNormalMode() {
-        _selectionViewState.update { it.copy(mode = Normal) }
     }
 
     fun onUpButtonPressed() {
@@ -452,7 +476,7 @@ class TabSwitcherViewModel @Inject constructor(
                 }
             }
             FabType.CLOSE_TABS -> {
-                onCloseSelectedTabs()
+                onCloseSelectedTabsRequested()
             }
         }
     }
@@ -489,7 +513,7 @@ class TabSwitcherViewModel @Inject constructor(
     data class SelectionViewState(
         val tabItems: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
-        private val layoutType: LayoutType? = null,
+        val layoutType: LayoutType? = null,
     ) {
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
 
@@ -510,7 +534,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseOtherTabsVisible = false,
                     isCloseAllTabsVisible = true,
                     isMoreMenuItemEnabled = !isThereOnlyNewTabPage,
-                    isFabVisible = !isThereOnlyNewTabPage,
+                    isFabVisible = true,
                     fabType = FabType.NEW_TAB,
                     backButtonType = ARROW,
                     layoutButtonType = when (layoutType) {
