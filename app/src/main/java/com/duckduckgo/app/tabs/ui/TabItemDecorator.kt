@@ -60,7 +60,7 @@ class TabItemDecorator(
                             drawSelectedTabDecoration(child, canvas)
                         }
                     }
-                    is TabSwitcherItem.TrackerAnimationTile -> Unit // No border for animation tile
+                    is TabSwitcherItem.TrackerAnimationInfoPanel -> Unit // No border for animation tile
                 }
             }
         }

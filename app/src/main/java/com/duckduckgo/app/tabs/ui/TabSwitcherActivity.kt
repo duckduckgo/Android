@@ -430,15 +430,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
-                is TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
+                is TabSwitcherItem.TrackerAnimationInfoPanel -> Unit // TODO delete from list
             }
         }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val isTrackerAnimationTileVisible = viewModel.tabSwitcherItems.value?.get(0) is TabSwitcherItem.TrackerAnimationTile
-            val canSwapFromIndex = if (isTrackerAnimationTileVisible) 1 else 0
+            val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.value?.get(0) is TabSwitcherItem.TrackerAnimationInfoPanel
+            val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
             val tabSwitcherItemCount = viewModel.tabSwitcherItems.value?.count() ?: 0
 
             val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount

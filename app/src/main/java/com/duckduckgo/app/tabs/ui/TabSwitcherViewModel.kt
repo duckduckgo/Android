@@ -37,7 +37,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -168,7 +168,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherItems.value?.forEach { tabSwitcherItem ->
                 when (tabSwitcherItem) {
                     is Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
-                    is TrackerAnimationTile -> Unit // No action needed
+                    is TrackerAnimationInfoPanel -> Unit // No action needed
                 }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
@@ -250,7 +250,7 @@ class TabSwitcherViewModel @Inject constructor(
             val tabSwitcherItems = if (!isDismissed) {
                 val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
-                listOf(TrackerAnimationTile(trackerCountForLast7Days)) + tabItems
+                listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + tabItems
             } else {
                 tabItems
             }

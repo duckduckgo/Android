@@ -452,7 +452,7 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
 
         assertEquals(3, items.size)
-        assert(items.first() is TabSwitcherItem.TrackerAnimationTile)
+        assert(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
         assert(items[1] is TabSwitcherItem.Tab)
         assert(items[2] is TabSwitcherItem.Tab)
     }
