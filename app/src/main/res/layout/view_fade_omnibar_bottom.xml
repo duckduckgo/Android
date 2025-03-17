@@ -241,11 +241,10 @@
                     app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
                     android:importantForAccessibility="no"/>
 
-                <View
+                <com.duckduckgo.common.ui.view.divider.VerticalDivider
                     android:id="@+id/verticalDivider"
                     android:layout_width="1dp"
-                    android:layout_height="@dimen/toolbarIcon"
-                    android:background="?daxColorLines"
+                    android:layout_height="24dp"
                     android:importantForAccessibility="no"
                     android:layout_marginVertical="@dimen/keyline_2"
                     app:layout_constraintBottom_toBottomOf="parent"
