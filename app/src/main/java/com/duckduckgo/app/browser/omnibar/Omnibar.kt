@@ -41,13 +41,19 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -64,33 +70,51 @@ import timber.log.Timber
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    val fadeBehaviourEnabled: Boolean,
+    val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) : OnScrollChangeListener {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                if (fadeBehaviourEnabled) {
-                    binding.rootView.removeView(binding.newOmnibar)
-                    binding.rootView.removeView(binding.newOmnibarBottom)
-                    binding.rootView.removeView(binding.fadeOmnibarBottom)
-                } else {
-                    binding.rootView.removeView(binding.fadeOmnibar)
-                    binding.rootView.removeView(binding.fadeOmnibarBottom)
-                    binding.rootView.removeView(binding.newOmnibarBottom)
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // remove bottom variant
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+
+                        // remove all fade omnibars
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    }
+                    FADE -> {
+                        // remove bottom variant
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+
+                        // remove all scrolling omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                    }
                 }
             }
 
             OmnibarPosition.BOTTOM -> {
-                if (fadeBehaviourEnabled) {
-                    binding.rootView.removeView(binding.newOmnibar)
-                    binding.rootView.removeView(binding.newOmnibarBottom)
-                    binding.rootView.removeView(binding.fadeOmnibar)
-                } else {
-                    binding.rootView.removeView(binding.fadeOmnibar)
-                    binding.rootView.removeView(binding.fadeOmnibarBottom)
-                    binding.rootView.removeView(binding.newOmnibar)
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // remove top variant
+                        binding.rootView.removeView(binding.newOmnibar)
+
+                        // remove all fade omnibars
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    }
+                    FADE -> {
+                        // remove top variant
+                        binding.rootView.removeView(binding.fadeOmnibar)
+
+                        // remove all scrolling omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                    }
                 }
 
                 // remove the default top abb bar behavior
@@ -139,10 +163,6 @@ class Omnibar(
         fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean)
     }
 
-    interface ScrollListener {
-        fun onScrollChanged(scrollY: Int, showImmediate: Boolean = false)
-    }
-
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
@@ -164,18 +184,16 @@ class Omnibar(
     private val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                if (fadeBehaviourEnabled) {
-                    binding.fadeOmnibar
-                } else {
-                    binding.newOmnibar
+                when (omnibarType) {
+                    SCROLLING -> binding.newOmnibar
+                    FADE -> binding.fadeOmnibar
                 }
             }
 
             OmnibarPosition.BOTTOM -> {
-                if (fadeBehaviourEnabled) {
-                    binding.fadeOmnibarBottom
-                } else {
-                    binding.newOmnibarBottom
+                when (omnibarType) {
+                    SCROLLING -> binding.newOmnibarBottom
+                    FADE -> binding.fadeOmnibarBottom
                 }
             }
         }
@@ -254,6 +272,13 @@ class Omnibar(
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
         newOmnibar.setOmnibarItemPressedListener(listener)
+    }
+
+    fun configureFadeOmnibarItemPressedListeners(listener: FadeOmnibarItemPressedListener) {
+        val omnibar = newOmnibar
+        if (omnibar is FadeOmnibarLayout) {
+            omnibar.setFadeOmnibarItemPressedListener(listener)
+        }
     }
 
     fun addTextListener(listener: TextListener) {
@@ -401,36 +426,60 @@ class Omnibar(
     }
 
     override fun onScrollChange(
-        view: View?,
-        p1: Int,
+        v: View,
+        scrollX: Int,
         scrollY: Int,
-        p3: Int,
-        p4: Int,
+        oldScrollX: Int,
+        oldScrollY: Int,
     ) {
-        if (fadeBehaviourEnabled) {
-            when (omnibarPosition) {
-                OmnibarPosition.TOP -> {
-                    binding.fadeOmnibar.onScrollChanged(scrollY)
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // no-op
+                    }
+                    FADE -> binding.fadeOmnibar.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
                 }
+            }
 
-                OmnibarPosition.BOTTOM -> {
-                    binding.fadeOmnibarBottom.onScrollChanged(scrollY)
+            OmnibarPosition.BOTTOM -> {
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // no-op
+                    }
+                    FADE -> binding.fadeOmnibarBottom.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
                 }
             }
         }
     }
 
     fun resetScrollPosition() {
-        if (fadeBehaviourEnabled) {
+        if (omnibarType == FADE) {
             when (omnibarPosition) {
                 OmnibarPosition.TOP -> {
-                    binding.fadeOmnibar.onScrollChanged(0, true)
+                    binding.fadeOmnibar.resetTransitionDelayed()
                 }
 
                 OmnibarPosition.BOTTOM -> {
-                    binding.fadeOmnibarBottom.onScrollChanged(0, true)
+                    binding.fadeOmnibarBottom.resetTransitionDelayed()
                 }
             }
         }
+    }
+}
+
+fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {
+    return if (experimentState.value.isEnabled) {
+        FADE
+    } else {
+        SCROLLING
     }
 }

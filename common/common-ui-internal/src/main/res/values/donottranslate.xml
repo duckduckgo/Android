@@ -25,6 +25,10 @@
     <string name="experimentalUIIconsTitle">Use colorful icons</string>
     <string name="experimentalUIIconsMessage">When enabled, colorful icons will be shown in the toolbar.</string>
 
+    <!--    Bottom Navigation Bar Experiment-->
+    <string name="navigationBarExperimentEnableTitle">Enable navigation bar</string>
+    <string name="navigationBarExperimentEnableMessage">Enables the bottom navigation bar and adjusts relevant functionality in the address bar and browser menu.</string>
+
     <!-- Trackers Blocking - O-10 -->
     <string name="trackersBlockingExperimentalUISettings">Trackers Blocking design updates from O-10</string>
     <string name="trackersBlockingVariant1ExperimentalUITitle">Enable Variant 1</string>

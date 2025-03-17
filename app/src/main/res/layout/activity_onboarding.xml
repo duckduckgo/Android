@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_margin="30dp"
-        app:buttonSize="large"
+        app:daxButtonSize="large"
         app:layout_constraintTop_toTopOf="parent"
         android:text="@string/skipOnboarding"
         app:layout_constraintStart_toStartOf="parent"

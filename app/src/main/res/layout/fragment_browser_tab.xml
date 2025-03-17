@@ -13,12 +13,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootView"
+    android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/navigationBar">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/trackersBurstAnimationView"
@@ -36,8 +44,14 @@
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
         android:id="@+id/fadeOmnibar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:omnibarPosition="top" />
+
+    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
+        android:id="@+id/delightfulOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
@@ -164,3 +178,11 @@
         app:omnibarPosition="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

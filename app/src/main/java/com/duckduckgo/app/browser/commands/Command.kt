@@ -262,6 +262,7 @@ sealed class Command {
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
     data object CloseCustomTab : Command()
+    data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
     data class StartExperimentTrackersBurstAnimation(val logos: List<TrackerLogo>, val ignoreLogos: Boolean) : Command()
     data object StartExperimentShieldPopAnimation : Command()
     data object StartExperimentV2ShieldPopAnimation : Command()

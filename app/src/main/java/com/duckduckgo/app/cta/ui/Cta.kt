@@ -61,6 +61,8 @@ interface DaxCta {
     val onboardingStore: OnboardingStore
     val appInstallStore: AppInstallStore
     var ctaPixelParam: String
+    val markAsReadOnShow: Boolean
+        get() = false
 
     companion object {
         const val MAX_DAYS_ALLOWED = 3
@@ -79,9 +81,6 @@ interface Cta {
 }
 
 interface OnboardingDaxCta {
-    val markAsReadOnShow: Boolean
-        get() = false
-
     fun showOnboardingCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
@@ -510,6 +509,7 @@ sealed class DaxBubbleCta(
         onTypingAnimationFinished: () -> Unit,
     ) {
         ctaView = view
+        clearDialog()
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
         val optionsViews: List<DaxButton> = listOf(
@@ -523,33 +523,27 @@ sealed class DaxBubbleCta(
             view.findViewById<DaxButton>(R.id.primaryCta).show()
             view.findViewById<DaxButton>(R.id.primaryCta).alpha = 0f
             view.findViewById<DaxButton>(R.id.primaryCta).text = view.context.getString(it)
-        } ?: view.findViewById<DaxButton>(R.id.primaryCta).gone()
+        }
 
         secondaryCta?.let {
             view.findViewById<DaxButton>(R.id.secondaryCta).show()
             view.findViewById<DaxButton>(R.id.secondaryCta).alpha = 0f
             view.findViewById<DaxButton>(R.id.secondaryCta).text = view.context.getString(it)
-        } ?: view.findViewById<DaxButton>(R.id.secondaryCta).gone()
+        }
 
         placeholder?.let {
             view.findViewById<ImageView>(R.id.placeholder).show()
             view.findViewById<ImageView>(R.id.placeholder).alpha = 0f
             view.findViewById<ImageView>(R.id.placeholder).setImageResource(it)
-        } ?: view.findViewById<ImageView>(R.id.placeholder).gone()
+        }
 
-        if (options.isNullOrEmpty()) {
-            view.findViewById<DaxButton>(R.id.daxDialogOption1).gone()
-            view.findViewById<DaxButton>(R.id.daxDialogOption2).gone()
-            view.findViewById<DaxButton>(R.id.daxDialogOption3).gone()
-            view.findViewById<DaxButton>(R.id.daxDialogOption4).gone()
-        } else {
-            options?.let {
-                optionsViews.forEachIndexed { index, buttonView ->
-                    if (it.size > index) {
-                        it[index].setOptionView(buttonView)
-                    } else {
-                        buttonView.gone()
-                    }
+        options?.let {
+            optionsViews.forEachIndexed { index, buttonView ->
+                buttonView.show()
+                if (it.size > index) {
+                    it[index].setOptionView(buttonView)
+                } else {
+                    buttonView.gone()
                 }
             }
         }
@@ -588,6 +582,23 @@ sealed class DaxBubbleCta(
         view.findViewById<View>(R.id.cardContainer).setOnClickListener { afterAnimation() }
     }
 
+    private fun clearDialog() {
+        ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.gone()
+        ctaView?.findViewById<DaxButton>(R.id.secondaryCta)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.secondaryCta)?.gone()
+        ctaView?.findViewById<ImageView>(R.id.placeholder)?.alpha = 0f
+        ctaView?.findViewById<ImageView>(R.id.placeholder)?.gone()
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption1)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption1)?.gone()
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.gone()
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.gone()
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.alpha = 0f
+        ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.gone()
+    }
+
     fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
         ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
@@ -611,6 +622,8 @@ sealed class DaxBubbleCta(
             option.let { ctaView?.findViewById<DaxButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
         }
     }
+
+    override val markAsReadOnShow: Boolean = true
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 

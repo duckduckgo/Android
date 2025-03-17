@@ -114,6 +114,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
+import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -292,6 +293,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
@@ -480,6 +482,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val appPersonalityFeature: AppPersonalityFeature,
     private val userStageStore: UserStageStore,
     private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
@@ -726,6 +729,12 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
             }
             .launchIn(viewModelScope)
+
+        visualDesignExperimentDataStore.navigationBarState
+            .onEach { navigationBarState ->
+                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = !navigationBarState.isEnabled)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -861,7 +870,7 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
+                showOrHideKeyboard(cta)
             }
         } else {
             command.value = HideKeyboard
@@ -2651,6 +2660,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
+        command.value = LaunchPopupMenu(anchorToNavigationBar = visualDesignExperimentDataStore.navigationBarState.value.isEnabled)
     }
 
     fun onPopupMenuLaunched() {
@@ -2727,16 +2737,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
+        // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
+        // we also don't want to automatically show keyboard when bottom nav bar is enabled because it overlaps and hides the navigation/tabs buttons
+        val isBottomNavigationBar = visualDesignExperimentDataStore.navigationBarState.value.isEnabled
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBottomNavigationBar
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
-    }
-
-    fun registerDaxBubbleCtaDismissed() {
-        viewModelScope.launch {
-            val cta = ctaViewState.value?.cta ?: return@launch
-            ctaViewModel.registerDaxBubbleCtaDismissed(cta)
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
-        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -3639,7 +3644,7 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(cta)
         return when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> {
-                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri())
+                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_onboarding_android".toUri())
             }
 
             is DaxBubbleCta.DaxEndCta -> {
@@ -3864,14 +3869,28 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onDuckChatMenuClicked() {
+        openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU)
+    }
+
+    fun onDuckChatOmnibarButtonClicked(query: String?) {
+        openDuckChat(query = query)
+    }
+
+    private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
 
-            val wasUsedBefore = duckChat.wasOpenedBefore()
-            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
+            if (pixelName != null) {
+                val wasUsedBefore = duckChat.wasOpenedBefore()
+                val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+                pixel.fire(pixelName, parameters = params)
+            }
 
-            duckChat.openDuckChat()
+            if (query?.isNotEmpty() == true) {
+                duckChat.openDuckChatWithAutoPrompt(query)
+            } else {
+                duckChat.openDuckChat()
+            }
         }
     }
 

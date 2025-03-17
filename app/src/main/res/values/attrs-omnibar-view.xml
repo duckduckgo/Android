@@ -32,7 +32,7 @@
         <attr name="omnibarPosition"/>
     </declare-styleable>
 
-    <!-- FadeOmnibarLayout-->
+    <!-- FadeOmnibarView-->
     <declare-styleable name="FadeOmnibarLayout">
         <attr name="omnibarPosition"/>
     </declare-styleable>

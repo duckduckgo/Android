@@ -196,6 +196,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -514,6 +516,10 @@ class BrowserTabViewModelTest {
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
 
+    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
     private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
     private val mockTrackersBurstAnimationPreferencesStore: TrackersBurstAnimationPreferencesStore = mock()
@@ -622,6 +628,12 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+            defaultVisualExperimentStateFlow,
+        )
+        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(
+            defaultVisualExperimentNavBarStateFlow,
+        )
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -690,6 +702,7 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
+            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             appPersonalityFeature = fakeAppPersonalityFeature,
             userStageStore = mockUserStageStore,
             privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
@@ -2461,24 +2474,6 @@ class BrowserTabViewModelTest {
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
