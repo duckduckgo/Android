@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.content.Context
 import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
@@ -30,10 +28,10 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackBu
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
-import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.HIDDEN
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
+import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 private const val FAB_HIDE_DELAY = 500L
