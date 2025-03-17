@@ -98,18 +98,26 @@ fun Menu.createDynamicInterface(
         when (dynamicMenu.layoutButtonType) {
             GRID -> {
                 setIcon(R.drawable.ic_grid_view_24)
-                title = actionView?.resources?.getString(R.string.tabSwitcherGridViewMenu)
+                title = toolbar.resources.getString(R.string.tabSwitcherGridViewMenu)
                 isVisible = true
             }
             LIST -> {
                 setIcon(R.drawable.ic_list_view_24)
-                title = actionView?.resources?.getString(R.string.tabSwitcherListViewMenu)
+                title = toolbar.resources.getString(R.string.tabSwitcherListViewMenu)
                 isVisible = true
             }
             HIDDEN -> isVisible = false
         }
     }
 
+    findItem(R.id.popupMenuItem).apply {
+        isEnabled = dynamicMenu.isMoreMenuItemEnabled
+        iconTintList = if (isEnabled) {
+            null
+        } else {
+            ContextCompat.getColorStateList(toolbar.context, commonR.color.disabledColor)
+        }
+    }
 
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 }
