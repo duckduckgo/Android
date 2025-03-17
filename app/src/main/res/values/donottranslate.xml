@@ -137,6 +137,10 @@
         <item quantity="other">Close %1$d Tabs</item>
     </plurals>
     <string name="closeOtherTabsMenuItem">Close Other Tabs</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab closed</item>
+        <item quantity="other">%1$d tabs closed</item>
+    </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">1 Private Tab</item>
