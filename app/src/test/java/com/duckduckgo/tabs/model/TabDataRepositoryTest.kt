@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -39,6 +40,8 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.time.Instant
 import java.time.LocalDateTime
@@ -53,6 +56,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,6 +87,13 @@ class TabDataRepositoryTest {
     private val mockDuckPlayer: DuckPlayer = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
+
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+
+    @Before
+    fun before() {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
+    }
 
     @After
     fun after() {
@@ -609,6 +620,7 @@ class TabDataRepositoryTest {
             timeProvider,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
+            tabManagerFeatureFlags
         )
     }
 

@@ -26,7 +26,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favicon.FaviconModule_FaviconManagerFactory.faviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -118,6 +117,7 @@ class TabSwitcherViewModelTest {
     private lateinit var testee: TabSwitcherViewModel
 
     private val tabList = listOf(TabEntity("1", position = 1), TabEntity("2", position = 2))
+    private val tabSwitcherItems = tabList.map { TabSwitcherItem.Tab.NormalTab(it, false) }
     private val repoDeletableTabs = Channel<List<TabEntity>>()
     private val tabs = MutableLiveData<List<TabEntity>>(tabList)
 
@@ -196,35 +196,39 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabDeletedThenRepositoryNotified() = runTest {
-        val entity = tabList.first()
-        whenever(mockTabRepository.getTab(any())).thenReturn(entity)
+        val tab = tabSwitcherItems.first()
+        whenever(mockTabRepository.liveTabs)
+            .thenReturn(MutableLiveData<List<TabEntity>>(listOf(tabList.first())))
+        whenever(mockTabRepository.getTab(any())).thenReturn(tab.tabEntity)
 
-        testee.onTabDeleted(entity.tabId)
-        verify(mockTabRepository).delete(entity)
-        verify(mockAdClickManager).clearTabId(entity.tabId)
+        initializeViewModel()
+
+        testee.onTabCloseInNormalModeRequested(tab)
+        verify(mockTabRepository).deleteTabs(listOf(tab.id))
+        verify(mockAdClickManager).clearTabId(tab.id)
     }
 
     @Test
     fun whenOnMarkTabAsDeletableAfterSwipeGestureUsedThenCallMarkDeletableAndSendPixel() = runTest {
         val swipeGestureUsed = true
-        val entity = TabEntity("abc", "", "", position = 0)
+        val tab = tabSwitcherItems.first()
 
-        testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
+        testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
-        verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
+        verify(mockTabRepository).markDeletable(tab.tabEntity)
+        verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
     }
 
     @Test
     fun whenOnMarkTabAsDeletableAfterClosePressedThenCallMarkDeletableAndSendPixel() = runTest {
         val swipeGestureUsed = false
-        val entity = TabEntity("abc", "", "", position = 0)
+        val tab = tabSwitcherItems.first()
 
-        testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
+        testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
-        verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
+        verify(mockTabRepository).markDeletable(tab.tabEntity)
+        verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
     }
 
@@ -280,7 +284,7 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
-        assertEquals(Command.CloseAllTabsRequest, commandCaptor.lastValue)
+        assertEquals(Command.CloseAllTabsRequest(tabList.size), commandCaptor.lastValue)
     }
 
     @Test
@@ -293,7 +297,7 @@ class TabSwitcherViewModelTest {
         testee.onCloseAllTabsConfirmed()
 
         tabList.forEach {
-            verify(mockTabRepository).delete(it)
+            verify(mockTabRepository).deleteTabs(tabList.map { it.tabId })
             verify(mockAdClickManager).clearTabId(it.tabId)
             verify(mockWebViewSessionStorage).deleteSession(it.tabId)
         }
