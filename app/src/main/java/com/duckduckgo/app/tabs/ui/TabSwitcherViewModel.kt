@@ -458,7 +458,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onMenuOpened() {
-        pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+        }
     }
 
     fun onDownloadsMenuPressed() {
