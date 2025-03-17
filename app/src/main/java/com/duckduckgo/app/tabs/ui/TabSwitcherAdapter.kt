@@ -77,6 +77,7 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
+    private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -147,7 +148,7 @@ class TabSwitcherAdapter(
                     trackerTextView = holder.binding.text,
                 )
                 holder.binding.close.setOnClickListener {
-                    // TODO delete
+                    onAnimationTileCloseClickListener?.invoke()
                 }
             }
             is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder -> {
@@ -160,7 +161,7 @@ class TabSwitcherAdapter(
                     trackerTextView = holder.binding.title,
                 )
                 holder.binding.close.setOnClickListener {
-                    // TODO delete
+                    onAnimationTileCloseClickListener?.invoke()
                 }
             }
             else -> throw IllegalArgumentException("Unknown ViewHolder type: $holder")
@@ -381,6 +382,10 @@ class TabSwitcherAdapter(
     fun onLayoutTypeChanged(layoutType: LayoutType) {
         this.layoutType = layoutType
         notifyDataSetChanged()
+    }
+
+    fun setAnimationTileCloseClickListener(onClick: () -> Unit) {
+        onAnimationTileCloseClickListener = onClick
     }
 
     companion object {
