@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.malicioussiteprotection.impl.data.network
 
-data class LoadingViewState(
-    val isLoading: Boolean = false,
-    val trackersAnimationEnabled: Boolean = true,
-    val progress: Int = 0,
-    val url: String = "",
-)
+/**
+ * This annotation is used in interceptors to be able to intercept the annotated service calls
+ */
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AuthRequired

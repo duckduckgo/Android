@@ -140,6 +140,7 @@ import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.Command.ShowDomainHasPermissionMessage
 import com.duckduckgo.app.browser.commands.Command.ShowEditSavedSiteDialog
@@ -767,18 +768,24 @@ class BrowserTabViewModel @Inject constructor(
         return downloadCallback.commands()
     }
 
+    // updateMaliciousSiteStatus should be false, unless you know the site is safe or malicious
     private fun buildSiteFactory(
         url: String,
         title: String? = null,
         stillExternal: Boolean? = false,
+        updateMaliciousSiteStatus: Boolean = false,
+        maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
-        Timber.v("buildSiteFactory for url=$url")
+        Timber.v("buildSiteFactory for url=$url, updateMaliciousSiteStatus=$updateMaliciousSiteStatus, maliciousSiteStatus=$maliciousSiteStatus")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
+        if (updateMaliciousSiteStatus) {
+            site?.maliciousSiteStatus = maliciousSiteStatus
+        }
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -846,7 +853,7 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
@@ -1114,6 +1121,8 @@ class BrowserTabViewModel @Inject constructor(
             browserShowing = true,
             browserError = OMITTED,
             sslError = NONE,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
         )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
@@ -1323,8 +1332,8 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
-        if (currentBrowserViewState().maliciousSiteDetected) {
-            command.postValue(HideWarningMaliciousSite)
+        if (currentBrowserViewState().maliciousSiteBlocked) {
+            command.postValue(HideWarningMaliciousSite(navigation.canGoBack))
             return true
         }
 
@@ -1386,7 +1395,16 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
+    /*
+     * This method shouldn't be called from outside the ViewModel.
+     * Calling this method when an error page is shown might cause unexpected issues, if said error page is a consequence
+     * of an error that prevents the page load from starting altogether. This currently only happens with malicious site protection
+     * when the WebView is stopped before the page load starts (local blocks)
+     * In such cases, by stopping the WebView, we're effectively stopping the load for the previously loaded
+     * page, which then triggers onProgressChanged/onPageFinished/etc. If we allow those to trigger an unfiltered navigationStateChanged,
+     * we will end up in a situation where we receive NewPage events for the previous page while the error is shown.
+     */
+    fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
         viewModelScope.launch {
@@ -1527,6 +1545,8 @@ class BrowserTabViewModel @Inject constructor(
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
             canPrintPage = domain != null,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -1606,7 +1626,11 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
+            loadingViewState.value =
+                currentLoadingViewState().copy(
+                    trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+                    url = site?.url ?: "",
+                )
         }
     }
 
@@ -1735,8 +1759,16 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun progressChanged(newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
+    override fun progressChanged(
+        newProgress: Int,
+        webViewNavigationState: WebViewNavigationState,
+    ) {
+        Timber.v("Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}")
+
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+        }
+
         if (!currentBrowserViewState().browserShowing) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
@@ -1754,6 +1786,37 @@ class BrowserTabViewModel @Inject constructor(
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
+    }
+
+    override fun pageFinished(
+        webViewNavigationState: WebViewNavigationState,
+        url: String?,
+    ) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+            url?.let { prefetchFavicon(url) }
+        }
+    }
+
+    override fun onPageCommitVisible(
+        webViewNavigationState: WebViewNavigationState,
+        url: String,
+    ) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+            onPageContentStart(url)
+        }
+    }
+
+    override fun pageStarted(webViewNavigationState: WebViewNavigationState) {
+        browserViewState.value =
+            currentBrowserViewState().copy(
+                browserShowing = true,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                fireButton = HighlightableButton.Visible(enabled = false),
+                maliciousSiteBlocked = false,
+            )
+        navigationStateChanged(webViewNavigationState)
     }
 
     override fun onSitePermissionRequested(
@@ -1884,7 +1947,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMaliciousSiteUserAction(
         action: MaliciousSiteBlockedWarningLayout.Action,
-        url: Uri,
+        siteUrl: Uri,
         feed: Feed,
         activeCustomTab: Boolean,
     ) {
@@ -1902,15 +1965,26 @@ class BrowserTabViewModel @Inject constructor(
             VisitSite -> {
                 val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
-                command.postValue(BypassMaliciousSiteWarning(url, feed))
-                browserViewState.value = currentBrowserViewState().copy(
-                    browserShowing = true,
-                    showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                command.postValue(BypassMaliciousSiteWarning(siteUrl, feed))
+                val documentUrlString = siteUrl.toString()
+                loadingViewState.value = currentLoadingViewState().copy(
+                    isLoading = true,
+                    trackersAnimationEnabled = true,
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                    * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                    * showing in case the URL was blocked locally and therefore never started to show*/
+                    progress = 20,
+                    url = documentUrlString,
+                )
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = documentUrlString,
+                    isEditing = false,
+                    navigationChange = true,
                 )
             }
 
             LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
-            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
+            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$siteUrl"))
         }
     }
 
@@ -1921,7 +1995,6 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
                 privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
@@ -2684,12 +2757,12 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
-            val isErrorShowing = currentBrowserViewState().maliciousSiteDetected
+            val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
-                    isBrowserShowing,
+                    isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
                 )
             }
@@ -3138,8 +3211,8 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
-        if (currentBrowserViewState().maliciousSiteDetected) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+        if (currentBrowserViewState().maliciousSiteBlocked) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteBlocked = false, maliciousSiteStatus = null)
         }
     }
 
@@ -3216,30 +3289,85 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
-    override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+    override fun onReceivedMaliciousSiteWarning(
+        siteUrl: Uri,
+        feed: Feed,
+        exempted: Boolean,
+        clientSideHit: Boolean,
+        isMainframe: Boolean,
+    ) {
         val previousSite = site
-        site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
-        site?.maliciousSiteStatus = when (feed) {
+
+        val siteUrlString = siteUrl.toString()
+
+        val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
 
+        buildSiteFactory(
+            url = siteUrlString,
+            updateMaliciousSiteStatus = true,
+            maliciousSiteStatus = maliciousSiteStatus,
+        )
+
         if (!exempted) {
-            if (currentBrowserViewState().maliciousSiteDetected && previousSite?.url == url.toString()) return
+            if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
+                Timber.tag("Cris").d("maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}")
+            } else {
+                val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
+                pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
+            }
             Timber.d("Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit")
-            val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
-            pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
-            loadingViewState.postValue(
-                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
-            )
-            browserViewState.postValue(
-                currentBrowserViewState().copy(
-                    browserShowing = false,
-                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                    maliciousSiteDetected = true,
-                ),
-            )
-            command.postValue(ShowWarningMaliciousSite(url, feed))
+
+            viewModelScope.launch(dispatchers.main()) {
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        isLoading = false,
+                        progress = 100,
+                        url = siteUrlString,
+                        trackersAnimationEnabled = false,
+                    )
+
+                browserViewState.value =
+                    browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus)
+
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = siteUrlString,
+                        isEditing = false,
+                    )
+
+                command.value =
+                    ShowWarningMaliciousSite(siteUrl, feed, clientSideHit, isMainframe) { navigationStateChanged(it) }
+            }
+        } else {
+            viewModelScope.launch(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
+                omnibarViewState.value =
+                    currentOmnibarViewState().copy(
+                        omnibarText = siteUrlString,
+                        isEditing = false,
+                    )
+                loadingViewState.value =
+                    currentLoadingViewState().copy(
+                        url = siteUrlString,
+                    )
+            }
+        }
+    }
+
+    override fun onReceivedMaliciousSiteSafe(
+        url: Uri,
+        isForMainFrame: Boolean,
+    ) {
+        if (isForMainFrame && currentBrowserViewState().maliciousSiteBlocked) {
+            viewModelScope.launch(dispatchers.main()) {
+                browserViewState.value =
+                    browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
+            }
+
+            buildSiteFactory(url = url.toString(), updateMaliciousSiteStatus = true, maliciousSiteStatus = null)
         }
     }
 
@@ -3279,11 +3407,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAutofillMenuSelected() {
         command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
-    }
-
-    @VisibleForTesting
-    fun updateWebNavigation(webNavigationState: WebNavigationState) {
-        this.webNavigationState = webNavigationState
     }
 
     fun cancelPendingAutofillRequestToChooseCredentials() {
@@ -3546,8 +3669,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun recoverFromWarningPage(showBrowser: Boolean) {
+        site?.maliciousSiteStatus = null
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
+            browserViewState.value = currentBrowserViewState().copy(
+                browserShowing = true,
+                sslError = NONE,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3558,7 +3687,8 @@ class BrowserTabViewModel @Inject constructor(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 browserShowing = showBrowser,
                 sslError = NONE,
-                maliciousSiteDetected = false,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
             )
         }
     }
@@ -3597,7 +3727,9 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 viewModelScope.launch {
-                    val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
+                    val cta = withContext(dispatchers.io()) {
+                        if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
+                    }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
                         command.value = HideOnboardingDaxDialog(onboardingCta)
@@ -3660,7 +3792,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOnboardingDaxTypingAnimationFinished() {
-        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+        if (currentBrowserViewState().browserShowing && currentBrowserViewState().maliciousSiteBlocked.not()) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+        }
     }
 
     override fun onShouldOverride() {
@@ -3863,6 +3997,12 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 duckChat.openDuckChat()
             }
+        }
+    }
+
+    fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            command.postValue(ShowAutoconsentAnimation(isCosmetic))
         }
     }
 

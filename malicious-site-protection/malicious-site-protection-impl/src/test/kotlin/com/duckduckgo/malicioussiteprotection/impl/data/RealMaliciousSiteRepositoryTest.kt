@@ -9,6 +9,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchesResponse
@@ -18,6 +19,8 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Ignored
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.test.runTest
@@ -37,10 +40,12 @@ class RealMaliciousSiteRepositoryTest {
 
     private val maliciousSiteDao: MaliciousSiteDao = mock()
     private val maliciousSiteService: MaliciousSiteService = mock()
+    private val maliciousSiteDatasetService: MaliciousSiteDatasetService = mock()
     private val mockPixel: Pixel = mock()
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
+        maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
     )
@@ -53,11 +58,11 @@ class RealMaliciousSiteRepositoryTest {
 
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
-        whenever(maliciousSiteService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
+        whenever(maliciousSiteDatasetService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
 
         repository.loadFilters()
 
-        verify(maliciousSiteService).getPhishingFilterSet(latestRevision.first().revision)
+        verify(maliciousSiteDatasetService).getPhishingFilterSet(latestRevision.first().revision)
         verify(maliciousSiteDao).updateFilters(any<PhishingFilterSetWithRevision>())
     }
 
@@ -71,7 +76,7 @@ class RealMaliciousSiteRepositoryTest {
 
         repository.loadFilters()
 
-        verify(maliciousSiteService, never()).getPhishingFilterSet(any())
+        verify(maliciousSiteDatasetService, never()).getPhishingFilterSet(any())
         verify(maliciousSiteDao, never()).updateFilters(any())
     }
 
@@ -83,11 +88,11 @@ class RealMaliciousSiteRepositoryTest {
 
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
-        whenever(maliciousSiteService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
+        whenever(maliciousSiteDatasetService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
 
         repository.loadHashPrefixes()
 
-        verify(maliciousSiteService).getPhishingHashPrefixes(latestRevision.first().revision)
+        verify(maliciousSiteDatasetService).getPhishingHashPrefixes(latestRevision.first().revision)
         verify(maliciousSiteDao).updateHashPrefixes(any<PhishingHashPrefixesWithRevision>())
     }
 
@@ -101,7 +106,7 @@ class RealMaliciousSiteRepositoryTest {
 
         repository.loadHashPrefixes()
 
-        verify(maliciousSiteService, never()).getPhishingHashPrefixes(any())
+        verify(maliciousSiteDatasetService, never()).getPhishingHashPrefixes(any())
         verify(maliciousSiteDao, never()).updateHashPrefixes(any())
     }
 
@@ -139,22 +144,26 @@ class RealMaliciousSiteRepositoryTest {
             ),
         )
 
+        val expected = matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }.let { matches ->
+            MatchesResult.Result(matches)
+        }
+
         whenever(maliciousSiteService.getMatches(hashPrefix)).thenReturn(matchesResponse)
 
         val result = repository.matches(hashPrefix)
 
-        assertEquals(matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }, result)
+        assertEquals(expected, result)
     }
 
     @Test
-    fun matches_returnsEmptyListOnTimeout() = runTest {
+    fun matches_returnsIgnoredOnTimeout() = runTest {
         val hashPrefix = "testPrefix"
 
         whenever(maliciousSiteService.getMatches(hashPrefix)).thenThrow(TimeoutCancellationException::class.java)
 
         val result = repository.matches(hashPrefix)
 
-        assertTrue(result.isEmpty())
+        assertTrue(result is Ignored)
         verify(mockPixel).fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
     }
 }

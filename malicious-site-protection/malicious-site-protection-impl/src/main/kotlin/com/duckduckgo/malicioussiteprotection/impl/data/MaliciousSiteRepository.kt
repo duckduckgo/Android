@@ -28,6 +28,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
@@ -38,11 +39,13 @@ import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevisi
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
@@ -51,18 +54,19 @@ import kotlinx.coroutines.withTimeout
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
     suspend fun getFilters(hash: String): List<FilterSet>?
-    suspend fun matches(hashPrefix: String): List<Match>
+    suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
     suspend fun loadHashPrefixes(): Result<Unit>
 }
 
-private const val MATCHES_ENDPOINT_TIMEOUT = 1000L
+private const val MATCHES_ENDPOINT_TIMEOUT = 5000L
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDao: MaliciousSiteDao,
     private val maliciousSiteService: MaliciousSiteService,
+    private val maliciousSiteDatasetService: MaliciousSiteDatasetService,
     private val dispatcherProvider: DispatcherProvider,
     private val pixels: Pixel,
 ) : MaliciousSiteRepository {
@@ -84,7 +88,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 
-    override suspend fun matches(hashPrefix: String): List<Match> {
+    override suspend fun matches(hashPrefix: String): MatchesResult {
         return try {
             withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
                 maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
@@ -99,12 +103,15 @@ class RealMaliciousSiteRepository @Inject constructor(
                         null
                     }
                 }
-            }
+            }.let { MatchesResult.Result(it) }
         } catch (e: TimeoutCancellationException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
-            listOf()
+            MatchesResult.Ignored
+        } catch (e: SocketTimeoutException) {
+            pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
+            MatchesResult.Ignored
         } catch (e: Exception) {
-            listOf()
+            MatchesResult.Ignored
         }
     }
 
@@ -164,8 +171,8 @@ class RealMaliciousSiteRepository @Inject constructor(
             networkRevision,
             feed,
             when (feed) {
-                PHISHING -> maliciousSiteService::getPhishingFilterSet
-                MALWARE -> maliciousSiteService::getMalwareFilterSet
+                PHISHING -> maliciousSiteDatasetService::getPhishingFilterSet
+                MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
             },
         ) { maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed)) }
     }
@@ -180,8 +187,8 @@ class RealMaliciousSiteRepository @Inject constructor(
             networkRevision,
             feed,
             when (feed) {
-                PHISHING -> maliciousSiteService::getPhishingHashPrefixes
-                MALWARE -> maliciousSiteService::getMalwareHashPrefixes
+                PHISHING -> maliciousSiteDatasetService::getPhishingHashPrefixes
+                MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
             },
         ) { maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed)) }
     }
