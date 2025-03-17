@@ -620,7 +620,7 @@ class TabDataRepositoryTest {
             timeProvider,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
-            tabManagerFeatureFlags
+            tabManagerFeatureFlags,
         )
     }
 
