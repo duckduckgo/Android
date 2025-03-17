@@ -16,7 +16,10 @@
 
 package com.duckduckgo.common.ui.menu
 
+import android.app.Activity
 import android.content.Context
+import android.os.Build.VERSION
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +28,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.mobile.android.R
 
 open class PopupMenu(
@@ -89,6 +93,59 @@ open class PopupMenu(
         val x = MARGIN
         val y = anchorLocation[1] + MARGIN
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
+    }
+
+    /**
+     * Shows an overflow menu and computes the gravity values based on the position of the [anchorView] on the screen.
+     *
+     * If the anchor is in the top half of the screen, the overflow menu will appear below it and expand towards the bottom.
+     * If it's in the bottom half of the screen, the overflow menu will appear above it and expand towards the top.
+     *
+     * If the anchor is more to the start of the screen, the overflow menu will also expand from the start of the screen.
+     * If it's more towards the end of the screen, so will the overflow menu.
+     */
+    fun showAnchoredView(
+        activity: Activity,
+        rootView: View,
+        anchorView: View,
+    ) {
+        val anchorLocation = IntArray(2)
+        anchorView.getLocationOnScreen(anchorLocation)
+        val x = MARGIN
+        val screenWidth = if (VERSION.SDK_INT >= 30) {
+            activity.windowManager.currentWindowMetrics.bounds.width()
+        } else {
+            val displayMetrics = DisplayMetrics()
+            activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            displayMetrics.heightPixels
+        }
+        val screenHeight = if (VERSION.SDK_INT >= 30) {
+            activity.windowManager.currentWindowMetrics.bounds.height()
+        } else {
+            val displayMetrics = DisplayMetrics()
+            activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            displayMetrics.heightPixels
+        }
+        val screenVerticalMidpoint = screenHeight / 2
+        val screenHorizontalMidpoint = screenWidth / 2
+
+        val anchorWidth = anchorView.width
+        val anchorHorizontalMidpoint = anchorLocation[0] + (anchorWidth / 2)
+        val anchorMoreToStartOfScreen: Boolean = anchorHorizontalMidpoint < screenHorizontalMidpoint
+        val anchorMoreToTopOfScreen: Boolean = anchorLocation[1] < screenVerticalMidpoint
+
+        val horizontalGravity = if (anchorMoreToStartOfScreen) Gravity.START else Gravity.END
+        val verticalGravity = if (anchorMoreToTopOfScreen) Gravity.TOP else Gravity.BOTTOM
+
+        val gravity = verticalGravity or horizontalGravity
+
+        val y = if (anchorMoreToTopOfScreen) {
+            anchorLocation[1] + anchorView.height + 4.toDp()
+        } else {
+            screenHeight - anchorLocation[1] + 4.toDp()
+        }
+
+        showAtLocation(rootView, gravity, x, y)
     }
 
     fun show(

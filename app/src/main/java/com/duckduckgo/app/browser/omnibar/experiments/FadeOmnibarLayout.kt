@@ -19,10 +19,12 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -41,6 +43,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
+    private val aiChat: FrameLayout by lazy { findViewById(R.id.aiChat) }
+
+    private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
     private var previousScrollY = 0
     private var targetHeight: Int = 0
@@ -78,7 +83,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     override fun render(viewState: ViewState) {
-        super.render(viewState)
+        val experimentalViewState = viewState.copy(
+            showBrowserMenu = !viewState.isNavigationBarEnabled && viewState.showBrowserMenu,
+            showFireIcon = !viewState.isNavigationBarEnabled && viewState.showFireIcon,
+            showTabsMenu = !viewState.isNavigationBarEnabled && viewState.showTabsMenu,
+        )
+        super.render(experimentalViewState)
+
+        val showChatMenu = viewState.isNavigationBarEnabled && viewState.viewMode !is ViewMode.CustomTab
+        aiChat.isVisible = showChatMenu
 
         minibarText.text = viewState.url.extractDomain()
     }
@@ -158,12 +171,20 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         this.layoutParams = layoutParams
     }
 
+    /**
+     * Returns a percentage (0.0 to 1.0) of how much the omnibar has shifted into the minibar.
+     */
+    fun getShiftRatio(): Float {
+        return currentTextAlpha
+    }
+
     private fun fadeToolbar(alpha: Float) {
         toolbar.fade(alpha)
         pageLoadingIndicator.fade(alpha)
         fireIconMenu.fade(alpha)
         tabsMenu.fade(alpha)
         browserMenu.fade(alpha)
+        aiChat.fade(alpha)
     }
 
     private fun fadeMinibar(alpha: Float) {
@@ -175,4 +196,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             minibar.isVisible = true
         }
     }
+
+    fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
+        fadeOmnibarItemPressedListener = itemPressedListener
+        aiChat.setOnClickListener {
+            fadeOmnibarItemPressedListener?.onDuckChatButtonPressed()
+        }
+    }
+}
+
+interface FadeOmnibarItemPressedListener {
+    fun onDuckChatButtonPressed()
 }
