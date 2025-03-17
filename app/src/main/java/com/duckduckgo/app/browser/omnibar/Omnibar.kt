@@ -415,11 +415,11 @@ class Omnibar(
     }
 
     override fun onScrollChange(
-        view: View?,
-        p1: Int,
+        v: View,
+        scrollX: Int,
         scrollY: Int,
-        p3: Int,
-        p4: Int,
+        oldScrollX: Int,
+        oldScrollY: Int,
     ) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
@@ -427,7 +427,11 @@ class Omnibar(
                     SCROLLING -> {
                         // no-op
                     }
-                    FADE -> binding.fadeOmnibar.onScrollChanged(scrollY)
+                    FADE -> binding.fadeOmnibar.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
                 }
             }
 
@@ -436,7 +440,11 @@ class Omnibar(
                     SCROLLING -> {
                         // no-op
                     }
-                    FADE -> binding.fadeOmnibarBottom.onScrollChanged(scrollY)
+                    FADE -> binding.fadeOmnibarBottom.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
                 }
             }
         }
@@ -446,11 +454,11 @@ class Omnibar(
         if (omnibarType == FADE) {
             when (omnibarPosition) {
                 OmnibarPosition.TOP -> {
-                    binding.fadeOmnibar.onScrollChanged(0, true)
+                    binding.fadeOmnibar.resetTransitionDelayed()
                 }
 
                 OmnibarPosition.BOTTOM -> {
-                    binding.fadeOmnibarBottom.onScrollChanged(0, true)
+                    binding.fadeOmnibarBottom.resetTransitionDelayed()
                 }
             }
         }
