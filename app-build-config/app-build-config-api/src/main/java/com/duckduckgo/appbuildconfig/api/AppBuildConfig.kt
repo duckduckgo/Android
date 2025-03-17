@@ -34,6 +34,7 @@ interface AppBuildConfig {
     val isDefaultVariantForced: Boolean
     val buildDateTimeMillis: Long
     val canSkipOnboarding: Boolean
+    val visualDesignExperimentEnabledByDefault: Boolean
 
     /**
      * You should call [variantName] in a background thread

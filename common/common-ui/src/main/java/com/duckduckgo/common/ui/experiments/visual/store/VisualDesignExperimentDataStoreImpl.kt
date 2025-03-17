@@ -21,6 +21,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.di.scopes.AppScope
@@ -50,15 +51,13 @@ import kotlinx.coroutines.runBlocking
 class VisualDesignExperimentDataStoreImpl @Inject constructor(
     @VisualDesignExperiment private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    appBuildConfig: AppBuildConfig,
     experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
     private companion object {
 
         private const val KEY_EXPERIMENT_ENABLED = "KEY_EXPERIMENT_ENABLED"
-        private const val DEFAULT_EXPERIMENT_USER_PREFERENCE = true
-
         private const val KEY_NAVIGATION_BAR_ENABLED = "KEY_NAVIGATION_BAR_ENABLED"
-        private const val DEFAULT_NAVIGATION_BAR_USER_PREFERENCE = true
 
         private val NO_PARENT_FEATURE = flowOf(FeatureState(isAvailable = true, isEnabled = true))
     }
@@ -68,7 +67,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         coroutineScope = appCoroutineScope,
         targetToggle = experimentalUIThemingFeature.self(),
         prefsKey = KEY_EXPERIMENT_ENABLED,
-        prefsDefault = DEFAULT_EXPERIMENT_USER_PREFERENCE,
+        prefsDefault = appBuildConfig.visualDesignExperimentEnabledByDefault,
     )
     override val experimentState: StateFlow<FeatureState> = _experimentState.state
 
@@ -78,7 +77,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         parentStateFlow = experimentState,
         targetToggle = experimentalUIThemingFeature.browserNavigationBar(),
         prefsKey = KEY_NAVIGATION_BAR_ENABLED,
-        prefsDefault = DEFAULT_NAVIGATION_BAR_USER_PREFERENCE,
+        prefsDefault = appBuildConfig.visualDesignExperimentEnabledByDefault,
     )
     override val navigationBarState: StateFlow<FeatureState> = _navigationBarState.state
 
