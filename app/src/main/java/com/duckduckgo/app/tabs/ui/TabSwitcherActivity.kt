@@ -676,7 +676,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {
         clearObserversEarlyToStopViewUpdates()
-        launch { viewModel.onNewTabRequested(fromOverflowMenu) }
+        viewModel.onNewTabRequested(fromOverflowMenu)
     }
 
     override fun onTabSelected(tabId: String) {

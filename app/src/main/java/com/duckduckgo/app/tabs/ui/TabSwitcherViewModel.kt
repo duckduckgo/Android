@@ -182,7 +182,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
-    suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
+    fun onNewTabRequested(fromOverflowMenu: Boolean) = viewModelScope.launch {
         if (swipingTabsFeature.isEnabled) {
             val newTab = tabItems
                 .filterIsInstance<Tab>()
@@ -499,9 +499,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onFabClicked() {
         when (selectionViewState.value.dynamicInterface.fabType) {
             FabType.NEW_TAB -> {
-                viewModelScope.launch {
-                    onNewTabRequested(fromOverflowMenu = false)
-                }
+                onNewTabRequested(fromOverflowMenu = false)
             }
             FabType.CLOSE_TABS -> {
                 onCloseSelectedTabsRequested()
