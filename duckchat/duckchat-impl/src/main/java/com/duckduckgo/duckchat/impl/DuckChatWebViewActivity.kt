@@ -32,7 +32,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChatScreens.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.DuckChatInternal.DuckChatWebViewActivityWithParams
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_NEW_TAB_REQUESTED
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED
 import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME

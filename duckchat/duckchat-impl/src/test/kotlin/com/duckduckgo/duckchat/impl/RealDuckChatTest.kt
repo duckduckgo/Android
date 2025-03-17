@@ -21,7 +21,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.duckchat.api.DuckChatScreens.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.DuckChatInternal.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter

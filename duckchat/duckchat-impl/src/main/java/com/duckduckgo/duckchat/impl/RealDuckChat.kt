@@ -27,7 +27,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.DuckChatScreens.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.DuckChatInternal.DuckChatWebViewActivityWithParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,6 +42,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
+    /**
+     * Use this model to launch the DuckChat screen
+     */
+    data class DuckChatWebViewActivityWithParams(
+        val url: String,
+    ) : GlobalActivityStarter.ActivityParams
+
     /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      * Sets IO dispatcher.
