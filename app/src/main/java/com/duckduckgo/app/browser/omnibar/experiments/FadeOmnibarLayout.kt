@@ -48,7 +48,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
     private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
-    private val aiChatDivider: FrameLayout by lazy { findViewById(R.id.verticalDivider) }
+    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 

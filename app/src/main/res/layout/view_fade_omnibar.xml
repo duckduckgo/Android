@@ -242,17 +242,17 @@
                     app:layout_constraintEnd_toStartOf="@id/aiChat"
                     app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
 
-                <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                <View
                     android:id="@+id/verticalDivider"
                     android:layout_width="1dp"
-                    android:layout_height="0dp"
-                    app:defaultPadding="false"
+                    android:layout_height="@dimen/toolbarIcon"
+                    android:background="?daxColorLines"
                     android:importantForAccessibility="no"
-                    android:layout_marginVertical="@dimen/keyline_1"
-                    app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
+                    android:layout_marginVertical="@dimen/keyline_2"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/aiChat"
                     app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
-                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/aiChat"
