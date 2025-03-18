@@ -240,6 +240,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
+
         _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabItems.map { tab -> tab.id })) }
     }
 
