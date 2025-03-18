@@ -38,7 +38,7 @@ class PirActionsRunnerFactory @Inject constructor(
     /**
      * Every instance of PirActionsRunner is created with its own instance of [PirMessagingInterface] and [RealBrokerActionProcessor]
      */
-    fun getInstance(
+    fun createInstance(
         context: Context,
         pirScriptToLoad: String,
         runType: RunType,

@@ -27,47 +27,47 @@ enum class PirPixel(
     private val withSuffix: Boolean = true,
 ) {
     PIR_INTERNAL_MANUAL_SCAN_STARTED(
-        baseName = "m_pir-internal_manual-scan_started",
+        baseName = "pir_internal_manual-scan_started",
         types = setOf(Count, Unique()),
     ),
 
     PIR_INTERNAL_MANUAL_SCAN_COMPLETED(
-        baseName = "m_pir-internal_manual-scan_completed",
+        baseName = "pir_internal_manual-scan_completed",
         types = setOf(Count, Unique()),
     ),
 
     PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED(
-        baseName = "m_pir-internal_manual-scan_broker_started",
+        baseName = "pir_internal_manual-scan_broker_started",
         type = Count,
     ),
 
     PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED(
-        baseName = "m_pir-internal_manual-scan_broker_completed",
+        baseName = "pir_internal_manual-scan_broker_completed",
         type = Count,
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED(
-        baseName = "m_pir-internal_scheduled-scan_scheduled",
+        baseName = "pir_internal_scheduled-scan_scheduled",
         types = setOf(Count, Unique()),
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_STARTED(
-        baseName = "m_pir-internal_scheduled-scan_started",
+        baseName = "pir_internal_scheduled-scan_started",
         types = setOf(Count, Unique()),
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED(
-        baseName = "m_pir-internal_scheduled-scan_completed",
+        baseName = "pir_internal_scheduled-scan_completed",
         types = setOf(Count, Unique()),
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED(
-        baseName = "m_pir-internal_scheduled-scan_broker_started",
+        baseName = "pir_internal_scheduled-scan_broker_started",
         type = Count,
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED(
-        baseName = "m_pir-internal_scheduled-scan_broker_completed",
+        baseName = "pir_internal_scheduled-scan_broker_completed",
         type = Count,
     ), ;
 

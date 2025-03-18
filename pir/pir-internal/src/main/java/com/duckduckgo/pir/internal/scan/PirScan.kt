@@ -152,7 +152,7 @@ class RealPirScan @Inject constructor(
         var createCount = 0
         while (createCount != maxWebViewCount) {
             runners.add(
-                pirActionsRunnerFactory.getInstance(
+                pirActionsRunnerFactory.createInstance(
                     context,
                     script,
                     runType,
