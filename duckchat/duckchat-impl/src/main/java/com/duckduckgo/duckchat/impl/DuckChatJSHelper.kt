@@ -21,6 +21,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
 interface DuckChatJSHelper {
@@ -35,7 +36,7 @@ interface DuckChatJSHelper {
 @ContributesBinding(AppScope::class)
 class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChat,
-    private val preferencesStore: DuckChatPreferencesStore,
+    private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
 
     override suspend fun processJsCallbackMessage(
@@ -52,7 +53,7 @@ class RealDuckChatJSHelper @Inject constructor(
         }
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)
-            preferencesStore.updateUserPreferences(payload)
+            dataStore.updateUserPreferences(payload)
             duckChat.openDuckChat()
             null
         }
@@ -63,7 +64,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
-            put(PAYLOAD, preferencesStore.fetchAndClearUserPreferences())
+            put(PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }

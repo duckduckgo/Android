@@ -38,11 +38,11 @@ class RealDuckChatJSHelperTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockDuckChat: DuckChat = mock()
-    private val mockPreferencesStore: DuckChatPreferencesStore = mock()
+    private val mockDataStore: DuckChatDataStore = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
-        preferencesStore = mockPreferencesStore,
+        dataStore = mockDataStore,
     )
 
     @Test
@@ -73,7 +73,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -98,7 +98,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -123,7 +123,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn(null)
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn(null)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -158,7 +158,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -182,7 +182,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -206,7 +206,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn(null)
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn(null)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -235,7 +235,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
-        verify(mockPreferencesStore).updateUserPreferences(payloadString)
+        verify(mockDataStore).updateUserPreferences(payloadString)
         verify(mockDuckChat).openDuckChat()
     }
 
@@ -246,7 +246,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
-        verify(mockPreferencesStore).updateUserPreferences(null)
+        verify(mockDataStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
     }
 
@@ -258,7 +258,7 @@ class RealDuckChatJSHelperTest {
         val data = JSONObject(mapOf("aiChatPayload" to JSONObject.NULL))
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
-        verify(mockPreferencesStore).updateUserPreferences(null)
+        verify(mockDataStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
     }
 }
