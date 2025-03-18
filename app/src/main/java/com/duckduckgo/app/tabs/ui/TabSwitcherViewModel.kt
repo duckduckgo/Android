@@ -274,15 +274,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBookmarkSelectedTabs() {
-        when (val mode = selectionViewState.value.mode) {
-            is Normal -> {
-                activeTab.value?.tabId?.let { tabId ->
-                    command.value = BookmarkTabsRequest(listOf(tabId))
-                }
-            }
-            is Selection -> {
-                command.value = BookmarkTabsRequest(mode.selectedTabs)
-            }
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY, type = Daily())
+
+        (selectionViewState.value.mode as? Selection)?.let { mode ->
+            command.value = BookmarkTabsRequest(mode.selectedTabs)
         }
     }
 
