@@ -333,18 +333,18 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
     TAB_MANAGER_CLICKED_DAILY("m_tab_manager_clicked_daily"),
-    TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"), // TODO: Add Test (FAB)
+    TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
     TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
     TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
     TAB_MANAGER_CLOSE_TAB_SWIPED("m_tab_manager_close_tab_swipe"),
     TAB_MANAGER_NEW_TAB_LONG_PRESSED("m_tab_manager_long_press_new_tab"),
     TAB_MANAGER_UP_BUTTON_PRESSED("m_tab_manager_exit_back_arrow"),
     TAB_MANAGER_BACK_BUTTON_PRESSED("m_tab_manager_exit_other"),
-    TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"), // TODO: Update Test
+    TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"),
     TAB_MANAGER_SELECT_MODE_MENU_PRESSED("m_tab_manager_select_mode_menu_clicked"), // TODO: Update Test
     TAB_MANAGER_MENU_NEW_TAB_PRESSED("m_tab_manager_menu_new_tab"),
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED("m_tab_manager_menu_close_all_tabs"),
-    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY("m_tab_manager_menu_close_all_tabs_daily"), // TODO: Add Test
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY("m_tab_manager_menu_close_all_tabs_daily"),
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY("m_tab_manager_menu_close_all_tabs_confirm_daily"),
     TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
@@ -355,8 +355,26 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_OPENED_FROM_SERP("m_tab_manager_open_from_serp"),
     TAB_MANAGER_OPENED_FROM_SITE("m_tab_manager_open_from_website"),
     TAB_MANAGER_OPENED_FROM_NEW_TAB("m_tab_manager_open_from_newtabpage"),
-    TAB_MANAGER_CLOSE_TABS("m_tab_manager_tab_closed"), // TODO: Add Test
-    TAB_MANAGER_CLOSE_TABS_DAILY("m_tab_manager_tab_closed_daily"), // TODO: Add Test
+    TAB_MANAGER_CLOSE_TABS("m_tab_manager_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_DAILY("m_tab_manager_close_tabs_daily"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED("m_tab_manager_confirm_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY("m_tab_manager_confirm_close_tabs_daily"),
+    TAB_MANAGER_MENU_SELECT_TABS("m_tab_manager_menu_select_tabs"),
+    TAB_MANAGER_MENU_SELECT_TABS_DAILY("m_tab_manager_menu_select_tabs_daily"),
+    TAB_MANAGER_TAB_SELECTED("m_tab_manager_tab_selected"),
+    TAB_MANAGER_TAB_DESELECTED("m_tab_manager_tab_deselected"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL("m_tab_manager_select_mode_menu_select_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY("m_tab_manager_select_mode_menu_select_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL("m_tab_manager_select_mode_menu_deselect_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY("m_tab_manager_select_mode_menu_deselect_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS("m_tab_manager_select_mode_menu_share_links"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY("m_tab_manager_select_mode_menu_share_links_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS("m_tab_manager_select_mode_menu_bookmark_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY("m_tab_manager_select_mode_menu_bookmark_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS("m_tab_manager_select_mode_menu_close_other_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS("m_tab_manager_select_mode_menu_close_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_daily"),
 
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
