@@ -182,7 +182,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
-    fun onNewTabRequested(fromOverflowMenu: Boolean) = viewModelScope.launch {
+    fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
         if (swipingTabsFeature.isEnabled) {
             val newTab = tabItems
                 .filterIsInstance<Tab>()
@@ -317,9 +317,14 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     // user has indicated they want to close selected tabs
-    fun onCloseSelectedTabsRequested() {
-        pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
-        pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_DAILY, type = Daily())
+    fun onCloseSelectedTabsRequested(fromOverflowMenu: Boolean = false) {
+        if (fromOverflowMenu) {
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS)
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY, type = Daily())
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_DAILY, type = Daily())
+        }
 
         val selectedTabs = selectionMode.selectedTabs
         val allTabsCount = tabItems.size
