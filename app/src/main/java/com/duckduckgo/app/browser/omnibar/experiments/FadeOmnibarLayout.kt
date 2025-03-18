@@ -23,20 +23,25 @@ import android.widget.ImageView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
 import kotlin.math.abs
 
 @InjectWith(FragmentScope::class)
@@ -46,13 +51,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
 
-    private val minibar: View by lazy { findViewById(R.id.minibar) }
+    private val minibarContainer: View by lazy { findViewById(R.id.minibarContainer) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
     private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
+    private val sharedShieldIcon: View by lazy { findViewById(R.id.minibarShield) }
+    private val omnibarBackground: View by lazy { findViewById(R.id.omnibarBackground) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
+
+    private val toolbarHeight: Int by lazy { context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.experimentalToolbarSize).toInt() }
+    private val minibarHeight: Int by lazy { context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.experimentalMinibarSize).toInt() }
 
     private var targetHeight: Int = 0
     private var currentHeight: Int = 0
@@ -60,6 +70,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private var currentToolbarAlpha: Float = 1f
     private var targetMinibarAlpha: Float = 0f
     private var currentMinibarAlpha: Float = 0f
+
+    private var transitionRatio = 0f
+    private var maximumTextInputWidth: Int = 0
 
     init {
         val attr =
@@ -74,8 +87,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         inflate(context, layout, this)
 
-        minibar.setOnClickListener {
-            revealToolbar()
+        minibarText.setOnClickListener {
+            //revealToolbar()
         }
 
         AndroidSupportInjection.inject(this)
@@ -101,11 +114,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarStroke)
         }
+
+        renderLeadingIconState(viewState.leadingIconState)
     }
 
     fun resetTransitionDelayed() {
         postDelayed(delayInMillis = 100) {
-            revealToolbar()
+            //revealToolbar()
         }
     }
 
@@ -114,6 +129,46 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         scrollY: Int,
         oldScrollY: Int,
     ) {
+        if (maximumTextInputWidth == 0) {
+            maximumTextInputWidth = omnibarTextInput.width
+        }
+
+        val scrollDelta = scrollY - oldScrollY
+        val ratioChange = scrollDelta / 76.toPx(context).toFloat()
+        transitionRatio = (transitionRatio + ratioChange).coerceIn(0f, 1f)
+
+        Timber.d("lp_test; transitionRatio: $transitionRatio")
+        Timber.d("lp_test; maximumTextInputWidth: ${toolbar.width}")
+        Timber.d("lp_test; omnibarTextInput.width: ${omnibarTextInput.width}")
+        Timber.d("lp_test; sharedShieldIcon.width: ${sharedShieldIcon.width}")
+        Timber.d("lp_test; sharedShieldIcon.height: ${sharedShieldIcon.height}")
+
+        omnibarTextInput.alpha = 1f - transitionRatio
+        aiChatDivider.alpha = 1f - transitionRatio
+        aiChat.alpha = 1f - transitionRatio
+        omnibarBackground.alpha = 1f - transitionRatio
+        minibarText.alpha = transitionRatio
+
+        val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionRatio).toInt()
+        Timber.d("lp_test; newInputTextWidth: ${newInputTextWidth}")
+        omniBarContainer.updateLayoutParams {
+            width = newInputTextWidth
+        }
+        toolbar.updateLayoutParams {
+            height = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
+        }
+        minibarContainer.updateLayoutParams {
+            height = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
+        }
+
+        val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
+        Timber.d("lp_test; newShieldSize: ${newShieldSize}")
+        sharedShieldIcon.updateLayoutParams {
+            width = newShieldSize
+            height = newShieldSize
+        }
+
+        /*
         if (currentHeight == 0) {
             currentHeight = layoutParams.height
         }
@@ -159,8 +214,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         if (targetHeight != currentHeight) {
             updateLayoutHeight(transitionStepRatio)
-        }
+        }*/
     }
+/*
 
     private fun revealToolbar() {
         // update layout alpha
@@ -202,14 +258,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         layoutParams.height = currentHeight
         this.layoutParams = layoutParams
     }
+*/
 
     /**
      * Returns a percentage (0.0 to 1.0) of how much the omnibar has shifted into the minibar.
      */
     fun getShiftRatio(): Float {
-        return currentMinibarAlpha
+        return transitionRatio
     }
-
+/*
     private fun fadeToolbar(alpha: Float) {
         toolbar.fade(alpha)
         pageLoadingIndicator.fade(alpha)
@@ -226,6 +283,31 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             minibar.isInvisible = true
         } else if (minibar.isInvisible) {
             minibar.isInvisible = false
+        }
+    }*/
+
+    private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
+        when (iconState) {
+            OmnibarLayoutViewModel.LeadingIconState.SEARCH -> {
+                sharedShieldIcon.gone()
+            }
+
+            OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
+                sharedShieldIcon.show()
+                shieldIcon.gone()
+            }
+
+            OmnibarLayoutViewModel.LeadingIconState.DAX -> {
+                sharedShieldIcon.gone()
+            }
+
+            OmnibarLayoutViewModel.LeadingIconState.GLOBE -> {
+                sharedShieldIcon.gone()
+            }
+
+            OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER -> {
+                sharedShieldIcon.gone()
+            }
         }
     }
 

@@ -463,6 +463,13 @@ class Omnibar(
             }
         }
     }
+
+    fun onViewCreated() {
+        val omnibar = newOmnibar
+        if (omnibar is FadeOmnibarLayout) {
+            // omnibar.onViewCreated()
+        }
+    }
 }
 
 fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {

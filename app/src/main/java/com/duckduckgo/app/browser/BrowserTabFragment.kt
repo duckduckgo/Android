@@ -852,6 +852,8 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
         omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
 
+        omnibar.onViewCreated()
+
         webViewContainer = binding.webViewContainer
         configureObservers()
         configureWebView()
