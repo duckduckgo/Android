@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatSettingsViewModel.Command
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,10 +29,8 @@ interface DuckChatJSHelper {
         method: String,
         id: String?,
         data: JSONObject?,
-    ): Command?
+    ): JsCallbackData?
 }
-
-data class SendResponseToJs(val data: JsCallbackData) : Command()
 
 @ContributesBinding(AppScope::class)
 class RealDuckChatJSHelper @Inject constructor(
@@ -46,12 +43,12 @@ class RealDuckChatJSHelper @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-    ): Command? = when (method) {
+    ): JsCallbackData? = when (method) {
         METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
-            SendResponseToJs(getAIChatNativeHandoffData(featureName, method, it))
+            getAIChatNativeHandoffData(featureName, method, it)
         }
         METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES -> id?.let {
-            SendResponseToJs(getAIChatNativeConfigValues(featureName, method, it))
+            getAIChatNativeConfigValues(featureName, method, it)
         }
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)

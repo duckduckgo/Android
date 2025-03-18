@@ -102,8 +102,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
-
-            is SendResponseToJs -> TODO()
         }
     }
 }

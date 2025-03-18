@@ -142,9 +142,9 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
-                                    if (response is SendResponseToJs) {
+                                    response?.let {
                                         withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response.data)
+                                            contentScopeScripts.onResponse(response)
                                         }
                                     }
                                 }
