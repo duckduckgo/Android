@@ -57,8 +57,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TRACKER_ANIMATION_TILE
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_DEFAULT_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationTile.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -67,7 +67,6 @@ import com.duckduckgo.mobile.android.R as AndroidR
 import java.io.File
 import java.security.MessageDigest
 import kotlin.Int
-import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -86,6 +85,7 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
+    private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -147,31 +147,29 @@ class TabSwitcherAdapter(
                 bindListTab(holder, tab)
             }
             is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder -> {
+                val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = R.string.trackersBlockedInTheLast7days,
-                    totalTrackerCount = when (Random.Default.nextInt(10)) {
-                        in 0..6 -> Random.Default.nextInt(10, 1000)
-                        else -> Random.Default.nextInt(1000, 10000)
-                    },
+                    totalTrackerCount = trackerAnimationTile.trackerCount,
                     trackerTextView = holder.binding.text,
                 )
                 holder.binding.close.setOnClickListener {
-                    // TODO delete
+                    onAnimationTileCloseClickListener?.invoke()
                 }
             }
             is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder -> {
+                val trackerAnimationTile = list[position] as TabSwitcherItem.TrackerAnimationTile
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = R.string.trackersBlocked,
-                    totalTrackerCount = when (Random.Default.nextInt(10)) {
-                        in 0..6 -> Random.Default.nextInt(10, 1000)
-                        else -> Random.Default.nextInt(1000, 10000)
-                    },
+                    totalTrackerCount = trackerAnimationTile.trackerCount,
                     trackerTextView = holder.binding.title,
                 )
                 holder.binding.close.setOnClickListener {
-                    // TODO delete
+                    onAnimationTileCloseClickListener?.invoke()
                 }
             }
             else -> throw IllegalArgumentException("Unknown ViewHolder type: $holder")
@@ -423,6 +421,10 @@ class TabSwitcherAdapter(
     fun onLayoutTypeChanged(layoutType: LayoutType) {
         this.layoutType = layoutType
         notifyDataSetChanged()
+    }
+
+    fun setAnimationTileCloseClickListener(onClick: () -> Unit) {
+        onAnimationTileCloseClickListener = onClick
     }
 
     companion object {

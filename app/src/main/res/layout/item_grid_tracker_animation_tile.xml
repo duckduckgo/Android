@@ -19,12 +19,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/keyline_2"
-    app:cardBackgroundColor="@color/green0"
     app:cardCornerRadius="10dp"
     tools:ignore="InvalidColorAttribute">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
+        android:background="@drawable/background_animated_tile"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -32,13 +32,14 @@
             android:id="@+id/close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selectable_circular_ripple"
+            android:background="@drawable/selectable_circular_ripple_dark"
             android:contentDescription="@string/closeContentDescription"
             android:padding="@dimen/keyline_2"
             android:scaleType="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_close_24_small" />
+            app:srcCompat="@drawable/ic_close_24_small"
+            app:tint="?attr/daxColorBlack" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/shieldAnimation"
@@ -52,7 +53,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             app:lottie_autoPlay="true"
-            app:lottie_rawRes="@raw/tab_shield" />
+            app:lottie_rawRes="@raw/shield_tabswitcher" />
 
         <TextView
             android:id="@+id/text"

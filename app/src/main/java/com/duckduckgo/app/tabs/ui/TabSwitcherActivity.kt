@@ -156,6 +156,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
 
+        if (tabSwitcherAnimationFeature.self().isEnabled()) {
+            tabsAdapter.setAnimationTileCloseClickListener {
+                viewModel.onTrackerAnimationTileCloseClicked()
+            }
+        }
+
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
@@ -424,7 +430,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
-                TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
+                is TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
             }
         }
     }
