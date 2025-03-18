@@ -18,10 +18,10 @@ class DuckChatWebViewClientTest {
 
         val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
         val webView: WebView = mock()
-        val testUrl = "https://example.com"
+        val url = "https://example.com"
 
-        duckChatWebViewClient.onPageStarted(webView, testUrl, null)
+        duckChatWebViewClient.onPageStarted(webView, url, null)
 
-        verify(mockPlugin).onPageStarted(webView, testUrl, null)
+        verify(mockPlugin).onPageStarted(webView, url, null)
     }
 }
