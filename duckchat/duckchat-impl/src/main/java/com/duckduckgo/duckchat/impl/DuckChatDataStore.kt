@@ -80,9 +80,9 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun fetchAndClearUserPreferences(): String? {
-        val currentPreferences = store.data.map { it[Keys.DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
+        val userPreferences = store.data.map { it[Keys.DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
         store.edit { prefs -> prefs.remove(Keys.DUCK_CHAT_USER_PREFERENCES) }
-        return currentPreferences
+        return userPreferences
     }
 
     override suspend fun updateUserPreferences(userPreferences: String?) {
