@@ -527,12 +527,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onFabClicked() {
         when (selectionViewState.value.dynamicInterface.fabType) {
-            FabType.NEW_TAB -> {
-                onNewTabRequested(fromOverflowMenu = false)
-            }
-            FabType.CLOSE_TABS -> {
-                onCloseSelectedTabsRequested()
-            }
+            FabType.NEW_TAB -> onNewTabRequested()
+            FabType.CLOSE_TABS -> onCloseSelectedTabsRequested()
         }
     }
 
