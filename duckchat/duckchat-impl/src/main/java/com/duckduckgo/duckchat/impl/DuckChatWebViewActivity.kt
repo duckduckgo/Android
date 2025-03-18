@@ -17,13 +17,14 @@
 package com.duckduckgo.duckchat.impl
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Message
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -32,7 +33,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.DuckChatInternal.DuckChatWebViewActivityWithParams
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_NEW_TAB_REQUESTED
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED
 import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -40,7 +40,6 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import javax.inject.Named
@@ -50,7 +49,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatWebViewActivityWithParams::class)
 class DuckChatWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -91,8 +89,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
-        val url = params?.url
+        val url = intent.getStringExtra(URL_EXTRA)
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -188,6 +185,15 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        fun intent(
+            context: Context,
+            url: String? = null,
+        ): Intent {
+            val intent = Intent(context, DuckChatWebViewActivity::class.java)
+            intent.putExtra(URL_EXTRA, url)
+            return intent
+        }
+        private const val URL_EXTRA = "URL_EXTRA"
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }

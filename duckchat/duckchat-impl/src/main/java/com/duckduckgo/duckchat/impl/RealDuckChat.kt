@@ -27,8 +27,6 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatInternal.DuckChatWebViewActivityWithParams
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -42,12 +40,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
-    /**
-     * Use this model to launch the DuckChat screen
-     */
-    data class DuckChatWebViewActivityWithParams(
-        val url: String,
-    ) : GlobalActivityStarter.ActivityParams
 
     /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
@@ -75,7 +67,6 @@ class RealDuckChat @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
-    private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -154,17 +145,9 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun startDuckChatActivity(url: String) {
-        val intent = globalActivityStarter.startIntent(
-            context,
-            DuckChatWebViewActivityWithParams(
-                url = url,
-            ),
-        )
-
-        intent?.let {
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(it)
-        }
+        val intent = DuckChatWebViewActivity.intent(context, url)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
     }
 
     private fun appendParameters(
