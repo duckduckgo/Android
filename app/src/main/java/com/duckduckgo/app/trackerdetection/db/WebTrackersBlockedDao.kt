@@ -36,4 +36,10 @@ interface WebTrackersBlockedDao {
         startTime: String,
         endTime: String,
     ): Flow<List<WebTrackerBlocked>>
+
+    @Query("SELECT COUNT(*) FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime")
+    suspend fun getTrackersCountBetween(
+        startTime: String,
+        endTime: String,
+    ): Int
 }
