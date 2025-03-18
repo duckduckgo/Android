@@ -29,7 +29,10 @@ import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
+import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
+import com.duckduckgo.pir.internal.store.db.PirScanLog
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
+import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.UserProfile
@@ -40,7 +43,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
@@ -51,6 +54,8 @@ import com.squareup.moshi.Types
         ScanErrorResult::class,
         ExtractProfileResult::class,
         UserProfile::class,
+        PirScanLog::class,
+        PirBrokerScanLog::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -59,6 +64,7 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun brokerDao(): BrokerDao
     abstract fun scanResultsDao(): ScanResultsDao
     abstract fun userProfileDao(): UserProfileDao
+    abstract fun scanLogDao(): ScanLogDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
