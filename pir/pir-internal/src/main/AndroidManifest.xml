@@ -5,11 +5,17 @@
         <activity
             android:name=".settings.PirDevSettingsActivity"
             android:label="@string/pirDevSettings" />
+
         <activity
             android:name=".settings.PirResultsActivity"
             android:label="@string/pirDevSimpleScanHeader" />
+
         <activity
             android:name=".settings.PirScanResultsActivity"
+            android:label="@string/pirDevViewScanResults" />
+
+        <activity
+            android:name=".settings.PirWebViewActivity"
             android:label="@string/pirDevViewScanResults" />
 
         <service

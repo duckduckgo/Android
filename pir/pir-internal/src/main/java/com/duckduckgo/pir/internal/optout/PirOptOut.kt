@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.internal.optout
 
 import android.content.Context
+import android.webkit.WebView
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
@@ -36,15 +37,41 @@ import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 interface PirOptOut {
+    /**
+     * This method can be used to execute pir opt-out for a given list of [brokers] names.
+     *
+     * @param brokers List of broker names
+     * @param context Context in which we want to create the detached WebView from
+     */
     suspend fun execute(
         brokers: List<String>,
         context: Context,
     ): Result<Unit>
 
+    /**
+     * This method can be used to execute pir opt out for all active brokers where the user's profile has been identified as a record.
+     *
+     * @param context Context in which we want to create the detached WebView from
+     */
     suspend fun executeForBrokersWithRecords(
         context: Context,
     ): Result<Unit>
 
+    /**
+     * This method should only be used if we want to debug opt-out and pass in a specific [webView] which will allow us to see the run in action.
+     * Do not use this for non-debug scenarios.
+     *
+     * @param brokers - brokers in which we want to run the opt out flow
+     * @param webView - attached/visible WebView in which we will run the opt-out flow.
+     */
+    suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
+    ): Result<Unit>
+
+    /**
+     * This method takes care of stopping the scan and cleaning up resources used.
+     */
     fun stop()
 }
 
@@ -71,6 +98,44 @@ class RealPirOptOut @Inject constructor(
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
     private var maxWebViewCount = 1
 
+    override suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
+    ): Result<Unit> {
+        if (runners.isNotEmpty()) {
+            stop()
+            runners.clear()
+        }
+        obtainProfile()
+
+        logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
+
+        runners.add(
+            pirActionsRunnerFactory.createInstance(
+                webView.context,
+                pirCssScriptLoader.getScript(),
+                OPTOUT,
+            ),
+        )
+
+        // Start each runner on a subset of the broker steps
+        return runBlocking {
+            brokers.mapNotNull { broker ->
+                repository.getBrokerOptOutSteps(broker)?.run {
+                    brokerStepsParser.parseStep(broker, this)
+                }
+            }.splitIntoParts(maxWebViewCount)
+                .mapIndexed { index, part ->
+                    async {
+                        runners[index].startOn(webView, profileQuery, part)
+                    }
+                }.awaitAll()
+
+            logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+            Result.success(Unit)
+        }
+    }
+
     override suspend fun execute(
         brokers: List<String>,
         context: Context,
@@ -80,26 +145,7 @@ class RealPirOptOut @Inject constructor(
                 stop()
                 runners.clear()
             }
-            repository.getUserProfiles().also {
-                if (it.isNotEmpty()) {
-                    // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
-                    val storedProfile = it[0]
-                    profileQuery = ProfileQuery(
-                        firstName = storedProfile.userName.firstName,
-                        lastName = storedProfile.userName.lastName,
-                        city = storedProfile.addresses.city,
-                        state = storedProfile.addresses.state,
-                        addresses = listOf(),
-                        birthYear = storedProfile.birthYear,
-                        fullName = storedProfile.userName.middleName?.run {
-                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                        }
-                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                        age = storedProfile.age,
-                        deprecated = false,
-                    )
-                }
-            }
+            obtainProfile()
         }
 
         logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
@@ -120,7 +166,7 @@ class RealPirOptOut @Inject constructor(
         var createCount = 0
         while (createCount != maxWebViewCount) {
             runners.add(
-                pirActionsRunnerFactory.getInstance(
+                pirActionsRunnerFactory.createInstance(
                     context,
                     script,
                     OPTOUT,
@@ -144,6 +190,29 @@ class RealPirOptOut @Inject constructor(
 
             logcat { "PIR-OPT-OUT: Optout completed for all runners" }
             Result.success(Unit)
+        }
+    }
+
+    private suspend fun obtainProfile() {
+        repository.getUserProfiles().also {
+            if (it.isNotEmpty()) {
+                // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
+                val storedProfile = it[0]
+                profileQuery = ProfileQuery(
+                    firstName = storedProfile.userName.firstName,
+                    lastName = storedProfile.userName.lastName,
+                    city = storedProfile.addresses.city,
+                    state = storedProfile.addresses.state,
+                    addresses = listOf(),
+                    birthYear = storedProfile.birthYear,
+                    fullName = storedProfile.userName.middleName?.run {
+                        "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
+                    }
+                        ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                    age = storedProfile.age,
+                    deprecated = false,
+                )
+            }
         }
     }
 

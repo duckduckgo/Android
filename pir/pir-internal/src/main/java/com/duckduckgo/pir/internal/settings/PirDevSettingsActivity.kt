@@ -167,6 +167,11 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             startForegroundService(Intent(this, PirForegroundOptOutService::class.java))
         }
 
+        binding.optOutDebug.setOnClickListener {
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            globalActivityStarter.start(this, PirDebugWebViewResultsScreenNoParams)
+        }
+
         binding.debugRunScan.setOnClickListener {
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }

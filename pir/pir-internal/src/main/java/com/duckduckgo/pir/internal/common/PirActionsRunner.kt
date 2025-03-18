@@ -83,6 +83,20 @@ interface PirActionsRunner {
     ): Result<Unit>
 
     /**
+     * This function is responsible for executing the [BrokerStep] passed on the passed [webView].
+     * This initializes everything necessary on the [webView].
+     *
+     * @param webView - WebView in which we want to execute the actions on
+     * @param profileQuery - Profile to be passed along actions in [BrokerStep]
+     * @param brokerSteps - List of [BrokerStep] each containing a broker + actions to be executed.
+     */
+    suspend fun startOn(
+        webView: WebView,
+        profileQuery: ProfileQuery,
+        brokerSteps: List<BrokerStep>,
+    ): Result<Unit>
+
+    /**
      * Forcefully stops / aborts a runner if it is running.
      */
     suspend fun stop()
@@ -100,10 +114,7 @@ internal class RealPirActionsRunner(
     private val currentTimeProvider: CurrentTimeProvider,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
 ) : PirActionsRunner, ActionResultListener {
-    private val timerCoroutineScope: CoroutineScope
-        get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
-
-    private val commandCoroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope
         get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
 
     private var detachedWebView: WebView? = null
@@ -127,8 +138,36 @@ internal class RealPirActionsRunner(
 
         initializeDetachedWebView(profileQuery)
 
+        return awaitResult()
+    }
+
+    override suspend fun startOn(
+        webView: WebView,
+        profileQuery: ProfileQuery,
+        brokerSteps: List<BrokerStep>,
+    ): Result<Unit> {
+        if (brokerSteps.isEmpty()) {
+            logcat { "PIR-RUNNER ($this): No broker steps to execute ${Thread.currentThread().name}" }
+            return Result.success(Unit)
+        }
+
+        brokersToExecute.clear()
+        brokersToExecute.addAll(brokerSteps)
+
+        withContext(dispatcherProvider.main()) {
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokersToExecute" }
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokersToExecute.size}" }
+            detachedWebView = pirDetachedWebViewProvider.setupWebView(webView, pirScriptToLoad) {
+                onLoadingComplete(it, profileQuery)
+            }
+            initializeRunner()
+        }
+        return awaitResult()
+    }
+
+    private suspend fun awaitResult(): Result<Unit> {
         return suspendCoroutine { continuation ->
-            commandsJob += commandCoroutineScope.launch {
+            commandsJob += coroutineScope.launch {
                 commandsFlow.asStateFlow().collect {
                     handleCommand(it, continuation)
                 }
@@ -136,50 +175,56 @@ internal class RealPirActionsRunner(
         }
     }
 
+    private fun initializeRunner() {
+        brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
+        detachedWebView!!.loadUrl(DBP_INITIAL_URL)
+    }
+
     private suspend fun initializeDetachedWebView(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.main()) {
-            /**
-             * 1. Create detached WebView
-             * 2. Prepare the detached WebView - load script and load the dbp url
-             * 3. Execute all steps for each Broker
-             * 4. Complete!
-             */
-
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokersToExecute" }
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokersToExecute.size}" }
-            detachedWebView = pirDetachedWebViewProvider.getInstance(context, pirScriptToLoad) {
-                logcat { "PIR-RUNNER ($this): finished loading $it and latest action ${commandsFlow.value}" }
-
-                // A completed initial scan means we are ready to run the scan for the brokers
-                if (it == DBP_INITIAL_URL) {
-                    nextCommand(
-                        HandleBroker(
-                            commandsFlow.value.state.copy(
-                                currentBrokerIndex = 0,
-                                currentActionIndex = 0,
-                                profileQuery = profileQuery,
-                            ),
-                        ),
-                    )
-                } else if (commandsFlow.value is LoadUrl) {
-                    // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
-                    // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
-                    logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Completed loading for ${commandsFlow.value}" }
-                    nextCommand(
-                        ExecuteBrokerAction(
-                            commandsFlow.value.state.copy(
-                                currentActionIndex = commandsFlow.value.state.currentActionIndex + 1,
-                            ),
-                        ),
-                    )
-                } else {
-                    logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Ignoring $it as next action has been pushed" }
-                }
-            }.also {
-                brokerActionProcessor.register(it, this@RealPirActionsRunner)
+            detachedWebView = pirDetachedWebViewProvider.createInstance(context, pirScriptToLoad) {
+                onLoadingComplete(it, profileQuery)
             }
 
-            detachedWebView!!.loadUrl(DBP_INITIAL_URL)
+            initializeRunner()
+        }
+    }
+
+    private fun onLoadingComplete(
+        url: String?,
+        profileQuery: ProfileQuery,
+    ) {
+        logcat { "PIR-RUNNER ($this): finished loading $url and latest action ${commandsFlow.value}" }
+        if (url == null) {
+            return
+        }
+
+        // A completed initial scan means we are ready to run the scan for the brokers
+        if (url == DBP_INITIAL_URL) {
+            nextCommand(
+                HandleBroker(
+                    commandsFlow.value.state.copy(
+                        currentBrokerIndex = 0,
+                        currentActionIndex = 0,
+                        profileQuery = profileQuery,
+                    ),
+                ),
+            )
+        } else if (commandsFlow.value is LoadUrl) {
+            // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
+            // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Completed loading for ${commandsFlow.value}" }
+            nextCommand(
+                ExecuteBrokerAction(
+                    commandsFlow.value.state.copy(
+                        currentActionIndex = commandsFlow.value.state.currentActionIndex + 1,
+                    ),
+                ),
+            )
+        } else {
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Ignoring $url as next action has been pushed" }
         }
     }
 
@@ -197,7 +242,7 @@ internal class RealPirActionsRunner(
                 cleanUpRunner()
             }
             // TODO add loading timeout
-            is LoadUrl -> commandCoroutineScope.launch(dispatcherProvider.main()) {
+            is LoadUrl -> coroutineScope.launch(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
 
@@ -208,7 +253,7 @@ internal class RealPirActionsRunner(
     }
 
     private fun nextCommand(command: Command) {
-        commandCoroutineScope.launch {
+        coroutineScope.launch {
             commandsFlow.emit(command)
         }
     }
@@ -425,7 +470,7 @@ internal class RealPirActionsRunner(
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
                     runBlocking(dispatcherProvider.io()) {
-                        delay(5_000)
+                        delay(10_000)
                     }
                 }
 
@@ -438,7 +483,7 @@ internal class RealPirActionsRunner(
                     )
                 } else {
                     timerJob.cancel()
-                    timerJob += timerCoroutineScope.launch {
+                    timerJob += coroutineScope.launch {
                         delay(60000) // 1 minute
                         // IF this timer completes, then timeout was reached
                         val currentState = commandsFlow.value.state
@@ -471,7 +516,7 @@ internal class RealPirActionsRunner(
         timerJob.cancel()
         nextCommand(Idle)
         commandsJob.cancel()
-        commandCoroutineScope.launch(dispatcherProvider.main()) {
+        coroutineScope.launch(dispatcherProvider.main()) {
             detachedWebView?.destroy()
         }
     }
