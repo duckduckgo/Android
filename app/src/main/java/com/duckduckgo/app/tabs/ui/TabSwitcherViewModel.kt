@@ -313,12 +313,16 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS_DAILY, type = Daily())
+
         triggerEmptySelectionMode()
     }
 
     // user has indicated they want to close all tabs
     fun onCloseAllTabsRequested() {
         command.value = Command.CloseAllTabsRequest(tabItems.size)
+
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY, type = Daily())
     }
