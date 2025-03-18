@@ -282,7 +282,8 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     }
 
     override fun onPageLoadStarted(url: String) {
-        val convertedUrl = URLDecoder.decode(url, "UTF-8").lowercase()
+        if (!isEnabled()) return
+        val convertedUrl = decodeUrl(url.toUri())
         /* onPageLoadStarted is often called after shouldOverride/shouldIntercept, therefore, if the URL
          * is already stored, we don't clear the processedUrls map to avoid re-checking the URL for the same
          * page load.
