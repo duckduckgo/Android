@@ -247,6 +247,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onDeselectAllTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY, type = Daily())
+
         triggerEmptySelectionMode()
     }
 
