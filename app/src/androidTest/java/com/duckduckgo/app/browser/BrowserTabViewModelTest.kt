@@ -5870,8 +5870,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val data = JsCallbackData(JSONObject(), "", "", "")
-        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(data)
+        val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
         testee.processJsCallbackMessage(
             DUCK_CHAT_FEATURE_NAME,
             "method",

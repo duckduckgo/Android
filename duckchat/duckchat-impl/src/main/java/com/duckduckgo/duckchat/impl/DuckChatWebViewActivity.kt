@@ -36,7 +36,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_NEW_TAB_REQUESTED
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED
 import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
-import com.duckduckgo.duckchat.impl.databinding.ActivityWebviewBinding
+import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -73,7 +73,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val binding: ActivityWebviewBinding by viewBinding()
+    private val binding: ActivityDuckChatWebviewBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
