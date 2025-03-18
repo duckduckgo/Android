@@ -74,7 +74,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -149,6 +148,7 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -239,8 +239,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
@@ -312,7 +312,6 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -634,8 +633,6 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
-    private lateinit var offsetChangedListener: AppBarLayout.OnOffsetChangedListener
-
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -828,25 +825,25 @@ class BrowserTabFragment :
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
             trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
                 listOf(
-                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedTextView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
                 )
             } else {
                 listOf(
-                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
                 )
             },
             omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.fadeOmnibar.omnibarTextInput
+                binding.delightfulOmnibar.omnibarTextInput
             } else {
-                binding.fadeOmnibarBottom.omnibarTextInput
+                binding.delightfulOmnibarBottom.omnibarTextInput
             },
             omnibarPosition = omnibar.omnibarPosition,
             minibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.fadeOmnibar.findViewById(R.id.minibar)
+                binding.delightfulOmnibar.findViewById(R.id.minibar)
             } else {
-                binding.fadeOmnibarBottom.findViewById(R.id.minibar)
+                binding.delightfulOmnibarBottom.findViewById(R.id.minibar)
             },
             logos = logos,
             ignoreLogos = ignoreLogos,
@@ -858,19 +855,19 @@ class BrowserTabFragment :
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
             trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
                 listOf(
-                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.fadeOmnibar.findViewById(R.id.trackersBlockedTextView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
                 )
             } else {
                 listOf(
-                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.fadeOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
                 )
             },
             omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.fadeOmnibar.omnibarTextInput
+                binding.delightfulOmnibar.omnibarTextInput
             } else {
-                binding.fadeOmnibarBottom.omnibarTextInput
+                binding.delightfulOmnibarBottom.omnibarTextInput
             },
         )
     }
@@ -958,7 +955,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, getOmnibarType(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1002,6 +999,21 @@ class BrowserTabFragment :
 
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
+        }
+    }
+
+    private fun getOmnibarType(): OmnibarType {
+        if (appPersonalityFeature.self().isEnabled()) {
+            if (appPersonalityFeature.variant3().isEnabled() ||
+                appPersonalityFeature.variant4().isEnabled() ||
+                appPersonalityFeature.variant5().isEnabled()
+            ) {
+                return OmnibarType.DELIGHTFUL
+            } else {
+                return OmnibarType.SCROLLING
+            }
+        } else {
+            return visualDesignExperimentDataStore.getOmnibarType()
         }
     }
 
@@ -1077,6 +1089,10 @@ class BrowserTabFragment :
 
     private fun onTabsButtonPressed() {
         launch { viewModel.userLaunchingTabSwitcher() }
+    }
+
+    private fun onTabsButtonLongPressed() {
+        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -1343,7 +1359,7 @@ class BrowserTabFragment :
         super.onResume()
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
+        val hasOmnibarTypeChanged = omnibar.omnibarType != getOmnibarType() // visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
@@ -3934,6 +3950,7 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
+                    omnibar.setPrivacyShield(viewState.privacyShield)
                     omnibar.renderPrivacyViewState(viewState)
                 }
             }
@@ -4023,7 +4040,7 @@ class BrowserTabFragment :
                 }
                 val privacyProtectionsPopupVisible = lastSeenBrowserViewState
                     ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
-                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible && isOmnibarOnScreen()) {
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
@@ -4031,11 +4048,6 @@ class BrowserTabFragment :
                     }
                 }
             }
-        }
-
-        private fun isOmnibarOnScreen(): Boolean {
-            return (omnibar.omnibarPosition == OmnibarPosition.TOP && binding.fadeOmnibar.findViewById<View>(R.id.minibar).isGone) ||
-                (omnibar.omnibarPosition == OmnibarPosition.BOTTOM && binding.fadeOmnibarBottom.findViewById<View>(R.id.minibar).isGone)
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {

@@ -22,8 +22,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,6 +39,7 @@ import kotlinx.coroutines.launch
 class VisualDesignExperimentViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val themingDataStore: ThemingDataStore,
+    private val appPersonalityFeature: AppPersonalityFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -80,6 +83,14 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     fun onExperimentalUIModeChanged(checked: Boolean) {
         visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
+        if (checked) {
+            appPersonalityFeature.self().setRawStoredState(State(false))
+            appPersonalityFeature.variant1().setRawStoredState(State(false))
+            appPersonalityFeature.variant2().setRawStoredState(State(false))
+            appPersonalityFeature.variant3().setRawStoredState(State(false))
+            appPersonalityFeature.variant4().setRawStoredState(State(false))
+            appPersonalityFeature.variant5().setRawStoredState(State(false))
+        }
     }
 
     fun onNavigationBarPrefChanged(checked: Boolean) {

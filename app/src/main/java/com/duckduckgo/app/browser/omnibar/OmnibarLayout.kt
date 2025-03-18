@@ -58,6 +58,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookies
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
@@ -118,6 +119,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
 
+        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
         data class HighlightOmnibarItem(
             val fireButton: Boolean,
             val privacyShield: Boolean,
@@ -584,6 +586,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         when (decoration) {
             is Mode -> {
                 viewModel.onViewModeChanged(decoration.viewMode)
+            }
+
+            is PrivacyShieldChanged -> {
+                viewModel.onPrivacyShieldChanged(decoration.privacyShield)
             }
 
             is Outline -> {

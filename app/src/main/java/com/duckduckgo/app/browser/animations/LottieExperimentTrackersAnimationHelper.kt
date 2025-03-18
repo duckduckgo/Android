@@ -25,7 +25,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isGone
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
@@ -141,8 +140,8 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 },
             )
 
-            val isOmnibarTopAndMinibarGone = (omnibarPosition == TOP && minibarView.isGone)
-            val isOmnibarBottomAndMinibarGone = (omnibarPosition == BOTTOM && minibarView.isGone)
+            val isOmnibarTopAndMinibarGone = (omnibarPosition == TOP && minibarView.alpha < 1f)
+            val isOmnibarBottomAndMinibarGone = (omnibarPosition == BOTTOM && minibarView.alpha < 1f)
             if (isOmnibarTopAndMinibarGone || isOmnibarBottomAndMinibarGone) {
                 this.setMaxProgress(1f)
                 this.playAnimation()

@@ -170,8 +170,15 @@
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
         android:id="@+id/fadeOmnibarBottom"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        app:omnibarPosition="bottom" />
+
+    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
+        android:id="@+id/delightfulOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"

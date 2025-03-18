@@ -30,68 +30,6 @@
         android:layout_height="wrap_content"
         android:background="?daxColorSurface">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/minibar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="@dimen/keyline_4"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:paddingVertical="@dimen/keyline_2">
-
-            <ImageView
-                android:id="@+id/minibarShield"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:layout_marginEnd="@dimen/keyline_1"
-                android:src="@drawable/ic_shield_exploration"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/trackersText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/keyline_1"
-                app:typography="body2"
-                android:gravity="center"
-                android:visibility="visible"
-                android:text="2"
-                tools:ignore="HardcodedText"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/minibarShield"/>
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/domainText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/keyline_1"
-                android:maxLines="1"
-                android:ellipsize="end"
-                app:typography="body2"
-                android:gravity="center_horizontal"
-                android:visibility="visible"
-                android:text="domain.com"
-                tools:ignore="HardcodedText"
-                android:paddingStart="@dimen/keyline_7"
-                android:paddingEnd="@dimen/keyline_7"
-                android:layout_marginStart="@dimen/keyline_7"
-                android:layout_marginEnd="@dimen/keyline_7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
@@ -442,6 +380,68 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/minibar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingVertical="@dimen/keyline_2">
+
+            <ImageView
+                android:id="@+id/minibarShield"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:layout_marginEnd="@dimen/keyline_1"
+                android:src="@drawable/ic_shield_exploration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/trackersText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_1"
+                app:typography="body2"
+                android:gravity="center"
+                android:visibility="visible"
+                android:text="2"
+                tools:ignore="HardcodedText"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/minibarShield"/>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/domainText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:typography="body2"
+                android:gravity="center_horizontal"
+                android:visibility="visible"
+                android:text="domain.com"
+                tools:ignore="HardcodedText"
+                android:paddingStart="@dimen/keyline_7"
+                android:paddingEnd="@dimen/keyline_7"
+                android:layout_marginStart="@dimen/keyline_7"
+                android:layout_marginEnd="@dimen/keyline_7"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </merge>
