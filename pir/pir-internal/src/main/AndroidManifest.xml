@@ -8,6 +8,9 @@
         <activity
             android:name=".settings.PirResultsActivity"
             android:label="@string/pirDevSimpleScanHeader" />
+        <activity
+            android:name=".settings.PirScanResultsActivity"
+            android:label="@string/pirDevViewScanResults" />
 
         <service
             android:name=".service.PirForegroundScanService"

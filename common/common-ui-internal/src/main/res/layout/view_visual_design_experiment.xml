@@ -36,13 +36,4 @@
         app:secondaryText="@string/experimentalUIMessage"
         app:showSwitch="true" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/experimentalUINavigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/navigationBarExperimentEnableTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/navigationBarExperimentEnableMessage"
-        app:showSwitch="true" />
-
 </LinearLayout>

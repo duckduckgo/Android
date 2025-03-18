@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -46,7 +46,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
-    private val aiChat: FrameLayout by lazy { findViewById(R.id.aiChat) }
+    private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
+    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -54,8 +55,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private var currentHeight: Int = 0
     private var targetToolbarAlpha: Float = 1f
     private var currentToolbarAlpha: Float = 1f
-    private var targetTextAlpha: Float = 0f
-    private var currentTextAlpha: Float = 0f
+    private var targetMinibarAlpha: Float = 0f
+    private var currentMinibarAlpha: Float = 0f
 
     init {
         val attr =
@@ -79,14 +80,16 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override fun render(viewState: ViewState) {
         val experimentalViewState = viewState.copy(
-            showBrowserMenu = !viewState.isNavigationBarEnabled && viewState.showBrowserMenu,
-            showFireIcon = !viewState.isNavigationBarEnabled && viewState.showFireIcon,
-            showTabsMenu = !viewState.isNavigationBarEnabled && viewState.showTabsMenu,
+            showBrowserMenu = false,
+            showFireIcon = false,
+            showTabsMenu = false,
         )
         super.render(experimentalViewState)
 
-        val showChatMenu = viewState.isNavigationBarEnabled && viewState.viewMode !is ViewMode.CustomTab
+        val showChatMenu = viewState.viewMode !is ViewMode.CustomTab
         aiChat.isVisible = showChatMenu
+        aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
+        spacer.isVisible = false
 
         minibarText.text = viewState.url.extractDomain()
     }
@@ -110,7 +113,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             revealToolbar()
             return
         } else if (!scrollableView.canScrollVertically(1)) { // bottom of the page condition
-            hideToolbar()
+            revealMinibar()
             return
         }
 
@@ -121,10 +124,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         // update layout alpha
         if (isScrollingDown) {
             targetToolbarAlpha = 0f
-            targetTextAlpha = 1f
+            targetMinibarAlpha = 1f
         } else {
             targetToolbarAlpha = 1f
-            targetTextAlpha = 0f
+            targetMinibarAlpha = 0f
         }
 
         val toolbarAlphaDifference = (targetToolbarAlpha - currentToolbarAlpha)
@@ -133,11 +136,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         currentToolbarAlpha = currentToolbarAlpha.coerceIn(0f, 1f)
         fadeToolbar(currentToolbarAlpha)
 
-        val textAlphaDifference = (targetTextAlpha - currentTextAlpha)
+        val textAlphaDifference = (targetMinibarAlpha - currentMinibarAlpha)
         val textAlphaChange = (textAlphaDifference * transitionStepRatio)
-        currentTextAlpha += textAlphaChange
-        currentTextAlpha = currentTextAlpha.coerceIn(0f, 1f)
-        fadeMinibar(currentTextAlpha)
+        currentMinibarAlpha += textAlphaChange
+        currentMinibarAlpha = currentMinibarAlpha.coerceIn(0f, 1f)
+        fadeMinibar(currentMinibarAlpha)
 
         // update layout height
         targetHeight = if (isScrollingDown) {
@@ -153,11 +156,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private fun revealToolbar() {
         // update layout alpha
         targetToolbarAlpha = 1f
-        targetTextAlpha = 0f
+        targetMinibarAlpha = 0f
         currentToolbarAlpha = 1f
-        currentTextAlpha = 0f
+        currentMinibarAlpha = 0f
         fadeToolbar(targetToolbarAlpha)
-        fadeMinibar(targetTextAlpha)
+        fadeMinibar(targetMinibarAlpha)
 
         // update layout height
         targetHeight = toolbar.height
@@ -166,14 +169,14 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         this.layoutParams = layoutParams
     }
 
-    private fun hideToolbar() {
+    private fun revealMinibar() {
         // update layout alpha
         targetToolbarAlpha = 0f
-        targetTextAlpha = 1f
+        targetMinibarAlpha = 1f
         currentToolbarAlpha = 0f
-        currentTextAlpha = 1f
+        currentMinibarAlpha = 1f
         fadeToolbar(targetToolbarAlpha)
-        fadeMinibar(targetTextAlpha)
+        fadeMinibar(targetMinibarAlpha)
 
         // update layout height
         targetHeight = minibar.height
@@ -195,7 +198,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
      * Returns a percentage (0.0 to 1.0) of how much the omnibar has shifted into the minibar.
      */
     fun getShiftRatio(): Float {
-        return currentTextAlpha
+        return currentMinibarAlpha
     }
 
     private fun fadeToolbar(alpha: Float) {
@@ -211,9 +214,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         minibar.fade(alpha)
         minibar.alpha = alpha
         if (alpha == 0f) {
-            minibar.isInvisible = false
-        } else if (!minibar.isVisible) {
             minibar.isInvisible = true
+        } else if (minibar.isInvisible) {
+            minibar.isInvisible = false
         }
     }
 

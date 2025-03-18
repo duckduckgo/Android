@@ -126,6 +126,7 @@ class WebViewRequestInterceptorTest {
 
     @Test
     fun whenUrlShouldBeFilteredThenResponseIsCancelled() = runTest {
+        whenever(mockRequest.url).thenReturn("foo.com".toUri())
         whenever(mockRequestFilterer.shouldFilterOutRequest(mockRequest, "foo.com")).thenReturn(true)
 
         val response = testee.shouldIntercept(
@@ -192,21 +193,6 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptUrlWithNullUrlThenDuckPlayerInterceptNotCalled() = runTest {
-        configureDuckPlayer()
-        whenever(mockRequest.url).thenReturn(null)
-
-        testee.shouldIntercept(
-            request = mockRequest,
-            documentUri = null,
-            webView = webView,
-            webViewClientListener = null,
-        )
-
-        verify(mockDuckPlayer, never()).intercept(any(), any(), any())
-    }
-
-    @Test
     fun whenInterceptUrlDuckPlayerInterceptIsCalled() = runTest {
         configureDuckPlayer()
         testee.shouldIntercept(
@@ -219,21 +205,8 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runTest {
-        configureShouldUpgrade()
-        whenever(mockRequest.url).thenReturn(null)
-        testee.shouldIntercept(
-            request = mockRequest,
-            documentUri = null,
-            webView = webView,
-            webViewClientListener = null,
-        )
-
-        verify(mockHttpsUpgrader, never()).upgrade(any())
-    }
-
-    @Test
     fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runTest {
+        whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,

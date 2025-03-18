@@ -58,10 +58,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         viewModel.onExperimentalUIModeChanged(isChecked)
     }
 
-    private val navigationBarToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onNavigationBarPrefChanged(isChecked)
-    }
-
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
@@ -87,10 +83,7 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.isVisible = viewState.isBrowserThemingFeatureAvailable
-        binding.experimentalUINavigationBar.isVisible = viewState.isNavigationBarAvailable
-
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
-        binding.experimentalUINavigationBar.quietlySetIsChecked(viewState.isNavigationBarEnabled, navigationBarToggleListener)
 
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }

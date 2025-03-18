@@ -854,7 +854,7 @@ class OmnibarLayoutViewModelTest {
             StateChange.LoadingStateChange(
                 LoadingViewState(
                     isLoading = true,
-                    privacyOn = true,
+                    trackersAnimationEnabled = true,
                     progress = 100,
                     url = SERP_URL,
                 ),
@@ -1055,7 +1055,7 @@ class OmnibarLayoutViewModelTest {
             StateChange.LoadingStateChange(
                 LoadingViewState(
                     isLoading = true,
-                    privacyOn = true,
+                    trackersAnimationEnabled = true,
                     progress = 100,
                     url = loadedUrl,
                 ),
