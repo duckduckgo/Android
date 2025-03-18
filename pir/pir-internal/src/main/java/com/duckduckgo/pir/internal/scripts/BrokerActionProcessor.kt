@@ -24,6 +24,8 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.ActionRequest
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirResult
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
@@ -59,11 +61,12 @@ interface BrokerActionProcessor {
     )
 
     /**
-     * Executes the [action] for the given [profileQuery]
+     * Executes the [action] for the given [profileQuery] and/or [extractedProfile]
      */
     fun pushAction(
         profileQuery: ProfileQuery,
         action: BrokerAction,
+        extractedProfile: ExtractedProfile? = null,
     )
 
     interface ActionResultListener {
@@ -114,6 +117,7 @@ class RealBrokerActionProcessor(
         webView: WebView,
         actionResultListener: ActionResultListener,
     ) {
+        logcat { "PIR-OPT-OUT: 7" }
         registeredActionResultListener = actionResultListener
         pirMessagingInterface.register(
             webView,
@@ -128,11 +132,13 @@ class RealBrokerActionProcessor(
                 }
             },
         )
+        logcat { "PIR-OPT-OUT: 8" }
     }
 
     override fun pushAction(
         profileQuery: ProfileQuery,
         action: BrokerAction,
+        extractedProfile: ExtractedProfile?,
     ) {
         logcat { "PIR-CSS: pushAction action: $action" }
 
@@ -150,6 +156,14 @@ class RealBrokerActionProcessor(
                         action = action,
                         data = UserProfile(
                             userProfile = profileQuery,
+                            extractedProfile = extractedProfile?.run {
+                                ExtractedProfileParams(
+                                    name = this.name,
+                                    profileUrl = this.profileUrl?.profileUrl,
+                                    fullName = profileQuery.fullName,
+                                    email = this.email,
+                                )
+                            },
                         ),
                     ),
                 ),

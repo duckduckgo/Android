@@ -35,4 +35,8 @@
     <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
     <string name="pirMessageSchedule">Successfully schedule background scan!</string>
     <string name="pirDevScanLogHeader">Scan events log</string>
+    <string name="pirOptOutNotificationTitle">Pir Opt Out</string>
+    <string name="pirOptOutNotificationMessageInProgress">Opt out is currently in progress…</string>
+    <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
+    <string name="pirDevOptOut">Run opt out</string>
 </resources>

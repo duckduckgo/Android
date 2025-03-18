@@ -33,6 +33,7 @@ class PirActionsRunnerFactory @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pixelSender: PirPixelSender,
+    private val nativeBrokerActionHandler: NativeBrokerActionHandler,
 ) {
     /**
      * Every instance of PirActionsRunner is created with its own instance of [PirMessagingInterface] and [RealBrokerActionProcessor]
@@ -56,6 +57,7 @@ class PirActionsRunnerFactory @Inject constructor(
             pixelSender,
             runType,
             currentTimeProvider,
+            nativeBrokerActionHandler,
         )
     }
 

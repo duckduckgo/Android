@@ -76,10 +76,11 @@ sealed class BrokerAction(
 
     data class FillForm(
         override val id: String,
-        override val needsEmail: Boolean = false,
         val elements: List<ElementSelector>,
         val selector: String,
-    ) : BrokerAction(id)
+    ) : BrokerAction(id) {
+        override val needsEmail: Boolean = elements.any { it.type == "email" }
+    }
 
     data class GetCaptchInfo(
         override val id: String,

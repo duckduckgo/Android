@@ -77,7 +77,7 @@ class PirResultsActivity : DuckDuckGoActivity() {
                     stringBuilder.append("PROFILE QUERY:\n ${it.profileQuery} \n")
                     stringBuilder.append("EXTRACTED DATA:\n")
                     it.extractResults.forEach { extract ->
-                        stringBuilder.append("> ${extract.scrapedData.profileUrl?.profileUrl} \n")
+                        stringBuilder.append("> ${extract.scrapedData.profileUrl} \n")
                     }
                 }
 

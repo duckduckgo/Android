@@ -48,6 +48,9 @@ interface ScanResultsDao {
     @Query("SELECT * FROM pir_scan_extracted_profile ORDER BY completionTimeInMillis")
     fun getAllExtractProfileResult(): List<ExtractProfileResult>
 
+    @Query("SELECT * FROM pir_scan_extracted_profile WHERE brokerName = :brokerName ORDER BY completionTimeInMillis")
+    fun getExtractProfileResultForProfile(brokerName: String): List<ExtractProfileResult>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertExtractProfileResult(extractProfileResult: ExtractProfileResult)
 

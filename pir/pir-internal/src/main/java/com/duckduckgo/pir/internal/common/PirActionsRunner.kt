@@ -22,18 +22,33 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.AwaitEmailConfirmation
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.BrokerCompleted
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.CompleteExecution
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.ExecuteBrokerAction
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.GetEmail
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.HandleBroker
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.Idle
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.LoadUrl
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Click
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchInfo
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ClickResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
@@ -83,6 +98,7 @@ internal class RealPirActionsRunner(
     private val pirPixelSender: PirPixelSender,
     private val runType: PirActionsRunnerFactory.RunType,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val nativeBrokerActionHandler: NativeBrokerActionHandler,
 ) : PirActionsRunner, ActionResultListener {
     private val timerCoroutineScope: CoroutineScope
         get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
@@ -91,7 +107,6 @@ internal class RealPirActionsRunner(
         get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
 
     private var detachedWebView: WebView? = null
-    private var submittedProfileQuery: ProfileQuery? = null
     private val brokersToExecute: MutableList<BrokerStep> = mutableListOf()
 
     private val commandsFlow = MutableStateFlow<Command>(Idle)
@@ -107,11 +122,10 @@ internal class RealPirActionsRunner(
             return Result.success(Unit)
         }
 
-        submittedProfileQuery = profileQuery
         brokersToExecute.clear()
         brokersToExecute.addAll(brokerSteps)
 
-        initializeDetachedWebView()
+        initializeDetachedWebView(profileQuery)
 
         return suspendCoroutine { continuation ->
             commandsJob += commandCoroutineScope.launch {
@@ -122,7 +136,7 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun initializeDetachedWebView() {
+    private suspend fun initializeDetachedWebView(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.main()) {
             /**
              * 1. Create detached WebView
@@ -143,6 +157,7 @@ internal class RealPirActionsRunner(
                             commandsFlow.value.state.copy(
                                 currentBrokerIndex = 0,
                                 currentActionIndex = 0,
+                                profileQuery = profileQuery,
                             ),
                         ),
                     )
@@ -187,12 +202,89 @@ internal class RealPirActionsRunner(
             }
 
             is BrokerCompleted -> handleBrokerCompleted(command.state, command.isSuccess)
+            is GetEmail -> handleGetEmail(command.state)
+            is AwaitEmailConfirmation -> handleEmailConfirmation(command.state, command.pollingIntervalSeconds)
         }
     }
 
     private fun nextCommand(command: Command) {
         commandCoroutineScope.launch {
             commandsFlow.emit(command)
+        }
+    }
+
+    private suspend fun handleEmailConfirmation(
+        state: State,
+        pollingIntervalSeconds: Float,
+    ) {
+        val broker = brokersToExecute[state.currentBrokerIndex]
+        val extractedProfileState = state.extractedProfileState
+        if (extractedProfileState != null) {
+            nativeBrokerActionHandler.pushAction(
+                NativeAction.GetEmailStatus(
+                    actionId = broker.actions[state.currentActionIndex].id,
+                    brokerName = broker.brokerName!!,
+                    email = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex].email!!,
+                    pollingIntervalSeconds = pollingIntervalSeconds,
+                ),
+            ).also {
+                if (it is NativeActionResult.Success) {
+                    nextCommand(
+                        LoadUrl(
+                            state = state,
+                            urlToLoad = (it.data as NativeSuccessData.EmailConfirmation).link,
+                        ),
+                    )
+                } else {
+                    val result = it as NativeActionResult.Failure
+                    onError(
+                        PirErrorReponse(
+                            actionID = result.actionId,
+                            message = result.message,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun handleGetEmail(state: State) {
+        val broker = brokersToExecute[state.currentBrokerIndex]
+
+        nativeBrokerActionHandler.pushAction(
+            NativeAction.GetEmail(
+                actionId = broker.actions[state.currentActionIndex].id,
+                brokerName = broker.brokerName!!,
+            ),
+        ).also {
+            if (it is NativeActionResult.Success) {
+                val extractedProfileState = state.extractedProfileState!!
+                val extractedProfile = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
+                val updatedList = extractedProfileState.extractedProfile.toMutableList()
+
+                updatedList[extractedProfileState.currentExtractedProfileIndex] = extractedProfile.copy(
+                    email = (it.data as Email).email,
+                )
+
+                extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
+                nextCommand(
+                    ExecuteBrokerAction(
+                        state = state.copy(
+                            extractedProfileState = extractedProfileState.copy(
+                                extractedProfile = updatedList,
+                            ),
+                        ),
+                    ),
+                )
+            } else {
+                val result = it as NativeActionResult.Failure
+                onError(
+                    PirErrorReponse(
+                        actionID = result.actionId,
+                        message = result.message,
+                    ),
+                )
+            }
         }
     }
 
@@ -203,15 +295,31 @@ internal class RealPirActionsRunner(
             // Entry point of execution for a Blocker
             brokersToExecute[state.currentBrokerIndex].brokerName?.let {
                 emitBrokerStartPixel(it)
-            }
 
-            nextCommand(
-                ExecuteBrokerAction(
-                    commandsFlow.value.state.copy(
-                        currentActionIndex = 0,
-                        brokerStartTime = currentTimeProvider.currentTimeMillis(),
+                nextCommand(
+                    ExecuteBrokerAction(
+                        commandsFlow.value.state.copy(
+                            currentActionIndex = 0,
+                            brokerStartTime = currentTimeProvider.currentTimeMillis(),
+                            extractedProfileState = getExtractedProfileForBroker(it),
+                        ),
                     ),
-                ),
+                )
+            }
+        }
+    }
+
+    private suspend fun getExtractedProfileForBroker(
+        brokerName: String,
+    ): ExtractedProfileState? {
+        return repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
+            it.score > 1
+        }?.map {
+            it.scrapedData
+        }?.run {
+            ExtractedProfileState(
+                currentExtractedProfileIndex = 0,
+                extractedProfile = this,
             )
         }
     }
@@ -220,28 +328,43 @@ internal class RealPirActionsRunner(
         state: State,
         isSuccess: Boolean,
     ) {
-        // Exit point of execution for a Blocker
-        brokersToExecute[state.currentBrokerIndex].brokerName?.let {
-            emitBrokerCompletePixel(
-                brokerName = it,
-                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
-                isSuccess = isSuccess,
+        if (state.extractedProfileState != null &&
+            state.extractedProfileState.currentExtractedProfileIndex < state.extractedProfileState.extractedProfile.size - 1
+        ) {
+            // Restart for broker but with different profile
+            nextCommand(
+                ExecuteBrokerAction(
+                    state = state.copy(
+                        currentActionIndex = 0,
+                        extractedProfileState = state.extractedProfileState.copy(
+                            currentExtractedProfileIndex = state.extractedProfileState.currentExtractedProfileIndex + 1,
+                        ),
+                    ),
+                ),
+            )
+        } else {
+            // Exit point of execution for a Blocker
+            brokersToExecute[state.currentBrokerIndex].brokerName?.let {
+                emitBrokerCompletePixel(
+                    brokerName = it,
+                    totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
+                    isSuccess = isSuccess,
+                )
+            }
+            nextCommand(
+                HandleBroker(
+                    state = state.copy(
+                        currentBrokerIndex = state.currentBrokerIndex + 1,
+                    ),
+                ),
             )
         }
-
-        nextCommand(
-            HandleBroker(
-                state = state.copy(
-                    currentBrokerIndex = state.currentBrokerIndex + 1,
-                ),
-            ),
-        )
     }
 
     private suspend fun emitBrokerStartPixel(brokerName: String) {
         if (runType == PirActionsRunnerFactory.RunType.MANUAL) {
             pirPixelSender.reportManualScanBrokerStarted(brokerName)
-        } else {
+        } else if (runType == PirActionsRunnerFactory.RunType.SCHEDULED) {
             pirPixelSender.reportScheduledScanBrokerStarted(brokerName)
         }
         repository.saveBrokerScanLog(
@@ -264,7 +387,7 @@ internal class RealPirActionsRunner(
                 totalTimeInMillis = totalTimeMillis,
                 isSuccess = isSuccess,
             )
-        } else {
+        } else if (runType == PirActionsRunnerFactory.RunType.SCHEDULED) {
             pirPixelSender.reportScheduledScanBrokerCompleted(
                 brokerName = brokerName,
                 totalTimeInMillis = totalTimeMillis,
@@ -280,7 +403,7 @@ internal class RealPirActionsRunner(
         )
     }
 
-    private fun executeBrokerAction(state: State) {
+    private suspend fun executeBrokerAction(state: State) {
         val currentBroker = brokersToExecute[state.currentBrokerIndex]
         if (state.currentActionIndex == currentBroker.actions.size) {
             nextCommand(
@@ -289,25 +412,59 @@ internal class RealPirActionsRunner(
         } else {
             val actionToExecute = currentBroker.actions[state.currentActionIndex]
 
-            timerJob.cancel()
-            timerJob += timerCoroutineScope.launch {
-                delay(60000) // 1 minute
-                // IF this timer completes, then timeout was reached
-                val currentState = commandsFlow.value.state
-                kotlin.runCatching {
-                    val id =
-                        brokersToExecute[currentState.currentBrokerIndex].actions[currentState.currentActionIndex].id
-                    onError(
-                        PirErrorReponse(
-                            actionID = id,
-                            message = "Local timeout",
+            if (actionToExecute.needsEmail && state.extractedProfileState != null && !hasEmail(state.extractedProfileState)) {
+                nextCommand(GetEmail(state))
+            } else {
+                val extractedProfile = if (state.extractedProfileState != null) {
+                    val extractedProfileState = state.extractedProfileState
+                    extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
+                } else {
+                    null
+                }
+
+                // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
+                if (actionToExecute is Click || actionToExecute is Expectation) {
+                    runBlocking(dispatcherProvider.io()) {
+                        delay(5_000)
+                    }
+                }
+
+                if (actionToExecute is EmailConfirmation) {
+                    nextCommand(
+                        AwaitEmailConfirmation(
+                            state = state,
+                            pollingIntervalSeconds = actionToExecute.pollingTime.toFloat(),
                         ),
+                    )
+                } else {
+                    timerJob.cancel()
+                    timerJob += timerCoroutineScope.launch {
+                        delay(60000) // 1 minute
+                        // IF this timer completes, then timeout was reached
+                        val currentState = commandsFlow.value.state
+                        kotlin.runCatching {
+                            val id =
+                                brokersToExecute[currentState.currentBrokerIndex].actions[currentState.currentActionIndex].id
+                            onError(
+                                PirErrorReponse(
+                                    actionID = id,
+                                    message = "Local timeout",
+                                ),
+                            )
+                        }
+                    }
+                    brokerActionProcessor.pushAction(
+                        state.profileQuery!!,
+                        actionToExecute,
+                        extractedProfile,
                     )
                 }
             }
-
-            brokerActionProcessor.pushAction(submittedProfileQuery!!, actionToExecute)
         }
+    }
+
+    private fun hasEmail(extractedProfileState: ExtractedProfileState): Boolean {
+        return extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex].email != null
     }
 
     private fun cleanUpRunner() {
@@ -364,6 +521,26 @@ internal class RealPirActionsRunner(
                         )
                     }
 
+                    is ClickResponse, is ExpectationResponse -> {
+                        nextCommand(
+                            ExecuteBrokerAction(
+                                state = lastState.copy(
+                                    currentActionIndex = lastState.currentActionIndex + 1,
+                                ),
+                            ),
+                        )
+                    }
+
+                    is FillFormResponse -> {
+                        nextCommand(
+                            ExecuteBrokerAction(
+                                state = lastState.copy(
+                                    currentActionIndex = lastState.currentActionIndex + 1,
+                                ),
+                            ),
+                        )
+                    }
+
                     else -> {
                         logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Do nothing for $pirSuccessResponse" }
                     }
@@ -388,10 +565,20 @@ internal class RealPirActionsRunner(
                     actionType = currentAction.asActionType(),
                     error = pirErrorReponse,
                 )
-                // If error happens we skip to next Broker as next steps will not make sense
-                nextCommand(
-                    BrokerCompleted(lastState, isSuccess = false),
-                )
+                if (currentAction is GetCaptchInfo || currentAction is SolveCaptcha) {
+                    nextCommand(
+                        ExecuteBrokerAction(
+                            lastState.copy(
+                                currentActionIndex = lastState.currentActionIndex + 1,
+                            ),
+                        ),
+                    )
+                } else {
+                    // If error happens we skip to next Broker as next steps will not make sense
+                    nextCommand(
+                        BrokerCompleted(lastState, isSuccess = false),
+                    )
+                }
             } else {
                 logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirErrorReponse" }
             }
@@ -413,9 +600,18 @@ internal class RealPirActionsRunner(
             val urlToLoad: String,
         ) : Command(State())
 
+        data class GetEmail(
+            override val state: State,
+        ) : Command(State())
+
         data class BrokerCompleted(
             override val state: State,
             val isSuccess: Boolean,
+        ) : Command(state)
+
+        data class AwaitEmailConfirmation(
+            override val state: State,
+            val pollingIntervalSeconds: Float,
         ) : Command(state)
 
         data object CompleteExecution : Command(State())
@@ -425,6 +621,13 @@ internal class RealPirActionsRunner(
         val currentBrokerIndex: Int = 0,
         val currentActionIndex: Int = 0,
         val brokerStartTime: Long = -1L,
+        val profileQuery: ProfileQuery? = null,
+        val extractedProfileState: ExtractedProfileState? = null,
+    )
+
+    data class ExtractedProfileState(
+        val currentExtractedProfileIndex: Int = 0,
+        val extractedProfile: List<ExtractedProfile>,
     )
 
     companion object {

@@ -47,6 +47,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
+import com.duckduckgo.pir.internal.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scan.PirForegroundScanService
 import com.duckduckgo.pir.internal.scan.PirRemoteWorkerService
@@ -131,17 +132,21 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
         val allError = results.filterIsInstance<ErrorResult>()
         val brokersWithRecords = allExtracted.filter {
-            it.extractResults.isNotEmpty()
+            it.extractResults.isNotEmpty() && it.extractResults.any { result ->
+                result.score > 1
+            }
         }
         val totalSitesScanned = allExtracted.size + allError.size
         val brokersWithRecordsCount = brokersWithRecords.size
 
         val brokersWithNoRecords = allExtracted.filter {
-            it.extractResults.isEmpty()
+            it.extractResults.isEmpty() || it.extractResults.none { result ->
+                result.score > 1
+            }
         }.size + allError.size
 
         val totalRecordCount = brokersWithRecords.sumOf {
-            it.extractResults.size
+            it.extractResults.filter { result -> result.score > 1 }.size
         }
 
         with(binding) {
@@ -157,6 +162,11 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupViews() {
+        binding.optOut.setOnClickListener {
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            startForegroundService(Intent(this, PirForegroundOptOutService::class.java))
+        }
+
         binding.debugRunScan.setOnClickListener {
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
@@ -220,7 +230,11 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             .build()
 
         val periodicWorkRequest =
-            PeriodicWorkRequest.Builder(PirScheduledScanRemoteWorker::class.java, 12, TimeUnit.HOURS)
+            PeriodicWorkRequest.Builder(
+                PirScheduledScanRemoteWorker::class.java,
+                12,
+                TimeUnit.HOURS,
+            )
                 .boundToPirProcess(appBuildConfig.applicationId)
                 .setConstraints(constraints)
                 .setInitialDelay(1, TimeUnit.MINUTES)

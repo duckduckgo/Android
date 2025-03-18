@@ -23,9 +23,12 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedRe
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse.ScrapedData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
+import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
+import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
+import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -70,6 +73,10 @@ interface PirRepository {
 
     suspend fun getBrokerScanSteps(name: String): String?
 
+    suspend fun getBrokerOptOutSteps(name: String): String?
+
+    suspend fun getBrokersForOptOut(): List<String>
+
     suspend fun saveNavigateResult(
         brokerName: String,
         navigateResponse: NavigateResponse,
@@ -85,6 +92,10 @@ interface PirRepository {
         brokerName: String,
         response: ExtractedResponse,
     )
+
+    suspend fun getExtractProfileResultForBroker(
+        brokerName: String,
+    ): ExtractedProfileResult?
 
     fun getAllResultsFlow(): Flow<List<ScanResult>>
 
@@ -109,6 +120,10 @@ interface PirRepository {
     suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
 
     suspend fun deleteAllScanLogs()
+
+    suspend fun getEmailForBroker(dataBroker: String): String
+
+    suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?>
 
     data class BrokerJson(
         val fileName: String,
@@ -142,6 +157,12 @@ interface PirRepository {
             val message: String,
         ) : ScanResult(brokerName, completionTimeInMillis, actionType)
     }
+
+    sealed class ConfirmationStatus(open val statusName: String) {
+        data object Ready : ConfirmationStatus("ready")
+        data object Pending : ConfirmationStatus("pending")
+        data object Unknown : ConfirmationStatus("unknown")
+    }
 }
 
 class RealPirRepository(
@@ -154,6 +175,7 @@ class RealPirRepository(
     private val scanResultsDao: ScanResultsDao,
     private val userProfileDao: UserProfileDao,
     private val scanLogDao: ScanLogDao,
+    private val dbpService: DbpService,
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
@@ -237,6 +259,18 @@ class RealPirRepository(
         brokerDao.getScanJson(name)
     }
 
+    override suspend fun getBrokerOptOutSteps(name: String): String? = withContext(dispatcherProvider.io()) {
+        brokerDao.getOptOutJson(name)
+    }
+
+    override suspend fun getBrokersForOptOut(): List<String> = withContext(dispatcherProvider.io()) {
+        scanResultsDao.getAllExtractProfileResult().filter {
+            it.extractResults.isNotEmpty()
+        }.map {
+            it.brokerName
+        }
+    }
+
     override suspend fun saveNavigateResult(
         brokerName: String,
         navigateResponse: NavigateResponse,
@@ -287,6 +321,20 @@ class RealPirRepository(
                         scrapedDataAdapter.toJson(it)
                     } ?: emptyList(),
                 ),
+            )
+        }
+    }
+
+    override suspend fun getExtractProfileResultForBroker(brokerName: String): ExtractedProfileResult? = withContext(dispatcherProvider.io()) {
+        return@withContext scanResultsDao.getExtractProfileResultForProfile(brokerName).firstOrNull()?.run {
+            ExtractedProfileResult(
+                brokerName = this.brokerName,
+                completionTimeInMillis = this.completionTimeInMillis,
+                actionType = this.actionType,
+                extractResults = this.extractResults.mapNotNull {
+                    scrapedDataAdapter.fromJson(it)
+                },
+                profileQuery = null,
             )
         }
     }
@@ -388,6 +436,24 @@ class RealPirRepository(
         withContext(dispatcherProvider.io()) {
             scanLogDao.deleteAllScanEvents()
             scanLogDao.deleteAllBrokerScanEvents()
+        }
+    }
+
+    override suspend fun getEmailForBroker(dataBroker: String): String = withContext(dispatcherProvider.io()) {
+        return@withContext dbpService.getEmail(brokerDao.getBrokerDetails(dataBroker)!!.url).emailAddress
+    }
+
+    override suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?> = withContext(dispatcherProvider.io()) {
+        return@withContext dbpService.getEmailStatus(email).run {
+            this.status.toConfirmationStatus() to this.link
+        }
+    }
+
+    private fun String.toConfirmationStatus(): ConfirmationStatus {
+        return when (this) {
+            "pending" -> ConfirmationStatus.Pending
+            "ready" -> ConfirmationStatus.Ready
+            else -> ConfirmationStatus.Unknown
         }
     }
 }

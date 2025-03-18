@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.store.PirDatabase
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.RealPirDataStore
@@ -93,6 +94,7 @@ class PirModule {
         moshi: Moshi,
         userProfileDao: UserProfileDao,
         scanLogDao: ScanLogDao,
+        dbpService: DbpService,
     ): PirRepository = RealPirRepository(
         moshi,
         dispatcherProvider,
@@ -103,5 +105,6 @@ class PirModule {
         scanResultsDao,
         userProfileDao,
         scanLogDao,
+        dbpService,
     )
 }

@@ -20,6 +20,13 @@
             android:process=":pir" />
 
         <service
+            android:name=".optout.PirForegroundOptOutService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":pir" />
+
+        <service
             android:name=".scan.PirRemoteWorkerService"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE"

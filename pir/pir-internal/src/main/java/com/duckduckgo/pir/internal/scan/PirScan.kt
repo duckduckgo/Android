@@ -141,7 +141,12 @@ class RealPirScan @Inject constructor(
             pirCssScriptLoader.getScript()
         }
 
-        maxWebViewCount = getMaximumParallelRunners()
+        val coreCount = getMaximumParallelRunners()
+        maxWebViewCount = if (brokers.size <= coreCount) {
+            brokers.size
+        } else {
+            coreCount
+        }
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners

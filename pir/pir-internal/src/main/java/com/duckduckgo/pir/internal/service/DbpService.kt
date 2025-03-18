@@ -23,23 +23,36 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Query
 import retrofit2.http.Streaming
 
 @ContributesServiceApi(AppScope::class)
 interface DbpService {
     @AuthRequired
-    @GET("$BASE_URL/main_config.json")
+    @GET("$BASE_URL/remote/v0/main_config.json")
     suspend fun getMainConfig(
         @Header("If-None-Match") etag: String?,
     ): Response<PirMainConfig>
 
     @AuthRequired
-    @GET("$BASE_URL?name=all.zip&type=spec")
+    @GET("$BASE_URL/remote/v0?name=all.zip&type=spec")
     @Streaming
     suspend fun getBrokerJsonFiles(): ResponseBody
 
+    @AuthRequired
+    @GET("$BASE_URL/em/v0/generate")
+    suspend fun getEmail(
+        @Query("dataBroker") dataBrokerUrl: String,
+    ): PirGetEmailResponse
+
+    @AuthRequired
+    @GET("$BASE_URL/em/v0/links")
+    suspend fun getEmailStatus(
+        @Query("e") emailAddress: String,
+    ): PirGetEmailStatusResponse
+
     companion object {
-        private const val BASE_URL = "https://dbp.duckduckgo.com/dbp/remote/v0"
+        private const val BASE_URL = "https://dbp.duckduckgo.com/dbp"
     }
 
     data class PirMainConfig(
@@ -73,5 +86,14 @@ interface DbpService {
         val confirmOptOutScan: Int,
         val maintenanceScan: Int,
         val maxAttempts: Int?,
+    )
+
+    data class PirGetEmailResponse(
+        val emailAddress: String,
+        val pattern: String,
+    )
+    data class PirGetEmailStatusResponse(
+        val link: String?,
+        val status: String,
     )
 }
