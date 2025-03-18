@@ -254,6 +254,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onShareSelectedTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
+
         val selectedTabs = tabItems
             .filterIsInstance<SelectableTab>()
             .filter { it.isSelected && !it.isNewTabPage }
