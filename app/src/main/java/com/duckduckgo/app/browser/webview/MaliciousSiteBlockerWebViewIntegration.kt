@@ -285,6 +285,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     }
 
     override fun onPageLoadStarted(url: String) {
+        if (!isEnabled()) return
         /* onPageLoadStarted is often called after shouldOverride/shouldIntercept, therefore, if the URL
          * is already stored, we don't clear the processedUrls map to avoid re-checking the URL for the same
          * page load.
