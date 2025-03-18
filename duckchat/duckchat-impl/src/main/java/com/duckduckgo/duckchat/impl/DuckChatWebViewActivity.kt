@@ -40,7 +40,6 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -50,9 +49,6 @@ import org.json.JSONObject
 
 @InjectWith(ActivityScope::class)
 class DuckChatWebViewActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var userAgentProvider: UserAgentProvider
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -153,7 +149,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
                                     }
                                 }
                             }
-
                             else -> {}
                         }
                     }

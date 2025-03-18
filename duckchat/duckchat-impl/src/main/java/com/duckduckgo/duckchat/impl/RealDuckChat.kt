@@ -40,7 +40,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
-
     /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      * Sets IO dispatcher.
