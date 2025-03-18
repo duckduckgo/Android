@@ -358,7 +358,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    // user has confirmed they want to close tabs based on a selection
+    // user has confirmed they want to close tabs
     fun onCloseTabsConfirmed(tabIds: List<String>) {
         viewModelScope.launch {
             if (selectionViewState.value.mode is Selection) {
@@ -366,12 +366,16 @@ class TabSwitcherViewModel @Inject constructor(
             }
 
             if (tabItems.size == tabIds.size) {
-                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
+
+                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                 deleteTabs(tabIds)
                 command.value = Command.Close
             } else {
+                pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
+                pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY, type = Daily())
+
                 // mark tabs as deletable and show undo snackbar
                 tabRepository.markDeletable(tabIds)
                 command.value = Command.ShowUndoDeleteTabsMessage(tabIds)
