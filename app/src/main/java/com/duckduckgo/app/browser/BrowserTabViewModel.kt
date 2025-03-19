@@ -2704,14 +2704,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
-    fun registerDaxBubbleCtaDismissed() {
-        viewModelScope.launch {
-            val cta = ctaViewState.value?.cta ?: return@launch
-            ctaViewModel.registerDaxBubbleCtaDismissed(cta)
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
-        }
-    }
-
     fun onUserClickCtaOkButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserClickCtaOkButton(cta)

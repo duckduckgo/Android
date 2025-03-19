@@ -577,6 +577,7 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
+            userBrowserProperties = mockUserBrowserProperties,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -2448,24 +2449,6 @@ class BrowserTabViewModelTest {
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
