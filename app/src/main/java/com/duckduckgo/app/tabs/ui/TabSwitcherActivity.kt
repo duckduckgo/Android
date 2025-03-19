@@ -63,10 +63,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
