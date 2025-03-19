@@ -50,7 +50,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             protectedShield = R.raw.protected_shield_experiment
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment
-            unprotectedShieldDark = R.raw.unprotected_shield_experiment
+            unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
         } else {
             protectedShield = R.raw.protected_shield
             protectedShieldDark = R.raw.dark_protected_shield

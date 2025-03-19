@@ -191,7 +191,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, UNPROTECTED)
 
-        verify(holder).setAnimation(R.raw.unprotected_shield_experiment)
+        verify(holder).setAnimation(R.raw.unprotected_shield_experiment_dark)
     }
 
     @Test
