@@ -35,6 +35,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -75,6 +77,9 @@ constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
     }
@@ -89,7 +94,7 @@ constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
     }
 
-    private var beepManager: BeepManager
+    private var beepManager: BeepManager? = null
     private val cameraSettings = CameraSettings().apply {
         isAutoFocusEnabled = true
         isContinuousFocusEnabled = true
@@ -99,7 +104,9 @@ constructor(
     private val conflatedCommandJob = ConflatedJob()
 
     init {
-        beepManager = BeepManager(getActivity())
+        if (appBuildConfig.isInternalBuild()) {
+            beepManager = BeepManager(getActivity())
+        }
         initQRScanner()
     }
 
@@ -154,7 +161,7 @@ constructor(
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
         binding.barcodeView.decodeSingle {
-            beepManager.playBeepSoundAndVibrate()
+            beepManager?.playBeepSoundAndVibrate()
             onQrCodeRead(it.text)
         }
     }
