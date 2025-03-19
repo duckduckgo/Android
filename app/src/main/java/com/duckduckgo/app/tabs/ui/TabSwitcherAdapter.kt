@@ -254,7 +254,7 @@ class TabSwitcherAdapter(
 
     private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
         val url = tab.url
-        if (url == null) {
+        if (url.isNullOrBlank()) {
             glide.clear(view)
             glide.load(AndroidR.drawable.ic_dax_icon).into(view)
         } else {
@@ -281,7 +281,7 @@ class TabSwitcherAdapter(
         }
 
         val previewFile = tab.tabPreviewFile
-        if (tab.url == null) {
+        if (tab.url.isNullOrBlank()) {
             glide.load(AndroidR.drawable.ic_dax_icon_72)
                 .into(tabPreview)
         } else if (previewFile != null) {
