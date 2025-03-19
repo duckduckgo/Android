@@ -46,9 +46,10 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
@@ -57,6 +58,7 @@ import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,6 +88,8 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -243,6 +247,8 @@ class TabSwitcherViewModelTest {
         prepareSelectionMode()
 
         testee.onSelectAllTabs()
+        assertEquals(testee.selectionViewState.value.mode, Selection(selectedTabs = tabSwitcherItems.map { it.id }))
+
         testee.onFabClicked()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
@@ -255,11 +261,15 @@ class TabSwitcherViewModelTest {
     fun whenSomeButNotAllTabsClosedUsingFabThenRepositoryNotifiedPixelSent() = runTest {
         prepareSelectionMode()
 
+        assertEquals(testee.selectionViewState.value.mode, Normal)
         testee.onSelectionModeRequested()
+        assertEquals(testee.selectionViewState.value.mode, Selection())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS_DAILY, type = Daily())
 
         testee.onTabSelected(tabList.first().tabId)
+        assertEquals(testee.selectionViewState.value.mode, Selection(selectedTabs = listOf(tabList.first().tabId)))
+
         testee.onFabClicked()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
@@ -308,32 +318,35 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabSelectedAndDeselectedThenPixelsSent() = runTest {
+    fun whenTabSelectedAndDeselectedThenViewStateUpdatedAndPixelsSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
-
+        assertEquals(testee.selectionViewState.value.mode, Selection())
         val selectedTabId = tabList[1].tabId
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_SELECTED)
+        assertEquals(testee.selectionViewState.value.mode, Selection(selectedTabs = listOf(selectedTabId)))
 
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
+        assertEquals(testee.selectionViewState.value.mode, Selection())
     }
 
     @Test
-    fun whenAllTabsSelectedAndDeselectedThenPixelsSent() = runTest {
+    fun whenAllTabsSelectedAndDeselectedThenViewStateUpdatedAndPixelsSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
-
         testee.onSelectAllTabs()
 
+        assertEquals(testee.selectionViewState.value.mode, Selection(tabList.map { it.tabId }))
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
 
         testee.onDeselectAllTabs()
 
+        assertEquals(testee.selectionViewState.value.mode, Selection())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY, type = Daily())
     }
@@ -349,15 +362,116 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
     }
 
+
     @Test
-    fun whenBookmarkTabsMenuTappedThenPixelsSent() = runTest {
+    fun whenShareSingleLinkThenShareLinkCommandSent() = runTest {
+        prepareSelectionMode()
+
+        val tab = tabList.first()
+
+        testee.onSelectionModeRequested()
+        testee.onTabSelected(tab.tabId)
+        testee.onShareSelectedTabs()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShareLink(tab.url.orEmpty(), tab.title.orEmpty()), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenShareMultipleLinksThenShareLinksCommandSentExcludingNewTabPage() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
+        testee.onSelectAllTabs()
+        testee.onShareSelectedTabs()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShareLinks(tabList.take(2).map { it.url.orEmpty() }), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenBookmarkTabsMenuTappedThenBookmarkTabsRequestCommandSentAndPixelsSent() = runTest {
+        prepareSelectionMode()
+
+        testee.onSelectionModeRequested()
+        testee.onSelectAllTabs()
         testee.onBookmarkSelectedTabs()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.BookmarkTabsRequest(tabList.map { it.tabId }), commandCaptor.lastValue)
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenBookmarkTabsConfirmedThenShowUndoBookmarkMessageCommandSentSkippingNewTabPage() = runTest {
+        val tabIds = tabList.map { it.tabId }
+        val bookmark = Bookmark(
+            id = tabIds.first(),
+            url = tabList.first().url.orEmpty(),
+            title = tabList.first().title.orEmpty(),
+            lastModified = null,
+        )
+
+        whenever(savedSitesRepository.insertBookmark(any(), any())).thenReturn(bookmark)
+
+        testee.onBookmarkTabsConfirmed(tabIds)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoBookmarkMessage(2), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenBookmarkTabsConfirmedThenShowUndoBookmarkMessageCommandSentSkippingExistingTabs() = runTest {
+        val tabIds = tabList.map { it.tabId }
+        whenever(savedSitesRepository.insertBookmark(any(), any())).thenReturn(null)
+
+        testee.onBookmarkTabsConfirmed(tabIds)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoBookmarkMessage(0), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenUndoBookmarkActionTappedThenBookmarkDeletedFromRepository() = runTest {
+        prepareSelectionMode()
+
+        val tab = tabList.first()
+        val bookmark = Bookmark(
+            id = tab.tabId,
+            url = tab.url.orEmpty(),
+            title = tab.title.orEmpty(),
+            lastModified = null,
+        )
+
+        whenever(savedSitesRepository.insertBookmark(any(), any())).thenReturn(bookmark)
+
+        testee.onBookmarkTabsConfirmed(listOf(tab.tabId))
+        testee.undoBookmarkAction()
+
+        verify(savedSitesRepository).delete(bookmark)
+    }
+
+    @Test
+    fun whenUndoBookmarkActionAndUndoActionNotTappedThenNoBookmarkIsRemoved() = runTest {
+        prepareSelectionMode()
+
+        val tab = tabList.first()
+        val bookmark = Bookmark(
+            id = tab.tabId,
+            url = tab.url.orEmpty(),
+            title = tab.title.orEmpty(),
+            lastModified = null,
+        )
+
+        whenever(savedSitesRepository.insertBookmark(any(), any())).thenReturn(bookmark)
+
+        testee.onBookmarkTabsConfirmed(listOf(tab.tabId))
+        testee.finishBookmarkAction()
+        testee.undoBookmarkAction()
+
+        verify(savedSitesRepository, never()).delete(bookmark)
     }
 
     @Test
@@ -390,7 +504,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenOnMarkTabAsDeletableAfterSwipeGestureUsedThenCallMarkDeletableAndSendPixel() = runTest {
+    fun whenTabClosedInNormalModeWithSwipeGestureThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
+
         initializeViewModel()
 
         val swipeGestureUsed = true
@@ -401,10 +517,15 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).markDeletable(tab.tabEntity)
         verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
     }
 
     @Test
-    fun whenOnMarkTabAsDeletableAfterClosePressedThenCallMarkDeletableAndSendPixel() = runTest {
+    fun whenTabClosedUsingCloseButtonInNormalModeThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
+
         initializeViewModel()
 
         val swipeGestureUsed = false
@@ -415,6 +536,9 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).markDeletable(tab.tabEntity)
         verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
     }
 
     @Test
@@ -425,6 +549,14 @@ class TabSwitcherViewModelTest {
         testee.undoDeletableTab(entity)
 
         verify(mockTabRepository).undoDeletable(entity)
+    }
+
+    @Test
+    fun whenUndoDeletableTabsThenUndoDeletable() = runTest {
+        val tabs = tabList.map { it.tabId }
+        testee.undoDeletableTabs(tabs)
+
+        verify(mockTabRepository).undoDeletable(tabs)
     }
 
     @Test
