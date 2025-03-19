@@ -19,7 +19,6 @@ package com.duckduckgo.app.tabs.ui
 import android.view.Menu
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
@@ -109,14 +108,6 @@ fun Menu.createDynamicInterface(
         }
     }
 
-    findItem(R.id.popupMenuItem).apply {
-        isEnabled = dynamicMenu.isMoreMenuItemEnabled
-        iconTintList = if (isEnabled) {
-            null
-        } else {
-            ContextCompat.getColorStateList(toolbar.context, commonR.color.disabledColor)
-        }
-    }
-
+    findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 }
