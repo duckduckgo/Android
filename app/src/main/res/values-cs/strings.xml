@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí vypnutá pro %1$s</string>
     <string name="undoSnackbarAction">Vrátit</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker je zablokovaný</item>
+        <item quantity="few">Trackery jsou zablokované</item>
+        <item quantity="many">Trackery jsou zablokované</item>
+        <item quantity="other">Trackery jsou zablokované</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
@@ -220,9 +227,9 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Pouze ukončení aplikace</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihned po ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
