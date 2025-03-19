@@ -142,7 +142,10 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChatSettings() {
-        globalActivityStarter.start(context, DuckChatSettingsNoParams)
+        val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
+        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+        closeDuckChat()
     }
 
     override fun closeDuckChat() {
