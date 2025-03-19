@@ -78,8 +78,8 @@
     </plurals>
 
     <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">Bookmark Selected Tab?</item>
-        <item quantity="other">Bookmark %1$d Tabs?</item>
+        <item quantity="one">Bookmark tab?</item>
+        <item quantity="other">Bookmark %1$d tabs?</item>
     </plurals>
     <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">%1$d bookmark added</item>
