@@ -319,38 +319,32 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
                 tabsAdapter.updateData(tabSwitcherItems)
 
-<<<<<<< HEAD
-            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
-            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                updateTabGridItemDecorator(tabSwitcherItems.last().id)
-=======
                 val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
                 if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                     updateTabGridItemDecorator()
                 }
->>>>>>> 503ddbfe9 (Avoid passing around the selection mode)
+
+                if (firstTimeLoadingTabsList) {
+                    firstTimeLoadingTabsList = false
+                    scrollToActiveTab()
+                }
             }
 
-            if (firstTimeLoadingTabsList) {
-                firstTimeLoadingTabsList = false
-                scrollToActiveTab()
+            lifecycleScope.launch {
+                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                    updateLayoutType(it)
+                }
             }
-        }
 
-        lifecycleScope.launch {
-            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                updateLayoutType(it)
+            viewModel.deletableTabs.observe(this) {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
+                }
             }
-        }
 
-        viewModel.deletableTabs.observe(this) {
-            if (it.isNotEmpty()) {
-                onDeletableTab(it.last())
+            viewModel.command.observe(this) {
+                processCommand(it)
             }
-        }
-
-        viewModel.command.observe(this) {
-            processCommand(it)
         }
     }
 
