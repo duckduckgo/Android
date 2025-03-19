@@ -1,4 +1,4 @@
-# DuckDuckGo Android
+# DuckDuckGo
 
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -20,11 +20,11 @@ We have taken steps to update our terminology and remove words with problematic 
 
 ## Contribute
 
-Please refer to [contributing](CONTRIBUTING.md).
+Please refer to [contributing](CONTRIBUTING.md)
 
 ## Discuss
 
 Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
 
 ## License
-DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
+DuckDuckGo android is distributed under the Apache 2.0
