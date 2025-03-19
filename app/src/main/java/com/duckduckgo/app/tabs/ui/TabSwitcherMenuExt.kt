@@ -53,6 +53,7 @@ fun Menu.createDynamicInterface(
     popupMenu.selectTabsMenuItem.isVisible = dynamicMenu.isSelectTabsVisible
     popupMenu.closeSelectedTabsMenuItem.isVisible = dynamicMenu.isCloseSelectedTabsVisible
     popupMenu.closeOtherTabsMenuItem.isVisible = dynamicMenu.isCloseOtherTabsVisible
+    popupMenu.closeAllTabsDivider.isVisible = dynamicMenu.isCloseAllTabsDividerVisible
     popupMenu.closeAllTabsMenuItem.isVisible = dynamicMenu.isCloseAllTabsVisible
 
     popupMenu.shareSelectedLinksMenuItem.apply {
