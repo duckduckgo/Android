@@ -92,6 +92,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         spacer.isVisible = false
 
         minibarText.text = viewState.url.extractDomain()
+        omniBarContainer.isPressed = viewState.hasFocus
     }
 
     fun resetTransitionDelayed() {

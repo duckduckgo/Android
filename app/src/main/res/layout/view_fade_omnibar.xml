@@ -58,7 +58,7 @@
                 android:id="@+id/omniBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/fading_omnibar_field_background">
+                android:background="@drawable/fade_omnibar_background_selector">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/trackersAnimation"
