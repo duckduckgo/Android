@@ -53,4 +53,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(true)
     fun automaticallyUpdateSyncSettings(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun qrCodeScannerHints(): Toggle
 }

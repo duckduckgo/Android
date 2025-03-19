@@ -42,6 +42,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.CheckCameraAvailable
@@ -80,6 +81,9 @@ constructor(
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var syncFeature: SyncFeature
+
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
     }
@@ -95,6 +99,7 @@ constructor(
     }
 
     private var beepManager: BeepManager? = null
+
     private val cameraSettings = CameraSettings().apply {
         isAutoFocusEnabled = true
         isContinuousFocusEnabled = true
@@ -103,16 +108,11 @@ constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
-    init {
-        if (appBuildConfig.isInternalBuild()) {
-            beepManager = BeepManager(getActivity())
-        }
-        initQRScanner()
-    }
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+
+        initQRScanner()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
@@ -132,8 +132,13 @@ constructor(
     }
 
     private fun initQRScanner() {
-        binding.barcodeView.cameraSettings = cameraSettings
-        binding.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
+        if (syncFeature.qrCodeScannerHints().isEnabled()) {
+            if (appBuildConfig.isInternalBuild()) {
+                beepManager = BeepManager(getActivity())
+            }
+            binding.barcodeView.cameraSettings = cameraSettings
+            binding.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
+        }
     }
 
     override fun onDetachedFromWindow() {
