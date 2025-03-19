@@ -86,7 +86,7 @@ class TabSwitcherViewModel @Inject constructor(
                     emit(tabItems)
                 }
             }
-    }
+        }
 
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
