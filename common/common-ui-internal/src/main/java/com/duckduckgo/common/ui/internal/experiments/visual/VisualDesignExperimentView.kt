@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.CompoundButton
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -28,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.internal.databinding.ViewVisualDesignExperimentBinding
 import com.duckduckgo.common.ui.internal.experiments.visual.VisualDesignExperimentViewModel.ViewState
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.snackbar.Snackbar
@@ -56,29 +58,33 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         viewModel.onExperimentalUIModeChanged(isChecked)
     }
 
-    private val warmColorsPaletteToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onWarmColorsFlagChanged(isChecked)
-    }
-
-    private val iconsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onIconsFlagChanged(isChecked)
-    }
+    private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
+    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
+        val viewTreeLifecycleOwner = findViewTreeLifecycleOwner()!!
+        viewTreeLifecycleOwner.lifecycle.addObserver(viewModel)
+        val coroutineScope = viewTreeLifecycleOwner.lifecycleScope
 
-        viewModel.viewState()
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(coroutineScope)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
+        conflatedCommandsJob.cancel()
+        conflatedStateJob.cancel()
     }
 
     private fun render(viewState: ViewState) {
+        binding.experimentalUIMode.isVisible = viewState.isBrowserThemingFeatureAvailable
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
-        binding.experimentalUIColorPalette.quietlySetIsChecked(viewState.useWarmColors, warmColorsPaletteToggleListener)
-        binding.experimentalUIIcons.quietlySetIsChecked(viewState.experimentalIcons, iconsToggleListener)
+
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }
 }

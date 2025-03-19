@@ -83,7 +83,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -163,7 +163,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
+    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     private val lastActiveTabs = TabList()
 
@@ -1038,7 +1038,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        if (experimentalUIThemingFeature.self().isEnabled()) {
+        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
             experimentalToolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
                 TOP -> {
                     binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()

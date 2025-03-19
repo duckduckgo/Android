@@ -88,3 +88,8 @@ enum class Type {
     HASH_PREFIXES,
     FILTER_SET,
 }
+
+sealed class MatchesResult {
+    data class Result(val matches: List<Match>) : MatchesResult()
+    data object Ignored : MatchesResult()
+}

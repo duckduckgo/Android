@@ -42,30 +42,6 @@
     <color name="warm_gray5">#F7F7F5</color>
     <color name="warm_gray0">#FAFAF8</color>
 
-    <color name="cool_gray100">#10161D</color>
-    <color name="cool_gray95">#191E25</color>
-    <color name="cool_gray90">#20262D</color>
-    <color name="cool_gray85">#30363D</color>
-    <color name="cool_gray85_84">#D630363D</color>
-    <color name="cool_gray85_50">#8030363D</color>
-    <color name="cool_gray80">#41464D</color>
-    <color name="cool_gray75">#51565E</color>
-    <color name="cool_gray70">#61666E</color>
-    <color name="cool_gray65">#71767E</color>
-    <color name="cool_gray60">#83878D</color>
-    <color name="cool_gray55">#93979D</color>
-    <color name="cool_gray50">#A3A8AD</color>
-    <color name="cool_gray45">#B4B8BE</color>
-    <color name="cool_gray40">#C4C8CE</color>
-    <color name="cool_gray35">#CCD0D6</color>
-    <color name="cool_gray30">#D4D8DE</color>
-    <color name="cool_gray25">#DEE1E6</color>
-    <color name="cool_gray20">#E9EBEE</color>
-    <color name="cool_gray15">#F0F1F2</color>
-    <color name="cool_gray10">#F3F4F5</color>
-    <color name="cool_gray5">#F5F6F7</color>
-    <color name="cool_gray0">#F8F9FA</color>
-
     <color name="gray87">#393E45</color>
     <color name="white_70">#B3FFFFFF</color>
     <color name="white_12">#1FFFFFFF</color>
@@ -81,6 +57,10 @@
     <color name="daxColorFireButtonOne_Light">#FA8B38</color>
     <color name="daxColorFireButtonTwo_Light">#E72A57</color>
     <color name="daxColorFireButtonThree_Light">#CC165B</color>
+
+    <!-- Browser Navigation Bar colors -->
+    <attr name="daxColorNavigationBarIconEnabled" format="color"/>
+    <attr name="daxColorNavigationBarIconDisabled" format="color"/>
 
 
 </resources>

@@ -19,17 +19,23 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
+import kotlin.math.abs
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -40,8 +46,17 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
+    private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
+    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
 
-    private val scrollThreshold = 200
+    private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
+
+    private var targetHeight: Int = 0
+    private var currentHeight: Int = 0
+    private var targetToolbarAlpha: Float = 1f
+    private var currentToolbarAlpha: Float = 1f
+    private var targetMinibarAlpha: Float = 0f
+    private var currentMinibarAlpha: Float = 0f
 
     init {
         val attr =
@@ -56,39 +71,134 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         inflate(context, layout, this)
 
-        minibar.setOnClickListener { }
+        minibar.setOnClickListener {
+            revealToolbar()
+        }
 
         AndroidSupportInjection.inject(this)
     }
 
     override fun render(viewState: ViewState) {
-        super.render(viewState)
+        val experimentalViewState = viewState.copy(
+            showBrowserMenu = false,
+            showFireIcon = false,
+            showTabsMenu = false,
+        )
+        super.render(experimentalViewState)
 
-        if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
-        } else {
-            fireIconImageView.setImageResource(R.drawable.ic_fire)
-            tabsMenu.setIcon(R.drawable.ic_tabs)
-        }
+        val showChatMenu = viewState.viewMode !is ViewMode.CustomTab
+        aiChat.isVisible = showChatMenu
+        aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
+        spacer.isVisible = false
 
         minibarText.text = viewState.url.extractDomain()
     }
 
-    fun onScrollChanged(scrollY: Int) {
-        val scrollRatio = (scrollY.toFloat() / scrollThreshold).coerceIn(0f, 1f)
-        fadeToolbar(1f - scrollRatio)
-        fadeMinibar(scrollRatio)
+    fun resetTransitionDelayed() {
+        postDelayed(delayInMillis = 100) {
+            revealToolbar()
+        }
+    }
 
-        // Calculate the new height for the AppBarLayout
-        val toolbarHeight = toolbar.height
-        val textHeight = minibar.height
-        val newHeight = (toolbarHeight * (1f - scrollRatio) + textHeight * scrollRatio).toInt()
+    fun onScrollChanged(
+        scrollableView: View,
+        scrollY: Int,
+        oldScrollY: Int,
+    ) {
+        if (currentHeight == 0) {
+            currentHeight = layoutParams.height
+        }
 
-        // Update the AppBarLayout's height
-        val layoutParams = layoutParams
-        layoutParams.height = newHeight
+        if (!scrollableView.canScrollVertically(-1)) { // top of the page condition
+            revealToolbar()
+            return
+        } else if (!scrollableView.canScrollVertically(1)) { // bottom of the page condition
+            revealMinibar()
+            return
+        }
+
+        val isScrollingDown = scrollY > oldScrollY
+        val scrollDelta = abs(scrollY - oldScrollY)
+        val transitionStepRatio = scrollDelta / 76.toPx(context).toFloat()
+
+        // update layout alpha
+        if (isScrollingDown) {
+            targetToolbarAlpha = 0f
+            targetMinibarAlpha = 1f
+        } else {
+            targetToolbarAlpha = 1f
+            targetMinibarAlpha = 0f
+        }
+
+        val toolbarAlphaDifference = (targetToolbarAlpha - currentToolbarAlpha)
+        val toolbarAlphaChange = (toolbarAlphaDifference * transitionStepRatio)
+        currentToolbarAlpha += toolbarAlphaChange
+        currentToolbarAlpha = currentToolbarAlpha.coerceIn(0f, 1f)
+        fadeToolbar(currentToolbarAlpha)
+
+        val textAlphaDifference = (targetMinibarAlpha - currentMinibarAlpha)
+        val textAlphaChange = (textAlphaDifference * transitionStepRatio)
+        currentMinibarAlpha += textAlphaChange
+        currentMinibarAlpha = currentMinibarAlpha.coerceIn(0f, 1f)
+        fadeMinibar(currentMinibarAlpha)
+
+        // update layout height
+        targetHeight = if (isScrollingDown) {
+            minibar.height
+        } else {
+            toolbar.height
+        }
+        if (targetHeight != currentHeight) {
+            updateLayoutHeight(transitionStepRatio)
+        }
+    }
+
+    private fun revealToolbar() {
+        // update layout alpha
+        targetToolbarAlpha = 1f
+        targetMinibarAlpha = 0f
+        currentToolbarAlpha = 1f
+        currentMinibarAlpha = 0f
+        fadeToolbar(targetToolbarAlpha)
+        fadeMinibar(targetMinibarAlpha)
+
+        // update layout height
+        targetHeight = toolbar.height
+        currentHeight = toolbar.height
+        layoutParams.height = targetHeight
         this.layoutParams = layoutParams
+    }
+
+    private fun revealMinibar() {
+        // update layout alpha
+        targetToolbarAlpha = 0f
+        targetMinibarAlpha = 1f
+        currentToolbarAlpha = 0f
+        currentMinibarAlpha = 1f
+        fadeToolbar(targetToolbarAlpha)
+        fadeMinibar(targetMinibarAlpha)
+
+        // update layout height
+        targetHeight = minibar.height
+        currentHeight = minibar.height
+        layoutParams.height = targetHeight
+        this.layoutParams = layoutParams
+    }
+
+    private fun updateLayoutHeight(transitionStepRatio: Float) {
+        val heightDifference = targetHeight - currentHeight
+        val heightChange = (heightDifference * transitionStepRatio).toInt()
+        currentHeight += heightChange
+        currentHeight = currentHeight.coerceIn(minibar.height, toolbar.height)
+        layoutParams.height = currentHeight
+        this.layoutParams = layoutParams
+    }
+
+    /**
+     * Returns a percentage (0.0 to 1.0) of how much the omnibar has shifted into the minibar.
+     */
+    fun getShiftRatio(): Float {
+        return currentMinibarAlpha
     }
 
     private fun fadeToolbar(alpha: Float) {
@@ -97,15 +207,27 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         fireIconMenu.fade(alpha)
         tabsMenu.fade(alpha)
         browserMenu.fade(alpha)
+        aiChat.fade(alpha)
     }
 
     private fun fadeMinibar(alpha: Float) {
         minibar.fade(alpha)
         minibar.alpha = alpha
         if (alpha == 0f) {
-            minibar.isVisible = false
-        } else if (!minibar.isVisible) {
-            minibar.isVisible = true
+            minibar.isInvisible = true
+        } else if (minibar.isInvisible) {
+            minibar.isInvisible = false
         }
     }
+
+    fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
+        fadeOmnibarItemPressedListener = itemPressedListener
+        aiChat.setOnClickListener {
+            fadeOmnibarItemPressedListener?.onDuckChatButtonPressed()
+        }
+    }
+}
+
+interface FadeOmnibarItemPressedListener {
+    fun onDuckChatButtonPressed()
 }

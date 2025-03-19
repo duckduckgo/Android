@@ -27,8 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
@@ -99,8 +98,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
                 }
             }
             DARK -> true
-            EXPERIMENT_DARK_WARM -> true
-            EXPERIMENT_DARK_COOL -> true
+            EXPERIMENT_DARK -> true
             else -> false
         }
     }

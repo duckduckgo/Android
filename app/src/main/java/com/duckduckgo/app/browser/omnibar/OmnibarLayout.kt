@@ -45,7 +45,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -62,12 +61,12 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -153,6 +152,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
 
     private var decoration: Decoration? = null
+    private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
@@ -252,6 +252,11 @@ open class OmnibarLayout @JvmOverloads constructor(
             viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 processCommand(it)
             }
+        }
+
+        if (lastViewMode != null) {
+            decorateDeferred(lastViewMode!!)
+            lastViewMode = null
         }
 
         if (decoration != null) {
@@ -530,8 +535,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (isAttachedToWindow) {
             decorateDeferred(decoration)
         } else {
-            if (this.decoration == null) {
-                Timber.d("Omnibar: decorate not attached saving $decoration")
+            /* TODO (cbarreiro): This is a temporary solution to prevent one-time decorations causing mode to be lost when view is not attached
+             *  As a long-term solution, we should move mode to StateChange, and only have one-time decorations here
+             */
+            if (decoration is Mode) {
+                lastViewMode = decoration
+                this.decoration = null
+            } else if (this.decoration == null) {
                 this.decoration = decoration
             }
         }

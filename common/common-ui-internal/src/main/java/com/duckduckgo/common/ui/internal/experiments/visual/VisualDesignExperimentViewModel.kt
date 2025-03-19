@@ -21,74 +21,68 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.ThemingDataStore
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
-    private val dispatchers: DispatcherProvider,
-    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
+        val isBrowserThemingFeatureAvailable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
-        val useWarmColors: Boolean = false,
-        val experimentalIcons: Boolean = false,
+        val isNavigationBarAvailable: Boolean = false,
+        val isNavigationBarEnabled: Boolean = false,
         val selectedTheme: String = "",
     )
 
-    private fun currentViewState(): ViewState {
-        return viewState.value
-    }
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.map {
+        it.copy(
+            selectedTheme = themingDataStore.theme.toString(),
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = ViewState())
 
-    private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { updateCurrentState() }
-
-    @SuppressLint("DenyListedApi")
-    fun onExperimentalUIModeChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            experimentalUIThemingFeature.self().setRawStoredState(State(checked))
-            updateCurrentState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onWarmColorsFlagChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            experimentalUIThemingFeature.warmColors().setRawStoredState(State(checked))
-            updateCurrentState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onIconsFlagChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            experimentalUIThemingFeature.icons().setRawStoredState(State(checked))
-            updateCurrentState()
-        }
-    }
-
-    private fun updateCurrentState() {
+    init {
         viewModelScope.launch {
-            viewState.update {
-                currentViewState().copy(
-                    isBrowserThemingFeatureEnabled = experimentalUIThemingFeature.self().isEnabled(),
-                    useWarmColors = experimentalUIThemingFeature.warmColors().isEnabled(),
-                    experimentalIcons = experimentalUIThemingFeature.icons().isEnabled(),
-                    selectedTheme = themingDataStore.theme.toString(),
-                )
+            visualDesignExperimentDataStore.experimentState.collect { state ->
+                _viewState.update {
+                    it.copy(
+                        isBrowserThemingFeatureAvailable = state.isAvailable,
+                        isBrowserThemingFeatureEnabled = state.isEnabled,
+                    )
+                }
             }
         }
+
+        viewModelScope.launch {
+            visualDesignExperimentDataStore.navigationBarState.collect { state ->
+                _viewState.update {
+                    it.copy(
+                        isNavigationBarAvailable = state.isAvailable,
+                        isNavigationBarEnabled = state.isEnabled,
+                    )
+                }
+            }
+        }
+    }
+
+    fun onExperimentalUIModeChanged(checked: Boolean) {
+        visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
+    }
+
+    fun onNavigationBarPrefChanged(checked: Boolean) {
+        visualDesignExperimentDataStore.setNavigationBarStateUserPreference(checked)
     }
 }

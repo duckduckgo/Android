@@ -20,11 +20,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.isInNightMode
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -42,8 +44,8 @@ class ThemingSharedPreferences @Inject constructor(
         return themePrefMapper.themeFrom(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
-            experimentalUIThemingFeature.self().isEnabled(),
-            experimentalUIThemingFeature.warmColors().isEnabled(),
+            context.isInNightMode(),
+            visualDesignExperimentDataStore.experimentState.value.isEnabled,
         )
     }
 
@@ -67,32 +69,32 @@ class ThemingSharedPreferences @Inject constructor(
         fun themeFrom(
             value: String?,
             defValue: DuckDuckGoTheme,
+            isInNightMode: Boolean,
             isExperimentEnabled: Boolean,
-            warmColors: Boolean,
         ) =
             when (value) {
                 THEME_LIGHT -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-                    }
+                    DuckDuckGoTheme.EXPERIMENT_LIGHT
                 } else {
                     DuckDuckGoTheme.LIGHT
                 }
 
                 THEME_DARK -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-                    }
+                    DuckDuckGoTheme.EXPERIMENT_DARK
                 } else {
                     DuckDuckGoTheme.DARK
                 }
 
-                THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
-                else -> defValue
+                else ->
+                    if (isExperimentEnabled) {
+                        if (isInNightMode) {
+                            DuckDuckGoTheme.EXPERIMENT_DARK
+                        } else {
+                            DuckDuckGoTheme.EXPERIMENT_LIGHT
+                        }
+                    } else {
+                        DuckDuckGoTheme.SYSTEM_DEFAULT
+                    }
             }
     }
 

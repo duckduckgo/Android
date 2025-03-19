@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -43,10 +44,14 @@ class CPUMonitorWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject @ProcessName
+    lateinit var processName: String
+
     // TODO: move thresholds to remote config
     private val alertThresholds = listOf(30, 20, 10, 5).sortedDescending()
 
     override suspend fun doRemoteWork(): Result {
+        logcat { "CPUMonitorWorker in process $processName" }
         return withContext(dispatcherProvider.io()) {
             try {
                 val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()
