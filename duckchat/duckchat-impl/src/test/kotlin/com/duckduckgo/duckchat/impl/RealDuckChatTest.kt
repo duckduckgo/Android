@@ -19,15 +19,21 @@ package com.duckduckgo.duckchat.impl
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -183,6 +189,32 @@ class RealDuckChatTest {
         whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
 
         assertTrue(testee.wasOpenedBefore())
+    }
+
+    @Test
+    fun whenOpenDuckChatSettingsCalledThenGlobalActivityStarterIsCalledWithDuckChatSettings() {
+        testee.openDuckChatSettings()
+
+        verify(mockGlobalActivityStarter).start(mockContext, DuckChatSettingsNoParams)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenCloseDuckChatCalled_thenObserveCloseEventCallbackIsInvoked() = runTest {
+        val testLifecycleOwner = TestLifecycleOwner(initialState = CREATED)
+
+        var onCloseCalled = false
+        testee.observeCloseEvent(testLifecycleOwner) {
+            onCloseCalled = true
+        }
+
+        testLifecycleOwner.currentState = Lifecycle.State.STARTED
+
+        testee.closeDuckChat()
+
+        advanceUntilIdle()
+
+        assertTrue(onCloseCalled)
     }
 
     private fun setFeatureToggle(enabled: Boolean) {
