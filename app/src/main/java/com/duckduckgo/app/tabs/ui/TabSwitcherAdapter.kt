@@ -98,15 +98,15 @@ class TabSwitcherAdapter(
         return when (viewType) {
             GRID_TAB -> {
                 val binding = ItemTabGridBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.GridTabViewHolder(binding)
+                TabSwitcherViewHolder.GridTabViewHolder(binding)
             }
             LIST_TAB -> {
                 val binding = ItemTabListBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.ListTabViewHolder(binding)
+                TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
+                TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
             }
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
