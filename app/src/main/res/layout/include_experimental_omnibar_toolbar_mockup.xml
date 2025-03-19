@@ -33,7 +33,7 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/fading_omnibar_field_background"
+        android:background="@drawable/fade_omnibar_field_background"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"

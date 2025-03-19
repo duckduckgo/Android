@@ -20,5 +20,5 @@
         android:state_pressed="true"
         android:drawable="@drawable/fade_omnibar_background_focused" />
     <item
-        android:drawable="@drawable/fading_omnibar_field_background" />
+        android:drawable="@drawable/fade_omnibar_field_background" />
 </selector>
