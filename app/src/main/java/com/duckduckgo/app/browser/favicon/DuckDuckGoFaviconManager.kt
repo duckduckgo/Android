@@ -22,6 +22,8 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -36,8 +38,12 @@ import com.duckduckgo.common.utils.touchFaviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import kotlinx.coroutines.withContext
+
+private const val FAVICON_LOAD_RETRY_DELAY = 2000L
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
@@ -170,8 +176,15 @@ class DuckDuckGoFaviconManager constructor(
     }
 
     override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
-        val bitmap = loadFromDisk(tabId, url)
+        var bitmap = loadFromDisk(tabId, url)
         view.loadFavicon(bitmap, url, placeholder)
+        if (bitmap == null) {
+            view.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                delay(FAVICON_LOAD_RETRY_DELAY)
+                bitmap = loadFromDisk(tabId, url)
+                view.loadFavicon(bitmap, url, placeholder)
+            }
+        }
     }
 
     override suspend fun persistCachedFavicon(
