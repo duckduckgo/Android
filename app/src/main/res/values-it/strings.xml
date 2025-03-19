@@ -802,4 +802,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Imposta DuckDuckGo come browser predefinito in modo che apra tutti i link dei siti.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Non adesso</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocca i sistemi di tracciamento per proteggere la navigazione</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">La cancellazione delle schede e dei dati comporterà l\'eliminazione della cronologia del blocco dei sistemi di tracciamento e azzererà questo numero.\n\nNascondi questo banner se preferisci non vederlo nella vista delle schede.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Nascondi banner</string>
+
 </resources>
