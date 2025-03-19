@@ -616,8 +616,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                             command.send(
                                 Command.StartExperimentVariant2To5Animation(
                                     entities = decoration.entities,
-                                    hasKnownLogos = decoration.entities.takeIf { it.size >= 3 }?.take(3)?.any {
-                                        it.name.contains("Facebook", true) || it.name.contains("Google", true)
+                                    hasKnownLogos = decoration.entities.toSet().takeIf { it.size >= 3 }?.take(3)?.any {
+                                        it.name.contains("Facebook", true) ||
+                                            it.name.contains("Google LLC", true) ||
+                                            it.name.contains("Amazon", true)
                                     } ?: false,
                                 ),
                             )
