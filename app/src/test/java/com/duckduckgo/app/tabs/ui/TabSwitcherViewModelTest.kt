@@ -21,7 +21,6 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.asFlow
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
@@ -49,7 +48,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
