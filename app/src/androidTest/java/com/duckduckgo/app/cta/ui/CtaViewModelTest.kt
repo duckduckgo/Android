@@ -49,6 +49,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -114,6 +115,8 @@ class CtaViewModelTest {
 
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
 
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -166,6 +169,7 @@ class CtaViewModelTest {
             subscriptions = mockSubscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
+            userBrowserProperties = mockUserBrowserProperties,
         )
     }
 
