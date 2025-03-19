@@ -30,10 +30,12 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.fade
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import kotlin.math.abs
 
@@ -48,6 +50,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
     private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
+    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -93,6 +96,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         minibarText.text = viewState.url.extractDomain()
         omniBarContainer.isPressed = viewState.hasFocus
+        if (viewState.hasFocus) {
+            omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+        } else {
+            omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarStroke)
+        }
     }
 
     fun resetTransitionDelayed() {

@@ -25,7 +25,7 @@
         <item name="daxColorWindow">@color/warm_gray85</item>
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
-
+        <item name="daxColorOmnibarStroke">?daxColorToolbar</item>
 
         <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
@@ -42,6 +42,7 @@
         <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+        <item name="daxColorOmnibarStroke">?attr/daxColorWhite</item>
 
         <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
