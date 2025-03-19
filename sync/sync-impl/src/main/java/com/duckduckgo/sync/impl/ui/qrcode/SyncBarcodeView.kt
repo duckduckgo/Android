@@ -35,11 +35,14 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.CheckCameraAvailable
@@ -47,9 +50,12 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.OpenSettings
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.google.zxing.client.android.BeepManager
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import com.journeyapps.barcodescanner.camera.CameraSettings
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -72,6 +78,12 @@ constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var syncFeature: SyncFeature
+
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
     }
@@ -86,12 +98,21 @@ constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
     }
 
+    private var beepManager: BeepManager? = null
+
+    private val cameraSettings = CameraSettings().apply {
+        isAutoFocusEnabled = true
+        isContinuousFocusEnabled = true
+    }
+
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+
+        initQRScanner()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
@@ -107,6 +128,16 @@ constructor(
 
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
+        }
+    }
+
+    private fun initQRScanner() {
+        if (syncFeature.qrCodeScannerHints().isEnabled()) {
+            if (appBuildConfig.isInternalBuild()) {
+                beepManager = BeepManager(getActivity())
+            }
+            binding.barcodeView.cameraSettings = cameraSettings
+            binding.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
         }
     }
 
@@ -135,6 +166,7 @@ constructor(
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
         binding.barcodeView.decodeSingle {
+            beepManager?.playBeepSoundAndVibrate()
             onQrCodeRead(it.text)
         }
     }
