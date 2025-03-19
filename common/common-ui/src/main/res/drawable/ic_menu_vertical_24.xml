@@ -5,11 +5,11 @@
     android:viewportHeight="24">
   <path
       android:pathData="M12,14c1.105,0 2,-0.895 2,-2s-0.895,-2 -2,-2 -2,0.895 -2,2 0.895,2 2,2z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+      android:fillColor="@color/primary_icon_color_selector"/>
   <path
       android:pathData="M12,7c1.105,0 2,-0.895 2,-2s-0.895,-2 -2,-2 -2,0.895 -2,2 0.895,2 2,2z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+      android:fillColor="@color/primary_icon_color_selector"/>
   <path
       android:pathData="M12,21c1.105,0 2,-0.895 2,-2s-0.895,-2 -2,-2 -2,0.895 -2,2 0.895,2 2,2z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+      android:fillColor="@color/primary_icon_color_selector"/>
 </vector>
