@@ -111,10 +111,14 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
+    private val tabsFlow = tabRepository.flowTabs
+        .debounce(100.milliseconds)
+        .conflate()
+
     private val _selectionViewState = MutableStateFlow(SelectionViewState())
     val selectionViewState = combine(
         _selectionViewState,
-        tabRepository.flowTabs,
+        tabsFlow,
         tabRepository.flowSelectedTab,
         tabRepository.tabSwitcherData,
     ) { viewState, tabs, activeTab, tabSwitcherData ->
@@ -130,9 +134,7 @@ class TabSwitcherViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
-        .debounce(100.milliseconds)
-        .conflate()
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabsFlow
         .asLiveData()
         .switchMap { tabEntities ->
             // TODO use test framework to determine whether to show tracker animation tile
