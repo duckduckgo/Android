@@ -47,6 +47,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -263,16 +264,16 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
-        val tab = TabEntity("ID", position = 0)
-        tabs.value = listOf(tab)
-
         testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
-        verify(mockTabRepository).delete(tab)
-        verify(mockAdClickManager).clearTabId(tab.tabId)
-        verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        flowTabs.first().forEach { tab ->
+            verify(mockTabRepository).delete(tab)
+            verify(mockAdClickManager).clearTabId(tab.tabId)
+            verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        }
+
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
