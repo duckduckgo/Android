@@ -47,9 +47,12 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.OpenSettings
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.google.zxing.client.android.BeepManager
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import com.journeyapps.barcodescanner.camera.CameraSettings
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -86,8 +89,19 @@ constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
     }
 
+    private var beepManager: BeepManager
+    private val cameraSettings = CameraSettings().apply {
+        isAutoFocusEnabled = true
+        isContinuousFocusEnabled = true
+    }
+
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
+
+    init {
+        beepManager = BeepManager(getActivity())
+        initQRScanner()
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -108,6 +122,11 @@ constructor(
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
         }
+    }
+
+    private fun initQRScanner() {
+        binding.barcodeView.cameraSettings = cameraSettings
+        binding.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
     }
 
     override fun onDetachedFromWindow() {
@@ -135,6 +154,7 @@ constructor(
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
         binding.barcodeView.decodeSingle {
+            beepManager.playBeepSoundAndVibrate()
             onQrCodeRead(it.text)
         }
     }
