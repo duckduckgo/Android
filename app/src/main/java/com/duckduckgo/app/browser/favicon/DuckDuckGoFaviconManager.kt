@@ -38,12 +38,13 @@ import com.duckduckgo.common.utils.touchFaviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import kotlinx.coroutines.withContext
 
 private const val FAVICON_LOAD_RETRY_DELAY = 2000L
+private const val FAVICON_LOAD_RETRIES = 3
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
@@ -178,11 +179,17 @@ class DuckDuckGoFaviconManager constructor(
     override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
         var bitmap = loadFromDisk(tabId, url)
         view.loadFavicon(bitmap, url, placeholder)
-        if (bitmap == null) {
-            view.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                delay(FAVICON_LOAD_RETRY_DELAY)
-                bitmap = loadFromDisk(tabId, url)
-                view.loadFavicon(bitmap, url, placeholder)
+
+        // sometimes it takes a while to fetch a favicon, so we try to load it from disk again
+        repeat(FAVICON_LOAD_RETRIES) {
+            if (bitmap == null) {
+                view.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    delay(FAVICON_LOAD_RETRY_DELAY)
+                    bitmap = loadFromDisk(tabId, url)
+                    if (bitmap != null) {
+                        view.loadFavicon(bitmap, url, placeholder)
+                    }
+                }
             }
         }
     }
