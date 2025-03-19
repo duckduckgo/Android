@@ -24,8 +24,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -402,28 +400,28 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
                     updateTabGridItemDecorator()
                 }
+
+                if (firstTimeLoadingTabsList) {
+                    firstTimeLoadingTabsList = false
+                    scrollToActiveTab()
+                }
             }
 
-            if (firstTimeLoadingTabsList) {
-                firstTimeLoadingTabsList = false
-                scrollToActiveTab()
+            lifecycleScope.launch {
+                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                    updateLayoutType(it)
+                }
             }
-        }
 
-        lifecycleScope.launch {
-            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                updateLayoutType(it)
+            viewModel.deletableTabs.observe(this) {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
+                }
             }
-        }
 
-        viewModel.deletableTabs.observe(this) {
-            if (it.isNotEmpty()) {
-                onDeletableTab(it.last())
+            viewModel.command.observe(this) {
+                processCommand(it)
             }
-        }
-
-        viewModel.command.observe(this) {
-            processCommand(it)
         }
     }
 
