@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -28,6 +29,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
@@ -37,6 +39,8 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlin.math.abs
 
+private const val TOOLBAR_VISIBLE_THRESHOLD = 0.9f
+
 @InjectWith(FragmentScope::class)
 class DelightfulOmnibarLayout @JvmOverloads constructor(
     context: Context,
@@ -45,10 +49,10 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 ) : OmnibarLayout(context, attrs, defStyle) {
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
+    private val minibarShield: ImageView by lazy { findViewById(R.id.minibarShield) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.domainText) }
     private val trackersText: DaxTextView by lazy { findViewById(R.id.trackersText) }
 
-    private var previousScrollY = 0
     private var targetHeight: Int = 0
     private var currentHeight: Int = 0
     private var targetToolbarAlpha: Float = 1f
@@ -84,6 +88,11 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 
         experimentTrackersCountAnimationHelper.animate(trackersText, viewState.trackersBlocked, viewState.previouslyTrackersBlocked)
         minibarText.text = viewState.url.extractDomain()
+        if (viewState.privacyShield == PROTECTED) {
+            minibarShield.setImageResource(R.drawable.ic_shield_exploration)
+        } else {
+            minibarShield.setImageResource(R.drawable.ic_shield_exploration_unprotected)
+        }
     }
 
     fun resetTransitionDelayed() {
@@ -182,6 +191,11 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
         val heightChange = (heightDifference * transitionStepRatio).toInt()
         currentHeight += heightChange
         currentHeight = currentHeight.coerceIn(minibar.height, toolbar.height)
+        if (toolbar.alpha > TOOLBAR_VISIBLE_THRESHOLD) {
+            currentHeight = toolbar.height
+        } else if (minibar.alpha > TOOLBAR_VISIBLE_THRESHOLD) {
+            currentHeight = minibar.height
+        }
         layoutParams.height = currentHeight
         this.layoutParams = layoutParams
     }

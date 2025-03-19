@@ -392,7 +392,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:paddingVertical="@dimen/keyline_2">
+            android:paddingVertical="@dimen/keyline_1">
 
             <ImageView
                 android:id="@+id/minibarShield"
