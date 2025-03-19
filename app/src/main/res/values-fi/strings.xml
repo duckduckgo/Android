@@ -802,4 +802,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ei nyt</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo suojaa selaamistasi estämällä seurantatoiminnot</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
+
 </resources>
