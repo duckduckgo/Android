@@ -269,7 +269,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
-            fileType = "txt",
         )
 
         if (hasWriteStoragePermission()) {
