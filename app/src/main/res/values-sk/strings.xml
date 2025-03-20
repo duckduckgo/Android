@@ -220,14 +220,14 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Iba ukončiť aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončiť 5 sekúnd neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončiť 5 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončiť 15 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončiť 30 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Aplikácia bola zatvorená po 1 hodine neaktívnosti</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikácie, neaktívnej po dobu 5 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

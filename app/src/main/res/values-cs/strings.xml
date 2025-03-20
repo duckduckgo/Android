@@ -220,9 +220,9 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Pouze ukončení aplikace</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihned po ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
