@@ -17,4 +17,6 @@
 <resources>
     <!-- Experimental Toolbar -->
     <dimen name="toolbarIcon">40dp</dimen>
+    <dimen name="bottomNavIconContainer">48dp</dimen>
+    <dimen name="bottomNavIcon">24dp</dimen>
 </resources>

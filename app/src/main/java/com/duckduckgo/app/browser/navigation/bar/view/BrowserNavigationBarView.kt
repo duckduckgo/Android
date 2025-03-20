@@ -168,9 +168,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         binding.fireButton.isVisible = viewState.fireButtonVisible
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
-        if (viewState.shouldUpdateTabsCount) {
-            binding.tabsButton.count = viewState.tabsCount
-        }
     }
 
     private fun processCommands(command: Command) {
