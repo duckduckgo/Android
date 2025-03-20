@@ -58,6 +58,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val sharedShieldIcon: View by lazy { findViewById(R.id.minibarShield) }
     private val transitionedOmnibarBackground: View by lazy { findViewById(R.id.transitionedOmnibarBackground) }
+    private val omniBarContainerWrapper: View by lazy { findViewById(R.id.omniBarContainerWrapper) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -151,23 +152,21 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionRatio).toInt()
         Timber.d("lp_test; newInputTextWidth: ${newInputTextWidth}")
-        omnibarCard.updateLayoutParams {
+        omniBarContainerWrapper.updateLayoutParams {
             width = newInputTextWidth
         }
         omnibarCard.strokeWidth = (1.toPx(context) - (1.toPx(context) * transitionRatio)).toInt()
         omnibarCard.elevation = (2.toPx(context) - (2.toPx(context) * transitionRatio))
-        toolbar.updateLayoutParams {
-            height = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
-        }
-        minibarContainer.updateLayoutParams {
-            height = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
+        val newOmnibarHeight = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
+        toolbarContainer.updateLayoutParams {
+            height = newOmnibarHeight
         }
 
-        val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
-        Timber.d("lp_test; newShieldSize: ${newShieldSize}")
-        shieldIcon.updateLayoutParams {
-            height = newShieldSize
-        }
+        // val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
+        // Timber.d("lp_test; newShieldSize: ${newShieldSize}")
+        // shieldIcon.updateLayoutParams {
+        //     height = newOmnibarHeight
+        // }
 
         /*
         if (currentHeight == 0) {

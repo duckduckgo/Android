@@ -27,13 +27,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/experimentalToolbarSize"
         android:background="?daxColorToolbar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="@dimen/experimentalToolbarSize"
+            android:layout_height="match_parent"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -50,10 +50,13 @@
                 android:visibility="gone" />
 
             <LinearLayout
+                android:id="@+id/omniBarContainerWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/keyline_1">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
@@ -65,17 +68,21 @@
                     style="@style/Widget.DuckDuckGo.OmnibarCardView"
                     android:stateListAnimator="@drawable/fade_omnibar_state_selector">
 
-                    <View
-                        android:id="@+id/transitionedOmnibarBackground"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0"
-                        android:background="@drawable/fade_omnibar_transitioned_background" />
-
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+
+                        <View
+                            android:id="@+id/transitionedOmnibarBackground"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:alpha="0"
+                            android:background="@drawable/fade_omnibar_transitioned_background"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/trackersAnimation"
@@ -194,6 +201,7 @@
                             android:contentDescription="@string/browserPopupMenu"
                             android:gravity="center"
                             android:src="@drawable/ic_shield_exploration"
+                            android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/omnibarTextInput"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -314,7 +322,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/minibarContainer"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/experimentalToolbarSize"
+            android:layout_height="match_parent"
             android:paddingBottom="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -325,7 +333,7 @@
                 android:layout_width="16dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/keyline_1"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="42dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/minibarText"
                 app:layout_constraintTop_toTopOf="parent" />
