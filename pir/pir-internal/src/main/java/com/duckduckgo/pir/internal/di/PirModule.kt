@@ -29,6 +29,7 @@ import com.duckduckgo.pir.internal.store.RealPirDataStore
 import com.duckduckgo.pir.internal.store.RealPirRepository
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
+import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
@@ -82,6 +83,12 @@ class PirModule {
         return database.scanLogDao()
     }
 
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideOptOutResultsDao(database: PirDatabase): OptOutResultsDao {
+        return database.optOutResultsDao()
+    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePirRepository(
@@ -95,6 +102,7 @@ class PirModule {
         userProfileDao: UserProfileDao,
         scanLogDao: ScanLogDao,
         dbpService: DbpService,
+        outResultsDao: OptOutResultsDao,
     ): PirRepository = RealPirRepository(
         moshi,
         dispatcherProvider,
@@ -106,5 +114,6 @@ class PirModule {
         userProfileDao,
         scanLogDao,
         dbpService,
+        outResultsDao,
     )
 }

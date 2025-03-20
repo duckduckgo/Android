@@ -116,6 +116,13 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
+        repository.getTotalScannedBrokersFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                binding.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, it)
+            }
+            .launchIn(lifecycleScope)
+
         workManager.getWorkInfosForUniqueWorkLiveData(TAG_SCHEDULED_SCAN)
             .observe(
                 this,
@@ -136,7 +143,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 result.score > 1
             }
         }
-        val totalSitesScanned = allExtracted.size + allError.size
         val brokersWithRecordsCount = brokersWithRecords.size
 
         val brokersWithNoRecords = allExtracted.filter {
@@ -150,8 +156,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(binding) {
-            this.statusSitesScanned.text =
-                getString(R.string.pirStatsStatusScanned, totalSitesScanned)
             this.statusTotalRecords.text =
                 getString(R.string.pirStatsStatusRecords, totalRecordCount)
             this.statusTotalBrokersFound.text =
@@ -206,6 +210,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 repository.deleteAllResults()
                 repository.deleteAllUserProfiles()
                 repository.deleteAllScanLogs()
+                repository.deleteAllOptOutData()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)

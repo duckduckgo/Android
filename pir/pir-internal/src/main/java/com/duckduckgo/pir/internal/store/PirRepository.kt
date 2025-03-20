@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.store
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse.ScrapedData
@@ -37,8 +38,12 @@ import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
+import com.duckduckgo.pir.internal.store.db.OptOutActionLog
+import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
+import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
 import com.duckduckgo.pir.internal.store.db.PirScanLog
+import com.duckduckgo.pir.internal.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
@@ -48,6 +53,7 @@ import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -125,6 +131,36 @@ interface PirRepository {
 
     suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?>
 
+    fun getTotalScannedBrokersFlow(): Flow<Int>
+
+    fun getTotalOptOutCompletedFlow(): Flow<Int>
+
+    fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
+
+    suspend fun saveScanCompletedBroker(
+        brokerName: String,
+        startTimeInMillis: Long,
+        endTimeInMillis: Long,
+    )
+
+    suspend fun saveOptOutCompleted(
+        brokerName: String,
+        extractedProfile: ExtractedProfile,
+        startTimeInMillis: Long,
+        endTimeInMillis: Long,
+    )
+
+    suspend fun saveOptOutActionLog(
+        brokerName: String,
+        extractedProfile: ExtractedProfile,
+        completionTimeInMillis: Long,
+        actionType: String,
+        isError: Boolean,
+        result: String,
+    )
+
+    suspend fun deleteAllOptOutData()
+
     data class BrokerJson(
         val fileName: String,
         val etag: String,
@@ -176,9 +212,11 @@ class RealPirRepository(
     private val userProfileDao: UserProfileDao,
     private val scanLogDao: ScanLogDao,
     private val dbpService: DbpService,
+    private val optOutResultsDao: OptOutResultsDao,
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
+    private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -384,6 +422,7 @@ class RealPirRepository(
             scanResultsDao.deleteAllNavigateResults()
             scanResultsDao.deleteAllScanErrorResults()
             scanResultsDao.deleteAllExtractProfileResult()
+            scanResultsDao.deleteAllScanCompletedBroker()
         }
     }
 
@@ -455,5 +494,72 @@ class RealPirRepository(
             "ready" -> ConfirmationStatus.Ready
             else -> ConfirmationStatus.Unknown
         }
+    }
+
+    override fun getTotalScannedBrokersFlow(): Flow<Int> {
+        return scanResultsDao.getScanCompletedBrokerFlow().map { it.size }
+    }
+
+    override fun getTotalOptOutCompletedFlow(): Flow<Int> {
+        return optOutResultsDao.getOptOutCompletedBrokerFlow().map { it.size }
+    }
+
+    override fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>> {
+        return optOutResultsDao.getOptOutActionLogFlow()
+    }
+
+    override suspend fun saveScanCompletedBroker(
+        brokerName: String,
+        startTimeInMillis: Long,
+        endTimeInMillis: Long,
+    ) = withContext(dispatcherProvider.io()) {
+        scanResultsDao.insertScanCompletedBroker(
+            ScanCompletedBroker(
+                brokerName = brokerName,
+                startTimeInMillis = startTimeInMillis,
+                endTimeInMillis = endTimeInMillis,
+            ),
+        )
+    }
+
+    override suspend fun saveOptOutCompleted(
+        brokerName: String,
+        extractedProfile: ExtractedProfile,
+        startTimeInMillis: Long,
+        endTimeInMillis: Long,
+    ) = withContext(dispatcherProvider.io()) {
+        optOutResultsDao.insertOptOutCompletedBroker(
+            OptOutCompletedBroker(
+                brokerName = brokerName,
+                extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
+                startTimeInMillis = startTimeInMillis,
+                endTimeInMillis = endTimeInMillis,
+            ),
+        )
+    }
+
+    override suspend fun saveOptOutActionLog(
+        brokerName: String,
+        extractedProfile: ExtractedProfile,
+        completionTimeInMillis: Long,
+        actionType: String,
+        isError: Boolean,
+        result: String,
+    ) = withContext(dispatcherProvider.io()) {
+        optOutResultsDao.insertOptOutActionLog(
+            OptOutActionLog(
+                brokerName = brokerName,
+                extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
+                completionTimeInMillis = completionTimeInMillis,
+                actionType = actionType,
+                isError = isError,
+                result = result,
+            ),
+        )
+    }
+
+    override suspend fun deleteAllOptOutData() = withContext(dispatcherProvider.io()) {
+        optOutResultsDao.deleteAllOptOutActionLog()
+        optOutResultsDao.deleteAllOptOutCompletedBroker()
     }
 }
