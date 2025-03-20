@@ -69,6 +69,9 @@ abstract class TabsDao {
     @Delete
     abstract fun deleteTab(tab: TabEntity)
 
+    @Query("delete from tabs where tabId in (:tabIds)")
+    abstract fun deleteTabs(tabIds: List<String>)
+
     @Query("delete from tabs where deletable is 1")
     abstract fun deleteTabsMarkedAsDeletable()
 
@@ -87,11 +90,30 @@ abstract class TabsDao {
     }
 
     @Transaction
+    open fun markTabsAsDeletable(tabIds: List<String>) {
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = true))
+            }
+        }
+    }
+
+    @Transaction
     open fun undoDeletableTab(tab: TabEntity) {
         // ensure the tab is in the DB
         val dbTab = tab(tab.tabId)
         dbTab?.let {
             updateTab(dbTab.copy(deletable = false))
+        }
+    }
+
+    @Transaction
+    open fun undoDeletableTabs(tabIds: List<String>) {
+        // ensure the tab is in the DB
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = false))
+            }
         }
     }
 
@@ -102,6 +124,19 @@ abstract class TabsDao {
             return
         }
         lastTab()?.let {
+            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
+        }
+    }
+
+    @Transaction
+    open fun deleteTabsAndUpdateSelection(tabIds: List<String>) {
+        deleteTabs(tabIds)
+
+        if (selectedTab() != null) {
+            return
+        }
+
+        firstTab()?.let {
             insertTabSelection(TabSelectionEntity(tabId = it.tabId))
         }
     }

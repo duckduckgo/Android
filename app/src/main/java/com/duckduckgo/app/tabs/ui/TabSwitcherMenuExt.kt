@@ -30,7 +30,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabTyp
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.HIDDEN
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
-import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 private const val FAB_HIDE_DELAY = 500L
@@ -52,6 +52,7 @@ fun Menu.createDynamicInterface(
     popupMenu.selectTabsMenuItem.isVisible = dynamicMenu.isSelectTabsVisible
     popupMenu.closeSelectedTabsMenuItem.isVisible = dynamicMenu.isCloseSelectedTabsVisible
     popupMenu.closeOtherTabsMenuItem.isVisible = dynamicMenu.isCloseOtherTabsVisible
+    popupMenu.closeAllTabsDivider.isVisible = dynamicMenu.isCloseAllTabsDividerVisible
     popupMenu.closeAllTabsMenuItem.isVisible = dynamicMenu.isCloseAllTabsVisible
 
     popupMenu.shareSelectedLinksMenuItem.apply {
@@ -69,11 +70,11 @@ fun Menu.createDynamicInterface(
             when (dynamicMenu.fabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
-                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_add_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24)
                 }
                 FabType.CLOSE_TABS -> {
                     text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-                    icon = AppCompatResources.getDrawable(context, CommonR.drawable.ic_close_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24)
                 }
             }
 
@@ -87,25 +88,26 @@ fun Menu.createDynamicInterface(
     }
 
     toolbar.navigationIcon = when (dynamicMenu.backButtonType) {
-        ARROW -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_arrow_left_24)
-        CLOSE -> AppCompatResources.getDrawable(toolbar.context, CommonR.drawable.ic_close_24)
+        ARROW -> AppCompatResources.getDrawable(toolbar.context, commonR.drawable.ic_arrow_left_24)
+        CLOSE -> AppCompatResources.getDrawable(toolbar.context, commonR.drawable.ic_close_24)
     }
 
     findItem(R.id.layoutTypeMenuItem).apply {
         when (dynamicMenu.layoutButtonType) {
             GRID -> {
                 setIcon(R.drawable.ic_grid_view_24)
-                title = actionView?.resources?.getString(R.string.tabSwitcherGridViewMenu)
+                title = toolbar.resources.getString(R.string.tabSwitcherGridViewMenu)
                 isVisible = true
             }
             LIST -> {
                 setIcon(R.drawable.ic_list_view_24)
-                title = actionView?.resources?.getString(R.string.tabSwitcherListViewMenu)
+                title = toolbar.resources.getString(R.string.tabSwitcherListViewMenu)
                 isVisible = true
             }
             HIDDEN -> isVisible = false
         }
     }
 
+    findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 }

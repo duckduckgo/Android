@@ -68,6 +68,7 @@
         app:primaryText="@string/selectTabsMenuItem" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/close_all_tabs_divider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:defaultPadding="false" />
