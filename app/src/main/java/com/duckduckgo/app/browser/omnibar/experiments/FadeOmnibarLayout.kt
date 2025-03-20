@@ -57,7 +57,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val sharedShieldIcon: View by lazy { findViewById(R.id.minibarShield) }
-    private val omnibarBackground: View by lazy { findViewById(R.id.omnibarBackground) }
+    private val transitionedOmnibarBackground: View by lazy { findViewById(R.id.transitionedOmnibarBackground) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -115,7 +115,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarStroke)
         }
 
-        renderLeadingIconState(viewState.leadingIconState)
+        // renderLeadingIconState(viewState.leadingIconState)
     }
 
     fun resetTransitionDelayed() {
@@ -146,14 +146,16 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         omnibarTextInput.alpha = 1f - transitionRatio
         aiChatDivider.alpha = 1f - transitionRatio
         aiChat.alpha = 1f - transitionRatio
-        omnibarBackground.alpha = 1f - transitionRatio
+        transitionedOmnibarBackground.alpha = transitionRatio
         minibarText.alpha = transitionRatio
 
         val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionRatio).toInt()
         Timber.d("lp_test; newInputTextWidth: ${newInputTextWidth}")
-        omniBarContainer.updateLayoutParams {
+        omnibarCard.updateLayoutParams {
             width = newInputTextWidth
         }
+        omnibarCard.strokeWidth = (1.toPx(context) - (1.toPx(context) * transitionRatio)).toInt()
+        omnibarCard.elevation = (2.toPx(context) - (2.toPx(context) * transitionRatio))
         toolbar.updateLayoutParams {
             height = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
         }
@@ -163,8 +165,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
         Timber.d("lp_test; newShieldSize: ${newShieldSize}")
-        sharedShieldIcon.updateLayoutParams {
-            width = newShieldSize
+        shieldIcon.updateLayoutParams {
             height = newShieldSize
         }
 

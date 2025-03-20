@@ -64,7 +64,6 @@
                     android:id="@+id/omnibarBackground"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/fading_omnibar_field_background"
                     app:layout_constraintEnd_toEndOf="@id/aiChat"
                     app:layout_constraintStart_toStartOf="@id/omnibarIconContainer" />
 
