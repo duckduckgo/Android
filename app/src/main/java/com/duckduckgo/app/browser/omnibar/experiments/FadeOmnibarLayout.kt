@@ -19,8 +19,10 @@ package com.duckduckgo.app.browser.omnibar.experiments
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.view.animation.PathInterpolator
 import android.widget.ImageView
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -31,7 +33,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -43,7 +44,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import timber.log.Timber
-import kotlin.math.abs
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -76,8 +76,14 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private var targetMinibarAlpha: Float = 0f
     private var currentMinibarAlpha: Float = 0f
 
-    private var transitionRatio = 0f
+    private var transitionProgress = 0f
+    private var transitionInterpolation = 0f
     private var maximumTextInputWidth: Int = 0
+
+    // ease-in-and-out
+    private val interpolator = PathInterpolator(
+        .42f,0f,.58f,1f
+    )
 
     init {
         val attr =
@@ -140,35 +146,39 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         val scrollDelta = scrollY - oldScrollY
         val ratioChange = scrollDelta / 76.toPx(context).toFloat()
-        transitionRatio = (transitionRatio + ratioChange).coerceIn(0f, 1f)
+        transitionProgress = (transitionProgress + ratioChange).coerceIn(0f, 1f)
+        transitionInterpolation = interpolator.getInterpolation(transitionProgress)
 
-        Timber.d("lp_test; transitionRatio: $transitionRatio")
+        Timber.d("lp_test; transitionRatio: $transitionInterpolation")
         Timber.d("lp_test; maximumTextInputWidth: ${toolbar.width}")
         Timber.d("lp_test; omnibarTextInput.width: ${omnibarTextInput.width}")
         Timber.d("lp_test; sharedShieldIcon.width: ${sharedShieldIcon.width}")
         Timber.d("lp_test; sharedShieldIcon.height: ${sharedShieldIcon.height}")
 
-        omnibarTextInput.alpha = 1f - transitionRatio
-        aiChatDivider.alpha = 1f - transitionRatio
-        aiChat.alpha = 1f - transitionRatio
-        transitionedOmnibarBackground.alpha = transitionRatio
-        minibarText.alpha = transitionRatio
+        omnibarTextInput.alpha = 1f - transitionInterpolation
+        aiChatDivider.alpha = 1f - transitionInterpolation
+        aiChat.alpha = 1f - transitionInterpolation
+        transitionedOmnibarBackground.alpha = transitionInterpolation
+        minibarText.alpha = transitionInterpolation
 
-        val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionRatio).toInt()
+        val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionInterpolation).toInt()
         Timber.d("lp_test; newInputTextWidth: ${newInputTextWidth}")
         omniBarContainerWrapper.updateLayoutParams {
             width = newInputTextWidth
         }
-        omnibarCard.strokeWidth = (1.toPx(context) - (1.toPx(context) * transitionRatio)).toInt()
-        omnibarCard.elevation = (2.toPx(context) - (2.toPx(context) * transitionRatio))
-        val newOmnibarHeight = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionRatio).toInt()
+        omnibarCard.strokeWidth = (1.toPx(context) - (1.toPx(context) * transitionInterpolation)).toInt()
+        omnibarCard.elevation = (2.toPx(context) - (2.toPx(context) * transitionInterpolation))
+        val newOmnibarHeight = toolbarHeight - ((toolbarHeight - minibarHeight) * transitionInterpolation).toInt()
         toolbarContainer.updateLayoutParams {
             height = newOmnibarHeight
         }
-        omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionRatio).toDp(context)
+        omnibarTextInput.scaleY = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        omnibarTextInput.scaleX = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        // omnibarTextInput.textScaleX = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        // omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionInterpolation).toDp(context)
 
         omniBarContainer.updateLayoutParams {
-            height = omnibarContainerHeight - ((omnibarContainerHeight - minibarHeight) * transitionRatio).toInt()
+            height = omnibarContainerHeight - ((omnibarContainerHeight - minibarHeight) * transitionInterpolation).toInt()
         }
 
         // val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
@@ -273,7 +283,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
      * Returns a percentage (0.0 to 1.0) of how much the omnibar has shifted into the minibar.
      */
     fun getShiftRatio(): Float {
-        return transitionRatio
+        return transitionInterpolation
     }
 /*
     private fun fadeToolbar(alpha: Float) {
