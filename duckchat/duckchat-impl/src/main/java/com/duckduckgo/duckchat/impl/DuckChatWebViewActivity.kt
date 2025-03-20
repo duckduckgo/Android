@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Message
@@ -290,7 +289,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     }
 
     private fun minSdk30(): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.R
+        return appBuildConfig.sdkInt >= 30
     }
 
     @Suppress("NewApi")
