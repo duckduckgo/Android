@@ -169,6 +169,11 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app_redirect",
         type = Count,
     ),
+    SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT(
+        baseName = "m_privacy-pro_app_purchase_with_restored_account",
+        type = Count,
+        removedParameters = setOf(ATB),
+    ),
     AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_detected",
         types = setOf(Count, Daily()),
