@@ -567,7 +567,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Animation Tile positive button clicked then Animation Tile is removed`() = runTest {
+    fun `when Animation Tile negative button clicked then Animation Tile is removed`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
 
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
