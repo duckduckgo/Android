@@ -61,7 +61,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/experimentalOmnibarCardSize"
                     android:layout_marginHorizontal="@dimen/keyline_4"
                     android:layout_marginTop="@dimen/keyline_2"
                     android:layout_marginBottom="@dimen/keyline_3"

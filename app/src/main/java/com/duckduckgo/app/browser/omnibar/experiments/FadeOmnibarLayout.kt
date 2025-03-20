@@ -167,6 +167,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
         omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionRatio).toDp(context)
 
+        omniBarContainer.updateLayoutParams {
+            height = omnibarContainerHeight - ((omnibarContainerHeight - minibarHeight) * transitionRatio).toInt()
+        }
+
         // val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
         // Timber.d("lp_test; newShieldSize: ${newShieldSize}")
         // shieldIcon.updateLayoutParams {
