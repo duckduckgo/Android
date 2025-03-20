@@ -70,9 +70,9 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.duckduckgo.mobile.android.R as AndroidR
 import com.duckduckgo.mobile.android.R as commonR
 import java.io.File
-import com.duckduckgo.mobile.android.R as AndroidR
 import java.security.MessageDigest
 import kotlin.Int
 import kotlinx.coroutines.launch
