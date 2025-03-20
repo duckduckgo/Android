@@ -23,12 +23,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,7 +36,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -51,14 +50,17 @@ class RealDuckChatTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
+    private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
+    private val mockIntent: Intent = mock()
 
     private val testee = RealDuckChat(
         mockDuckPlayerFeatureRepository,
         duckChatFeature,
         moshi,
         dispatcherProvider,
+        mockGlobalActivityStarter,
         mockContext,
         true,
         coroutineRule.testScope,
@@ -70,6 +72,7 @@ class RealDuckChatTest {
         whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         setFeatureToggle(true)
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
     }
 
     @Test
@@ -124,48 +127,39 @@ class RealDuckChatTest {
     @Test
     fun whenOpenDuckChatCalled_activityStarted() = runTest {
         testee.openDuckChat()
-
-        val intentCaptor = argumentCaptor<Intent>()
-        verify(mockContext).startActivity(intentCaptor.capture())
-        val capturedIntent = intentCaptor.firstValue
-
-        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, capturedIntent.flags)
-        assertEquals(
-            "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-            capturedIntent.getStringExtra("URL_EXTRA"),
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            ),
         )
+        verify(mockContext).startActivity(any())
         verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 
     @Test
     fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() = runTest {
         testee.openDuckChat(query = "example")
-
-        val intentCaptor = argumentCaptor<Intent>()
-        verify(mockContext).startActivity(intentCaptor.capture())
-        val capturedIntent = intentCaptor.firstValue
-
-        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, capturedIntent.flags)
-        assertEquals(
-            "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
-            capturedIntent.getStringExtra("URL_EXTRA"),
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            ),
         )
+        verify(mockContext).startActivity(any())
         verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 
     @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() = runTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
-
-        val intentCaptor = argumentCaptor<Intent>()
-        verify(mockContext).startActivity(intentCaptor.capture())
-        val capturedIntent = intentCaptor.firstValue
-
-        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, capturedIntent.flags)
-        assertEquals(
-            "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
-            capturedIntent.getStringExtra("URL_EXTRA"),
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
+            ),
         )
+        verify(mockContext).startActivity(any())
         verify(mockDuckPlayerFeatureRepository).registerOpened()
     }
 

@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -66,6 +67,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
+    private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -144,9 +146,16 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun startDuckChatActivity(url: String) {
-        val intent = DuckChatWebViewActivity.intent(context, url)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
+        val intent = globalActivityStarter.startIntent(
+            context,
+            DuckChatWebViewActivityWithParams(
+                url = url,
+            ),
+        )
+        intent?.let {
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(it)
+        }
     }
 
     private fun appendParameters(

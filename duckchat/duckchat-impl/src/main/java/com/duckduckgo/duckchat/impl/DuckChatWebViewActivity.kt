@@ -17,14 +17,13 @@
 package com.duckduckgo.duckchat.impl
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Message
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
@@ -36,6 +35,8 @@ import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEA
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
+internal data class DuckChatWebViewActivityWithParams(
+    val url: String,
+) : GlobalActivityStarter.ActivityParams
+
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(DuckChatWebViewActivityWithParams::class)
 class DuckChatWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -78,7 +84,8 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        val url = intent.getStringExtra(URL_EXTRA)
+        val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
+        val url = params?.url
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -163,15 +170,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(
-            context: Context,
-            url: String? = null,
-        ): Intent {
-            val intent = Intent(context, DuckChatWebViewActivity::class.java)
-            intent.putExtra(URL_EXTRA, url)
-            return intent
-        }
-        private const val URL_EXTRA = "URL_EXTRA"
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
