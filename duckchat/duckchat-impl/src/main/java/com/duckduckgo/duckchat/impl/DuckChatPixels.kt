@@ -36,8 +36,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_MENU_SETTING_OFF("aichat_menu_setting_off"),
     DUCK_CHAT_MENU_SETTING_ON("aichat_menu_setting_on"),
     DUCK_CHAT_SETTINGS_PRESSED("settings_aichat_pressed"),
-    DEDICATED_WEBVIEW_NEW_TAB_REQUESTED("m_dedicated_webview_new_tab_requested"),
-    DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
 }
 
 @ContributesMultibinding(AppScope::class)

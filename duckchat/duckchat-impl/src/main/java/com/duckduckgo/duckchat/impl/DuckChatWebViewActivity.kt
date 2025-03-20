@@ -27,14 +27,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_NEW_TAB_REQUESTED
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED
 import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -51,9 +48,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
-
-    @Inject
-    lateinit var pixel: Pixel
 
     @Inject
     @Named("ContentScopeScripts")
@@ -95,14 +89,11 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
                     isUserGesture: Boolean,
                     resultMsg: Message?,
                 ): Boolean {
-                    pixel.fire(DEDICATED_WEBVIEW_NEW_TAB_REQUESTED)
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
                         startActivity(browserNav.openInNewTab(this@DuckChatWebViewActivity, newWindowUrl))
                         return true
-                    } else {
-                        pixel.fire(DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED)
                     }
                     return false
                 }
