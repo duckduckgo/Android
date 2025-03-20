@@ -162,6 +162,6 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearCalledThenWebTrackersAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockWebTrackersBlockedRepository.deleteAll())
+        verify(mockWebTrackersBlockedRepository).deleteAll()
     }
 }
