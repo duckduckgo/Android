@@ -514,7 +514,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
-                is TrackerAnimationInfoPanel -> Unit // TODO delete from list
+                is TrackerAnimationInfoPanel -> Unit
             }
         }
     }
