@@ -20,8 +20,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class DuckPlayerPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS("duckplayer_overlay_youtube_impressions"),
+    DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE("duckplayer_overlay_youtube_impressions_unique"),
     DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY("duckplayer_view-from_youtube_main-overlay"),
+    DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE("duckplayer_view-from_youtube_main-overlay_unique"),
     DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE("duckplayer_overlay_youtube_watch_here"),
+    DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE("duckplayer_overlay_youtube_watch_here_unique"),
+    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE("duckplayer_overlay_youtube_thumbnail-play"),
+    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE("duckplayer_overlay_youtube_thumbnail-play_unique"),
     DUCK_PLAYER_WATCH_ON_YOUTUBE("duckplayer_watch_on_youtube"),
     DUCK_PLAYER_DAILY_UNIQUE_VIEW("duckplayer_daily-unique-view"),
     DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC("duckplayer_view-from_youtube_automatic"),
