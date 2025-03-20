@@ -54,6 +54,7 @@
         app:layout_constraintStart_toEndOf="@+id/infoPanelAnimatedImage"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body2"
-        tools:text="396 trackers blocked in the last 7 days" />
+        tools:text="396 trackers blocked in the last 7 days"
+        tools:ignore="InvalidColorAttribute" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
