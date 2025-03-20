@@ -59,8 +59,8 @@
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/keyline_1"
-                    android:layout_marginBottom="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginBottom="@dimen/keyline_3"
                     android:layout_marginHorizontal="@dimen/keyline_4"
                     style="@style/Widget.DuckDuckGo.OmnibarCardView"
                     android:stateListAnimator="@drawable/fade_omnibar_state_selector">
