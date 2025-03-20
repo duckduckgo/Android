@@ -148,4 +148,15 @@ class DataUriParserTest {
         val parsed = testee.generate("data:application/octet-stream;base64,JVBERi0xLjMKJeL") as ParsedDataUri
         assertEquals("pdf", parsed.filename.fileType)
     }
+
+    @Test
+    fun whenFilenameParameterIsProvidedThenItIsUsedInParsedDataUri() {
+        val parseResult = testee.generate("data:text/plain;base64,Qk1AwgEA", "file_name", "txt")
+        assertTrue(parseResult is ParsedDataUri)
+        parseResult as ParsedDataUri
+
+        assertEquals("file_name.txt", parseResult.filename.toString())
+        assertEquals("txt", parseResult.filename.fileType)
+        assertEquals("file_name", parseResult.filename.name)
+    }
 }

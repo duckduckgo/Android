@@ -25,7 +25,7 @@ import okio.ByteString.Companion.decodeBase64
 
 class DataUriParser @Inject constructor() {
 
-    fun generate(url: String): ParseResult {
+    fun generate(url: String, fileName: String? = null, fileType: String? = null): ParseResult {
         val offset = url.indexOf(',')
         if (offset == -1) {
             return ParseResult.Invalid
@@ -46,8 +46,8 @@ class DataUriParser @Inject constructor() {
         val fileTypeGeneral = result.groupValues[REGEX_GROUP_FILE_TYPE_GENERAL]
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
 
-        val suffix = parseSuffix(mimeType, url, data)
-        val filename = UUID.randomUUID().toString()
+        val suffix = fileType ?: parseSuffix(mimeType, url, data)
+        val filename = fileName ?: UUID.randomUUID().toString()
         val generatedFilename = GeneratedFilename(name = filename, fileType = suffix)
 
         return ParsedDataUri(fileTypeGeneral, fileTypeSpecific, data, mimeType, generatedFilename)
