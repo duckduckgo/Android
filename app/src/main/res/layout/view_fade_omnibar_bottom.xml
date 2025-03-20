@@ -27,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/daxColorToolbar">
 
         <androidx.appcompat.widget.Toolbar
@@ -58,7 +58,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_2"
                     android:layout_marginBottom="@dimen/keyline_3"
                     android:layout_marginHorizontal="@dimen/keyline_4"
