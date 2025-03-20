@@ -26,11 +26,11 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
     featureName = "experimentalUITheming",
 )
 interface ExperimentalUIThemingFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     @InternalAlwaysEnabled
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     @InternalAlwaysEnabled
     fun browserNavigationBar(): Toggle
 }
