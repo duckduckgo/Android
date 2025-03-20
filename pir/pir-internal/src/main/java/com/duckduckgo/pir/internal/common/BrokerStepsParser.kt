@@ -22,6 +22,8 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
+import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -45,22 +47,23 @@ interface BrokerStepsParser {
     ): BrokerStep?
 
     sealed class BrokerStep(
-        open var brokerName: String? = null,
+        open val brokerName: String = "", // this will be set later / not coming from json
         open val stepType: String,
         open val actions: List<BrokerAction>,
     ) {
         data class ScanStep(
-            override var brokerName: String? = null,
+            override val brokerName: String = "", // this will be set later / not coming from json
             override val stepType: String,
             override val actions: List<BrokerAction>,
             val scanType: String,
         ) : BrokerStep(brokerName, stepType, actions)
 
         data class OptOutStep(
-            override var brokerName: String? = null,
+            override val brokerName: String = "", // this will be set later / not coming from json
             override val stepType: String,
             override val actions: List<BrokerAction>,
             val optOutType: String,
+            val profilesToOptOut: List<ExtractedProfile> = emptyList(),
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -68,6 +71,7 @@ interface BrokerStepsParser {
 @ContributesBinding(AppScope::class)
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
+    private val repository: PirRepository,
 ) : BrokerStepsParser {
     val adapter: JsonAdapter<BrokerStep> by lazy {
         Moshi.Builder()
@@ -97,8 +101,19 @@ class RealBrokerStepsParser @Inject constructor(
         stepsJson: String,
     ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            adapter.fromJson(stepsJson)?.apply {
-                this.brokerName = brokerName
+            adapter.fromJson(stepsJson)?.run {
+                if (this is OptOutStep) {
+                    this.copy(
+                        brokerName = brokerName,
+                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
+                            it.score > 1
+                        }?.map {
+                            it.scrapedData
+                        } ?: emptyList(),
+                    )
+                } else {
+                    (this as ScanStep).copy(brokerName = brokerName)
+                }
             }
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }

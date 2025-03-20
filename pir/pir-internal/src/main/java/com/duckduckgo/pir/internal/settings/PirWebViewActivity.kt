@@ -45,7 +45,7 @@ class PirWebViewActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         lifecycleScope.launch(dispatcherProvider.io()) {
-            pirOptOut.debugExecute(listOf("Clubset"), binding.pirDebugWebView).also {
+            pirOptOut.debugExecute(listOf("Verecor"), binding.pirDebugWebView).also {
                 finish()
             }
         }

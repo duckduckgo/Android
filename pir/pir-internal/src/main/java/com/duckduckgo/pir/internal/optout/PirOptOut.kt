@@ -20,6 +20,7 @@ import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
@@ -124,6 +125,8 @@ class RealPirOptOut @Inject constructor(
                 repository.getBrokerOptOutSteps(broker)?.run {
                     brokerStepsParser.parseStep(broker, this)
                 }
+            }.filter {
+                (it as OptOutStep).profilesToOptOut.isNotEmpty()
             }.splitIntoParts(maxWebViewCount)
                 .mapIndexed { index, part ->
                     async {
@@ -181,6 +184,8 @@ class RealPirOptOut @Inject constructor(
                 repository.getBrokerOptOutSteps(broker)?.run {
                     brokerStepsParser.parseStep(broker, this)
                 }
+            }.filter {
+                (it as OptOutStep).profilesToOptOut.isNotEmpty()
             }.splitIntoParts(maxWebViewCount)
                 .mapIndexed { index, part ->
                     async {

@@ -76,6 +76,7 @@ sealed class BrokerAction(
 
     data class FillForm(
         override val id: String,
+        override val dataSource: DataSource? = DataSource.EXTRACTED_PROFILE,
         val elements: List<ElementSelector>,
         val selector: String,
     ) : BrokerAction(id) {

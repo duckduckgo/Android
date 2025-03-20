@@ -32,6 +32,10 @@ internal fun getMaximumParallelRunners(): Int {
 }
 
 internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
-    val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
-    return this.chunked(chunkSize)
+    return if (this.isEmpty()) {
+        emptyList()
+    } else {
+        val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
+        this.chunked(chunkSize)
+    }
 }

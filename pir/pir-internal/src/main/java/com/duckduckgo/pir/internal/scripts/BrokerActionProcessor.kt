@@ -117,7 +117,6 @@ class RealBrokerActionProcessor(
         webView: WebView,
         actionResultListener: ActionResultListener,
     ) {
-        logcat { "PIR-OPT-OUT: 7" }
         registeredActionResultListener = actionResultListener
         pirMessagingInterface.register(
             webView,
@@ -132,7 +131,6 @@ class RealBrokerActionProcessor(
                 }
             },
         )
-        logcat { "PIR-OPT-OUT: 8" }
     }
 
     override fun pushAction(

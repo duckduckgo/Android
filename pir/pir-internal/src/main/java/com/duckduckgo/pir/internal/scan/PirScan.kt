@@ -24,6 +24,7 @@ import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
 import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
+import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
@@ -183,11 +184,6 @@ class RealPirScan @Inject constructor(
             )
             Result.success(Unit)
         }
-    }
-
-    private fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
-        val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
-        return this.chunked(chunkSize)
     }
 
     override suspend fun executeAllBrokers(
