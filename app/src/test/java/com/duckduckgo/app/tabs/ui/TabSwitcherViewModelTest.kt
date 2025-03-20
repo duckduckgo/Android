@@ -585,6 +585,39 @@ class TabSwitcherViewModelTest {
         assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
     }
 
+    @Test
+    fun `when Animation Tile visible then impressions pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelVisible()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+    }
+
+    @Test
+    fun `when Animation Tile clicked then tapped pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelClicked()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED)
+    }
+
+    @Test
+    fun `when Animation Tile negative button clicked then dismiss pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationTileNegativeButtonClicked()
+
+        verify(mockPixel).fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to "15"))
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
