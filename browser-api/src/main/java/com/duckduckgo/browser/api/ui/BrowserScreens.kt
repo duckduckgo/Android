@@ -24,13 +24,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 sealed class BrowserScreens {
 
     /**
-     * Use this model to launch the Browser screen
-     */
-    data class BrowserActivityWithParams(
-        val url: String,
-    ) : GlobalActivityStarter.ActivityParams
-
-    /**
      * Use this model to launch the standalone WebView
      */
     data class WebViewActivityWithParams(

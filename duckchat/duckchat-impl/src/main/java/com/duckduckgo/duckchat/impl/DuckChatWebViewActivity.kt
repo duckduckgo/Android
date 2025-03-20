@@ -28,7 +28,7 @@ import android.webkit.WebView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.BrowserActivityWithParams
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,7 +39,6 @@ import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEA
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -71,7 +70,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
+    lateinit var browserNav: BrowserNav
 
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
 
@@ -100,13 +99,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity() {
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        val intent = globalActivityStarter.startIntent(
-                            this@DuckChatWebViewActivity,
-                            BrowserActivityWithParams(
-                                url = newWindowUrl,
-                            ),
-                        )
-                        startActivity(intent)
+                        startActivity(browserNav.openInNewTab(this@DuckChatWebViewActivity, newWindowUrl))
                         return true
                     } else {
                         pixel.fire(DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED)
