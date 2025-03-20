@@ -42,6 +42,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -93,6 +94,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
+    @Mock
+    private lateinit var mockTabSwitcherItemsObserver: Observer<List<TabSwitcherItem>>
+
     private val commandCaptor = argumentCaptor<Command>()
 
     @Mock
@@ -134,8 +138,12 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
-    private val tabList = listOf(TabEntity("1", position = 1), TabEntity("2", position = 2))
-    private val tabSwitcherItems = tabList.map { TabSwitcherItem.Tab.NormalTab(it, false) }
+    private val tabList = listOf(
+        TabEntity("1", url = "https://cnn.com", position = 1),
+        TabEntity("2", url = "http://test.com", position = 2),
+        TabEntity("3", position = 3),
+    )
+    private val tabSwitcherItems = tabList.map { NormalTab(it, false) }
     private val repoDeletableTabs = Channel<List<TabEntity>>()
     private val tabs = MutableLiveData<List<TabEntity>>(tabList)
 
@@ -180,6 +188,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
         )
         testee.command.observeForever(mockCommandObserver)
+        testee.tabSwitcherItems.observeForever(mockTabSwitcherItemsObserver)
     }
 
     @After
@@ -221,12 +230,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified() = runTest {
-        initializeViewModel()
-
+    fun whenTabDeletedThenRepositoryNotifiedAndCloseCommandSent() = runTest {
         val tab = tabSwitcherItems.first()
-        whenever(mockTabRepository.liveTabs)
-            .thenReturn(MutableLiveData<List<TabEntity>>(listOf(tabList.first())))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tabList.first())))
         whenever(mockTabRepository.getTab(any())).thenReturn(tab.tabEntity)
 
         initializeViewModel()
@@ -234,6 +240,9 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab)
         verify(mockTabRepository).deleteTabs(listOf(tab.id))
         verify(mockAdClickManager).clearTabId(tab.id)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
