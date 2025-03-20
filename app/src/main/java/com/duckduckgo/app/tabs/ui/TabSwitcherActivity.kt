@@ -315,6 +315,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     tabTouchHelper.mode = it.mode
 
                     invalidateOptionsMenu()
+
+                    if (firstTimeLoadingTabsList && it.tabItems.isNotEmpty()) {
+                        firstTimeLoadingTabsList = false
+                        scrollToActiveTab()
+                    }
                 }
             }
         } else {
