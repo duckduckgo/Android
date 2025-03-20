@@ -4333,6 +4333,10 @@ class BrowserTabFragment :
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
     }
+
+    fun onTabSwipedAway() {
+        viewModel.onTabSwipedAway()
+    }
 }
 
 private class JsOrientationHandler {
