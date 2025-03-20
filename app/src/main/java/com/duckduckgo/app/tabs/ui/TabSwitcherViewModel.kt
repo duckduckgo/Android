@@ -260,6 +260,10 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onTrackerAnimationInfoPanelVisible() {
+        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+    }
+
     private suspend fun LiveDataScope<List<TabSwitcherItem>>.collectTabItemsWithOptionalAnimationTile(
         tabEntities: List<TabEntity>,
     ) {
