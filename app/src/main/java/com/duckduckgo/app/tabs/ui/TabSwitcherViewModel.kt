@@ -152,7 +152,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
-    suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
+    fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
         if (swipingTabsFeature.isEnabled) {
             val newTab = tabItems
                 .filterIsInstance<Tab>()
@@ -176,11 +176,13 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onTabSelected(tabId: String) {
-        val mode = _selectionViewState.value.mode as? Selection ?: Normal
+        val mode = selectionViewState.value.mode as? Selection ?: Normal
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
             if (tabId in mode.selectedTabs) {
+                pixel.fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
                 unselectTab(tabId)
             } else {
+                pixel.fire(AppPixelName.TAB_MANAGER_TAB_SELECTED)
                 selectTab(tabId)
             }
         } else {
@@ -208,14 +210,23 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
+
         _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabItems.map { tab -> tab.id })) }
     }
 
     fun onDeselectAllTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY, type = Daily())
+
         triggerEmptySelectionMode()
     }
 
     fun onShareSelectedTabs() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
+
         val selectedTabs = tabItems
             .filterIsInstance<SelectableTab>()
             .filter { it.isSelected && !it.isNewTabPage }
@@ -233,15 +244,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBookmarkSelectedTabs() {
-        when (val mode = selectionViewState.value.mode) {
-            is Normal -> {
-                activeTab.value?.tabId?.let { tabId ->
-                    command.value = BookmarkTabsRequest(listOf(tabId))
-                }
-            }
-            is Selection -> {
-                command.value = BookmarkTabsRequest(mode.selectedTabs)
-            }
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY, type = Daily())
+
+        (selectionViewState.value.mode as? Selection)?.let { mode ->
+            command.value = BookmarkTabsRequest(mode.selectedTabs)
         }
     }
 
@@ -276,17 +283,30 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_SELECT_TABS_DAILY, type = Daily())
+
         triggerEmptySelectionMode()
     }
 
     // user has indicated they want to close all tabs
     fun onCloseAllTabsRequested() {
         command.value = Command.CloseAllTabsRequest(tabItems.size)
+
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY, type = Daily())
     }
 
     // user has indicated they want to close selected tabs
-    fun onCloseSelectedTabsRequested() {
+    fun onCloseSelectedTabsRequested(fromOverflowMenu: Boolean = false) {
+        if (fromOverflowMenu) {
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS)
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY, type = Daily())
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS)
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_DAILY, type = Daily())
+        }
+
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val allTabsCount = tabItems.size
             command.value = if (allTabsCount == selectedTabs.size) {
@@ -299,6 +319,9 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has indicated they want to close all tabs except the selected ones
     fun onCloseOtherTabsRequested() {
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS)
+        pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY, type = Daily())
+
         (selectionViewState.value.mode as? Selection)?.selectedTabs?.let { selectedTabs ->
             val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
             if (otherTabsIds.isNotEmpty()) {
@@ -307,7 +330,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    // user has confirmed they want to close tabs based on a selection
+    // user has confirmed they want to close tabs
     fun onCloseTabsConfirmed(tabIds: List<String>) {
         viewModelScope.launch {
             if (selectionViewState.value.mode is Selection) {
@@ -315,11 +338,16 @@ class TabSwitcherViewModel @Inject constructor(
             }
 
             if (tabItems.size == tabIds.size) {
-                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+                pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
+
+                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                 deleteTabs(tabIds)
                 command.value = Command.Close
             } else {
+                pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
+                pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY, type = Daily())
+
                 // mark tabs as deletable and show undo snackbar
                 tabRepository.markDeletable(tabIds)
                 command.value = Command.ShowUndoDeleteTabsMessage(tabIds)
@@ -387,7 +415,7 @@ class TabSwitcherViewModel @Inject constructor(
     private fun selectTab(tabId: String) = selectTabs(listOf(tabId))
 
     private fun unselectTabs(tabIds: List<String>) {
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+        (selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             _selectionViewState.update {
                 it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs - tabIds.toSet()))
             }
@@ -395,7 +423,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     private fun selectTabs(tabIds: List<String>) {
-        (_selectionViewState.value.mode as? Selection)?.let { selectionMode ->
+        (selectionViewState.value.mode as? Selection)?.let { selectionMode ->
             _selectionViewState.update {
                 it.copy(mode = Selection(selectedTabs = selectionMode.selectedTabs + tabIds.toSet()))
             }
@@ -403,7 +431,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onEmptyAreaClicked() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         }
     }
@@ -411,7 +439,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
             command.value = Command.Close
@@ -421,7 +449,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBackButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is Selection) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
             command.value = Command.Close
@@ -429,7 +457,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onMenuOpened() {
-        pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
+            pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+        }
     }
 
     fun onDownloadsMenuPressed() {
@@ -471,14 +503,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onFabClicked() {
         when (selectionViewState.value.dynamicInterface.fabType) {
-            FabType.NEW_TAB -> {
-                viewModelScope.launch {
-                    onNewTabRequested(fromOverflowMenu = false)
-                }
-            }
-            FabType.CLOSE_TABS -> {
-                onCloseSelectedTabsRequested()
-            }
+            FabType.NEW_TAB -> onNewTabRequested()
+            FabType.CLOSE_TABS -> onCloseSelectedTabsRequested()
         }
     }
 
