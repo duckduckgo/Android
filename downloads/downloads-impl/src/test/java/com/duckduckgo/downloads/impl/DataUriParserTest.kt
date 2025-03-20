@@ -150,13 +150,33 @@ class DataUriParserTest {
     }
 
     @Test
-    fun whenFilenameParameterIsProvidedThenItIsUsedInParsedDataUri() {
-        val parseResult = testee.generate("data:text/plain;base64,Qk1AwgEA", "file_name", "txt")
+    fun whenFileNameAndFileTypeProvidedThenParseDataUriWithProvidedFileNameAndFileType() {
+        val parseResult = testee.generate("data:text/plain;base64,Qk1AwgEA", fileName = "file_name", fileType = "txt")
         assertTrue(parseResult is ParsedDataUri)
         parseResult as ParsedDataUri
 
         assertEquals("file_name.txt", parseResult.filename.toString())
         assertEquals("txt", parseResult.filename.fileType)
         assertEquals("file_name", parseResult.filename.name)
+    }
+
+    @Test
+    fun whenFileNameProvidedThenParseDataUriWithProvidedFileName() {
+        val parseResult = testee.generate("data:image/jpeg;base64,RUJQVlA4WAo", fileName = "file_name")
+        assertTrue(parseResult is ParsedDataUri)
+        parseResult as ParsedDataUri
+
+        assertEquals("file_name.jpg", parseResult.filename.toString())
+        assertEquals("jpg", parseResult.filename.fileType)
+        assertEquals("file_name", parseResult.filename.name)
+    }
+
+    @Test
+    fun whenFileTypeProvidedThenParseDataUriWithProvidedFileType() {
+        val parseResult = testee.generate("data:image/jpeg;base64,RUJQVlA4WAo", fileType = "txt")
+        assertTrue(parseResult is ParsedDataUri)
+        parseResult as ParsedDataUri
+
+        assertEquals("txt", parseResult.filename.fileType)
     }
 }
