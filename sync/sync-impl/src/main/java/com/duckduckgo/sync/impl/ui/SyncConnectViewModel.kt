@@ -114,6 +114,7 @@ class SyncConnectViewModel @Inject constructor(
                         }
                         is LoggedIn -> {
                             polling = false
+                            syncPixels.fireLoginPixel()
                             command.send(LoginSuccess)
                         }
                     }

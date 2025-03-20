@@ -41,7 +41,6 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -78,7 +77,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var exchangeInvitationCode: String? = null
+    private var barcodeContents: String? = null
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
@@ -114,10 +113,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (!shouldExchangeKeysToSyncAnotherDevice) {
             syncAccountRepository.getRecoveryCode()
         } else {
-            syncAccountRepository.generateExchangeInvitationCode().also {
-                exchangeInvitationCode = it.getOrNull()
-            }
+            syncAccountRepository.generateExchangeInvitationCode()
         }.onSuccess { connectQR ->
+            barcodeContents = connectQR
             val qrBitmap = withContext(dispatchers.io()) {
                 qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
             }
@@ -135,18 +133,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val shouldExchangeKeysToSyncAnotherDevice = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
-            if (!shouldExchangeKeysToSyncAnotherDevice) {
-                syncAccountRepository.getRecoveryCode()
-            } else {
-                if (exchangeInvitationCode != null) {
-                    Success(exchangeInvitationCode)
-                } else {
-                    Error(reason = "Exchange code is null").also {
-                        Timber.e("Sync-exchange: ${it.reason}")
-                    }
-                }
-            }.getOrNull()?.let { code ->
+            barcodeContents?.let { code ->
                 clipboard.copyToClipboard(code)
                 command.send(ShowMessage(string.sync_code_copied_message))
             } ?: command.send(FinishWithError)

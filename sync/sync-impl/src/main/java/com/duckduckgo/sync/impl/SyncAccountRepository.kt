@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.API_CODE.NOT_FOUND
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
@@ -87,14 +88,14 @@ class AppSyncAccountRepository @Inject constructor(
 ) : SyncAccountRepository {
 
     /**
-     * If there is a key-exchange invitation in progress, we need to keep a reference to them
-     * There are separate invitation details for the inviter and the receiver
+     * If there is a key-exchange flow in progress, we need to keep a reference to them
+     * There are separate device details for the inviter and the receiver
      *
      * Inviter is reset every time a new exchange invitation code is created.
      * Receiver is reset every time an exchange invitation is received.
      */
-    private var pendingInvitationAsInviter: PendingInvitation? = null
-    private var pendingInvitationAsReceiver: PendingInvitation? = null
+    private var exchangeDeviceDetailsAsInviter: DeviceDetailsForKeyExchange? = null
+    private var exchangeDeviceDetailsAsReceiver: DeviceDetailsForKeyExchange? = null
 
     private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
@@ -144,7 +145,7 @@ class AppSyncAccountRepository @Inject constructor(
                 return@let null
             }
 
-            return completeExchange(it)
+            return onInvitationCodeReceived(it)
         }
 
         Timber.e("Sync: code is not supported")
@@ -165,50 +166,39 @@ class AppSyncAccountRepository @Inject constructor(
         }.getOrDefault(UNKNOWN)
     }
 
-    private fun completeExchange(invitationCode: InvitationCode): Result<Boolean> {
+    private fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
         // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - B. code is an exchange code $invitationCode")
 
-        // generate new ID and and public/private key-pair for receiving device
-        val thisDeviceKeyId = deviceKeyGenerator.generate()
-        val thisDeviceKeyPair = nativeLib.prepareForConnect()
-
-        pendingInvitationAsReceiver = PendingInvitation(
-            keyId = thisDeviceKeyId,
-            privateKey = thisDeviceKeyPair.secretKey,
-            publicKey = thisDeviceKeyPair.publicKey,
-        )
-        val deviceName = syncDeviceIds.deviceName()
-
-        Timber.i(
-            "Sync: details for this (receiver) device:" +
-                "\n\tkey ID is $thisDeviceKeyId" +
-                "\n\tpublic key is ${thisDeviceKeyPair.publicKey}" +
-                "\n\tdevice name is $deviceName",
-        )
+        // generate new ID and public/private key-pair for receiving device
+        val deviceDetailsAsReceiver = kotlin.runCatching {
+            generateReceiverDeviceDetails()
+        }.getOrElse {
+            return Error(code = EXCHANGE_FAILED.code, reason = "Error generating receiver key-pair").alsoFireAccountErrorPixel()
+        }
 
         val invitedDeviceDetails = InvitedDeviceDetails(
-            keyId = thisDeviceKeyId,
-            publicKey = thisDeviceKeyPair.publicKey,
-            deviceName = deviceName,
+            keyId = deviceDetailsAsReceiver.keyId,
+            publicKey = deviceDetailsAsReceiver.publicKey,
+            deviceName = syncDeviceIds.deviceName(),
         )
 
-        kotlin.runCatching {
+        val encryptedPayload = kotlin.runCatching {
             val payload = Adapters.invitedDeviceAdapter.toJson(invitedDeviceDetails)
-            val encrypted = nativeLib.seal(payload, invitationCode.publicKey)
-            return syncApi.sendEncryptedMessage(invitationCode.keyId, encrypted)
+            nativeLib.seal(payload, invitationCode.publicKey)
         }.getOrElse { throwable ->
             throwable.asErrorResult().alsoFireAccountErrorPixel()
-            return Error(code = GENERIC_ERROR.code, reason = "Exchange: Error encrypting payload")
+            return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: Error encrypting payload")
         }
+        return syncApi.sendEncryptedMessage(invitationCode.keyId, encryptedPayload)
     }
 
     override fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult> {
         // Sync: InviteFlow - E (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - E")
 
-        val pendingInvite = pendingInvitationAsReceiver
-            ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: No pending invite initialized").also {
+        val pendingInvite = exchangeDeviceDetailsAsReceiver
+            ?: return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: No pending invite initialized").also {
                 Timber.w("Sync-exchange: no pending invite initialized")
             }
 
@@ -221,13 +211,13 @@ class AppSyncAccountRepository @Inject constructor(
                     }
                     GONE.code -> {
                         Timber.w("Sync-exchange: keys expired: ${result.reason}")
-                        return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
+                        return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: keys expired").alsoFireAccountErrorPixel()
                     }
                     else -> {
                         Timber.e("Sync-exchange: error getting encrypted recovery code: ${result.reason}")
+                        result.alsoFireAccountErrorPixel()
                     }
                 }
-                result.alsoFireAccountErrorPixel()
             }
 
             is Success -> {
@@ -236,12 +226,12 @@ class AppSyncAccountRepository @Inject constructor(
                 val decryptedJson = kotlin.runCatching {
                     nativeLib.sealOpen(result.data, pendingInvite.publicKey, pendingInvite.privateKey)
                 }.getOrNull()
-                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal").alsoFireAccountErrorPixel()
+                    ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error opening seal").alsoFireAccountErrorPixel()
 
                 val recoveryData = kotlin.runCatching {
                     Adapters.recoveryCodeAdapter.fromJson(decryptedJson)?.recovery
                 }.getOrNull()
-                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading recovery code").alsoFireAccountErrorPixel()
+                    ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error reading recovery code").alsoFireAccountErrorPixel()
 
                 return when (val loginResult = login(recoveryData)) {
                     is Success -> Success(LoggedIn)
@@ -320,20 +310,21 @@ class AppSyncAccountRepository @Inject constructor(
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - A. Generating invitation code")
 
-        // generate new ID and and public/private key-pair
-        generateInviterDeviceDetails()
+        // generate new ID and and public/private key-pair for inviter device
+        val deviceDetailsAsInviter = kotlin.runCatching {
+            generateInviterDeviceDetails()
+        }.getOrElse {
+            return Error(code = EXCHANGE_FAILED.code, reason = "Error generating inviter key-pair").alsoFireAccountErrorPixel()
+        }
 
-        val pendingInvitation = pendingInvitationAsInviter
-            ?: return Error(code = GENERIC_ERROR.code, reason = "Exchange: No pending invitation initialized").alsoFireAccountErrorPixel()
-
-        val invitationCode = InvitationCode(keyId = pendingInvitation.keyId, publicKey = pendingInvitation.publicKey)
+        val invitationCode = InvitationCode(keyId = deviceDetailsAsInviter.keyId, publicKey = deviceDetailsAsInviter.publicKey)
         val invitationWrapper = InvitationCodeWrapper(invitationCode)
 
         return kotlin.runCatching {
             val code = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
             Success(code)
         }.getOrElse {
-            Error(code = GENERIC_ERROR.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
+            Error(code = EXCHANGE_FAILED.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
         }
     }
 
@@ -405,7 +396,7 @@ class AppSyncAccountRepository @Inject constructor(
         // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - C")
 
-        val keyId = pendingInvitationAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
+        val keyId = exchangeDeviceDetailsAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
 
         return when (val result = syncApi.getEncryptedMessage(keyId)) {
             is Error -> {
@@ -413,7 +404,7 @@ class AppSyncAccountRepository @Inject constructor(
                     return Success(false)
                 } else if (result.code == GONE.code) {
                     return Error(
-                        code = CONNECT_FAILED.code,
+                        code = EXCHANGE_FAILED.code,
                         reason = "Connect: keys expired",
                     ).alsoFireAccountErrorPixel()
                 }
@@ -424,20 +415,20 @@ class AppSyncAccountRepository @Inject constructor(
                 Timber.v("Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}")
 
                 val decrypted = kotlin.runCatching {
-                    val pending = pendingInvitationAsInviter
-                        ?: return Error(code = CONNECT_FAILED.code, reason = "Exchange: No pending invitation initialized")
+                    val pending = exchangeDeviceDetailsAsInviter
+                        ?: return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: No pending invitation initialized")
                             .alsoFireAccountErrorPixel()
 
                     nativeLib.sealOpen(result.data, pending.publicKey, pending.privateKey)
                 }.getOrElse { throwable ->
                     throwable.asErrorResult().alsoFireAccountErrorPixel()
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
+                    return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error opening seal")
                 }
 
                 Timber.v("Sync-exchange: invitation acceptance received: $decrypted")
 
                 val response = Adapters.invitedDeviceAdapter.fromJson(decrypted)
-                    ?: return Error(code = GENERIC_ERROR.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
+                    ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
 
                 val otherDevicePublicKey = response.publicKey
                 val otherDeviceKeyId = response.keyId
@@ -450,7 +441,7 @@ class AppSyncAccountRepository @Inject constructor(
                 // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
                 return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {
                     Timber.w("Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}")
-                    return it.copy(code = LOGIN_FAILED.code)
+                    return it.copy(code = EXCHANGE_FAILED.code)
                 }
             }
         }
@@ -610,20 +601,35 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun generateInviterDeviceDetails() {
+    private fun generateInviterDeviceDetails(): DeviceDetailsForKeyExchange {
         Timber.i("Sync-exchange: Generating inviter device details")
-        // generate new ID and and public/private key-pair
         val keyId = deviceKeyGenerator.generate()
         val prepareForConnect = nativeLib.prepareForConnect()
 
-        PendingInvitation(
+        return DeviceDetailsForKeyExchange(
             keyId = keyId,
             privateKey = prepareForConnect.secretKey,
             publicKey = prepareForConnect.publicKey,
         ).also {
-            pendingInvitationAsInviter = it
+            exchangeDeviceDetailsAsInviter = it
             Timber.w("Sync-exchange: this (inviter) device's key ID is $keyId")
             Timber.w("Sync-exchange: this (inviter) device's public key is ${it.publicKey}")
+        }
+    }
+
+    private fun generateReceiverDeviceDetails(): DeviceDetailsForKeyExchange {
+        Timber.i("Sync-exchange: Generating receiver device details")
+        val thisDeviceKeyId = deviceKeyGenerator.generate()
+        val thisDeviceKeyPair = nativeLib.prepareForConnect()
+
+        return DeviceDetailsForKeyExchange(
+            keyId = thisDeviceKeyId,
+            privateKey = thisDeviceKeyPair.secretKey,
+            publicKey = thisDeviceKeyPair.publicKey,
+        ).also {
+            exchangeDeviceDetailsAsReceiver = it
+            Timber.w("Sync-exchange: this (receiver) device's key ID is ${it.keyId}")
+            Timber.w("Sync-exchange: this (receiver) device's public key is ${it.publicKey}")
         }
     }
 
@@ -869,6 +875,7 @@ enum class AccountErrorCodes(val code: Int) {
     CREATE_ACCOUNT_FAILED(53),
     CONNECT_FAILED(54),
     INVALID_CODE(55),
+    EXCHANGE_FAILED(56),
 }
 
 enum class CodeType {
@@ -917,7 +924,7 @@ inline fun <T> Result<T>.onFailure(action: (error: Error) -> Unit): Result<T> {
     return this
 }
 
-private data class PendingInvitation(
+private data class DeviceDetailsForKeyExchange(
     val keyId: String,
     val privateKey: String,
     var publicKey: String,
