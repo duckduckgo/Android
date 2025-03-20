@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -64,6 +65,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val toolbarHeight: Int by lazy { context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.experimentalToolbarSize).toInt() }
     private val minibarHeight: Int by lazy { context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.experimentalMinibarSize).toInt() }
+    private val omnibarTextInputSize: Float by lazy { omnibarTextInput.textSize }
+    private val minibarTextSize: Float by lazy { minibarText.textSize }
+    private val omnibarContainerHeight: Int by lazy { context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardSize).toInt() }
 
     private var targetHeight: Int = 0
     private var currentHeight: Int = 0
@@ -161,6 +165,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         toolbarContainer.updateLayoutParams {
             height = newOmnibarHeight
         }
+        omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionRatio).toDp(context)
 
         // val newShieldSize = 20.toPx(context) - ((4.toPx(context) * transitionRatio)).toInt()
         // Timber.d("lp_test; newShieldSize: ${newShieldSize}")
