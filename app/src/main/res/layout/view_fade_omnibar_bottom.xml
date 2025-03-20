@@ -27,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/daxColorToolbar">
 
         <androidx.appcompat.widget.Toolbar
@@ -52,18 +52,17 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/keyline_1"
-                    android:layout_marginBottom="@dimen/keyline_2"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginBottom="@dimen/keyline_3"
                     android:layout_marginHorizontal="@dimen/keyline_4"
-                    app:strokeWidth="1dp"
-                    app:cardCornerRadius="@dimen/largeShapeCornerRadius"
+                    style="@style/Widget.DuckDuckGo.OmnibarCardView"
                     android:stateListAnimator="@drawable/fade_omnibar_state_selector">
 
                     <androidx.constraintlayout.widget.ConstraintLayout

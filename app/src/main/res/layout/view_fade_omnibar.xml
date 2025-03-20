@@ -34,7 +34,6 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="@dimen/experimentalToolbarSize"
-            android:background="?attr/daxColorToolbar"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -52,19 +51,18 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_1"
-                    android:layout_marginBottom="@dimen/keyline_2"
-                    android:stateListAnimator="@drawable/fade_omnibar_state_selector"
-                    app:cardCornerRadius="@dimen/largeShapeCornerRadius"
-                    app:strokeWidth="1dp">
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginBottom="@dimen/keyline_3"
+                    style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                    android:stateListAnimator="@drawable/fade_omnibar_state_selector">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
@@ -316,7 +314,6 @@
             app:layout_constraintEnd_toStartOf="@id/browserMenu"
             app:layout_constraintStart_toEndOf="@id/fireIconMenu"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <FrameLayout
             android:id="@+id/browserMenu"
