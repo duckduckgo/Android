@@ -27,6 +27,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -41,10 +42,15 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQ
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -244,6 +250,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -253,6 +260,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -263,6 +271,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -272,6 +281,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -282,6 +292,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -291,6 +302,17 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE, emptyMap(), emptyMap(), Unique())
+    }
+
+    @Test
+    fun sendDuckPlayerPixelWithPlayDoNotUseThumbnail_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
+        val pixelName = "play.do_not_use.thumbnail"
+
+        testee.sendDuckPlayerPixel(pixelName, emptyMap())
+
+        verify(mockPixel).fire(DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     // endregion
