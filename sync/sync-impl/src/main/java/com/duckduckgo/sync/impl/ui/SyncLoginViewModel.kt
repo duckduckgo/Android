@@ -124,16 +124,20 @@ class SyncLoginViewModel @Inject constructor(
             delay(POLLING_INTERVAL_EXCHANGE_FLOW)
             syncAccountRepository.pollForRecoveryCodeAndLogin()
                 .onSuccess { success ->
-                    polling = false
                     when (success) {
                         is Pending -> return@onSuccess // continue polling
-                        is AccountSwitchingRequired -> processError(Error(ALREADY_SIGNED_IN.code, "user already signed in"))
+                        is AccountSwitchingRequired -> {
+                            polling = false
+                            processError(Error(ALREADY_SIGNED_IN.code, "user already signed in"))
+                        }
                         LoggedIn -> {
+                            polling = false
                             syncPixels.fireLoginPixel()
                             command.send(LoginSucess)
                         }
                     }
                 }.onFailure {
+                    polling = false
                     processError(it)
                 }
         }

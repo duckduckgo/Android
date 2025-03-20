@@ -106,14 +106,19 @@ class SyncConnectViewModel @Inject constructor(
             delay(POLLING_INTERVAL_EXCHANGE_FLOW)
             syncAccountRepository.pollForRecoveryCodeAndLogin()
                 .onSuccess { success ->
-                    polling = false
-
                     when (success) {
                         is Pending -> return@onSuccess // continue polling
-                        is AccountSwitchingRequired -> processError(Error(ALREADY_SIGNED_IN.code, success.recoveryCode))
-                        is LoggedIn -> command.send(LoginSuccess)
+                        is AccountSwitchingRequired -> {
+                            polling = false
+                            processError(Error(ALREADY_SIGNED_IN.code, success.recoveryCode))
+                        }
+                        is LoggedIn -> {
+                            polling = false
+                            command.send(LoginSuccess)
+                        }
                     }
                 }.onFailure {
+                    polling = false
                     processError(it)
                 }
         }

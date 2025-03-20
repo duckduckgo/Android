@@ -214,10 +214,18 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.getEncryptedMessage(pendingInvite.keyId)) {
             is Error -> {
-                if (result.code == NOT_FOUND.code) {
-                    return Success(Pending)
-                } else if (result.code == GONE.code) {
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
+                when (result.code) {
+                    NOT_FOUND.code -> {
+                        Timber.v("Sync-exchange: no encrypted recovery code found yet")
+                        return Success(Pending)
+                    }
+                    GONE.code -> {
+                        Timber.w("Sync-exchange: keys expired: ${result.reason}")
+                        return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
+                    }
+                    else -> {
+                        Timber.e("Sync-exchange: error getting encrypted recovery code: ${result.reason}")
+                    }
                 }
                 result.alsoFireAccountErrorPixel()
             }

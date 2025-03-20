@@ -137,12 +137,16 @@ class EnterCodeViewModel @Inject constructor(
                 delay(POLLING_INTERVAL_EXCHANGE_FLOW)
                 syncAccountRepository.pollForRecoveryCodeAndLogin()
                     .onSuccess { success ->
-                        polling = false
-
                         when (success) {
                             is Pending -> return@onSuccess // continue polling
-                            is AccountSwitchingRequired -> command.send(AskToSwitchAccount(success.recoveryCode))
-                            LoggedIn -> onLoginSuccess(previousPrimaryKey)
+                            is AccountSwitchingRequired -> {
+                                polling = false
+                                command.send(AskToSwitchAccount(success.recoveryCode))
+                            }
+                            LoggedIn -> {
+                                polling = false
+                                onLoginSuccess(previousPrimaryKey)
+                            }
                         }
                     }.onFailure {
                         when (it.code) {
