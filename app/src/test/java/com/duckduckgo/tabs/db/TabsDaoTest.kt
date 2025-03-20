@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -370,5 +371,79 @@ class TabsDaoTest {
         val tabId = testee.selectTabByUrl("https://www.quackquackno.com/")
 
         assertNull(tabId)
+    }
+
+    @Test
+    fun whenNoTabsThenFlowSelectedTabIsNull() = runTest {
+        val selectedTab = testee.flowSelectedTab().first()
+        assertNull(selectedTab)
+    }
+
+    @Test
+    fun whenTabSelectionInsertedWithForeignKeyThatExistsThenFlowSelectedTabIsUpdated() = runTest {
+        val tab = TabEntity("TAB_ID", position = 0)
+        val tabSelection = TabSelectionEntity(1, "TAB_ID")
+        testee.insertTab(tab)
+        testee.insertTabSelection(tabSelection)
+        val selectedTab = testee.flowSelectedTab().first()
+        assertEquals(tab, selectedTab)
+    }
+
+    @Test
+    fun whenTabThatWasSelectedDeletedThenFlowSelectedTabIsNull() = runTest {
+        val tab = TabEntity("TAB_ID", position = 0)
+        val tabSelection = TabSelectionEntity(1, "TAB_ID")
+
+        testee.insertTab(tab)
+        testee.insertTabSelection(tabSelection)
+        testee.deleteTab(tab)
+
+        val selectedTab = testee.flowSelectedTab().first()
+        assertNull(selectedTab)
+    }
+
+    @Test
+    fun whenMarkTabsAsDeletableThenModifyOnlyDeletableColumn() {
+        val tab1 = TabEntity(tabId = "TAB_ID1", url = "www.duckduckgo.com", position = 0)
+        val tab2 = TabEntity(tabId = "TAB_ID2", url = "www.duckduckgo.com", position = 1)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        testee.markTabsAsDeletable(listOf(tab1.tabId, tab2.tabId))
+
+        assertEquals(tab1.copy(deletable = true), testee.tab(tab1.tabId))
+        assertEquals(tab2.copy(deletable = true), testee.tab(tab2.tabId))
+    }
+
+    @Test
+    fun whenUndoDeletableTabsThenModifyOnlyDeletableColumn() {
+        val tab1 = TabEntity(tabId = "TAB_ID1", url = "www.duckduckgo.com", position = 0, deletable = true)
+        val tab2 = TabEntity(tabId = "TAB_ID2", url = "www.duckduckgo.com", position = 1, deletable = true)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        testee.undoDeletableTabs(listOf(tab1.tabId, tab2.tabId))
+
+        assertEquals(tab1.copy(deletable = false), testee.tab(tab1.tabId))
+        assertEquals(tab2.copy(deletable = false), testee.tab(tab2.tabId))
+    }
+
+    @Test
+    fun whenDeleteTabsAndUpdateSelectionThenTabsDeletedAndSelectionUpdated() {
+        val tab1 = TabEntity(tabId = "TAB_ID1", url = "www.duckduckgo.com", position = 0)
+        val tab2 = TabEntity(tabId = "TAB_ID2", url = "www.duckduckgo.com", position = 1)
+        val tab3 = TabEntity(tabId = "TAB_ID3", url = "www.duckduckgo.com", position = 2)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        testee.insertTab(tab3)
+        testee.insertTabSelection(TabSelectionEntity(tabId = tab1.tabId))
+
+        testee.deleteTabsAndUpdateSelection(listOf(tab1.tabId, tab2.tabId))
+
+        assertNull(testee.tab(tab1.tabId))
+        assertNull(testee.tab(tab2.tabId))
+        assertNotNull(testee.tab(tab3.tabId))
+        assertEquals(tab3, testee.selectedTab())
     }
 }

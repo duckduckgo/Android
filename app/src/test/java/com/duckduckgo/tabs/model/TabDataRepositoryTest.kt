@@ -48,6 +48,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -55,6 +56,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -588,6 +590,77 @@ class TabDataRepositoryTest {
 
         // Assert: Verify the count is correct
         assertEquals(1, inactiveTabCount)
+    }
+
+    @Test
+    fun whenFlowSelectedTabEmitsThenCollect() = runTest {
+        val testee = tabDataRepository()
+        val tab = TabEntity("ID", position = 0)
+        whenever(mockDao.flowSelectedTab()).thenReturn(flowOf(tab))
+
+        val job = launch {
+            testee.flowSelectedTab.collect {
+                assertEquals(tab, it)
+            }
+        }
+
+        job.cancel()
+    }
+
+    @Test
+    fun whenUpdateTabLastAccessThenTabLastAccessUpdated() = runTest {
+        val testee = tabDataRepository()
+        val tabId = "tabid"
+        val now = now()
+
+        testee.updateTabLastAccess(tabId)
+
+        verify(mockDao).updateTabLastAccess(tabId, now)
+    }
+
+    @Test
+    fun whenMarkDeletableWithTabIdsThenTabsMarkedAsDeletable() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+
+        testee.markDeletable(tabIds)
+
+        verify(mockDao).markTabsAsDeletable(tabIds)
+    }
+
+    @Test
+    fun whenUndoDeletableWithTabIdsThenTabsMarkedAsNonDeletable() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+
+        testee.undoDeletable(tabIds)
+
+        verify(mockDao).undoDeletableTabs(tabIds)
+    }
+
+    @Test
+    fun whenGetTabByIdThenReturnTab() = runTest {
+        val testee = tabDataRepository()
+        val tabId = "tabid"
+        val tab = TabEntity(tabId)
+        whenever(mockDao.tab(tabId)).thenReturn(tab)
+
+        val result = testee.getTab(tabId)
+
+        assertEquals(tab, result)
+    }
+
+    @Test
+    fun whenDeleteTabsThenTabsDeletedAndDataCleared() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+
+        testee.deleteTabs(tabIds)
+
+        verify(mockDao).deleteTabsAndUpdateSelection(tabIds)
+        tabIds.forEach { tabId ->
+            assertNull(testee.retrieveSiteData(tabId).value)
+        }
     }
 
     private fun tabDataRepository(
