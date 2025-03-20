@@ -248,10 +248,10 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             Snackbar.LENGTH_LONG,
         )
             .apply {
-                this.setAction(R.string.downloadsDownloadFinishedActionName) {
+                this.setAction(R.string.duck_chat_download_finished_action_name) {
                     val result = downloadsFileActions.openFile(context, File(command.filePath))
                     if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                        view.makeSnackbarWithNoBottomInset(getString(R.string.duck_chat_cannot_open_file_error_message), Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
