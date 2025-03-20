@@ -49,4 +49,11 @@ interface DuckPlayerFeature {
      */
     @Toggle.DefaultValue(false)
     fun openInNewTab(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "customError" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun customError(): Toggle
 }
