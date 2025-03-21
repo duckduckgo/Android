@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
 import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -899,6 +900,7 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1EnabledThenStartExperimentVariant1AnimationCommandSent() = runTest {
         testee.onOmnibarFocusChanged(false, SERP_URL)
@@ -920,6 +922,7 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2To5AnimationCommandSent() = runTest {
         testee.onOmnibarFocusChanged(false, SERP_URL)

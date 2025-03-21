@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar.animations
 
+import android.annotation.SuppressLint
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
@@ -110,6 +111,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).progress = 0.0f
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
         val holder: LottieAnimationView = mock()
@@ -131,6 +133,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.protected_shield_experiment)
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndUnprotectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
         val holder: LottieAnimationView = mock()
@@ -152,6 +155,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.unprotected_shield_experiment)
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenDarkModeAndProtectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
         val holder: LottieAnimationView = mock()
@@ -173,6 +177,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.protected_shield_experiment)
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenDarkModeAndUnprotectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
         val holder: LottieAnimationView = mock()
@@ -194,6 +199,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.unprotected_shield_experiment_dark)
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndVariant1EnabledThenUseNonExperimentAssets() {
         val holder: LottieAnimationView = mock()
