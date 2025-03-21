@@ -11,7 +11,7 @@ tags:
       - launchApp:
           clearState: true
 
-      - runFlow: ../../shared/pre_onboarding.yaml
+      - runFlow: ../../shared/skip_all_onboarding.yaml
 
       # setup an existing credential
       - runFlow: ../steps/manually_add_existing_credential.yaml

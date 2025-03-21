@@ -365,6 +365,15 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
 
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION("duckplayer_youtube-signin-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION("duckplayer_youtube-age-restricted-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION("duckplayer_youtube-no-embed-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION("duckplayer_youtube-unknown-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE("duckplayer_youtube-signin-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE("duckplayer_youtube-age-restricted-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE("duckplayer_youtube-no-embed-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE("duckplayer_youtube-unknown-error_daily-unique"),
+
     MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED("m_malicious-site-protection_feature-toggled"),
     MALICIOUS_SITE_PROTECTION_VISIT_SITE("m_malicious-site-protection_visit-site"),
     MALICIOUS_SITE_PROTECTION_ERROR_SHOWN("m_malicious-site-protection_error-page-shown"),

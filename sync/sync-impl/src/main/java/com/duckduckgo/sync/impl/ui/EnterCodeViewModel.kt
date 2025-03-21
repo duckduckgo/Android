@@ -28,19 +28,27 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.CodeType.EXCHANGE
+import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
+import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
+import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.onFailure
+import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -92,20 +100,62 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
+        val codeType = syncAccountRepository.getCodeType(pastedCode)
         when (val result = syncAccountRepository.processCode(pastedCode)) {
             is Result.Success -> {
-                val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
-                val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
-                val commandSuccess = if (userSwitchedAccount) {
-                    syncPixels.fireUserSwitchedAccount()
-                    SwitchAccountSuccess
+                if (codeType == EXCHANGE) {
+                    pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
                 } else {
-                    LoginSuccess
+                    onLoginSuccess(previousPrimaryKey)
                 }
-                command.send(commandSuccess)
             }
             is Result.Error -> {
                 processError(result, pastedCode)
+            }
+        }
+    }
+
+    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+        val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
+        val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
+        val commandSuccess = if (userSwitchedAccount) {
+            syncPixels.fireUserSwitchedAccount()
+            SwitchAccountSuccess
+        } else {
+            LoginSuccess
+        }
+        command.send(commandSuccess)
+    }
+
+    private fun pollForRecoveryKey(
+        previousPrimaryKey: String,
+        code: String,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            var polling = true
+            while (polling) {
+                delay(POLLING_INTERVAL_EXCHANGE_FLOW)
+                syncAccountRepository.pollForRecoveryCodeAndLogin()
+                    .onSuccess { success ->
+                        when (success) {
+                            is Pending -> return@onSuccess // continue polling
+                            is AccountSwitchingRequired -> {
+                                polling = false
+                                command.send(AskToSwitchAccount(success.recoveryCode))
+                            }
+                            LoggedIn -> {
+                                polling = false
+                                onLoginSuccess(previousPrimaryKey)
+                            }
+                        }
+                    }.onFailure {
+                        when (it.code) {
+                            CONNECT_FAILED.code, LOGIN_FAILED.code -> {
+                                polling = false
+                                processError(result = it, pastedCode = code)
+                            }
+                        }
+                    }
             }
         }
     }

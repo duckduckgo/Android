@@ -33,8 +33,8 @@ class TabRendererExtensionTest {
 
     @Test
     fun whenTabIsBlankThenDisplayTitleIsDuckDuckGo() {
-        whenever(context.getString(R.string.homeTab)).thenReturn("DuckDuckGo")
-        assertEquals("DuckDuckGo", TabEntity("", position = 0).displayTitle(context))
+        whenever(context.getString(R.string.newTabMenuItem)).thenReturn("New Tab")
+        assertEquals("New Tab", TabEntity("", position = 0).displayTitle(context))
     }
 
     @Test

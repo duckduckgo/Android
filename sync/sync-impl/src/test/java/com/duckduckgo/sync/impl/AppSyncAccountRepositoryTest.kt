@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -36,6 +37,7 @@ import com.duckduckgo.sync.TestSyncFixtures.deviceFactor
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceName
 import com.duckduckgo.sync.TestSyncFixtures.deviceType
+import com.duckduckgo.sync.TestSyncFixtures.encryptedExchangeCode
 import com.duckduckgo.sync.TestSyncFixtures.encryptedRecoveryCode
 import com.duckduckgo.sync.TestSyncFixtures.failedLoginKeys
 import com.duckduckgo.sync.TestSyncFixtures.getDevicesError
@@ -43,12 +45,15 @@ import com.duckduckgo.sync.TestSyncFixtures.getDevicesSuccess
 import com.duckduckgo.sync.TestSyncFixtures.hashedPassword
 import com.duckduckgo.sync.TestSyncFixtures.invalidDecryptedSecretKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.jsonExchangeKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.listOfConnectedDevices
 import com.duckduckgo.sync.TestSyncFixtures.loginFailed
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
 import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
+import com.duckduckgo.sync.TestSyncFixtures.otherDeviceKeyId
+import com.duckduckgo.sync.TestSyncFixtures.primaryDeviceKeyId
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.protectedEncryptionKey
 import com.duckduckgo.sync.TestSyncFixtures.secretKey
@@ -70,6 +75,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -79,6 +85,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -87,6 +94,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class AppSyncAccountRepositoryTest {
 
@@ -96,6 +104,11 @@ class AppSyncAccountRepositoryTest {
     private var syncStore: SyncStore = mock()
     private var syncEngine: SyncEngine = mock()
     private var syncPixels: SyncPixels = mock()
+    private val deviceKeyGenerator: DeviceKeyGenerator = mock()
+    private val moshi = Moshi.Builder().build()
+    private val invitationCodeWrapperAdapter = moshi.adapter(InvitationCodeWrapper::class.java)
+    private val invitedDeviceDetailsAdapter = moshi.adapter(InvitedDeviceDetails::class.java)
+    private val recoveryCodeAdapter = moshi.adapter(LinkCode::class.java)
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
     }
@@ -114,6 +127,7 @@ class AppSyncAccountRepositoryTest {
             TestScope(),
             DefaultDispatcherProvider(),
             syncFeature,
+            deviceKeyGenerator,
         )
     }
 
@@ -124,7 +138,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.createAccount()
 
-        assertEquals(Result.Success(true), result)
+        assertEquals(Success(true), result)
         verify(syncStore).storeCredentials(
             userId = userId,
             deviceId = deviceId,
@@ -201,7 +215,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.logout(deviceId)
 
-        assertTrue(result is Result.Success)
+        assertTrue(result is Success)
         verify(syncStore).clearAll()
     }
 
@@ -224,7 +238,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.deleteAccount()
 
-        assertTrue(result is Result.Success)
+        assertTrue(result is Success)
         verify(syncStore).clearAll()
     }
 
@@ -234,7 +248,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
-        assertEquals(Result.Success(true), result)
+        assertEquals(Success(true), result)
         verify(syncStore).storeCredentials(
             userId = userId,
             deviceId = deviceId,
@@ -243,6 +257,186 @@ class AppSyncAccountRepositoryTest {
             secretKey = secretKey,
             token = token,
         )
+    }
+
+    @Test
+    fun whenExchangeCodeProcessedButFeatureFlagIsDisabledThenIsError() {
+        prepareForExchangeSuccess()
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+
+        val result = syncRepo.processCode(exchangeCode.encodeB64())
+        assertTrue(result is Error)
+    }
+
+    @Test
+    fun whenExchangeCodeProcessedThenInvitationAccepted() {
+        prepareForExchangeSuccess()
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+
+        val result = syncRepo.processCode(exchangeCode.encodeB64())
+
+        assertTrue(result is Success)
+        verify(syncApi).sendEncryptedMessage(eq(primaryDeviceKeyId), eq(encryptedExchangeCode))
+    }
+
+    @Test
+    fun whenExchangeCodeProcessedAndInvitationAcceptedRequestFailedThenIsError() {
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
+        prepareForExchangeSuccess()
+
+        whenever(syncApi.sendEncryptedMessage(eq(primaryDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Result.Error(reason = "error"))
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        val result = syncRepo.processCode(exchangeCode.encodeB64())
+
+        assertTrue(result is Error)
+    }
+
+    @Test
+    fun whenGettingExchangeCodeThenFormatIsCorrect() {
+        prepareForExchangeSuccess()
+        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
+        val resultJson = syncRepo.generateExchangeInvitationCode()
+        val result = parseInvitationCodeJson(resultJson)
+        assertEquals(validLoginKeys.primaryKey, result.exchangeKey.publicKey)
+        assertEquals(primaryDeviceKeyId, result.exchangeKey.keyId)
+    }
+
+    @Test
+    fun whenAttemptingPollForOtherDeviceExchangeBeforeInvitationCodeGeneratedThenIsError() {
+        prepareForExchangeSuccess()
+        val result = syncRepo.pollSecondDeviceExchangeAcknowledgement()
+        assert(result is Error)
+    }
+
+    @Test
+    fun whenPollingForOtherDeviceExchangeAndResponseReceivedThenRecoveryCodeSentSuccessfully() {
+        givenAuthenticatedDevice()
+        prepareForExchangeSuccess()
+        initiateInvitationAsPrimaryDevice()
+
+        val result = syncRepo.pollSecondDeviceExchangeAcknowledgement()
+        assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenAttemptingToPollForRecoveryCodeBeforePendingInviteReceivedThenIsError() {
+        val result = syncRepo.pollForRecoveryCodeAndLogin()
+        assertTrue(result is Error)
+    }
+
+    @Test
+    fun whenPollingForRecoveryCodeReturnsUnexpectedResponseThenIsError() {
+        prepareForExchangeSuccess()
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+        syncRepo.processCode(exchangeCode.encodeB64())
+
+        whenever(syncApi.getEncryptedMessage(otherDeviceKeyId)).thenReturn(Success("encryptedExchangeResponse"))
+        whenever(nativeLib.sealOpen("encryptedExchangeResponse", primaryKey, secretKey)).thenReturn("invalid response")
+
+        assertTrue(syncRepo.pollForRecoveryCodeAndLogin() is Error)
+    }
+
+    @Test
+    fun whenPollingForRecoveryCodeSuccessfulAndNotAlreadySignedInThenIsLoggedIn() {
+        prepareForExchangeSuccess()
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+        syncRepo.processCode(exchangeCode.encodeB64())
+
+        configureExchangeResultRecoveryReceived()
+
+        prepareForLoginSuccess()
+        val result = syncRepo.pollForRecoveryCodeAndLogin()
+        assertTrue(result.getOrNull() is ExchangeResult.LoggedIn)
+    }
+
+    @Test
+    fun whenPollingForRecoveryCodeSuccessfulAndAlreadySignedInSingleDeviceThenIsLoggedIn() {
+        prepareForExchangeSuccess()
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+        syncRepo.processCode(exchangeCode.encodeB64())
+
+        configureExchangeResultRecoveryReceived()
+        prepareForLoginSuccess()
+        configureAsSignedWithConnectedDevices(numberOfDevices = 1)
+
+        val result = syncRepo.pollForRecoveryCodeAndLogin()
+        assertTrue(result.getOrNull() is ExchangeResult.LoggedIn)
+    }
+
+    @Test
+    fun whenPollingForRecoveryCodeSuccessfulAndAlreadySignedInMultipleDevicesThenAccountSwitchingRequired() {
+        prepareForExchangeSuccess()
+
+        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
+        syncRepo.processCode(exchangeCode.encodeB64())
+
+        configureExchangeResultRecoveryReceived()
+        prepareForLoginSuccess()
+        configureAsSignedWithConnectedDevices(numberOfDevices = 2)
+
+        val result = syncRepo.pollForRecoveryCodeAndLogin()
+        assertTrue(result.getOrNull() is ExchangeResult.AccountSwitchingRequired)
+    }
+
+    private fun configureAsSignedWithConnectedDevices(numberOfDevices: Int) {
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        val devices = mutableListOf<Device>()
+        for (i in 1..numberOfDevices) {
+            devices.add(Device(deviceId = "$deviceId-$i", deviceName = "$deviceName-$i", jwIat = "", deviceType = deviceFactor))
+        }
+        whenever(syncApi.getDevices(token)).thenReturn(Success(devices))
+        whenever(syncApi.logout(token, deviceId)).thenReturn(Success(Logout(deviceId)))
+        syncRepo.getConnectedDevices()
+    }
+
+    private fun configureExchangeResultRecoveryReceived() {
+        val recoveryCodeJson = recoveryCodeAdapter.toJson((LinkCode(recovery = RecoveryCode(primaryKey, "userId"))))
+        whenever(syncApi.getEncryptedMessage(otherDeviceKeyId)).thenReturn(Success("encryptedExchangeResponse"))
+        whenever(nativeLib.sealOpen("encryptedExchangeResponse", primaryKey, secretKey)).thenReturn(recoveryCodeJson)
+    }
+
+    @Test
+    fun whenCodeIsEmptyThenCodeTypeIsUnknown() {
+        val type = syncRepo.getCodeType("")
+        assertTrue(type == CodeType.UNKNOWN)
+    }
+
+    @Test
+    fun whenCodeIsRecoveryThenCodeTypeIsIdentified() {
+        val code = recoveryCodeAdapter.toJson((LinkCode(recovery = RecoveryCode(primaryKey, "userId"))))
+        val type = syncRepo.getCodeType(code.encodeB64())
+        assertTrue(type == CodeType.RECOVERY)
+    }
+
+    @Test
+    fun whenCodeIsConnectThenCodeTypeIsIdentified() {
+        val code = recoveryCodeAdapter.toJson((LinkCode(connect = ConnectCode(deviceId, secretKey))))
+        val type = syncRepo.getCodeType(code.encodeB64())
+        assertTrue(type == CodeType.CONNECT)
+    }
+
+    @Test
+    fun whenCodeIsExchangeThenCodeTypeIsIdentified() {
+        val invitationCode = InvitationCode(keyId = primaryDeviceKeyId, publicKey = validLoginKeys.primaryKey)
+        val code = invitationCodeWrapperAdapter.toJson(InvitationCodeWrapper(exchangeKey = invitationCode))
+        val type = syncRepo.getCodeType(code.encodeB64())
+        assertTrue(type == CodeType.EXCHANGE)
     }
 
     @Test
@@ -289,7 +483,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)
 
-        assertTrue(result is Result.Success)
+        assertTrue(result is Success)
         verify(syncStore).clearAll()
         verify(syncStore).storeCredentials(
             userId = userId,
@@ -363,7 +557,7 @@ class AppSyncAccountRepositoryTest {
         val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
         val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
         val anotherRemoteDevice = Device(deviceId = "anotherRemoteDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(anotherDevice, anotherRemoteDevice, thisDevice)))
+        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOf(anotherDevice, anotherRemoteDevice, thisDevice)))
 
         val result = syncRepo.getConnectedDevices() as Success
 
@@ -392,8 +586,8 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
-        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(thisDevice, otherDevice)))
-        whenever(syncApi.logout("token", "otherDeviceId")).thenReturn(Result.Success(Logout("otherDeviceId")))
+        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOf(thisDevice, otherDevice)))
+        whenever(syncApi.logout("token", "otherDeviceId")).thenReturn(Success(Logout("otherDeviceId")))
 
         val result = syncRepo.getConnectedDevices() as Success
         verify(syncApi).logout("token", "otherDeviceId")
@@ -431,7 +625,7 @@ class AppSyncAccountRepositoryTest {
     fun whenProcessConnectCodeFromAuthenticatedDeviceThenConnectsDevice() {
         givenAuthenticatedDevice()
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
-        whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
+        whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Success(true))
 
         val result = syncRepo.processCode(jsonConnectKeyEncoded)
 
@@ -449,7 +643,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
-        whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
+        whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Success(true))
 
         val result = syncRepo.processCode(jsonConnectKeyEncoded)
 
@@ -562,7 +756,7 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.renameDevice(connectedDevice)
 
         verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString())
-        assertTrue(result is Result.Success)
+        assertTrue(result is Success)
     }
 
     @Test
@@ -581,6 +775,34 @@ class AppSyncAccountRepositoryTest {
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginSuccess)
+    }
+
+    private fun prepareForExchangeSuccess() {
+        prepareForEncryption()
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
+        whenever(syncApi.sendEncryptedMessage(eq(primaryDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Success(true))
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
+        whenever(nativeLib.seal(any(), eq(primaryKey))).thenReturn(encryptedExchangeCode)
+    }
+
+    private fun initiateInvitationAsPrimaryDevice() {
+        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
+        syncRepo.generateExchangeInvitationCode()
+        val otherDeviceDetails = InvitedDeviceDetails(keyId = otherDeviceKeyId, publicKey = "otherDevicePublicKey", deviceName = "otherDeviceName")
+        val json = invitedDeviceDetailsAdapter.toJson(otherDeviceDetails)
+        whenever(nativeLib.sealOpen(any(), eq(primaryKey), eq(secretKey))).thenReturn(json)
+        whenever(nativeLib.seal(any(), eq("otherDevicePublicKey"))).thenReturn(encryptedExchangeCode)
+        whenever(syncApi.getEncryptedMessage(primaryDeviceKeyId)).thenReturn(Success(json))
+        whenever(syncApi.sendEncryptedMessage(eq(otherDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Success(true))
+    }
+
+    private fun parseInvitationCodeJson(resultJson: Result<String>): InvitationCodeWrapper {
+        assertTrue(resultJson is Success)
+        return invitationCodeWrapperAdapter.fromJson(resultJson.getOrNull()?.decodeB64()!!)!!
     }
 
     private fun givenAuthenticatedDevice() {
@@ -608,7 +830,7 @@ class AppSyncAccountRepositoryTest {
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
         whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(Result.Success(AccountCreatedResponse(userId, token)))
+            .thenReturn(Success(AccountCreatedResponse(userId, token)))
     }
 
     private fun prepareForEncryption() {

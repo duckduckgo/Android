@@ -8,12 +8,10 @@ tags:
       - launchApp:
           clearState: true
 
-      - runFlow: ../shared/pre_onboarding.yaml
+      - runFlow: ../shared/skip_all_onboarding.yaml
 
       - inputText: "https://www.search-company.site/#ad-id-6"
       - pressKey: Enter
-      - assertVisible:
-          text: ".*Got It.*"
       - assertVisible:
           id: "ad-id-6"
       - tapOn:

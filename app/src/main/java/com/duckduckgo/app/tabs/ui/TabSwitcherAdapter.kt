@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +34,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.Transformation
+import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
@@ -49,13 +52,17 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.duckduckgo.mobile.android.R as AndroidR
 import java.io.File
-import kotlin.Int
+import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+private const val GRID_ITEM_HEIGHT_DP = 170
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -132,11 +139,12 @@ class TabSwitcherAdapter(
 
     private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tab: TabEntity) {
         val context = holder.binding.root.context
+        val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab, context)
         holder.url.text = tab.url ?: ""
         holder.url.visibility = if (tab.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab)
-        loadFavicon(tab, holder.favicon)
+        loadFavicon(tab, glide, holder.favicon)
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
@@ -149,8 +157,8 @@ class TabSwitcherAdapter(
         val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
-        loadFavicon(tab, holder.favicon)
-        loadTabPreviewImage(tab, glide, holder)
+        loadFavicon(tab, glide, holder.favicon)
+        loadTabPreviewImage(tab, glide, holder.tabPreview)
         attachTabClickListeners(
             tabViewHolder = holder,
             bindingAdapterPosition = { holder.bindingAdapterPosition },
@@ -200,7 +208,11 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
-                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder)
+                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview)
+            }
+
+            bundle.getString(DIFF_KEY_URL)?.let {
+                loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon)
             }
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
@@ -227,6 +239,7 @@ class TabSwitcherAdapter(
             bundle.getString(DIFF_KEY_URL)?.let {
                 viewHolder.url.show()
                 viewHolder.url.text = it
+                loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon)
             }
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
@@ -239,31 +252,56 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun loadFavicon(tab: TabEntity, view: ImageView) {
-        val url = tab.url ?: return
-        lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
+    private fun loadFavicon(tab: TabEntity, glide: RequestManager, view: ImageView) {
+        val url = tab.url
+        if (url.isNullOrBlank()) {
+            glide.clear(view)
+            glide.load(AndroidR.drawable.ic_dax_icon).into(view)
+        } else {
+            lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
+            }
         }
     }
 
-    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, holder: TabSwitcherViewHolder.GridTabViewHolder) {
-        val previewFile = tab.tabPreviewFile ?: return glide.clear(holder.tabPreview)
-
-        lifecycleOwner.lifecycleScope.launch {
-            val cachedWebViewPreview = withContext(dispatchers.io()) {
-                File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+    private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, tabPreview: ImageView) {
+        fun fitAndClipBottom() = object : Transformation<Bitmap> {
+            override fun transform(
+                context: Context,
+                resource: Resource<Bitmap>,
+                outWidth: Int,
+                outHeight: Int,
+            ): Resource<Bitmap> {
+                resource.get().height = GRID_ITEM_HEIGHT_DP.toPx()
+                return resource
             }
 
-            if (cachedWebViewPreview == null) {
-                glide.clear(holder.tabPreview)
-                return@launch
+            override fun updateDiskCacheKey(messageDigest: MessageDigest) {
             }
+        }
 
-            glide.load(cachedWebViewPreview)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.tabPreview)
+        val previewFile = tab.tabPreviewFile
+        if (tab.url.isNullOrBlank()) {
+            glide.load(AndroidR.drawable.ic_dax_icon_72)
+                .into(tabPreview)
+        } else if (previewFile != null) {
+            lifecycleOwner.lifecycleScope.launch {
+                val cachedWebViewPreview = withContext(dispatchers.io()) {
+                    File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+                }
 
-            holder.tabPreview.show()
+                if (cachedWebViewPreview == null) {
+                    glide.clear(tabPreview)
+                    return@launch
+                }
+
+                glide.load(cachedWebViewPreview)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .optionalTransform(fitAndClipBottom())
+                    .into(tabPreview)
+            }
+        } else {
+            glide.clear(tabPreview)
         }
     }
 
