@@ -71,6 +71,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.animations.store.TrackersBurstAnimationPreferencesStore
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -163,6 +164,9 @@ import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.StartExperimentShieldPopAnimation
+import com.duckduckgo.app.browser.commands.Command.StartExperimentTrackersBurstAnimation
+import com.duckduckgo.app.browser.commands.Command.StartExperimentV2ShieldPopAnimation
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
@@ -191,6 +195,7 @@ import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -237,6 +242,8 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -250,6 +257,8 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
+import com.duckduckgo.app.pixels.AppPixelName.TRACKERS_GREEN_BURST_ANIMATION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -257,6 +266,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_BURST
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT_MINIBAR
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOGOS_BURST
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -278,6 +292,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
@@ -312,6 +327,7 @@ import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -468,6 +484,11 @@ class BrowserTabViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val appPersonalityFeature: AppPersonalityFeature,
+    private val userStageStore: UserStageStore,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
+    private val trackersBurstAnimationPreferencesStore: TrackersBurstAnimationPreferencesStore,
+
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1515,6 +1536,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         cleanupBlobDownloadReplyProxyMaps()
+        privacyDashboardExternalPixelParams.clearPixelParams()
 
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
@@ -1997,7 +2019,12 @@ class BrowserTabViewModel @Inject constructor(
             }
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
+                val previousPrivacyShieldState = currentPrivacyShieldState()
+                privacyShieldViewState.value = previousPrivacyShieldState.copy(
+                    privacyShield = privacyProtection,
+                    trackersBlocked = site?.trackerCount ?: 0,
+                    previousTrackesBlocked = previousPrivacyShieldState.trackersBlocked,
+                )
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
@@ -3217,6 +3244,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onWebViewRefreshed() {
+        resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
@@ -4010,6 +4038,70 @@ class BrowserTabViewModel @Inject constructor(
         command.value = GenerateWebViewPreviewImage
     }
 
+    fun onAnimationFinished(
+        logos: List<TrackerLogo>,
+        hasKnownLogos: Boolean,
+    ) {
+        if (logos.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            when {
+                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled() -> handleVariant2()
+                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant5().isEnabled() -> handleVariant5()
+                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled() -> handleVariant3(hasKnownLogos, logos)
+                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant4().isEnabled() -> handleVariant4(logos)
+            }
+        }
+    }
+
+    private fun handleVariant2() {
+        command.value = StartExperimentV2ShieldPopAnimation
+        privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
+    }
+
+    private fun handleVariant5() {
+        command.value = StartExperimentShieldPopAnimation
+        privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT_MINIBAR, "true")
+    }
+
+    private suspend fun handleVariant3(
+        hasKnownLogos: Boolean,
+        logos: List<TrackerLogo>,
+    ) {
+        if (hasKnownLogos && logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD && trackersBurstAnimationPreferencesStore.fetchCount() < 3) {
+            trackersBurstAnimationPreferencesStore.incrementCount()
+            command.value = StartExperimentTrackersBurstAnimation(logos, false)
+            pixel.fire(
+                TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
+                mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != ESTABLISHED}"),
+            )
+            privacyDashboardExternalPixelParams.setPixelParams(LOGOS_BURST, "true")
+        } else {
+            command.value = StartExperimentShieldPopAnimation
+        }
+    }
+
+    private suspend fun handleVariant4(logos: List<TrackerLogo>) {
+        if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD && trackersBurstAnimationPreferencesStore.fetchCount() < 3) {
+            trackersBurstAnimationPreferencesStore.incrementCount()
+            command.value = StartExperimentTrackersBurstAnimation(logos, true)
+            pixel.fire(
+                TRACKERS_GREEN_BURST_ANIMATION_SHOWN,
+                mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != ESTABLISHED}"),
+            )
+            privacyDashboardExternalPixelParams.setPixelParams(GREEN_BURST, "true")
+        } else {
+            command.value = StartExperimentShieldPopAnimation
+        }
+    }
+
+    fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
+
+    fun resetTrackersCount() {
+        site?.resetTrackingEvents()
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
@@ -4025,6 +4117,8 @@ class BrowserTabViewModel @Inject constructor(
 
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
+
+        internal const val TRACKER_LOGO_ANIMATION_THRESHOLD = 2
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(

@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.DELIGHTFUL
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -119,6 +120,10 @@ class BrowserNavigationBarViewIntegration(
                     FADE -> {
                         browserTabFragmentBinding.fadeOmnibar.viewTreeObserver.addOnPreDrawListener(topFadeOmnibarOffsetChangedListener)
                     }
+
+                    DELIGHTFUL -> {
+                        // no-op
+                    }
                 }
             }
 
@@ -130,6 +135,10 @@ class BrowserNavigationBarViewIntegration(
 
                     FADE -> {
                         browserTabFragmentBinding.fadeOmnibarBottom.viewTreeObserver.addOnPreDrawListener(bottomFadeOmnibarPreDrawListener)
+                    }
+
+                    DELIGHTFUL -> {
+                        // no-op
                     }
                 }
             }

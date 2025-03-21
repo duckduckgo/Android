@@ -40,16 +40,19 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.DELIGHTFUL
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
@@ -84,6 +87,8 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
+                        binding.rootView.removeView(binding.delightfulOmnibar)
+                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
                     }
                     FADE -> {
                         // remove bottom variant
@@ -92,6 +97,18 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
+                        binding.rootView.removeView(binding.delightfulOmnibar)
+                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
+                    }
+                    DELIGHTFUL -> {
+                        // remove bottom variant
+                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
+
+                        // remove all other omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
             }
@@ -105,6 +122,8 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
+                        binding.rootView.removeView(binding.delightfulOmnibar)
+                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
                     }
                     FADE -> {
                         // remove top variant
@@ -113,6 +132,18 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
+                        binding.rootView.removeView(binding.delightfulOmnibar)
+                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
+                    }
+                    DELIGHTFUL -> {
+                        // remove top variant
+                        binding.rootView.removeView(binding.delightfulOmnibar)
+
+                        // remove all other omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
 
@@ -159,6 +190,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
+        fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean)
     }
 
     data class OmnibarTextState(
@@ -185,6 +217,7 @@ class Omnibar(
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibar
                     FADE -> binding.fadeOmnibar
+                    DELIGHTFUL -> binding.delightfulOmnibar
                 }
             }
 
@@ -192,6 +225,7 @@ class Omnibar(
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibarBottom
                     FADE -> binding.fadeOmnibarBottom
+                    DELIGHTFUL -> binding.delightfulOmnibarBottom
                 }
             }
         }
@@ -221,6 +255,10 @@ class Omnibar(
 
     val shieldIcon: LottieAnimationView by lazy {
         newOmnibar.shieldIcon
+    }
+
+    val shieldIconExperiment: LottieAnimationView by lazy {
+        newOmnibar.shieldIconExperiment
     }
 
     val textInputRootView: View by lazy {
@@ -306,6 +344,11 @@ class Omnibar(
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
     }
 
+    fun renderPrivacyViewState(privacyShieldViewState: PrivacyShieldViewState) {
+        Timber.d("Omnibar: renderPrivacyViewState $privacyShieldViewState")
+        newOmnibar.reduce(StateChange.PrivacyStateChange(privacyShieldViewState))
+    }
+
     fun setPrivacyShield(privacyShield: PrivacyShield) {
         newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
     }
@@ -377,6 +420,10 @@ class Omnibar(
         newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
     }
 
+    fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
+    }
+
     fun cancelTrackersAnimation() {
         newOmnibar.decorate(Decoration.CancelAnimations)
     }
@@ -432,6 +479,11 @@ class Omnibar(
                         scrollY = scrollY,
                         oldScrollY = oldScrollY,
                     )
+                    DELIGHTFUL -> binding.delightfulOmnibar.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
                 }
             }
 
@@ -441,6 +493,11 @@ class Omnibar(
                         // no-op
                     }
                     FADE -> binding.fadeOmnibarBottom.onScrollChanged(
+                        scrollableView = v,
+                        scrollY = scrollY,
+                        oldScrollY = oldScrollY,
+                    )
+                    DELIGHTFUL -> binding.delightfulOmnibarBottom.onScrollChanged(
                         scrollableView = v,
                         scrollY = scrollY,
                         oldScrollY = oldScrollY,
@@ -459,6 +516,16 @@ class Omnibar(
 
                 OmnibarPosition.BOTTOM -> {
                     binding.fadeOmnibarBottom.resetTransitionDelayed()
+                }
+            }
+        } else if (omnibarType == DELIGHTFUL) {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    binding.delightfulOmnibar.resetTransitionDelayed()
+                }
+
+                OmnibarPosition.BOTTOM -> {
+                    binding.delightfulOmnibarBottom.resetTransitionDelayed()
                 }
             }
         }
