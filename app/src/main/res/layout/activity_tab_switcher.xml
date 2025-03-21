@@ -14,27 +14,41 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
-    android:orientation="vertical"
-    tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/include_default_toolbar" />
+    <include
+        android:id="@+id/toolbarInclude"
+        layout="@layout/include_default_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tabsRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="@dimen/keyline_2"
+        android:paddingHorizontal="@dimen/keyline_2"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingBottom="76dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
         tools:listitem="@layout/item_tab_grid"
         tools:showIn="@layout/activity_tab_switcher"
         tools:spanCount="2" />
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/tabsFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/keyline_4"
+        tools:text="Test"
+        app:icon="@drawable/ic_add_24" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

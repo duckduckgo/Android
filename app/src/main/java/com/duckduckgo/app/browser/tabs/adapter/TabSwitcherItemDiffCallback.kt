@@ -19,8 +19,12 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 
-class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitcherItem>) : DiffUtil.Callback() {
+class TabSwitcherItemDiffCallback(
+    old: List<TabSwitcherItem>,
+    new: List<TabSwitcherItem>,
+) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
     private val oldList = old.toList()
@@ -42,7 +46,8 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
                 oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
-                    oldItem.tabEntity.url == newItem.tabEntity.url
+                    oldItem.tabEntity.url == newItem.tabEntity.url &&
+                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
             }
             else -> false
         }
@@ -70,6 +75,10 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
 
                 if (oldItem.tabEntity.tabPreviewFile != newItem.tabEntity.tabPreviewFile) {
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
+                }
+
+                if ((oldItem as? SelectableTab)?.isSelected != (newItem as? SelectableTab)?.isSelected) {
+                    diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
             }
         }
@@ -114,5 +123,6 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
         const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
+        const val DIFF_KEY_SELECTION = "selection"
     }
 }
