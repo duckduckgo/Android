@@ -67,11 +67,6 @@ android {
         } else {
             buildConfigField "long", "BUILD_DATE_MILLIS", "0"
         }
-        if (project.hasProperty('disable-visual-design-experiment')) {
-            buildConfigField "boolean", "VISUAL_DESIGN_EXPERIMENT_ENABLED_BY_DEFAULT", "false"
-        } else {
-            buildConfigField "boolean", "VISUAL_DESIGN_EXPERIMENT_ENABLED_BY_DEFAULT", "true"
-        }
 
         namespace 'com.duckduckgo.app.browser'
     }
