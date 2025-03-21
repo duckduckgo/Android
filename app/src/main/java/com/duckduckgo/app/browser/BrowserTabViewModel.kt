@@ -173,8 +173,6 @@ import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
-import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
-import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -314,7 +312,9 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -3561,7 +3561,7 @@ class BrowserTabViewModel @Inject constructor(
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
                     withContext(dispatchers.main()) {
                         response?.let {
-                            command.value = it
+                            command.value = SendResponseToJs(it)
                         }
                     }
                 }
@@ -4032,6 +4032,10 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             command.postValue(ShowAutoconsentAnimation(isCosmetic))
         }
+    }
+
+    fun onTabSwipedAway() {
+        command.value = GenerateWebViewPreviewImage
     }
 
     fun onAnimationFinished(

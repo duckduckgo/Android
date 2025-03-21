@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.duckchat
+package com.duckduckgo.duckchat.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -39,11 +38,11 @@ class RealDuckChatJSHelperTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockDuckChat: DuckChat = mock()
-    private val mockPreferencesStore: DuckChatPreferencesStore = mock()
+    private val mockDataStore: DuckChatDataStore = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
-        preferencesStore = mockPreferencesStore,
+        dataStore = mockDataStore,
     )
 
     @Test
@@ -68,15 +67,15 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataAndDuckChatEnabledThenReturnSendResponseToJsWithDuckChatEnabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
@@ -84,24 +83,24 @@ class RealDuckChatJSHelperTest {
             put("aiChatPayload", "preferences")
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataAndDuckChatDisabledThenReturnSendResponseToJsWithDuckChatDisabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
@@ -109,24 +108,24 @@ class RealDuckChatJSHelperTest {
             put("aiChatPayload", "preferences")
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataAndPreferencesNullThenReturnSendResponseToJsWithPreferencesNull() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndPreferencesNullThenReturnJsCallbackDataWithPreferencesNull() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn(null)
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn(null)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
@@ -134,12 +133,12 @@ class RealDuckChatJSHelperTest {
             put("aiChatPayload", null)
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
@@ -153,63 +152,63 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatEnabledThenReturnSendResponseToJsWithDuckChatEnabled() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
             put("isAIChatHandoffEnabled", true)
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatDisabledThenReturnSendResponseToJsWithDuckChatDisabled() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
             put("isAIChatHandoffEnabled", false)
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndPreferencesNullThenReturnSendResponseToJsWithPreferencesNull() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndPreferencesNullThenReturnJsCallbackDataWithPreferencesNull() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn(null)
+        whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn(null)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
             put("platform", "android")
@@ -217,12 +216,12 @@ class RealDuckChatJSHelperTest {
             put("aiChatPayload", null)
         }
 
-        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
-        assertEquals(expected.data.id, result.data.id)
-        assertEquals(expected.data.method, result.data.method)
-        assertEquals(expected.data.featureName, result.data.featureName)
-        assertEquals(expected.data.params.toString(), result.data.params.toString())
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
     }
 
     @Test
@@ -236,7 +235,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
-        verify(mockPreferencesStore).updateUserPreferences(payloadString)
+        verify(mockDataStore).updateUserPreferences(payloadString)
         verify(mockDuckChat).openDuckChat()
     }
 
@@ -247,7 +246,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
-        verify(mockPreferencesStore).updateUserPreferences(null)
+        verify(mockDataStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
     }
 
@@ -259,7 +258,7 @@ class RealDuckChatJSHelperTest {
         val data = JSONObject(mapOf("aiChatPayload" to JSONObject.NULL))
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
-        verify(mockPreferencesStore).updateUserPreferences(null)
+        verify(mockDataStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
     }
 }

@@ -41,6 +41,10 @@
     <color name="warm_gray10">#F5F5F3</color>
     <color name="warm_gray5">#F7F7F5</color>
     <color name="warm_gray0">#FAFAF8</color>
+    <color name="dark_surface_tertiary">#404145</color>
+    <color name="light_surface_tertiary">#FFFFFF</color>
+    <color name="dark_controls_fill_primary">#1FF9F9F9</color>
+    <color name="light_controls_fill_primary">#171C1F21</color>
 
     <color name="gray87">#393E45</color>
     <color name="white_70">#B3FFFFFF</color>

@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "Autofill: Prompted to save and update credentials on web form"
 tags:
-    - autofillNoAuthTestsModernWebView
+    - autofillNoAuthTests
 ---
 # Pre-requisite: on an autofill-eligible device, including having a modern WebView
 - retry:
@@ -9,7 +9,7 @@ tags:
       commands:
         - launchApp:
               clearState: true
-        - runFlow: ../shared/pre_onboarding.yaml
+        - runFlow: ../shared/skip_all_onboarding.yaml
 
         - tapOn:
             id: "omnibarTextInput"

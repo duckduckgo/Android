@@ -21,20 +21,21 @@
     android:background="?attr/preferredNavigationBarColor"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:paddingTop="@dimen/keyline_3"
+    android:paddingBottom="@dimen/keyline_3"
+    android:paddingHorizontal="14dp">
 
     <FrameLayout
         android:id="@+id/backArrowButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bottomNavIconContainer"
+        android:layout_height="@dimen/bottomNavIconContainer"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/backArrowIconImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_arrow_left_24e" />
     </FrameLayout>
 
@@ -45,16 +46,15 @@
 
     <FrameLayout
         android:id="@+id/forwardArrowButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bottomNavIconContainer"
+        android:layout_height="@dimen/bottomNavIconContainer"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/forwardArrowIconImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_arrow_right_24e" />
     </FrameLayout>
 
@@ -65,16 +65,16 @@
 
     <FrameLayout
         android:id="@+id/fireButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:layout_width="80dp"
+        android:layout_height="@dimen/bottomNavIconContainer"
+        android:foreground="@drawable/bottom_nav_fire_button_foreground"
+        android:background="@drawable/bottom_nav_fire_button_background">
 
         <ImageView
             android:id="@+id/fireIconImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_fire_new_24e" />
     </FrameLayout>
 
@@ -83,15 +83,19 @@
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
-    <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
+    <FrameLayout
         android:id="@+id/tabsButton"
-        android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="@dimen/toolbarIcon"
-        android:layout_marginHorizontal="@dimen/keyline_0"
-        android:background="?selectableItemBackgroundBorderless"
-        android:paddingBottom="@dimen/keyline_2"
-        android:paddingHorizontal="@dimen/keyline_2"
-        android:paddingTop="10dp"/>
+        android:layout_width="@dimen/bottomNavIconContainer"
+        android:layout_height="@dimen/bottomNavIconContainer"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/tabsImageView"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_tab_switcher_experiment" />
+    </FrameLayout>
 
     <Space
         android:layout_width="0dp"
@@ -100,16 +104,15 @@
 
     <FrameLayout
         android:id="@+id/menuButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bottomNavIconContainer"
+        android:layout_height="@dimen/bottomNavIconContainer"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/menuIconImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            android:padding="@dimen/keyline_2"
             app:tint="?daxColorNavigationBarIconEnabled"
             android:src="@drawable/ic_menu_vertical_24" />
     </FrameLayout>

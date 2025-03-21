@@ -71,6 +71,10 @@
     <attr name="daxColorToolbar" format="color"/>
     <attr name="daxColorBrowserOverlay" format="color"/>
 
+    <!-- Visual Design Specific Colors -->
+    <attr name="daxColorOmnibarStroke" format="color"/>
+    <attr name="daxColorControlFillPrimary" format="color"/>
+
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>

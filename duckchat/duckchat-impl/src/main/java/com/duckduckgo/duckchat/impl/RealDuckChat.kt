@@ -23,7 +23,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -149,13 +148,10 @@ class RealDuckChat @Inject constructor(
     private fun startDuckChatActivity(url: String) {
         val intent = globalActivityStarter.startIntent(
             context,
-            WebViewActivityWithParams(
+            DuckChatWebViewActivityWithParams(
                 url = url,
-                screenTitle = context.getString(R.string.duck_chat_title),
-                supportNewWindows = true,
             ),
         )
-
         intent?.let {
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(it)

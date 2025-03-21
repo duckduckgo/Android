@@ -20,4 +20,7 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai, popüler 3. taraf yapay zeka sohbet modelleriyle anonim olarak sohbet etmenizi sağlayan isteğe bağlı bir özelliktir. Sohbetler yapay zekayı eğitmek için kullanılmaz.\n<annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="duck_chat_visibility_setting">Tarayıcı Menüsünde Duck.ai\'yi Göster</string>
+
+    <string name="duck_chat_download_finished_action_name">Aç</string>
+    <string name="duck_chat_cannot_open_file_error_message">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 </resources>

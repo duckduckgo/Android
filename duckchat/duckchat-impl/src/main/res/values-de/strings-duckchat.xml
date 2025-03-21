@@ -20,4 +20,7 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai ist eine optionale Funktion, mit der du anonym mit beliebten KI-Chatmodellen von Drittanbietern chatten kannst. Deine Chats werden nicht zum Trainieren von KI verwendet.\n<annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="duck_chat_visibility_setting">Duck.ai im Browser-Menü anzeigen</string>
+
+    <string name="duck_chat_download_finished_action_name">Öffnen</string>
+    <string name="duck_chat_cannot_open_file_error_message">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
 </resources>

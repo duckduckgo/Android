@@ -36,11 +36,6 @@
             android:layout_height="@dimen/experimentalToolbarSize"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
-            android:background="?attr/daxColorToolbar"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:paddingTop="8dp"
-            android:paddingBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -54,224 +49,243 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/omniBarContainer"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/fading_omnibar_field_background">
+                android:orientation="horizontal">
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/trackersAnimation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:importantForAccessibility="no"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:saveEnabled="false"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/omniBarContainer"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:lottie_autoPlay="false" />
-
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/shieldIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/omniBarContainer"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <FrameLayout
-                    android:id="@+id/omnibarIconContainer"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/omniBarContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginBottom="@dimen/keyline_3"
+                    style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                    android:stateListAnimator="@drawable/fade_omnibar_state_selector">
 
-                    <ImageView
-                        android:id="@+id/daxIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:padding="@dimen/keyline_1"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_ddg_logo" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/omniBarContentContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                    <ImageView
-                        android:id="@+id/duckPlayerIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:padding="@dimen/keyline_1"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_duckplayer" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/trackersAnimation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:importantForAccessibility="no"
+                            android:paddingStart="@dimen/keyline_4"
+                            android:saveEnabled="false"
+                            android:scaleType="centerCrop"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:lottie_autoPlay="false" />
 
-                    <ImageView
-                        android:id="@+id/searchIcon"
-                        android:layout_width="@dimen/toolbarIcon"
-                        android:layout_height="@dimen/toolbarIcon"
-                        android:scaleType="center"
-                        android:gravity="center"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:padding="6dp"
-                        android:src="@drawable/ic_find_search_20_a05" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/shieldIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageView
-                        android:id="@+id/globeIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:padding="@dimen/keyline_1"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_globe_20" />
+                        <FrameLayout
+                            android:id="@+id/omnibarIconContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/keyline_1"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                    <FrameLayout
-                        android:id="@+id/sceneRoot"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|center_vertical"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="4dp"
-                        android:visibility="gone">
+                            <ImageView
+                                android:id="@+id/daxIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:padding="@dimen/keyline_1"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_ddg_logo" />
 
-                        <include layout="@layout/cookie_scene_1" />
-                    </FrameLayout>
+                            <ImageView
+                                android:id="@+id/duckPlayerIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:padding="@dimen/keyline_1"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_duckplayer" />
 
-                    <!-- Placeholder should have same size a sibling ImageViews. size = image_width + padding -->
-                    <View
-                        android:id="@+id/placeholder"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/keyline_1"
-                        android:visibility="invisible" />
+                            <ImageView
+                                android:id="@+id/searchIcon"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:importantForAccessibility="no"
+                                android:padding="6dp"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_find_search_20_a05" />
 
-                </FrameLayout>
+                            <ImageView
+                                android:id="@+id/globeIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:padding="@dimen/keyline_1"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_globe_20" />
 
-                <View
-                    android:id="@+id/cookieDummyView"
-                    android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
-                    android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
-                    android:layout_gravity="start|center_vertical"
-                    android:alpha="0"
-                    android:layout_marginStart="2dp"
-                    android:background="@drawable/cookies_dummy_background"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/omniBarContainer"
-                    app:layout_constraintTop_toTopOf="parent" />
+                            <FrameLayout
+                                android:id="@+id/sceneRoot"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start|center_vertical"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="4dp"
+                                android:visibility="gone">
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/cookieAnimation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center_vertical"
-                    android:saveEnabled="false"
-                    android:layout_marginStart="2dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/omniBarContainer"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:lottie_loop="false" />
+                                <include layout="@layout/cookie_scene_1" />
+                            </FrameLayout>
 
-                <com.duckduckgo.common.ui.view.KeyboardAwareEditText
-                    android:id="@+id/omnibarTextInput"
-                    style="@style/Base.V7.Widget.AppCompat.EditText"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginEnd="6dp"
-                    android:background="@null"
-                    android:fontFamily="sans-serif"
-                    android:hint="@string/omnibarInputHint"
-                    android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                    android:inputType="textUri|textNoSuggestions"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:selectAllOnFocus="true"
-                    android:textColor="?attr/daxColorPrimaryText"
-                    android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
-                    android:textColorHint="?attr/daxColorSecondaryText"
-                    android:textCursorDrawable="@drawable/text_cursor"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/clearTextButton"
-                    app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
-                    app:layout_constraintTop_toTopOf="parent" />
+                            <!-- Placeholder should have same size a sibling ImageViews. size = image_width + padding -->
+                            <View
+                                android:id="@+id/placeholder"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="@dimen/keyline_1"
+                                android:visibility="invisible" />
 
-                <ImageView
-                    android:id="@+id/clearTextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/clearButtonContentDescription"
-                    android:padding="@dimen/toolbarIconPadding"
-                    android:layout_marginEnd="@dimen/keyline_1"
-                    android:src="@drawable/ic_close_24"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                        </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/voiceSearchButton"
-                    android:layout_width="@dimen/toolbarIcon"
-                    android:layout_height="@dimen/toolbarIcon"
-                    android:scaleType="center"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/voiceSearchIconContentDescription"
-                    android:padding="@dimen/toolbarIconPadding"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/spacer"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_microphone_24"
-                    tools:visibility="visible" />
+                        <View
+                            android:id="@+id/cookieDummyView"
+                            android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
+                            android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginStart="2dp"
+                            android:alpha="0"
+                            android:background="@drawable/cookies_dummy_background"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:id="@+id/spacer"
-                    android:layout_width="10dp"
-                    android:layout_height="0dp"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
-                    app:layout_constraintEnd_toStartOf="@id/aiChat"
-                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/cookieAnimation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginStart="2dp"
+                            android:saveEnabled="false"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:lottie_loop="false" />
 
-                <com.duckduckgo.common.ui.view.divider.VerticalDivider
-                    android:id="@+id/verticalDivider"
-                    android:layout_width="1dp"
-                    android:layout_height="24dp"
-                    android:importantForAccessibility="no"
-                    android:layout_marginVertical="@dimen/keyline_2"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/aiChat"
-                    app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
-                    app:layout_constraintTop_toTopOf="parent" />
+                        <com.duckduckgo.common.ui.view.KeyboardAwareEditText
+                            android:id="@+id/omnibarTextInput"
+                            style="@style/Base.V7.Widget.AppCompat.EditText"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@null"
+                            android:fontFamily="sans-serif"
+                            android:hint="@string/omnibarInputHint"
+                            android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                            android:inputType="textUri|textNoSuggestions"
+                            android:maxLines="1"
+                            android:paddingStart="5dp"
+                            android:selectAllOnFocus="true"
+                            android:textColor="?attr/daxColorPrimaryText"
+                            android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                            android:textColorHint="?attr/daxColorSecondaryText"
+                            android:textCursorDrawable="@drawable/text_cursor"
+                            android:textSize="16sp"
+                            android:textStyle="normal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                            app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/aiChat"
-                    android:layout_width="@dimen/toolbarIcon"
-                    android:layout_height="@dimen/toolbarIcon"
-                    android:layout_marginEnd="@dimen/keyline_1"
-                    android:scaleType="center"
-                    android:layout_gravity="center"
-                    android:padding="@dimen/toolbarIconPadding"
-                    android:visibility="gone"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@string/browserPopupMenu"
-                    tools:visibility="visible"
-                    android:src="@drawable/ic_ai_chat_outline_24" />
+                        <ImageView
+                            android:id="@+id/clearTextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/clearButtonContentDescription"
+                            android:padding="@dimen/toolbarIconPadding"
+                            android:src="@drawable/ic_close_24"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/voiceSearchButton"
+                            android:layout_width="@dimen/toolbarIcon"
+                            android:layout_height="@dimen/toolbarIcon"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/voiceSearchIconContentDescription"
+                            android:padding="@dimen/toolbarIconPadding"
+                            android:scaleType="center"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/spacer"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_microphone_24"
+                            tools:visibility="visible" />
+
+                        <View
+                            android:id="@+id/spacer"
+                            android:layout_width="10dp"
+                            android:layout_height="0dp"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
+                            app:layout_constraintEnd_toStartOf="@id/aiChat"
+                            app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+
+                        <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                            android:id="@+id/verticalDivider"
+                            android:layout_width="1dp"
+                            android:layout_height="24dp"
+                            android:layout_marginVertical="@dimen/keyline_2"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/aiChat"
+                            app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/aiChat"
+                            android:layout_width="@dimen/toolbarIcon"
+                            android:layout_height="@dimen/toolbarIcon"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/browserPopupMenu"
+                            android:padding="@dimen/toolbarIconPadding"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_ai_chat_outline_24"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -300,7 +314,6 @@
             app:layout_constraintEnd_toStartOf="@id/browserMenu"
             app:layout_constraintStart_toEndOf="@id/fireIconMenu"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <FrameLayout
             android:id="@+id/browserMenu"
@@ -376,35 +389,35 @@
             android:id="@+id/minibar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/keyline_2"
             android:visibility="invisible"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:paddingVertical="@dimen/keyline_2">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/minibarShield"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:gravity="center"
+                android:layout_marginEnd="@dimen/keyline_1"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
-                android:layout_marginEnd="@dimen/keyline_1"
+                android:gravity="center"
                 android:src="@drawable/ic_shield_exploration" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/minibarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/keyline_1"
-                app:typography="caption"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
+                android:padding="@dimen/keyline_1"
                 android:text="domain.com"
-                tools:ignore="HardcodedText"/>
+                app:typography="caption"
+                tools:ignore="HardcodedText" />
 
         </LinearLayout>
 

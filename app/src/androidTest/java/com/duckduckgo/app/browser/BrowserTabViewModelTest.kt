@@ -100,8 +100,6 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
-import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
-import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -224,7 +222,9 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -234,6 +234,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -434,6 +435,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
+    private val mockPagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin> = mock()
+
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -612,6 +615,7 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
+            userBrowserProperties = mockUserBrowserProperties,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -710,7 +714,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
-            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector, mockPagesSettingPlugin),
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
@@ -5882,8 +5886,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val sendResponseToJs = Command.SendResponseToJs(JsCallbackData(JSONObject(), "", "", ""))
-        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(sendResponseToJs)
+        val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
         testee.processJsCallbackMessage(
             DUCK_CHAT_FEATURE_NAME,
             "method",

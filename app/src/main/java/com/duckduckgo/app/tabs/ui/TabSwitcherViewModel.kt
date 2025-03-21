@@ -39,12 +39,17 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
@@ -55,9 +60,15 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
 ) : ViewModel() {
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
-        tabEntities.map { TabSwitcherItem.Tab(it) }
-    }
+
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.flowTabs
+        .debounce(100.milliseconds)
+        .conflate()
+        .asLiveData()
+        .map { tabEntities ->
+            tabEntities.map { TabSwitcherItem.Tab(it) }
+        }
+
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,

@@ -7,13 +7,13 @@ tags:
       commands:
             - launchApp:
                 clearState: true
-            - runFlow: ../shared/pre_onboarding.yaml
+            - runFlow: ../shared/skip_all_onboarding.yaml
             # Test 1
             - doubleTapOn:
                 id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-open-b64-html.html"
             - pressKey: Enter
-            - tapOn: "Got It"
+
             - tapOn: "Start"
             # This test is expected to open a new tab with empty origin ("") and then prompt to open the link in another app
             - assertVisible: "Open in another app"
