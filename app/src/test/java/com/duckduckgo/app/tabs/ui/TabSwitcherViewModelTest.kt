@@ -490,7 +490,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Animation Tile Visible then Tab Switcher Items Include Animation Tile And Tabs`() = runTest {
+    fun `when animated info panel then tab switcher items include animation tile and tabs`() = runTest {
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
 
         val tab1 = TabEntity("1", position = 1)
@@ -511,7 +511,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Animation Tile Not Visible then Tab Switcher Items Contain Only Tabs`() = runTest {
+    fun `when animated info panel not visible then tab switcher items contain only tabs`() = runTest {
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
 
         val tab1 = TabEntity("1", position = 1)
@@ -531,7 +531,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Tab Switcher Animation Feature disabled then Tab Switcher Items Contain Only Tabs`() = runTest {
+    fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = false))
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
@@ -549,7 +549,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Animation Tile positive button clicked then Animation Tile is still visible`() = runTest {
+    fun `when animated info panel positive button clicked then animated info panel is still visible`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
@@ -567,7 +567,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Animation Tile positive button clicked then Animation Tile is removed`() = runTest {
+    fun `when animated info panel negative button clicked then animated info panel is removed`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
 
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
@@ -583,6 +583,39 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
 
         assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+    }
+
+    @Test
+    fun `when animated info panel visible then impressions pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelVisible()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+    }
+
+    @Test
+    fun `when animated info panel clicked then tapped pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelClicked()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED)
+    }
+
+    @Test
+    fun `when animated info panel negative button clicked then dismiss pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationTileNegativeButtonClicked()
+
+        verify(mockPixel).fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to "15"))
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
