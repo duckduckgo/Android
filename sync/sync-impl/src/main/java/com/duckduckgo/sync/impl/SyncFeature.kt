@@ -48,7 +48,6 @@ interface SyncFeature {
     @Toggle.DefaultValue(true)
     fun seamlessAccountSwitching(): Toggle
 
-    @InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun exchangeKeysToSyncWithAnotherDevice(): Toggle
 
