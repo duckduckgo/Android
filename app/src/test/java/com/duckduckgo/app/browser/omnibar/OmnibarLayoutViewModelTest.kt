@@ -157,7 +157,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, "query")
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -948,7 +948,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

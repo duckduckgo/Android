@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
@@ -146,8 +148,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data object CancelTrackersAnimation : Command()
+        data object CancelAnimations : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object StartExperimentVariant1Animation : Command()
         data class StartExperimentVariant2To5Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
@@ -175,7 +178,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
         if (hasFocus) {
             viewModelScope.launch {
-                command.send(Command.CancelTrackersAnimation)
+                command.send(Command.CancelAnimations)
             }
 
             _viewState.update {
@@ -596,33 +599,58 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
     }
 
-    fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
-        Timber.d("Omnibar: LaunchTrackersAnimation")
-        if (!decoration.entities.isNullOrEmpty()) {
-            val hasFocus = _viewState.value.hasFocus
-            if (!hasFocus) {
-                _viewState.update {
-                    it.copy(
-                        leadingIconState = PRIVACY_SHIELD,
-                    )
-                }
+    fun onAnimationStarted(decoration: Decoration) {
+        when (decoration) {
+            is LaunchCookiesAnimation -> {
                 viewModelScope.launch {
-                    when {
-                        appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled() -> {
-                            command.send(Command.StartExperimentVariant1Animation)
-                        }
+                    command.send(Command.StartCookiesAnimation(decoration.isCosmetic))
+                }
+            }
 
-                        appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
-                            command.send(
-                                Command.StartExperimentVariant2To5Animation(decoration.entities),
+            is LaunchTrackersAnimation -> {
+                Timber.d("Omnibar: LaunchTrackersAnimation")
+                if (!decoration.entities.isNullOrEmpty()) {
+                    val hasFocus = _viewState.value.hasFocus
+                    if (!hasFocus) {
+                        _viewState.update {
+                            it.copy(
+                                leadingIconState = PRIVACY_SHIELD,
                             )
                         }
+                        viewModelScope.launch {
+                            when {
+                                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled() -> {
+                                    command.send(Command.StartExperimentVariant1Animation)
+                                }
 
-                        else -> {
-                            command.send(Command.StartTrackersAnimation(decoration.entities))
+                                appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
+                                    command.send(
+                                        Command.StartExperimentVariant2To5Animation(decoration.entities),
+                                    )
+                                }
+
+                                else -> {
+                                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                                }
+                            }
                         }
                     }
                 }
+            }
+
+            else -> {
+                // no-op
+            }
+        }
+    }
+
+    fun onStartedTransforming() {
+        viewModelScope.launch {
+            command.send(Command.CancelAnimations)
+            _viewState.update {
+                it.copy(
+                    highlightPrivacyShield = HighlightableButton.Gone,
+                )
             }
         }
     }

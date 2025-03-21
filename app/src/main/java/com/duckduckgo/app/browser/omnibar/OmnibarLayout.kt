@@ -50,7 +50,6 @@ import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
@@ -60,7 +59,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2To5Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
@@ -244,7 +245,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
-    private val viewModel: OmnibarLayoutViewModel by lazy {
+    protected val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
             viewModelFactory,
@@ -441,14 +442,22 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderButtons(viewState)
     }
 
-    private fun processCommand(command: OmnibarLayoutViewModel.Command) {
+    open fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
-            CancelTrackersAnimation -> {
+            Command.CancelAnimations -> {
                 cancelTrackersAnimation()
             }
 
             is StartTrackersAnimation -> {
                 startTrackersAnimation(command.entities)
+            }
+
+            is StartCookiesAnimation -> {
+                createCookiesAnimation(command.isCosmetic)
+            }
+
+            MoveCaretToFront -> {
+                moveCaretToFront()
             }
 
             is StartExperimentVariant1Animation -> {
@@ -457,10 +466,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             is StartExperimentVariant2To5Animation -> {
                 startExperimentVariant2To5Animation(command.entities)
-            }
-
-            OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
-                moveCaretToFront()
             }
         }
     }
@@ -607,7 +612,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onOutlineEnabled(decoration.enabled)
             }
 
-            CancelAnimations -> {
+            Decoration.CancelAnimations -> {
                 cancelTrackersAnimation()
             }
 
@@ -616,7 +621,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is LaunchCookiesAnimation -> {
-                createCookiesAnimation(decoration.isCosmetic)
+                viewModel.onAnimationStarted(decoration)
             }
 
             is QueueCookiesAnimation -> {
