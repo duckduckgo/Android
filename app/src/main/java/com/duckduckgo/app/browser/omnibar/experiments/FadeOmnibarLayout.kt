@@ -79,17 +79,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
     init {
-        val attr =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
-        omnibarPosition =
-            OmnibarPosition.entries[attr.getInt(R.styleable.FadeOmnibarLayout_omnibarPosition, 0)]
-
-        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_fade_omnibar_bottom
-        } else {
-            R.layout.view_fade_omnibar
-        }
-        inflate(context, layout, this)
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.FadeOmnibarLayout_omnibarPosition, 0)]
+        inflate(context, R.layout.view_fade_omnibar, this)
 
         minibarClickSurface.setOnClickListener {
             revealToolbar()
