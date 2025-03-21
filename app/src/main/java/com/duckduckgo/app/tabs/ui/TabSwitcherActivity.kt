@@ -323,9 +323,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     dy: Int,
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (dy > 0) {
+                    if (dy > 20) {
                         tabsFab.shrink()
-                    } else if (dy < 0) {
+                    } else if (dy < -20) {
                         tabsFab.extend()
                     }
                 }
