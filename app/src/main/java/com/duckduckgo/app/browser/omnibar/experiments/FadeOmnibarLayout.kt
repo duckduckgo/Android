@@ -118,7 +118,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
         spacer.isVisible = false
 
-        minibarText.text = viewState.url.extractDomain()
+        minibarText.text = viewState.omnibarText
         omniBarContainer.isPressed = viewState.hasFocus
         if (viewState.hasFocus) {
             omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
@@ -155,13 +155,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         Timber.d("lp_test; sharedShieldIcon.width: ${sharedShieldIcon.width}")
         Timber.d("lp_test; sharedShieldIcon.height: ${sharedShieldIcon.height}")
 
-        omnibarTextInput.alpha = 1f - transitionInterpolation
+        // omnibarTextInput.alpha = 1f - transitionInterpolation
         aiChatDivider.alpha = 1f - transitionInterpolation
         aiChat.alpha = 1f - transitionInterpolation
         transitionedOmnibarBackground.alpha = transitionInterpolation
-        minibarText.alpha = transitionInterpolation
+        minibarText.alpha = 0f
 
-        val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionInterpolation).toInt()
+        val newInputTextWidth = toolbar.width - ((toolbar.width - minibarContainer.width /*/ 2*/) * transitionInterpolation.coerceIn(0f, 0.95f)).toInt()
         Timber.d("lp_test; newInputTextWidth: ${newInputTextWidth}")
         omniBarContainerWrapper.updateLayoutParams {
             width = newInputTextWidth
@@ -172,10 +172,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         toolbarContainer.updateLayoutParams {
             height = newOmnibarHeight
         }
-        omnibarTextInput.scaleY = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
-        omnibarTextInput.scaleX = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        // omnibarTextInput.scaleY = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        // omnibarTextInput.scaleX = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
+        // omnibarTextInput.translationX = -((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
         // omnibarTextInput.textScaleX = 1f - ((1f - (minibarTextSize / omnibarTextInputSize)) * transitionInterpolation)
-        // omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionInterpolation).toDp(context)
+        omnibarTextInput.textSize = (omnibarTextInputSize - (omnibarTextInputSize - minibarTextSize) * transitionInterpolation).toDp(context)
 
         omniBarContainer.updateLayoutParams {
             height = omnibarContainerHeight - ((omnibarContainerHeight - minibarHeight) * transitionInterpolation).toInt()

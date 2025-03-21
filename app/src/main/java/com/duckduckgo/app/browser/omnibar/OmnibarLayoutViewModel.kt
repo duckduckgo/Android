@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.net.Uri
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
@@ -51,6 +52,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -194,7 +196,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         it.query
                     } else {
                         Timber.d("Omnibar: is url, showing URL ${it.url}")
-                        it.url
+                        it.url.extractDomain()?.removePrefix("www.") ?: ""
                     }
                 } else {
                     Timber.d("Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text")
