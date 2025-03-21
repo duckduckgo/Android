@@ -823,6 +823,38 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithUnknownAccountErrorThenSignOutAndReturnFailure() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+
+        // Simulating the scenario where account was removed from BE.
+        givenV2AccessTokenRefreshFails(errorCode = "unknown_account")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+
+        // Verify user was signed out.
+        assertFalse(subscriptionsManager.isSignedIn())
+        assertNull(authRepository.getAccessTokenV2())
+        assertNull(authRepository.getRefreshTokenV2())
+        assertNull(authRepository.getAccount())
+        assertNull(authRepository.getSubscription())
+
+        // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
+        verify(authClient, never()).authorize(any())
+        verify(authClient, never()).storeLogin(any(), any(), any())
+
+        // This isn't the case of invalid refresh token, so the related pixels should not be sent.
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
+    }
+
+    @Test
     fun whenGetAccessTokenIfSignedInWithV1ThenExchangesTokenForV2AndReturnsTrue() = runTest {
         assumeTrue(authApiV2Enabled)
 
