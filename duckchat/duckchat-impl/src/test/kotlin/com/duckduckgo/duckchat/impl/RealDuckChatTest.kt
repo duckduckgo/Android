@@ -66,17 +66,19 @@ class RealDuckChatTest {
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
 
-    private val testee = spy(RealDuckChat(
-        mockDuckPlayerFeatureRepository,
-        duckChatFeature,
-        moshi,
-        dispatcherProvider,
-        mockGlobalActivityStarter,
-        mockContext,
-        true,
-        coroutineRule.testScope,
-        mockPixel,
-    ))
+    private val testee = spy(
+        RealDuckChat(
+            mockDuckPlayerFeatureRepository,
+            duckChatFeature,
+            moshi,
+            dispatcherProvider,
+            mockGlobalActivityStarter,
+            mockContext,
+            true,
+            coroutineRule.testScope,
+            mockPixel,
+        ),
+    )
 
     @Before
     fun setup() = runTest {
