@@ -20,4 +20,7 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai on valinnainen ominaisuus, jonka avulla voit keskustella anonyymisti suosittujen kolmannen osapuolen tekoälykeskustelumallien kanssa. Keskustelujasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="duck_chat_visibility_setting">Näytä Duck.ai selainvalikossa</string>
+
+    <string name="duck_chat_download_finished_action_name">Avaa</string>
+    <string name="duck_chat_cannot_open_file_error_message">Tiedoston avaaminen ei onnistu. Tarkista yhteensopiva sovellus.</string>
 </resources>

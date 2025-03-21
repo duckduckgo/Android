@@ -42,7 +42,7 @@ class DataUriDownloader @Inject constructor(
         callback: DownloadCallback,
     ) {
         try {
-            when (val parsedDataUri = dataUriParser.generate(pending.url)) {
+            when (val parsedDataUri = dataUriParser.generate(pending.url, pending.fileName)) {
                 is ParseResult.Invalid -> {
                     logcat { "Failed to extract data from data URI" }
                     callback.onError(url = pending.url, reason = DataUriParseException)
