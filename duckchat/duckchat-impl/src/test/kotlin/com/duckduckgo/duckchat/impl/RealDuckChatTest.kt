@@ -215,7 +215,6 @@ class RealDuckChatTest {
         verify(testee).closeDuckChat()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun whenCloseDuckChatCalledThenOnCloseIsInvoked() = runTest {
         val testLifecycleOwner = TestLifecycleOwner(initialState = CREATED)
