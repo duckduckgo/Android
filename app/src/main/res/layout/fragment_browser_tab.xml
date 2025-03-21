@@ -157,7 +157,7 @@
     <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
         android:id="@+id/fadeOmnibarBottom"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 
