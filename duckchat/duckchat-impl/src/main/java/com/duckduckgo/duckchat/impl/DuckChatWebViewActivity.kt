@@ -104,6 +104,9 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
+    @Inject
+    lateinit var duckChat: DuckChatInternal
+
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
 
     private var pendingFileDownload: PendingFileDownload? = null
@@ -115,6 +118,10 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        duckChat.observeCloseEvent(this) {
+            finish()
+        }
 
         setContentView(binding.root)
         setupToolbar(toolbar)

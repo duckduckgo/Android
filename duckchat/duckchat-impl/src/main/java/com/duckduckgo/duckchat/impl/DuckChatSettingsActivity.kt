@@ -23,6 +23,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -30,6 +31,7 @@ import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
@@ -45,6 +47,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var pixel: Pixel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +71,8 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+
+        pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
     }
 
     private fun configureUiEventHandlers() {

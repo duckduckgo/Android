@@ -19,26 +19,37 @@ package com.duckduckgo.duckchat.impl
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class RealDuckChatTest {
 
@@ -55,16 +66,18 @@ class RealDuckChatTest {
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
 
-    private val testee = RealDuckChat(
-        mockDuckPlayerFeatureRepository,
-        duckChatFeature,
-        moshi,
-        dispatcherProvider,
-        mockGlobalActivityStarter,
-        mockContext,
-        true,
-        coroutineRule.testScope,
-        mockPixel,
+    private val testee = spy(
+        RealDuckChat(
+            mockDuckPlayerFeatureRepository,
+            duckChatFeature,
+            moshi,
+            dispatcherProvider,
+            mockGlobalActivityStarter,
+            mockContext,
+            true,
+            coroutineRule.testScope,
+            mockPixel,
+        ),
     )
 
     @Before
@@ -183,6 +196,41 @@ class RealDuckChatTest {
         whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
 
         assertTrue(testee.wasOpenedBefore())
+    }
+
+    @Test
+    fun whenOpenDuckChatSettingsCalledThenGlobalActivityStarterCalledWithDuckChatSettings() = runTest {
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<ActivityParams>())).thenReturn(Intent())
+
+        testee.openDuckChatSettings()
+
+        verify(mockGlobalActivityStarter).startIntent(mockContext, DuckChatSettingsNoParams)
+
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(mockContext).startActivity(intentCaptor.capture())
+        val capturedIntent = intentCaptor.firstValue
+
+        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, capturedIntent.flags)
+
+        verify(testee).closeDuckChat()
+    }
+
+    @Test
+    fun whenCloseDuckChatCalledThenOnCloseIsInvoked() = runTest {
+        val testLifecycleOwner = TestLifecycleOwner(initialState = CREATED)
+
+        var onCloseCalled = false
+        testee.observeCloseEvent(testLifecycleOwner) {
+            onCloseCalled = true
+        }
+
+        testLifecycleOwner.currentState = Lifecycle.State.STARTED
+
+        testee.closeDuckChat()
+
+        advanceUntilIdle()
+
+        assertTrue(onCloseCalled)
     }
 
     private fun setFeatureToggle(enabled: Boolean) {
