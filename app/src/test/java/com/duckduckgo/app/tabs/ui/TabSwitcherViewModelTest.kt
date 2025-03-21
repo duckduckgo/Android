@@ -29,14 +29,20 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.duckchat.api.DuckChat
@@ -45,6 +51,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
@@ -55,6 +63,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -98,7 +108,16 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var duckChatMock: DuckChat
 
+    @Mock
+    private lateinit var mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository
+
+    @Mock
+    private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
+
+    private lateinit var fakeTabSwitcherDataStore: TabSwitcherPrefsDataStore
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+    private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -126,11 +145,9 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
         whenever(mockTabRepository.flowTabs).thenReturn(flowTabs)
         whenever(statisticsDataStore.variant).thenReturn("")
-
-        initializeViewModel()
     }
 
-    private fun initializeViewModel() {
+    private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
         testee = TabSwitcherViewModel(
             mockTabRepository,
             mockWebViewSessionStorage,
@@ -139,6 +156,9 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
+            tabSwitcherAnimationFeature,
+            mockWebTrackersBlockedAppRepository,
+            tabSwitcherDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -150,6 +170,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNewTabRequestedFromOverflowMenuThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
+        initializeViewModel()
+
         testee.onNewTabRequested(fromOverflowMenu = true)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -159,6 +181,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNewTabRequestedFromIconThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
+        initializeViewModel()
+
         testee.onNewTabRequested(fromOverflowMenu = false)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -168,6 +192,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
+        initializeViewModel()
+
         testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -177,6 +203,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabDeletedThenRepositoryNotified() = runTest {
+        initializeViewModel()
+
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
@@ -185,6 +213,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnMarkTabAsDeletableAfterSwipeGestureUsedThenCallMarkDeletableAndSendPixel() = runTest {
+        initializeViewModel()
+
         val swipeGestureUsed = true
         val entity = TabEntity("abc", "", "", position = 0)
 
@@ -197,6 +227,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnMarkTabAsDeletableAfterClosePressedThenCallMarkDeletableAndSendPixel() = runTest {
+        initializeViewModel()
+
         val swipeGestureUsed = false
         val entity = TabEntity("abc", "", "", position = 0)
 
@@ -209,6 +241,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenUndoDeletableTabThenUndoDeletable() = runTest {
+        initializeViewModel()
+
         val entity = TabEntity("abc", "", "", position = 0)
         testee.undoDeletableTab(entity)
 
@@ -217,6 +251,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runTest {
+        initializeViewModel()
+
         whenever(mockTabRepository.getDeletableTabIds()).thenReturn(listOf("id_1", "id_2"))
 
         testee.purgeDeletableTabs()
@@ -229,6 +265,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runTest {
+        initializeViewModel()
+
         val tab = TabEntity("ID", position = 0)
 
         val expectedTabs = listOf(listOf(), listOf(tab))
@@ -243,6 +281,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runTest {
+        initializeViewModel()
+
         val tab = TabEntity("ID", position = 0)
 
         testee.deletableTabs.observeForever {
@@ -255,6 +295,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsRequestedThenEmitCommandCloseAllTabsRequest() = runTest {
+        initializeViewModel()
+
         testee.onCloseAllTabsRequested()
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -264,6 +306,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
+        initializeViewModel()
+
         testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
@@ -279,6 +323,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnUpButtonPressedCalledThePixelSent() {
+        initializeViewModel()
+
         testee.onUpButtonPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
@@ -286,6 +332,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnBackButtonPressedCalledThePixelSent() {
+        initializeViewModel()
+
         testee.onBackButtonPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
@@ -293,6 +341,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnMenuOpenedCalledThePixelSent() {
+        initializeViewModel()
+
         testee.onMenuOpened()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
@@ -300,6 +350,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnDownloadsMenuPressedCalledThePixelSent() {
+        initializeViewModel()
+
         testee.onDownloadsMenuPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_DOWNLOADS_PRESSED)
@@ -307,6 +359,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnSettingsMenuPressedCalledThePixelSent() {
+        initializeViewModel()
+
         testee.onSettingsMenuPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SETTINGS_PRESSED)
@@ -328,6 +382,8 @@ class TabSwitcherViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun whenOnDraggingStartedThePixelsSent() = runTest {
+        initializeViewModel()
+
         testee.onTabDraggingStarted()
 
         advanceUntilIdle()
@@ -338,6 +394,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnTabMovedRepositoryUpdatesTabPosition() = runTest {
+        initializeViewModel()
+
         val fromIndex = 0
         val toIndex = 2
 
@@ -348,6 +406,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
+        initializeViewModel()
+
         coroutinesTestRule.testScope.launch {
             testee.layoutType.collect()
         }
@@ -375,6 +435,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
+        initializeViewModel()
+
         coroutinesTestRule.testScope.launch {
             testee.layoutType.collect()
         }
@@ -403,6 +465,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when Duck Chat menu item clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
+        initializeViewModel()
+
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         testee.onDuckChatMenuClicked()
@@ -414,6 +478,8 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when Duck Chat menu item clicked and it was used before then open Duck Chat and send a pixel`() = runTest {
+        initializeViewModel()
+
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
 
         testee.onDuckChatMenuClicked()
@@ -421,5 +487,152 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
         verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when animated info panel then tab switcher items include animation tile and tabs`() = runTest {
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(3, items.size)
+        assert(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+        assert(items[1] is TabSwitcherItem.Tab)
+        assert(items[2] is TabSwitcherItem.Tab)
+    }
+
+    @Test
+    fun `when animated info panel not visible then tab switcher items contain only tabs`() = runTest {
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
+
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assert(item is TabSwitcherItem.Tab)
+        }
+    }
+
+    @Test
+    fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = false))
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertEquals(2, items.size)
+        items.forEach { item ->
+            assert(item is TabSwitcherItem.Tab)
+        }
+    }
+
+    @Test
+    fun `when animated info panel positive button clicked then animated info panel is still visible`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        testee.onTrackerAnimationTilePositiveButtonClicked()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertTrue(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+    }
+
+    @Test
+    fun `when animated info panel negative button clicked then animated info panel is removed`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabs.value = listOf(tab1, tab2)
+
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationTileNegativeButtonClicked()
+
+        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+
+        assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+    }
+
+    @Test
+    fun `when animated info panel visible then impressions pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelVisible()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+    }
+
+    @Test
+    fun `when animated info panel clicked then tapped pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationInfoPanelClicked()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED)
+    }
+
+    @Test
+    fun `when animated info panel negative button clicked then dismiss pixel fired`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
+        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        testee.onTrackerAnimationTileNegativeButtonClicked()
+
+        verify(mockPixel).fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to "15"))
+    }
+
+    private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
+
+        private val animationTileDismissedFlow = MutableStateFlow(false)
+
+        override val data: Flow<TabSwitcherData>
+            get() = flowOf(TabSwitcherData(NEW, GRID))
+
+        override suspend fun setUserState(userState: UserState) {}
+
+        override suspend fun setTabLayoutType(layoutType: LayoutType) {}
+
+        override fun isAnimationTileDismissed(): Flow<Boolean> = animationTileDismissedFlow
+
+        override suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
+            animationTileDismissedFlow.value = isDismissed
+        }
     }
 }

@@ -113,6 +113,11 @@
     <string name="tabSwitcherListViewMenu">List view</string>
     <string name="tabSwitcherGridViewMenu">Grid view</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers blocked &lt;/b&gt; in the last 7 days</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers blocked &lt;/b&gt;</string>
+    <string name="inTheLast7Days">in the last 7 days</string>
+
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Tabs And Data</string>
@@ -795,5 +800,10 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
 </resources>

@@ -28,6 +28,8 @@ interface WebTrackersBlockedRepository {
         endTime: String = noEndDate(),
     ): Flow<List<WebTrackerBlocked>>
 
+    suspend fun deleteAll()
+
     private fun noEndDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }

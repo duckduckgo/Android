@@ -37,11 +37,14 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
+import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_ALPHA
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
@@ -50,7 +53,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -58,6 +64,7 @@ import com.duckduckgo.common.utils.swap
 import com.duckduckgo.mobile.android.R as AndroidR
 import java.io.File
 import java.security.MessageDigest
+import kotlin.Int
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -70,11 +77,13 @@ class TabSwitcherAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider,
+    private val trackerCountAnimator: TrackerCountAnimator,
 ) : Adapter<ViewHolder>() {
 
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
+    private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -89,11 +98,15 @@ class TabSwitcherAdapter(
         return when (viewType) {
             GRID_TAB -> {
                 val binding = ItemTabGridBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.GridTabViewHolder(binding)
+                TabSwitcherViewHolder.GridTabViewHolder(binding)
             }
             LIST_TAB -> {
                 val binding = ItemTabListBinding.inflate(inflater, parent, false)
-                return TabSwitcherViewHolder.ListTabViewHolder(binding)
+                TabSwitcherViewHolder.ListTabViewHolder(binding)
+            }
+            TRACKER_ANIMATION_TILE_INFO_PANEL -> {
+                val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
+                TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
             }
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
@@ -107,6 +120,7 @@ class TabSwitcherAdapter(
                     LayoutType.LIST -> LIST_TAB
                 }
             }
+            is TabSwitcherItem.TrackerAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
 
     override fun getItemCount(): Int = list.size
@@ -121,6 +135,20 @@ class TabSwitcherAdapter(
                 val tab = (list[position] as TabSwitcherItem.Tab).tabEntity
                 bindListTab(holder, tab)
             }
+            is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
+                val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
+
+                trackerCountAnimator.animateTrackersBlockedCountView(
+                    context = holder.binding.root.context,
+                    stringRes = R.string.trackersBlockedInTheLast7days,
+                    totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
+                    trackerTextView = holder.binding.infoPanelText,
+                )
+                holder.binding.root.setOnClickListener {
+                    onAnimationTileCloseClickListener?.invoke()
+                }
+            }
+            else -> throw IllegalArgumentException("Unknown ViewHolder type: $holder")
         }
     }
 
@@ -193,6 +221,12 @@ class TabSwitcherAdapter(
                 tab = list[position] as TabSwitcherItem.Tab,
                 payloads = payloads,
             )
+            TRACKER_ANIMATION_TILE_INFO_PANEL -> {
+                for (payload in payloads) {
+                    val bundle = payload as Bundle
+                    holder.itemView.alpha = bundle.getFloat(DIFF_ALPHA, ANIMATED_TILE_DEFAULT_ALPHA)
+                }
+            }
         }
     }
 
@@ -320,7 +354,7 @@ class TabSwitcherAdapter(
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
-        val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList))
+        val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList, isDragging))
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
@@ -334,10 +368,24 @@ class TabSwitcherAdapter(
 
     fun onDraggingStarted() {
         isDragging = true
+        updateAnimatedTileAlpha(ANIMATED_TILE_NO_REPLACE_ALPHA)
     }
 
     fun onDraggingFinished() {
         isDragging = false
+        updateAnimatedTileAlpha(ANIMATED_TILE_DEFAULT_ALPHA)
+    }
+
+    private fun updateAnimatedTileAlpha(alpha: Float) {
+        val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackerAnimationInfoPanel }
+        if (animatedTilePosition != -1) {
+            notifyItemChanged(
+                animatedTilePosition,
+                Bundle().apply {
+                    putFloat(DIFF_ALPHA, alpha)
+                },
+            )
+        }
     }
 
     fun onTabMoved(from: Int, to: Int) {
@@ -351,6 +399,10 @@ class TabSwitcherAdapter(
         notifyDataSetChanged()
     }
 
+    fun setAnimationTileCloseClickListener(onClick: () -> Unit) {
+        onAnimationTileCloseClickListener = onClick
+    }
+
     companion object {
         private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
@@ -360,6 +412,7 @@ class TabSwitcherAdapter(
         companion object {
             const val GRID_TAB = 0
             const val LIST_TAB = 1
+            const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
         }
 
         interface TabViewHolder {
@@ -389,5 +442,9 @@ class TabSwitcherAdapter(
             override val tabUnread: ImageView = binding.tabUnread,
             val url: TextView = binding.url,
         ) : TabSwitcherViewHolder(binding.root), TabViewHolder
+
+        data class TrackerAnimationInfoPanelViewHolder(
+            val binding: ItemTabSwitcherAnimationInfoPanelBinding,
+        ) : TabSwitcherViewHolder(binding.root)
     }
 }
