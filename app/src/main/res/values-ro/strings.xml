@@ -804,4 +804,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Nu acum</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blochează tehnologiile de urmărire pentru a-ți proteja navigarea</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Ștergerea filelor și a datelor tale va șterge istoricul blocării tehnologiilor de urmărire și va reseta acest număr la zero.\n\nAscunde acest banner dacă preferi să nu-l vezi în vizualizarea filelor.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ascunde bannerul</string>
+
 </resources>

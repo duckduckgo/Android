@@ -806,4 +806,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne zdaj</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira sledilnike, da zaščiti vaše brskanje</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
+
 </resources>

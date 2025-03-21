@@ -29,9 +29,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -49,13 +51,18 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -67,6 +74,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filterNotNull
@@ -137,6 +145,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         )
     }
 
+    private val onScrolledListener = object : OnScrollListener() {
+        override fun onScrolled(
+            recyclerView: RecyclerView,
+            dx: Int,
+            dy: Int,
+        ) {
+            super.onScrolled(recyclerView, dx, dy)
+            checkTrackerAnimationPanelVisibility()
+        }
+    }
+
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
 
@@ -150,6 +169,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
 
+    private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
+
+    private var isTrackerAnimationPanelVisible = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
@@ -158,7 +181,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
             tabsAdapter.setAnimationTileCloseClickListener {
-                viewModel.onTrackerAnimationTileCloseClicked()
+                viewModel.onTrackerAnimationInfoPanelClicked()
             }
         }
 
@@ -208,6 +231,37 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.setHasFixedSize(true)
     }
 
+    private fun checkTrackerAnimationPanelVisibility() {
+        if (!tabSwitcherAnimationFeature.self().isEnabled()) {
+            return
+        }
+
+        val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
+        val firstVisible = layoutManager.findFirstVisibleItemPosition()
+        val isPanelCurrentlyVisible = firstVisible == 0 && tabsAdapter.getTabSwitcherItem(0) is TrackerAnimationInfoPanel
+
+        if (!isPanelCurrentlyVisible) {
+            isTrackerAnimationPanelVisible = false
+            return
+        }
+
+        val viewHolder = tabsRecycler.findViewHolderForAdapterPosition(0) ?: return
+        val itemView = viewHolder.itemView
+
+        val itemHeight = itemView.height
+        val visibleHeight = itemHeight - max(0, -itemView.top) -
+            max(0, itemView.bottom - tabsRecycler.height)
+
+        val isEnoughVisible = visibleHeight > itemHeight * 0.75
+
+        if (isEnoughVisible && !isTrackerAnimationPanelVisible) {
+            viewModel.onTrackerAnimationInfoPanelVisible()
+            isTrackerAnimationPanelVisible = true
+        } else if (!isEnoughVisible) {
+            isTrackerAnimationPanelVisible = false
+        }
+    }
+
     private fun configureObservers() {
         viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
 
@@ -247,16 +301,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun updateLayoutType(layoutType: LayoutType) {
         tabsRecycler.hide()
+        tabsRecycler.removeOnScrollListener(onScrolledListener)
 
         val centerOffsetPercent = getCurrentCenterOffset()
 
         this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
-                val gridLayoutManager = GridLayoutManager(
-                    this@TabSwitcherActivity,
-                    gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT),
-                )
+                val columnCount = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
+
+                val gridLayoutManager = getGridLayoutManager(columnCount)
                 tabsRecycler.layoutManager = gridLayoutManager
                 showListLayoutButton()
             }
@@ -269,17 +323,45 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
 
-        scrollToPreviousCenterOffset(centerOffsetPercent)
+        scrollToPreviousCenterOffset(
+            centerOffsetPercent = centerOffsetPercent,
+            onScrollCompleted = {
+                tabsRecycler.addOnScrollListener(onScrolledListener)
+            },
+        )
 
         tabsRecycler.show()
     }
 
-    private fun scrollToPreviousCenterOffset(centerOffsetPercent: Float) {
+    private fun getGridLayoutManager(columnCount: Int): GridLayoutManager {
+        return GridLayoutManager(
+            this,
+            columnCount,
+        ).apply {
+            spanSizeLookup = object : SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (tabsAdapter.getTabSwitcherItem(position) is TrackerAnimationInfoPanel) {
+                        columnCount
+                    } else {
+                        1
+                    }
+                }
+            }
+        }
+    }
+
+    private fun scrollToPreviousCenterOffset(
+        centerOffsetPercent: Float,
+        onScrollCompleted: () -> Unit = {},
+    ) {
         tabsRecycler.post {
             val newRange = tabsRecycler.computeVerticalScrollRange()
             val newExtent = tabsRecycler.computeVerticalScrollExtent()
             val newOffset = (centerOffsetPercent * newRange - newExtent / 2).toInt()
             (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, -newOffset)
+            tabsRecycler.post {
+                onScrollCompleted()
+            }
         }
     }
 
@@ -330,6 +412,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
+            ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
+            DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
         }
     }
 
@@ -430,15 +514,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
-                is TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
+                is TrackerAnimationInfoPanel -> Unit
             }
         }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val isTrackerAnimationTileVisible = viewModel.tabSwitcherItems.value?.get(0) is TabSwitcherItem.TrackerAnimationTile
-            val canSwapFromIndex = if (isTrackerAnimationTileVisible) 1 else 0
+            val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.value?.get(0) is TrackerAnimationInfoPanel
+            val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
             val tabSwitcherItemCount = viewModel.tabSwitcherItems.value?.count() ?: 0
 
             val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
@@ -550,6 +634,30 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 },
             )
             .show()
+    }
+
+    private fun showAnimatedTileDismissalDialog() {
+        tabSwitcherAnimationTileRemovalDialog = TextAlertDialogBuilder(this)
+            .setTitle(R.string.tabSwitcherAnimationTileRemovalDialogTitle)
+            .setMessage(R.string.tabSwitcherAnimationTileRemovalDialogBody)
+            .setPositiveButton(R.string.daxDialogGotIt)
+            .setNegativeButton(R.string.tabSwitcherAnimationTileRemovalDialogNegativeButton, GHOST)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onTrackerAnimationTileNegativeButtonClicked()
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTrackerAnimationTilePositiveButtonClicked()
+                    }
+                },
+            )
+            .build()
+            .also { dialog ->
+                dialog.show()
+            }
     }
 
     private fun configureOnBackPressedListener() {

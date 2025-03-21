@@ -801,4 +801,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
+
 </resources>

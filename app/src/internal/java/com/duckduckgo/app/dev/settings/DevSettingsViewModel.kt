@@ -154,7 +154,6 @@ class DevSettingsViewModel @Inject constructor(
     fun showAnimatedTileClicked() {
         viewModelScope.launch {
             tabSwitcherPrefsDataStore.setIsAnimationTileDismissed(isDismissed = false)
-            tabSwitcherPrefsDataStore.setAnimationTileSeen(isSeen = false)
             command.send(Command.Toast("Animated tile dismissal has been reset"))
         }
     }

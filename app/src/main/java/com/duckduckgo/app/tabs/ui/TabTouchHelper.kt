@@ -148,8 +148,7 @@ class TabTouchHelper(
         return ObjectAnimator.ofFloat(view, View.SCALE_Y, view.scaleY, scaleTo)
     }
 
-    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean = this is TabSwitcherViewHolder.GridTrackerAnimationTileViewHolder ||
-        this is TabSwitcherViewHolder.ListTrackerAnimationTileViewHolder
+    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean = this is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder
 
     companion object {
         private const val ANIM_DURATION = 100L

@@ -802,4 +802,9 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Haznos tu navegador predeterminado para que todos los enlaces a sitios se abran en DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ahora no</string>
 
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloquea rastreadores para proteger tu navegación</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Al borrar tus pestañas y datos, se eliminará el historial de bloqueo de rastreadores y se restablecerá este número a cero.\n\nOculta este banner si prefieres no verlo en la vista de pestañas.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar banner</string>
+
 </resources>

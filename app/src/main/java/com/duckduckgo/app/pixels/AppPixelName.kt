@@ -407,4 +407,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
+
+    TAB_MANAGER_INFO_PANEL_IMPRESSIONS("m_tab_manager_info_panel_impressions"),
+    TAB_MANAGER_INFO_PANEL_DISMISSED("m_tab_manager_info_panel_dismissed"),
+    TAB_MANAGER_INFO_PANEL_TAPPED("m_tab_manager_info_panel_tapped"),
 }
