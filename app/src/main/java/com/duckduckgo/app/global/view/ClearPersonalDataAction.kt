@@ -30,6 +30,7 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -73,6 +74,7 @@ class ClearPersonalDataAction(
     private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -103,6 +105,8 @@ class ClearPersonalDataAction(
             privacyProtectionsPopupDataClearer.clearPersonalData()
 
             clearTabsAsync(appInForeground)
+
+            webTrackersBlockedRepository.deleteAll()
 
             navigationHistory.clearHistory()
         }

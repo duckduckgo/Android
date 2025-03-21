@@ -48,7 +48,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble the project
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pdisable-visual-design-experiment
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant
 
       - name: Move APK to new folder
         if: always()

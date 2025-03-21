@@ -92,8 +92,4 @@ class VisualDesignExperimentViewModel @Inject constructor(
             appPersonalityFeature.variant5().setRawStoredState(State(false))
         }
     }
-
-    fun onNavigationBarPrefChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.setNavigationBarStateUserPreference(checked)
-    }
 }

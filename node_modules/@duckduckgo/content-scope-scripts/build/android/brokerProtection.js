@@ -7151,12 +7151,15 @@
       trackerLookup: define_import_meta_trackerLookup_default,
       injectName: "android-broker-protection"
     };
-    const featureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] : [];
-    for (const featureName of featureNames) {
-      const ContentFeature2 = ddg_platformFeatures_default["ddg_feature_" + featureName];
-      const featureInstance = new ContentFeature2(featureName, importConfig, args);
-      featureInstance.callLoad();
-      features.push({ featureName, featureInstance });
+    const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] : [];
+    const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
+    for (const featureName of bundledFeatureNames) {
+      if (featuresToLoad.includes(featureName)) {
+        const ContentFeature2 = ddg_platformFeatures_default["ddg_feature_" + featureName];
+        const featureInstance = new ContentFeature2(featureName, importConfig, args);
+        featureInstance.callLoad();
+        features.push({ featureName, featureInstance });
+      }
     }
     mark.end();
   }
@@ -7201,9 +7204,6 @@
     const userUnprotectedDomains = $USER_UNPROTECTED_DOMAINS$;
     const userPreferences = $USER_PREFERENCES$;
     const processedConfig = processConfig(config, userUnprotectedDomains, userPreferences);
-    if (isGloballyDisabled(processedConfig)) {
-      return;
-    }
     const configConstruct = processedConfig;
     const messageCallback = configConstruct.messageCallback;
     const messageSecret2 = configConstruct.messageSecret;

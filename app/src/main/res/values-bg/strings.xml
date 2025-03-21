@@ -119,6 +119,11 @@
     <string name="tabSwitcherListViewMenu">Изглед в списък</string>
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt;</string>
+    <string name="inTheLast7Days">през последните 7 дни</string>
+
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
@@ -801,5 +806,10 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сега</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
 
 </resources>

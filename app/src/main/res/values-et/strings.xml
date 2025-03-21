@@ -119,6 +119,11 @@
     <string name="tabSwitcherListViewMenu">Loendivaade</string>
     <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt;</string>
+    <string name="inTheLast7Days">viimase 7 päeva jooksul</string>
+
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
@@ -801,5 +806,10 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Mitte praegu</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokeerib jälgurid, et kaitsta sinu sirvimist</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
 
 </resources>
