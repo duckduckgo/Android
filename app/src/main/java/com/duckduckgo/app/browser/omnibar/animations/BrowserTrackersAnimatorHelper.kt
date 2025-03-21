@@ -58,7 +58,6 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,
-        hasKnownLogos: Boolean,
     )
 
     /**

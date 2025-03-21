@@ -456,7 +456,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartExperimentVariant2To5Animation -> {
-                startExperimentVariant2To5Animation(command.entities, command.hasKnownLogos)
+                startExperimentVariant2To5Animation(command.entities)
             }
 
             OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
@@ -717,7 +717,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startExperimentVariant2To5Animation(events: List<Entity>?, hasKnownLogos: Boolean) {
+    private fun startExperimentVariant2To5Animation(events: List<Entity>?) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
@@ -730,7 +730,6 @@ open class OmnibarLayout @JvmOverloads constructor(
                 omnibarViews = omnibarViews(),
                 shieldViews = shieldViews(),
                 entities = events,
-                hasKnownLogos = hasKnownLogos,
             )
         }
     }
