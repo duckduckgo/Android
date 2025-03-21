@@ -33,8 +33,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Layout
 import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
-private const val FAB_HIDE_DELAY = 500L
-
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
@@ -81,9 +79,7 @@ fun Menu.createDynamicInterface(
             show()
             extend()
         } else {
-            fab.postDelayed(FAB_HIDE_DELAY) {
-                hide()
-            }
+            hide()
         }
     }
 
