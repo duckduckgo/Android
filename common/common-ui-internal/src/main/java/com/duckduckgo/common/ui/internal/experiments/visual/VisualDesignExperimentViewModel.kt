@@ -81,8 +81,4 @@ class VisualDesignExperimentViewModel @Inject constructor(
     fun onExperimentalUIModeChanged(checked: Boolean) {
         visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
     }
-
-    fun onNavigationBarPrefChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.setNavigationBarStateUserPreference(checked)
-    }
 }
