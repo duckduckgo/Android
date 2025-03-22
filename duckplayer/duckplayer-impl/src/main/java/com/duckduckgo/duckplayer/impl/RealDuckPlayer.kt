@@ -27,7 +27,10 @@ import androidx.fragment.app.FragmentManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -54,11 +57,16 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQ
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_SERP
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
@@ -73,6 +81,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
@@ -184,15 +193,39 @@ class RealDuckPlayer @Inject constructor(
         pixelData: Map<String, String>,
     ) {
         if (!isFeatureEnabled) return
-        val duckPlayerPixelName = when (pixelName) {
-            "overlay" -> DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
-            "play.use" -> DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
-            "play.do_not_use" -> DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
-            else -> { null }
+        val duckPlayerPixelNames: List<Pair<DuckPlayerPixelName, PixelType>>? = when (pixelName) {
+            "overlay" -> {
+                listOf(
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS to Count,
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE to Unique(),
+                )
+            }
+            "play.use" -> {
+                listOf(
+                    DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY to Count,
+                    DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE to Unique(),
+                )
+            }
+            "play.do_not_use" -> {
+                listOf(
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE to Count,
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE to Unique(),
+                )
+            }
+            "play.do_not_use.thumbnail" -> {
+                listOf(
+                    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE to Count,
+                    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE to Unique(),
+                )
+            }
+            else -> {
+                Timber.d("Unknown duck player pixel: $pixelName, data: $pixelData")
+                null
+            }
         }
 
-        duckPlayerPixelName?.let {
-            pixel.fire(duckPlayerPixelName, parameters = pixelData)
+        duckPlayerPixelNames?.forEach { (duckPlayerPixelName, type) ->
+            pixel.fire(duckPlayerPixelName, if (type is Unique) mapOf() else pixelData, type = type)
             if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS) {
                 duckPlayerFeatureRepository.setUserOnboarded()
             }
