@@ -39,4 +39,11 @@ interface VariantManager {
      * @param variants Updated list of VariantConfig objects
      */
     fun updateVariants(variants: List<VariantConfig>)
+
+    /**
+     * Checks if the user has been assigned the reinstall variant.
+     *
+     * @return True if the user is assigned the reinstall variant; false otherwise.
+     */
+    fun isReinstallVariant(): Boolean
 }
