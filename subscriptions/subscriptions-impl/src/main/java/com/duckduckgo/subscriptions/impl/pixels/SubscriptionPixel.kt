@@ -20,11 +20,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.OS_VERSION
 
 enum class SubscriptionPixel(
     val baseName: String,
     private val types: Set<PixelType>,
     private val withSuffix: Boolean = true,
+    val removedParameters: Set<PixelParameter> = emptySet(),
 ) {
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
@@ -62,6 +66,7 @@ enum class SubscriptionPixel(
         baseName = "m_subscribe",
         type = Count,
         withSuffix = false,
+        removedParameters = setOf(ATB, OS_VERSION),
     ),
     OFFER_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_offer_restore-purchase_click",
@@ -130,6 +135,7 @@ enum class SubscriptionPixel(
     APP_SETTINGS_GET_SUBSCRIPTION_CLICK(
         baseName = "m_privacy-pro_app-settings_get_click",
         type = Count,
+        removedParameters = setOf(ATB),
     ),
     APP_SETTINGS_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_app-settings_restore-purchase_click",
@@ -166,38 +172,47 @@ enum class SubscriptionPixel(
     AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_detected",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_signed_out",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_recovered",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_MIGRATION_SUCCESS(
         baseName = "m_privacy-pro_auth_v2_migration_success",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_MIGRATION_FAILURE_IO(
         baseName = "m_privacy-pro_auth_v2_migration_failure_io",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_MIGRATION_FAILURE_INVALID_TOKEN(
         baseName = "m_privacy-pro_auth_v2_migration_failure_invalid_token",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_MIGRATION_FAILURE_OTHER(
         baseName = "m_privacy-pro_auth_v2_migration_failure_other",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_TOKEN_VALIDATION_ERROR(
         baseName = "m_privacy-pro_auth_v2_token_validation_error",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     AUTH_V2_TOKEN_STORE_ERROR(
         baseName = "m_privacy-pro_auth_v2_token_store_error",
         types = setOf(Count, Daily()),
+        removedParameters = setOf(ATB),
     ),
     ;
 
@@ -205,7 +220,8 @@ enum class SubscriptionPixel(
         baseName: String,
         type: PixelType,
         withSuffix: Boolean = true,
-    ) : this(baseName, setOf(type), withSuffix)
+        removedParameters: Set<PixelParameter> = emptySet(),
+    ) : this(baseName, setOf(type), withSuffix, removedParameters)
 
     fun getPixelNames(): Map<PixelType, String> =
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
