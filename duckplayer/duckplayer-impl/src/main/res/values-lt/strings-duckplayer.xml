@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.</string>
     <string name="duck_player_info_modal_button">Supratau!</string>
     <string name="duck_player_unavailable">„Duck Player“ nepasiekiamas</string>
-    <string name="duck_player_unavailable_description">Neseniai atlikti „YouTube“ pakeitimai turėjo įtakos „Duck Player“ funkcijoms. Stengiamės pašalinti šias triktis ir dėkojame už supratingumą.</string>
     <string name="duck_player_unavailable_learn_more">Sužinoti daugiau</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Atidaryti „YouTube“ vaizdo įrašus „Duck Player“</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Atidarykite „Duck Player“ naujame skirtuke</string>

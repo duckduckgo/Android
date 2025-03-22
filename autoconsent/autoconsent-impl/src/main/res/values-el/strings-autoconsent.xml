@@ -18,7 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
-    <string name="autoconsentDescription"><![CDATA[Όταν το DuckDuckGo εντοπίζει αναδυόμενα παράθυρα για cookies σε ιστότοπους που επισκέπτεστε, μπορούμε να ρυθμίσουμε αυτόματα τις προτιμήσεις σας για τα cookies ώστε να ελαχιστοποιήσετε τα cookies και να μεγιστοποιήσετε το απόρρητο. Έπειτα μπορείτε να κλείσετε τα αναδυόμενα παράθυρα. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew"><![CDATA[Το DuckDuckGo θα προσπαθήσει να επιλέξει τις πιο ιδιωτικές ρυθμίσεις που υπάρχουν διαθέσιμες και να αποκρύψει αυτά τα αναδυόμενα παράθυρα για εσάς.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="autoconsentDescription"><![CDATA[Το DuckDuckGo θα προσπαθήσει να επιλέξει τις πιο ιδιωτικές ρυθμίσεις που υπάρχουν διαθέσιμες και να αποκρύψει αυτά τα αναδυόμενα παράθυρα για εσάς.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="autoconsentToggle">Επιτρέψτε στο DuckDuckGo να διαχειρίζεται τα αναδυόμενα παράθυρα για cookies</string>
 </resources>
