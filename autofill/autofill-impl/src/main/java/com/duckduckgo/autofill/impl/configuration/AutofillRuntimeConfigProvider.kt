@@ -47,6 +47,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val shareableCredentials: ShareableCredentials,
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
+    private val siteSpecificFixesStore: AutofillSiteSpecificFixesStore,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -54,7 +55,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
-        val contentScope = runtimeConfigurationWriter.generateContentScope()
+        val contentScope = runtimeConfigurationWriter.generateContentScope(siteSpecificFixesStore.getConfig().javascriptConfigSiteSpecificFixes)
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = canInjectCredentials(url),

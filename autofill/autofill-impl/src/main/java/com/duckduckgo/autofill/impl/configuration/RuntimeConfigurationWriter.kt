@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessRespo
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -30,7 +31,7 @@ interface RuntimeConfigurationWriter {
         emailAvailable: Boolean,
     ): String
 
-    fun generateContentScope(): String
+    fun generateContentScope(settingsJson: String): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
@@ -59,10 +60,15 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     /*
     * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
     */
-    override fun generateContentScope(): String {
+    override fun generateContentScope(settingsJson: String): String {
         return """
             contentScope = {
               "features": {
+                "autofillSiteSpecificFixes" : {
+                    "state": "enabled",
+                    "exceptions": [],
+                    "settings": $settingsJson
+                },
                 "autofill": {
                   "state": "enabled",
                   "exceptions": []
