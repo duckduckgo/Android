@@ -409,7 +409,7 @@
   function isGloballyDisabled(args) {
     return args.site.allowlisted || args.site.isBroken;
   }
-  var platformSpecificFeatures = ["windowsPermissionUsage", "messageBridge"];
+  var platformSpecificFeatures = ["windowsPermissionUsage", "messageBridge", "favicon"];
   function isPlatformSpecificFeature(featureName) {
     return platformSpecificFeatures.includes(featureName);
   }
@@ -480,12 +480,13 @@
       "brokerProtection",
       "performanceMetrics",
       "breakageReporting",
-      "autofillPasswordImport"
+      "autofillPasswordImport",
+      "favicon"
     ]
   );
   var platformSupport = {
     apple: ["webCompat", ...baseFeatures],
-    "apple-isolated": ["duckPlayer", "brokerProtection", "performanceMetrics", "clickToLoad", "messageBridge"],
+    "apple-isolated": ["duckPlayer", "brokerProtection", "performanceMetrics", "clickToLoad", "messageBridge", "favicon"],
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
     "android-autofill-password-import": ["autofillPasswordImport"],
