@@ -153,7 +153,7 @@ class TabSwitcherViewModel @Inject constructor(
         get() = requireNotNull(selectionViewState.value.mode as Selection)
 
     sealed class Command {
-        data object Close : Command()
+        data class Close(val skipTabPurge: Boolean = false) : Command()
         data class CloseTabsRequest(val tabIds: List<String>, val isClosingOtherTabs: Boolean = false) : Command()
         data class CloseAllTabsRequest(val numTabs: Int) : Command()
         data object ShowAnimatedTileDismissalDialog : Command()
@@ -180,7 +180,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabRepository.add()
         }
 
-        command.value = Command.Close
+        command.value = Command.Close()
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
         } else {
@@ -200,7 +200,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
         } else {
             tabRepository.select(tabId)
-            command.value = Command.Close
+            command.value = Command.Close()
             pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         }
     }
@@ -349,9 +349,15 @@ class TabSwitcherViewModel @Inject constructor(
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
-                // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
-                deleteTabs(tabIds)
-                command.value = Command.Close
+                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                    // mark tabs as deletable, the undo snackbar will be displayed when the tab switcher is closed
+                    tabRepository.markDeletable(tabIds)
+                    command.value = Command.Close(skipTabPurge = true)
+                } else {
+                    // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
+                    deleteTabs(tabIds)
+                    command.value = Command.Close()
+                }
             } else {
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY, type = Daily())
@@ -370,10 +376,17 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onTabCloseInNormalModeRequested(tab: Tab, swipeGestureUsed: Boolean = false) {
         viewModelScope.launch {
+            // TODO: Fix bug when 2 tabs, one NTP -> quick closing of non-NTP then NTP => snackbar shown in browser
             if (tabItems.size == 1) {
-                // the last tab can be deleted immediately because no snackbar is needed and the tab switcher will be closed
-                deleteTabs(listOf(tab.id))
-                command.value = Command.Close
+                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+                    // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
+                    markTabAsDeletable(tab, swipeGestureUsed)
+                    command.value = Command.Close(skipTabPurge = true)
+                } else {
+                    // the last tab can be deleted immediately because no snackbar is needed and the tab switcher will be closed
+                    deleteTabs(listOf(tab.id))
+                    command.value = Command.Close()
+                }
             } else {
                 markTabAsDeletable(tab, swipeGestureUsed)
 
@@ -405,7 +418,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has tapped the Undo action -> restore the closed tabs
     fun undoDeletableTabs(tabIds: List<String>) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             tabRepository.undoDeletable(tabIds)
         }
     }
@@ -443,7 +456,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
-            command.value = Command.Close
+            command.value = Command.Close()
         }
     }
 
@@ -453,7 +466,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
-            command.value = Command.Close
+            command.value = Command.Close()
         }
     }
 
@@ -595,7 +608,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class SelectionViewState(
-        val tabItems: List<TabSwitcherItem> = emptyList(),
+        val tabItems: List<Tab> = emptyList(),
         val mode: Mode = Normal,
         val layoutType: LayoutType? = null,
     ) {
@@ -603,7 +616,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.any { it is Tab && it.isNewTabPage }
+                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.any { it.isNewTabPage }
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,

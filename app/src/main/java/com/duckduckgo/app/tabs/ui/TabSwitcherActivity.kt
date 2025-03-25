@@ -181,6 +181,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
 
+    private var skipTabPurgeOnFinish = false
+
     private var selectedTabId: String? = null
 
     private lateinit var tabTouchHelper: TabTouchHelper
@@ -547,7 +549,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Close -> finishAfterTransition()
+            is Close -> {
+                skipTabPurgeOnFinish = command.skipTabPurge
+                finishAfterTransition()
+            }
             is CloseAllTabsRequest -> {
                 if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                     showCloseAllTabsConfirmation(command.numTabs)
@@ -758,7 +763,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             action = getString(R.string.tabClosedUndo),
             showAction = true,
             onAction = { viewModel.undoDeletableTabs(tabIds) },
-            onDismiss = { launch { viewModel.purgeDeletableTabs() } },
+            onDismiss = { launch { viewModel.deleteTabs(tabIds) } }, // delete specific tabs, because some may need to be preserved for undeleting
         ).show()
     }
 
@@ -817,9 +822,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.tabSwitcherItems.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
+
         // we don't want to purge during device rotation
-        if (isFinishing) {
+        if (isFinishing && !skipTabPurgeOnFinish) {
             launch { viewModel.purgeDeletableTabs() }
         }
     }
