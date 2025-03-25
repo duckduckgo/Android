@@ -81,6 +81,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+private const val DELETABLE_TABS_CHECK_DELAY = 200L
+
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
 class BrowserViewModel @Inject constructor(
@@ -451,7 +453,7 @@ class BrowserViewModel @Inject constructor(
 
     private fun checkIfAnyDeletableTabsExist() {
         viewModelScope.launch {
-            delay() // delayed so that a potential DB operation has time to mark tabs as deletable
+            delay(DELETABLE_TABS_CHECK_DELAY) // delayed so that a potential DB operation has time to mark tabs as deletable
             val deletableTabIds = tabRepository.getDeletableTabIds()
             if (deletableTabIds.isNotEmpty()) {
                 command.value = ShowUndoDeleteTabsMessage(deletableTabIds)
