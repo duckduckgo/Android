@@ -16,7 +16,48 @@
 
 package com.duckduckgo.networkprotection.impl.config
 
-internal class WgVpnRoutes {
+import java.net.InetAddress
+import logcat.logcat
+
+typealias IpRange = Pair<String, Int>
+
+class WgVpnRoutes {
+
+    fun generateVpnRoutes(excludedRanges: Map<String, Int>): Map<String, Int> {
+        // special cases
+        // empty, return all space
+        if (excludedRanges.isEmpty()) {
+            return mapOf("0.0.0.0" to 0)
+        }
+        // all, return no routes
+        if (excludedRanges["0.0.0.0"] == 0) {
+            return emptyMap()
+        }
+
+        val listExclude = excludedRanges.map { CIDR(InetAddress.getByName(it.key), it.value) }.sorted()
+
+        return runCatching {
+            val routes = mutableMapOf<InetAddress, Int>()
+            var start = InetAddress.getByName("0.0.0.0")
+            listExclude.forEach { exclude ->
+                CIDR.createFrom(start, exclude.start?.minus1()!!).forEach { include ->
+                    routes[include.address] = include.prefix
+                }
+                start = exclude.end?.plus1()!!
+            }
+
+            if (start.toLong() != 0L) {
+                CIDR.createFrom(start, InetAddress.getByName("255.255.255.255")).forEach { remaining ->
+                    routes[remaining.address] = remaining.prefix
+                }
+            }
+            // routes
+            routes.mapKeys { it.key.hostAddress!! }
+        }.getOrDefault(emptyMap()).also {
+            logcat { "Runtime-generated routes $it" }
+        }
+    }
+
     /**
      * We want to exclude local network traffic from routing through the VPN, but include everything else
      *
@@ -25,7 +66,6 @@ internal class WgVpnRoutes {
      *
      * We exclude:
      *   - private local IP ranges
-     *   - CGNAT address range 100.64.0.0 -> 100.127.255.255
      *   - special IP addresses 127.0.0.0 to 127.255.255.255
      *   - not allocated to host (Class E) IP address - 240.0.0.0 to 255.255.255.255
      *   - link-local address range
@@ -35,6 +75,28 @@ internal class WgVpnRoutes {
      *   - use controller: 20.253.26.112
      */
     companion object {
+        private val CLASS_A_PRIVATE_IP_RANGE: IpRange = "10.0.0.0" to 8
+        private val CLASS_B_PRIVATE_IP_RANGE: IpRange = "172.16.0.0" to 16
+        private val CLASS_B_APIPA_IP_RANGE: IpRange = "169.254.0.0" to 16
+        private val CLASS_C_PRIVATE_IP_RANGE: IpRange = "192.168.0.0" to 16
+        private val CLASS_C_SPECIAL_IP_RANGE: IpRange = "127.0.0.0" to 8
+        private val CLASS_D_SPECIAL_IP_RANGE: IpRange = "224.0.0.0" to 4
+
+        val vpnDefaultExcludedRoutes: Map<String, Int> = mapOf(
+            CLASS_A_PRIVATE_IP_RANGE,
+            CLASS_C_SPECIAL_IP_RANGE,
+            CLASS_B_APIPA_IP_RANGE,
+            CLASS_B_PRIVATE_IP_RANGE,
+            CLASS_C_PRIVATE_IP_RANGE,
+            CLASS_D_SPECIAL_IP_RANGE,
+        )
+
+        val vpnExcludedSpecialRoutes: Map<String, Int> = mapOf(
+            CLASS_C_SPECIAL_IP_RANGE,
+            CLASS_B_APIPA_IP_RANGE,
+            CLASS_D_SPECIAL_IP_RANGE,
+        )
+
         val wgVpnDefaultRoutes: Map<String, Int> = mapOf(
             "0.0.0.0" to 5,
             "8.0.0.0" to 7,
