@@ -20,7 +20,4 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai ir papildu līdzeklis, kas ļauj anonīmi tērzēt ar populāriem trešo pušu Ml tērzēšanas modeļiem. Tavas tērzēšanas sarunas netiek izmantotas AMI apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_visibility_setting">Rādīt Duck.ai pārlūka izvēlnē</string>
-
-    <string name="duck_chat_download_finished_action_name">Atvērt</string>
-    <string name="duck_chat_cannot_open_file_error_message">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 </resources>

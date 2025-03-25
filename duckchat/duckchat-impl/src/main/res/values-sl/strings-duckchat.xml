@@ -20,7 +20,4 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai je izbirna funkcija, ki vam omogoča anonimen klepet s priljubljenimi modeli za klepet z umetno inteligenco drugih ponudnikov. Vaši klepeti se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="duck_chat_visibility_setting">Prikaži Duck.ai v meniju brskalnika</string>
-
-    <string name="duck_chat_download_finished_action_name">Odpri</string>
-    <string name="duck_chat_cannot_open_file_error_message">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
 </resources>

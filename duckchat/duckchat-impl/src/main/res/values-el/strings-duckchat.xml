@@ -20,7 +20,4 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Το Duck.ai αποτελεί προαιρετική λειτουργία που σας επιτρέπει να συνομιλείτε ανώνυμα με δημοφιλή μοντέλα τρίτων για συνομιλία μέσω τεχνητής νοημοσύνης. Οι συνομιλίες σας δεν χρησιμοποιούνται για την εκπαίδευση τεχνητής συνομιλίας.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_chat_visibility_setting">Εμφάνιση του Duck.ai στο μενού του προγράμματος περιήγησης</string>
-
-    <string name="duck_chat_download_finished_action_name">Άνοιγμα</string>
-    <string name="duck_chat_cannot_open_file_error_message">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
 </resources>

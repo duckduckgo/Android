@@ -20,7 +20,4 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai es una función opcional que te permite chatear de forma anónima con modelos populares de chat de IA de terceros. Tus chats no se utilizan para entrenar la IA.\n<annotation type="learn_more_link">Más información</annotation></string>
     <string name="duck_chat_visibility_setting">Mostrar Duck.ai en el menú del navegador</string>
-
-    <string name="duck_chat_download_finished_action_name">Abrir</string>
-    <string name="duck_chat_cannot_open_file_error_message">No se puede abrir el archivo. Busca una aplicación compatible.</string>
 </resources>

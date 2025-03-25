@@ -20,7 +20,4 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai je volitelná funkce, která umožňuje anonymně chatovat s populárními AI chatovacími modely třetích stran. Tvoje chaty neslouží k trénování umělé inteligence.\n<annotation type="learn_more_link">Další informace</annotation></string>
     <string name="duck_chat_visibility_setting">Zobrazit Duck.ai v nabídce prohlížeče</string>
-
-    <string name="duck_chat_download_finished_action_name">Otevřít</string>
-    <string name="duck_chat_cannot_open_file_error_message">Soubor nejde otevřít. Zkus vyhledat kompatibilní aplikaci.</string>
 </resources>
