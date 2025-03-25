@@ -4330,6 +4330,10 @@ class BrowserTabFragment :
     fun onTabSwipedAway() {
         viewModel.onTabSwipedAway()
     }
+
+    fun launchTabSwitcherAfterTabsUndeleted() {
+        viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
+    }
 }
 
 private class JsOrientationHandler {

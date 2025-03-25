@@ -25,6 +25,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcherAfterTabsUndeleted
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
@@ -67,6 +69,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -94,8 +97,7 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-) : ViewModel(),
-    CoroutineScope {
+) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = dispatchers.main()
@@ -107,8 +109,9 @@ class BrowserViewModel @Inject constructor(
 
     sealed class Command {
         data class Query(val query: String) : Command()
-        object LaunchPlayStore : Command()
-        object LaunchFeedbackView : Command()
+        data object LaunchPlayStore : Command()
+        data object LaunchFeedbackView : Command()
+        data object LaunchTabSwitcherAfterTabsUndeleted : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
@@ -119,6 +122,7 @@ class BrowserViewModel @Inject constructor(
         data object DismissSetAsDefaultBrowserDialog : Command()
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
+        data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -424,6 +428,35 @@ class BrowserViewModel @Inject constructor(
 
     fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
         viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
+    }
+
+    fun onBrowserResumed() {
+        checkIfAnyDeletableTabsExist()
+    }
+
+    // user has not tapped the Undo action -> purge the deletable tabs and remove all data
+    fun purgeDeletableTabs() {
+        viewModelScope.launch {
+            tabRepository.purgeDeletableTabs()
+        }
+    }
+
+    // user has tapped the Undo action -> restore the closed tabs
+    fun undoDeletableTabs(tabIds: List<String>) {
+        viewModelScope.launch {
+            tabRepository.undoDeletable(tabIds)
+            command.value = LaunchTabSwitcherAfterTabsUndeleted
+        }
+    }
+
+    private fun checkIfAnyDeletableTabsExist() {
+        viewModelScope.launch {
+            delay() // delayed so that a potential DB operation has time to mark tabs as deletable
+            val deletableTabIds = tabRepository.getDeletableTabIds()
+            if (deletableTabIds.isNotEmpty()) {
+                command.value = ShowUndoDeleteTabsMessage(deletableTabIds)
+            }
+        }
     }
 }
 

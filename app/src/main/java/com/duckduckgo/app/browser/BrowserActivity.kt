@@ -44,9 +44,6 @@ import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
-import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultAppsActivity
-import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
@@ -79,7 +76,9 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -156,6 +155,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
+    @Inject
+    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
     lateinit var tabManager: TabManager
@@ -302,6 +304,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            viewModel.onBrowserResumed()
+        }
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
@@ -314,6 +324,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             binding.tabPager.adapter = null
             binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+        }
+
+        // we don't want to purge during device rotation
+        if (isFinishing && tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            viewModel.purgeDeletableTabs()
         }
 
         super.onDestroy()
@@ -604,7 +619,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
-            is Query -> currentTab?.submitQuery(command.query)
+            is Command.Query -> currentTab?.submitQuery(command.query)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
@@ -615,9 +630,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
-            is ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
-            is ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
+            is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
+            is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
+            is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
+            Command.LaunchTabSwitcherAfterTabsUndeleted -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
+    }
+
+    private fun showTabsDeletedSnackbar(tabIds: List<String>) {
+        TabSwitcherSnackbar(
+            anchorView = binding.fragmentContainer,
+            message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+            action = getString(R.string.tabClosedUndo),
+            showAction = true,
+            onAction = { viewModel.undoDeletableTabs(tabIds) },
+            onDismiss = { viewModel.purgeDeletableTabs() },
+        ).show()
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
