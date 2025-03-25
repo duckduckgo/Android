@@ -620,6 +620,7 @@ class TabSwitcherViewModel @Inject constructor(
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,
+                    isDuckChatVisible = true,
                     isSelectAllVisible = false,
                     isDeselectAllVisible = false,
                     isSelectionActionsDividerVisible = false,
@@ -652,6 +653,7 @@ class TabSwitcherViewModel @Inject constructor(
                 DynamicInterface(
                     isFireButtonVisible = false,
                     isNewTabVisible = false,
+                    isDuckChatVisible = false,
                     isSelectAllVisible = !areAllTabsSelected,
                     isDeselectAllVisible = areAllTabsSelected,
                     isSelectionActionsDividerVisible = isSelectionActionable,
@@ -675,6 +677,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class DynamicInterface(
             val isFireButtonVisible: Boolean,
             val isNewTabVisible: Boolean,
+            val isDuckChatVisible: Boolean,
             val isSelectAllVisible: Boolean,
             val isDeselectAllVisible: Boolean,
             val isSelectionActionsDividerVisible: Boolean,

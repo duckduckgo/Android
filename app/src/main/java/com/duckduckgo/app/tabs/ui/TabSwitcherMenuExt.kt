@@ -40,6 +40,7 @@ fun Menu.createDynamicInterface(
     dynamicMenu: DynamicInterface,
 ) {
     popupMenu.newTabMenuItem.isVisible = dynamicMenu.isNewTabVisible
+    popupMenu.duckChatMenuItem.isVisible = dynamicMenu.isDuckChatVisible
     popupMenu.selectAllMenuItem.isVisible = dynamicMenu.isSelectAllVisible
     popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
     popupMenu.selectionActionsDivider.isVisible = dynamicMenu.isSelectionActionsDividerVisible
