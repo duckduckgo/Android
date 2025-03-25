@@ -20,7 +20,9 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
@@ -61,6 +63,8 @@ class TabDataRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val adClickManager: AdClickManager,
+    private val webViewSessionStorage: WebViewSessionStorage,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -282,6 +286,8 @@ class TabDataRepository @Inject constructor(
 
     private fun clearAllSiteData(tabIds: List<String>) {
         tabIds.forEach { tabId ->
+            webViewSessionStorage.deleteSession(tabId)
+            adClickManager.clearTabId(tabId)
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
@@ -313,9 +319,7 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            clearAllSiteData(getDeletableTabIds())
-        }
+        clearAllSiteData(getDeletableTabIds())
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }

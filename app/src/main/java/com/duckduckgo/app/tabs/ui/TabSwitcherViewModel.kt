@@ -20,11 +20,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
@@ -89,8 +87,6 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
-    private val webViewSessionStorage: WebViewSessionStorage,
-    private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
@@ -209,12 +205,9 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteTabs(tabIds: List<String>) = withContext(dispatcherProvider.io()) {
-        tabRepository.deleteTabs(tabIds.filterNot { it == TRACKER_ANIMATION_PANEL_ID })
-
-        tabIds.forEach { tabId ->
-            adClickManager.clearTabId(tabId)
-            webViewSessionStorage.deleteSession(tabId)
+    suspend fun deleteTabs(tabIds: List<String>) {
+        withContext(dispatcherProvider.io()) {
+            tabRepository.deleteTabs(tabIds.filterNot { it == TRACKER_ANIMATION_PANEL_ID })
         }
     }
 
@@ -419,9 +412,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data
     suspend fun purgeDeletableTabs() {
-        tabRepository.getDeletableTabIds().forEach {
-            adClickManager.clearTabId(it)
-        }
         tabRepository.purgeDeletableTabs()
     }
 
