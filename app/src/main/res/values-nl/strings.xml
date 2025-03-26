@@ -114,11 +114,6 @@
     <string name="tabSwitcherListViewMenu">Lijstweergave</string>
     <string name="tabSwitcherGridViewMenu">Rasterweergave</string>
 
-    <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers geblokkeerd &lt;/b&gt; in de afgelopen 7 dagen</string>
-    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers geblokkeerd &lt;/b&gt;</string>
-    <string name="inTheLast7Days">in de afgelopen 7 dagen</string>
-
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
     <string name="fireClearAll">Alle tabbladen en gegevens wissen</string>
@@ -802,9 +797,19 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Niet nu</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkeert trackers om je te beschermen tijdens het browsen  </string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Deze website verlaten</string>
+    <string name="maliciousSiteAdvancedCTA">Geavanceerd</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Je kunt <a href=\"\">een fout melden</a> als je denkt dat deze website veilig is. Je kunt de website nog steeds bezoeken op eigen risico.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Risico accepteren en site bezoeken</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Meld een website die ten onrechte als schadelijk is aangeduid</string>
+    <string name="maliciousSiteLearnMoreTitle">Meer informatie</string>
+    <string name="maliciousSiteSettingTitle">Waarschuwingen over de veiligheid van de website</string>
+    <string name="maliciousSiteToggleHint">Waarschuw me op websites die zijn aangeduid als phishing of malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Als je deze functie uitschakelt, kunnen je gegevens in gevaar komen.</string>
 
 </resources>
