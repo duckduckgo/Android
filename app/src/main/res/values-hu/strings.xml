@@ -114,11 +114,6 @@
     <string name="tabSwitcherListViewMenu">Listanézet</string>
     <string name="tabSwitcherGridViewMenu">Rácsnézet</string>
 
-    <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
-    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető letiltva &lt;/b&gt;</string>
-    <string name="inTheLast7Days">az elmúlt 7 napban</string>
-
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Összes lap és adat törlése</string>
@@ -802,9 +797,19 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Most nem</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">A DuckDuckGo a böngészésed védelme érdekében blokkolja a nyomkövetőket</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
+    <string name="maliciousSiteAdvancedCTA">Haladó</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Helytelenül rosszindulatúnak jelölt webhely jelentése</string>
+    <string name="maliciousSiteLearnMoreTitle">További részletek</string>
+    <string name="maliciousSiteSettingTitle">Webhelybiztonsági figyelmeztetések</string>
+    <string name="maliciousSiteToggleHint">Figyelmeztetés az adathalászat vagy rosszindulatú programok miatt megjelölt webhelyekre</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
 
 </resources>
