@@ -114,11 +114,6 @@
     <string name="tabSwitcherListViewMenu">В виде списка</string>
     <string name="tabSwitcherGridViewMenu">В виде сетки</string>
 
-    <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Заблокировано трекеров: %1$s&lt;/b&gt; (за последние 7 дней)</string>
-    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Заблокировано трекеров: %1$s &lt;/b&gt;</string>
-    <string name="inTheLast7Days">за последние 7 дней</string>
-
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
@@ -806,9 +801,19 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Сделайте его браузером по умолчанию, чтобы все ссылки на сайты открывались в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сейчас</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Для безопасности просмотра DuckDuckGo блокирует трекеры</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">В результате закрытия вкладок и очистки данных также будет удалена история блокировки трекеров, а их счетчик будет сброшен до нуля.\n\nЭтот баннер на вкладках можно при желании скрыть.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скрыть баннер</string>
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу: возможно, она распространяет вредоносное ПО для взлома устройств или кражи личной информации.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Возможно, это лишь имитация настоящего сайта, созданная с целью собрать ваши данные (например, пароли и номера платежных карт) обманным путем.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Покинуть сайт</string>
+    <string name="maliciousSiteAdvancedCTA">Дополнительно</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Если вы уверены в безопасности этого сайта, можете <a href=\"\">сообщить нам об ошибке</a>. Решив посетить его, вы принимаете на себя все связанные с этим риски.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Принять риск и перейти на сайт</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Сайт не вредоносный</string>
+    <string name="maliciousSiteLearnMoreTitle">Подробнее</string>
+    <string name="maliciousSiteSettingTitle">Предупреждения о безопасности на сайте</string>
+    <string name="maliciousSiteToggleHint">Предупреждать о вредоносных и фишинговых сайтах</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Отключение этой функции может поставить ваши данные под угрозу.</string>
 
 </resources>
