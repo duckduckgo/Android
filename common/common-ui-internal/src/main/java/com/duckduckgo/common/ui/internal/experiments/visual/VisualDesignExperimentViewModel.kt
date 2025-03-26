@@ -81,7 +81,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("DenyListedApi") fun onExperimentalUIModeChanged(checked: Boolean) {
+    @SuppressLint("DenyListedApi")
+    fun onExperimentalUIModeChanged(checked: Boolean) {
         visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
         if (checked) {
             appPersonalityFeature.self().setRawStoredState(State(false))
