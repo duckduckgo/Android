@@ -114,11 +114,6 @@
     <string name="tabSwitcherListViewMenu">Luettelonäkymä</string>
     <string name="tabSwitcherGridViewMenu">Ruudukkonäkymä</string>
 
-    <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt; edellisen seitsemän päivän aikana</string>
-    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt;</string>
-    <string name="inTheLast7Days">viimeisten 7 päivän aikana</string>
-
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
@@ -802,9 +797,19 @@
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ei nyt</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo suojaa selaamistasi estämällä seurantatoiminnot</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Tämä verkkosivusto saattaa esiintyä laillisena sivustona huijatakseen sinua antamaan henkilötietoja, kuten salasanan tai luottokortin numeron.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Poistu sivustolta</string>
+    <string name="maliciousSiteAdvancedCTA">Lisäasetukset</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Jos uskot, että tämä verkkosivusto on turvallinen, voit <a href=\"\">ilmoittaa virheestä</a>. Voit silti vierailla verkkosivustolla omalla vastuullasi.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Hyväksy riski ja mene sivustolle</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Ilmoita sivustosta, joka on virheellisesti merkitty haitalliseksi</string>
+    <string name="maliciousSiteLearnMoreTitle">Lue lisää</string>
+    <string name="maliciousSiteSettingTitle">Sivustojen tietoturvavaroitukset</string>
+    <string name="maliciousSiteToggleHint">Varoita sivustoista, jotka on merkitty tietojenkalastelun tai haittaohjelmien johdosta</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Tämän ominaisuuden käytöstä poistaminen voi vaarantaa tietosi.</string>
 
 </resources>
