@@ -22,10 +22,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.COOL_DOWN_DAYS
+import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.DISMISS_EVENTS
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.DISMISS_STREAK
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.DISMISS_STREAK_RESET_DAYS
+import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.LAST_SHOWN_DATE
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.MAX_DISMISS_STREAK
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.NEXT_SHOWN_DATE
 import com.duckduckgo.brokensite.impl.di.BrokenSitePrompt
@@ -40,6 +43,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.time.ZoneOffset
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
@@ -50,8 +55,17 @@ interface BrokenSitePomptDataStore {
 
     suspend fun setCoolDownDays(days: Long)
     suspend fun getCoolDownDays(): Long
+
     suspend fun setDismissStreak(streak: Int)
     suspend fun getDismissStreak(): Int
+
+    suspend fun addDismissal(dismissal: LocalDateTime)
+    suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
+    suspend fun deleteAllExpiredDismissals(expiryDate: String)
+
+    suspend fun setLastShownDate(lastShownDate: LocalDateTime)
+    suspend fun getLastShownDate(): LocalDateTime?
+
     suspend fun setNextShownDate(nextShownDate: LocalDateTime?)
     suspend fun getNextShownDate(): LocalDateTime?
 }
@@ -68,6 +82,8 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val DISMISS_STREAK_RESET_DAYS = intPreferencesKey(name = "DISMISS_STREAK_RESET_DAYS")
         val COOL_DOWN_DAYS = longPreferencesKey(name = "COOL_DOWN_DAYS")
         val DISMISS_STREAK = intPreferencesKey(name = "DISMISS_STREAK")
+        val DISMISS_EVENTS = stringSetPreferencesKey(name = "DISMISS_EVENTS")
+        val LAST_SHOWN_DATE = stringPreferencesKey(name = "LAST_SHOWN_DATE")
         val NEXT_SHOWN_DATE = stringPreferencesKey(name = "NEXT_SHOWN_DATE")
     }
 
@@ -136,6 +152,57 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun getDismissStreak(): Int {
         return dismissStreak.first()
+    }
+
+    override suspend fun addDismissal(dismissal: LocalDateTime) {
+        store.edit { prefs ->
+            prefs[DISMISS_EVENTS] = (prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()).plus(formatter.format(dismissal))
+        }
+    }
+
+    override suspend fun getDismissalCountBetween(
+        t1: LocalDateTime,
+        t2: LocalDateTime
+    ): Int {
+        val allDismissEvents = store.data.map { prefs ->
+            prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()
+        }.first()
+
+        return allDismissEvents.count { dateString: String ->
+            try {
+                val eventDateTime = LocalDateTime.parse(dateString, formatter)
+                eventDateTime.isAfter(t1) && eventDateTime.isBefore(t2)
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    override suspend fun deleteAllExpiredDismissals(expiryDate: String) {
+        val normalizedExpiry = LocalDateTime.ofInstant(Instant.parse(expiryDate), ZoneOffset.UTC)
+
+        store.edit { prefs ->
+            val allDismissEvents = prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()
+
+            val validDismissEvents = allDismissEvents.filter { dateString ->
+                try {
+                    val eventDateTime = LocalDateTime.parse(dateString, formatter)
+                    eventDateTime.isAfter(normalizedExpiry)
+                } catch (e: Exception) {
+                    false
+                }
+            }.toSet()
+            prefs[DISMISS_EVENTS] = validDismissEvents
+        }
+    }
+
+    override suspend fun setLastShownDate(lastShownDate: LocalDateTime) {
+        store.edit { prefs -> prefs[LAST_SHOWN_DATE] = formatter.format(lastShownDate) }
+    }
+
+    override suspend fun getLastShownDate(): LocalDateTime? {
+        val lastShownDate = store.data.first()[LAST_SHOWN_DATE]
+        return lastShownDate?.let { LocalDateTime.parse(it, formatter) }
     }
 
     override suspend fun getNextShownDate(): LocalDateTime? {

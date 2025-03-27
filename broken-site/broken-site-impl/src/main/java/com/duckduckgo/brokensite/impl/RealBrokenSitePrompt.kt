@@ -43,16 +43,24 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
-        if (brokenSiteReportRepository.getDismissStreak() >= brokenSiteReportRepository.getMaxDismissStreak() - 1) {
-            brokenSiteReportRepository.resetDismissStreak()
-            val nextShownDate = brokenSiteReportRepository.getNextShownDate()
-            val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
 
+        val currentTimestamp = currentTimeProvider.localDateTimeNow()
+
+        brokenSiteReportRepository.addDismissal(currentTimestamp)
+
+        val dismissStreakCount = brokenSiteReportRepository.getDismissalCountBetween(
+            currentTimestamp.minusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong()),
+            currentTimestamp
+        )
+
+        if (dismissStreakCount >= brokenSiteReportRepository.getMaxDismissStreak()) {
+            val newNextShownDate = currentTimestamp
+                .plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
+
+            val nextShownDate = brokenSiteReportRepository.getNextShownDate()
             if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
                 brokenSiteReportRepository.setNextShownDate(newNextShownDate)
             }
-        } else {
-            brokenSiteReportRepository.incrementDismissStreak()
         }
     }
 
@@ -88,15 +96,48 @@ class RealBrokenSitePrompt @Inject constructor(
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
-        return isFeatureEnabled() &&
-            getUserRefreshesCount() >= REFRESH_COUNT_LIMIT &&
-            brokenSiteReportRepository.getNextShownDate()?.isBefore(currentTimeProvider.localDateTimeNow()) ?: true &&
-            !duckGoUrlDetector.isDuckDuckGoUrl(url)
+        if (!isFeatureEnabled() || getUserRefreshesCount() < REFRESH_COUNT_LIMIT || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            return false
+        }
+
+        val currentTimestamp = currentTimeProvider.localDateTimeNow()
+
+        brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
+            if (currentTimestamp.isBefore(nextDate)) {
+                return false
+            }
+        }
+
+        val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
+        when (val lastShownDate = brokenSiteReportRepository.getLastShownDate()) {
+            null -> {
+                // First time showing the prompt
+                return true
+            }
+
+            else -> {
+                if (currentTimestamp.isAfter(lastShownDate.plusDays(dismissStreakResetDays))) {
+                    return true
+                }
+            }
+        }
+
+        val recentDismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
+            currentTimestamp,
+            currentTimestamp.minusDays(
+                brokenSiteReportRepository.getDismissStreakResetDays().toLong()
+            )
+        )
+        return recentDismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }
 
     override suspend fun ctaShown() {
+        val currentTimestamp = currentTimeProvider.localDateTimeNow()
         val nextShownDate = brokenSiteReportRepository.getNextShownDate()
-        val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
+        val newNextShownDate = currentTimestamp.plusDays(brokenSiteReportRepository.getCoolDownDays())
+
+        brokenSiteReportRepository.setLastShownDate(currentTimestamp)
+
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
             brokenSiteReportRepository.setNextShownDate(newNextShownDate)
         }
