@@ -776,8 +776,8 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
-    <string name="settingsAddressBarPositionTop">Fel</string>
-    <string name="settingsAddressBarPositionBottom">Alul</string>
+    <string name="settingsAddressBarPositionTop">Fent</string>
+    <string name="settingsAddressBarPositionBottom">Lent</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
