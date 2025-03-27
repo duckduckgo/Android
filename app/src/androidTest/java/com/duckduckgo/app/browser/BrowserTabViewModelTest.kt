@@ -211,9 +211,9 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
-import com.duckduckgo.common.ui.internal.experiments.trackersblocking.AppPersonalityFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -6152,7 +6152,7 @@ class BrowserTabViewModelTest {
             AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
             mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${mockUserStageStore.getUserAppStage() != ESTABLISHED}"),
         )
-        verify(mockPrivacyDashboardExternalPixelParams).setPixelParams(PixelParameter.AFTER_BURST_ANIMATION, "true")
+        verify(mockPrivacyDashboardExternalPixelParams).setPixelParams(PixelParameter.LOGOS_BURST, "true")
     }
 
     @Test

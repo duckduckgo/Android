@@ -72,7 +72,6 @@ interface Pixel {
         const val LOGOS_BURST = "logos_burst"
         const val GREEN_BURST = "green_burst"
         const val GREEN_SHIELD_COUNT_MINIBAR = "greenshield_count_minibar"
-        const val AFTER_BURST_ANIMATION = "after_burst_animation"
     }
 
     object PixelValues {
