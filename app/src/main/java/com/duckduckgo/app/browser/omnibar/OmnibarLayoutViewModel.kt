@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
@@ -652,6 +653,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                     urlLoaded = url,
                 ),
             )
+        }
+    }
+
+    fun onCustomTabTitleUpdate(decoration: ChangeCustomTabTitle) {
+        val customTabMode = viewState.value.viewMode
+        if (customTabMode is CustomTab) {
+            _viewState.update {
+                it.copy(
+                    viewMode = customTabMode.copy(title = decoration.title),
+                )
+            }
         }
     }
 }
