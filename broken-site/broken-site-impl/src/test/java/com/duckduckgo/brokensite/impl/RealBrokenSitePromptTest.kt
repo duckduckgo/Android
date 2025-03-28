@@ -87,8 +87,8 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenUserDismissPromptLessThanMaxDismissStreakTimesThenAddDismissalAndDoNotUpdateNextShownDate() =
         runTest {
+            whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
             whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(1)
-            whenever(mockBrokenSiteReportRepository.getDismissStreakResetDays().toLong()).thenReturn(30)
 
             testee.userDismissedPrompt()
 

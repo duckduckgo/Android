@@ -35,7 +35,9 @@ import com.duckduckgo.brokensite.impl.di.BrokenSitePrompt
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -43,8 +45,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import java.time.Instant
-import java.time.ZoneOffset
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
@@ -162,7 +162,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun getDismissalCountBetween(
         t1: LocalDateTime,
-        t2: LocalDateTime
+        t2: LocalDateTime,
     ): Int {
         val allDismissEvents = store.data.map { prefs ->
             prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()
