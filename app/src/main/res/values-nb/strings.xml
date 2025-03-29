@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Listevisning</string>
     <string name="tabSwitcherGridViewMenu">Rutenettvisning</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt; de siste 7 dagene</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt;</string>
+    <string name="inTheLast7Days">de siste 7 dagene</string>
+
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
     <string name="fireClearAll">Lukk alle faner og slett data</string>
@@ -796,6 +801,11 @@
     <string name="defaultBrowserBottomSheetDialogTitle">La DuckDuckGo beskytte mer av det du gjør på nettet</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gjør oss til standardnettleseren din slik at alle nettstedslenker åpnes i DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nå</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkerer sporere for å beskytte surfingen din</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du fjerner fanene og dataene dine, slettes sporingsblokkeringshistorikken din, og dette tallet tilbakestilles til null.\n\nSkjul dette banneret hvis du ikke vil se det i fanevisningen.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
 
     <!-- Malicious Site -->
     <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>

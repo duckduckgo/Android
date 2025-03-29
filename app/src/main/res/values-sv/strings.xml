@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Listvy</string>
     <string name="tabSwitcherGridViewMenu">Rutnätsvy</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s spårare blockerade &lt;/b&gt; under de senaste 7 dagarna</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s spårare blockerades &lt;/b&gt;</string>
+    <string name="inTheLast7Days">under de senaste 7 dagarna</string>
+
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
     <string name="fireClearAll">Rensa alla flikar och data</string>
@@ -796,6 +801,11 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Inte nu</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blockerar spårare för att skydda ditt surfande</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">När du rensar dina flikar och data kommer historiken för spårningsblockering att raderas och detta nummer att nollställas.\n\nDölj den här bannern om du inte vill se den i flikvyn.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Dölj banner</string>
 
     <!-- Malicious Site -->
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>

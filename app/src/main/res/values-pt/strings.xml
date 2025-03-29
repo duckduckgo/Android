@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Vista de lista</string>
     <string name="tabSwitcherGridViewMenu">Vista de grelha</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s rastreadores bloqueados &lt;/b&gt; nos últimos 7 dias</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s rastreadores bloqueados &lt;/b&gt;</string>
+    <string name="inTheLast7Days">nos últimos 7 dias</string>
+
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
     <string name="fireClearAll">Limpar todos os separadores e dados</string>
@@ -796,6 +801,11 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Deixa o DuckDuckGo proteger melhor o que fazes online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Torna-nos o teu navegador predefinido para que todos os links dos sites sejam abertos no DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Agora não</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">O DuckDuckGo bloqueia rastreadores para proteger a tua navegação</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Limpar os separadores e os dados elimina o teu histórico de bloqueio de rastreadores e redefine este número para zero.\n\nOculta esta faixa se preferires não a ver na vista de separadores.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar faixa</string>
 
     <!-- Malicious Site -->
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
