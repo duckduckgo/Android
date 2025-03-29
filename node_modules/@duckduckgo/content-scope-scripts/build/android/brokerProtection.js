@@ -3730,9 +3730,12 @@
     addDebugFlag() {
       if (__privateGet(this, _isDebugFlagSet)) return;
       __privateSet(this, _isDebugFlagSet, true);
-      this.messaging?.notify("addDebugFlag", {
-        flag: this.name
-      });
+      try {
+        this.messaging?.notify("addDebugFlag", {
+          flag: this.name
+        });
+      } catch (_e) {
+      }
     }
     /**
      * Define a property descriptor with debug flags.
