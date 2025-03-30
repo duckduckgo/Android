@@ -811,4 +811,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Brisanjem svojih kartica i podataka izbrisat ćeš povijest blokiranja alata za praćenje i vratiti ovaj broj na nulu.\n\nSakrij ovaj baner ako ga ne želiš vidjeti u prikazu kartica.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Sakrij baner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Upozorenje: ova web lokacija može predstavljati sigurnosni rizik</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokirao ovu stranicu jer možda širi zlonamjerni softver izrađen da ugrozi tvoj uređaj ili ukrade tvoje osobne podatke.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ovo web-mjesto može se lažno predstavljati kao legitimno web-mjesto kako bi te prevarilo da uneseš svoje osobne podatke, kao što su lozinke ili brojevi kreditnih kartica.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Napusti ovo web-mjesto</string>
+    <string name="maliciousSiteAdvancedCTA">Napredno</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ako vjeruješ da je ovo web-mjesto sigurno, možeš <a href=\"\">prijaviti pogrešku</a>. Još uvijek možeš posjetiti web-mjesto na vlastitu odgovornost.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Prihvati rizik i posjeti web-mjesto</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Prijavi web-mjesto pogrešno označeno kao zlonamjerno</string>
+    <string name="maliciousSiteLearnMoreTitle">Saznajte više</string>
+    <string name="maliciousSiteSettingTitle">Sigurnosna upozorenja za web-mjesto</string>
+    <string name="maliciousSiteToggleHint">Upozori me na web-mjestima označenim zbog krađe identiteta ili zlonamjernog softvera.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Onemogućavanje ove značajke može ugroziti tvoje podatke.</string>
+
 </resources>

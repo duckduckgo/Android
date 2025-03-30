@@ -807,4 +807,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Deze website verlaten</string>
+    <string name="maliciousSiteAdvancedCTA">Geavanceerd</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Je kunt <a href=\"\">een fout melden</a> als je denkt dat deze website veilig is. Je kunt de website nog steeds bezoeken op eigen risico.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Risico accepteren en site bezoeken</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Meld een website die ten onrechte als schadelijk is aangeduid</string>
+    <string name="maliciousSiteLearnMoreTitle">Meer informatie</string>
+    <string name="maliciousSiteSettingTitle">Waarschuwingen over de veiligheid van de website</string>
+    <string name="maliciousSiteToggleHint">Waarschuw me op websites die zijn aangeduid als phishing of malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Als je deze functie uitschakelt, kunnen je gegevens in gevaar komen.</string>
+
 </resources>

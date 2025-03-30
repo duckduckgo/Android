@@ -806,4 +806,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Leave This Site</string>
+    <string name="maliciousSiteAdvancedCTA">Advanced</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Report a site incorrectly flagged as malicious</string>
+    <string name="maliciousSiteLearnMoreTitle">Learn more</string>
+    <string name="maliciousSiteSettingTitle">Site Safety Warnings</string>
+    <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
+
 </resources>

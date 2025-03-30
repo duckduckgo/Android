@@ -807,4 +807,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">När du rensar dina flikar och data kommer historiken för spårningsblockering att raderas och detta nummer att nollställas.\n\nDölj den här bannern om du inte vill se den i flikvyn.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Dölj banner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan distribuera skadlig programvara avsedd att göra intrång på din enhet eller stjäla din personliga information.\n<a href=\"\">Mer information</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Den här webbplatsen kan utge sig för att vara en legitim webbplats för att lura dig att lämna ut personlig information som lösenord eller kortnummer.\n<a href=\"\">Mer information</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Lämna denna webbplats</string>
+    <string name="maliciousSiteAdvancedCTA">Avancerat</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Om du tror att den här webbplatsen är säker kan du <a href=\"\">rapportera ett fel</a>. Du kan fortfarande besöka webbplatsen på egen risk.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Acceptera risken och besök webbplatsen</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Rapportera en webbplats som felaktigt flaggats som skadlig</string>
+    <string name="maliciousSiteLearnMoreTitle">Läs mer</string>
+    <string name="maliciousSiteSettingTitle">Säkerhetsvarningar för webbplatser</string>
+    <string name="maliciousSiteToggleHint">Varna mig på webbplatser som har flaggats för nätfiske eller skadlig programvara</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Om den här funktionen inaktiveras kan dina uppgifter utsättas för risker.</string>
+
 </resources>

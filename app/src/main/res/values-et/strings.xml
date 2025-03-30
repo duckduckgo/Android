@@ -807,4 +807,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Lahku sellelt saidilt</string>
+    <string name="maliciousSiteAdvancedCTA">Täiustatud</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Kui arvate, et see veebisait on turvaline, võite <a href=\"\">teatada veast</a>. Võite siiski külastada veebisaiti omal vastutusel.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Nõustu riskiga ja külasta saiti</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Teatage saidist, mis on valesti pahatahtlikuks märgitud</string>
+    <string name="maliciousSiteLearnMoreTitle">Loe edasi</string>
+    <string name="maliciousSiteSettingTitle">Saidi ohutuse hoiatused</string>
+    <string name="maliciousSiteToggleHint">Hoiata mind andmepüügi või pahavara tõttu märgistatud saitidel</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Selle funktsiooni keelamine võib teie andmed ohtu seada.</string>
+
 </resources>

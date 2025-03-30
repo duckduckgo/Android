@@ -809,4 +809,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Ștergerea filelor și a datelor tale va șterge istoricul blocării tehnologiilor de urmărire și va reseta acest număr la zero.\n\nAscunde acest banner dacă preferi să nu-l vezi în vizualizarea filelor.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ascunde bannerul</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Acest site poate imita un site legitim pentru a te induce în eroare să furnizezi informații personale, cum ar fi parole sau numere de carduri de credit.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Părăsește acest site</string>
+    <string name="maliciousSiteAdvancedCTA">Avansat</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Dacă crezi că acest site este sigur, poți <a href=\"\">să raportezi o eroare</a>. Poți vizita în continuare site-ul pe propriul risc.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Raportează un site marcat incorect ca fiind rău intenționat</string>
+    <string name="maliciousSiteLearnMoreTitle">Află mai multe</string>
+    <string name="maliciousSiteSettingTitle">Avertizări de siguranță privind site-urile</string>
+    <string name="maliciousSiteToggleHint">Avertizează-mă cu privire la site-urile marcate pentru phishing sau programe rău intenționate.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Dezactivarea acestei funcții poate genera riscuri privind informațiile tale.</string>
+
 </resources>

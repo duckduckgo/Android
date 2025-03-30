@@ -811,4 +811,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Táto webová lokalita sa môže vydávať za legitímnu lokalitu s cieľom oklamať vás k poskytnutiu osobných údajov, ako sú heslá alebo čísla kreditných kariet.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Opustiť túto stránku</string>
+    <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ak si myslíš, že táto webová stránka je bezpečná, môžeš <a href=\"\">nahlásiť chybu</a>. Webovú stránku môžeš stále navštíviť na vlastné riziko.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Akceptovať riziko a navštíviť stránku</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Nahlás, že stránka je nesprávne označená stránku ako škodlivá.</string>
+    <string name="maliciousSiteLearnMoreTitle">Zistite viac</string>
+    <string name="maliciousSiteSettingTitle">Bezpečnostné upozornenia na lokalite</string>
+    <string name="maliciousSiteToggleHint">Upozorni ma na stránkach označených ako phishing alebo malvér.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Zistiť viac</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Deaktivácia tejto funkcie môže ohroziť tvoje údaje.</string>
+
 </resources>
