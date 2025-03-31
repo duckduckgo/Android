@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.ZoneId
 
 interface BrokenSiteReportRepository {
     suspend fun getLastSentDay(hostname: String): String?
@@ -54,13 +55,6 @@ interface BrokenSiteReportRepository {
 
     suspend fun addDismissal(dismissal: LocalDateTime)
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
-
-    suspend fun setLastShownDate(lastShownDate: LocalDateTime)
-    suspend fun getLastShownDate(): LocalDateTime?
-
-    suspend fun incrementDismissStreak()
-    suspend fun getDismissStreak(): Int
-    suspend fun resetDismissStreak()
 
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
@@ -102,7 +96,7 @@ class RealBrokenSiteReportRepository(
         coroutineScope.launch(dispatcherProvider.io()) {
             val expiryTime = getUTCDate30DaysAgo()
             database.brokenSiteDao().deleteAllExpiredReports(expiryTime)
-            brokenSitePromptDataStore.deleteAllExpiredDismissals(expiryTime)
+            brokenSitePromptDataStore.deleteAllExpiredDismissals(expiryTime, ZoneId.systemDefault())
         }
     }
 
@@ -137,25 +131,12 @@ class RealBrokenSiteReportRepository(
         setCoolDownDays(coolDownDays.toLong())
     }
 
-    override suspend fun resetDismissStreak() {
-        brokenSitePromptDataStore.setDismissStreak(0)
-    }
-
     override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
     }
 
-    override suspend fun getDismissStreak(): Int {
-        return brokenSitePromptDataStore.getDismissStreak()
-    }
-
     override suspend fun getNextShownDate(): LocalDateTime? {
         return brokenSitePromptDataStore.getNextShownDate()
-    }
-
-    override suspend fun incrementDismissStreak() {
-        val dismissCount = getDismissStreak()
-        brokenSitePromptDataStore.setDismissStreak(dismissCount + 1)
     }
 
     override suspend fun addDismissal(dismissal: LocalDateTime) {
@@ -164,14 +145,6 @@ class RealBrokenSiteReportRepository(
 
     override suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
         return brokenSitePromptDataStore.getDismissalCountBetween(t1, t2)
-    }
-
-    override suspend fun setLastShownDate(lastShownDate: LocalDateTime) {
-        brokenSitePromptDataStore.setLastShownDate(lastShownDate)
-    }
-
-    override suspend fun getLastShownDate(): LocalDateTime? {
-        return brokenSitePromptDataStore.getLastShownDate()
     }
 
     override fun resetRefreshCount() {

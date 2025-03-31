@@ -47,27 +47,6 @@ class RealBrokenSitePrompt @Inject constructor(
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
 
         brokenSiteReportRepository.addDismissal(currentTimestamp)
-
-        val dismissStreakCount = brokenSiteReportRepository.getDismissalCountBetween(
-            currentTimestamp.minusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong()),
-            currentTimestamp,
-        )
-
-        if (dismissStreakCount >= brokenSiteReportRepository.getMaxDismissStreak()) {
-            val newNextShownDate = currentTimestamp
-                .plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
-
-            val nextShownDate = brokenSiteReportRepository.getNextShownDate()
-            if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
-                brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-            }
-        }
-    }
-
-    override suspend fun userAcceptedPrompt() {
-        if (!_featureEnabled) return
-
-        brokenSiteReportRepository.resetDismissStreak()
     }
 
     override suspend fun isFeatureEnabled(): Boolean {
@@ -102,6 +81,7 @@ class RealBrokenSitePrompt @Inject constructor(
 
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
 
+        // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
             if (currentTimestamp.isBefore(nextDate)) {
                 return false
@@ -109,34 +89,25 @@ class RealBrokenSitePrompt @Inject constructor(
         }
 
         val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
-        when (val lastShownDate = brokenSiteReportRepository.getLastShownDate()) {
-            null -> {
-                // First time showing the prompt
-                return true
-            }
-
-            else -> {
-                if (currentTimestamp.isAfter(lastShownDate.plusDays(dismissStreakResetDays))) {
-                    return true
-                }
-            }
-        }
-
-        val recentDismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
-            currentTimestamp,
-            currentTimestamp.minusDays(
-                brokenSiteReportRepository.getDismissStreakResetDays().toLong(),
-            ),
+        val dismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
+            currentTimestamp.minusDays(dismissStreakResetDays),
+            currentTimestamp
         )
-        return recentDismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
+
+        if (dismissalCount >= brokenSiteReportRepository.getMaxDismissStreak()) {
+            // User has dismissed 3+ times within max period, set cooldown and don't show
+            val newNextShownDate = currentTimestamp.plusDays(dismissStreakResetDays)
+            brokenSiteReportRepository.setNextShownDate(newNextShownDate)
+            return false
+        }
+        // All checks passed, show prompt
+        return true
     }
 
     override suspend fun ctaShown() {
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
         val nextShownDate = brokenSiteReportRepository.getNextShownDate()
         val newNextShownDate = currentTimestamp.plusDays(brokenSiteReportRepository.getCoolDownDays())
-
-        brokenSiteReportRepository.setLastShownDate(currentTimestamp)
 
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
             brokenSiteReportRepository.setNextShownDate(newNextShownDate)
