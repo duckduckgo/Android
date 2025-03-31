@@ -105,6 +105,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.SPLASHSCREEN_FAILED_TO_LAUNCH.pixelName to PixelParameter.removeAll(),
             AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE.pixelName to PixelParameter.removeAll(),
             AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SETTINGS_SYNC_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
