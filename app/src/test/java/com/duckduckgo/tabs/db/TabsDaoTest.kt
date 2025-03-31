@@ -422,10 +422,29 @@ class TabsDaoTest {
 
         testee.insertTab(tab1)
         testee.insertTab(tab2)
-        testee.undoDeletableTabs(listOf(tab1.tabId, tab2.tabId))
+        testee.undoDeletableTabs(listOf(tab1.tabId, tab2.tabId), false)
 
         assertEquals(tab1.copy(deletable = false), testee.tab(tab1.tabId))
         assertEquals(tab2.copy(deletable = false), testee.tab(tab2.tabId))
+    }
+
+    @Test
+    fun whenUndoDeletableTabsAndMoveActiveToEndThenModifyDeletableColumnAndMoveActiveToEnd() {
+        val tab1 = TabEntity(tabId = "TAB_ID1", url = "www.duckduckgo.com", position = 0, deletable = false)
+        val tab2 = TabEntity(tabId = "TAB_ID2", url = "www.duckduckgo.com", position = 0, deletable = true)
+        val tab3 = TabEntity(tabId = "TAB_ID3", url = "www.duckduckgo.com", position = 1, deletable = true)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        testee.insertTab(tab3)
+        testee.insertTabSelection(TabSelectionEntity(tabId = tab1.tabId))
+        testee.undoDeletableTabs(listOf(tab2.tabId, tab3.tabId), true)
+
+        val tabs = testee.tabs()
+        assertEquals(tab2.copy(deletable = false), testee.tab(tab2.tabId))
+        assertEquals(tab3.copy(deletable = false), testee.tab(tab3.tabId))
+        assertEquals(tab1.copy(position = 2), testee.tab(tab1.tabId))
+        assertEquals(tab1.tabId, tabs.last().tabId)
     }
 
     @Test
