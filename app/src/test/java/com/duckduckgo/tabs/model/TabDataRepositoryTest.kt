@@ -21,9 +21,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
@@ -90,6 +92,10 @@ class TabDataRepositoryTest {
     private val daoDeletableTabs = Channel<List<TabEntity>>()
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+
+    private val mockWebViewSessionStorage: WebViewSessionStorage = mock()
+
+    private val mockAdClickManager: AdClickManager = mock()
 
     @Before
     fun before() {
@@ -601,6 +607,24 @@ class TabDataRepositoryTest {
         verify(mockDao).deleteTabsAndUpdateSelection(tabIds)
         tabIds.forEach { tabId ->
             assertNull(testee.retrieveSiteData(tabId).value)
+            verify(mockWebViewSessionStorage).deleteSession(tabId)
+            verify(mockAdClickManager).clearTabId(tabId)
+        }
+    }
+
+    @Test
+    fun whenPurgeDeletableTabsThenPurgeDeletableTabsAndClearData() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+        whenever(mockDao.getDeletableTabIds()).thenReturn(tabIds)
+
+        testee.purgeDeletableTabs()
+
+        verify(mockDao).purgeDeletableTabsAndUpdateSelection()
+        tabIds.forEach { tabId ->
+            assertNull(testee.retrieveSiteData(tabId).value)
+            verify(mockWebViewSessionStorage).deleteSession(tabId)
+            verify(mockAdClickManager).clearTabId(tabId)
         }
     }
 
@@ -634,7 +658,8 @@ class TabDataRepositoryTest {
             timeProvider,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
-            tabManagerFeatureFlags,
+            mockAdClickManager,
+            mockWebViewSessionStorage,
         )
     }
 
