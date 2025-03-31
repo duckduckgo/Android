@@ -114,6 +114,7 @@ class RealBrokenSiteReportRepositoryTest {
         testee.cleanupOldEntries()
 
         verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
+        verify(mockDataStore).deleteAllExpiredDismissals(any(), any())
     }
 
     @Test
@@ -144,29 +145,12 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenResetDismissStreakCalledThenDismissStreakIsSetToZero() = runTest {
-        testee.resetDismissStreak()
-
-        verify(mockDataStore).setDismissStreak(0)
-    }
-
-    @Test
     fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
         val nextShownDate = LocalDateTime.now()
 
         testee.setNextShownDate(nextShownDate)
 
         verify(mockDataStore).setNextShownDate(nextShownDate)
-    }
-
-    @Test
-    fun whenGetDismissStreakCalledThenReturnDismissStreak() = runTest {
-        val dismissStreak = 5
-        whenever(mockDataStore.getDismissStreak()).thenReturn(dismissStreak)
-
-        val result = testee.getDismissStreak()
-
-        assertEquals(dismissStreak, result)
     }
 
     @Test

@@ -91,7 +91,7 @@ class RealBrokenSitePrompt @Inject constructor(
         val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
         val dismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
             currentTimestamp.minusDays(dismissStreakResetDays),
-            currentTimestamp
+            currentTimestamp,
         )
 
         if (dismissalCount >= brokenSiteReportRepository.getMaxDismissStreak()) {
