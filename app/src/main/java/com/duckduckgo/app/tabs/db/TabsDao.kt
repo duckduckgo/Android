@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
+import kotlin.math.max
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -110,15 +111,17 @@ abstract class TabsDao {
     @Transaction
     open fun undoDeletableTabs(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
         // ensure the tab is in the DB
+        var lastTabPosition = selectedTab()?.position ?: 0
         tabIds.forEach { tabId ->
             tab(tabId)?.let { tab ->
                 updateTab(tab.copy(deletable = false))
+                lastTabPosition = max(lastTabPosition, tab.position)
             }
         }
 
         if (moveActiveTabToEnd) {
             selectedTab()?.let { activeTab ->
-                updateTab(activeTab.copy(position = tabIds.size))
+                updateTab(activeTab.copy(position = lastTabPosition + 1))
             }
         }
     }
