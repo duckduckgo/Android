@@ -54,6 +54,7 @@ interface BrokenSiteReportRepository {
     suspend fun getNextShownDate(): LocalDateTime?
 
     suspend fun addDismissal(dismissal: LocalDateTime)
+    suspend fun clearAllDismissals()
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 
     fun resetRefreshCount()
@@ -141,6 +142,10 @@ class RealBrokenSiteReportRepository(
 
     override suspend fun addDismissal(dismissal: LocalDateTime) {
         brokenSitePromptDataStore.addDismissal(dismissal)
+    }
+
+    override suspend fun clearAllDismissals() {
+        brokenSitePromptDataStore.clearAllDismissals()
     }
 
     override suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int {

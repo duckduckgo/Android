@@ -164,6 +164,35 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
+    fun whenAddDismissalCalledThenNewDismissalEventIsAdded() = runTest {
+        val newDismissal = LocalDateTime.now()
+
+        testee.addDismissal(newDismissal)
+
+        verify(mockDataStore).addDismissal(newDismissal)
+    }
+
+    @Test
+    fun whenClearAllDismissalsCalledThenAllDismissalEventsRemoved() = runTest {
+        testee.clearAllDismissals()
+
+        verify(mockDataStore).clearAllDismissals()
+    }
+
+    @Test
+    fun whenGetDismissalCountBetweenCalledThenDismissalCountBetweenDatesReturned() = runTest {
+        val dismissalCount = 2
+        whenever(mockDataStore.getDismissalCountBetween(any(), any())).thenReturn(dismissalCount)
+
+        val result = testee.getDismissalCountBetween(
+            LocalDateTime.now().minusDays(3),
+            LocalDateTime.now(),
+        )
+
+        assertEquals(dismissalCount, result)
+    }
+
+    @Test
     fun whenResetRefreshCountCalledThenResetRefreshCountIsCalled() = runTest {
         testee.resetRefreshCount()
 

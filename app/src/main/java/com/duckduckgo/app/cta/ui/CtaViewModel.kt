@@ -187,6 +187,9 @@ class CtaViewModel @Inject constructor(
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
         }
+        if (cta is BrokenSitePromptDialogCta) {
+            brokenSitePrompt.userAcceptedPrompt()
+        }
     }
 
     suspend fun refreshCta(

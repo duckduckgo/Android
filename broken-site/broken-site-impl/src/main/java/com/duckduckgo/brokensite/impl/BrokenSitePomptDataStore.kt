@@ -55,6 +55,7 @@ interface BrokenSitePomptDataStore {
     suspend fun getCoolDownDays(): Long
 
     suspend fun addDismissal(dismissal: LocalDateTime)
+    suspend fun clearAllDismissals()
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
     suspend fun deleteAllExpiredDismissals(expiryDate: String, zoneId: ZoneId)
 
@@ -133,6 +134,12 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     override suspend fun addDismissal(dismissal: LocalDateTime) {
         store.edit { prefs ->
             prefs[DISMISS_EVENTS] = (prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()).plus(formatter.format(dismissal))
+        }
+    }
+
+    override suspend fun clearAllDismissals() {
+        store.edit { prefs ->
+            prefs.remove(DISMISS_EVENTS)
         }
     }
 

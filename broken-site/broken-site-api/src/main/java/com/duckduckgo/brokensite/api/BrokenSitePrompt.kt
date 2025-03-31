@@ -22,6 +22,8 @@ interface BrokenSitePrompt {
 
     suspend fun userDismissedPrompt()
 
+    suspend fun userAcceptedPrompt()
+
     suspend fun isFeatureEnabled(): Boolean
 
     fun pageRefreshed(url: Uri)

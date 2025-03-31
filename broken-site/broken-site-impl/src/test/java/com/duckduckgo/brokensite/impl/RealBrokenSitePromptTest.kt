@@ -56,8 +56,23 @@ class RealBrokenSitePromptTest {
 
         testee.userDismissedPrompt()
 
-        verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
         verify(mockBrokenSiteReportRepository, never()).addDismissal(any())
+    }
+
+    @Test
+    fun whenUserAcceptedPromptThenClearAllStoredDismissals() = runTest {
+        testee.userAcceptedPrompt()
+
+        verify(mockBrokenSiteReportRepository).clearAllDismissals()
+    }
+
+    @Test
+    fun whenUserAcceptedPromptAndFeatureDisabledThenDoNothing() = runTest {
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
+
+        testee.userAcceptedPrompt()
+
+        verify(mockBrokenSiteReportRepository, never()).clearAllDismissals()
     }
 
     @Test
@@ -111,6 +126,17 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
+    fun whenFeatureEnabledAndUrlIsDuckDuckGoThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
+        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
+        whenever(mockDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+
+        val result = testee.shouldShowBrokenSitePrompt("https://duckduckgo.com")
+
+        assertFalse(result)
+    }
+
+    @Test
     fun whenFeatureEnabledAndUserStillInCooldownPeriodThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(3))
@@ -121,7 +147,7 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenFeatureEnabledAndUserHasDismissedMaxDismissStreakTimesThenNextShownDateUpdatedAndShouldShowBrokenSitePromptReturnsFalse() = runTest {
+    fun whenFeatureEnabledAndUserHasDismissedMaxDismissStreakTimesThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
@@ -129,7 +155,6 @@ class RealBrokenSitePromptTest {
 
         val result = testee.shouldShowBrokenSitePrompt("https://example.com")
 
-        verify(mockBrokenSiteReportRepository).setNextShownDate(any())
         assertFalse(result)
     }
 

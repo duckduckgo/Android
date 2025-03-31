@@ -49,6 +49,12 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.addDismissal(currentTimestamp)
     }
 
+    override suspend fun userAcceptedPrompt() {
+        if (!_featureEnabled) return
+
+        brokenSiteReportRepository.clearAllDismissals()
+    }
+
     override suspend fun isFeatureEnabled(): Boolean {
         return _featureEnabled
     }
@@ -94,14 +100,7 @@ class RealBrokenSitePrompt @Inject constructor(
             currentTimestamp,
         )
 
-        if (dismissalCount >= brokenSiteReportRepository.getMaxDismissStreak()) {
-            // User has dismissed 3+ times within max period, set cooldown and don't show
-            val newNextShownDate = currentTimestamp.plusDays(dismissStreakResetDays)
-            brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-            return false
-        }
-        // All checks passed, show prompt
-        return true
+        return dismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }
 
     override suspend fun ctaShown() {
