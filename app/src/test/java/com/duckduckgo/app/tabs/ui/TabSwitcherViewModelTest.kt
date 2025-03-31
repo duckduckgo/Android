@@ -21,11 +21,9 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -113,12 +111,6 @@ class TabSwitcherViewModelTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockWebViewSessionStorage: WebViewSessionStorage
-
-    @Mock
-    private lateinit var mockAdClickManager: AdClickManager
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -187,8 +179,6 @@ class TabSwitcherViewModelTest {
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
         testee = TabSwitcherViewModel(
             mockTabRepository,
-            mockWebViewSessionStorage,
-            mockAdClickManager,
             coroutinesTestRule.testDispatcherProvider,
             mockPixel,
             swipingTabsFeatureProvider,
@@ -215,7 +205,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -224,7 +214,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -236,7 +226,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -309,7 +299,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -525,10 +515,9 @@ class TabSwitcherViewModelTest {
 
         testee.onTabCloseInNormalModeRequested(tab)
         verify(mockTabRepository).deleteTabs(listOf(tab.id))
-        verify(mockAdClickManager).clearTabId(tab.id)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -541,7 +530,6 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -558,7 +546,6 @@ class TabSwitcherViewModelTest {
         testee.onTabCloseInNormalModeRequested(tab, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(tab.tabEntity)
-        verify(mockAdClickManager, never()).clearTabId(tab.id)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -566,30 +553,25 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenUndoDeletableTabThenUndoDeletable() = runTest {
+    fun whenUndoDeletableTabThenUndoDelete() = runTest {
         val entity = TabEntity("abc", "", "", position = 0)
-        testee.undoDeletableTab(entity)
+        testee.onUndoDeleteTab(entity)
 
         verify(mockTabRepository).undoDeletable(entity)
     }
 
     @Test
-    fun whenUndoDeletableTabsThenUndoDeletable() = runTest {
+    fun whenUndoDeletableTabsThenOnUndoDelete() = runTest {
         val tabs = tabList.map { it.tabId }
-        testee.undoDeletableTabs(tabs)
+        testee.onUndoDeleteTabs(tabs)
 
         verify(mockTabRepository).undoDeletable(tabs)
     }
 
     @Test
     fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runTest {
-        whenever(mockTabRepository.getDeletableTabIds()).thenReturn(listOf("id_1", "id_2"))
-
         testee.purgeDeletableTabs()
 
-        verify(mockTabRepository).getDeletableTabIds()
-        verify(mockAdClickManager).clearTabId("id_1")
-        verify(mockAdClickManager).clearTabId("id_2")
         verify(mockTabRepository).purgeDeletableTabs()
     }
 
@@ -639,14 +621,12 @@ class TabSwitcherViewModelTest {
 
         tabList.forEach {
             verify(mockTabRepository).deleteTabs(tabList.map { it.tabId })
-            verify(mockAdClickManager).clearTabId(it.tabId)
-            verify(mockWebViewSessionStorage).deleteSession(it.tabId)
         }
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.Close(), commandCaptor.lastValue)
     }
 
     @Test
@@ -822,6 +802,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
+            isDuckChatVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -849,6 +830,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
+            isDuckChatVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -876,6 +858,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
+            isDuckChatVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -903,6 +886,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
+            isDuckChatVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -930,6 +914,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
+            isDuckChatVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -960,6 +945,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
+            isDuckChatVisible = false,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -990,6 +976,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
+            isDuckChatVisible = false,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = true,
@@ -1020,6 +1007,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
+            isDuckChatVisible = false,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1051,6 +1039,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
+            isDuckChatVisible = false,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = true,
@@ -1081,6 +1070,7 @@ class TabSwitcherViewModelTest {
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
+            isDuckChatVisible = false,
             isSelectAllVisible = false,
             isDeselectAllVisible = true,
             isSelectionActionsDividerVisible = true,
