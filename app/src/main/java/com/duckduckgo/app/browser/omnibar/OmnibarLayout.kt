@@ -547,10 +547,15 @@ open class OmnibarLayout @JvmOverloads constructor(
              */
             if (decoration is Mode) {
                 val lastMode = lastViewMode?.viewMode
-                if (lastMode is CustomTab) {
-                    this.decoration = null
-                } else {
-                    lastViewMode = decoration
+                when (lastMode) {
+                    is CustomTab -> {
+                        this.decoration = null
+                    }
+
+                    else -> {
+                        lastViewMode = decoration
+                        this.decoration = null
+                    }
                 }
             } else if (this.decoration == null) {
                 this.decoration = decoration
