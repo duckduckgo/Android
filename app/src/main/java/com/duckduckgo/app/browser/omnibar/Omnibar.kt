@@ -85,6 +85,7 @@ class Omnibar(
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
+
                     FADE -> {
                         // remove bottom variant
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
@@ -106,6 +107,7 @@ class Omnibar(
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
+
                     FADE -> {
                         // remove top variant
                         binding.rootView.removeView(binding.fadeOmnibar)
@@ -174,6 +176,7 @@ class Omnibar(
         data class Browser(val url: String?) : ViewMode()
         data class CustomTab(
             val toolbarColor: Int,
+            val title: String?,
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
@@ -237,6 +240,7 @@ class Omnibar(
         }
 
     fun setViewMode(viewMode: ViewMode) {
+        Timber.d("Omnibar: setViewMode $viewMode")
         when (viewMode) {
             Error -> {
                 newOmnibar.decorate(Mode(viewMode))
@@ -389,7 +393,7 @@ class Omnibar(
         customTabToolbarColor: Int,
         customTabDomainText: String?,
     ) {
-        newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
+        newOmnibar.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(
@@ -427,6 +431,7 @@ class Omnibar(
                     SCROLLING -> {
                         // no-op
                     }
+
                     FADE -> binding.fadeOmnibar.onScrollChanged(
                         scrollableView = v,
                         scrollY = scrollY,
@@ -440,6 +445,7 @@ class Omnibar(
                     SCROLLING -> {
                         // no-op
                     }
+
                     FADE -> binding.fadeOmnibarBottom.onScrollChanged(
                         scrollableView = v,
                         scrollY = scrollY,

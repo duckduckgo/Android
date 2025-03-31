@@ -256,11 +256,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (lastViewMode != null) {
+            Timber.d("Omnibar: onAttachedToWindow lastViewMode $lastViewMode")
             decorateDeferred(lastViewMode!!)
             lastViewMode = null
         }
 
         if (decoration != null) {
+            Timber.d("Omnibar: onAttachedToWindow decoration $decoration")
             decorateDeferred(decoration!!)
             decoration = null
         }
@@ -534,9 +536,11 @@ open class OmnibarLayout @JvmOverloads constructor(
     ) {
         Timber.d("Omnibar: renderCustomTabMode $viewState")
         configureCustomTabOmnibar(viewMode)
+        renderCustomTab(viewMode)
     }
 
     fun decorate(decoration: Decoration) {
+        Timber.d("Omnibar: decorate $decoration")
         if (isAttachedToWindow) {
             decorateDeferred(decoration)
         } else {
@@ -544,7 +548,10 @@ open class OmnibarLayout @JvmOverloads constructor(
              *  As a long-term solution, we should move mode to StateChange, and only have one-time decorations here
              */
             if (decoration is Mode) {
-                lastViewMode = decoration
+                val lastMode = lastViewMode?.viewMode
+                if (lastMode !is CustomTab) {
+                    lastViewMode = decoration
+                }
                 this.decoration = null
             } else if (this.decoration == null) {
                 this.decoration = decoration
@@ -579,7 +586,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is ChangeCustomTabTitle -> {
-                updateCustomTabTitle(decoration)
+                viewModel.onCustomTabTitleUpdate(decoration)
             }
 
             is HighlightOmnibarItem -> {
@@ -696,10 +703,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             browserMenu.isVisible = true
 
-            customTabToolbarContainer.customTabDomain.text = customTab.domain
-            customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
-            customTabToolbarContainer.customTabDomainOnly.show()
-
             val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
             customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
             customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
@@ -709,19 +712,24 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun updateCustomTabTitle(decoration: ChangeCustomTabTitle) {
+    private fun renderCustomTab(viewMode: CustomTab) {
         Timber.d("Omnibar: updateCustomTabTitle $decoration")
-        customTabToolbarContainer.customTabTitle.text = decoration.title
 
-        decoration.domain?.let {
-            customTabToolbarContainer.customTabDomain.text = decoration.domain
+        viewMode.domain?.let {
+            customTabToolbarContainer.customTabDomain.text = viewMode.domain
+            customTabToolbarContainer.customTabDomainOnly.text = viewMode.domain
+            customTabToolbarContainer.customTabDomain.show()
+            customTabToolbarContainer.customTabDomainOnly.show()
         }
 
-        customTabToolbarContainer.customTabTitle.show()
-        customTabToolbarContainer.customTabDomainOnly.hide()
-        customTabToolbarContainer.customTabDomain.show()
-        customTabToolbarContainer.customTabShieldIcon.isInvisible = decoration.showDuckPlayerIcon
-        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = decoration.showDuckPlayerIcon
+        viewMode.title?.let {
+            customTabToolbarContainer.customTabTitle.text = viewMode.title
+            customTabToolbarContainer.customTabTitle.show()
+            customTabToolbarContainer.customTabDomainOnly.hide()
+        }
+
+        customTabToolbarContainer.customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
     }
 
     private fun calculateCustomTabBackgroundColor(color: Int): Int {

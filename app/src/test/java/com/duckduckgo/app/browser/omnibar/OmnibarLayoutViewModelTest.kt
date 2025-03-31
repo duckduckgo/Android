@@ -287,7 +287,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
-        testee.onViewModeChanged(ViewMode.CustomTab(0, "example.com", false))
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
 
         testee.viewState.test {
             val viewState = awaitItem()
