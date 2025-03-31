@@ -820,7 +820,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
-        override suspend fun undoDeletable(tabIds: List<String>) {
+        override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
             TODO("Not yet implemented")
         }
 
