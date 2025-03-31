@@ -67,21 +67,22 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
-private const val DELETABLE_TABS_CHECK_DELAY = 200L
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
@@ -151,6 +152,14 @@ class BrowserViewModel @Inject constructor(
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
+
+    val deletableTabsFlow = tabRepository.flowDeletableTabs
+        .map { tabs -> tabs.map { tab -> tab.tabId } }
+        .filter { it.isNotEmpty() }
+        .distinctUntilChanged()
+        .debounce(100.milliseconds)
+        .conflate()
+        .onEach { onDeletableTabsChanged(it) }
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -432,10 +441,6 @@ class BrowserViewModel @Inject constructor(
         viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
     }
 
-    fun onBrowserResumed() {
-        checkIfAnyDeletableTabsExist()
-    }
-
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data
     fun purgeDeletableTabs() {
         viewModelScope.launch {
@@ -451,14 +456,8 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    private fun checkIfAnyDeletableTabsExist() {
-        viewModelScope.launch {
-            delay(DELETABLE_TABS_CHECK_DELAY) // delayed so that a potential DB operation has time to mark tabs as deletable
-            val deletableTabIds = tabRepository.getDeletableTabIds()
-            if (deletableTabIds.isNotEmpty()) {
-                command.value = ShowUndoDeleteTabsMessage(deletableTabIds)
-            }
-        }
+    private fun onDeletableTabsChanged(deletableTabs: List<String>) {
+        command.value = ShowUndoDeleteTabsMessage(deletableTabs)
     }
 }
 

@@ -205,10 +205,13 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteTabs(tabIds: List<String>) {
-        withContext(dispatcherProvider.io()) {
-            tabRepository.deleteTabs(tabIds.filterNot { it == TRACKER_ANIMATION_PANEL_ID })
-        }
+    suspend fun onUndoDeleteSnackbarDismissed(tabIds: List<String>) {
+        // delete only recently deleted tabs, because others may need to be preserved for undeleting
+        deleteTabs(tabIds)
+    }
+
+    private suspend fun deleteTabs(tabIds: List<String>) {
+        tabRepository.deleteTabs(tabIds.filterNot { it == TRACKER_ANIMATION_PANEL_ID })
     }
 
     private fun triggerEmptySelectionMode() {
@@ -376,7 +379,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onTabCloseInNormalModeRequested(tab: Tab, swipeGestureUsed: Boolean = false) {
         viewModelScope.launch {
-            // TODO: Fix bug when 2 tabs, one NTP -> quick closing of non-NTP then NTP => snackbar shown in browser
             if (tabItems.size == 1) {
                 if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                     // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
@@ -412,15 +414,13 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     // user has tapped the Undo action -> restore the closed tab
-    suspend fun undoDeletableTab(tab: TabEntity) {
+    suspend fun onUndoDeleteTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
     }
 
     // user has tapped the Undo action -> restore the closed tabs
-    fun undoDeletableTabs(tabIds: List<String>) {
-        viewModelScope.launch {
-            tabRepository.undoDeletable(tabIds)
-        }
+    suspend fun onUndoDeleteTabs(tabIds: List<String>) {
+        tabRepository.undoDeletable(tabIds)
     }
 
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data

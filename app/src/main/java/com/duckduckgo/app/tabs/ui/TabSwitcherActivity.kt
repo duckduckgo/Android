@@ -181,9 +181,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
 
-    private var skipTabPurgeOnFinish = false
-
     private var selectedTabId: String? = null
+    private var skipTabPurge: Boolean = false
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
@@ -550,7 +549,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun processCommand(command: Command) {
         when (command) {
             is Close -> {
-                skipTabPurgeOnFinish = command.skipTabPurge
+                skipTabPurge = command.skipTabPurge
                 finishAfterTransition()
             }
             is CloseAllTabsRequest -> {
@@ -752,7 +751,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             message = getString(R.string.tabClosed),
             action = getString(R.string.tabClosedUndo),
             showAction = true,
-            onAction = { launch { viewModel.undoDeletableTab(tab) } },
+            onAction = { launch { viewModel.onUndoDeleteTab(tab) } },
             onDismiss = { launch { viewModel.purgeDeletableTabs() } },
         ).show()
     }
@@ -763,8 +762,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
             action = getString(R.string.tabClosedUndo),
             showAction = true,
-            onAction = { viewModel.undoDeletableTabs(tabIds) },
-            onDismiss = { launch { viewModel.deleteTabs(tabIds) } }, // delete specific tabs, because some may need to be preserved for undeleting
+            onAction = { launch { viewModel.onUndoDeleteTabs(tabIds) } },
+            onDismiss = { launch { viewModel.onUndoDeleteSnackbarDismissed(tabIds) } },
         ).show()
     }
 
@@ -827,8 +826,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.deletableTabs.removeObservers(this)
 
         // we don't want to purge during device rotation
-        if (isFinishing && !skipTabPurgeOnFinish) {
-            launch { viewModel.purgeDeletableTabs() }
+        if (isFinishing) {
+            launch {
+                if (!tabManagerFeatureFlags.multiSelection().isEnabled() || !skipTabPurge) {
+                    viewModel.purgeDeletableTabs()
+                }
+            }
         }
     }
 
