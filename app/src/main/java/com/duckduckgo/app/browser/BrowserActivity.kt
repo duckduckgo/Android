@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -99,6 +100,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -292,6 +294,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         initializeTabs()
 
+        // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
+        // flows only once, so a separate initialization is necessary
+        configureFlowCollectors()
+
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
@@ -304,11 +310,31 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun configureFlowCollectors() {
+        if (swipingTabsFeature.isEnabled) {
+            lifecycleScope.launch {
+                viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
+                    tabManager.onTabsChanged(it)
+                }
+            }
+
+            lifecycleScope.launch {
+                viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
+                    tabManager.onSelectedTabChanged(it)
+                }
+            }
+
+            lifecycleScope.launch {
+                viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
+                    onMoveToTabRequested(it)
+                }
+            }
+        }
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            viewModel.onBrowserResumed()
+            lifecycleScope.launch {
+                viewModel.deletableTabsFlow.flowWithLifecycle(lifecycle, RESUMED).collect()
+            }
         }
     }
 
@@ -547,25 +573,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         }
 
-        if (swipingTabsFeature.isEnabled) {
-            lifecycleScope.launch {
-                viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onTabsChanged(it)
-                }
-            }
-
-            lifecycleScope.launch {
-                viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onSelectedTabChanged(it)
-                }
-            }
-
-            lifecycleScope.launch {
-                viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
-                    onMoveToTabRequested(it)
-                }
-            }
-        } else {
+        if (!swipingTabsFeature.isEnabled) {
+            // when swiping is enabled, the state is controlled be flows initialized in configureFlowCollectors()
             viewModel.selectedTab.observe(this) {
                 if (it != null) {
                     selectTab(it)
