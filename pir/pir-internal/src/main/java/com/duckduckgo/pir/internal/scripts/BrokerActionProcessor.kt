@@ -24,8 +24,6 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.ActionRequest
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirResult
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
@@ -40,7 +38,6 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.FillFormRes
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -64,9 +61,8 @@ interface BrokerActionProcessor {
      * Executes the [action] for the given [profileQuery] and/or [extractedProfile]
      */
     fun pushAction(
-        profileQuery: ProfileQuery,
         action: BrokerAction,
-        extractedProfile: ExtractedProfile? = null,
+        requestParamsData: PirScriptRequestData,
     )
 
     interface ActionResultListener {
@@ -91,7 +87,7 @@ class RealBrokerActionProcessor(
                     .withSubtype(BrokerAction.Click::class.java, "click")
                     .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
                     .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
+                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
             ).add(KotlinJsonAdapterFactory())
@@ -134,9 +130,8 @@ class RealBrokerActionProcessor(
     }
 
     override fun pushAction(
-        profileQuery: ProfileQuery,
         action: BrokerAction,
-        extractedProfile: ExtractedProfile?,
+        requestParamsData: PirScriptRequestData,
     ) {
         logcat { "PIR-CSS: pushAction action: $action" }
 
@@ -152,17 +147,7 @@ class RealBrokerActionProcessor(
                 PirScriptRequestParams(
                     state = ActionRequest(
                         action = action,
-                        data = UserProfile(
-                            userProfile = profileQuery,
-                            extractedProfile = extractedProfile?.run {
-                                ExtractedProfileParams(
-                                    name = this.name,
-                                    profileUrl = this.profileUrl?.profileUrl,
-                                    fullName = profileQuery.fullName,
-                                    email = this.email,
-                                )
-                            },
-                        ),
+                        data = requestParamsData,
                     ),
                 ),
             ).run {

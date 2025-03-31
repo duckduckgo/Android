@@ -50,6 +50,11 @@ class PirWebViewActivity : DuckDuckGoActivity() {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        pirOptOut.stop()
+    }
 }
 
 object PirDebugWebViewResultsScreenNoParams : ActivityParams

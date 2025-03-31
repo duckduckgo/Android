@@ -82,7 +82,7 @@ class RealBrokerStepsParser @Inject constructor(
                     .withSubtype(BrokerAction.Click::class.java, "click")
                     .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
                     .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
+                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
             )

@@ -18,11 +18,19 @@ package com.duckduckgo.pir.internal.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.CaptchaResolver.CaptchaResolverError
+import com.duckduckgo.pir.internal.common.CaptchaResolver.CaptchaResolverResult
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.GetCaptchaSolutionStatus
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.GetEmail
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.GetEmailStatus
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.SubmitCaptchaInfo
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Failure
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
+import com.duckduckgo.pir.internal.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus.Ready
@@ -47,6 +55,18 @@ interface NativeBrokerActionHandler {
             val email: String,
             val pollingIntervalSeconds: Float,
         ) : NativeAction(actionId)
+
+        data class SubmitCaptchaInfo(
+            override val actionId: String,
+            val siteKey: String,
+            val url: String,
+            val type: String,
+        ) : NativeAction(actionId)
+
+        data class GetCaptchaSolutionStatus(
+            override val actionId: String,
+            val transactionID: String,
+        ) : NativeAction(actionId)
     }
 
     sealed class NativeActionResult {
@@ -63,12 +83,30 @@ interface NativeBrokerActionHandler {
                     val link: String,
                     val status: ConfirmationStatus,
                 ) : NativeSuccessData()
+
+                data class CaptchaTransactionIdReceived(
+                    val transactionID: String,
+                ) : NativeSuccessData()
+
+                data class CaptchaSolutionStatus(
+                    val status: CaptchaStatus,
+                ) : NativeSuccessData() {
+                    sealed class CaptchaStatus {
+                        data class Ready(
+                            val token: String,
+                            val meta: CaptchaSolutionMeta,
+                        ) : CaptchaStatus()
+
+                        data object InProgress : CaptchaStatus()
+                    }
+                }
             }
         }
 
         data class Failure(
             val actionId: String,
             val message: String,
+            val retryNativeAction: Boolean = false,
         ) : NativeActionResult()
     }
 }
@@ -77,11 +115,14 @@ interface NativeBrokerActionHandler {
 class RealNativeBrokerActionHandler @Inject constructor(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val captchaResolver: CaptchaResolver,
 ) : NativeBrokerActionHandler {
     override suspend fun pushAction(nativeAction: NativeAction): NativeActionResult = withContext(dispatcherProvider.io()) {
         when (nativeAction) {
             is GetEmailStatus -> handleAwaitConfirmation(nativeAction)
             is GetEmail -> handleGetEmail(nativeAction)
+            is SubmitCaptchaInfo -> handleSolveCaptcha(nativeAction)
+            is GetCaptchaSolutionStatus -> handleGetCaptchaSolutionStatus(nativeAction)
         }
     }
 
@@ -139,6 +180,80 @@ class RealNativeBrokerActionHandler @Inject constructor(
                 actionId = action.actionId,
                 message = "Unknown error while getting email : ${error.message}",
             )
+        }
+    }
+
+    private suspend fun handleSolveCaptcha(nativeAction: SubmitCaptchaInfo): NativeActionResult {
+        return captchaResolver.submitCaptchaInformation(
+            siteKey = nativeAction.siteKey,
+            url = nativeAction.url,
+            type = nativeAction.type,
+        ).run {
+            when (this) {
+                is CaptchaResolverResult.CaptchaSubmitSuccess -> NativeActionResult.Success(
+                    CaptchaTransactionIdReceived(
+                        this.transactionID,
+                    ),
+                )
+
+                is CaptchaResolverResult.CaptchaFailure -> if (this.type == CaptchaResolverError.TransientFailure) {
+                    // Transient failures mean that client should retry after a minute
+                    NativeActionResult.Failure(
+                        actionId = nativeAction.actionId,
+                        message = this.message,
+                        retryNativeAction = true,
+                    )
+                } else {
+                    NativeActionResult.Failure(
+                        actionId = nativeAction.actionId,
+                        message = this.message,
+                        retryNativeAction = false,
+                    )
+                }
+
+                else -> NativeActionResult.Failure(
+                    actionId = nativeAction.actionId,
+                    message = "Invalid scenario",
+                    retryNativeAction = false,
+                )
+            }
+        }
+    }
+
+    private suspend fun handleGetCaptchaSolutionStatus(nativeAction: GetCaptchaSolutionStatus): NativeActionResult {
+        return captchaResolver.submitCaptchaToBeResolved(
+            transactionID = nativeAction.transactionID,
+        ).run {
+            when (this) {
+                is CaptchaResolverResult.SolveCaptchaSuccess -> NativeActionResult.Success(
+                    data = CaptchaSolutionStatus(
+                        status = CaptchaSolutionStatus.CaptchaStatus.Ready(
+                            token = this.token,
+                            meta = this.meta,
+                        ),
+                    ),
+                )
+
+                is CaptchaResolverResult.CaptchaFailure -> if (this.type == CaptchaResolverError.SolutionNotReady) {
+                    NativeActionResult.Success(
+                        data = CaptchaSolutionStatus(
+                            status = CaptchaSolutionStatus.CaptchaStatus.InProgress,
+                        ),
+                    )
+                } else {
+                    Failure(
+                        actionId = nativeAction.actionId,
+                        message = "Failed to resolve captcha",
+                        retryNativeAction = false,
+                    )
+                }
+
+                else -> Failure(
+                    actionId = nativeAction.actionId,
+                    message = "Invalid scenario",
+                    retryNativeAction = false,
+                )
+            }
         }
     }
 }

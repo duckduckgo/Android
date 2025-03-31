@@ -21,7 +21,7 @@ import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Extract
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.FillForm
-import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchInfo
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Navigate
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.internal.scripts.models.DataSource.USER_PROFILE
@@ -83,7 +83,7 @@ sealed class BrokerAction(
         override val needsEmail: Boolean = elements.any { it.type == "email" }
     }
 
-    data class GetCaptchInfo(
+    data class GetCaptchaInfo(
         override val id: String,
         val selector: String,
     ) : BrokerAction(id)
@@ -142,7 +142,7 @@ fun BrokerAction.asActionType(): String {
         is Expectation -> "expectation"
         is Click -> "click"
         is FillForm -> "fillForm"
-        is GetCaptchInfo -> "getCaptchaInfo"
+        is GetCaptchaInfo -> "getCaptchaInfo"
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
     }

@@ -57,7 +57,7 @@ interface DbpService {
 
     @AuthRequired
     @POST("$BASE_URL/captcha/v0/submit")
-    suspend fun startCaptchaSolution(
+    suspend fun submitCaptchaInformation(
         @Body body: PirStartCaptchaSolutionBody,
         @Query("attemptId") attemptId: String? = null,
     ): PirStartCaptchaSolutionResponse
@@ -131,7 +131,7 @@ interface DbpService {
     data class PirGetCaptchaSolutionResponse(
         val message: String,
         val data: String,
-        val meta: String,
+        val meta: CaptchaSolutionMeta,
     )
 
     data class CaptchaSolutionMeta(

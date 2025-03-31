@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_6"
             android:orientation="vertical">
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

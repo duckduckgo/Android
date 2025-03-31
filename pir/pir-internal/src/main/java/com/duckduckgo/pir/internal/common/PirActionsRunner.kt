@@ -24,8 +24,14 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
-import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.GetCaptchaSolutionStatus
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction.SubmitCaptchaInfo
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Failure
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus.CaptchaStatus.Ready
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
@@ -37,29 +43,40 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerS
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.AwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.AwaitEmailConfirmation
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.BrokerCompleted
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.CompleteExecution
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.ExecuteBrokerAction
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.GetCaptchaSolution
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.GetEmail
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.HandleBroker
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.Idle
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.LoadUrl
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.SendCaptchaSolution
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
-import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchInfo
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
+import com.duckduckgo.pir.internal.scripts.models.DataSource.EXTRACTED_PROFILE
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
+import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.FillFormResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse.ResponseData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import kotlin.coroutines.Continuation
@@ -240,7 +257,7 @@ internal class RealPirActionsRunner(
         when (command) {
             Idle -> {} // Do nothing
             is HandleBroker -> handleBrokerAction(command.state)
-            is ExecuteBrokerAction -> executeBrokerAction(command.state)
+            is ExecuteBrokerAction -> executeBrokerAction(command.state, command.actionRequestData)
             is CompleteExecution -> {
                 continuationResult.resume(Result.success(Unit))
                 cleanUpRunner()
@@ -253,12 +270,129 @@ internal class RealPirActionsRunner(
             is BrokerCompleted -> handleBrokerCompleted(command.state, command.isSuccess)
             is GetEmail -> handleGetEmail(command.state)
             is AwaitEmailConfirmation -> handleEmailConfirmation(command.state, command.pollingIntervalSeconds)
+            is GetCaptchaSolution -> handleGetCaptchaSolution(command.state, command.responseData, command.isRetry)
+            is AwaitCaptchaSolution -> handleAwaitCaptchaSolution(command.state, command.pollingIntervalSeconds, command.retries, command.attempt)
+            is SendCaptchaSolution -> handleSendCaptchaSolution(command.state, command.callback)
         }
     }
 
     private fun nextCommand(command: Command) {
         coroutineScope.launch {
             commandsFlow.emit(command)
+        }
+    }
+
+    private suspend fun handleSendCaptchaSolution(
+        state: State,
+        callback: String,
+    ) {
+        withContext(dispatcherProvider.main()) {
+            detachedWebView?.evaluateJavascript(callback, null)
+        }
+        nextCommand(
+            ExecuteBrokerAction(
+                state = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                ),
+            ),
+        )
+    }
+
+    private suspend fun handleAwaitCaptchaSolution(
+        state: State,
+        pollingIntervalSeconds: Int,
+        retries: Int,
+        attempt: Int,
+    ) {
+        val broker = brokersToExecute[state.currentBrokerIndex]
+        nativeBrokerActionHandler.pushAction(
+            GetCaptchaSolutionStatus(
+                actionId = broker.actions[state.currentActionIndex].id,
+                transactionID = state.transactionID,
+            ),
+        ).run {
+            if (this is Success && this.data is CaptchaSolutionStatus) {
+                when (this.data.status) {
+                    is Ready -> nextCommand(
+                        ExecuteBrokerAction(
+                            state = state,
+                            actionRequestData = PirScriptRequestData.SolveCaptcha(
+                                token = this.data.status.token,
+                            ),
+                        ),
+                    )
+
+                    else -> {
+                        if (attempt == retries) {
+                            onError(
+                                PirErrorReponse(
+                                    actionID = broker.actions[state.currentActionIndex].id,
+                                    message = "Unable to solve captcha",
+                                ),
+                            )
+                        } else {
+                            delay(pollingIntervalSeconds * 1000L)
+                            nextCommand(
+                                AwaitCaptchaSolution(
+                                    state = state,
+                                    attempt = attempt + 1,
+                                ),
+                            )
+                        }
+                    }
+                }
+            } else if (this is Failure) {
+                onError(
+                    PirErrorReponse(
+                        actionID = broker.actions[state.currentActionIndex].id,
+                        message = "Unable to solve captcha",
+                    ),
+                )
+            }
+        }
+    }
+
+    private suspend fun handleGetCaptchaSolution(
+        state: State,
+        responseData: ResponseData,
+        isRetry: Boolean,
+    ) {
+        val broker = brokersToExecute[state.currentBrokerIndex]
+        nativeBrokerActionHandler.pushAction(
+            SubmitCaptchaInfo(
+                actionId = broker.actions[state.currentActionIndex].id,
+                siteKey = responseData.siteKey,
+                url = responseData.url,
+                type = responseData.type,
+            ),
+        ).also {
+            if (it is Success) {
+                nextCommand(
+                    ExecuteBrokerAction(
+                        state = state.copy(
+                            currentActionIndex = state.currentActionIndex + 1,
+                            transactionID = (it.data as CaptchaTransactionIdReceived).transactionID,
+                        ),
+                    ),
+                )
+            } else if (it is Failure && !isRetry && it.retryNativeAction) {
+                delay(60_000)
+                nextCommand(
+                    GetCaptchaSolution(
+                        state = state,
+                        responseData = responseData,
+                        isRetry = true,
+                    ),
+                )
+            } else {
+                val result = it as Failure
+                onError(
+                    PirErrorReponse(
+                        actionID = it.actionId,
+                        message = result.message,
+                    ),
+                )
+            }
         }
     }
 
@@ -277,7 +411,7 @@ internal class RealPirActionsRunner(
                     pollingIntervalSeconds = pollingIntervalSeconds,
                 ),
             ).also {
-                if (it is NativeActionResult.Success) {
+                if (it is Success) {
                     nextCommand(
                         LoadUrl(
                             state = state,
@@ -285,7 +419,7 @@ internal class RealPirActionsRunner(
                         ),
                     )
                 } else {
-                    val result = it as NativeActionResult.Failure
+                    val result = it as Failure
                     onError(
                         PirErrorReponse(
                             actionID = result.actionId,
@@ -306,14 +440,14 @@ internal class RealPirActionsRunner(
                 brokerName = broker.brokerName,
             ),
         ).also {
-            if (it is NativeActionResult.Success && state.extractedProfileState.extractedProfile.isNotEmpty()) {
+            if (it is Success && state.extractedProfileState.extractedProfile.isNotEmpty()) {
                 val extractedProfileState = state.extractedProfileState
-                val extractedProfile = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
-                val updatedList = extractedProfileState.extractedProfile.toMutableList()
-
-                updatedList[extractedProfileState.currentExtractedProfileIndex] = extractedProfile.copy(
+                val extractedProfileWithEmail = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex].copy(
                     email = (it.data as Email).email,
                 )
+                val updatedList = extractedProfileState.extractedProfile.toMutableList()
+
+                updatedList[extractedProfileState.currentExtractedProfileIndex] = extractedProfileWithEmail
 
                 extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
                 nextCommand(
@@ -323,10 +457,21 @@ internal class RealPirActionsRunner(
                                 extractedProfile = updatedList,
                             ),
                         ),
+                        actionRequestData = UserProfile(
+                            userProfile = state.profileQuery,
+                            extractedProfile = extractedProfileWithEmail.run {
+                                ExtractedProfileParams(
+                                    name = this.name,
+                                    profileUrl = this.profileUrl?.profileUrl,
+                                    fullName = state.profileQuery?.fullName,
+                                    email = this.email,
+                                )
+                            },
+                        ),
                     ),
                 )
             } else {
-                val result = it as NativeActionResult.Failure
+                val result = it as Failure
                 onError(
                     PirErrorReponse(
                         actionID = result.actionId,
@@ -459,7 +604,10 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private fun executeBrokerAction(state: State) {
+    private fun executeBrokerAction(
+        state: State,
+        requestData: PirScriptRequestData,
+    ) {
         val currentBroker = brokersToExecute[state.currentBrokerIndex]
         if (state.currentActionIndex == currentBroker.actions.size) {
             nextCommand(
@@ -471,9 +619,6 @@ internal class RealPirActionsRunner(
             if (actionToExecute.needsEmail && !hasEmail(state.extractedProfileState)) {
                 nextCommand(GetEmail(state))
             } else {
-                val extractedProfileState = state.extractedProfileState
-                val extractedProfile = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
-
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
                     runBlocking(dispatcherProvider.io()) {
@@ -486,6 +631,13 @@ internal class RealPirActionsRunner(
                         AwaitEmailConfirmation(
                             state = state,
                             pollingIntervalSeconds = actionToExecute.pollingTime.toFloat(),
+                        ),
+                    )
+                } else if (actionToExecute is SolveCaptcha && requestData !is PirScriptRequestData.SolveCaptcha) {
+                    nextCommand(
+                        AwaitCaptchaSolution(
+                            state = state,
+                            attempt = 0,
                         ),
                     )
                 } else {
@@ -505,13 +657,38 @@ internal class RealPirActionsRunner(
                             )
                         }
                     }
+
                     brokerActionProcessor.pushAction(
-                        state.profileQuery!!,
                         actionToExecute,
-                        extractedProfile,
+                        completeRequestData(state, actionToExecute, requestData),
                     )
                 }
             }
+        }
+    }
+
+    private fun completeRequestData(
+        state: State,
+        actionToExecute: BrokerAction,
+        requestData: PirScriptRequestData,
+    ): PirScriptRequestData {
+        return if (actionToExecute.dataSource == EXTRACTED_PROFILE && (requestData as UserProfile).extractedProfile == null) {
+            val extractedProfileState = state.extractedProfileState
+            val extractedProfile = extractedProfileState.extractedProfile[extractedProfileState.currentExtractedProfileIndex]
+
+            UserProfile(
+                userProfile = requestData.userProfile,
+                extractedProfile = extractedProfile.run {
+                    ExtractedProfileParams(
+                        name = this.name,
+                        profileUrl = this.profileUrl?.profileUrl,
+                        fullName = state.profileQuery?.fullName,
+                        email = this.email,
+                    )
+                },
+            )
+        } else {
+            requestData
         }
     }
 
@@ -551,7 +728,7 @@ internal class RealPirActionsRunner(
                         ),
                     )
                 } else {
-                    lastState.extractedProfileState?.extractedProfile?.get(lastState.extractedProfileState.currentExtractedProfileIndex)?.let {
+                    lastState.extractedProfileState.extractedProfile.get(lastState.extractedProfileState.currentExtractedProfileIndex).let {
                         pirRunStateHandler.handleState(
                             BrokerOptOutActionSucceeded(
                                 brokerName = currentBroker.brokerName,
@@ -603,6 +780,27 @@ internal class RealPirActionsRunner(
                         )
                     }
 
+                    is GetCaptchaInfoResponse -> {
+                        pirSuccessResponse.response?.let {
+                            nextCommand(
+                                GetCaptchaSolution(
+                                    state = lastState,
+                                    responseData = it,
+                                    isRetry = false,
+                                ),
+                            )
+                        }
+                    }
+
+                    is SolveCaptchaResponse -> {
+                        nextCommand(
+                            SendCaptchaSolution(
+                                state = lastState,
+                                callback = pirSuccessResponse.response!!.callback.eval,
+                            ),
+                        )
+                    }
+
                     else -> {
                         logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Do nothing for $pirSuccessResponse" }
                     }
@@ -643,7 +841,7 @@ internal class RealPirActionsRunner(
                         )
                     }
                 }
-                if (currentAction is GetCaptchInfo || currentAction is SolveCaptcha) {
+                if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
                     nextCommand(
                         ExecuteBrokerAction(
                             lastState.copy(
@@ -671,6 +869,9 @@ internal class RealPirActionsRunner(
 
         data class ExecuteBrokerAction(
             override val state: State,
+            val actionRequestData: PirScriptRequestData = UserProfile(
+                userProfile = state.profileQuery,
+            ),
         ) : Command(state)
 
         data class LoadUrl(
@@ -692,6 +893,24 @@ internal class RealPirActionsRunner(
             val pollingIntervalSeconds: Float,
         ) : Command(state)
 
+        data class GetCaptchaSolution(
+            override val state: State,
+            val responseData: ResponseData,
+            val isRetry: Boolean,
+        ) : Command(state)
+
+        data class AwaitCaptchaSolution(
+            override val state: State,
+            val pollingIntervalSeconds: Int = 5,
+            val retries: Int = 50,
+            val attempt: Int = 0,
+        ) : Command(state)
+
+        data class SendCaptchaSolution(
+            override val state: State,
+            val callback: String,
+        ) : Command(state)
+
         data object CompleteExecution : Command(State())
     }
 
@@ -701,6 +920,7 @@ internal class RealPirActionsRunner(
         val brokerStartTime: Long = -1L,
         val profileQuery: ProfileQuery? = null,
         val extractedProfileState: ExtractedProfileState = ExtractedProfileState(),
+        val transactionID: String = "",
     )
 
     data class ExtractedProfileState(

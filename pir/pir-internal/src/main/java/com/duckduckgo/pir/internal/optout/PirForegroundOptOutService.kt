@@ -78,7 +78,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
         synchronized(this) {
             launch(serviceDispatcher) {
                 async {
-                    val result = pirOptOut.execute(listOf("Clubset"), this@PirForegroundOptOutService)
+                    val result = pirOptOut.execute(listOf("Verecor"), this@PirForegroundOptOutService)
                     if (result.isSuccess) {
                         notificationManagerCompat.checkPermissionAndNotify(
                             applicationContext,
