@@ -256,11 +256,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (lastViewMode != null) {
+            Timber.d("Omnibar: onAttachedToWindow lastViewMode $lastViewMode")
             decorateDeferred(lastViewMode!!)
             lastViewMode = null
         }
 
         if (decoration != null) {
+            Timber.d("Omnibar: onAttachedToWindow decoration $decoration")
             decorateDeferred(decoration!!)
             decoration = null
         }
