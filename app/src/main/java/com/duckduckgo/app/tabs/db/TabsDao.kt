@@ -108,11 +108,17 @@ abstract class TabsDao {
     }
 
     @Transaction
-    open fun undoDeletableTabs(tabIds: List<String>) {
+    open fun undoDeletableTabs(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
         // ensure the tab is in the DB
         tabIds.forEach { tabId ->
             tab(tabId)?.let { tab ->
                 updateTab(tab.copy(deletable = false))
+            }
+        }
+
+        if (moveActiveTabToEnd) {
+            selectedTab()?.let { activeTab ->
+                updateTab(activeTab.copy(position = tabIds.size))
             }
         }
     }

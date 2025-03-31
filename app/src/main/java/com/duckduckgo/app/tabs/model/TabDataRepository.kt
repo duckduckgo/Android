@@ -62,7 +62,6 @@ class TabDataRepository @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
-    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
 ) : TabRepository {
@@ -312,9 +311,9 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun undoDeletable(tabIds: List<String>) {
+    override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
         databaseExecutor().scheduleDirect {
-            tabsDao.undoDeletableTabs(tabIds)
+            tabsDao.undoDeletableTabs(tabIds, moveActiveTabToEnd)
         }
     }
 

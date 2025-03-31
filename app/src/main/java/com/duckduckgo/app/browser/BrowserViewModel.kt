@@ -446,7 +446,7 @@ class BrowserViewModel @Inject constructor(
     // user has tapped the Undo action -> restore the closed tabs
     fun undoDeletableTabs(tabIds: List<String>) {
         viewModelScope.launch {
-            tabRepository.undoDeletable(tabIds)
+            tabRepository.undoDeletable(tabIds, moveActiveTabToEnd = true)
             command.value = LaunchTabSwitcherAfterTabsUndeleted
         }
     }
