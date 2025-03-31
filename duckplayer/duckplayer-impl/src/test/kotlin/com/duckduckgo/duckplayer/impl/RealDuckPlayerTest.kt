@@ -45,8 +45,8 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YO
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
@@ -307,12 +307,12 @@ class RealDuckPlayerTest {
 
     @Test
     fun sendDuckPlayerPixelWithPlayDoNotUseThumbnail_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
-        val pixelName = "play.do_not_use.thumbnail"
+        val pixelName = "play.do_not_use.dismiss"
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
-        verify(mockPixel).fire(DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
-        verify(mockPixel).fire(DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE, emptyMap(), emptyMap(), Unique())
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     // endregion

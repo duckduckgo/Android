@@ -60,8 +60,8 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YO
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_SERP
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
@@ -212,10 +212,10 @@ class RealDuckPlayer @Inject constructor(
                     DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE to Unique(),
                 )
             }
-            "play.do_not_use.thumbnail" -> {
+            "play.do_not_use.dismiss" -> {
                 listOf(
-                    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE to Count,
-                    DUCK_PLAYER_THUMBNAIL_YOUTUBE_WATCH_HERE_UNIQUE to Unique(),
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS to Count,
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE to Unique(),
                 )
             }
             else -> {
