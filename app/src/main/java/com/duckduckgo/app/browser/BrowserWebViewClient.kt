@@ -738,3 +738,16 @@ enum class SSLErrorType(@StringRes val errorId: Int) {
     GENERIC(R.string.sslErrorUntrustedMessage),
     NONE(R.string.sslErrorUntrustedMessage),
 }
+
+private fun setProxy(webView: WebView) {
+    try {
+        val proxyAddress = "127.0.0.1"
+        val proxyPort = 9050  // Orbot's default SOCKS5 port
+
+        val proxyField: Field = webView.settings.javaClass.getDeclaredField("mProxy")
+        proxyField.isAccessible = true
+        proxyField.set(webView.settings, JavaProxy(JavaProxy.Type.SOCKS, InetSocketAddress(proxyAddress, proxyPort)))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
