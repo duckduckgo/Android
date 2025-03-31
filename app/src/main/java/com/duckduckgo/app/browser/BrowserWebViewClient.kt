@@ -142,13 +142,10 @@ class BrowserWebViewClient @Inject constructor(
      * This is the method of url overriding available from API 24 onwards
      */
     @UiThread
-    override fun shouldOverrideUrlLoading(
-        view: WebView,
-        request: WebResourceRequest,
-    ): Boolean {
-        val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
-    }
+   override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+    setProxy(view)  // Force all requests through Orbot
+    return super.shouldOverrideUrlLoading(view, request)
+}
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
