@@ -76,7 +76,7 @@ class RealAutofillService : AutofillService() {
 
         autofillJob += coroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
-                if (autofillServiceFeature.self().isEnabled().not()) {
+                if (isAutofillServiceEnabled().not()) {
                     callback.onSuccess(null)
                     return@launch
                 }
@@ -167,6 +167,10 @@ class RealAutofillService : AutofillService() {
     override fun onDisconnected() {
         super.onDisconnected()
         Timber.v("DDGAutofillService onDisconnected")
+    }
+
+    private fun isAutofillServiceEnabled(): Boolean {
+        return autofillServiceFeature.self().isEnabled() && autofillServiceFeature.canProcessSystemFillRequests().isEnabled()
     }
 
     companion object {
