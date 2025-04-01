@@ -25,6 +25,6 @@ class SwipingTabsFeatureProvider @Inject constructor(
     swipingTabsFeature: SwipingTabsFeature,
 ) {
     val isEnabled: Boolean by lazy {
-        swipingTabsFeature.self().isEnabled()
+        swipingTabsFeature.self().isEnabled() && swipingTabsFeature.onForExistingUsers().isEnabled()
     }
 }
