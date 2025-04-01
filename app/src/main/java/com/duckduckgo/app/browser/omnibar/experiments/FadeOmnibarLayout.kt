@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.browser.omnibar.experiments
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.PathInterpolator
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -30,6 +33,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.CompleteCurrentTransition
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.TransitionToTarget
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -39,6 +44,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
+import kotlin.math.abs
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -68,6 +74,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private var transitionProgress = 0f
     private var maximumTextInputWidth: Int = 0
 
+    private var isGestureInProgress: Boolean = false
+    private var scrollYOnGestureStart = 0
+
     // ease-in-out interpolation
     private val interpolator = PathInterpolator(0.42f, 0f, 0.58f, 1f)
 
@@ -84,7 +93,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         inflate(context, R.layout.view_fade_omnibar, this)
 
         minibarClickSurface.setOnClickListener {
-            revealToolbar()
+            revealToolbar(animated = true)
         }
 
         AndroidSupportInjection.inject(this)
@@ -122,7 +131,34 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     fun resetTransitionDelayed() {
         postDelayed(delayInMillis = 100) {
-            revealToolbar()
+            revealToolbar(animated = false)
+        }
+    }
+
+    fun onScrollViewMotionEvent(
+        scrollableView: View,
+        motionEvent: MotionEvent,
+    ) {
+        when (motionEvent.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                animator?.cancel()
+                isGestureInProgress = true
+                scrollYOnGestureStart = scrollableView.scrollY
+            }
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                isGestureInProgress = false
+
+                // Most of user gestures will end with a little bit of fling, so users will not be gesturing anymore once the views stop scrolling,
+                // and logic from #onScrollChanged takes over.
+                // However, in cases where user releases the gesture without any acceleration, we need to reconsider all the cases here as well.
+                applyTopOrBottomPageConditionOrElse(scrollableView, isGestureInProgress = false) {
+                    // if user released the gesture in the middle of a transition, without any direction, complete it based on progress
+                    if (isTransitioning()) {
+                        animateTransition(transitionType = CompleteCurrentTransition)
+                    }
+                }
+            }
         }
     }
 
@@ -131,25 +167,97 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         scrollY: Int,
         oldScrollY: Int,
     ) {
-        if (!scrollableView.canScrollVertically(-1)) { // top of the page condition
-            revealToolbar()
-        } else if (!scrollableView.canScrollVertically(1)) { // bottom of the page condition
-            revealMinibar()
-        } else {
+        animator?.cancel()
+        applyTopOrBottomPageConditionOrElse(scrollableView, isGestureInProgress) {
             val scrollDelta = scrollY - oldScrollY
-            // We define that scrolling by 76dp should fully expand or fully collapse the toolbar
-            val changeRatio = scrollDelta / 76.toPx(context).toFloat()
-            val progress = (transitionProgress + changeRatio).coerceIn(0f, 1f)
-            evaluateTransition(progress)
+
+            // always allow to continue the transition if it's already started
+            val isTransitioning = isTransitioning()
+
+            // always allow the transition to minibar if scrolling down
+            val isScrollingDown = scrollDelta > 0
+
+            // only allow the transition back to toolbar if the scroll since start of the gesture is past a threshold
+            val scrollDeltaSinceStartOfGesture = scrollYOnGestureStart - scrollY
+            val isScrollingUpPastThreshold = scrollDeltaSinceStartOfGesture > SCROLL_UP_THRESHOLD_TO_START_TRANSITION_DP.toPx(context)
+
+            if (isTransitioning || isScrollingDown || isScrollingUpPastThreshold) {
+                val changeRatio = scrollDelta / FULL_TRANSITION_SCROLL_DP.toPx(context)
+                val progress = (transitionProgress + changeRatio).coerceIn(0f, 1f)
+                evaluateTransition(progress)
+
+                // schedule an animation to finish the transition in the current direction, but only if user is not gesturing anymore
+                if (!isGestureInProgress) {
+                    val target = if (scrollDelta > 0) {
+                        1f
+                    } else {
+                        0f
+                    }
+                    animateTransition(transitionType = TransitionToTarget(target = target))
+                }
+            }
         }
     }
 
-    private fun revealToolbar() {
-        evaluateTransition(progress = 0f)
+    private fun animateTransition(transitionType: TransitionType) {
+        animator?.cancel()
+        val currentProgress = transitionProgress
+
+        val targetProgress = when (transitionType) {
+            is CompleteCurrentTransition -> {
+                if (currentProgress > 0.5f) 1f else 0f
+            }
+
+            is TransitionToTarget -> {
+                transitionType.target
+            }
+        }
+
+        if (currentProgress != targetProgress) {
+            animator = ValueAnimator.ofFloat(currentProgress, targetProgress).apply {
+                val remainingTransitionPercentage = abs(targetProgress - currentProgress)
+                duration = (MAX_TRANSITION_DURATION_MS * remainingTransitionPercentage).toLong()
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { evaluateTransition(it.animatedValue as Float) }
+                start()
+            }
+        }
+    }
+
+    private fun isTransitioning(): Boolean {
+        return transitionProgress > 0f && transitionProgress < 1f
+    }
+
+    /**
+     * Checks whether the view can still be scrolled in either direction.
+     * If not, reveals the toolbar (top of the page) or minibar (bottom of the page).
+     * If yes, runs the logic provided in [ifNotTopOrBottomFun].
+     */
+    private fun applyTopOrBottomPageConditionOrElse(
+        scrollableView: View,
+        isGestureInProgress: Boolean,
+        ifNotTopOrBottomFun: () -> Unit,
+    ) {
+        if (!isGestureInProgress && !scrollableView.canScrollVertically(-1)) { // top of the page condition
+            revealToolbar(animated = true)
+        } else if (!isGestureInProgress && !scrollableView.canScrollVertically(1)) { // bottom of the page condition
+            revealMinibar()
+        } else {
+            ifNotTopOrBottomFun()
+        }
+    }
+
+    private fun revealToolbar(animated: Boolean) {
+        if (animated) {
+            animateTransition(transitionType = TransitionToTarget(target = 0f))
+        } else {
+            animator?.cancel()
+            evaluateTransition(0f)
+        }
     }
 
     private fun revealMinibar() {
-        evaluateTransition(progress = 1f)
+        animateTransition(transitionType = TransitionToTarget(target = 1f))
     }
 
     private fun evaluateTransition(progress: Float) {
@@ -158,18 +266,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             maximumTextInputWidth = omnibarTextInput.width
         }
 
-        val wasTransitioning = transitionProgress > 0
-        val isTransitioning = progress > 0
+        val wasToolbar = transitionProgress <= 0
+        val isToolbar = progress <= 0
         transitionProgress = progress
         val transitionInterpolation = interpolator.getInterpolation(transitionProgress)
-        val justStartedTransitioning = !wasTransitioning && isTransitioning
+        val justStartedTransitioning = wasToolbar && !isToolbar
 
         if (justStartedTransitioning) {
             // cancel animations at minibar starts showing
             viewModel.onStartedTransforming()
             // when the minibar is expanded, capture clicks
             setMinibarClickCaptureState(enabled = true)
-        } else if (!isTransitioning) {
+        } else if (isToolbar) {
             // when the toolbar is expanded, forward clicks to the underlying views
             setMinibarClickCaptureState(enabled = false)
         }
@@ -225,6 +333,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    var animator: ValueAnimator? = null
+
     private fun setMinibarClickCaptureState(enabled: Boolean) {
         minibarClickSurface.isClickable = enabled
         minibarClickSurface.isLongClickable = enabled
@@ -243,6 +353,22 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         aiChat.setOnClickListener {
             fadeOmnibarItemPressedListener?.onDuckChatButtonPressed()
         }
+    }
+
+    private sealed class TransitionType {
+        data object CompleteCurrentTransition : TransitionType()
+        data class TransitionToTarget(val target: Float) : TransitionType()
+    }
+
+    private companion object {
+        private const val MAX_TRANSITION_DURATION_MS = 300L
+
+        // We define that scrolling by 76dp should fully expand or fully collapse the toolbar
+        private const val FULL_TRANSITION_SCROLL_DP = 76f
+
+        // We transition to minibar as soon as users starts scrolling
+        // but we require a least 4 times as much of up scroll to start the transition back to the toolbar
+        private const val SCROLL_UP_THRESHOLD_TO_START_TRANSITION_DP = FULL_TRANSITION_SCROLL_DP * 4
     }
 }
 

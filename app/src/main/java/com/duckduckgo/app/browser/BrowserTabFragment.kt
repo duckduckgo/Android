@@ -2751,11 +2751,12 @@ class BrowserTabFragment :
                 }
             }
 
-            it.setOnTouchListener { _, _ ->
+            it.setOnTouchListener { webView, event ->
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
+                omnibar.onScrollViewMotionEvent(scrollableView = webView, motionEvent = event)
                 false
             }
 
