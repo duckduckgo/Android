@@ -3438,19 +3438,22 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun updateHttpErrorCount(statusCode: Int) {
-        when {
-            // 400 errors
-            statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
-            )
-            // all 4xx errors apart from 400
-            statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
-            )
-            // all 5xx errors
-            statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
-            )
+        viewModelScope.launch(dispatchers.io()) {
+            when {
+                // 400 errors
+                statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR -> httpErrorPixels.get().updateCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
+                )
+                // all 4xx errors apart from 400
+                statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
+                )
+                // all 5xx errors
+                statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX -> httpErrorPixels.get().update5xxCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
+                    statusCode,
+                )
+            }
         }
     }
 

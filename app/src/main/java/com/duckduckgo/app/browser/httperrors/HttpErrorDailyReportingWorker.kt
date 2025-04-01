@@ -48,7 +48,7 @@ class HttpErrorDailyReportingWorker(context: Context, workerParameters: WorkerPa
         return withContext(dispatchers.io()) {
             httpErrorPixels.fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
             httpErrorPixels.fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY)
-            httpErrorPixels.fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
+            httpErrorPixels.fire5xxCountPixels()
             return@withContext Result.success()
         }
     }
