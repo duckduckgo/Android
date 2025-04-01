@@ -25,7 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
-import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcherAfterTabsUndeleted
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
@@ -114,7 +114,7 @@ class BrowserViewModel @Inject constructor(
         data class Query(val query: String) : Command()
         data object LaunchPlayStore : Command()
         data object LaunchFeedbackView : Command()
-        data object LaunchTabSwitcherAfterTabsUndeleted : Command()
+        data object LaunchTabSwitcher : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
@@ -452,7 +452,7 @@ class BrowserViewModel @Inject constructor(
     fun undoDeletableTabs(tabIds: List<String>) {
         viewModelScope.launch {
             tabRepository.undoDeletable(tabIds, moveActiveTabToEnd = true)
-            command.value = LaunchTabSwitcherAfterTabsUndeleted
+            command.value = LaunchTabSwitcher
         }
     }
 
