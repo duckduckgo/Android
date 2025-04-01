@@ -64,7 +64,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         return """
             contentScope = {
               "features": {
-                "autofillSiteSpecificFixes" : {
+                "siteSpecificFixes" : {
                     "state": "enabled",
                     "exceptions": [],
                     "settings": $settingsJson
