@@ -206,7 +206,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onUndoDeleteSnackbarDismissed(tabIds: List<String>) {
-        // delete only recently deleted tabs, because others may need to be preserved for undeleting
+        // delete only recently deleted tabs, because others may need to be preserved for restoring
         deleteTabs(tabIds)
     }
 
