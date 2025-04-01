@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.duckplayer.impl
 
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-class SwipingTabsFeatureProvider @Inject constructor(
-    swipingTabsFeature: SwipingTabsFeature,
-) {
-    val isEnabled: Boolean by lazy {
-        swipingTabsFeature.self().isEnabled() &&
-            (swipingTabsFeature.onForInternalUsers().isEnabled() || swipingTabsFeature.onForExternalUsers().isEnabled())
-    }
+@ContributesMultibinding(AppScope::class)
+class DuckPlayerPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> = listOf(
+        DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
+    )
 }

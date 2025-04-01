@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU
+import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -36,6 +37,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_MENU_SETTING_OFF("aichat_menu_setting_off"),
     DUCK_CHAT_MENU_SETTING_ON("aichat_menu_setting_on"),
     DUCK_CHAT_SETTINGS_PRESSED("settings_aichat_pressed"),
+    DUCK_CHAT_SETTINGS_DISPLAYED("m_aichat_settings_displayed"),
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -48,6 +50,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_OPEN_BROWSER_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_NEW_TAB_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_SETTINGS_DISPLAYED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

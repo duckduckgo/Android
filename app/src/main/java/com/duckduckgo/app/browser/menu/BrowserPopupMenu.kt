@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
-import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
@@ -276,7 +275,7 @@ class BrowserPopupMenu(
 
         printPageMenuItem.isEnabled = browserShowing
 
-        newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
+        newTabMenuItem.isVisible = !displayedInCustomTabScreen
         duckChatMenuItem.isVisible = viewState.showDuckChatOption && !displayedInCustomTabScreen
         sharePageMenuItem.isVisible = viewState.canSharePage
 
@@ -348,13 +347,14 @@ class BrowserPopupMenu(
         openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
         customTabsMenuDivider.isVisible = displayedInCustomTabScreen
         runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-        overrideForSSlError(viewState)
+        overrideForSSlError(viewState, displayedInCustomTabScreen)
     }
 
     private fun overrideForSSlError(
         viewState: BrowserViewState,
+        displayedInCustomTabScreen: Boolean,
     ) {
-        if (viewState.sslError != NONE) {
+        if (viewState.sslError != NONE && !displayedInCustomTabScreen) {
             newTabMenuItem.isVisible = true
             siteOptionsMenuDivider.isVisible = true
         }

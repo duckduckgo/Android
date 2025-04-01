@@ -575,6 +575,15 @@ class RealSubscriptionsManager @Inject constructor(
             validateTokens(tokens, jwks)
         } catch (e: HttpException) {
             if (e.code() == 400) {
+                if (parseError(e)?.error == "unknown_account") {
+                    /*
+                        Refresh token appears to be valid, but the related account doesn't exist in BE.
+                        After the subscription expires, BE eventually deletes the account, so this is expected.
+                     */
+                    signOut()
+                    throw e
+                }
+
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }

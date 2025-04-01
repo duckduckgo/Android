@@ -134,6 +134,7 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
         whenever(mockTabRepository.flowDeletableTabs)
             .thenReturn(repoDeletableTabs.consumeAsFlow())

@@ -151,7 +151,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -524,9 +523,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var newTabPageProvider: NewTabPageProvider
-
-    @Inject
-    lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
 
     @Inject
     lateinit var safeWebViewFeature: SafeWebViewFeature
@@ -4407,15 +4403,11 @@ class BrowserTabFragment :
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
 
-                val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
-                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                        webViewPrintDocumentAdapter,
-                        onStartCallback = { viewModel.onStartPrint() },
-                        onFinishCallback = { viewModel.onFinishPrint() },
-                    )
-                } else {
-                    webViewPrintDocumentAdapter
-                }
+                val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+                    webViewPrintDocumentAdapter,
+                    onStartCallback = { viewModel.onStartPrint() },
+                    onFinishCallback = { viewModel.onFinishPrint() },
+                )
                 printManager.print(
                     url,
                     printAdapter,

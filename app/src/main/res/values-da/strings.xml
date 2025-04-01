@@ -812,4 +812,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du rydder dine faner og data, slettes din tracker-blokeringshistorik, og dette tal nulstilles.\n\nSkjul dette banner, hvis du ikke ønsker at se det i fanebladene.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Dette websted efterligner muligvis et legitimt websted for at narre dig til at give personlige oplysninger, såsom adgangskoder eller kreditkortnumre.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Forlad dette websted</string>
+    <string name="maliciousSiteAdvancedCTA">Avanceret</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener, at dette websted er sikkert, kan du <a href=\"\">anmelde en fejl</a>. Du kan stadig besøge webstedet på eget ansvar.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accepter risiko og besøg webstedet</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Rapportér et websted, der fejlagtigt er markeret som ondsindet.</string>
+    <string name="maliciousSiteLearnMoreTitle">Mere info</string>
+    <string name="maliciousSiteSettingTitle">Sikkerhedsadvarsler for websteder</string>
+    <string name="maliciousSiteToggleHint">Advar mig på websteder, der er registreret for phishing eller malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Få mere at vide</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Deaktivering af denne funktion kan bringe dine oplysninger i fare.</string>
+
 </resources>

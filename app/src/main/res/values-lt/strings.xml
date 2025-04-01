@@ -818,4 +818,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Išeiti iš šios svetainės</string>
+    <string name="maliciousSiteAdvancedCTA">Išplėstinė</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Jei manote, kad ši svetainė yra saugi, galite <a href=\"\">pranešti apie klaidą</a>. Vis dar galite apsilankyti svetainėje savo rizika.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Priimti riziką ir apsilankyti svetainėje</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Praneškite apie svetainę, kuri neteisingai pažymėta kaip kenkėjiška.</string>
+    <string name="maliciousSiteLearnMoreTitle">Sužinoti daugiau</string>
+    <string name="maliciousSiteSettingTitle">Svetainės saugos įspėjimai</string>
+    <string name="maliciousSiteToggleHint">Gauti saugos įspėjimą svetainėse, pažymėtose dėl sukčiavimo ar kenkėjiškų programų</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Išjungus šią funkciją, gali kilti pavojus jūsų informacijai.</string>
+
 </resources>

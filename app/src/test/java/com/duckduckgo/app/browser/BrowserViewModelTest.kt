@@ -111,6 +111,7 @@ class BrowserViewModelTest {
 
         configureSkipUrlConversionInNewTabState(enabled = true)
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
+        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
         whenever(mockDefaultBrowserPromptsExperiment.commands).thenReturn(defaultBrowserPromptsExperimentCommandsFlow.receiveAsFlow())
 

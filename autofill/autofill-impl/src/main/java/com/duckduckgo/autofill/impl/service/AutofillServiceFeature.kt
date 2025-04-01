@@ -44,4 +44,7 @@ interface AutofillServiceFeature {
     @Toggle.DefaultValue(false)
     @InternalAlwaysEnabled
     fun canAutofillInsideDDG(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun canProcessSystemFillRequests(): Toggle
 }

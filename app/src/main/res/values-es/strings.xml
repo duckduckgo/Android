@@ -812,4 +812,19 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Al borrar tus pestañas y datos, se eliminará el historial de bloqueo de rastreadores y se restablecerá este número a cero.\n\nOculta este banner si prefieres no verlo en la vista de pestañas.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar banner</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Advertencia: este sitio puede suponer un riesgo para la seguridad</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloqueado esta página porque podría estar distribuyendo malware diseñado para comprometer tu dispositivo o robar tu información personal.\n<a href=\"\">Más información</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Este sitio web puede hacerse pasar por un sitio legítimo con el fin de engañarte para que proporciones información personal, como contraseñas o números de tarjetas de crédito.\n<a href=\"\">Más información</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Salir de este sitio</string>
+    <string name="maliciousSiteAdvancedCTA">Avanzado</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Si crees que este sitio web es seguro, puedes <a href=\"\">informar de un error</a>. Puedes seguir visitando el sitio web por tu cuenta y riesgo.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Aceptar el riesgo y visitar el sitio</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Informar de un sitio marcado incorrectamente como malicioso</string>
+    <string name="maliciousSiteLearnMoreTitle">Más información</string>
+    <string name="maliciousSiteSettingTitle">Advertencias de seguridad del sitio</string>
+    <string name="maliciousSiteToggleHint">Avisarme sobre sitios marcados como phishing o malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Más información</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Desactivar esta función puede poner en riesgo tu información.</string>
+
 </resources>

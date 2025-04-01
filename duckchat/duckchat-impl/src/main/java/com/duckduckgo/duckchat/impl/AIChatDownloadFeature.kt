@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.print
+package com.duckduckgo.duckchat.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,10 +22,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "singlePrintSafeguard",
+    featureName = "aiChatDownload",
 )
 
-interface SinglePrintSafeguardFeature {
+interface AIChatDownloadFeature {
 
     @Toggle.DefaultValue(true)
     fun self(): Toggle

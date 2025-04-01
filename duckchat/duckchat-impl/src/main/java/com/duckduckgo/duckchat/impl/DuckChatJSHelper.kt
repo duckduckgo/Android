@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,7 +34,7 @@ interface DuckChatJSHelper {
 
 @ContributesBinding(AppScope::class)
 class RealDuckChatJSHelper @Inject constructor(
-    private val duckChat: DuckChat,
+    private val duckChat: DuckChatInternal,
     private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
 
@@ -57,6 +56,14 @@ class RealDuckChatJSHelper @Inject constructor(
             duckChat.openDuckChat()
             null
         }
+        METHOD_CLOSE_AI_CHAT -> {
+            duckChat.closeDuckChat()
+            null
+        }
+        METHOD_OPEN_AI_CHAT_SETTINGS -> {
+            duckChat.openDuckChatSettings()
+            null
+        }
         else -> null
     }
 
@@ -73,6 +80,8 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
+            put(SUPPORTS_CLOSING_AI_CHAT, true)
+            put(SUPPORTS_OPENING_SETTINGS, true)
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -88,8 +97,12 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
+        private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
+        private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
+        private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
+        private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
     }

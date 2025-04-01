@@ -104,6 +104,12 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
+    @Inject
+    lateinit var duckChat: DuckChatInternal
+
+    @Inject
+    lateinit var aiChatDownloadFeature: AIChatDownloadFeature
+
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
 
     private var pendingFileDownload: PendingFileDownload? = null
@@ -115,6 +121,10 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        duckChat.observeCloseEvent(this) {
+            finish()
+        }
 
         setContentView(binding.root)
         setupToolbar(toolbar)
@@ -156,7 +166,11 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType)
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    if (aiChatDownloadFeature.self().isEnabled()) {
+                        requestFileDownload(url, contentDisposition, mimeType)
+                    }
+                }
             }
 
             contentScopeScripts.register(
