@@ -24,6 +24,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -31,6 +32,8 @@ import com.duckduckgo.app.browser.omnibar.animations.ExperimentTrackersCountAnim
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.common.ui.view.fade
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extractDomain
@@ -63,6 +66,9 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
 
+    @Inject
+    lateinit var duckDuckGoUrlDetector: DuckDuckGoUrlDetector
+
     init {
         val attr =
             context.theme.obtainStyledAttributes(attrs, R.styleable.DelightfulOmnibarLayout, defStyle, 0)
@@ -88,10 +94,14 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 
         experimentTrackersCountAnimationHelper.animate(trackersText, viewState.trackersBlocked, viewState.previouslyTrackersBlocked)
         minibarText.text = viewState.url.extractDomain()
-        if (viewState.privacyShield == PROTECTED) {
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(viewState.url)) {
+            minibarShield.hide()
+        } else if (viewState.privacyShield == PROTECTED) {
             minibarShield.setImageResource(R.drawable.ic_shield_exploration)
+            minibarShield.show()
         } else {
             minibarShield.setImageResource(R.drawable.ic_shield_exploration_unprotected)
+            minibarShield.show()
         }
     }
 
