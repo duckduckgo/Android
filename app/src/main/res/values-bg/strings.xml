@@ -663,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Плъзнете надолу от горния край и натиснете бутона за връщане, за да излезете от цял екран</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Затваряне на всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Сигурни ли сте, че искате да затворите всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отмени</string>
     <string name="closeAppTabsConfirmationDialogClose">Затваряне</string>
+
+    <string name="selectTabsMenuItem">Избиране на раздели</string>
+    <string name="selectAllTabsMenuItem">Избиране на всички</string>
+    <string name="deselectAllTabsMenuItem">Премахване на избора на всички</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d избрани</string>
+    <string name="tabSelectedIndicator">Индикатор за избран раздел</string>
+    <string name="tabNotSelectedIndicator">Индикатор за неизбран раздел</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d връзки от DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Споделяне на връзката</item>
+        <item quantity="other">Споделяне на връзки %1$d</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне отметка на избрания раздел?</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Отметката е добавена</item>
+        <item quantity="other">%1$d отметки са добавени</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Отметка</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне на отметка на раздела</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Съществуващите отметки няма да бъдат дублирани.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на всички %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d други раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите този раздел?</item>
+        <item quantity="other">Наистина ли искате да затворите всички раздели?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите раздела?</item>
+        <item quantity="other">Наистина ли искате да затворите тези раздели?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на разделите</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздел</item>
+        <item quantity="other">Затваряне на %1$d раздела</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Затваряне на другите раздели</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затворен раздел</item>
+        <item quantity="other">%1$d затворени раздела</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d поверителен раздел</item>
+        <item quantity="other">%1$d поверителни раздела</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
