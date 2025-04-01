@@ -543,6 +543,7 @@ class BrowserTabViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
