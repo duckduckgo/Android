@@ -21,11 +21,14 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.httperrors.RealHttpErrorPixels.Companion.PIXEL_5XX_KEYS_SET
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
@@ -64,6 +67,7 @@ class RealHttpErrorPixelsTest {
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
     private val mockSubscriptions: Subscriptions = mock()
     private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
+    private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun setup() {
@@ -76,6 +80,7 @@ class RealHttpErrorPixelsTest {
             mockNetworkProtectionState,
             mockSubscriptions,
             mockVpnFeaturesRegistry,
+            fakeAndroidConfigBrowserFeature,
         )
     }
 
@@ -164,6 +169,8 @@ class RealHttpErrorPixelsTest {
         val netpFlow = flowOf(listOf(NetP))
         val connectionStateFlow = flowOf(ConnectionState.CONNECTED)
 
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
         whenever(mockSubscriptions.getEntitlementStatus()).thenReturn(netpFlow)
         whenever(mockNetworkProtectionState.getConnectionStateFlow()).thenReturn(connectionStateFlow)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
@@ -183,6 +190,8 @@ class RealHttpErrorPixelsTest {
         val netpFlow = flowOf(listOf(NetP))
         val connectionStateFlow = flowOf(ConnectionState.CONNECTED)
 
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
         whenever(mockSubscriptions.getEntitlementStatus()).thenReturn(netpFlow)
         whenever(mockNetworkProtectionState.getConnectionStateFlow()).thenReturn(connectionStateFlow)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
@@ -203,6 +212,8 @@ class RealHttpErrorPixelsTest {
         val pixelKey = "${pixelName.pixelName}|503|true|false|123.45.67.89|_count"
         val pixelKeys = mutableSetOf(pixelKey)
 
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
         prefs.edit {
             putStringSet(PIXEL_5XX_KEYS_SET, pixelKeys)
             putInt(pixelKey, 5)
@@ -234,6 +245,8 @@ class RealHttpErrorPixelsTest {
         val pixelKey = "${pixelName.pixelName}|503|true|false|123.45.67.89|_count"
         val pixelKeys = mutableSetOf(pixelKey)
 
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
         prefs.edit {
             putStringSet(PIXEL_5XX_KEYS_SET, pixelKeys)
             putInt(pixelKey, 0)
@@ -256,6 +269,8 @@ class RealHttpErrorPixelsTest {
         val pixelKeys = mutableSetOf(pixelKey)
         val now = Instant.now().toEpochMilli()
 
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
         prefs.edit {
             putStringSet(PIXEL_5XX_KEYS_SET, pixelKeys)
             putInt(pixelKey, 5)

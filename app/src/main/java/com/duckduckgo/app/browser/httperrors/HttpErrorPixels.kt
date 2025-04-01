@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.core.content.edit
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -53,6 +54,7 @@ class RealHttpErrorPixels @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val subscriptions: Subscriptions,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val androidBrowserConfig: AndroidBrowserConfigFeature,
 ) : HttpErrorPixels {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -69,6 +71,11 @@ class RealHttpErrorPixels @Inject constructor(
         httpErrorPixelName: HttpErrorPixelName,
         statusCode: Int,
     ) {
+        // Kill switch
+        if (!androidBrowserConfig.self().isEnabled() || !androidBrowserConfig.httpError5xxPixel().isEnabled()) {
+            return
+        }
+
         combine(
             subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.contains(NetP) },
             networkProtectionState.getConnectionStateFlow(),
@@ -112,6 +119,11 @@ class RealHttpErrorPixels @Inject constructor(
     }
 
     override fun fire5xxCountPixels() {
+        // Kill switch
+        if (!androidBrowserConfig.self().isEnabled() || !androidBrowserConfig.httpError5xxPixel().isEnabled()) {
+            return
+        }
+
         val now = Instant.now().toEpochMilli()
         val updatedSet = pixel5xxKeys
         updatedSet.forEach { pixelKey ->
