@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -86,7 +87,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
-import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -98,7 +98,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
+) : LinearLayout(context, attrs, defStyle), OmnibarBehaviour {
 
     sealed class Decoration {
         data class Mode(val viewMode: ViewMode) : Decoration()
@@ -510,7 +510,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             omnibarTextInput.setText(viewState.omnibarText)
         }
         if (viewState.expanded) {
-            setExpanded(true, viewState.expandedAnimated)
+            // setExpanded(true, viewState.expandedAnimated)
         }
 
         if (viewState.isLoading) {

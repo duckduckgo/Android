@@ -93,6 +93,12 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
+
+                        // remove the default top abb bar behavior
+                        removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                        removeAppBarBehavior(binding.browserLayout)
+                        removeAppBarBehavior(binding.focusedView)
+                        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
                     }
                 }
             }
@@ -265,7 +271,7 @@ class Omnibar(
     }
 
     fun setExpanded(expanded: Boolean) {
-        newOmnibar.setExpanded(expanded)
+        // newOmnibar.setExpanded(expanded)
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {

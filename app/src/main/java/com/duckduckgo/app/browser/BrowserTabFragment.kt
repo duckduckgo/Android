@@ -2713,7 +2713,7 @@ class BrowserTabFragment :
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
-            R.layout.include_duckduckgo_browser_webview,
+            R.layout.include_duckduckgo_browser_webview_experiment,
             binding.webViewContainer,
             true,
         ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
