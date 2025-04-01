@@ -31,6 +31,7 @@ data class OptOutCompletedBroker(
     val extractedProfile: String,
     val startTimeInMillis: Long,
     val endTimeInMillis: Long,
+    val isSubmitSuccess: Boolean,
 )
 
 /**

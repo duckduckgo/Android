@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.optout
 
 import android.content.Context
 import android.webkit.WebView
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
@@ -30,6 +31,8 @@ import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
+import com.duckduckgo.pir.internal.store.db.EventType
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
@@ -85,6 +88,7 @@ class RealPirOptOut @Inject constructor(
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirOptOut {
     private var profileQuery: ProfileQuery = ProfileQuery(
         firstName = "William",
@@ -110,6 +114,7 @@ class RealPirOptOut @Inject constructor(
         brokers: List<String>,
         webView: WebView,
     ): Result<Unit> {
+        emitStartPixel()
         if (runners.isNotEmpty()) {
             stop()
             runners.clear()
@@ -139,6 +144,7 @@ class RealPirOptOut @Inject constructor(
             }
 
             logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+            emitCompletedPixel()
             Result.success(Unit)
         }
     }
@@ -147,6 +153,7 @@ class RealPirOptOut @Inject constructor(
         brokers: List<String>,
         context: Context,
     ): Result<Unit> {
+        emitStartPixel()
         runBlocking {
             if (runners.isNotEmpty()) {
                 stop()
@@ -198,6 +205,7 @@ class RealPirOptOut @Inject constructor(
                 }.awaitAll()
 
             logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+            emitCompletedPixel()
             Result.success(Unit)
         }
     }
@@ -231,7 +239,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     override suspend fun executeForBrokersWithRecords(context: Context): Result<Unit> {
-        val brokers = repository.getBrokersForOptOut()
+        val brokers = repository.getBrokersForOptOut(formOptOutOnly = true)
         return execute(brokers, context)
     }
 
@@ -240,5 +248,23 @@ class RealPirOptOut @Inject constructor(
         runners.forEach {
             runBlocking { it.stop() }
         }
+    }
+
+    private suspend fun emitStartPixel() {
+        repository.saveScanLog(
+            PirEventLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                eventType = EventType.MANUAL_OPTOUT_STARTED,
+            ),
+        )
+    }
+
+    private suspend fun emitCompletedPixel() {
+        repository.saveScanLog(
+            PirEventLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                eventType = EventType.MANUAL_OPTOUT_COMPLETED,
+            ),
+        )
     }
 }
