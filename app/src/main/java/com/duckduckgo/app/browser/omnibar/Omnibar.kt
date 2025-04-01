@@ -82,13 +82,14 @@ class Omnibar(
                         binding.rootView.removeView(binding.newOmnibarBottom)
 
                         // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                        binding.rootContainer.removeView(binding.fadeOmnibar)
+                        binding.rootContainer.removeView(binding.fadeOmnibarBottom)
                     }
 
                     FADE -> {
                         // remove bottom variant
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                        // binding.rootContainer.removeView(binding.fadeOmnibarBottom)
+                        binding.fadeOmnibarBottom.gone()
 
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
@@ -110,13 +111,14 @@ class Omnibar(
                         binding.rootView.removeView(binding.newOmnibar)
 
                         // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                        binding.rootContainer.removeView(binding.fadeOmnibar)
+                        binding.rootContainer.removeView(binding.fadeOmnibarBottom)
                     }
 
                     FADE -> {
                         // remove top variant
-                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.fadeOmnibar.gone()
+                        // binding.rootContainer.removeView(binding.fadeOmnibar)
 
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
