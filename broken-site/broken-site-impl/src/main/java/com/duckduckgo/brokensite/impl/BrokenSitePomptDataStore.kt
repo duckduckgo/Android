@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-interface BrokenSitePomptDataStore {
+interface BrokenSitePromptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
     suspend fun getMaxDismissStreak(): Int
 
@@ -68,7 +68,7 @@ interface BrokenSitePomptDataStore {
 class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     @BrokenSitePrompt private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : BrokenSitePomptDataStore {
+) : BrokenSitePromptDataStore {
 
     private object Keys {
         val MAX_DISMISS_STREAK = intPreferencesKey(name = "MAX_DISMISS_STREAK")

@@ -66,7 +66,7 @@ class RealBrokenSiteReportRepository(
     private val database: BrokenSiteDatabase,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val brokenSitePromptDataStore: BrokenSitePomptDataStore,
+    private val brokenSitePromptDataStore: BrokenSitePromptDataStore,
     private val brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
 ) : BrokenSiteReportRepository {
 

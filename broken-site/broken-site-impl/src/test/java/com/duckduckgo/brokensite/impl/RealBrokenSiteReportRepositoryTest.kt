@@ -40,7 +40,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
-    private val mockDataStore: BrokenSitePomptDataStore = mock()
+    private val mockDataStore: BrokenSitePromptDataStore = mock()
     private val mockInMemoryStore: BrokenSitePromptInMemoryStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
