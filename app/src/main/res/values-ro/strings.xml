@@ -663,11 +663,91 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trage în jos din partea superioară și atinge butonul înapoi pentru a ieși din ecranul complet</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Dorești să închizi toate filele?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Sigur dorești să închizi toate filele?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Anulare</string>
     <string name="closeAppTabsConfirmationDialogClose">Închidere</string>
+
+    <string name="selectTabsMenuItem">Selectează filele</string>
+    <string name="selectAllTabsMenuItem">Selectează tot</string>
+    <string name="deselectAllTabsMenuItem">Deselectează tot</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d selectate</string>
+    <string name="tabSelectedIndicator">Indicator de filă selectată</string>
+    <string name="tabNotSelectedIndicator">Indicator de filă neselectată</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linkuri de la DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Distribuie linkul</item>
+        <item quantity="few">Distribuie %1$d linkuri</item>
+        <item quantity="other">Distribuie %1$d de linkuri</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marchezi fila selectată?</item>
+        <item quantity="few">Dorești să marchezi %1$d file?</item>
+        <item quantity="other">Dorești să marchezi %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcaj adăugat</item>
+        <item quantity="few">%1$d marcaje adăugate</item>
+        <item quantity="other">%1$d de marcaje adăugate</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Marchează</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marchează fila</item>
+        <item quantity="few">Marchează %1$d file</item>
+        <item quantity="other">Marchează %1$d de file</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Marcajele existente nu vor fi duplicate.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi fila?</item>
+        <item quantity="few">Dorești să închizi toate cele %1$d file?</item>
+        <item quantity="other">Dorești să închizi toate cele %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi altă filă?</item>
+        <item quantity="few">Închizi alte %1$d file?</item>
+        <item quantity="other">Închizi alte %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi fila?</item>
+        <item quantity="few">Închizi %1$d file?</item>
+        <item quantity="other">Închizi %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sigur dorești să închizi această filă?</item>
+        <item quantity="few">Sigur dorești să închizi toate filele?</item>
+        <item quantity="other">Sigur dorești să închizi toate filele?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sigur dorești să închizi fila?</item>
+        <item quantity="few">Sigur dorești să închizi aceste file?</item>
+        <item quantity="other">Sigur dorești să închizi aceste file?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide filele</item>
+        <item quantity="other">Închide filele</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide %1$d file</item>
+        <item quantity="other">Închide %1$d de file</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Închide alte file</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Filă închisă</item>
+        <item quantity="few">%1$d file închise</item>
+        <item quantity="other">%1$d de file închise</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d filă privată</item>
+        <item quantity="few">%1$d file private</item>
+        <item quantity="other">%1$d de file private</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
