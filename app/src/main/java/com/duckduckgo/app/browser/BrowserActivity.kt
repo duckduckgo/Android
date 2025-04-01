@@ -36,8 +36,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
@@ -313,20 +315,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun configureFlowCollectors() {
         if (swipingTabsFeature.isEnabled) {
             lifecycleScope.launch {
-                viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onTabsChanged(it)
-                }
-            }
+                repeatOnLifecycle(STARTED) {
+                    launch {
+                        viewModel.tabsFlow.collectLatest {
+                            tabManager.onTabsChanged(it)
+                        }
+                    }
 
-            lifecycleScope.launch {
-                viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onSelectedTabChanged(it)
-                }
-            }
+                    launch {
+                        viewModel.selectedTabFlow.collectLatest {
+                            tabManager.onSelectedTabChanged(it)
+                        }
+                    }
 
-            lifecycleScope.launch {
-                viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
-                    onMoveToTabRequested(it)
+                    launch {
+                        viewModel.selectedTabIndex.collectLatest {
+                            onMoveToTabRequested(it)
+                        }
+                    }
                 }
             }
         }

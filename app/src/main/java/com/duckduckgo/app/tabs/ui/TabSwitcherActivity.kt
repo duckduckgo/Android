@@ -380,7 +380,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureObservers() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
             lifecycleScope.launch {
-                viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
+                viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
                     tabsAdapter.updateData(it.tabItems)
 
