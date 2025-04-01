@@ -663,11 +663,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Povucite prema dolje s vrha i dodirnite gumb za natrag kako biste izašli iz prikaza preko cijelog zaslona</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želiš li zatvoriti sve kartice?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Jesi li siguran da želiš zatvoriti sve kartice?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
+
+    <string name="selectTabsMenuItem">Odaberi kartice</string>
+    <string name="selectAllTabsMenuItem">Odaberi sve</string>
+    <string name="deselectAllTabsMenuItem">Poništi odabir svega</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Odabrano: %1$d</string>
+    <string name="tabSelectedIndicator">Indikator odabrane kartice</string>
+    <string name="tabNotSelectedIndicator">Indikator neodabrane kartice</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d poveznice s DuckDuckGoa</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Podijeli poveznice</item>
+        <item quantity="few">Podijeli %1$d poveznice</item>
+        <item quantity="many">Podijeli %1$d poveznica</item>
+        <item quantity="other">Podijeli %1$d poveznica</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Označiti odabranu karticu?</item>
+        <item quantity="few">Označiti %1$d kartice?</item>
+        <item quantity="many">Označiti %1$d kartica?</item>
+        <item quantity="other">Označiti %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodana je knjižna oznaka</item>
+        <item quantity="few">Dodane su %1$d knjižne oznake</item>
+        <item quantity="many">Dodano je %1$d knjižnih oznaka</item>
+        <item quantity="other">Dodano je %1$d knjižnih oznaka</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Knjižna oznaka</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Označi karticu</item>
+        <item quantity="few">Označi %1$d kartice</item>
+        <item quantity="many">Označi %1$d kartica</item>
+        <item quantity="other">Označi %1$d kartica</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Postojeće knjižne oznake neće se duplicirati.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti karticu?</item>
+        <item quantity="few">Zatvoriti sve %1$d kartice?</item>
+        <item quantity="many">Zatvoriti svih %1$d kartica?</item>
+        <item quantity="other">Zatvoriti svih %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti drugu karticu?</item>
+        <item quantity="few">Zatvoriti %1$d druge kartice?</item>
+        <item quantity="many">Zatvoriti %1$d drugih kartica?</item>
+        <item quantity="other">Zatvoriti %1$d drugih kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti karticu?</item>
+        <item quantity="few">Zatvoriti %1$d kartice?</item>
+        <item quantity="many">Zatvoriti %1$d kartica?</item>
+        <item quantity="other">Zatvoriti %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jesi li siguran da želiš zatvoriti ovu karticu?</item>
+        <item quantity="few">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+        <item quantity="many">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+        <item quantity="other">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jesi li siguran da želiš zatvoriti karticu?</item>
+        <item quantity="few">Sigurno želiš zatvoriti ove kartice?</item>
+        <item quantity="many">Sigurno želiš zatvoriti ove kartice?</item>
+        <item quantity="other">Sigurno želiš zatvoriti ove kartice?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori kartice</item>
+        <item quantity="many">Zatvori kartica</item>
+        <item quantity="other">Zatvori kartica</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori %1$d kartice</item>
+        <item quantity="many">Zatvori %1$d kartica</item>
+        <item quantity="other">Zatvori %1$d kartica</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zatvori druge kartice</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kartica zatvorena</item>
+        <item quantity="few">%1$d kartice zatvoreno</item>
+        <item quantity="many">%1$d kartica zatvoreno</item>
+        <item quantity="other">%1$d kartica zatvoreno</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Privatna kartica</item>
+        <item quantity="few">%1$d Privatne kartice</item>
+        <item quantity="many">%1$d Privatnih kartica</item>
+        <item quantity="other">%1$d Privatnih kartica</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
