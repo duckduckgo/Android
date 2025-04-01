@@ -25,11 +25,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "swipingTabs",
 )
 interface SwipingTabsFeature {
-    // the main kill switch for the feature
+    // The flag used to enable the feature for the internal users
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
-    // This toggle is used to enable the feature for existing users (during the rollout phase)
+    // The toggle used to enable the feature for prod users (during the rollout phase)
     @Toggle.DefaultValue(false)
     fun onForExistingUsers(): Toggle
 }
