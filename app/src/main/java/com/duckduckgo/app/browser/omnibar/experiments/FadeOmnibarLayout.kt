@@ -261,8 +261,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun evaluateTransition(progress: Float) {
-        if (maximumTextInputWidth == 0) {
+        if (transitionProgress == 0f) {
             // the maximum input text width is only available after the layout is evaluated because it occupies all available space on screen
+            // on top of that, icons in the toolbar can show/hide dynamically depending on the state and enabled features
+            // to work around this problem, we re-measure the maximum width whenever the toolbar is fully visible
             maximumTextInputWidth = omnibarTextInput.width
         }
 
@@ -285,8 +287,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         // hide toolbar views
         val toolbarViewsAlpha = 1f - transitionInterpolation
         omnibarTextInput.alpha = toolbarViewsAlpha
-        aiChatDivider.alpha = toolbarViewsAlpha
-        aiChat.alpha = toolbarViewsAlpha
+        endIconsContainer.alpha = toolbarViewsAlpha
 
         // show minibar views
         minibarText.alpha = transitionInterpolation
