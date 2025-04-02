@@ -522,6 +522,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         localeLanguage = target.localeLanguage,
                                         isReturningUser = target.isReturningUser,
                                         isPrivacyProEligible = target.isPrivacyProEligible,
+                                        minSdkVersion = target.minSdkVersion,
                                     )
                                 } ?: emptyList()
                                 val cohorts = jsonToggle?.cohorts?.map { cohort ->
@@ -730,6 +731,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addParameter("localeLanguage", String::class.asClassName())
                     .addParameter("isReturningUser", Boolean::class.asClassName().copy(nullable = true))
                     .addParameter("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
+                    .addParameter("minSdkVersion", Int::class.asClassName().copy(nullable = true))
                     .build(),
             )
             .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
@@ -742,6 +744,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
                     .initializer("isPrivacyProEligible")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("minSdkVersion", Int::class.asClassName().copy(nullable = true))
+                    .initializer("minSdkVersion")
                     .build(),
             )
             .build()

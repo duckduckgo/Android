@@ -225,6 +225,7 @@ interface Toggle {
             val localeLanguage: String?,
             val isReturningUser: Boolean?,
             val isPrivacyProEligible: Boolean?,
+            val minSdkVersion: Int?,
         )
         data class Cohort(
             val name: String,
