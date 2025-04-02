@@ -73,6 +73,6 @@ class PproUpsellRevokedMessagePlugin @Inject constructor(
     companion object {
         internal const val PRIORITY_PPRO_REVOKED = PRIORITY_REVOKED - 1
         private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"
-        private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_revoked"
+        private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_apptrackingprotection_android__revoked"
     }
 }
