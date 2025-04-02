@@ -47,4 +47,10 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(true)
     fun seamlessAccountSwitching(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun exchangeKeysToSyncWithAnotherDevice(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun automaticallyUpdateSyncSettings(): Toggle
 }

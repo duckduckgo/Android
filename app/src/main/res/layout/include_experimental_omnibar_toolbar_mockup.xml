@@ -33,10 +33,10 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/fading_omnibar_field_background"
+        android:background="@drawable/fade_omnibar_field_background"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -63,57 +63,4 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/fireIconMenuMockup"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:padding="@dimen/keyline_2"
-        android:layout_marginEnd="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
-        app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible">
-
-        <ImageView
-            android:id="@+id/fireIconImageViewMockup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/browserPopupMenu"
-            android:src="@drawable/ic_fire" />
-    </FrameLayout>
-
-    <com.duckduckgo.app.browser.TabSwitcherButton
-        android:id="@+id/tabsMenuMockup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_0"
-        android:padding="@dimen/keyline_2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
-        app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/browserMenuMockup"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:padding="@dimen/keyline_2"
-        android:layout_marginEnd="@dimen/keyline_0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/browserPopupMenu"
-            android:src="@drawable/ic_menu_vertical_24" />
-
-    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

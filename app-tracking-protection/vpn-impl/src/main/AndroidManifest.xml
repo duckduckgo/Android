@@ -11,10 +11,16 @@
         android:largeHeap="true"
         android:theme="@style/Theme.DuckDuckGo.Light">
 
+        <!-- This is the Worker Service where VPN workers need to bind into -->
+        <service
+                android:name=".worker.VpnRemoteWorkerService"
+                android:exported="false"
+                android:process=":vpn" />
+
         <activity
-            android:name=".service.VpnPermissionRequesterActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+                android:name=".service.VpnPermissionRequesterActivity"
+                android:exported="false"
+                android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"

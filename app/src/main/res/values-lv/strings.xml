@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Saraksta skats</string>
     <string name="tabSwitcherGridViewMenu">Režģa skats</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
+    <string name="inTheLast7Days">pēdējo 7 dienu laikā</string>
+
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
     <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
@@ -707,8 +712,8 @@
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
-    <string name="preOnboardingComparisonChartItem4">Bloķē kaitinošas reklāmas</string>
-    <string name="preOnboardingComparisonChartItem5">Ātri izdzēs pārlūkošanas datus</string>
+    <string name="preOnboardingComparisonChartItem4">Bloķēt izsekojošas reklāmas</string>
+    <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
     <string name="preOnboardingDaxDialog3Title">Lieliski! Apsveicam ar pievienošanos pīļu komandai.</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
@@ -798,5 +803,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne tagad</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloķē izsekotājus, lai aizsargātu tavu pārlūkošanu</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Pamest šo vietni</string>
+    <string name="maliciousSiteAdvancedCTA">Detalizēti</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ja uzskati, ka šī vietne ir droša, vari <a href=\"\">ziņot par kļūdu</a>. Tu joprojām vari apmeklēt šo vietni, apzinoties savu risku.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Pieņemt risku un apmeklēt vietni</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Ziņo par vietni, kas ir nepareizi atzīmēta kā ļaunprātīga.</string>
+    <string name="maliciousSiteLearnMoreTitle">Uzzināt vairāk</string>
+    <string name="maliciousSiteSettingTitle">Vietnes drošības brīdinājumi</string>
+    <string name="maliciousSiteToggleHint">Brīdiniet mani par vietnēm, kas atzīmētas kā pikšķerēšanas vai ļaunprātīgas programmatūras vietnes</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Šī līdzekļa atspējošana var apdraudēt tavu informāciju.</string>
 
 </resources>

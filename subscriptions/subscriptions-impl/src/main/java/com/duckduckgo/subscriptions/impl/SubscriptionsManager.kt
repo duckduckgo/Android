@@ -575,6 +575,15 @@ class RealSubscriptionsManager @Inject constructor(
             validateTokens(tokens, jwks)
         } catch (e: HttpException) {
             if (e.code() == 400) {
+                if (parseError(e)?.error == "unknown_account") {
+                    /*
+                        Refresh token appears to be valid, but the related account doesn't exist in BE.
+                        After the subscription expires, BE eventually deletes the account, so this is expected.
+                     */
+                    signOut()
+                    throw e
+                }
+
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
@@ -941,6 +950,16 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.setAccessToken(null)
             authRepository.setAuthToken(null)
             pixelSender.reportAuthV2MigrationSuccess()
+        } catch (e: HttpException) {
+            if (e.code() == 400 && parseError(e)?.error == "invalid_token") {
+                // After the account is removed from the backend, the user is automatically signed out of the app.
+                // This is a rare edge case where migration is triggered between these two events.
+                pixelSender.reportAuthV2MigrationFailureInvalidToken()
+                signOut()
+            } else {
+                pixelSender.reportAuthV2MigrationFailureOther()
+            }
+            throw e
         } catch (e: Exception) {
             if (e is IOException) {
                 pixelSender.reportAuthV2MigrationFailureIo()

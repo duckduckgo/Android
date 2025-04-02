@@ -53,6 +53,9 @@ object TestSyncFixtures {
     const val hashedPassword = "hashedPassword"
     const val protectedEncryptionKey = "protectedEncryptionKey"
     const val encryptedRecoveryCode = "encrypted_recovery_code"
+    const val encryptedExchangeCode = "encrypted_exchange_code"
+    const val primaryDeviceKeyId = "primary_device_key_id"
+    const val otherDeviceKeyId = "other_device_key_id"
     val accountKeys = AccountKeys(
         result = 0,
         userId = userId,
@@ -192,8 +195,12 @@ object TestSyncFixtures {
         "\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
 
     fun qrBitmap(): Bitmap {
-        return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     }
 
     fun pdfFile(): File = File("Sync Data Recovery - DuckDuckGo.pdf")
+
+    fun jsonExchangeKey(keyId: String, publicKey: String) = """
+        {"exchange_key":{"key_id":"$keyId","public_key":"$publicKey"}}
+    """.trimIndent()
 }

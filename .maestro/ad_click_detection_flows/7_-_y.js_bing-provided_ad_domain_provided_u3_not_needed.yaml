@@ -8,14 +8,11 @@ tags:
       - launchApp:
           clearState: true
 
-      - runFlow: ../shared/pre_onboarding.yaml
+      - runFlow: ../shared/skip_all_onboarding.yaml
 
       - inputText: "https://www.search-company.site/#ad-id-6" # scroll until the ad-id-6 instead of ad-id-7 (context: https://app.asana.com/0/0/1204397066248823/1204415854211764/f)
       - pressKey: Enter
-      - assertVisible:
-          text: ".*Got It.*"
-      - tapOn:
-          text: "Got It"
+
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/fireIconMenu"
       - tapOn:

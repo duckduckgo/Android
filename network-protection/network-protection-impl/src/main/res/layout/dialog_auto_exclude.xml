@@ -58,7 +58,7 @@
         android:id="@+id/autoExcludePromptAddAction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:buttonSize="large"
+        app:daxButtonSize="large"
         android:text="@string/netpAutoExcludePromptActionAdd" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost

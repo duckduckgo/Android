@@ -128,6 +128,7 @@
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
+        <item name="daxColorOmnibarStroke">?attr/daxColorSurface</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
@@ -223,6 +224,10 @@
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
 
+        <!-- Browser Navigation Bar colors -->
+        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray50</item>
+        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray70</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -314,6 +319,10 @@
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
 
+        <!-- Browser Navigation Bar colors -->
+        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray70</item>
+        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray50</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
@@ -340,7 +349,6 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimationDuration">0</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
     </style>
 

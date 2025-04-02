@@ -69,6 +69,16 @@ interface SyncService {
         @Path("device_id") deviceId: String,
     ): Call<ConnectKey>
 
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/exchange/{key_id}")
+    fun getEncryptedMessage(
+        @Path("key_id") keyId: String,
+    ): Call<EncryptedMessage>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/exchange")
+    fun sendEncryptedMessage(
+        @Body request: EncryptedMessage,
+    ): Call<Void>
+
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
     fun patch(
         @Header("Authorization") token: String,
@@ -128,6 +138,11 @@ data class Logout(
 
 data class ConnectKey(
     @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
+)
+
+data class EncryptedMessage(
+    @field:Json(name = "key_id") val keyId: String,
+    @field:Json(name = "encrypted_message") val encryptedMessage: String,
 )
 
 data class Connect(

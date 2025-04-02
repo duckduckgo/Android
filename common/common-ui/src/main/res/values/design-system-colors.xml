@@ -71,6 +71,10 @@
     <attr name="daxColorToolbar" format="color"/>
     <attr name="daxColorBrowserOverlay" format="color"/>
 
+    <!-- Visual Design Specific Colors -->
+    <attr name="daxColorOmnibarStroke" format="color"/>
+    <attr name="daxColorControlFillPrimary" format="color"/>
+
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
@@ -135,7 +139,10 @@
     <color name="yellow50">#FFCC33</color>
     <color name="yellow10">#FFF0C2</color>
 
+    <color name="green0">#D3FFCC</color>
     <color name="green50">#4CBA3C</color>
+    <color name="green70">#288419</color>
+    <color name="green80">#1A690D</color>
 
     <color name="gray100">#111111</color>
     <color name="gray95">#494949</color>

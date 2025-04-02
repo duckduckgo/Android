@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
-import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
@@ -52,6 +51,13 @@ class BrowserPopupMenu(
         }
     }
 
+    internal val navigationButtonsContainer: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.navigationButtonsContainer
+            BOTTOM -> bottomBinding.navigationButtonsContainer
+        }
+    }
+
     internal val backMenuItem: View by lazy {
         when (omnibarPosition) {
             TOP -> topBinding.backMenuItem
@@ -70,6 +76,20 @@ class BrowserPopupMenu(
         when (omnibarPosition) {
             TOP -> topBinding.refreshMenuItem
             BOTTOM -> bottomBinding.refreshMenuItem
+        }
+    }
+
+    internal val navigationButtonsSectionDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.navigationButtonsSectionDivider
+            BOTTOM -> bottomBinding.navigationButtonsSectionDivider
+        }
+    }
+
+    internal val refreshLongMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.refreshLongMenuItem
+            BOTTOM -> bottomBinding.refreshLongMenuItem
         }
     }
 
@@ -249,9 +269,13 @@ class BrowserPopupMenu(
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         refreshMenuItem.isEnabled = browserShowing
+        navigationButtonsContainer.isVisible = viewState.navigationButtonsVisible
+        navigationButtonsSectionDivider.isVisible = viewState.navigationButtonsVisible
+        refreshLongMenuItem.isVisible = !viewState.navigationButtonsVisible && browserShowing
+
         printPageMenuItem.isEnabled = browserShowing
 
-        newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
+        newTabMenuItem.isVisible = !displayedInCustomTabScreen
         duckChatMenuItem.isVisible = viewState.showDuckChatOption && !displayedInCustomTabScreen
         sharePageMenuItem.isVisible = viewState.canSharePage
 
@@ -323,13 +347,14 @@ class BrowserPopupMenu(
         openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
         customTabsMenuDivider.isVisible = displayedInCustomTabScreen
         runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-        overrideForSSlError(viewState)
+        overrideForSSlError(viewState, displayedInCustomTabScreen)
     }
 
     private fun overrideForSSlError(
         viewState: BrowserViewState,
+        displayedInCustomTabScreen: Boolean,
     ) {
-        if (viewState.sslError != NONE) {
+        if (viewState.sslError != NONE && !displayedInCustomTabScreen) {
             newTabMenuItem.isVisible = true
             siteOptionsMenuDivider.isVisible = true
         }

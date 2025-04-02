@@ -91,4 +91,20 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun enableMaliciousSiteProtection(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "fireproofedWebLocalStorage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun fireproofedWebLocalStorage(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "httpError5xxPixel" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun httpError5xxPixel(): Toggle
 }

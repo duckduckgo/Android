@@ -37,9 +37,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
     PROTECTION_TOGGLE_BROKEN_SITE_REPORT("m_protection-toggled-off-breakage-report"),
 
-    SPLASHSCREEN_SHOWN("m_splashscreen_shown"),
-    SPLASHSCREEN_FAILED_TO_LAUNCH("m_splashscreen_failed_to_launch"),
-
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
     PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
@@ -365,6 +362,15 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
 
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION("duckplayer_youtube-signin-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION("duckplayer_youtube-age-restricted-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION("duckplayer_youtube-no-embed-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION("duckplayer_youtube-unknown-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE("duckplayer_youtube-signin-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE("duckplayer_youtube-age-restricted-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE("duckplayer_youtube-no-embed-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE("duckplayer_youtube-unknown-error_daily-unique"),
+
     MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED("m_malicious-site-protection_feature-toggled"),
     MALICIOUS_SITE_PROTECTION_VISIT_SITE("m_malicious-site-protection_visit-site"),
     MALICIOUS_SITE_PROTECTION_ERROR_SHOWN("m_malicious-site-protection_error-page-shown"),
@@ -398,4 +404,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
+
+    TAB_MANAGER_INFO_PANEL_IMPRESSIONS("m_tab_manager_info_panel_impressions"),
+    TAB_MANAGER_INFO_PANEL_DISMISSED("m_tab_manager_info_panel_dismissed"),
+    TAB_MANAGER_INFO_PANEL_TAPPED("m_tab_manager_info_panel_tapped"),
 }

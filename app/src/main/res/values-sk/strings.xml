@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Zobrazenie zoznamu</string>
     <string name="tabSwitcherGridViewMenu">Zobrazenie mriežky</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">Za posledných 7 dní &lt;b&gt;bolo zablokovaných %1$s sledovačov&lt;/b&gt;</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Bolo zablokovaných %1$s sledovačov &lt;/b&gt;</string>
+    <string name="inTheLast7Days">za posledných 7 dní</string>
+
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
     <string name="fireClearAll">Vymazať všetky karty a údaje</string>
@@ -220,14 +225,14 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Iba ukončiť aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončiť 5 sekúnd neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončiť 5 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončiť 15 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončiť 30 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Aplikácia bola zatvorená po 1 hodine neaktívnosti</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikácie, neaktívnej po dobu 5 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -707,8 +712,8 @@
     <string name="preOnboardingComparisonChartItem1">Predvolené vyhľadávanie so súkromím</string>
     <string name="preOnboardingComparisonChartItem2">Blokovať sledovanie tretími stranami</string>
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokovať nepríjemné reklamy</string>
-    <string name="preOnboardingComparisonChartItem5">Rýchle vymazanie údajov prehliadania</string>
+    <string name="preOnboardingComparisonChartItem4">Blokovať reklamy, ktoré sledujú</string>
+    <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
     <string name="preOnboardingDaxDialog3Title">Úžasné! Vitajte vo svete Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="onboardingSearchDaxDialogTitle">Skúste vyhľadávanie!</string>
@@ -800,5 +805,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Nechaj DuckDuckGo chrániť viac toho, čo robíš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás ako svoj predvolený prehliadač, aby sa všetky odkazy na stránky otvárali v DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Teraz nie</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokuje sledovače, aby chránil tvoje prehliadanie</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Táto webová lokalita sa môže vydávať za legitímnu lokalitu s cieľom oklamať vás k poskytnutiu osobných údajov, ako sú heslá alebo čísla kreditných kariet.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Opustiť túto stránku</string>
+    <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ak si myslíš, že táto webová stránka je bezpečná, môžeš <a href=\"\">nahlásiť chybu</a>. Webovú stránku môžeš stále navštíviť na vlastné riziko.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Akceptovať riziko a navštíviť stránku</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Nahlás, že stránka je nesprávne označená stránku ako škodlivá.</string>
+    <string name="maliciousSiteLearnMoreTitle">Zistite viac</string>
+    <string name="maliciousSiteSettingTitle">Bezpečnostné upozornenia na lokalite</string>
+    <string name="maliciousSiteToggleHint">Upozorni ma na stránkach označených ako phishing alebo malvér.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Zistiť viac</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Deaktivácia tejto funkcie môže ohroziť tvoje údaje.</string>
 
 </resources>

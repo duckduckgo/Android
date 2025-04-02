@@ -15,12 +15,4 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application>
-        <!-- This is the Worker Service where VPN workers need to bind into -->
-        <service
-                android:name="androidx.work.multiprocess.RemoteWorkerService"
-                android:exported="false"
-                android:process=":vpn" />
-    </application>
 </manifest>

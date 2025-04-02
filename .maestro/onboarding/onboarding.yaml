@@ -1,0 +1,13 @@
+appId: com.duckduckgo.mobile.android
+name: "Onboarding: Ensuring we can navigate through pre-onboarding flow"
+tags:
+    - onboardingTest
+---
+# Pre-requisite: None
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+            clearState: true
+      - runFlow: ../shared/pre_onboarding.yaml

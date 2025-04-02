@@ -48,6 +48,18 @@ tags:
       - inputText: "https://www.search-company.site"
       - tapOn:
           text: "load custom tab"
+      - assertNotVisible:
+          id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - assertNotVisible:
+          id: "com.duckduckgo.mobile.android:id/tabsMenu"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabCloseIcon"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabShieldIcon"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabTitle"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabDomain"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
       - assertVisible:

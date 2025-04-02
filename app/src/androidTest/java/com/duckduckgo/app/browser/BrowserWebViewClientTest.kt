@@ -220,9 +220,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationState() {
+    fun whenOnPageStartedCalledThenListenerNotified() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).navigationStateChanged(any())
+        verify(listener).pageStarted(any())
     }
 
     @UiThreadTest
@@ -243,12 +243,12 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateNavigationState() {
+    fun whenOnPageCommitVisibleCalledThenListenerIsNotified() {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        verify(listener).navigationStateChanged(any())
+        verify(listener).onPageCommitVisible(any(), any())
     }
 
     @UiThreadTest
@@ -259,7 +259,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
         testee.onPageCommitVisible(mockWebView, "foo.com")
-        verify(listener).navigationStateChanged(any())
+        verify(listener).onPageCommitVisible(any(), any())
     }
 
     @UiThreadTest
@@ -310,9 +310,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationState() {
+    fun whenOnPageFinishedCalledThenListenerNotified() {
         testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).navigationStateChanged(any())
+        verify(listener).pageFinished(any(), eq(EXAMPLE_URL))
     }
 
     @UiThreadTest
@@ -377,13 +377,6 @@ class BrowserWebViewClientTest {
         whenever(detail.didCrash()).thenReturn(true)
         testee.onRenderProcessGone(webView, detail)
         verify(listener, times(1)).recoverFromRenderProcessGone()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageFinishedCalledThenPrefetchIconCalled() {
-        testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).prefetchFavicon(EXAMPLE_URL)
     }
 
     @UiThreadTest
@@ -1106,7 +1099,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledBeforeCompleteThenNavigationStateNotInvoked() {
+    fun whenOnPageFinishedCalledBeforeCompleteThenOnPageFinishedNotInvoked() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(10)
         whenever(mockWebView.settings).thenReturn(mock())

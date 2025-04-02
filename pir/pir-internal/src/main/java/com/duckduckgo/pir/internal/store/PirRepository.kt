@@ -16,9 +16,16 @@
 
 package com.duckduckgo.pir.internal.store
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse.ScrapedData
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
+import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -26,7 +33,20 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
+import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
+import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
+import com.duckduckgo.pir.internal.store.db.PirScanLog
+import com.duckduckgo.pir.internal.store.db.ScanErrorResult
+import com.duckduckgo.pir.internal.store.db.ScanLogDao
+import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
+import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.UserProfile
+import com.duckduckgo.pir.internal.store.db.UserProfileDao
+import com.squareup.moshi.Moshi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 interface PirRepository {
     suspend fun getCurrentMainEtag(): String?
@@ -39,6 +59,8 @@ interface PirRepository {
 
     suspend fun getActiveBrokerJsons(): List<BrokerJson>
 
+    suspend fun getAllBrokersForScan(): List<String>
+
     suspend fun getEtagForFilename(fileName: String): String?
 
     suspend fun updateBrokerData(
@@ -46,18 +68,96 @@ interface PirRepository {
         broker: PirJsonBroker,
     )
 
+    suspend fun getBrokerScanSteps(name: String): String?
+
+    suspend fun saveNavigateResult(
+        brokerName: String,
+        navigateResponse: NavigateResponse,
+    )
+
+    suspend fun saveErrorResult(
+        brokerName: String,
+        actionType: String,
+        error: PirErrorReponse,
+    )
+
+    suspend fun saveExtractProfileResult(
+        brokerName: String,
+        response: ExtractedResponse,
+    )
+
+    fun getAllResultsFlow(): Flow<List<ScanResult>>
+
+    suspend fun getErrorResultsCount(): Int
+
+    suspend fun getSuccessResultsCount(): Int
+
+    suspend fun deleteAllResults()
+
+    suspend fun getUserProfiles(): List<UserProfile>
+
+    suspend fun deleteAllUserProfiles()
+
+    suspend fun replaceUserProfile(userProfile: UserProfile)
+
+    fun getAllScanEventsFlow(): Flow<List<PirScanLog>>
+
+    fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
+
+    suspend fun saveScanLog(pirScanLog: PirScanLog)
+
+    suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
+
+    suspend fun deleteAllScanLogs()
+
     data class BrokerJson(
         val fileName: String,
         val etag: String,
     )
+
+    sealed class ScanResult(
+        open val brokerName: String,
+        open val completionTimeInMillis: Long,
+        open val actionType: String,
+    ) {
+        data class NavigateResult(
+            override val brokerName: String,
+            override val completionTimeInMillis: Long,
+            override val actionType: String,
+            val url: String,
+        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
+
+        data class ExtractedProfileResult(
+            override val brokerName: String,
+            override val completionTimeInMillis: Long,
+            override val actionType: String,
+            val profileQuery: ProfileQuery?,
+            val extractResults: List<ScrapedData> = emptyList(),
+        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
+
+        data class ErrorResult(
+            override val brokerName: String,
+            override val completionTimeInMillis: Long,
+            override val actionType: String,
+            val message: String,
+        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
+    }
 }
 
 class RealPirRepository(
+    val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val pirDataStore: PirDataStore,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val brokerJsonDao: BrokerJsonDao,
     private val brokerDao: BrokerDao,
+    private val scanResultsDao: ScanResultsDao,
+    private val userProfileDao: UserProfileDao,
+    private val scanLogDao: ScanLogDao,
 ) : PirRepository {
+    private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
+    private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
+
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
     override suspend fun updateMainEtag(etag: String) {
@@ -89,6 +189,10 @@ class RealPirRepository(
 
     override suspend fun getActiveBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getAllActiveBrokers().map { BrokerJson(fileName = it.fileName, etag = it.etag) }
+    }
+
+    override suspend fun getAllBrokersForScan(): List<String> = withContext(dispatcherProvider.io()) {
+        return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
     }
 
     override suspend fun getEtagForFilename(fileName: String): String? = withContext(dispatcherProvider.io()) {
@@ -126,6 +230,164 @@ class RealPirRepository(
                     maxAttempts = broker.schedulingConfig.maxAttempts,
                 ),
             )
+        }
+    }
+
+    override suspend fun getBrokerScanSteps(name: String): String? = withContext(dispatcherProvider.io()) {
+        brokerDao.getScanJson(name)
+    }
+
+    override suspend fun saveNavigateResult(
+        brokerName: String,
+        navigateResponse: NavigateResponse,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao.insertNavigateResult(
+                ScanNavigateResult(
+                    brokerName = brokerName,
+                    actionType = navigateResponse.actionType,
+                    url = navigateResponse.response.url,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                ),
+            )
+
+            logcat { "PIR-SCAN: saveNavigateResult: $navigateResponse" }
+        }
+    }
+
+    override suspend fun saveErrorResult(
+        brokerName: String,
+        actionType: String,
+        error: PirErrorReponse,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao.insertScanErrorResult(
+                ScanErrorResult(
+                    brokerName = brokerName,
+                    actionType = actionType,
+                    message = error.message,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+
+    override suspend fun saveExtractProfileResult(
+        brokerName: String,
+        response: ExtractedResponse,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao.insertExtractProfileResult(
+                ExtractProfileResult(
+                    brokerName = brokerName,
+                    actionType = response.actionType,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    userData = profileQueryAdapter.toJson(response.meta?.userData),
+                    extractResults = response.meta?.extractResults?.map {
+                        scrapedDataAdapter.toJson(it)
+                    } ?: emptyList(),
+                ),
+            )
+        }
+    }
+
+    override fun getAllResultsFlow(): Flow<List<ScanResult>> {
+        return combine(
+            scanResultsDao.getAllNavigateResultsFlow(),
+            scanResultsDao.getAllScanErrorResultsFlow(),
+            scanResultsDao.getAllExtractProfileResultFlow(),
+        ) { navigateResults, errorResults, profileResults ->
+            val navScanResult = navigateResults.map {
+                ScanResult.NavigateResult(
+                    brokerName = it.brokerName,
+                    completionTimeInMillis = it.completionTimeInMillis,
+                    actionType = it.actionType,
+                    url = it.url,
+                )
+            }
+            val errorScanResults = errorResults.map {
+                ScanResult.ErrorResult(
+                    brokerName = it.brokerName,
+                    completionTimeInMillis = it.completionTimeInMillis,
+                    actionType = it.actionType,
+                    message = it.message,
+                )
+            }
+            val profileScanResults = profileResults.map {
+                ScanResult.ExtractedProfileResult(
+                    brokerName = it.brokerName,
+                    completionTimeInMillis = it.completionTimeInMillis,
+                    actionType = it.actionType,
+                    profileQuery = profileQueryAdapter.fromJson(it.userData),
+                    extractResults = it.extractResults.mapNotNull { data ->
+                        scrapedDataAdapter.fromJson(data)
+                    },
+                )
+            }
+
+            return@combine (navScanResult + errorScanResults + profileScanResults).sortedBy {
+                it.completionTimeInMillis
+            }
+        }
+    }
+
+    override suspend fun deleteAllResults() {
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao.deleteAllNavigateResults()
+            scanResultsDao.deleteAllScanErrorResults()
+            scanResultsDao.deleteAllExtractProfileResult()
+        }
+    }
+
+    override suspend fun getUserProfiles(): List<UserProfile> = withContext(dispatcherProvider.io()) {
+        userProfileDao.getUserProfiles()
+    }
+
+    override suspend fun getErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanResultsDao.getAllScanErrorResults().size
+    }
+
+    override suspend fun getSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanResultsDao.getAllExtractProfileResult().size
+    }
+
+    override suspend fun deleteAllUserProfiles() {
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.deleteAllProfiles()
+        }
+    }
+
+    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.deleteAllProfiles()
+            userProfileDao.insertUserProfile(userProfile)
+        }
+    }
+
+    override fun getAllScanEventsFlow(): Flow<List<PirScanLog>> {
+        return scanLogDao.getAllScanEventsFlow()
+    }
+
+    override fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>> {
+        return scanLogDao.getAllBrokerScanEventsFlow()
+    }
+
+    override suspend fun saveScanLog(pirScanLog: PirScanLog) {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.insertScanEvent(pirScanLog)
+        }
+    }
+
+    override suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog) {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.insertBrokerScanEvent(pirBrokerScanLog)
+        }
+    }
+
+    override suspend fun deleteAllScanLogs() {
+        withContext(dispatcherProvider.io()) {
+            scanLogDao.deleteAllScanEvents()
+            scanLogDao.deleteAllBrokerScanEvents()
         }
     }
 }

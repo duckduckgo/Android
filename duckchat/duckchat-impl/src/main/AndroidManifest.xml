@@ -22,5 +22,10 @@
             android:exported="false"
             android:label="@string/duck_chat_title"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.duckchat.impl.DuckChatWebViewActivity"
+            android:exported="false"
+            android:label="@string/duck_chat_title"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"/>
     </application>
 </manifest>

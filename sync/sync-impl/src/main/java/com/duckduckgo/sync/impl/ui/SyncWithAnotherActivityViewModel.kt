@@ -29,6 +29,10 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.CodeType.EXCHANGE
+import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
+import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
+import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.dimen
@@ -37,10 +41,10 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
@@ -52,12 +56,14 @@ import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutp
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncWithAnotherActivityViewModel @Inject constructor(
@@ -71,27 +77,52 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    private var barcodeContents: String? = null
+
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        generateQRCode()
+        startExchangeProcess()
     }
 
-    private fun generateQRCode() {
+    private fun startExchangeProcess() {
         viewModelScope.launch(dispatchers.io()) {
             showQRCode()
+            var polling = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
+            while (polling) {
+                delay(POLLING_INTERVAL_EXCHANGE_FLOW)
+                syncAccountRepository.pollSecondDeviceExchangeAcknowledgement()
+                    .onSuccess { success ->
+                        if (!success) return@onSuccess // continue polling
+                        command.send(Command.LoginSuccess)
+                        polling = false
+                    }.onFailure {
+                        when (it.code) {
+                            CONNECT_FAILED.code, LOGIN_FAILED.code -> {
+                                command.send(Command.ShowError(string.sync_connect_login_error, it.reason))
+                                polling = false
+                            }
+                        }
+                    }
+            }
         }
     }
 
     private suspend fun showQRCode() {
-        syncAccountRepository.getRecoveryCode()
-            .onSuccess { connectQR ->
-                val qrBitmap = withContext(dispatchers.io()) {
-                    qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
-                }
-                viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
-            }.onFailure {
-                command.send(Command.FinishWithError)
+        val shouldExchangeKeysToSyncAnotherDevice = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
+
+        if (!shouldExchangeKeysToSyncAnotherDevice) {
+            syncAccountRepository.getRecoveryCode()
+        } else {
+            syncAccountRepository.generateExchangeInvitationCode()
+        }.onSuccess { connectQR ->
+            barcodeContents = connectQR
+            val qrBitmap = withContext(dispatchers.io()) {
+                qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
             }
+            viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
+        }.onFailure {
+            command.send(Command.FinishWithError)
+        }
     }
 
     fun onErrorDialogDismissed() {
@@ -102,7 +133,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            syncAccountRepository.getRecoveryCode().getOrNull()?.let { code ->
+            barcodeContents?.let { code ->
                 clipboard.copyToClipboard(code)
                 command.send(ShowMessage(string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
@@ -136,23 +167,62 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
+            val codeType = syncAccountRepository.getCodeType(qrCode)
             when (val result = syncAccountRepository.processCode(qrCode)) {
                 is Error -> {
+                    Timber.w("Sync: error processing code ${result.reason}")
                     emitError(result, qrCode)
                 }
 
                 is Success -> {
-                    val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
-                    syncPixels.fireLoginPixel()
-                    val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
-                    val commandSuccess = if (userSwitchedAccount) {
-                        syncPixels.fireUserSwitchedAccount()
-                        SwitchAccountSuccess
+                    if (codeType == EXCHANGE) {
+                        pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
-                        LoginSuccess
+                        onLoginSuccess(previousPrimaryKey)
                     }
-                    command.send(commandSuccess)
                 }
+            }
+        }
+    }
+
+    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+        val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
+        syncPixels.fireLoginPixel()
+        val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
+        val commandSuccess = if (userSwitchedAccount) {
+            syncPixels.fireUserSwitchedAccount()
+            SwitchAccountSuccess
+        } else {
+            LoginSuccess
+        }
+        command.send(commandSuccess)
+    }
+
+    private fun pollForRecoveryKey(
+        previousPrimaryKey: String,
+        qrCode: String,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            var polling = true
+            while (polling) {
+                delay(POLLING_INTERVAL_EXCHANGE_FLOW)
+                syncAccountRepository.pollForRecoveryCodeAndLogin()
+                    .onSuccess { success ->
+                        when (success) {
+                            is Pending -> return@onSuccess // continue polling
+                            is AccountSwitchingRequired -> {
+                                polling = false
+                                command.send(AskToSwitchAccount(success.recoveryCode))
+                            }
+                            is LoggedIn -> {
+                                polling = false
+                                onLoginSuccess(previousPrimaryKey)
+                            }
+                        }
+                    }.onFailure {
+                        polling = false
+                        emitError(it, qrCode)
+                    }
             }
         }
     }

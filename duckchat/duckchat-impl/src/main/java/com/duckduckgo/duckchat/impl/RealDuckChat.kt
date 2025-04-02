@@ -20,14 +20,18 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,6 +42,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -52,6 +57,21 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
      */
     fun observeShowInBrowserMenuUserSetting(): Flow<Boolean>
+
+    /**
+     * Opens DuckChat settings.
+     */
+    fun openDuckChatSettings()
+
+    /**
+     * Closes DuckChat.
+     */
+    fun closeDuckChat()
+
+    /**
+     * Calls onClose when a close event is emitted.
+     */
+    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
 }
 
 data class DuckChatSettingJson(
@@ -74,6 +94,8 @@ class RealDuckChat @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
+
+    private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -119,6 +141,29 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.observeShowInBrowserMenu()
     }
 
+    override fun openDuckChatSettings() {
+        val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
+        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+        closeDuckChat()
+    }
+
+    override fun closeDuckChat() {
+        appCoroutineScope.launch {
+            closeChatFlow.emit(Unit)
+        }
+    }
+
+    override fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                closeChatFlow.collect {
+                    onClose()
+                }
+            }
+        }
+    }
+
     override fun showInBrowserMenu(): Boolean {
         return showInBrowserMenu
     }
@@ -149,13 +194,10 @@ class RealDuckChat @Inject constructor(
     private fun startDuckChatActivity(url: String) {
         val intent = globalActivityStarter.startIntent(
             context,
-            WebViewActivityWithParams(
+            DuckChatWebViewActivityWithParams(
                 url = url,
-                screenTitle = context.getString(R.string.duck_chat_title),
-                supportNewWindows = true,
             ),
         )
-
         intent?.let {
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(it)

@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Изглед в списък</string>
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt;</string>
+    <string name="inTheLast7Days">през последните 7 дни</string>
+
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
@@ -707,8 +712,8 @@
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокиране на досадни реклами</string>
-    <string name="preOnboardingComparisonChartItem5">Бързо изтриване на данните за сърфиране</string>
+    <string name="preOnboardingComparisonChartItem4">Блокиране на проследяващи реклами</string>
+    <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
     <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
@@ -796,5 +801,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сега</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Напускане на този сайт</string>
+    <string name="maliciousSiteAdvancedCTA">Разширени</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ако смятате, че този уебсайт е безопасен, можете да <a href=\"\">съобщите за грешка</a>. Все пак можете да посетите уебсайта на свой собствен риск.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Поемане на риска и отваряне на сайта</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Докладване за сайт, който е отбелязан неправилно като злонамерен</string>
+    <string name="maliciousSiteLearnMoreTitle">Научете повече</string>
+    <string name="maliciousSiteSettingTitle">Предупреждения за безопасност на сайта</string>
+    <string name="maliciousSiteToggleHint">Предупреди ме за сайтове, отбелязани за фишинг или злонамерен софтуер</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Деактивирането на тази функция може да изложи информацията Ви на риск.</string>
 
 </resources>

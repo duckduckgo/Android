@@ -24,10 +24,8 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
@@ -37,10 +35,8 @@ enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
     LIGHT,
-    EXPERIMENT_DARK_WARM,
-    EXPERIMENT_DARK_COOL,
-    EXPERIMENT_LIGHT_WARM,
-    EXPERIMENT_LIGHT_COOL,
+    EXPERIMENT_DARK,
+    EXPERIMENT_LIGHT,
     ;
 
     fun getOptionIndex(): Int {
@@ -48,10 +44,8 @@ enum class DuckDuckGoTheme {
             SYSTEM_DEFAULT -> 1
             DARK -> 2
             LIGHT -> 3
-            EXPERIMENT_DARK_WARM -> 4
-            EXPERIMENT_DARK_COOL -> 5
-            EXPERIMENT_LIGHT_WARM -> 6
-            EXPERIMENT_LIGHT_COOL -> 7
+            EXPERIMENT_DARK -> 4
+            EXPERIMENT_LIGHT -> 5
         }
     }
 }
@@ -81,10 +75,8 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DARK -> R.style.Theme_DuckDuckGo_Dark
-        EXPERIMENT_DARK_COOL -> R.style.Theme_DuckDuckGo_Dark_Experiment_Cool
-        EXPERIMENT_DARK_WARM -> R.style.Theme_DuckDuckGo_Dark_Experiment_Warm
-        EXPERIMENT_LIGHT_WARM -> R.style.Theme_DuckDuckGo_Light_Experiment_Warm
-        EXPERIMENT_LIGHT_COOL -> R.style.Theme_DuckDuckGo_Light_Experiment_Cool
+        EXPERIMENT_DARK -> R.style.Theme_DuckDuckGo_Dark_Experiment
+        EXPERIMENT_LIGHT -> R.style.Theme_DuckDuckGo_Light_Experiment
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }
@@ -97,7 +89,7 @@ private fun Context.getSystemDefaultTheme(): Int {
     }
 }
 
-private fun Context.isInNightMode(): Boolean {
+fun Context.isInNightMode(): Boolean {
     val mode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     return mode == Configuration.UI_MODE_NIGHT_YES
 }

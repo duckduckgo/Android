@@ -20,6 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
@@ -40,6 +41,8 @@ interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun getShowInBrowserMenu(): Boolean
+    suspend fun fetchAndClearUserPreferences(): String?
+    suspend fun updateUserPreferences(userPreferences: String?)
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
 }
@@ -54,6 +57,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     private object Keys {
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
+        val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
     }
 
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
@@ -73,6 +77,22 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun getShowInBrowserMenu(): Boolean {
         return duckChatShowInBrowserMenu.value
+    }
+
+    override suspend fun fetchAndClearUserPreferences(): String? {
+        val userPreferences = store.data.map { it[Keys.DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
+        store.edit { prefs -> prefs.remove(Keys.DUCK_CHAT_USER_PREFERENCES) }
+        return userPreferences
+    }
+
+    override suspend fun updateUserPreferences(userPreferences: String?) {
+        store.edit { prefs ->
+            if (userPreferences == null) {
+                prefs.remove(Keys.DUCK_CHAT_USER_PREFERENCES)
+            } else {
+                prefs[Keys.DUCK_CHAT_USER_PREFERENCES] = userPreferences
+            }
+        }
     }
 
     override suspend fun registerOpened() {

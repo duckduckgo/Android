@@ -69,6 +69,6 @@
             android:layout_marginVertical="@dimen/keyline_4"
             android:text="@string/feedbackSubmitVpnSubmit"
             android:enabled="false"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
