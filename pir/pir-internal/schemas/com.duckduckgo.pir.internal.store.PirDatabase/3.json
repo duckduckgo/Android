@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "5deea3d7970e9ca29d49ad32e26d0a0f",
+    "identityHash": "d0d73549ba4b0b04e71f170b01f787e4",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -364,7 +364,7 @@
       },
       {
         "tableName": "pir_user_profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `birthYear` INTEGER NOT NULL, `phone` TEXT, `age` INTEGER NOT NULL, `user_firstName` TEXT NOT NULL, `user_lastName` TEXT NOT NULL, `user_middleName` TEXT, `user_suffix` TEXT, `address_city` TEXT NOT NULL, `address_state` TEXT NOT NULL, `address_street` TEXT, `address_zip` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `birthYear` INTEGER NOT NULL, `phone` TEXT, `user_firstName` TEXT NOT NULL, `user_lastName` TEXT NOT NULL, `user_middleName` TEXT, `user_suffix` TEXT, `address_city` TEXT NOT NULL, `address_state` TEXT NOT NULL, `address_street` TEXT, `address_zip` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -383,12 +383,6 @@
             "columnName": "phone",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "age",
-            "columnName": "age",
-            "affinity": "INTEGER",
-            "notNull": true
           },
           {
             "fieldPath": "userName.firstName",
@@ -642,7 +636,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5deea3d7970e9ca29d49ad32e26d0a0f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd0d73549ba4b0b04e71f170b01f787e4')"
     ]
   }
 }

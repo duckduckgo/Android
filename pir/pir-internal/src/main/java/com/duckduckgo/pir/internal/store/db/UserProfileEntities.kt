@@ -29,7 +29,6 @@ data class UserProfile(
     val addresses: Address,
     val birthYear: Int,
     val phone: String? = null,
-    val age: Int,
 )
 
 data class UserName(

@@ -106,7 +106,7 @@ class RealBrokerStepsParser @Inject constructor(
                     this.copy(
                         brokerName = brokerName,
                         profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
-                            it.score > 1
+                            it.result
                         }?.map {
                             it.scrapedData
                         } ?: emptyList(),

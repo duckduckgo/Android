@@ -27,10 +27,12 @@ import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -89,10 +91,15 @@ class RealPirOptOut @Inject constructor(
         lastName = "Smith",
         city = "Chicago",
         state = "IL",
-        addresses = listOf(),
+        addresses = listOf(
+            Address(
+                city = "Chicago",
+                state = "IL",
+            ),
+        ),
         birthYear = 1993,
         fullName = "William Smith",
-        age = 34,
+        age = 32,
         deprecated = false,
     )
 
@@ -205,13 +212,18 @@ class RealPirOptOut @Inject constructor(
                     lastName = storedProfile.userName.lastName,
                     city = storedProfile.addresses.city,
                     state = storedProfile.addresses.state,
-                    addresses = listOf(),
+                    addresses = listOf(
+                        Address(
+                            city = storedProfile.addresses.city,
+                            state = storedProfile.addresses.state,
+                        ),
+                    ),
                     birthYear = storedProfile.birthYear,
                     fullName = storedProfile.userName.middleName?.run {
                         "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
                     }
                         ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                    age = storedProfile.age,
+                    age = LocalDate.now().year - storedProfile.birthYear,
                     deprecated = false,
                 )
             }

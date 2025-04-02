@@ -62,7 +62,6 @@ import com.duckduckgo.pir.internal.store.db.PirScanLog
 import com.duckduckgo.pir.internal.store.db.ScanEventType.SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.internal.store.db.UserName
 import com.duckduckgo.pir.internal.store.db.UserProfile
-import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -195,7 +194,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                                 state = binding.profileState.text,
                             ),
                             birthYear = binding.profileBirthYear.text.toInt(),
-                            age = LocalDate.now().year - binding.profileBirthYear.text.toInt(),
                         ),
                     )
                 }
