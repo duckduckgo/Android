@@ -19,7 +19,6 @@
 package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
 import com.duckduckgo.adclick.api.AdClickManager
@@ -69,7 +68,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -150,17 +148,15 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
-    private val tabList = listOf(
+    private var tabList = listOf(
         TabEntity("1", url = "https://cnn.com", position = 1),
         TabEntity("2", url = "http://test.com", position = 2),
         TabEntity("3", position = 3),
     )
-    private val tabSwitcherItems = tabList.map { NormalTab(it, false) }
+    private val tabSwitcherItems
+        get() = tabList.map { NormalTab(it, false) }
     private val repoDeletableTabs = Channel<List<TabEntity>>()
-    private val tabs = MutableLiveData<List<TabEntity>>(tabList)
-
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
-    private val flowTabs = flowOf(tabList)
 
     @Before
     fun before() {
@@ -170,17 +166,22 @@ class TabSwitcherViewModelTest {
         tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
+        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
+        whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
-        whenever(mockTabRepository.flowTabs).thenReturn(flowTabs)
-        whenever(statisticsDataStore.variant).thenReturn("")
+
+        initializeMockTabEntitesData()
+        initializeViewModel()
+    }
+
+    private fun initializeMockTabEntitesData() {
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(tabList))
         whenever(mockTabRepository.liveSelectedTab).thenReturn(liveData { tabList.first() })
         whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabList.first()))
-
-        initializeViewModel()
     }
 
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
@@ -200,7 +201,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
         )
         testee.command.observeForever(mockCommandObserver)
-        testee.tabSwitcherItems.observeForever(mockTabSwitcherItemsObserver)
+        testee.tabItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
 
     @After
@@ -632,7 +633,7 @@ class TabSwitcherViewModelTest {
         val tabIdCaptor = argumentCaptor<String>()
         whenever(mockTabRepository.getTab(tabIdCaptor.capture())).thenAnswer { _ -> tabList.first { it.tabId == tabIdCaptor.lastValue } }
 
-        testee.tabSwitcherItems.blockingObserve()
+        testee.tabItemsLiveData.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
@@ -655,7 +656,7 @@ class TabSwitcherViewModelTest {
 
         val tabId = tabList.first().tabId
 
-        testee.tabSwitcherItems.blockingObserve()
+        testee.tabItemsLiveData.blockingObserve()
         testee.onCloseTabsConfirmed(listOf(tabId))
 
         verify(mockTabRepository).markDeletable(listOf(tabId))
@@ -1106,14 +1107,15 @@ class TabSwitcherViewModelTest {
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
-        tabs.value = listOf(tab1, tab2)
+        tabList = listOf(tab1, tab2)
 
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
+        initializeMockTabEntitesData()
         initializeViewModel()
 
-        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(3, items.size)
         assert(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
@@ -1127,13 +1129,14 @@ class TabSwitcherViewModelTest {
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
-        tabs.value = listOf(tab1, tab2)
+        tabList = listOf(tab1, tab2)
 
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
 
+        initializeMockTabEntitesData()
         initializeViewModel()
 
-        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(2, items.size)
         items.forEach { item ->
@@ -1143,15 +1146,17 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
-        initializeViewModel(FakeTabSwitcherDataStore())
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = false))
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
-        tabs.value = listOf(tab1, tab2)
+        tabList = listOf(tab1, tab2)
 
-        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+        initializeMockTabEntitesData()
+        initializeViewModel(FakeTabSwitcherDataStore())
+
+        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(2, items.size)
         items.forEach { item ->
@@ -1161,18 +1166,20 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then animated info panel is still visible`() = runTest {
-        initializeViewModel(FakeTabSwitcherDataStore())
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
-        tabs.value = listOf(tab1, tab2)
+        tabList = listOf(tab1, tab2)
+
+        initializeMockTabEntitesData()
+        initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
 
-        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
 
         assertTrue(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
     }
@@ -1185,13 +1192,13 @@ class TabSwitcherViewModelTest {
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
-        tabs.value = listOf(tab1, tab2)
+        tabList = listOf(tab1, tab2)
 
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         testee.onTrackerAnimationTileNegativeButtonClicked()
 
-        val items = testee.tabSwitcherItems.blockingObserve() ?: listOf()
+        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
 
         assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
     }
