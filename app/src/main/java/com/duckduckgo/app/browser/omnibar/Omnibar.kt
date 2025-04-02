@@ -456,6 +456,30 @@ class Omnibar(
         }
     }
 
+    fun onScrollViewMotionEvent(scrollableView: View, motionEvent: MotionEvent) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // no-op
+                    }
+
+                    FADE -> binding.fadeOmnibar.onScrollViewMotionEvent(scrollableView, motionEvent)
+                }
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // no-op
+                    }
+
+                    FADE -> binding.fadeOmnibarBottom.onScrollViewMotionEvent(scrollableView, motionEvent)
+                }
+            }
+        }
+    }
+
     fun resetScrollPosition() {
         if (omnibarType == FADE) {
             when (omnibarPosition) {
