@@ -23,8 +23,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
+import com.duckduckgo.app.browser.omnibar.OmnibarController
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.TopAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.di.scopes.FragmentScope
@@ -36,9 +36,7 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : OmnibarLayout(context, attrs, defStyle) {
-
-    private val appBarLayout: AppBarLayout by lazy { findViewById(R.id.appBarLayout) }
+) : OmnibarLayout(context, attrs, defStyle), OmnibarController {
 
     init {
         val attr =
@@ -63,18 +61,10 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    override fun render(viewState: ViewState) {
-        super.render(viewState)
-
-        if (viewState.expanded) {
-            setExpanded(true, viewState.expandedAnimated)
-        }
-    }
-
     override fun setExpanded(expanded: Boolean) {
         when (omnibarPosition) {
-            OmnibarPosition.TOP -> appBarLayout.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> appBarLayout.setExpanded(expanded)
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
@@ -83,8 +73,8 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
         animate: Boolean,
     ) {
         when (omnibarPosition) {
-            OmnibarPosition.TOP -> appBarLayout.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> appBarLayout.setExpanded(expanded)
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 }

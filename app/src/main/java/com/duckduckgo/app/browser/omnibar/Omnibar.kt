@@ -214,7 +214,7 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: OmnibarLayout by lazy {
+    private val newOmnibar: OmnibarController by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 when (omnibarType) {
@@ -438,12 +438,8 @@ class Omnibar(
         newOmnibar.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
     }
 
-    fun show() {
-        newOmnibar.show()
-    }
-
-    fun hide() {
-        newOmnibar.gone()
+    fun setVisible(visible: Boolean) {
+        newOmnibar.setVisible(visible)
     }
 
     fun voiceSearchDisabled(url: String?) {

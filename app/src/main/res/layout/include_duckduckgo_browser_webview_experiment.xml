@@ -21,6 +21,7 @@
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/keyline_1"
     android:layout_marginBottom="@dimen/keyline_1"
+    app:cardElevation="0dp"
     app:cardBackgroundColor="?attr/preferredNavigationBarColor"
     app:cardCornerRadius="@dimen/mediumShapeCornerRadius">
 

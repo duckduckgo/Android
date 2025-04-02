@@ -98,7 +98,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
+) : AppBarLayout(context, attrs, defStyle), OmnibarController, OmnibarBehaviour {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -130,8 +130,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
-    internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
-    internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
+    override val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
@@ -139,8 +139,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
-    internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
-    internal val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+    override val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
+    override val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
     internal val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
     internal val customTabToolbarContainer by lazy {
         IncludeCustomTabToolbarBinding.bind(
@@ -148,7 +148,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         )
     }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
-    internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    override val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
@@ -167,7 +167,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         searchIcon,
     )
 
-    var isScrollingEnabled: Boolean
+    override var isScrollingEnabled: Boolean
         get() {
             return if (isAttachedToWindow) {
                 viewModel.viewState.value.scrollingEnabled
@@ -181,7 +181,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-    val isEditing: Boolean
+    override val isEditing: Boolean
         get() {
             return if (isAttachedToWindow) {
                 viewModel.viewState.value.hasFocus
@@ -190,7 +190,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-    val isEditingFlow by lazy {
+    override val isEditingFlow by lazy {
         viewModel.viewState.map {
             isAttachedToWindow && it.hasFocus
         }
@@ -256,7 +256,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
+    override fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
         omnibarTextListener = textListener
 
         omnibarTextInput.onFocusChangeListener =
@@ -338,7 +338,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun setOmnibarItemPressedListener(itemPressedListener: Omnibar.ItemPressedListener) {
+    override fun setOmnibarItemPressedListener(itemPressedListener: Omnibar.ItemPressedListener) {
         omnibarItemPressedListener = itemPressedListener
         tabsMenu.setOnClickListener {
             omnibarItemPressedListener?.onTabsButtonPressed()
@@ -513,7 +513,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderCustomTab(viewMode)
     }
 
-    fun decorate(decoration: Decoration) {
+    override fun decorate(decoration: Decoration) {
         Timber.d("Omnibar: decorate $decoration")
         if (isAttachedToWindow) {
             decorateDeferred(decoration)
@@ -573,7 +573,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun reduce(stateChange: StateChange) {
+    override fun reduce(stateChange: StateChange) {
         if (isAttachedToWindow) {
             reduceDeferred(stateChange)
         } else {
@@ -607,7 +607,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun isPulseAnimationPlaying() = pulseAnimation.isActive
+    override fun isPulseAnimationPlaying() = pulseAnimation.isActive
 
     private fun createCookiesAnimation(isCosmetic: Boolean) {
         if (this::animatorHelper.isInitialized) {
@@ -742,5 +742,13 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun setVisible(visible: Boolean) {
+        if (visible) {
+            show()
+        } else {
+            gone()
+        }
     }
 }

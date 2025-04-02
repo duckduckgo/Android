@@ -4250,14 +4250,14 @@ class BrowserTabFragment :
         }
 
         private fun goFullScreen() {
-            omnibar.hide()
+            omnibar.setVisible(false)
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {
-            omnibar.show()
+            omnibar.setVisible(true)
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
