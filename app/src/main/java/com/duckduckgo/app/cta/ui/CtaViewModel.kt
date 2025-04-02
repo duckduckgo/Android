@@ -368,7 +368,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            noBrowserCtaExperiment || daxDialogEndShown() || hideTips()
+            noBrowserCtaExperiment || daxDialogEndShown() || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 
@@ -376,7 +376,7 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
-            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips()
+            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 
