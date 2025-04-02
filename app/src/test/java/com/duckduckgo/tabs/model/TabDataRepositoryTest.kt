@@ -660,6 +660,7 @@ class TabDataRepositoryTest {
             coroutinesTestRule.testDispatcherProvider,
             mockAdClickManager,
             mockWebViewSessionStorage,
+            tabManagerFeatureFlags,
         )
     }
 

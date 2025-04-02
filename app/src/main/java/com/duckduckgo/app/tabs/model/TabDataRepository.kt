@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
@@ -63,6 +64,7 @@ class TabDataRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -317,7 +319,9 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        clearAllSiteData(getDeletableTabIds())
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            clearAllSiteData(getDeletableTabIds())
+        }
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }
