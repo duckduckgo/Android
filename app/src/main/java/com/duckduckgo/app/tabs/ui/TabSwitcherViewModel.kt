@@ -608,7 +608,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class SelectionViewState(
-        val tabItems: List<Tab> = emptyList(),
+        val tabItems: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
         val layoutType: LayoutType? = null,
     ) {
@@ -616,7 +616,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.any { it.isNewTabPage }
+                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.mapNotNull { it as? Tab }.any { it.isNewTabPage }
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,

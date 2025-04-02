@@ -684,7 +684,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        clearObserversEarlyToStopViewUpdates()
+        // clear observers early to stop view updates
+        removeObservers()
+
         viewModel.onNewTabRequested(fromOverflowMenu)
     }
 
@@ -816,14 +818,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun finish() {
-        clearObserversEarlyToStopViewUpdates()
+        removeObservers()
         super.finish()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.tabSwitcherItems.removeObservers(this)
-        viewModel.deletableTabs.removeObservers(this)
+        removeObservers()
 
         // we don't want to purge during device rotation
         if (isFinishing) {
@@ -835,7 +836,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
-    private fun clearObserversEarlyToStopViewUpdates() {
+    private fun removeObservers() {
         viewModel.tabItemsLiveData.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
     }
