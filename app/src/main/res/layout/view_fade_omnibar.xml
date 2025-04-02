@@ -318,6 +318,19 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
+                        <ProgressBar
+                            android:id="@+id/pageLoadingIndicator"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="4dp"
+                            android:progressDrawable="@drawable/loading_progress_experiment"
+                            android:visibility="invisible"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            tools:progress="50"
+                            tools:visibility="visible" />
+
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
@@ -334,19 +347,6 @@
             app:layout_constraintEnd_toEndOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="@id/toolbar"
             app:layout_constraintTop_toTopOf="@id/toolbar" />
-
-        <ProgressBar
-            android:id="@+id/pageLoadingIndicator"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:progressDrawable="@drawable/loading_progress"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:progress="50"
-            tools:visibility="visible" />
 
         <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
             android:id="@+id/tabsMenu"
