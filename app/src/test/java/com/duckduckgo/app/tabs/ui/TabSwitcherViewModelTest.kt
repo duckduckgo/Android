@@ -240,7 +240,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenAllTabsClosedUsingFabThenRepositoryNotifiedAndPixelSent() = runTest {
+    fun whenAllTabsClosedUsingFabThenViewStateUpdatedAndCommandSentAndPixelSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectAllTabs()
@@ -255,7 +255,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenSomeButNotAllTabsClosedUsingFabThenRepositoryNotifiedPixelSent() = runTest {
+    fun whenSomeButNotAllTabsClosedUsingFabThenViewStateUpdatedAndCommandSentAndPixelSent() = runTest {
         prepareSelectionMode()
 
         assertEquals(testee.selectionViewState.value.mode, Normal)
@@ -276,7 +276,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenOtherTabsClosedThenRepositoryNotifiedAndPixelSent() = runTest {
+    fun whenOtherTabsClosedThenCommandSentAndPixelSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
@@ -290,7 +290,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabsClosedThenRepositoryNotifiedAndPixelSent() = runTest {
+    fun whenTabsClosedThenCommandSentAndPixelSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
@@ -358,7 +358,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenShareSingleLinkThenShareLinkCommandSent() = runTest {
+    fun whenShareSingleLinkThenShareLinkCommandSentAndPixelsSent() = runTest {
         prepareSelectionMode()
 
         val tab = tabList.first()
@@ -369,10 +369,13 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShareLink(tab.url.orEmpty(), tab.title.orEmpty()), commandCaptor.lastValue)
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
     }
 
     @Test
-    fun whenShareMultipleLinksThenShareLinksCommandSentExcludingNewTabPage() = runTest {
+    fun whenShareMultipleLinksThenShareLinksCommandSentExcludingNewTabPageAndPixelsSent() = runTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
@@ -381,6 +384,9 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShareLinks(tabList.take(2).map { it.url.orEmpty() }), commandCaptor.lastValue)
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
     }
 
     @Test
