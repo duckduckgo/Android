@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -48,17 +47,19 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.DisableVoiceSearch
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.HighlightOmnibarItem
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Mode
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Outline
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
@@ -69,8 +70,6 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelp
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -87,6 +86,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -98,33 +98,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle), OmnibarBehaviour {
-
-    sealed class Decoration {
-        data class Mode(val viewMode: ViewMode) : Decoration()
-        data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
-        data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
-        data object CancelAnimations : Decoration()
-        data class ChangeCustomTabTitle(
-            val title: String,
-            val domain: String?,
-            val showDuckPlayerIcon: Boolean,
-        ) : Decoration()
-
-        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
-        data class HighlightOmnibarItem(
-            val fireButton: Boolean,
-            val privacyShield: Boolean,
-        ) : Decoration()
-
-        data class Outline(val enabled: Boolean) : Decoration()
-        data class DisableVoiceSearch(val url: String) : Decoration()
-    }
-
-    sealed class StateChange {
-        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
-        data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
-    }
+) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -509,9 +483,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (viewState.updateOmnibarText) {
             omnibarTextInput.setText(viewState.omnibarText)
         }
-        if (viewState.expanded) {
-            // setExpanded(true, viewState.expandedAnimated)
-        }
+        // if (viewState.expanded) {
+        //     setExpanded(true, viewState.expandedAnimated)
+        // }
 
         if (viewState.isLoading) {
             pageLoadingIndicator.show()

@@ -30,16 +30,14 @@ import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.DisableVoiceSearch
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.HighlightOmnibarItem
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -62,6 +60,7 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import timber.log.Timber
@@ -72,6 +71,32 @@ class Omnibar(
     val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) : OnScrollChangeListener {
+
+    sealed class Decoration {
+        data class Mode(val viewMode: ViewMode) : Decoration()
+        data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
+        data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
+        data object CancelAnimations : Decoration()
+        data class ChangeCustomTabTitle(
+            val title: String,
+            val domain: String?,
+            val showDuckPlayerIcon: Boolean,
+        ) : Decoration()
+
+        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
+        data class HighlightOmnibarItem(
+            val fireButton: Boolean,
+            val privacyShield: Boolean,
+        ) : Decoration()
+
+        data class Outline(val enabled: Boolean) : Decoration()
+        data class DisableVoiceSearch(val url: String) : Decoration()
+    }
+
+    sealed class StateChange {
+        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
+        data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
+    }
 
     init {
         when (omnibarPosition) {
@@ -211,6 +236,12 @@ class Omnibar(
     private fun removeAppBarBehavior(view: View) {
         view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = null
+        }
+    }
+
+    private fun addAppBarBehavior(view: View, newBehavior: AppBarLayout.Behavior) {
+        view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = newBehavior
         }
     }
 

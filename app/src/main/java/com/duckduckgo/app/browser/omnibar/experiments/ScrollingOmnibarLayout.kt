@@ -18,11 +18,17 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.TopAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 
 @InjectWith(FragmentScope::class)
@@ -31,6 +37,8 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
+
+    private val appBarLayout: AppBarLayout by lazy { findViewById(R.id.appBarLayout) }
 
     init {
         val attr =
@@ -47,28 +55,36 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
     }
-    //
-    // override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-    //     return when (omnibarPosition) {
-    //         OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-    //         OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-    //     }
-    // }
-    //
-    // override fun setExpanded(expanded: Boolean) {
-    //     when (omnibarPosition) {
-    //         OmnibarPosition.TOP -> super.setExpanded(expanded)
-    //         OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-    //     }
-    // }
-    //
-    // override fun setExpanded(
-    //     expanded: Boolean,
-    //     animate: Boolean,
-    // ) {
-    //     when (omnibarPosition) {
-    //         OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-    //         OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-    //     }
-    // }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        }
+    }
+
+    override fun render(viewState: ViewState) {
+        super.render(viewState)
+
+        if (viewState.expanded) {
+            setExpanded(true, viewState.expandedAnimated)
+        }
+    }
+
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> appBarLayout.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> appBarLayout.setExpanded(expanded)
+        }
+    }
+
+    override fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean,
+    ) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> appBarLayout.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> appBarLayout.setExpanded(expanded)
+        }
+    }
 }

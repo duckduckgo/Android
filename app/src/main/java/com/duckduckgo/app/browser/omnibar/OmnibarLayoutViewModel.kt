@@ -23,6 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -30,12 +36,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DAX
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
@@ -470,7 +470,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
+    fun onHighlightItem(decoration: Decoration.HighlightOmnibarItem) {
         // We only want to disable scrolling if one of the elements is highlighted
         Timber.d("Omnibar: onHighlightItem")
         val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
