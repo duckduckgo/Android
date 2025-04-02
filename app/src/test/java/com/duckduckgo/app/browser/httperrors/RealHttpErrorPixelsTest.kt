@@ -29,17 +29,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
-import com.duckduckgo.subscriptions.api.Product.NetP
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.api.Subscriptions
 import java.time.Instant
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -65,8 +61,7 @@ class RealHttpErrorPixelsTest {
     private val mockContext: Context = mock()
     private val mockWebViewVersionProvider: WebViewVersionProvider = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
-    private val mockSubscriptions: Subscriptions = mock()
-    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
+    private val mockExternalVpnDetector: ExternalVpnDetector = mock()
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
@@ -78,8 +73,7 @@ class RealHttpErrorPixelsTest {
             mockContext,
             mockWebViewVersionProvider,
             mockNetworkProtectionState,
-            mockSubscriptions,
-            mockVpnFeaturesRegistry,
+            mockExternalVpnDetector,
             fakeAndroidConfigBrowserFeature,
         )
     }
@@ -166,14 +160,10 @@ class RealHttpErrorPixelsTest {
 
     @Test
     fun whenUpdate5xxCountPixelCalledThenSharedPrefUpdated() = runTest {
-        val netpFlow = flowOf(listOf(NetP))
-        val connectionStateFlow = flowOf(ConnectionState.CONNECTED)
-
         fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
         fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
-        whenever(mockSubscriptions.getEntitlementStatus()).thenReturn(netpFlow)
-        whenever(mockNetworkProtectionState.getConnectionStateFlow()).thenReturn(connectionStateFlow)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+        whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
         whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
 
         // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
@@ -187,14 +177,10 @@ class RealHttpErrorPixelsTest {
 
     @Test
     fun whenUpdate5xxCountPixelCalledMultipleTimesThenCounterIncremented() = runTest {
-        val netpFlow = flowOf(listOf(NetP))
-        val connectionStateFlow = flowOf(ConnectionState.CONNECTED)
-
         fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
         fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = true))
-        whenever(mockSubscriptions.getEntitlementStatus()).thenReturn(netpFlow)
-        whenever(mockNetworkProtectionState.getConnectionStateFlow()).thenReturn(connectionStateFlow)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+        whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
         whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
 
         // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
@@ -204,6 +190,23 @@ class RealHttpErrorPixelsTest {
         testee.update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 503)
 
         assertEquals(2, prefs.getInt(expectedKey, 0))
+    }
+
+    @Test
+    fun whenUpdate5xxCountPixelCalledWirhFeatureFlagDisabledThenSharedPrefNotUpdated() = runTest {
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = false))
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+        whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
+        whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
+
+        // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
+        val expectedKey = "${HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName}|503|true|false|123.45.67.89|_count"
+
+        testee.update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 503)
+
+        assertEquals(0, prefs.getInt(expectedKey, 0))
+        assertFalse(prefs.getStringSet(PIXEL_5XX_KEYS_SET, emptySet())!!.contains(expectedKey))
     }
 
     @Test
@@ -287,5 +290,25 @@ class RealHttpErrorPixelsTest {
         )
 
         assertEquals(5, prefs.getInt(pixelKey, -1))
+    }
+
+    @Test
+    fun whenFire5xxCountPixelsCalledWithTheFeatureFlagDisabledThenPixelNotSent() {
+        val pixelName = HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY
+        val pixelKey = "${pixelName.pixelName}|503|true|false|123.45.67.89|_count"
+
+        fakeAndroidConfigBrowserFeature.self().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.httpError5xxPixel().setRawStoredState(State(enable = false))
+
+        testee.fire5xxCountPixels()
+
+        verify(mockPixel, never()).fire(
+            pixel = eq(pixelName),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals(-1, prefs.getInt(pixelKey, -1))
     }
 }

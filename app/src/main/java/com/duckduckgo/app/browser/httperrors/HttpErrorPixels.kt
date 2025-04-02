@@ -18,26 +18,17 @@ package com.duckduckgo.app.browser.httperrors
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.core.content.edit
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
-import com.duckduckgo.subscriptions.api.Product.NetP
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 
 interface HttpErrorPixels {
     fun updateCountPixel(httpErrorPixelName: HttpErrorPixelName)
@@ -52,8 +43,7 @@ class RealHttpErrorPixels @Inject constructor(
     private val context: Context,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val networkProtectionState: NetworkProtectionState,
-    private val subscriptions: Subscriptions,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val externalVpnDetector: ExternalVpnDetector,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
 ) : HttpErrorPixels {
 
@@ -76,26 +66,25 @@ class RealHttpErrorPixels @Inject constructor(
             return
         }
 
-        combine(
-            subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.contains(NetP) },
-            networkProtectionState.getConnectionStateFlow(),
-            flowOf(webViewVersionProvider.getFullVersion()),
-        ) { netpEntitlementStatus, connectionState, webViewFullVersion ->
-            val subscriptionStatus = subscriptions.getSubscriptionStatus()
-            val pProVpnConnected = isVpnConnected(netpEntitlementStatus, connectionState, subscriptionStatus)
-            val externalVpnConnected = isExternalVpnDetected(pProVpnConnected)
+        val pProVpnConnected = runCatching {
+            networkProtectionState.isRunning()
+        }.getOrDefault(false)
 
-            "${httpErrorPixelName.pixelName}|$statusCode|$pProVpnConnected|$externalVpnConnected|$webViewFullVersion|_count"
+        val externalVpnConnected = runCatching {
+            externalVpnDetector.isExternalVpnDetected()
+        }.getOrDefault(false)
+
+        val webViewFullVersion = webViewVersionProvider.getFullVersion()
+
+        val pixelPrefKey = "${httpErrorPixelName.pixelName}|$statusCode|$pProVpnConnected|$externalVpnConnected|$webViewFullVersion|_count"
+
+        val updatedSet = pixel5xxKeys
+        updatedSet.add(pixelPrefKey)
+        val count = preferences.getInt(pixelPrefKey, 0)
+        preferences.edit {
+            putInt(pixelPrefKey, count + 1)
+            putStringSet(PIXEL_5XX_KEYS_SET, updatedSet)
         }
-            .collect { pixelPrefKey ->
-                val updatedSet = pixel5xxKeys
-                updatedSet.add(pixelPrefKey)
-                val count = preferences.getInt(pixelPrefKey, 0)
-                preferences.edit {
-                    putInt(pixelPrefKey, count + 1)
-                    putStringSet(PIXEL_5XX_KEYS_SET, updatedSet)
-                }
-            }
     }
 
     override fun fireCountPixel(httpErrorPixelName: HttpErrorPixelName) {
@@ -167,35 +156,6 @@ class RealHttpErrorPixels @Inject constructor(
 
     private fun HttpErrorPixelName.appendCountSuffix(): String {
         return "${this.pixelName}_count"
-    }
-
-    private fun isVpnConnected(
-        netpEntitlementStatus: Boolean,
-        connectionState: ConnectionState,
-        subscriptionStatus: SubscriptionStatus,
-    ): Boolean {
-        if (subscriptionStatus in setOf(
-                SubscriptionStatus.AUTO_RENEWABLE,
-                SubscriptionStatus.NOT_AUTO_RENEWABLE,
-                SubscriptionStatus.GRACE_PERIOD,
-            )
-        ) {
-            if (netpEntitlementStatus) {
-                return connectionState.isConnected()
-            }
-        }
-        return false
-    }
-
-    private suspend fun isExternalVpnDetected(pProVpnConnected: Boolean): Boolean {
-        if (pProVpnConnected) return false
-        if (vpnFeaturesRegistry.isAnyFeatureRunning()) return false
-
-        return runCatching {
-            val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork = connectivityManager.activeNetwork
-            connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
-        }.getOrDefault(false)
     }
 
     companion object {
