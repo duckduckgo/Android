@@ -305,49 +305,59 @@ internal class RealPirActionsRunner(
         attempt: Int,
     ) {
         val broker = brokersToExecute[state.currentBrokerIndex]
-        nativeBrokerActionHandler.pushAction(
-            GetCaptchaSolutionStatus(
-                actionId = broker.actions[state.currentActionIndex].id,
-                transactionID = state.transactionID,
-            ),
-        ).run {
-            if (this is Success && this.data is CaptchaSolutionStatus) {
-                when (this.data.status) {
-                    is Ready -> nextCommand(
-                        ExecuteBrokerAction(
-                            state = state,
-                            actionRequestData = PirScriptRequestData.SolveCaptcha(
-                                token = this.data.status.token,
-                            ),
-                        ),
-                    )
 
-                    else -> {
-                        if (attempt == retries) {
-                            onError(
-                                PirErrorReponse(
-                                    actionID = broker.actions[state.currentActionIndex].id,
-                                    message = "Unable to solve captcha",
+        if (state.transactionID.isEmpty()) {
+            onError(
+                PirErrorReponse(
+                    actionID = broker.actions[state.currentActionIndex].id,
+                    message = "Unable to solve captcha",
+                ),
+            )
+        } else {
+            nativeBrokerActionHandler.pushAction(
+                GetCaptchaSolutionStatus(
+                    actionId = broker.actions[state.currentActionIndex].id,
+                    transactionID = state.transactionID,
+                ),
+            ).run {
+                if (this is Success && this.data is CaptchaSolutionStatus) {
+                    when (this.data.status) {
+                        is Ready -> nextCommand(
+                            ExecuteBrokerAction(
+                                state = state,
+                                actionRequestData = PirScriptRequestData.SolveCaptcha(
+                                    token = this.data.status.token,
                                 ),
-                            )
-                        } else {
-                            delay(pollingIntervalSeconds * 1000L)
-                            nextCommand(
-                                AwaitCaptchaSolution(
-                                    state = state,
-                                    attempt = attempt + 1,
-                                ),
-                            )
+                            ),
+                        )
+
+                        else -> {
+                            if (attempt == retries) {
+                                onError(
+                                    PirErrorReponse(
+                                        actionID = broker.actions[state.currentActionIndex].id,
+                                        message = "Unable to solve captcha",
+                                    ),
+                                )
+                            } else {
+                                delay(pollingIntervalSeconds * 1000L)
+                                nextCommand(
+                                    AwaitCaptchaSolution(
+                                        state = state,
+                                        attempt = attempt + 1,
+                                    ),
+                                )
+                            }
                         }
                     }
+                } else if (this is Failure) {
+                    onError(
+                        PirErrorReponse(
+                            actionID = broker.actions[state.currentActionIndex].id,
+                            message = "Unable to solve captcha",
+                        ),
+                    )
                 }
-            } else if (this is Failure) {
-                onError(
-                    PirErrorReponse(
-                        actionID = broker.actions[state.currentActionIndex].id,
-                        message = "Unable to solve captcha",
-                    ),
-                )
             }
         }
     }

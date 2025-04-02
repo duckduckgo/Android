@@ -52,7 +52,13 @@ interface CaptchaResolver {
         attemptId: String? = null,
     ): CaptchaResolverResult
 
-    suspend fun submitCaptchaToBeResolved(
+    /**
+     * Obtains the status of the solution for the captcha submitted with the given [transactionID]
+     *
+     * @param transactionID - obtained after submitting the information needed to solve captcha
+     * @param attemptId - Identifies the scan or the opt-out attempt
+     */
+    suspend fun getCaptchaSolution(
         transactionID: String,
         attemptId: String? = null,
     ): CaptchaResolverResult
@@ -93,6 +99,7 @@ class RealCaptchaResolver @Inject constructor(
         type: String,
         attemptId: String?,
     ): CaptchaResolverResult = withContext(dispatcherProvider.io()) {
+        // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#post-dbpcaptchav0submit
         runCatching {
             dbpService.submitCaptchaInformation(
                 PirStartCaptchaSolutionBody(
@@ -134,10 +141,11 @@ class RealCaptchaResolver @Inject constructor(
         }
     }
 
-    override suspend fun submitCaptchaToBeResolved(
+    override suspend fun getCaptchaSolution(
         transactionID: String,
         attemptId: String?,
     ): CaptchaResolverResult = withContext(dispatcherProvider.io()) {
+        // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#get-dbpcaptchav0resulttransactionidtransaction_id
         runCatching {
             dbpService.getCaptchaSolution(transactionID, attemptId).run {
                 logcat { "PIR-CAPTCHA: RESULT -> $this" }

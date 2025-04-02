@@ -39,6 +39,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 interface NativeBrokerActionHandler {
     suspend fun pushAction(nativeAction: NativeAction): NativeActionResult
@@ -130,8 +131,11 @@ class RealNativeBrokerActionHandler @Inject constructor(
         return kotlin.runCatching {
             var attempt = 0
             var result: Pair<ConfirmationStatus, String?> = Unknown to null
-            while (attempt < 2) {
+            while (attempt < MAX_AWAIT_EMAIL_ATTEMPT) {
+                attempt++
+                // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#get-dbpemv0linkseemail_address
                 result = repository.getEmailConfirmation(action.email)
+                logcat { "PIR-EMAIL: $result" }
                 if (result.first is Ready) {
                     return NativeActionResult.Success(
                         data = NativeSuccessData.EmailConfirmation(
@@ -145,14 +149,14 @@ class RealNativeBrokerActionHandler @Inject constructor(
                         actionId = action.actionId,
                         message = "Unable to confirm email: ${action.email} as email doesn't exist in the backend",
                     )
-                } else if (attempt == 1) {
+                } else if (attempt == MAX_AWAIT_EMAIL_ATTEMPT) {
+                    // Final attempt failed
                     return NativeActionResult.Failure(
                         actionId = action.actionId,
                         message = "Timeout reached to confirm email: ${action.email}. Link is still pending",
                     )
                 } else {
                     delay(action.pollingIntervalSeconds.toLong() * 1000)
-                    attempt++
                 }
             }
 
@@ -161,6 +165,7 @@ class RealNativeBrokerActionHandler @Inject constructor(
                 message = "Unable to confirm email: ${action.email}, last status: ${result.first} }",
             )
         }.getOrElse { error ->
+            logcat { "PIR-EMAIL: $error" }
             NativeActionResult.Failure(
                 actionId = action.actionId,
                 message = "Unknown error while getting email : ${error.message}",
@@ -221,7 +226,7 @@ class RealNativeBrokerActionHandler @Inject constructor(
     }
 
     private suspend fun handleGetCaptchaSolutionStatus(nativeAction: GetCaptchaSolutionStatus): NativeActionResult {
-        return captchaResolver.submitCaptchaToBeResolved(
+        return captchaResolver.getCaptchaSolution(
             transactionID = nativeAction.transactionID,
         ).run {
             when (this) {
@@ -255,5 +260,8 @@ class RealNativeBrokerActionHandler @Inject constructor(
                 )
             }
         }
+    }
+    companion object {
+        private const val MAX_AWAIT_EMAIL_ATTEMPT = 3
     }
 }
