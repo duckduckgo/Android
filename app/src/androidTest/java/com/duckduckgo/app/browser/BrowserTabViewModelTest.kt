@@ -4945,10 +4945,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageIsChangedWithHttpError5XXThenUpdateCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
+    fun whenPageIsChangedWithHttpError5XXThenUpdate5xxCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
         testee.recordHttpErrorCode(statusCode = 504, url = "example2.com")
 
-        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
+        verify(mockHttpErrorPixels).update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 504)
     }
 
     @Test
