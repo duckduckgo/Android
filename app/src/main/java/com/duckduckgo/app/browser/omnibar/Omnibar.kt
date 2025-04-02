@@ -60,7 +60,6 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import timber.log.Timber
@@ -236,12 +235,6 @@ class Omnibar(
     private fun removeAppBarBehavior(view: View) {
         view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = null
-        }
-    }
-
-    private fun addAppBarBehavior(view: View, newBehavior: AppBarLayout.Behavior) {
-        view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            behavior = newBehavior
         }
     }
 
