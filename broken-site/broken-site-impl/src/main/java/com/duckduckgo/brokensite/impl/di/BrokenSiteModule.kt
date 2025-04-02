@@ -19,7 +19,7 @@ package com.duckduckgo.brokensite.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.brokensite.impl.BrokenSitePomptDataStore
+import com.duckduckgo.brokensite.impl.BrokenSitePromptDataStore
 import com.duckduckgo.brokensite.impl.BrokenSitePromptInMemoryStore
 import com.duckduckgo.brokensite.impl.BrokenSiteReportRepository
 import com.duckduckgo.brokensite.impl.RealBrokenSiteReportRepository
@@ -43,7 +43,7 @@ class BrokenSiteModule {
         database: BrokenSiteDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        brokenSitePromptDataStore: BrokenSitePomptDataStore,
+        brokenSitePromptDataStore: BrokenSitePromptDataStore,
         brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
     ): BrokenSiteReportRepository {
         return RealBrokenSiteReportRepository(database, coroutineScope, dispatcherProvider, brokenSitePromptDataStore, brokenSitePromptInMemoryStore)
