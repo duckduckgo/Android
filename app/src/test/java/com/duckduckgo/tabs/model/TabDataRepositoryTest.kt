@@ -48,7 +48,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -591,7 +590,6 @@ class TabDataRepositoryTest {
         // Assert: Verify the count is correct
         assertEquals(1, inactiveTabCount)
     }
-
 
     @Test
     fun whenDeleteTabsThenTabsDeletedAndDataCleared() = runTest {
