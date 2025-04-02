@@ -105,11 +105,7 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun ctaShown() {
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
-        val nextShownDate = brokenSiteReportRepository.getNextShownDate()
         val newNextShownDate = currentTimestamp.plusDays(brokenSiteReportRepository.getCoolDownDays())
-
-        if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
-            brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-        }
+        brokenSiteReportRepository.setNextShownDate(newNextShownDate)
     }
 }
