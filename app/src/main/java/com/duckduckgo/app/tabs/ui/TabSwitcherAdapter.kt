@@ -62,9 +62,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -93,7 +90,6 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = GRID
-    private var layoutType: LayoutType = LayoutType.GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
     init {
