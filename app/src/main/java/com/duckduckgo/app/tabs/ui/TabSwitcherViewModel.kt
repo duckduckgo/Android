@@ -17,12 +17,8 @@
 package com.duckduckgo.app.tabs.ui
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -58,6 +54,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkM
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
@@ -69,6 +66,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
@@ -80,13 +78,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
@@ -111,44 +110,32 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val tabsFlow = tabRepository.flowTabs
+    private val tabItemsFlow = tabRepository.flowTabs
         .debounce(100.milliseconds)
         .conflate()
+        .flatMapLatest { tabEntities ->
+            combine(
+                tabRepository.flowSelectedTab,
+                _selectionViewState,
+                tabSwitcherDataStore.isAnimationTileDismissed(),
+            ) { activeTab, viewState, isAnimationTileDismissed ->
+                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+            }
+        }
 
     private val _selectionViewState = MutableStateFlow(SelectionViewState())
     val selectionViewState = combine(
         _selectionViewState,
-        tabsFlow,
-        tabRepository.flowSelectedTab,
+        tabItemsFlow,
         tabRepository.tabSwitcherData,
-    ) { viewState, tabs, activeTab, tabSwitcherData ->
+    ) { viewState, tabs, tabSwitcherData ->
         viewState.copy(
-            tabItems = tabs.map {
-                if (viewState.mode is Selection) {
-                    SelectableTab(it, isSelected = it.tabId in viewState.mode.selectedTabs)
-                } else {
-                    NormalTab(it, isActive = it.tabId == activeTab?.tabId)
-                }
-            },
+            tabItems = tabs,
             layoutType = tabSwitcherData.layoutType,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
-    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabsFlow
-        .asLiveData()
-        .switchMap { tabEntities ->
-            // TODO use test framework to determine whether to show tracker animation tile
-            liveData {
-                if (tabSwitcherAnimationFeature.self().isEnabled()) {
-                    collectTabItemsWithOptionalAnimationTile(tabEntities)
-                } else {
-                    val tabItems = tabEntities.map {
-                        NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
-                    }
-                    emit(tabItems)
-                }
-            }
-        }
+    val tabItemsLiveData: LiveData<List<TabSwitcherItem>> = tabItemsFlow.asLiveData()
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -159,7 +146,7 @@ class TabSwitcherViewModel @Inject constructor(
             return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                 selectionViewState.value.tabItems
             } else {
-                tabSwitcherItems.value.orEmpty()
+                tabItemsLiveData.value.orEmpty()
             }
         }
 
@@ -584,22 +571,36 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
     }
 
-    private suspend fun LiveDataScope<List<TabSwitcherItem>>.collectTabItemsWithOptionalAnimationTile(
+    private suspend fun getTabItems(
         tabEntities: List<TabEntity>,
-    ) {
-        tabSwitcherDataStore.isAnimationTileDismissed().collect { isDismissed ->
-            val tabItems = tabEntities.map {
-                NormalTab(it, isActive = it.tabId == activeTab.value?.tabId)
-            }
+        activeTab: TabEntity?,
+        isAnimationTileDismissed: Boolean,
+        mode: Mode,
+    ): List<TabSwitcherItem> {
+        val normalTabs = tabEntities.map {
+            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+        }
 
-            val tabSwitcherItems = if (!isDismissed) {
-                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+        suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
+            return if (tabSwitcherAnimationFeature.self().isEnabled()) {
+                if (!isAnimationTileDismissed) {
+                    val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
-                listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + tabItems
+                    listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
+                } else {
+                    normalTabs
+                }
             } else {
-                tabItems
+                normalTabs
             }
-            emit(tabSwitcherItems)
+        }
+
+        return if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
+            tabEntities.map {
+                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
+            }
+        } else {
+            getNormalTabItemsWithOptionalAnimationTile()
         }
     }
 
