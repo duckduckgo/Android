@@ -39,6 +39,9 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerM
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutCompleted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutStarted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
@@ -51,6 +54,7 @@ import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.ExecuteBr
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.GetCaptchaSolution
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.GetEmail
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.HandleBroker
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.HandleNextProfileForBroker
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.Idle
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.LoadUrl
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner.Command.SendCaptchaSolution
@@ -267,6 +271,7 @@ internal class RealPirActionsRunner(
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
 
+            is HandleNextProfileForBroker -> handleNextProfileForBroker(command.state)
             is BrokerCompleted -> handleBrokerCompleted(command.state, command.isSuccess)
             is GetEmail -> handleGetEmail(command.state)
             is AwaitEmailConfirmation -> handleEmailConfirmation(
@@ -289,6 +294,33 @@ internal class RealPirActionsRunner(
 
             is SendCaptchaSolution -> handleSendCaptchaSolution(command.state, command.callback)
         }
+    }
+
+    private suspend fun handleNextProfileForBroker(state: State) {
+        // We reset action to 0 and update the profile state to the next profile
+        val newState = state.copy(
+            currentActionIndex = 0,
+            extractedProfileState = state.extractedProfileState.copy(
+                currentExtractedProfileIndex = state.extractedProfileState.currentExtractedProfileIndex + 1,
+            ),
+        )
+
+        // Should only be run for opt out really
+        if (runType == RunType.OPTOUT) {
+            // Signal start for current run.
+            pirRunStateHandler.handleState(
+                BrokerRecordOptOutStarted(
+                    brokerName = brokersToExecute[state.currentBrokerIndex].brokerName,
+                    extractedProfile = newState.extractedProfileState.extractedProfile[state.extractedProfileState.currentExtractedProfileIndex],
+                ),
+            )
+        }
+        // Restart for broker but with different profile
+        nextCommand(
+            ExecuteBrokerAction(
+                state = newState,
+            ),
+        )
     }
 
     private fun nextCommand(command: Command) {
@@ -513,9 +545,9 @@ internal class RealPirActionsRunner(
         if (state.currentBrokerIndex >= brokersToExecute.size) {
             nextCommand(CompleteExecution)
         } else {
-            // Entry point of execution for a Blocker
+            // Entry point of execution for a Broker
             brokersToExecute.get(state.currentBrokerIndex).let {
-                emitBrokerStartPixel(it.brokerName)
+                emitBrokerStartPixel(it)
 
                 nextCommand(
                     ExecuteBrokerAction(
@@ -542,10 +574,10 @@ internal class RealPirActionsRunner(
         isSuccess: Boolean,
     ) {
         if (state.extractedProfileState.currentExtractedProfileIndex < state.extractedProfileState.extractedProfile.size - 1) {
-            // Restart for broker but with different profile
             if (runType == RunType.OPTOUT) {
+                // Signal complete for previous run.
                 pirRunStateHandler.handleState(
-                    BrokerOptOutCompleted(
+                    BrokerRecordOptOutCompleted(
                         brokerName = brokersToExecute[state.currentBrokerIndex].brokerName,
                         extractedProfile = state.extractedProfileState.extractedProfile[state.extractedProfileState.currentExtractedProfileIndex],
                         startTimeInMillis = state.brokerStartTime,
@@ -555,26 +587,21 @@ internal class RealPirActionsRunner(
                 )
             }
 
+            // Broker is not yet completed as another profile can be run
             nextCommand(
-                ExecuteBrokerAction(
-                    state = state.copy(
-                        currentActionIndex = 0,
-                        extractedProfileState = state.extractedProfileState.copy(
-                            currentExtractedProfileIndex = state.extractedProfileState.currentExtractedProfileIndex + 1,
-                        ),
-                    ),
+                HandleNextProfileForBroker(
+                    state = state,
                 ),
             )
         } else {
             // Exit point of execution for a Blocker
-            brokersToExecute[state.currentBrokerIndex].brokerName.let {
-                emitBrokerCompletePixel(
-                    brokerName = it,
-                    startTimeInMillis = state.brokerStartTime,
-                    totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
-                    isSuccess = isSuccess,
-                )
-            }
+            emitBrokerCompletePixel(
+                brokerName = brokersToExecute[state.currentBrokerIndex].brokerName,
+                state = state,
+                startTimeInMillis = state.brokerStartTime,
+                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
+                isSuccess = isSuccess,
+            )
             nextCommand(
                 HandleBroker(
                     state = state.copy(
@@ -585,50 +612,92 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun emitBrokerStartPixel(brokerName: String) {
+    private suspend fun emitBrokerStartPixel(brokerStep: BrokerStep) {
         when (runType) {
-            RunType.MANUAL -> BrokerManualScanStarted(
-                brokerName,
-                currentTimeProvider.currentTimeMillis(),
+            RunType.MANUAL -> pirRunStateHandler.handleState(
+                BrokerManualScanStarted(
+                    brokerStep.brokerName,
+                    currentTimeProvider.currentTimeMillis(),
+                ),
             )
 
-            RunType.SCHEDULED -> BrokerScheduledScanStarted(
-                brokerName,
-                currentTimeProvider.currentTimeMillis(),
+            RunType.SCHEDULED -> pirRunStateHandler.handleState(
+                BrokerScheduledScanStarted(
+                    brokerStep.brokerName,
+                    currentTimeProvider.currentTimeMillis(),
+                ),
             )
 
-            else -> null
-        }?.also {
-            pirRunStateHandler.handleState(it)
+            RunType.OPTOUT -> {
+                // When we get here it means we are starting a new process for a new broker
+                pirRunStateHandler.handleState(
+                    BrokerOptOutStarted(
+                        brokerStep.brokerName,
+                    ),
+                )
+
+                // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
+                pirRunStateHandler.handleState(
+                    BrokerRecordOptOutStarted(
+                        brokerStep.brokerName,
+                        (brokerStep as OptOutStep).profilesToOptOut[0],
+                    ),
+                )
+            }
+
+            else -> {}
         }
     }
 
     private suspend fun emitBrokerCompletePixel(
         brokerName: String,
+        state: State,
         startTimeInMillis: Long,
         totalTimeMillis: Long,
         isSuccess: Boolean,
     ) {
         when (runType) {
-            RunType.MANUAL -> BrokerManualScanCompleted(
-                brokerName = brokerName,
-                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                totalTimeMillis = totalTimeMillis,
-                isSuccess = isSuccess,
-                startTimeInMillis = startTimeInMillis,
+            RunType.MANUAL ->
+                pirRunStateHandler.handleState(
+                    BrokerManualScanCompleted(
+                        brokerName = brokerName,
+                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                        totalTimeMillis = totalTimeMillis,
+                        isSuccess = isSuccess,
+                        startTimeInMillis = startTimeInMillis,
+                    ),
+                )
+
+            RunType.SCHEDULED -> pirRunStateHandler.handleState(
+                BrokerScheduledScanCompleted(
+                    brokerName = brokerName,
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    totalTimeMillis = totalTimeMillis,
+                    isSuccess = isSuccess,
+                    startTimeInMillis = startTimeInMillis,
+                ),
             )
 
-            RunType.SCHEDULED -> BrokerScheduledScanCompleted(
-                brokerName = brokerName,
-                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                totalTimeMillis = totalTimeMillis,
-                isSuccess = isSuccess,
-                startTimeInMillis = startTimeInMillis,
-            )
+            RunType.OPTOUT -> {
+                pirRunStateHandler.handleState(
+                    BrokerRecordOptOutCompleted(
+                        brokerName = brokerName,
+                        startTimeInMillis = startTimeInMillis,
+                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                        extractedProfile = state.extractedProfileState.extractedProfile[state.extractedProfileState.currentExtractedProfileIndex],
+                        isSubmitSuccess = isSuccess,
+                    ),
+                )
+                pirRunStateHandler.handleState(
+                    BrokerOptOutCompleted(
+                        brokerName = brokerName,
+                        startTimeInMillis = startTimeInMillis,
+                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    ),
+                )
+            }
 
-            else -> null
-        }?.also {
-            pirRunStateHandler.handleState(it)
+            else -> {}
         }
     }
 
@@ -859,7 +928,7 @@ internal class RealPirActionsRunner(
                         ),
                     )
                 } else {
-                    lastState.extractedProfileState?.extractedProfile?.get(lastState.extractedProfileState.currentExtractedProfileIndex)
+                    lastState.extractedProfileState.extractedProfile?.get(lastState.extractedProfileState.currentExtractedProfileIndex)
                         ?.let {
                             pirRunStateHandler.handleState(
                                 BrokerOptOutActionFailed(
@@ -908,6 +977,10 @@ internal class RealPirActionsRunner(
         data class LoadUrl(
             override val state: State,
             val urlToLoad: String,
+        ) : Command(State())
+
+        data class HandleNextProfileForBroker(
+            override val state: State,
         ) : Command(State())
 
         data class GetEmail(

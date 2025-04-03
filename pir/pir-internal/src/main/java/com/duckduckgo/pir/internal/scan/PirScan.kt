@@ -191,7 +191,7 @@ class RealPirScan @Inject constructor(
             logcat { "PIR-SCAN: Scan completed for all runners" }
             emitScanCompletedPixel(
                 runType,
-                startTimeMillis - currentTimeProvider.currentTimeMillis(),
+                currentTimeProvider.currentTimeMillis() - startTimeMillis,
                 maxWebViewCount,
             )
             Result.success(Unit)

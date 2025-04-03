@@ -69,6 +69,26 @@ enum class PirPixel(
     PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED(
         baseName = "pir_internal_scheduled-scan_broker_completed",
         type = Count,
+    ),
+
+    PIR_INTERNAL_OPT_OUT_BROKER_STARTED(
+        baseName = "pir_internal_optout_broker_started",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED(
+        baseName = "pir_internal_optout_broker_completed",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_OPT_OUT_RECORD_STARTED(
+        baseName = "pir_internal_optout_record_started",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED(
+        baseName = "pir_internal_optout_record_completed",
+        type = Count,
     ), ;
 
     constructor(

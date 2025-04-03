@@ -24,6 +24,9 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerM
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutCompleted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutStarted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
+import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
@@ -98,6 +101,17 @@ interface PirRunStateHandler {
 
         data class BrokerOptOutCompleted(
             override val brokerName: String,
+            val startTimeInMillis: Long,
+            val endTimeInMillis: Long,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordOptOutStarted(
+            override val brokerName: String,
+            val extractedProfile: ExtractedProfile,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordOptOutCompleted(
+            override val brokerName: String,
             val extractedProfile: ExtractedProfile,
             val startTimeInMillis: Long,
             val endTimeInMillis: Long,
@@ -153,7 +167,10 @@ class RealPirRunStateHandler @Inject constructor(
             is BrokerScheduledScanCompleted -> handleBrokerScheduledScanCompleted(pirRunState)
             is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
             is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
+            is BrokerOptOutStarted -> handleBrokerOptOutStarted(pirRunState)
             is BrokerOptOutCompleted -> handleBrokerOptOutCompleted(pirRunState)
+            is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
+            is BrokerRecordOptOutCompleted -> handleRecordOptOutCompleted(pirRunState)
             is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
             is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
             else -> {}
@@ -246,8 +263,33 @@ class RealPirRunStateHandler @Inject constructor(
         )
     }
 
-    private suspend fun handleBrokerOptOutCompleted(state: BrokerOptOutCompleted) {
-        // TODO: Add pixel
+    private fun handleBrokerOptOutStarted(state: BrokerOptOutStarted) {
+        pixelSender.reportBrokerOptOutStarted(
+            brokerName = state.brokerName,
+        )
+    }
+
+    private fun handleBrokerOptOutCompleted(state: BrokerOptOutCompleted) {
+        pixelSender.reportBrokerOptOutCompleted(
+            brokerName = state.brokerName,
+            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
+        )
+    }
+
+    private fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
+        pixelSender.reportRecordOptOutStarted(
+            brokerName = state.brokerName,
+            recordId = state.extractedProfile.profileUrl?.identifier ?: "Unavailable",
+        )
+    }
+
+    private suspend fun handleRecordOptOutCompleted(state: BrokerRecordOptOutCompleted) {
+        pixelSender.reportRecordOptOutCompleted(
+            brokerName = state.brokerName,
+            recordId = state.extractedProfile.profileUrl?.identifier ?: "Unavailable",
+            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
+            isSuccess = state.isSubmitSuccess,
+        )
         repository.saveOptOutCompleted(
             brokerName = state.brokerName,
             extractedProfile = state.extractedProfile,
