@@ -57,7 +57,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import timber.log.Timber
 
 interface MaliciousSiteRepository {
     /**
@@ -192,7 +191,6 @@ class RealMaliciousSiteRepository @Inject constructor(
         val revision = latestRevision.getRevisionForFeed(feed)
         val data: T? = if (networkRevision > revision) {
             if (feed == SCAM && !maliciousSiteProtectionFeature.scamProtectionEnabled()) {
-                Timber.tag("Cris").d("Scam protection is disabled, skipping scam dataset download")
                 null
             } else {
                 getFunction(revision)
