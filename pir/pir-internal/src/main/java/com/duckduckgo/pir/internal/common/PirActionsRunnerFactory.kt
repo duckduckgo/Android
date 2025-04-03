@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.pir.internal.scripts.PirMessagingInterface
 import com.duckduckgo.pir.internal.scripts.RealBrokerActionProcessor
+import com.duckduckgo.pir.internal.store.PirRepository
 import javax.inject.Inject
 
 class PirActionsRunnerFactory @Inject constructor(
@@ -29,8 +30,9 @@ class PirActionsRunnerFactory @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val jsMessageHelper: JsMessageHelper,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val nativeBrokerActionHandler: NativeBrokerActionHandler,
     private val pirRunStateHandler: PirRunStateHandler,
+    private val pirRepository: PirRepository,
+    private val captchaResolver: CaptchaResolver,
 ) {
     /**
      * Every instance of PirActionsRunner is created with its own instance of [PirMessagingInterface] and [RealBrokerActionProcessor]
@@ -52,7 +54,11 @@ class PirActionsRunnerFactory @Inject constructor(
             pirScriptToLoad,
             runType,
             currentTimeProvider,
-            nativeBrokerActionHandler,
+            RealNativeBrokerActionHandler(
+                pirRepository,
+                dispatcherProvider,
+                captchaResolver,
+            ),
             pirRunStateHandler,
         )
     }

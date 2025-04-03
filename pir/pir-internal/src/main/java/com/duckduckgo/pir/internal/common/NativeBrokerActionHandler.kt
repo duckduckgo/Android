@@ -17,7 +17,6 @@
 package com.duckduckgo.pir.internal.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.CaptchaResolver.CaptchaResolverError
 import com.duckduckgo.pir.internal.common.CaptchaResolver.CaptchaResolverResult
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
@@ -35,8 +34,6 @@ import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus.Ready
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus.Unknown
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -112,8 +109,7 @@ interface NativeBrokerActionHandler {
     }
 }
 
-@ContributesBinding(AppScope::class)
-class RealNativeBrokerActionHandler @Inject constructor(
+class RealNativeBrokerActionHandler(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val captchaResolver: CaptchaResolver,
@@ -261,6 +257,7 @@ class RealNativeBrokerActionHandler @Inject constructor(
             }
         }
     }
+
     companion object {
         private const val MAX_AWAIT_EMAIL_ATTEMPT = 3
     }
