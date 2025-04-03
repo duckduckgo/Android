@@ -712,7 +712,7 @@ class BrowserTabViewModel @Inject constructor(
 
         visualDesignExperimentDataStore.navigationBarState
             .onEach { navigationBarState ->
-                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = !navigationBarState.isEnabled)
+                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = navigationBarState.isEnabled)
             }
             .launchIn(viewModelScope)
     }

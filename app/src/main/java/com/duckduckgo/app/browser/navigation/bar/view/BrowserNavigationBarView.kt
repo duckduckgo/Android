@@ -150,18 +150,18 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         binding.backArrowIconImageView.setImageResource(
             if (viewState.backArrowButtonEnabled) {
-                R.drawable.ic_arrow_left_24e
+                R.drawable.ic_grid_view_24
             } else {
-                R.drawable.ic_arrow_left_24e_disabled
+                R.drawable.ic_grid_view_24
             },
         )
         binding.backArrowButton.isEnabled = viewState.backArrowButtonEnabled
 
         binding.forwardArrowIconImageView.setImageResource(
             if (viewState.forwardArrowButtonEnabled) {
-                R.drawable.ic_arrow_right_24e
+                com.duckduckgo.mobile.android.R.drawable.ic_add_24
             } else {
-                R.drawable.ic_arrow_right_24e_disabled
+                com.duckduckgo.mobile.android.R.drawable.ic_add_24
             },
         )
         binding.forwardArrowButton.isEnabled = viewState.forwardArrowButtonEnabled
