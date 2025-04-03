@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse

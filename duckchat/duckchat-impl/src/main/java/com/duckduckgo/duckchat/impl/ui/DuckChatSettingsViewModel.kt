@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.DuckChatSettingsViewModel.Command.OpenLearnMore
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLearnMore
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
