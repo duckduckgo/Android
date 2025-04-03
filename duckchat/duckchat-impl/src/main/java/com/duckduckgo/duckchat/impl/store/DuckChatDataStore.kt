@@ -23,9 +23,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
-import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject

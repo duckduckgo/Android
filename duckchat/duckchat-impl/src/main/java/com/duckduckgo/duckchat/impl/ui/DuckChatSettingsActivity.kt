@@ -31,9 +31,9 @@ import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
