@@ -24,6 +24,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.M
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
@@ -56,12 +57,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import timber.log.Timber
 
 interface MaliciousSiteRepository {
     /**
      * @throws WriteInProgressException if a write is in progress
      */
-    suspend fun containsHashPrefix(hashPrefix: String): Boolean
+    suspend fun getFeedForHashPrefix(hashPrefix: String): Feed?
 
     /**
      * @throws WriteInProgressException if a write is in progress
@@ -82,17 +84,24 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDatasetService: MaliciousSiteDatasetService,
     private val dispatcherProvider: DispatcherProvider,
     private val pixels: Pixel,
+    private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature,
 ) : MaliciousSiteRepository {
 
     private val writeMutex = Mutex()
 
-    override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
+    override suspend fun getFeedForHashPrefix(hashPrefix: String): Feed? {
         return withContext(dispatcherProvider.io()) {
             if (writeMutex.isLocked) {
                 throw WriteInProgressException()
             }
-            maliciousSiteDao.hashPrefixExists(hashPrefix)
-        }
+            maliciousSiteDao.getHashPrefix(hashPrefix)?.type?.let {
+                when (it) {
+                    PHISHING.name -> PHISHING
+                    MALWARE.name -> MALWARE
+                    SCAM.name -> SCAM
+                    else -> null
+                }
+            }        }
     }
 
     override suspend fun getFilters(hash: String): FilterSet? {
@@ -182,7 +191,12 @@ class RealMaliciousSiteRepository @Inject constructor(
     ) {
         val revision = latestRevision.getRevisionForFeed(feed)
         val data: T? = if (networkRevision > revision) {
-            getFunction(revision)
+            if (feed == SCAM && !maliciousSiteProtectionFeature.scamProtectionEnabled()) {
+                Timber.tag("Cris").d("Scam protection is disabled, skipping scam dataset download")
+                null
+            } else {
+                getFunction(revision)
+            }
         } else {
             null
         }

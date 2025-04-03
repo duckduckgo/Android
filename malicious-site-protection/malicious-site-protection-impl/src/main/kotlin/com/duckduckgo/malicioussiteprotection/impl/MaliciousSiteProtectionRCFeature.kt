@@ -34,6 +34,7 @@ import org.json.JSONObject
 interface MaliciousSiteProtectionRCFeature {
     fun isFeatureEnabled(): Boolean
     fun canUpdateDatasets(): Boolean
+    fun scamProtectionEnabled(): Boolean
     fun getHashPrefixUpdateFrequency(): Long
     fun getFilterSetUpdateFrequency(): Long
 }
@@ -50,6 +51,7 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
 ) : MaliciousSiteProtectionRCFeature, PrivacyConfigCallbackPlugin {
     private var isFeatureEnabled = false
     private var canUpdateDatasets = false
+    private var scamProtection = false
 
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
@@ -80,11 +82,16 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
         return canUpdateDatasets
     }
 
+    override fun scamProtectionEnabled(): Boolean {
+        return scamProtection
+    }
+
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
             // MSP is disabled in F-Droid builds, as we can't download datasets
             isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled() &&
                 maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled() && appBuildConfig.flavor != FDROID
+            scamProtection = isFeatureEnabled && maliciousSiteProtectionFeature.scamProtection().isEnabled()
             canUpdateDatasets = maliciousSiteProtectionFeature.canUpdateDatasets().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
