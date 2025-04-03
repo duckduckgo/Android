@@ -214,7 +214,7 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: OmnibarController by lazy {
+    private val newOmnibar: OmnibarBehaviour by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 when (omnibarType) {

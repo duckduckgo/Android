@@ -16,6 +16,15 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.view.View
+import androidx.appcompat.widget.Toolbar
+import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
+import kotlinx.coroutines.flow.Flow
+
 interface OmnibarBehaviour {
 
     fun measuredHeight(): Int
@@ -27,4 +36,32 @@ interface OmnibarBehaviour {
     fun setTranslation(y: Float)
 
     fun isOmnibarScrollingEnabled(): Boolean
+
+    fun decorate(decoration: Decoration)
+
+    fun reduce(stateChange: StateChange)
+
+    fun setOmnibarTextListener(textListener: Omnibar.TextListener)
+
+    fun setOmnibarItemPressedListener(itemPressedListener: Omnibar.ItemPressedListener)
+
+    var isScrollingEnabled: Boolean
+
+    val isEditingFlow: Flow<Boolean>
+
+    val isEditing: Boolean
+
+    fun isPulseAnimationPlaying(): Boolean
+
+    fun setVisible(visible: Boolean)
+
+    val findInPage: IncludeFindInPageBinding
+
+    val omnibarTextInput: KeyboardAwareEditText
+
+    val omniBarContainer: View
+
+    val toolbar: Toolbar
+
+    val shieldIcon: LottieAnimationView
 }

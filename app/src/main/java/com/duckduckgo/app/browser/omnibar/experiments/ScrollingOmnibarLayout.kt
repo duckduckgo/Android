@@ -23,7 +23,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
-import com.duckduckgo.app.browser.omnibar.OmnibarController
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.TopAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -36,7 +35,7 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : OmnibarLayout(context, attrs, defStyle), OmnibarController {
+) : OmnibarLayout(context, attrs, defStyle) {
 
     init {
         val attr =

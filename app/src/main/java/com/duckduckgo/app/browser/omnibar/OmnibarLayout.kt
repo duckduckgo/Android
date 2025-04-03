@@ -98,7 +98,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarController, OmnibarBehaviour {
+) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
