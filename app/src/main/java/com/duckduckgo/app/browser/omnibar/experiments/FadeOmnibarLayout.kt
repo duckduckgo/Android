@@ -23,11 +23,11 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.util.AttributeSet
-import android.view.MotionEvent
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.PathInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -76,10 +76,10 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.CompleteCurrentTransition
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.TransitionToTarget
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.CompleteCurrentTransition
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout.TransitionType.TransitionToTarget
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -105,8 +105,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
-import kotlin.math.abs
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
