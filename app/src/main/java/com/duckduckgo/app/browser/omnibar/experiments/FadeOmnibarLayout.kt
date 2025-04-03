@@ -834,6 +834,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun setExpanded(expanded: Boolean) {
+        // no-op
+    }
+
     fun resetTransitionDelayed() {
         postDelayed(delayInMillis = 100) {
             revealToolbar(animated = false)

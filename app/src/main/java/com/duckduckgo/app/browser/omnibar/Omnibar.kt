@@ -112,18 +112,11 @@ class Omnibar(
 
                     FADE -> {
                         // remove bottom variant
-                        // binding.rootContainer.removeView(binding.fadeOmnibarBottom)
-                        binding.fadeOmnibarBottom.gone()
+                        binding.rootContainer.removeView(binding.fadeOmnibarBottom)
 
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove the default top abb bar behavior
-                        removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                        removeAppBarBehavior(binding.browserLayout)
-                        removeAppBarBehavior(binding.focusedView)
-                        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
                     }
                 }
             }
@@ -141,8 +134,7 @@ class Omnibar(
 
                     FADE -> {
                         // remove top variant
-                        binding.fadeOmnibar.gone()
-                        // binding.rootContainer.removeView(binding.fadeOmnibar)
+                        binding.rootContainer.removeView(binding.fadeOmnibar)
 
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
@@ -297,7 +289,7 @@ class Omnibar(
     }
 
     fun setExpanded(expanded: Boolean) {
-        // newOmnibar.setExpanded(expanded)
+        newOmnibar.setExpanded(expanded)
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {

@@ -64,4 +64,6 @@ interface OmnibarBehaviour {
     val toolbar: Toolbar
 
     val shieldIcon: LottieAnimationView
+
+    fun setExpanded(expanded: Boolean)
 }

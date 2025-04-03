@@ -483,9 +483,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (viewState.updateOmnibarText) {
             omnibarTextInput.setText(viewState.omnibarText)
         }
-        // if (viewState.expanded) {
-        //     setExpanded(true, viewState.expandedAnimated)
-        // }
+
+        if (viewState.expanded) {
+            setExpanded(true, viewState.expandedAnimated)
+        }
 
         if (viewState.isLoading) {
             pageLoadingIndicator.show()
