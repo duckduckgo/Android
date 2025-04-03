@@ -307,6 +307,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -3307,6 +3308,7 @@ class BrowserTabViewModel @Inject constructor(
         val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
+            SCAM -> MaliciousSiteStatus.SCAM
         }
 
         buildSiteFactory(
