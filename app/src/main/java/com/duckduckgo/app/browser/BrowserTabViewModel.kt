@@ -2765,13 +2765,13 @@ class BrowserTabViewModel @Inject constructor(
                     siteLiveData.value,
                 )
             }
-            val isOnboardingComplete = withContext(dispatchers.io()) {
+            val contextDaxDialogsShown = withContext(dispatchers.io()) {
                 ctaViewModel.areBubbleDaxDialogsCompleted()
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
                 cta = cta,
-                daxOnboardingComplete = isOnboardingComplete,
+                isOnboardingCompleteInNewTabPage = contextDaxDialogsShown,
                 isBrowserShowing = isBrowserShowing,
                 isErrorShowing = isErrorShowing,
             )

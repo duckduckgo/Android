@@ -2527,7 +2527,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
-        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage)
         assertFalse(testee.ctaViewState.value!!.isBrowserShowing)
     }
 
@@ -2541,7 +2541,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
-        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage)
         assertTrue(testee.ctaViewState.value!!.isBrowserShowing)
     }
 
