@@ -3,6 +3,7 @@ package com.duckduckgo.malicioussiteprotection.impl.data
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
@@ -41,12 +42,14 @@ class RealMaliciousSiteRepositoryTest {
     private val maliciousSiteService: MaliciousSiteService = mock()
     private val maliciousSiteDatasetService: MaliciousSiteDatasetService = mock()
     private val mockPixel: Pixel = mock()
+    private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
         maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
+        mockMaliciousSiteProtectionRCFeature,
     )
 
     @Test
@@ -115,9 +118,9 @@ class RealMaliciousSiteRepositoryTest {
 
         whenever(maliciousSiteDao.hashPrefixExists(hashPrefix)).thenReturn(true)
 
-        val result = repository.containsHashPrefix(hashPrefix)
+        val result = repository.getFeedForHashPrefix(hashPrefix)
 
-        assertTrue(result)
+        assertEquals(PHISHING, result)
     }
 
     @Test

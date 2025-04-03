@@ -111,12 +111,15 @@ class RealMaliciousSiteProtection @Inject constructor(
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
                     is Result -> matches.matches.firstOrNull { match ->
-                        (match.feed != SCAM || maliciousSiteProtectionRCFeature.scamProtectionEnabled()) &&
-                            Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
+                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
-                        Malicious(feed)
+                        if (feed != SCAM || maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
+                            Malicious(feed)
+                        } else {
+                            Ignored
+                        }
                     } ?: Safe
                     is MatchesResult.Ignored -> Ignored
                 }
