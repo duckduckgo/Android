@@ -663,11 +663,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Przeciągnij w dół od góry i naciśnij przycisk Wstecz, aby zamknąć tryb pełnoekranowy.</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zamknąć wszystkie karty?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Czy na pewno chcesz zamknąć wszystkie karty?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Anuluj</string>
     <string name="closeAppTabsConfirmationDialogClose">Zamknij</string>
+
+    <string name="selectTabsMenuItem">Wybierz karty</string>
+    <string name="selectAllTabsMenuItem">Wybierz wszystko</string>
+    <string name="deselectAllTabsMenuItem">Usuń wszystkie zaznaczenia</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Wybrano %1$d</string>
+    <string name="tabSelectedIndicator">Wskaźnik wybranej karty</string>
+    <string name="tabNotSelectedIndicator">Wskaźnik niewybranej karty</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Linki z DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Udostępnij link</item>
+        <item quantity="few">Udostępnij %1$d linki</item>
+        <item quantity="many">Udostępnij %1$d linków</item>
+        <item quantity="other">Udostępnij %1$d linku</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodać wybraną kartę do zakładek?</item>
+        <item quantity="few">Dodać %1$d karty do zakładek?</item>
+        <item quantity="many">Dodać %1$d kart do zakładek?</item>
+        <item quantity="other">Dodać %1$d karty do zakładek?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodano zakładkę</item>
+        <item quantity="few">Dodano %1$d zakładki</item>
+        <item quantity="many">Dodano %1$d zakładek</item>
+        <item quantity="other">Dodano %1$d zakładki</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Dodaj do zakładek</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodaj kartę do zakładek</item>
+        <item quantity="few">Dodaj %1$d karty do zakładek</item>
+        <item quantity="many">Dodaj %1$d kart do zakładek</item>
+        <item quantity="other">Dodaj %1$d karty do zakładek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Istniejące zakładki nie zostaną zduplikowane.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknąć kartę?</item>
+        <item quantity="few">Zamknąć wszystkie %1$d karty?</item>
+        <item quantity="many">Zamknąć wszystkie %1$d kart?</item>
+        <item quantity="other">Zamknąć wszystkie %1$d karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknąć inną kartę?</item>
+        <item quantity="few">Zamknąć %1$d inne karty?</item>
+        <item quantity="many">Zamknąć %1$d innych kart?</item>
+        <item quantity="other">Zamknąć %1$d innej karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknąć kartę?</item>
+        <item quantity="few">Zamknąć %1$d karty?</item>
+        <item quantity="many">Zamknąć %1$d kart?</item>
+        <item quantity="other">Zamknąć %1$d karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Czy na pewno chcesz zamknąć tę kartę?</item>
+        <item quantity="few">Czy na pewno chcesz zamknąć wszystkie karty?</item>
+        <item quantity="many">Czy na pewno chcesz zamknąć wszystkie karty?</item>
+        <item quantity="other">Czy na pewno chcesz zamknąć wszystkie karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Czy na pewno chcesz zamknąć tę kartę?</item>
+        <item quantity="few">Czy na pewno chcesz zamknąć te karty?</item>
+        <item quantity="many">Czy na pewno chcesz zamknąć te karty?</item>
+        <item quantity="other">Czy na pewno chcesz zamknąć te karty?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknij kartę</item>
+        <item quantity="few">Zamknij karty</item>
+        <item quantity="many">Zamknij karty</item>
+        <item quantity="other">Zamknij karty</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknij kartę</item>
+        <item quantity="few">Zamknij %1$d karty</item>
+        <item quantity="many">Zamknij %1$d kart</item>
+        <item quantity="other">Zamknij %1$d karty</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zamknij inne karty</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zamknięto kartę</item>
+        <item quantity="few">Zamknięto %1$d karty</item>
+        <item quantity="many">Zamknięto %1$d kart</item>
+        <item quantity="other">Zamknięto %1$d karty</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d prywatna karta</item>
+        <item quantity="few">%1$d prywatne karty</item>
+        <item quantity="many">%1$d prywatnych kart</item>
+        <item quantity="other">%1$d prywatnych kart</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opcję prywatnego wyszukiwania głosowego do paska adresu. Dźwięk nie jest przechowywany ani udostępniany żadnym podmiotom, w tym DuckDuckGo.</string>

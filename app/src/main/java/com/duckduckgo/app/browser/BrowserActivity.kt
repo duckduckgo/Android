@@ -35,8 +35,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
@@ -44,9 +47,6 @@ import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
-import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultAppsActivity
-import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
@@ -79,7 +79,9 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -100,6 +102,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -156,6 +159,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
+    @Inject
+    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
     lateinit var tabManager: TabManager
@@ -290,6 +296,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         initializeTabs()
 
+        // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
+        // flows only once, so a separate initialization is necessary
+        configureFlowCollectors()
+
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
@@ -300,6 +310,38 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+    }
+
+    private fun configureFlowCollectors() {
+        if (swipingTabsFeature.isEnabled) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(STARTED) {
+                    launch {
+                        viewModel.tabsFlow.collectLatest {
+                            tabManager.onTabsChanged(it)
+                        }
+                    }
+
+                    launch {
+                        viewModel.selectedTabFlow.collectLatest {
+                            tabManager.onSelectedTabChanged(it)
+                        }
+                    }
+
+                    launch {
+                        viewModel.selectedTabIndex.collectLatest {
+                            onMoveToTabRequested(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            lifecycleScope.launch {
+                viewModel.deletableTabsFlow.flowWithLifecycle(lifecycle, RESUMED).collect()
+            }
+        }
     }
 
     override fun onStop() {
@@ -314,6 +356,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             binding.tabPager.adapter = null
             binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+        }
+
+        // we don't want to purge during device rotation
+        if (isFinishing && tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            viewModel.purgeDeletableTabs()
         }
 
         super.onDestroy()
@@ -532,25 +579,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         }
 
-        if (swipingTabsFeature.isEnabled) {
-            lifecycleScope.launch {
-                viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onTabsChanged(it)
-                }
-            }
-
-            lifecycleScope.launch {
-                viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onSelectedTabChanged(it)
-                }
-            }
-
-            lifecycleScope.launch {
-                viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
-                    onMoveToTabRequested(it)
-                }
-            }
-        } else {
+        if (!swipingTabsFeature.isEnabled) {
+            // when swiping is enabled, the state is controlled be flows initialized in configureFlowCollectors()
             viewModel.selectedTab.observe(this) {
                 if (it != null) {
                     selectTab(it)
@@ -604,7 +634,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
-            is Query -> currentTab?.submitQuery(command.query)
+            is Command.Query -> currentTab?.submitQuery(command.query)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
@@ -615,9 +645,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
-            is ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
-            is ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
+            is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
+            is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
+            is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
+            Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
+    }
+
+    private fun showTabsDeletedSnackbar(tabIds: List<String>) {
+        TabSwitcherSnackbar(
+            anchorView = binding.fragmentContainer,
+            message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+            action = getString(R.string.tabClosedUndo),
+            showAction = true,
+            onAction = { viewModel.undoDeletableTabs(tabIds) },
+            onDismiss = { viewModel.purgeDeletableTabs() },
+        ).show()
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {

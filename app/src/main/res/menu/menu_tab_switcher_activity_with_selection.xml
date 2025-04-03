@@ -20,6 +20,12 @@
     tools:ignore="AlwaysShowAction">
 
     <item
+        android:id="@+id/fireMenuItem"
+        android:icon="@drawable/ic_fire"
+        android:title="@string/fireMenu"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/layoutTypeMenuItem"
         android:icon="@drawable/ic_list_view_24"
         android:title="@string/tabSwitcherListViewMenu"
@@ -27,40 +33,9 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/fireMenuItem"
-        android:icon="@drawable/ic_fire"
-        android:title="@string/fireMenu"
+        android:id="@+id/popupMenuItem"
+        android:icon="@drawable/ic_menu_vertical_24"
+        android:title="@string/browserPopupMenu"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/newTab"
-        android:icon="@drawable/ic_add_24"
-        android:title="@string/newTabMenuItem"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/newTabOverflow"
-        android:title="@string/newTabMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/duckChat"
-        android:title="@string/duckChatMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/closeAllTabs"
-        android:title="@string/closeAllTabsMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/downloads"
-        android:title="@string/downloadsMenuItemTitle"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/settings"
-        android:title="@string/settingsMenuItemTitle"
-        app:showAsAction="never" />
 
 </menu>

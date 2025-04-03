@@ -663,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra nedåt från toppen och tryck på bakåtknappen för att lämna helskärmsläget</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Stäng alla flikar?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Är du säker på att du vill stänga alla flikar?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Avbryt</string>
     <string name="closeAppTabsConfirmationDialogClose">Stäng</string>
+
+    <string name="selectTabsMenuItem">Välj flikar</string>
+    <string name="selectAllTabsMenuItem">Välj alla</string>
+    <string name="deselectAllTabsMenuItem">Avmarkera alla</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d vald</string>
+    <string name="tabSelectedIndicator">Indikator för vald flik</string>
+    <string name="tabNotSelectedIndicator">Indikator för flik som inte är vald</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d länkar från DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dela länk</item>
+        <item quantity="other">Dela %1$d länkar</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bokmärk vald flik?</item>
+        <item quantity="other">Bokmärk %1$d flikar?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bokmärke har lagts till</item>
+        <item quantity="other">%1$d bokmärken har lagts till</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Bokmärk</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bokmärk flik</item>
+        <item quantity="other">Bokmärk %1$d flikar</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Befintliga bokmärken kommer inte att kopieras.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Stäng alla %1$d flikar?</item>
+        <item quantity="other">Stäng alla %1$d flikar?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Stäng andra flikar?</item>
+        <item quantity="other">Stäng %1$d andra flikar?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Stäng flik?</item>
+        <item quantity="other">Stäng %1$d flikar?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Är du säker på att du vill stänga fliken?</item>
+        <item quantity="other">Är du säker på att du vill stänga alla flikar?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Är du säker på att du vill stänga fliken?</item>
+        <item quantity="other">Är du säker på att du vill stänga dessa flikar?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Stäng flik</item>
+        <item quantity="other">Stäng flikar</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Stäng flik</item>
+        <item quantity="other">Stäng %1$d flikar</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Stäng andra flikar</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Flik har stängts</item>
+        <item quantity="other">%1$d flikar har stängts</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privat flik</item>
+        <item quantity="other">%1$d privata flikar</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lägg till alternativet privat röstsökning i adressfältet Ljud lagras inte och delas inte med någon, inte ens DuckDuckGo.</string>

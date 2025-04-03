@@ -2973,6 +2973,10 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
+    fun onLaunchTabSwitcherAfterTabsUndeletedRequest() {
+        command.value = LaunchTabSwitcher
+    }
+
     private fun fireDailyLaunchPixel() {
         val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getNumberOfOpenTabs() }
         val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveLastWeek() }

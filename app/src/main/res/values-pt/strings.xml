@@ -663,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arraste para baixo a partir da parte superior e toque no botão de retrocesso para sair do ecrã completo</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fechar todos os separadores?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Tens a certeza de que pretendes fechar todos os separadores?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Fechar</string>
+
+    <string name="selectTabsMenuItem">Selecionar separadores</string>
+    <string name="selectAllTabsMenuItem">Selecionar tudo</string>
+    <string name="deselectAllTabsMenuItem">Desmarcar tudo</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d selecionados</string>
+    <string name="tabSelectedIndicator">Indicador de separador selecionado</string>
+    <string name="tabNotSelectedIndicator">Indicador de separador não selecionado</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links do DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Partilhar link</item>
+        <item quantity="other">Partilhar %1$d links</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Adicionar separador selecionado aos marcadores?</item>
+        <item quantity="other">Adicionar %1$d separadores aos marcadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcador adicionado</item>
+        <item quantity="other">%1$d marcadores adicionados</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Adicionar aos marcadores</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Adicionar separador aos marcadores</item>
+        <item quantity="other">Adicionar %1$d separadores aos marcadores</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Os marcadores existentes não serão duplicados.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador?</item>
+        <item quantity="other">Fechar os %1$d separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar outro separador?</item>
+        <item quantity="other">Fechar %1$d outros separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador?</item>
+        <item quantity="other">Fechar %1$d separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tens a certeza de que queres fechar este separador?</item>
+        <item quantity="other">Tens a certeza de que queres fechar todos os separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tens a certeza de que queres fechar este separador?</item>
+        <item quantity="other">Tens a certeza de que queres fechar estes separadores?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar separadores</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar %1$d separadores</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Fechar outros separadores</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Separador fechado</item>
+        <item quantity="other">%1$d separadores fechados</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Separador privado</item>
+        <item quantity="other">%1$d Separadores privados</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adicionar opção de pesquisa privada por voz à barra de endereços. O áudio não é armazenado nem partilhado com ninguém, incluindo o DuckDuckGo.</string>
