@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
@@ -85,9 +86,14 @@ class RealMaliciousSiteProtection @Inject constructor(
         val hashPrefix = hash.substring(0, 8)
 
         try {
-            if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-                timber.d("should not block (no hash) $hashPrefix,  $canonicalUriString")
-                return ConfirmedResult(Safe)
+            maliciousSiteRepository.getFeedForHashPrefix(hashPrefix).let {
+                if (it == null) {
+                    timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+                    return ConfirmedResult(Safe)
+                } else if (it == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
+                    timber.d("should not block (scam protection disabled) $canonicalUri")
+                    return ConfirmedResult(Ignored)
+                }
             }
             maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
                 filterSet.filters.let {
@@ -105,7 +111,8 @@ class RealMaliciousSiteProtection @Inject constructor(
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
                     is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
+                        (match.feed != SCAM || maliciousSiteProtectionRCFeature.scamProtectionEnabled()) &&
+                            Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
@@ -115,7 +122,7 @@ class RealMaliciousSiteProtection @Inject constructor(
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUriString")
+                    is Malicious -> timber.d("should block (matches) $canonicalUriString, result: ${result.feed}")
                     is Safe -> timber.d("should not block (no match) $canonicalUriString")
                     is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
                 }
