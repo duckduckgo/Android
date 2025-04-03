@@ -59,14 +59,12 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SET
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_SERP
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
@@ -203,19 +201,19 @@ class RealDuckPlayer @Inject constructor(
             "play.use" -> {
                 listOf(
                     DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY to Count,
-                    DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY_UNIQUE to Unique(),
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE to Unique(),
                 )
             }
             "play.do_not_use" -> {
                 listOf(
                     DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE to Count,
-                    DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE_UNIQUE to Unique(),
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE to Unique(),
                 )
             }
             "play.do_not_use.dismiss" -> {
                 listOf(
                     DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS to Count,
-                    DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS_UNIQUE to Unique(),
+                    DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE to Unique(),
                 )
             }
             else -> {
@@ -225,7 +223,17 @@ class RealDuckPlayer @Inject constructor(
         }
 
         duckPlayerPixelNames?.forEach { (duckPlayerPixelName, type) ->
-            pixel.fire(duckPlayerPixelName, if (type is Unique) mapOf() else pixelData, type = type)
+            val dataToSend = when {
+                duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE -> mapOf("choice" to pixelName.split(".").last())
+                type is Unique -> emptyMap()
+                else -> pixelData
+            }
+
+            if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE && getUserPreferences().overlayInteracted) {
+                return@forEach
+            }
+            pixel.fire(duckPlayerPixelName, dataToSend, type = type)
+
             if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS) {
                 duckPlayerFeatureRepository.setUserOnboarded()
             }
