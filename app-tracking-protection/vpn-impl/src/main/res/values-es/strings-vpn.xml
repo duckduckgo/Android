@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Vigila los rastreadores bloqueados</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Recibe actualizaciones sobre intentos de rastreo bloqueados en tu cajón de notificaciones.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">¿No puedes usar App Tracking Protection debido a tu VPN? Cámbiate a DuckDuckGo VPN, la única VPN compatible. <annotation type="ppro_upsell_link">Más información</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection desactivada</b>\n¿Tu VPN ha desactivado App Tracking Protection? Usa el botón de arriba para volver a activarla.\n\nHazte con DuckDuckGo VPN: la única VPN que funciona con App Tracking Protection. <annotation type="ppro_upsell_link">Más información</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Lleva la privacidad al siguiente nivel</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo tiene la única VPN que es compatible con App Tracking Protection. Actívala con una suscripción de pago a Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Más información</string>
+
 </resources>
