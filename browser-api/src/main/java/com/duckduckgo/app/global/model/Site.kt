@@ -87,7 +87,7 @@ interface Site {
 }
 
 enum class MaliciousSiteStatus {
-    PHISHING, MALWARE
+    PHISHING, MALWARE, SCAM
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents
