@@ -19,8 +19,6 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
@@ -33,22 +31,23 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.eq
-import javax.inject.Inject
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-
 
 // TODO: currently copied from feature-toggles-impl, but might be a better way to share this (2025-04-02)
 class RealFeatureTogglesInventory @Inject constructor(
@@ -123,14 +122,18 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when multiple experiments enabled, use the first one`() {
-        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(makeExperiment(
-            controlUrl = "controlUrl1",
-            treatmentUrl = "treatmentUrl1"
-        ))
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment(
-            controlUrl = "controlUrl2",
-            treatmentUrl = "treatmentUrl2"
-        ))
+        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
+            makeExperiment(
+                controlUrl = "controlUrl1",
+                treatmentUrl = "treatmentUrl1",
+            ),
+        )
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+            makeExperiment(
+                controlUrl = "controlUrl2",
+                treatmentUrl = "treatmentUrl2",
+            ),
+        )
         checkEndpointIntercept("controlUrl1")
     }
 
@@ -247,7 +250,7 @@ abstract class TriggerTestScope private constructor()
 
 @ContributesRemoteFeature(
     scope = TriggerTestScope::class,
-    featureName = "appTrackerProtection"
+    featureName = "appTrackerProtection",
 )
 interface TestBlockListFeature {
     @DefaultValue(false)

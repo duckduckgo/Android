@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -29,11 +29,11 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
-import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -56,7 +56,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
             ?.isAnnotationPresent(AppTPTdsRequired::class.java) == true
 
         return if (tdsRequired) {
-            logcat { "[AppTP]: Intercepted AppTP TDS Request: ${chain.request()}"}
+            logcat { "[AppTP]: Intercepted AppTP TDS Request: ${chain.request()}" }
             val activeExperiment = runBlocking {
                 inventory.activeAppTpTdsFlag()
             }
@@ -75,7 +75,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
                     else -> config["nextUrl"]
                 } ?: return chain.proceed(request.build())
                 val newURL = "$APPTP_TDS_BASE_URL$path"
-                logcat {"[AppTP]: Rewrote TDS request URL to $newURL" }
+                logcat { "[AppTP]: Rewrote TDS request URL to $newURL" }
                 chain.proceed(request.url(newURL).build()).also { response ->
                     if (!response.isSuccessful) {
                         pixel.appTPBlocklistExperimentDownloadFailure(response.code)
