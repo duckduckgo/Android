@@ -18,15 +18,11 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
-import com.duckduckgo.app.browser.omnibar.TopAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.di.scopes.FragmentScope
-import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 
 @InjectWith(FragmentScope::class)
@@ -50,29 +46,5 @@ class ScrollingOmnibarLayout @JvmOverloads constructor(
         inflate(context, layout, this)
 
         AndroidSupportInjection.inject(this)
-    }
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
-    }
-
-    override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
     }
 }
