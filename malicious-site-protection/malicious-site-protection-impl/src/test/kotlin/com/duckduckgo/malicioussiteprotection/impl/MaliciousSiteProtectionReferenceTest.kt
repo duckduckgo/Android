@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.impl.data.RealMaliciousSiteRepository
@@ -148,8 +149,8 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
         )
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(true)
         whenever(mockMaliciousSiteProtectionRCRepository.isExempted(any())).thenReturn(false)
-        repository.loadFilters()
-        repository.loadHashPrefixes()
+        repository.loadFilters(*enumValues<Feed>())
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         testee = RealMaliciousSiteProtection(
             coroutineRule.testDispatcherProvider,
