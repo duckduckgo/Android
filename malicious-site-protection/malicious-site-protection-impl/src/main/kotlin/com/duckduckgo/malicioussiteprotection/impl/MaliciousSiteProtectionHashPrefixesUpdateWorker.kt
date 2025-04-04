@@ -111,11 +111,12 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler @Inject construct
     }
 
     private fun enqueuePeriodicScamWork() {
-        if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not() || maliciousSiteProtectionFeature.scamProtectionEnabled().not()) {
-            workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG)
-            return
+        with(maliciousSiteProtectionFeature) {
+            if (isFeatureEnabled().not() || canUpdateDatasets().not() || scamProtectionEnabled().not()) {
+                workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG)
+                return
+            }
         }
-
         enqueueWorker(SCAM, tag = MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG)
     }
 
@@ -137,6 +138,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler @Inject construct
 
     companion object {
         private const val MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG = "MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"
-        private const val MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG = "MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG"
+        private const val MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG =
+            "MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG"
     }
 }
