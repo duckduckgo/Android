@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 /** Public interface for the Unprotected Temporary feature */
 interface UnprotectedTemporary {

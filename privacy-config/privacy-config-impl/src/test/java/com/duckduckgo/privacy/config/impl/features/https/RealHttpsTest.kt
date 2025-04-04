@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.https
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import java.util.concurrent.CopyOnWriteArrayList
