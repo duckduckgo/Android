@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.store.features.trackingparameters
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.store.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope

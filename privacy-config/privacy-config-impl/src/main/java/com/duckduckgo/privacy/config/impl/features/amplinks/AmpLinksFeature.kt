@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 data class AmpLinksFeature(
     val state: String,
