@@ -125,7 +125,7 @@ interface PirActionsRunner {
     /**
      * Forcefully stops / aborts a runner if it is running.
      */
-    suspend fun stop()
+    fun stop()
 }
 
 internal class RealPirActionsRunner(
@@ -267,7 +267,7 @@ internal class RealPirActionsRunner(
                 cleanUpRunner()
             }
             // TODO add loading timeout
-            is LoadUrl -> coroutineScope.launch(dispatcherProvider.main()) {
+            is LoadUrl -> withContext(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
 
@@ -799,11 +799,15 @@ internal class RealPirActionsRunner(
         nextCommand(Idle)
         commandsJob.cancel()
         coroutineScope.launch(dispatcherProvider.main()) {
+            detachedWebView?.stopLoading()
+            detachedWebView?.loadUrl("about:blank")
+            detachedWebView?.evaluateJavascript("window.stop();", null)
             detachedWebView?.destroy()
+            logcat { "PIR-RUNNER ($this): Destroyed webview" }
         }
     }
 
-    override suspend fun stop() {
+    override fun stop() {
         logcat { "PIR-RUNNER ($this): Stopping and resetting values" }
         cleanUpRunner()
     }

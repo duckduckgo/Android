@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
@@ -156,6 +157,14 @@ interface PirPixelSender {
         totalTimeInMillis: Long,
         isSuccess: Boolean,
     )
+
+    /**
+     * Sends a pixel when the CPU Usage threshold has been reached while executing
+     * PIR related work.
+     *
+     * @param averageCpuUsagePercent - average CPU usage percent
+     */
+    fun sendCPUUsageAlert(averageCpuUsagePercent: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -288,6 +297,13 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED, params)
     }
 
+    override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {
+        val params = mapOf(
+            PARAM_KEY_CPU_USAGE to averageCpuUsagePercent.toString(),
+        )
+        fire(PIR_INTERNAL_CPU_USAGE, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -306,5 +322,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_TOTAL_BROKER_SUCCESS = "totalBrokerSuccess"
         private const val PARAM_KEY_TOTAL_BROKER_FAILED = "totalBrokerFailed"
         private const val PARAM_KEY_RECORD_ID = "recordId"
+        private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
     }
 }

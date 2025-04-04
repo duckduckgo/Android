@@ -89,6 +89,11 @@ enum class PirPixel(
     PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED(
         baseName = "pir_internal_optout_record_completed",
         type = Count,
+    ),
+
+    PIR_INTERNAL_CPU_USAGE(
+        baseName = "pir_internal_cpu_usage",
+        type = Count,
     ), ;
 
     constructor(
