@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.helper
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject

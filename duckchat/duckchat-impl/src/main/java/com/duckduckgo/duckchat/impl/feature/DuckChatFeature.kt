@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.feature
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,11 +22,16 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "aiChatDownload",
+    featureName = "aiChat",
 )
-
-interface AIChatDownloadFeature {
-
-    @Toggle.DefaultValue(true)
+/**
+ * This is the class that represents the aiChat feature flags
+ */
+interface DuckChatFeature {
+    /**
+     * @return `true` when the remote config has the global "aiChat" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 }

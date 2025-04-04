@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

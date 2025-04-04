@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import kotlinx.coroutines.flow.emptyFlow
