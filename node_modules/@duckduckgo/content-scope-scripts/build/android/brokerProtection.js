@@ -23,10 +23,6 @@
   var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
-  var __export = (target, all) => {
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
-  };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
       for (let key of __getOwnPropNames(from))
@@ -6439,12 +6435,6 @@
   init_define_import_meta_trackerLookup();
 
   // src/features/broker-protection/captcha-services/captcha.service.js
-  var captcha_service_exports = {};
-  __export(captcha_service_exports, {
-    getCaptchaInfo: () => getCaptchaInfo2,
-    getSupportingCodeToInject: () => getSupportingCodeToInject,
-    solveCaptcha: () => solveCaptcha2
-  });
   init_define_import_meta_trackerLookup();
 
   // src/features/broker-protection/utils/url.js
@@ -6754,11 +6744,6 @@
   }
 
   // src/features/broker-protection/actions/captcha-deprecated.js
-  var captcha_deprecated_exports = {};
-  __export(captcha_deprecated_exports, {
-    getCaptchaInfo: () => getCaptchaInfo,
-    solveCaptcha: () => solveCaptcha
-  });
   init_define_import_meta_trackerLookup();
   function getCaptchaInfo(action, root = document) {
     const pageUrl = window.location.href;
@@ -6965,45 +6950,24 @@
     return new SuccessResponse({ actionID, actionType, response });
   }
 
-  // src/features/broker-protection/actions/actions.js
-  function resolveActionHandlers({ useEnhancedCaptchaSystem }) {
-    return {
-      extract,
-      fillForm,
-      click,
-      expectation,
-      ...useEnhancedCaptchaSystem ? {
-        navigate,
-        ...captcha_service_exports
-      } : {
-        navigate: buildUrl,
-        ...captcha_deprecated_exports
-      }
-    };
-  }
-
   // src/features/broker-protection/execute.js
-  async function execute(action, inputData, root = document, options = {}) {
+  async function execute(action, inputData, root = document) {
     try {
-      const { useEnhancedCaptchaSystem = false } = options;
-      const { navigate: navigate2, extract: extract2, click: click2, expectation: expectation2, fillForm: fillForm2, getCaptchaInfo: getCaptchaInfo3, solveCaptcha: solveCaptcha3 } = resolveActionHandlers({
-        useEnhancedCaptchaSystem
-      });
       switch (action.actionType) {
         case "navigate":
-          return navigate2(action, data(action, inputData, "userProfile"));
+          return navigate(action, data(action, inputData, "userProfile"));
         case "extract":
-          return await extract2(action, data(action, inputData, "userProfile"), root);
+          return await extract(action, data(action, inputData, "userProfile"), root);
         case "click":
-          return click2(action, data(action, inputData, "userProfile"), root);
+          return click(action, data(action, inputData, "userProfile"), root);
         case "expectation":
-          return expectation2(action, root);
+          return expectation(action, root);
         case "fillForm":
-          return fillForm2(action, data(action, inputData, "extractedProfile"), root);
+          return fillForm(action, data(action, inputData, "extractedProfile"), root);
         case "getCaptchaInfo":
-          return getCaptchaInfo3(action, root);
+          return getCaptchaInfo2(action, root);
         case "solveCaptcha":
-          return solveCaptcha3(action, data(action, inputData, "token"), root);
+          return solveCaptcha2(action, data(action, inputData, "token"), root);
         default: {
           return new ErrorResponse({
             actionID: action.id,
@@ -7091,8 +7055,7 @@
      */
     async exec(action, data2) {
       const retryConfig = this.retryConfigFor(action);
-      const options = { useEnhancedCaptchaSystem: this.getFeatureSettingEnabled("useEnhancedCaptchaSystem") };
-      const { result, exceptions } = await retry(() => execute(action, data2, document, options), retryConfig);
+      const { result, exceptions } = await retry(() => execute(action, data2, document), retryConfig);
       if (result) {
         if ("success" in result && Array.isArray(result.success.next)) {
           const nextResults = [];
