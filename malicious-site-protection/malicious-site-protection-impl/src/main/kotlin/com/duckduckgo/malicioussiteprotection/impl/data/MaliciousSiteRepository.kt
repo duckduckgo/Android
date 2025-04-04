@@ -69,8 +69,8 @@ interface MaliciousSiteRepository {
      */
     suspend fun getFilters(hash: String): FilterSet?
     suspend fun matches(hashPrefix: String): MatchesResult
-    suspend fun loadFilters(): Result<Unit>
-    suspend fun loadHashPrefixes(): Result<Unit>
+    suspend fun loadFilters(vararg feeds: Feed): Result<Unit>
+    suspend fun loadHashPrefixes(vararg feeds: Feed): Result<Unit>
 }
 
 private const val MATCHES_ENDPOINT_TIMEOUT = 5000L
@@ -153,34 +153,38 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 
-    override suspend fun loadFilters(): Result<Unit> {
-        return loadDataOfType(FILTER_SET) { latestRevision, networkRevision, feed -> loadFilters(latestRevision, networkRevision, feed) }
+    override suspend fun loadFilters(vararg feeds: Feed): Result<Unit> {
+        return loadDataOfType(FILTER_SET) {
+                latestRevision, networkRevision ->
+            feeds.forEach { feed ->
+                loadFilters(latestRevision, networkRevision, feed)
+            }
+        }
     }
 
-    override suspend fun loadHashPrefixes(): Result<Unit> {
-        return loadDataOfType(HASH_PREFIXES) { latestRevision, networkRevision, feed -> loadHashPrefixes(latestRevision, networkRevision, feed) }
+    override suspend fun loadHashPrefixes(vararg feeds: Feed): Result<Unit> {
+        return loadDataOfType(HASH_PREFIXES) {
+                latestRevision, networkRevision ->
+            feeds.forEach { feed ->
+                loadHashPrefixes(latestRevision, networkRevision, feed)
+            }
+        }
     }
 
     private suspend fun loadDataOfType(
         type: Type,
-        loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int, feed: Feed) -> Unit,
+        loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int) -> Unit,
     ): Result<Unit> {
         return withContext(dispatcherProvider.io()) {
             val networkRevision = maliciousSiteService.getRevision().revision
-
             val localRevisions = getLocalRevisions(type)
 
-            val result = Feed.entries.filter {
-                it != SCAM || maliciousSiteProtectionFeature.scamProtectionEnabled()
-            }.fold(Result.success(Unit)) { acc, feed ->
-                try {
-                    loadData(localRevisions, networkRevision, feed)
-                    acc
-                } catch (e: Exception) {
-                    Result.failure(e)
-                }
+            try {
+                loadData(localRevisions, networkRevision)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-            result
         }
     }
 
