@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.service
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.autofill.impl.service.store.AutofillServiceExceptionsStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
@@ -25,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "autofillService",
-    exceptionsStore = AutofillServiceExceptionsStore::class,
 )
 interface AutofillServiceFeature {
 
