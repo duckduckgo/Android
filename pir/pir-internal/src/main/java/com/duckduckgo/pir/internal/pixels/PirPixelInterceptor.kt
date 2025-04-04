@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.pixels
 
 import android.content.Context
 import android.os.PowerManager
+import android.util.Base64
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -34,6 +35,7 @@ import org.json.JSONObject
 class PirPixelInterceptor @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val networkInfoProvider: NetworkInfoProvider,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
@@ -47,7 +49,10 @@ class PirPixelInterceptor @Inject constructor(
                         .put("os", appBuildConfig.sdkInt)
                         .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
                         .put("man", appBuildConfig.manufacturer)
-                        .toString(),
+                        .put("networkInfo", networkInfoProvider.getCurrentNetworkInfo())
+                        .toString().toByteArray().run {
+                            Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
+                        },
                 )
                 .build()
         } else {
@@ -70,7 +75,7 @@ class PirPixelInterceptor @Inject constructor(
 
     companion object {
         private const val KEY_METADATA = "metadata"
-        private const val PIXEL_PREFIX = "m_pir-internal"
+        private const val PIXEL_PREFIX = "pir_internal"
         private val EXCEPTIONS = emptyList<String>()
     }
 }
