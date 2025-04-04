@@ -26,7 +26,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.SCHEDULED
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import logcat.logcat
 
@@ -42,7 +41,7 @@ class PirScheduledScanRemoteWorker(
     lateinit var dispatcherProvider: DispatcherProvider
 
     private val serviceJob = SupervisorJob()
-    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
+    private val serviceScope = CoroutineScope(dispatcherProvider.io() + serviceJob)
 
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
