@@ -44,7 +44,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -52,10 +54,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -85,6 +89,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val appPersonalityFeature: AppPersonalityFeature,
+    private val userStageStore: UserStageStore,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -132,6 +139,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
         val isNavigationBarEnabled: Boolean = false,
+        val experimentalIconsEnabled: Boolean = false,
+        val trackersBlocked: Int = 0,
+        val previouslyTrackersBlocked: Int = 0,
     ) {
         fun shouldUpdateOmnibarText(): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
@@ -142,6 +152,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         data object CancelAnimations : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
+        data object StartExperimentVariant1Animation : Command()
+        data class StartExperimentVariant2To5Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
     }
 
@@ -493,6 +505,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         when (stateChange) {
             is OmnibarStateChange -> onExternalOmnibarStateChanged(stateChange.omnibarViewState)
             is StateChange.LoadingStateChange -> onExternalLoadingStateChanged(stateChange.loadingViewState)
+            is StateChange.PrivacyStateChange -> onExternalPrivacyStateChanged(stateChange.privacyShieldViewState)
         }
     }
 
@@ -542,6 +555,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasQueryChanged = false,
                     urlLoaded = loadingState.url,
                 ),
+            )
+        }
+    }
+
+    private fun onExternalPrivacyStateChanged(privacyState: PrivacyShieldViewState) {
+        Timber.d("Omnibar: onExternalPrivacyStateChanged $privacyState")
+        _viewState.update {
+            it.copy(
+                privacyShield = privacyState.privacyShield,
+                trackersBlocked = privacyState.trackersBlocked,
+                previouslyTrackersBlocked = privacyState.previousTrackesBlocked,
             )
         }
     }
@@ -600,7 +624,21 @@ class OmnibarLayoutViewModel @Inject constructor(
                             )
                         }
                         viewModelScope.launch {
-                            command.send(Command.StartTrackersAnimation(decoration.entities))
+                            when {
+                                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled() -> {
+                                    command.send(Command.StartExperimentVariant1Animation)
+                                }
+
+                                appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
+                                    command.send(
+                                        Command.StartExperimentVariant2To5Animation(decoration.entities),
+                                    )
+                                }
+
+                                else -> {
+                                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                                }
+                            }
                         }
                     }
                 }

@@ -103,6 +103,8 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
+import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -142,8 +144,11 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -233,6 +238,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -536,6 +542,15 @@ class BrowserTabFragment :
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
+    @Inject
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
+
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
+
+    @Inject
+    lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -651,7 +666,21 @@ class BrowserTabFragment :
         override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
-            viewModel.onAutoConsentPopUpHandled(isCosmetic)
+            launch {
+                context?.let {
+                    if (appPersonalityFeature.self().isEnabled() &&
+                        !appPersonalityFeature.variant1().isEnabled() &&
+                        viewModel.trackersCount().isNotEmpty()
+                    ) {
+                        if (isCosmetic) {
+                            delay(COOKIES_ANIMATION_DELAY)
+                        }
+                        omnibar.enqueueCookiesAnimation(isCosmetic)
+                    } else {
+                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
+                    }
+                }
+            }
         }
 
         override fun onResultReceived(
@@ -785,6 +814,82 @@ class BrowserTabFragment :
 
     private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
 
+    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>, ignoreLogos: Boolean) {
+        experimentTrackersAnimationHelper.startTrackersBurstAnimation(
+            context = requireContext(),
+            trackersBurstAnimationView = binding.trackersBurstAnimationView,
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.delightfulOmnibar.omnibarTextInput
+            } else {
+                binding.delightfulOmnibarBottom.omnibarTextInput
+            },
+            omnibarPosition = omnibar.omnibarPosition,
+            minibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.delightfulOmnibar.findViewById(R.id.minibar)
+            } else {
+                binding.delightfulOmnibarBottom.findViewById(R.id.minibar)
+            },
+            logos = logos,
+            ignoreLogos = ignoreLogos,
+        )
+    }
+
+    private fun showExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.delightfulOmnibar.omnibarTextInput
+            } else {
+                binding.delightfulOmnibarBottom.omnibarTextInput
+            },
+        )
+    }
+
+    private fun showExperimentV2ShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar.omnibarTextInput
+            } else {
+                binding.newOmnibarBottom.omnibarTextInput
+            },
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -846,7 +951,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, getOmnibarType(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -900,6 +1005,21 @@ class BrowserTabFragment :
             viewModel.deleteTabPreview(tabId)
         } else {
             generateWebViewPreviewImage()
+        }
+    }
+
+    private fun getOmnibarType(): OmnibarType {
+        if (appPersonalityFeature.self().isEnabled()) {
+            if (appPersonalityFeature.variant3().isEnabled() ||
+                appPersonalityFeature.variant4().isEnabled() ||
+                appPersonalityFeature.variant5().isEnabled()
+            ) {
+                return OmnibarType.DELIGHTFUL
+            } else {
+                return OmnibarType.SCROLLING
+            }
+        } else {
+            return visualDesignExperimentDataStore.getOmnibarType()
         }
     }
 
@@ -1194,7 +1314,13 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = omnibar.shieldIcon,
+            anchor = if (appPersonalityFeature.self().isEnabled() &&
+                !appPersonalityFeature.variant1().isEnabled()
+            ) {
+                omnibar.shieldIconExperiment
+            } else {
+                omnibar.shieldIcon
+            },
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1229,8 +1355,9 @@ class BrowserTabFragment :
         super.onResume()
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
+        val hasOmnibarTypeChanged = omnibar.omnibarType != getOmnibarType() // visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
+            viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
@@ -1258,6 +1385,8 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
+        experimentTrackersCountAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -1970,6 +2099,9 @@ class BrowserTabFragment :
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
+            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos, it.ignoreLogos)
+            is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
+            is Command.StartExperimentV2ShieldPopAnimation -> showExperimentV2ShieldPopAnimation()
             else -> {
                 // NO OP
             }
@@ -2657,6 +2789,10 @@ class BrowserTabFragment :
                         state.hasFocus,
                         true,
                     )
+                }
+
+                override fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
+                    viewModel.onAnimationFinished(logos, hasKnownLogos)
                 }
             },
         )
@@ -3844,6 +3980,7 @@ class BrowserTabFragment :
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
                     omnibar.setPrivacyShield(viewState.privacyShield)
+                    omnibar.renderPrivacyViewState(viewState)
                 }
             }
         }
