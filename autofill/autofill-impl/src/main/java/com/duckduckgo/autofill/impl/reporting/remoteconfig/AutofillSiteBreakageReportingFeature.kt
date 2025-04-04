@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     boundType = AutofillSiteBreakageReportingFeature::class,
     featureName = "autofillBreakageReporter",
     settingsStore = AutofillSiteBreakageReportingRemoteSettingsPersister::class,
-    exceptionsStore = AutofillSiteBreakageReportingExceptionsPersister::class,
 )
 /**
  * This is the class that represents the feature flag for offering to report Autofill breakages
