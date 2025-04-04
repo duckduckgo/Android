@@ -30,8 +30,8 @@ import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.db.PirScanLog
-import com.duckduckgo.pir.internal.store.db.ScanEventType
+import com.duckduckgo.pir.internal.store.db.EventType
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
@@ -121,7 +121,7 @@ class RealPirScan @Inject constructor(
                 stop()
                 runners.clear()
             }
-            repository.deleteAllResults()
+            repository.deleteAllScanResults()
             repository.getUserProfiles().also {
                 if (it.isNotEmpty()) {
                     // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
@@ -217,17 +217,17 @@ class RealPirScan @Inject constructor(
         if (runType == RunType.MANUAL) {
             pixelSender.reportManualScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_STARTED,
+                    eventType = EventType.MANUAL_SCAN_STARTED,
                 ),
             )
         } else {
             pixelSender.reportScheduledScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_STARTED,
+                    eventType = EventType.SCHEDULED_SCAN_STARTED,
                 ),
             )
         }
@@ -246,9 +246,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_COMPLETED,
+                    eventType = EventType.MANUAL_SCAN_COMPLETED,
                 ),
             )
         } else {
@@ -259,9 +259,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_COMPLETED,
+                    eventType = EventType.SCHEDULED_SCAN_COMPLETED,
                 ),
             )
         }

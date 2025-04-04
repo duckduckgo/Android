@@ -33,7 +33,7 @@ import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
-import com.duckduckgo.pir.internal.store.db.PirScanLog
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.duckduckgo.pir.internal.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
@@ -58,7 +58,7 @@ import com.squareup.moshi.Types
         ScanErrorResult::class,
         ExtractProfileResult::class,
         UserProfile::class,
-        PirScanLog::class,
+        PirEventLog::class,
         PirBrokerScanLog::class,
         ScanCompletedBroker::class,
         OptOutCompletedBroker::class,

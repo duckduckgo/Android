@@ -101,6 +101,7 @@ interface PirRunStateHandler {
             val extractedProfile: ExtractedProfile,
             val startTimeInMillis: Long,
             val endTimeInMillis: Long,
+            val isSubmitSuccess: Boolean,
         ) : PirRunState(brokerName)
 
         data class BrokerOptOutActionSucceeded(
@@ -252,6 +253,7 @@ class RealPirRunStateHandler @Inject constructor(
             extractedProfile = state.extractedProfile,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.endTimeInMillis,
+            isSubmitSuccess = state.isSubmitSuccess,
         )
     }
 

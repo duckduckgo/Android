@@ -24,20 +24,20 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScanLogDao {
-    @Query("SELECT * FROM pir_scan_log ORDER BY eventTimeInMillis")
-    fun getAllScanEventsFlow(): Flow<List<PirScanLog>>
+    @Query("SELECT * FROM pir_events_log ORDER BY eventTimeInMillis")
+    fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
 
     @Query("SELECT * FROM pir_broker_scan_log ORDER BY eventTimeInMillis")
     fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertScanEvent(pirScanLog: PirScanLog)
+    fun insertEventLog(pirScanLog: PirEventLog)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBrokerScanEvent(pirBrokerScanLog: PirBrokerScanLog)
 
-    @Query("DELETE from pir_scan_log")
-    fun deleteAllScanEvents()
+    @Query("DELETE from pir_events_log")
+    fun deleteAllEventLogs()
 
     @Query("DELETE from pir_broker_scan_log")
     fun deleteAllBrokerScanEvents()

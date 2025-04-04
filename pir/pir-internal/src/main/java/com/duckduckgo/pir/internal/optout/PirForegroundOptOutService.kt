@@ -78,7 +78,14 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
         synchronized(this) {
             launch(serviceDispatcher) {
                 async {
-                    val result = pirOptOut.execute(listOf("Verecor"), this@PirForegroundOptOutService)
+                    val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
+
+                    val result = if (!brokers.isNullOrEmpty()) {
+                        pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService)
+                    } else {
+                        pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService)
+                    }
+
                     if (result.isSuccess) {
                         notificationManagerCompat.checkPermissionAndNotify(
                             applicationContext,
@@ -118,5 +125,9 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(pendingIntent)
             .build()
+    }
+
+    companion object {
+        internal const val EXTRA_BROKER_TO_OPT_OUT = "EXTRA_BROKER_TO_OPT_OUT"
     }
 }

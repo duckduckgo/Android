@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "d0d73549ba4b0b04e71f170b01f787e4",
+    "identityHash": "a82b3c3fcdfd42d3736c96fd4b979451",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -443,7 +443,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "pir_scan_log",
+        "tableName": "pir_events_log",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventTimeInMillis` INTEGER NOT NULL, `eventType` TEXT NOT NULL, PRIMARY KEY(`eventTimeInMillis`))",
         "fields": [
           {
@@ -534,7 +534,7 @@
       },
       {
         "tableName": "pir_opt_out_complete_brokers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `extractedProfile` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `extractedProfile` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSubmitSuccess` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -563,6 +563,12 @@
           {
             "fieldPath": "endTimeInMillis",
             "columnName": "endTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSubmitSuccess",
+            "columnName": "isSubmitSuccess",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -636,7 +642,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd0d73549ba4b0b04e71f170b01f787e4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a82b3c3fcdfd42d3736c96fd4b979451')"
     ]
   }
 }
