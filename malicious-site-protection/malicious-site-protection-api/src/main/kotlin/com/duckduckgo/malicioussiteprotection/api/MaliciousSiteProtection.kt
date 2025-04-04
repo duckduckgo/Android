@@ -34,6 +34,17 @@ interface MaliciousSiteProtection {
         PHISHING,
         MALWARE,
         SCAM,
+        ;
+
+        companion object {
+            fun fromString(name: String): Feed? {
+                return try {
+                    valueOf(name)
+                } catch (e: IllegalArgumentException) {
+                    null
+                }
+            }
+        }
     }
 
     sealed class IsMaliciousResult {
