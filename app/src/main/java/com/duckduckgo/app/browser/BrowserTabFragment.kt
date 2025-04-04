@@ -1177,7 +1177,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
                 if (anchorToNavigationBar) {
-                    val anchorView = binding.navigationBar.popupMenuAnchor
+                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
                     popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
                 } else {
                     popupMenu.show(binding.rootView, omnibar.toolbar)
@@ -2756,12 +2756,8 @@ class BrowserTabFragment :
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
-                omnibar.onScrollViewMotionEvent(scrollableView = webView, motionEvent = event)
                 false
             }
-
-            it.setOnScrollChangeListener(omnibar)
-            omnibar.resetScrollPosition()
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable

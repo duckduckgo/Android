@@ -16,14 +16,16 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/preferredNavigationBarColor"
     android:gravity="center"
     android:orientation="horizontal"
+    android:paddingHorizontal="14dp"
     android:paddingTop="@dimen/keyline_3"
     android:paddingBottom="@dimen/keyline_3"
-    android:paddingHorizontal="14dp">
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout
         android:id="@+id/backArrowButton"
@@ -67,8 +69,8 @@
         android:id="@+id/fireButton"
         android:layout_width="80dp"
         android:layout_height="@dimen/bottomNavIconContainer"
-        android:foreground="@drawable/bottom_nav_fire_button_foreground"
-        android:background="@drawable/bottom_nav_fire_button_background">
+        android:background="@drawable/bottom_nav_fire_button_background"
+        android:foreground="@drawable/bottom_nav_fire_button_foreground">
 
         <ImageView
             android:id="@+id/fireIconImageView"
@@ -113,8 +115,8 @@
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            app:tint="?daxColorNavigationBarIconEnabled"
-            android:src="@drawable/ic_menu_vertical_24" />
+            android:src="@drawable/ic_menu_vertical_24"
+            app:tint="?daxColorNavigationBarIconEnabled" />
     </FrameLayout>
 
 </LinearLayout>
