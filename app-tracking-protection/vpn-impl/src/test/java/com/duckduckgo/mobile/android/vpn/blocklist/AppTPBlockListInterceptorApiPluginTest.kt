@@ -123,82 +123,27 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when multiple experiments enabled, use the first one`() {
-        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 0),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 1),
-                ),
-            ),
-        )
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 0),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 1),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-
-        assertEquals(getUrl("treatmentUrl"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(makeExperiment(
+            controlUrl = "controlUrl1",
+            treatmentUrl = "treatmentUrl1"
+        ))
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment(
+            controlUrl = "controlUrl2",
+            treatmentUrl = "treatmentUrl2"
+        ))
+        checkEndpointIntercept("controlUrl1")
     }
 
     @Test
     fun `when cohort is treatment use treatment URL`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 0),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 1),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-
-        assertEquals(getUrl("anotherTreatmentUrl"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment(useTreatment = true))
+        checkEndpointIntercept("treatmentUrl")
     }
 
     @Test
     fun `when cohort is control use control URL`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 1),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-
-        assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        checkEndpointIntercept("controlUrl")
     }
 
     @Test
@@ -212,107 +157,78 @@ class AppTPBlockListInterceptorApiPluginTest {
                 ),
             ),
         )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-
-        assertEquals(getUrl("nextUrl"), result.request.url.toString())
+        checkEndpointIntercept("nextUrl")
     }
 
     @Test
     fun `when no experiments enabled, use default path`() {
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-        assertEquals(getUrl(APPTP_TDS_PATH), result.request.url.toString())
+        checkEndpointIntercept(APPTP_TDS_PATH)
     }
 
     @Test
     fun `when feature name doesn't match prefix, it is ignored`() {
-        testBlockListFeature.nonMatchingFeatureName().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 1),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
-
-        assertEquals(getUrl(APPTP_TDS_PATH), result.request.url.toString())
+        testBlockListFeature.nonMatchingFeatureName().setRawStoredState(makeExperiment())
+        checkEndpointIntercept(APPTP_TDS_PATH)
     }
 
     @Test
     fun `when annotation not present, even if experiment present, ignore and proceed as normal`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(nextUrl = "nextUrl"),
-                ),
-            ),
-        )
-        val nonAnnotatedMethod = FakeApiService::class.java.getMethod("endpointNotRequiringTds")
-        val url = getUrl("test.json")
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = nonAnnotatedMethod))
-        assertEquals(getUrl("test.json"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        // even though there's an experiment, we expect the request to not be altered,
+        // as the requesting method doesn't have the annotation
+        checkEndpointIntercept(APPTP_TDS_PATH, requestMethodName = "endpointNotRequiringTds")
     }
 
     @Test
     fun `when experiment request succeeds, doesn't send failure pixel`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 1),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod, expectedResponseCode = 200))
-
-        assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        checkEndpointIntercept("controlUrl", expectedResponseCode = 200)
         verifyNoInteractions(pixel)
     }
 
     @Test
     fun `when experiment request fails, sends failure pixel`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                settings = configAdapter.toJson(
-                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
-                ),
-                cohorts = listOf(
-                    State.Cohort(name = CONTROL.cohortName, weight = 1),
-                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
-                ),
-            ),
-        )
-        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
-        val url = getUrl(APPTP_TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod, expectedResponseCode = 400))
-
-        assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
         verify(pixel).fire(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName, mapOf("code" to "400"))
     }
 
     private fun getUrl(path: String): String = "$APPTP_TDS_BASE_URL$path"
+
+    /**
+     * Check that the usual TDS endpoint request is rewritten to `expectedURL`.
+     *
+     * @param requestMethodName - name of the method generating the request. By default this is a method that is annotated (and thus would be intercepted).
+     */
+    private fun checkEndpointIntercept(expectedURL: String, expectedResponseCode: Int? = null, requestMethodName: String = "endpointRequiringTds") {
+        val method = FakeApiService::class.java.getMethod(requestMethodName)
+        val url = getUrl(APPTP_TDS_PATH)
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = method, expectedResponseCode = expectedResponseCode))
+        assertEquals(getUrl(expectedURL), result.request.url.toString())
+    }
+
+    /**
+     * Configuration for a valid experiment.
+     *
+     * @param useTreatment - weight the treatment as 1 instead of control.
+     */
+    private fun makeExperiment(
+        useTreatment: Boolean = false,
+        treatmentUrl: String = "treatmentUrl",
+        controlUrl: String = "controlUrl",
+    ): State {
+        return State(
+            remoteEnableState = true,
+            enable = true,
+            settings = configAdapter.toJson(
+                Config(treatmentUrl = treatmentUrl, controlUrl = controlUrl),
+            ),
+            cohorts = listOf(
+                State.Cohort(name = CONTROL.cohortName, weight = if (useTreatment) 0 else 1),
+                State.Cohort(name = TREATMENT.cohortName, weight = if (useTreatment) 1 else 0),
+            ),
+        )
+    }
 }
 
 class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureTogglesInventory {
