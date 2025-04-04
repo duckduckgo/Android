@@ -42,10 +42,6 @@ import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
-import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as EmailInContextMigrations
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
-import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -105,15 +101,6 @@ class AutofillModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideEmailInContextDatabase(context: Context): EmailProtectionInContextDatabase {
-        return Room.databaseBuilder(context, EmailProtectionInContextDatabase::class.java, "emailInContext.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*EmailInContextMigrations)
-            .build()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
     fun provideAutofillRepository(
         database: AutofillDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -121,17 +108,6 @@ class AutofillModule {
         @IsMainProcess isMainProcess: Boolean,
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideEmailInContextRepository(
-        database: EmailProtectionInContextDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): EmailProtectionInContextFeatureRepository {
-        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @Provides
