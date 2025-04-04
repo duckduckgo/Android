@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.blocklist.BlockList.Cohorts.CONTROL
-import com.duckduckgo.mobile.android.vpn.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
