@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.reporting
 
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
+import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding

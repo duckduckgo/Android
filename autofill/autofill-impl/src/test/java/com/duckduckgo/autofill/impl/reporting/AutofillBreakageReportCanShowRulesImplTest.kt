@@ -3,9 +3,9 @@ package com.duckduckgo.autofill.impl.reporting
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
+import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
