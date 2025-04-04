@@ -21,7 +21,6 @@ import android.view.autofill.AutofillManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -42,15 +41,6 @@ class AutofillServiceModule {
     @AutofillServiceDataStore
     fun providesAutofillServiceStore(context: Context): DataStore<Preferences> {
         return context.autofillServiceStore
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAutofillServiceDatabase(context: Context): AutofillServiceDatabase {
-        return Room.databaseBuilder(context, AutofillServiceDatabase::class.java, "autofillService.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
     }
 
     @Provides
