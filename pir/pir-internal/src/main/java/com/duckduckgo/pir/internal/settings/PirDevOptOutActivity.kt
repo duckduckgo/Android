@@ -134,7 +134,11 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { optOuts ->
                 optOutAdapter.clear()
-                optOutAdapter.addAll(optOuts)
+                optOutAdapter.addAll(
+                    optOuts.map {
+                        "${it.value} - ${it.key}"
+                    },
+                )
             }
             .launchIn(lifecycleScope)
     }

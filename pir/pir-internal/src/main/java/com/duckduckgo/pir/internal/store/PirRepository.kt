@@ -138,7 +138,7 @@ interface PirRepository {
 
     fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
 
-    fun getAllSuccessfullySubmittedOptOutFlow(): Flow<List<String>>
+    fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>>
 
     suspend fun saveScanCompletedBroker(
         brokerName: String,
@@ -519,13 +519,13 @@ class RealPirRepository(
         return optOutResultsDao.getOptOutCompletedBrokerFlow().map { it.size }
     }
 
-    override fun getAllSuccessfullySubmittedOptOutFlow(): Flow<List<String>> {
+    override fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>> {
         return optOutResultsDao.getOptOutCompletedBrokerFlow().map {
             it.filter {
                 it.isSubmitSuccess
             }.map {
-                it.brokerName
-            }.distinct()
+                (extractedProfileAdapter.fromJson(it.extractedProfile)?.profileUrl?.identifier ?: "Unknown") to it.brokerName
+            }.distinct().toMap()
         }
     }
 
