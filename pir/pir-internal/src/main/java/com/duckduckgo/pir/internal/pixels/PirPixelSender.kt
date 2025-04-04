@@ -18,10 +18,15 @@ package com.duckduckgo.pir.internal.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_BROKER_STARTED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
@@ -29,6 +34,7 @@ import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_S
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.logcat
 
 interface PirPixelSender {
     // Manual Scan Pixels
@@ -105,6 +111,60 @@ interface PirPixelSender {
         totalTimeInMillis: Long,
         isSuccess: Boolean,
     )
+
+    /**
+     * Tells us when the opt-out process is started for a broker
+     *
+     * @param brokerName for which the opt-out is started for
+     */
+    fun reportBrokerOptOutStarted(
+        brokerName: String,
+    )
+
+    /**
+     * Tells us when the opt-out process is completed for a broker. This means that all records for the broker has been completed.
+     *
+     * @param brokerName for which the opt-out is started for
+     * @param totalTimeInMillis How long it took to complete the optout for the broker.
+     */
+    fun reportBrokerOptOutCompleted(
+        brokerName: String,
+        totalTimeInMillis: Long,
+    )
+
+    /**
+     * Tells us whenever an opt-out is started for a specific record on a broker
+     *
+     * @param brokerName for which the opt-out is started for
+     * @param recordId for which the opt-out is started for
+     */
+    fun reportRecordOptOutStarted(
+        brokerName: String,
+        recordId: String,
+    )
+
+    /**
+     * Tells us whenever an opt-out is completed - could mean that the opt-out for the record was successful or failed.
+     *
+     * @param brokerName for which the opt-out is for
+     * @param recordId for which the opt-out is started for
+     * @param totalTimeInMillis How long it took to complete the opt-out for the record.
+     * @param isSuccess - if result was not an error, it is a success.
+     */
+    fun reportRecordOptOutCompleted(
+        brokerName: String,
+        recordId: String,
+        totalTimeInMillis: Long,
+        isSuccess: Boolean,
+    )
+
+    /**
+     * Sends a pixel when the CPU Usage threshold has been reached while executing
+     * PIR related work.
+     *
+     * @param averageCpuUsagePercent - average CPU usage percent
+     */
+    fun sendCPUUsageAlert(averageCpuUsagePercent: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -122,17 +182,17 @@ class RealPirPixelSender @Inject constructor(
         totalBrokerFailed: Int,
     ) {
         val params = mapOf(
-            "totalTimeInMillis" to totalTimeInMillis.toString(),
-            "totalParallelWebViews" to totalParallelWebViews.toString(),
-            "totalBrokerSuccess" to totalBrokerSuccess.toString(),
-            "totalBrokerFailed" to totalBrokerFailed.toString(),
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_WEBVIEW_COUNT to totalParallelWebViews.toString(),
+            PARAM_KEY_TOTAL_BROKER_SUCCESS to totalBrokerSuccess.toString(),
+            PARAM_KEY_TOTAL_BROKER_FAILED to totalBrokerFailed.toString(),
         )
         fire(PIR_INTERNAL_MANUAL_SCAN_COMPLETED, params)
     }
 
     override fun reportManualScanBrokerStarted(brokerName: String) {
         val params = mapOf(
-            "brokerName" to brokerName,
+            PARAM_KEY_BROKER_NAME to brokerName,
         )
         fire(PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED, params)
     }
@@ -143,9 +203,9 @@ class RealPirPixelSender @Inject constructor(
         isSuccess: Boolean,
     ) {
         val params = mapOf(
-            "brokerName" to brokerName,
-            "totalTimeInMillis" to totalTimeInMillis.toString(),
-            "isSuccess" to isSuccess.toString(),
+            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
         fire(PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED, params)
     }
@@ -165,10 +225,10 @@ class RealPirPixelSender @Inject constructor(
         totalBrokerFailed: Int,
     ) {
         val params = mapOf(
-            "totalTimeInMillis" to totalTimeInMillis.toString(),
-            "totalParallelWebViews" to totalParallelWebViews.toString(),
-            "totalBrokerSuccess" to totalBrokerSuccess.toString(),
-            "totalBrokerFailed" to totalBrokerFailed.toString(),
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_WEBVIEW_COUNT to totalParallelWebViews.toString(),
+            PARAM_KEY_TOTAL_BROKER_SUCCESS to totalBrokerSuccess.toString(),
+            PARAM_KEY_TOTAL_BROKER_FAILED to totalBrokerFailed.toString(),
         )
         fire(PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED, params)
     }
@@ -179,18 +239,69 @@ class RealPirPixelSender @Inject constructor(
         isSuccess: Boolean,
     ) {
         val params = mapOf(
-            "brokerName" to brokerName,
-            "totalTimeInMillis" to totalTimeInMillis.toString(),
-            "isSuccess" to isSuccess.toString(),
+            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
         fire(PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED, params)
     }
 
     override fun reportScheduledScanBrokerStarted(brokerName: String) {
         val params = mapOf(
-            "brokerName" to brokerName,
+            PARAM_KEY_BROKER_NAME to brokerName,
         )
         fire(PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED, params)
+    }
+
+    override fun reportRecordOptOutStarted(
+        brokerName: String,
+        recordId: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_RECORD_ID to recordId,
+        )
+        fire(PIR_INTERNAL_OPT_OUT_RECORD_STARTED, params)
+    }
+
+    override fun reportRecordOptOutCompleted(
+        brokerName: String,
+        recordId: String,
+        totalTimeInMillis: Long,
+        isSuccess: Boolean,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_RECORD_ID to recordId,
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_SUCCESS to isSuccess.toString(),
+        )
+        fire(PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED, params)
+    }
+
+    override fun reportBrokerOptOutStarted(brokerName: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER_NAME to brokerName,
+        )
+        fire(PIR_INTERNAL_OPT_OUT_BROKER_STARTED, params)
+    }
+
+    override fun reportBrokerOptOutCompleted(
+        brokerName: String,
+        totalTimeInMillis: Long,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+        )
+        fire(PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED, params)
+    }
+
+    override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {
+        val params = mapOf(
+            PARAM_KEY_CPU_USAGE to averageCpuUsagePercent.toString(),
+        )
+        fire(PIR_INTERNAL_CPU_USAGE, params)
     }
 
     private fun fire(
@@ -198,7 +309,19 @@ class RealPirPixelSender @Inject constructor(
         params: Map<String, String> = emptyMap(),
     ) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
+            logcat { "PIR-LOGGING: $pixelName params: $params" }
             pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
         }
+    }
+
+    companion object {
+        private const val PARAM_KEY_BROKER_NAME = "brokerName"
+        private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
+        private const val PARAM_KEY_SUCCESS = "isSuccess"
+        private const val PARAM_KEY_WEBVIEW_COUNT = "totalParallelWebViews"
+        private const val PARAM_KEY_TOTAL_BROKER_SUCCESS = "totalBrokerSuccess"
+        private const val PARAM_KEY_TOTAL_BROKER_FAILED = "totalBrokerFailed"
+        private const val PARAM_KEY_RECORD_ID = "recordId"
+        private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
     }
 }

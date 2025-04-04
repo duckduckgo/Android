@@ -79,7 +79,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         synchronized(this) {
             launch(serviceDispatcher) {
                 async {
-                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService, MANUAL)
+                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService, MANUAL, this)
                     if (result.isSuccess) {
                         notificationManagerCompat.checkPermissionAndNotify(
                             applicationContext,
