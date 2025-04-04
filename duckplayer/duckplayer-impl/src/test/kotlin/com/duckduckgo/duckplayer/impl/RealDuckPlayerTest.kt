@@ -266,49 +266,22 @@ class RealDuckPlayerTest {
         val pixelName = "play.use"
         val pixelData = mapOf("key" to "value")
         val uniquePixelData = mapOf("choice" to "use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), Count)
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithPlayUse_firesPixelWithCorrectNameAndDataWithOverlayInteracted() = runTest {
-        val pixelName = "play.use"
-        val pixelData = mapOf("key" to "value")
-        val uniquePixelData = mapOf("choice" to "use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
-
-        testee.sendDuckPlayerPixel(pixelName, pixelData)
-
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), Count)
-        verify(mockPixel, never()).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayUse_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
         val pixelName = "play.use"
         val uniquePixelData = mapOf("choice" to "use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), Count)
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithPlayUse_firesPixelWithEmptyDataWhenNoDataProvidedWithOverlayInteracted() = runTest {
-        val pixelName = "play.use"
-        val uniquePixelData = mapOf("choice" to "use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
-
-        testee.sendDuckPlayerPixel(pixelName, emptyMap())
-
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), Count)
-        verify(mockPixel, never()).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
@@ -316,73 +289,33 @@ class RealDuckPlayerTest {
         val pixelName = "play.do_not_use"
         val pixelData = mapOf("key" to "value")
         val uniquePixelData = mapOf("choice" to "do_not_use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), Count)
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithPlayDoNotUse_firesPixelWithCorrectNameAndDataWithOverlayInteracted() = runTest {
-        val pixelName = "play.do_not_use"
-        val pixelData = mapOf("key" to "value")
-        val uniquePixelData = mapOf("choice" to "do_not_use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
-
-        testee.sendDuckPlayerPixel(pixelName, pixelData)
-
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), Count)
-        verify(mockPixel, never()).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayDoNotUse_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
         val pixelName = "play.do_not_use"
         val uniquePixelData = mapOf("choice" to "do_not_use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithPlayDoNotUse_firesPixelWithEmptyDataWhenNoDataProvidedWithOverlayInteracted() = runTest {
-        val pixelName = "play.do_not_use"
-        val uniquePixelData = mapOf("choice" to "do_not_use")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
-
-        testee.sendDuckPlayerPixel(pixelName, emptyMap())
-
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
-        verify(mockPixel, never()).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayDoNotUseDismiss_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
         val pixelName = "play.do_not_use.dismiss"
         val uniquePixelData = mapOf("choice" to "dismiss")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS, emptyMap(), emptyMap(), Count)
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
-    }
-
-    @Test
-    fun sendDuckPlayerPixelWithPlayDoNotUseDismiss_firesPixelWithEmptyDataWhenNoDataProvidedWithOverlayInteracted() = runTest {
-        val pixelName = "play.do_not_use.dismiss"
-        val uniquePixelData = mapOf("choice" to "dismiss")
-        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
-
-        testee.sendDuckPlayerPixel(pixelName, emptyMap())
-
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS, emptyMap(), emptyMap(), Count)
-        verify(mockPixel, never()).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     // endregion

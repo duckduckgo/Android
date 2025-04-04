@@ -229,9 +229,6 @@ class RealDuckPlayer @Inject constructor(
                 else -> pixelData
             }
 
-            if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE && getUserPreferences().overlayInteracted) {
-                return@forEach
-            }
             pixel.fire(duckPlayerPixelName, dataToSend, type = type)
 
             if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS) {
