@@ -111,9 +111,11 @@ class MaliciousSiteProtectionFiltersUpdateWorkerScheduler @Inject constructor(
     }
 
     private fun enqueuePeriodicScamWork() {
-        if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not() || maliciousSiteProtectionFeature.scamProtectionEnabled().not()) {
-            workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG)
-            return
+        with(maliciousSiteProtectionFeature) {
+            if (isFeatureEnabled().not() || canUpdateDatasets().not() || scamProtectionEnabled().not()) {
+                workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG)
+                return
+            }
         }
         enqueueWorker(SCAM, tag = MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG)
     }
