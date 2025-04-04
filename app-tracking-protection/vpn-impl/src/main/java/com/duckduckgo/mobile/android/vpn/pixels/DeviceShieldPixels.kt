@@ -379,6 +379,9 @@ interface DeviceShieldPixels {
 
     fun reportPproUpsellRevokedInfoShown()
     fun reportPproUpsellRevokedInfoLinkClicked()
+
+    /** Fires when the AppTP experiment blocklist fails to download. */
+    fun appTPBlocklistExperimentDownloadFailure(statusCode: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -890,6 +893,10 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
         firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
+    }
+
+    override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int) {
+        firePixel(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED, mapOf("code" to statusCode.toString()))
     }
 
     private fun firePixel(
