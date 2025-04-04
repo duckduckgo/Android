@@ -17,10 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.mobile.android.vpn.blocklist.BlockList.Cohorts.CONTROL
-import com.duckduckgo.mobile.android.vpn.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
