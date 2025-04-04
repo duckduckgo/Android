@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.toFeatureException

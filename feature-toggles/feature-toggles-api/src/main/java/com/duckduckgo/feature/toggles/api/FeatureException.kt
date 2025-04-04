@@ -15,6 +15,4 @@
  */
 package com.duckduckgo.feature.toggles.api
 
-object FeatureExceptions {
-    data class FeatureException(val domain: String, val reason: String?)
-}
+data class FeatureException(val domain: String, val reason: String?)

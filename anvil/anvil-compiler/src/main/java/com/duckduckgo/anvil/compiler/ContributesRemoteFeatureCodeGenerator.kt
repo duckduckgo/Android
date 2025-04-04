@@ -597,11 +597,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             }
                             return featureExceptions.toList()
                         """.trimIndent(),
-                        FeatureExceptions.FeatureException::class.fqName.asClassName(module),
-                        FeatureExceptions.FeatureException::class.fqName.asClassName(module),
+                        FeatureException::class.fqName.asClassName(module),
+                        FeatureException::class.fqName.asClassName(module),
                     ).build(),
             )
-            .returns(List::class.asClassName().parameterizedBy(FeatureExceptions.FeatureException::class.asClassName()))
+            .returns(List::class.asClassName().parameterizedBy(FeatureException::class.asClassName()))
             .build()
     }
 

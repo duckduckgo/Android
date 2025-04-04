@@ -3,7 +3,7 @@ package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import kotlinx.coroutines.test.runTest
