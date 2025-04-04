@@ -87,6 +87,7 @@ interface OnboardingDaxCta {
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit,
         onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
+        onDismissCtaClicked: () -> Unit,
     )
 
     fun hideOnboardingCta(
@@ -125,6 +126,7 @@ sealed class OnboardingDaxDialogCta(
         onPrimaryCtaClicked: () -> Unit,
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit = {},
+        onDismissCtaClicked: () -> Unit,
     ) {
         val daxDialog = binding.includeOnboardingInContextDaxDialog
 
@@ -157,6 +159,7 @@ sealed class OnboardingDaxDialogCta(
             secondaryCtaText?.let { daxDialog.secondaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
             binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
+            binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
             onTypingAnimationFinished.invoke()
         }
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
@@ -185,6 +188,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -194,6 +198,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -220,6 +225,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -229,6 +235,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
 
@@ -278,6 +285,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -287,6 +295,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
 
@@ -332,6 +341,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -341,6 +351,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -365,6 +376,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -375,6 +387,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -399,6 +412,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingInContextDaxDialog
@@ -460,6 +474,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -469,6 +484,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -611,6 +627,12 @@ sealed class DaxBubbleCta(
         }
     }
 
+    fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.daxDialogDismissButton)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
+    }
+
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
         options?.forEachIndexed { index, option ->
             val optionView = when (index) {
@@ -621,6 +643,10 @@ sealed class DaxBubbleCta(
             }
             option.let { ctaView?.findViewById<DaxButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
         }
+    }
+
+    fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
+        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxCtaContainer.gone()
     }
 
     override val markAsReadOnShow: Boolean = true

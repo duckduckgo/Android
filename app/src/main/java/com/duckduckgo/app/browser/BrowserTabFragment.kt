@@ -1927,6 +1927,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -2838,6 +2839,10 @@ class BrowserTabFragment :
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
+        daxBubbleCta.hideDaxBubbleCta(binding)
     }
 
     private fun hideDaxBubbleCta() {
@@ -4113,6 +4118,10 @@ class BrowserTabFragment :
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
+
+                setOnDismissCtaClicked {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                }
             }
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4138,6 +4147,9 @@ class BrowserTabFragment :
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
                 onSuggestedOptionsSelected,
+                {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                },
             )
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
