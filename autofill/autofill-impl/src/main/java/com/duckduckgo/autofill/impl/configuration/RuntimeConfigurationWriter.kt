@@ -20,7 +20,6 @@ import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessRespo
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -57,7 +56,6 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         return availableInputTypesAdapter.toJson(availableInputTypes)
     }
 
-
     private fun generateSiteSpecificFixesJson(settingsJson: AutofillSiteSpecificFixesSettings): String {
         if (!settingsJson.canApplySiteSpecificFixes) {
             return ""
@@ -83,11 +81,14 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                 "autofill": {
                   "state": "enabled",
                   "exceptions": [],
-                  "features": {${generateSiteSpecificFixesJson(settingsJson)}}
+                  "features": {
+                    ${generateSiteSpecificFixesJson(settingsJson)}
+                  }
                 }
               },
               "unprotectedTemporary": []
-            };""".trimIndent()
+            };
+        """.trim()
     }
 
     /*

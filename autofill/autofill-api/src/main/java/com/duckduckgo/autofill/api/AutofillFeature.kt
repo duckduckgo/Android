@@ -137,5 +137,4 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = false)
     fun siteSpecificFixes(): Toggle
-
 }

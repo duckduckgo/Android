@@ -16,17 +16,25 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
+import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessResponse
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
-import com.squareup.moshi.Moshi.Builder
+import com.squareup.moshi.Json
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RealRuntimeConfigurationWriterTest {
-    private val testee = RealRuntimeConfigurationWriter(Builder().build())
+    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val testee = RealRuntimeConfigurationWriter(moshi)
+    private val contentScopeJsonAdapter = moshi.adapter(ContentScope::class.java)
+    private val availableInputTypesJsonAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java)
 
     @Test
     fun whenGenerateResponseGetAvailableInputTypesThenReturnAvailableInputTypesJson() {
-        val expectedJson = """
+        val expectedAvailableInputTypes = availableInputTypesJsonAdapter.fromJson(
+            """
             {
               "credentials": {
                 "password": false,
@@ -34,44 +42,49 @@ class RealRuntimeConfigurationWriterTest {
               },
               "email": true
             }
-        """.trimIndent()
-
-        assertEquals(
-            expectedJson,
-            testee.generateResponseGetAvailableInputTypes(
-                credentialsAvailable = AvailableInputTypeCredentials(username = false, password = false),
-                emailAvailable = true,
-            ),
+        """,
         )
+
+        val actualInputTypes = testee.generateResponseGetAvailableInputTypes(
+            credentialsAvailable = AvailableInputTypeCredentials(username = false, password = false),
+            emailAvailable = true,
+        )
+
+        assertAvailableInputTypesJsonCorrect(expectedAvailableInputTypes, actualInputTypes)
     }
 
     @Test
     fun whenGenerateContentScopeWithSiteSpecificFixesDisabledTheReturnContentScopeString() {
-        val expectedJson = """
-            contentScope = {
+        val expectedContentScope = contentScopeJsonAdapter.fromJson(
+            """
+            {
               "features": {
                 "autofill": {
                   "state": "enabled",
                   "exceptions": [],
-                  "features": {}
+                  "features": {
+                    
+                  }
                 }
               },
               "unprotectedTemporary": []
-            };
-        """.trimIndent()
-        assertEquals(
-            expectedJson,
-            testee.generateContentScope(AutofillSiteSpecificFixesSettings(
-                javascriptConfigSiteSpecificFixes = "{settings: {}}",
-                canApplySiteSpecificFixes = false
-            )),
+            }
+        """,
         )
+
+        val actualContentScope = AutofillSiteSpecificFixesSettings(
+            javascriptConfigSiteSpecificFixes = "{settings: {}}",
+            canApplySiteSpecificFixes = false,
+        ).asJsonConfig()
+
+        assertContentScopeJsonCorrect(expectedContentScope, actualContentScope)
     }
 
     @Test
     fun whenGenerateContentScopeWithSiteSpecificFixesEnabledTheReturnContentScopeString() {
-        val expectedJson = """
-            contentScope = {
+        val expectedContentScope = contentScopeJsonAdapter.fromJson(
+            """
+               {
               "features": {
                 "autofill": {
                   "state": "enabled",
@@ -80,22 +93,22 @@ class RealRuntimeConfigurationWriterTest {
                     "siteSpecificFixes": {
                         "state": "enabled",
                         "settings": {
-                            "javascriptConfig": {}
+                            "javascriptConfig": ${populatedJsConfig()}
                         }
                     }
-                  },
+                  }
                 }
               },
               "unprotectedTemporary": []
-            };
-        """.trimIndent()
-        assertEquals(
-            expectedJson,
-            testee.generateContentScope(AutofillSiteSpecificFixesSettings(
-                javascriptConfigSiteSpecificFixes = "{}".trimIndent(),
-                canApplySiteSpecificFixes = true
-            )),
+            }
+        """,
         )
+
+        val actualContentScope = AutofillSiteSpecificFixesSettings(
+            javascriptConfigSiteSpecificFixes = populatedJsConfig(),
+            canApplySiteSpecificFixes = true,
+        ).asJsonConfig()
+        assertContentScopeJsonCorrect(expectedContentScope, actualContentScope)
     }
 
     @Test
@@ -147,5 +160,67 @@ class RealRuntimeConfigurationWriterTest {
                 partialFormSaves = false,
             ),
         )
+    }
+
+    data class ContentScope(
+        @Json(name = "features") val features: Features,
+        @Json(name = "unprotectedTemporary") val unprotectedTemporary: List<Any> = emptyList(),
+    )
+
+    data class Features(
+        @Json(name = "autofill") val autofill: Autofill,
+    )
+
+    data class Autofill(
+        @Json(name = "state") val state: String,
+        @Json(name = "exceptions") val exceptions: List<Any> = emptyList(),
+        @Json(name = "features") val features: AutofillFeatures,
+    )
+
+    data class AutofillFeatures(
+        @Json(name = "siteSpecificFixes") val siteSpecificFixes: SiteSpecificFixes? = null,
+    )
+
+    data class SiteSpecificFixes(
+        @Json(name = "state") val state: String,
+        @Json(name = "settings") val settings: Settings,
+    )
+
+    data class Settings(
+        @Json(name = "javascriptConfig") val javascriptConfig: Map<String, Any> = emptyMap(),
+    )
+
+    private fun assertContentScopeJsonCorrect(
+        expected: ContentScope?,
+        json: String,
+    ) {
+        assertEquals(expected, contentScopeJsonAdapter.fromJson(json))
+    }
+
+    private fun assertAvailableInputTypesJsonCorrect(
+        expected: AvailableInputSuccessResponse?,
+        json: String,
+    ) {
+        assertEquals(expected, availableInputTypesJsonAdapter.fromJson(json))
+    }
+
+    private fun extractJson(generatedJson: String): String {
+        assertTrue(generatedJson.startsWith("contentScope = "))
+        assertTrue(generatedJson.endsWith(";"))
+        val json = generatedJson.removePrefix("contentScope = ").removeSuffix(";")
+        return json
+    }
+
+    private fun AutofillSiteSpecificFixesSettings.asJsonConfig(): String {
+        return extractJson(testee.generateContentScope(this))
+    }
+
+    private fun populatedJsConfig(): String {
+        return """
+            {
+                "some": "javascript", 
+                "config": "in here"
+            }
+        """.trimIndent()
     }
 }

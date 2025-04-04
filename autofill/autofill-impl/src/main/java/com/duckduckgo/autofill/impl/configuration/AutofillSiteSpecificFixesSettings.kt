@@ -17,16 +17,15 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStoreImpl.Companion.JAVASCRIPT_CONFIG_DEFAULT
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import javax.inject.Inject
 
 interface AutofillSiteSpecificFixesStore {
     suspend fun getConfig(): AutofillSiteSpecificFixesSettings
@@ -62,7 +61,10 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
                 }.getOrNull()
             }
             val settingsJson = if (isSiteSpecificFicesEnabled && settings != null) settings.javascriptConfig.toString() else "\"{}\""
-            AutofillSiteSpecificFixesSettings(javascriptConfigSiteSpecificFixes = settingsJson, canApplySiteSpecificFixes = isSiteSpecificFicesEnabled)
+            AutofillSiteSpecificFixesSettings(
+                javascriptConfigSiteSpecificFixes = settingsJson,
+                canApplySiteSpecificFixes = isSiteSpecificFicesEnabled,
+            )
         }
     }
 }

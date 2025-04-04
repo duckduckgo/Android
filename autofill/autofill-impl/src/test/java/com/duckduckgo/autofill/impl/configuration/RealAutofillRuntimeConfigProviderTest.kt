@@ -66,7 +66,7 @@ class RealAutofillRuntimeConfigProviderTest {
             shareableCredentials = shareableCredentials,
             emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
             neverSavedSiteRepository = neverSavedSiteRepository,
-            siteSpecificFixesStore = siteSpecificFixesStore
+            siteSpecificFixesStore = siteSpecificFixesStore,
         )
 
         runTest {
@@ -75,12 +75,14 @@ class RealAutofillRuntimeConfigProviderTest {
         }
 
         autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))
-        whenever(runtimeConfigurationWriter.generateContentScope(
-            AutofillSiteSpecificFixesSettings(
-                javascriptConfigSiteSpecificFixes = "",
-                canApplySiteSpecificFixes = false
-            )
-        )).thenReturn("")
+        whenever(
+            runtimeConfigurationWriter.generateContentScope(
+                AutofillSiteSpecificFixesSettings(
+                    javascriptConfigSiteSpecificFixes = "",
+                    canApplySiteSpecificFixes = false,
+                ),
+            ),
+        ).thenReturn("")
         whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")
         whenever(
