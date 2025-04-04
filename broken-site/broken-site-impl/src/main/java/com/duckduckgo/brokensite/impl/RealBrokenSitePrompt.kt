@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 internal const val REFRESH_COUNT_WINDOW = 20L
@@ -69,19 +70,26 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.resetRefreshCount()
     }
 
-    override fun getUserRefreshesCount(): Int {
+    override fun getUserRefreshesCount(reset: Boolean): Int {
         return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
             currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
             currentTimeProvider.localDateTimeNow(),
         ).also {
-            if (it >= REFRESH_COUNT_LIMIT) {
+            if (it >= REFRESH_COUNT_LIMIT && reset) {
                 brokenSiteReportRepository.resetRefreshCount()
             }
         }
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
-        if (!isFeatureEnabled() || getUserRefreshesCount() < REFRESH_COUNT_LIMIT || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+        if (!isFeatureEnabled() || getUserRefreshesCount(reset = true) < REFRESH_COUNT_LIMIT || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            val reason = when {
+                !isFeatureEnabled() -> "DISABLED"
+                duckGoUrlDetector.isDuckDuckGoUrl(url) -> "DDG"
+                else -> "COUNT TOO LOW (${getUserRefreshesCount(reset = false)})"
+            }
+
+            Timber.d("KateTest--> should NOT show bc $reason")
             return false
         }
 
@@ -90,22 +98,25 @@ class RealBrokenSitePrompt @Inject constructor(
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
             if (currentTimestamp.isBefore(nextDate)) {
+                Timber.d("KateTest--> should NOT show bc cooldown: NextDate= $nextDate")
                 return false
             }
+            Timber.d("KateTest--> Passed cooldown test: NextDate= $nextDate")
         }
 
         val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
         val dismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
-            currentTimestamp.minusDays(dismissStreakResetDays),
+            currentTimestamp.minusMinutes(dismissStreakResetDays),
             currentTimestamp,
         )
+        Timber.d("KateTest--> SHOULDshow()?  dismissCount= $dismissalCount, resetDays= $dismissStreakResetDays")
 
         return dismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }
 
     override suspend fun ctaShown() {
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
-        val newNextShownDate = currentTimestamp.plusDays(brokenSiteReportRepository.getCoolDownDays())
+        val newNextShownDate = currentTimestamp.plusSeconds(brokenSiteReportRepository.getCoolDownDays())
         brokenSiteReportRepository.setNextShownDate(newNextShownDate)
     }
 }

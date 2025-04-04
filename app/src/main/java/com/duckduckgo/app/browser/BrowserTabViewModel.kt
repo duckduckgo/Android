@@ -4000,16 +4000,26 @@ class BrowserTabViewModel @Inject constructor(
         newTabPixels.get().fireNewTabDisplayed()
     }
 
+    private fun fireReloadPixelIfRefreshCountMet() {
+        if (brokenSitePrompt.getUserRefreshesCount(reset = false) >= REFRESH_COUNT_LIMIT) {
+            Timber.d("KateTest--> Sending 3x reload pixel from BTVM fireReloadPixelIfRefreshCountMet")
+            pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        }
+    }
+
     fun handleMenuRefreshAction() {
         refreshPixelSender.sendMenuRefreshPixels()
+        fireReloadPixelIfRefreshCountMet()
     }
 
     fun handlePullToRefreshAction() {
         refreshPixelSender.sendPullToRefreshPixels()
+        fireReloadPixelIfRefreshCountMet()
     }
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
+        fireReloadPixelIfRefreshCountMet()
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
@@ -4114,6 +4124,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+
+        private const val REFRESH_COUNT_LIMIT = 3
 
         private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
         private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix

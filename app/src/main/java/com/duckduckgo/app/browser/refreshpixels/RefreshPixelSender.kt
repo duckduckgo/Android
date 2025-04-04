@@ -19,8 +19,6 @@ package com.duckduckgo.app.browser.refreshpixels
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-import com.duckduckgo.app.pixels.AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
@@ -34,6 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface RefreshPixelSender {
     fun sendMenuRefreshPixels()
@@ -78,14 +77,13 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
             val refreshes = dao.updateRecentRefreshes(twentySecondsAgo, now)
 
             if (refreshes.count { it.timestamp >= twelveSecondsAgo } >= 2) {
-                pixel.fire(RELOAD_TWICE_WITHIN_12_SECONDS)
+                Timber.d("KateTest--> sending 2x refresh pixel from timeBasedPixels")
                 blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
                     pixel.fire(it.pixelName, it.params)
                 }
             }
             if (refreshes.size >= 3) {
-                pixel.fire(RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-
+                Timber.d("KateTest--> sending 3x refresh pixel from timeBasedPixels")
                 blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
                     pixel.fire(it.pixelName, it.params)
                 }
