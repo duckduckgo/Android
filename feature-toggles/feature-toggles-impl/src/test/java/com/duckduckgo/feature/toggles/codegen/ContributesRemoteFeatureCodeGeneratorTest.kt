@@ -1759,6 +1759,194 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion not matching as sdkVersion is lower than minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 28
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 30
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 30),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is the same as minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 28
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is higher than minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 30
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets matching and minSdkVersion matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.US
+        featureTogglesCallback.sdkVersion = 30
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
     fun `test variant parsing when no remote variant provided`() {
         val feature = generatedFeatureNewInstance()
 
