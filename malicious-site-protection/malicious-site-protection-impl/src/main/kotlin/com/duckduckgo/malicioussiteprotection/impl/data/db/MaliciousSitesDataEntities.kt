@@ -44,10 +44,3 @@ data class FilterEntity(
     val regex: String,
     val type: String,
 )
-
-@Entity(tableName = "featureExceptions")
-data class FeatureExceptionEntity(
-    @PrimaryKey
-    val domain: String,
-    val reason: String?,
-)
