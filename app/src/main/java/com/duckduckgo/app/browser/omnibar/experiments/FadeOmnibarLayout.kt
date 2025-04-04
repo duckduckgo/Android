@@ -22,6 +22,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
+import androidx.core.view.setMargins
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -30,6 +31,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
@@ -67,6 +69,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
+            val layoutParams = omnibarCard.layoutParams as LinearLayout.LayoutParams
+            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 8.toPx())
+            omnibarCard.layoutParams = layoutParams
         } else {
             navigationBar = navBar
         }

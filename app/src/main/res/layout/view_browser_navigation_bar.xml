@@ -23,8 +23,8 @@
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingHorizontal="14dp"
-    android:paddingTop="@dimen/keyline_3"
-    android:paddingBottom="@dimen/keyline_3"
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingBottom="@dimen/keyline_2"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout

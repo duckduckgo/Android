@@ -71,13 +71,27 @@
                         android:layout_height="@dimen/experimentalOmnibarCardSize"
                         android:layout_marginHorizontal="@dimen/keyline_4"
                         android:layout_marginTop="@dimen/keyline_2"
-                        android:layout_marginBottom="@dimen/keyline_3"
+                        android:layout_marginBottom="@dimen/keyline_1"
                         android:stateListAnimator="@drawable/fade_omnibar_state_selector">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/omniBarContentContainer"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
+
+                            <ProgressBar
+                                android:id="@+id/pageLoadingIndicator"
+                                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="4dp"
+                                android:progressDrawable="@drawable/loading_progress_experiment"
+                                android:visibility="invisible"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:progress="50"
+                                tools:visibility="visible" />
+
 
                             <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/trackersAnimation"
@@ -327,19 +341,6 @@
                 app:layout_constraintEnd_toEndOf="@id/toolbar"
                 app:layout_constraintStart_toStartOf="@id/toolbar"
                 app:layout_constraintTop_toTopOf="@id/toolbar" />
-
-            <ProgressBar
-                android:id="@+id/pageLoadingIndicator"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:progressDrawable="@drawable/loading_progress"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:progress="50"
-                tools:visibility="visible" />
 
             <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
                 android:id="@+id/tabsMenu"
