@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.ui
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -25,11 +26,8 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.settings.api.SettingsPageFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -37,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi")
 class AutoconsentSettingsViewModelTest {
 
     @get:Rule
@@ -44,19 +43,19 @@ class AutoconsentSettingsViewModelTest {
 
     private val autoconsent: Autoconsent = FakeAutoconsent()
     private val pixel: FakePixel = FakePixel()
-    private val newSettingsFeature: FakeSettingsPageFeature = FakeSettingsPageFeature()
+    private val newSettingsFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     private lateinit var viewModel: AutoconsentSettingsViewModel
 
     @Before
     fun setup() {
-        newSettingsFeature.enabled = false
+        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = false))
         pixel.firedPixels.clear()
     }
 
     @Test
     fun whenViewModelCreatedThenAutoConsentShownPixelFired() {
-        newSettingsFeature.enabled = true
+        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
 
         initViewModel()
 
@@ -100,7 +99,7 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOnPixelIsFired() {
-        newSettingsFeature.enabled = true
+        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
 
         initViewModel()
 
@@ -123,7 +122,7 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOffPixelIsFired() {
-        newSettingsFeature.enabled = true
+        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
 
         initViewModel()
 
@@ -213,92 +212,6 @@ class AutoconsentSettingsViewModelTest {
             encodedParameters: Map<String, String>,
         ) {
             firedPixels.add(pixelName)
-        }
-    }
-
-    internal class FakeSettingsPageFeature : SettingsPageFeature {
-
-        var enabled: Boolean = false
-
-        override fun self(): Toggle = object : Toggle {
-
-            override fun featureName(): FeatureName {
-                return FeatureName(null, "FakeSettingsPageFeature")
-            }
-
-            override fun isEnabled(cohort: CohortName): Boolean {
-                return enabled
-            }
-
-            override fun setRawStoredState(state: State) {
-                // NO OP
-            }
-
-            override fun getRawStoredState(): State? {
-                return null
-            }
-
-            override fun getSettings(): String? {
-                return null
-            }
-
-            override fun getCohort(): Cohort? {
-                return null
-            }
-        }
-
-        override fun newSettingsPage() = object : Toggle {
-
-            override fun featureName(): FeatureName {
-                return FeatureName(null, "FakeNewSettingsScreen")
-            }
-
-            override fun isEnabled(cohort: CohortName): Boolean {
-                return enabled
-            }
-
-            override fun setRawStoredState(state: State) {
-                // NO OP
-            }
-
-            override fun getRawStoredState(): State? {
-                return null
-            }
-
-            override fun getSettings(): String? {
-                return null
-            }
-
-            override fun getCohort(): Cohort? {
-                return null
-            }
-        }
-
-        override fun newPrivacyProSection() = object : Toggle {
-
-            override fun featureName(): FeatureName {
-                return FeatureName(null, "FakePrivacyProSection")
-            }
-
-            override fun isEnabled(cohort: CohortName): Boolean {
-                return enabled
-            }
-
-            override fun setRawStoredState(state: State) {
-                // NO OP
-            }
-
-            override fun getRawStoredState(): State? {
-                return null
-            }
-
-            override fun getSettings(): String? {
-                return null
-            }
-
-            override fun getCohort(): Cohort? {
-                return null
-            }
         }
     }
 }
