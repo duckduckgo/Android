@@ -382,7 +382,6 @@ sealed class OnboardingDaxDialogCta(
             setOnboardingDialogView(
                 daxText = description?.let { context.getString(it) }.orEmpty(),
                 primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                secondaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton),
                 binding = binding,
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
