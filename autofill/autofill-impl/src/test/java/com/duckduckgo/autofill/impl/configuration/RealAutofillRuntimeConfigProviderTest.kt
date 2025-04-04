@@ -50,6 +50,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
+    private val siteSpecificFixesStore: AutofillSiteSpecificFixesStore = mock()
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
@@ -65,6 +66,7 @@ class RealAutofillRuntimeConfigProviderTest {
             shareableCredentials = shareableCredentials,
             emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
             neverSavedSiteRepository = neverSavedSiteRepository,
+            siteSpecificFixesStore = siteSpecificFixesStore
         )
 
         runTest {
@@ -73,7 +75,12 @@ class RealAutofillRuntimeConfigProviderTest {
         }
 
         autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))
-        whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
+        whenever(runtimeConfigurationWriter.generateContentScope(
+            AutofillSiteSpecificFixesSettings(
+                javascriptConfigSiteSpecificFixes = "",
+                canApplySiteSpecificFixes = false
+            )
+        )).thenReturn("")
         whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")
         whenever(

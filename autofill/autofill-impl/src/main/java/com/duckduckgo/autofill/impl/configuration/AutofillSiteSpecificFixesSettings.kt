@@ -34,6 +34,7 @@ interface AutofillSiteSpecificFixesStore {
 
 data class AutofillSiteSpecificFixesSettings(
     val javascriptConfigSiteSpecificFixes: String,
+    val canApplySiteSpecificFixes: Boolean,
 )
 
 @ContributesBinding(AppScope::class)
@@ -61,7 +62,7 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
                 }.getOrNull()
             }
             val settingsJson = if (isSiteSpecificFicesEnabled && settings != null) settings.javascriptConfig.toString() else "\"{}\""
-            AutofillSiteSpecificFixesSettings(javascriptConfigSiteSpecificFixes = settingsJson)
+            AutofillSiteSpecificFixesSettings(javascriptConfigSiteSpecificFixes = settingsJson, canApplySiteSpecificFixes = isSiteSpecificFicesEnabled)
         }
     }
 }

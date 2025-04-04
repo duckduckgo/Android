@@ -46,13 +46,14 @@ class RealRuntimeConfigurationWriterTest {
     }
 
     @Test
-    fun whenGenerateContentScopeTheReturnContentScopeString() {
+    fun whenGenerateContentScopeWithSiteSpecificFixesDisabledTheReturnContentScopeString() {
         val expectedJson = """
             contentScope = {
               "features": {
                 "autofill": {
                   "state": "enabled",
-                  "exceptions": []
+                  "exceptions": [],
+                  "features": {}
                 }
               },
               "unprotectedTemporary": []
@@ -60,7 +61,40 @@ class RealRuntimeConfigurationWriterTest {
         """.trimIndent()
         assertEquals(
             expectedJson,
-            testee.generateContentScope(),
+            testee.generateContentScope(AutofillSiteSpecificFixesSettings(
+                javascriptConfigSiteSpecificFixes = "{settings: {}}",
+                canApplySiteSpecificFixes = false
+            )),
+        )
+    }
+
+    @Test
+    fun whenGenerateContentScopeWithSiteSpecificFixesEnabledTheReturnContentScopeString() {
+        val expectedJson = """
+            contentScope = {
+              "features": {
+                "autofill": {
+                  "state": "enabled",
+                  "exceptions": [],
+                  "features": {
+                    "siteSpecificFixes": {
+                        "state": "enabled",
+                        "settings": {
+                            "javascriptConfig": {}
+                        }
+                    }
+                  },
+                }
+              },
+              "unprotectedTemporary": []
+            };
+        """.trimIndent()
+        assertEquals(
+            expectedJson,
+            testee.generateContentScope(AutofillSiteSpecificFixesSettings(
+                javascriptConfigSiteSpecificFixes = "{}".trimIndent(),
+                canApplySiteSpecificFixes = true
+            )),
         )
     }
 

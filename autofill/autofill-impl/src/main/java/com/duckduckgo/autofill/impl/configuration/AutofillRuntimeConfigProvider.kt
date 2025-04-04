@@ -55,7 +55,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
-        val contentScope = runtimeConfigurationWriter.generateContentScope(siteSpecificFixesStore.getConfig().javascriptConfigSiteSpecificFixes)
+        val contentScope = runtimeConfigurationWriter.generateContentScope(siteSpecificFixesStore.getConfig())
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = canInjectCredentials(url),
