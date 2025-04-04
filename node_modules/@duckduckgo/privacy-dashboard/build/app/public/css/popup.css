@@ -1043,8 +1043,8 @@ body.environment--windows {
   background-image: url("../../img/refresh-assets/Cookies-Hidden-128.svg");
 }
 
-.hero-icon--phishing,
-.hero-icon--connection-phishing {
+.hero-icon--malicious,
+.hero-icon--connection-malicious {
   background-image: url("../../img/refresh-assets/Phishing-128.svg");
 }
 

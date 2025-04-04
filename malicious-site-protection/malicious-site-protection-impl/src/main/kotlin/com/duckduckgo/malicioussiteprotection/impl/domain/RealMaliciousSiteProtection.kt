@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
@@ -83,9 +84,14 @@ class RealMaliciousSiteProtection @Inject constructor(
             .joinToString("") { "%02x".format(it) }
         val hashPrefix = hash.substring(0, 8)
 
-        if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-            timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
-            return ConfirmedResult(Safe)
+        maliciousSiteRepository.getFeedForHashPrefix(hashPrefix).let {
+            if (it == null) {
+                timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+                return ConfirmedResult(Safe)
+            } else if (it == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
+                timber.d("should not block (scam protection disabled) $canonicalUri")
+                return ConfirmedResult(Ignored)
+            }
         }
         maliciousSiteRepository.getFilters(hash)?.forEach { filterSet ->
             filterSet.filters.firstOrNull {
@@ -103,13 +109,17 @@ class RealMaliciousSiteProtection @Inject constructor(
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
-                        Malicious(feed)
+                        if (feed != SCAM || maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
+                            Malicious(feed)
+                        } else {
+                            Ignored
+                        }
                     } ?: Safe
                     is MatchesResult.Ignored -> Ignored
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUri")
+                    is Malicious -> timber.d("should block (matches) $canonicalUri, result: ${result.feed}")
                     is Safe -> timber.d("should not block (no match) $canonicalUri")
                     is Ignored -> timber.d("should not block (ignored) $canonicalUri")
                 }

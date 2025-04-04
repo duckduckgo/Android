@@ -98,6 +98,7 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
         maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
+        mockMaliciousSiteProtectionRCFeature,
     )
 
     @Before
