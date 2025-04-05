@@ -89,8 +89,6 @@ class VisualDesignExperimentViewModel @Inject constructor(
             appPersonalityFeature.variant1().setRawStoredState(State(false))
             appPersonalityFeature.variant2().setRawStoredState(State(false))
             appPersonalityFeature.variant3().setRawStoredState(State(false))
-            appPersonalityFeature.variant4().setRawStoredState(State(false))
-            appPersonalityFeature.variant5().setRawStoredState(State(false))
         }
     }
 }

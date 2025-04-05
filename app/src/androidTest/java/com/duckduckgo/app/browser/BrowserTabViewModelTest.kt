@@ -61,7 +61,6 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.browser.BrowserTabViewModel.Companion.TRACKER_LOGO_ANIMATION_THRESHOLD
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -6100,8 +6099,6 @@ class BrowserTabViewModelTest {
         // All other variants are disabled
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
 
         testee.onAnimationFinished(logos, true)
 
@@ -6111,128 +6108,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant5EnabledThenStartShieldPopAnimation() = runTest {
+    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartV2ShieldPopAnimation() = runTest {
         val logos = listOf<TrackerLogo>(mock())
-        // Variant 5 is enabled
+        // Variant 3 is enabled
         fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
         // All other variants are disabled
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
 
         testee.onAnimationFinished(logos, true)
 
-        assertCommandIssued<Command.StartExperimentShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentV2ShieldPopAnimation>()
+        assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
+        assertCommandNotIssued<Command.StartExperimentShieldPopAnimation>()
         assertCommandNotIssued<Command.StartExperimentTrackersBurstAnimation>()
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledAndConditionsMetThenStartTrackersBurstAnimation() = runTest {
-        val logos = List(TRACKER_LOGO_ANIMATION_THRESHOLD + 1) { mock<TrackerLogo>() }
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
-        whenever(mockTrackersBurstAnimationPreferencesStore.fetchCount()).thenReturn(0)
-
-        testee.onAnimationFinished(logos, true)
-
-        verify(mockTrackersBurstAnimationPreferencesStore).incrementCount()
-        assertCommandIssued<Command.StartExperimentTrackersBurstAnimation> {
-            assertEquals(logos, this.logos)
-            assertEquals(false, this.ignoreLogos)
-        }
-        verify(mockPixel).fire(
-            AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
-            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${mockUserStageStore.getUserAppStage() != ESTABLISHED}"),
-        )
-        verify(mockPrivacyDashboardExternalPixelParams).setPixelParams(PixelParameter.LOGOS_BURST, "true")
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant4EnabledThenIgnoreLogosIsTrue() = runTest {
-        val logos = List(TRACKER_LOGO_ANIMATION_THRESHOLD + 1) { mock<TrackerLogo>() }
-        // Variant 4 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
-        whenever(mockTrackersBurstAnimationPreferencesStore.fetchCount()).thenReturn(0)
-
-        testee.onAnimationFinished(logos, false)
-
-        verify(mockTrackersBurstAnimationPreferencesStore).incrementCount()
-        assertCommandIssued<Command.StartExperimentTrackersBurstAnimation> {
-            assertEquals(logos, this.logos)
-            assertEquals(true, this.ignoreLogos)
-        }
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledAndTooFewTrackersThenStartShieldPopAnimation() = runTest {
-        val logos = List(TRACKER_LOGO_ANIMATION_THRESHOLD - 1) { mock<TrackerLogo>() }
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
-        whenever(mockTrackersBurstAnimationPreferencesStore.fetchCount()).thenReturn(0)
-
-        testee.onAnimationFinished(logos, true)
-
-        verify(mockTrackersBurstAnimationPreferencesStore, never()).incrementCount()
-        assertCommandIssued<Command.StartExperimentShieldPopAnimation>()
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledAndAnimationAlreadyShown3TimesThenStartShieldPopAnimation() = runTest {
-        val logos = List(TRACKER_LOGO_ANIMATION_THRESHOLD + 1) { mock<TrackerLogo>() }
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
-        whenever(mockTrackersBurstAnimationPreferencesStore.fetchCount()).thenReturn(3)
-
-        testee.onAnimationFinished(logos, true)
-
-        verify(mockTrackersBurstAnimationPreferencesStore, never()).incrementCount()
-        assertCommandIssued<Command.StartExperimentShieldPopAnimation>()
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledAndNoKnownLogosAndVariant3ThenStartShieldPopAnimation() = runTest {
-        val logos = List(TRACKER_LOGO_ANIMATION_THRESHOLD + 1) { mock<TrackerLogo>() }
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
-        whenever(mockTrackersBurstAnimationPreferencesStore.fetchCount()).thenReturn(0)
-
-        testee.onAnimationFinished(logos, false)
-
-        verify(mockTrackersBurstAnimationPreferencesStore, never()).incrementCount()
-        assertCommandIssued<Command.StartExperimentShieldPopAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {

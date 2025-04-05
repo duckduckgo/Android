@@ -64,14 +64,6 @@ class TrackersBlockingExperimentView @JvmOverloads constructor(
         viewModel.onTrackersBlockingVariant3ExperimentalUIModeChanged(isChecked)
     }
 
-    private val trackersBlockingVariant4ToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onTrackersBlockingVariant4ExperimentalUIModeChanged(isChecked)
-    }
-
-    private val trackersBlockingVariant5ToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onTrackersBlockingVariant5ExperimentalUIModeChanged(isChecked)
-    }
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -87,8 +79,6 @@ class TrackersBlockingExperimentView @JvmOverloads constructor(
         binding.trackersBlockingVariant1ExperimentalUIMode.quietlySetIsChecked(viewState.variant1, trackersBlockingVariant1ToggleListener)
         binding.trackersBlockingVariant2ExperimentalUIMode.quietlySetIsChecked(viewState.variant2, trackersBlockingVariant2ToggleListener)
         binding.trackersBlockingVariant3ExperimentalUIMode.quietlySetIsChecked(viewState.variant3, trackersBlockingVariant3ToggleListener)
-        binding.trackersBlockingVariant4ExperimentalUIMode.quietlySetIsChecked(viewState.variant4, trackersBlockingVariant4ToggleListener)
-        binding.trackersBlockingVariant5ExperimentalUIMode.quietlySetIsChecked(viewState.variant5, trackersBlockingVariant5ToggleListener)
 
         Snackbar.make(binding.root, "Updated", Snackbar.LENGTH_SHORT).show()
     }

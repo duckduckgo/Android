@@ -54,22 +54,4 @@
         app:secondaryText="@string/trackersBlockingVariant3ExperimentalUIMessage"
         app:showSwitch="true" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/trackersBlockingVariant4ExperimentalUIMode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/trackersBlockingVariant4ExperimentalUITitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/trackersBlockingVariant4ExperimentalUIMessage"
-        app:showSwitch="true" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/trackersBlockingVariant5ExperimentalUIMode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/trackersBlockingVariant5ExperimentalUITitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/trackersBlockingVariant5ExperimentalUIMessage"
-        app:showSwitch="true" />
-
 </LinearLayout>

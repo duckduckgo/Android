@@ -148,7 +148,6 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -951,7 +950,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, getOmnibarType(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1005,21 +1004,6 @@ class BrowserTabFragment :
             viewModel.deleteTabPreview(tabId)
         } else {
             generateWebViewPreviewImage()
-        }
-    }
-
-    private fun getOmnibarType(): OmnibarType {
-        if (appPersonalityFeature.self().isEnabled()) {
-            if (appPersonalityFeature.variant3().isEnabled() ||
-                appPersonalityFeature.variant4().isEnabled() ||
-                appPersonalityFeature.variant5().isEnabled()
-            ) {
-                return OmnibarType.DELIGHTFUL
-            } else {
-                return OmnibarType.SCROLLING
-            }
-        } else {
-            return visualDesignExperimentDataStore.getOmnibarType()
         }
     }
 
@@ -1355,7 +1339,7 @@ class BrowserTabFragment :
         super.onResume()
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != getOmnibarType() // visualDesignExperimentDataStore.getOmnibarType()
+        val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {

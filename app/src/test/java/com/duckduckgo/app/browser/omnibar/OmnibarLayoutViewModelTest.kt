@@ -911,8 +911,6 @@ class OmnibarLayoutViewModelTest {
         // All other variants are disabled
         fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
 
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 
@@ -933,8 +931,6 @@ class OmnibarLayoutViewModelTest {
         // All other variants are disabled, including Variant 1
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant4().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant5().setRawStoredState(State(enable = false))
 
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 

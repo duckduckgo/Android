@@ -45,8 +45,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
         val variant1: Boolean = false,
         val variant2: Boolean = false,
         val variant3: Boolean = false,
-        val variant4: Boolean = false,
-        val variant5: Boolean = false,
     )
 
     private fun currentViewState(): ViewState {
@@ -66,8 +64,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
                 visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
                 appPersonalityFeature.variant2().setRawStoredState(State(false))
                 appPersonalityFeature.variant3().setRawStoredState(State(false))
-                appPersonalityFeature.variant4().setRawStoredState(State(false))
-                appPersonalityFeature.variant5().setRawStoredState(State(false))
             }
             updateCurrentState()
         }
@@ -83,8 +79,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
                 visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
                 appPersonalityFeature.variant1().setRawStoredState(State(false))
                 appPersonalityFeature.variant3().setRawStoredState(State(false))
-                appPersonalityFeature.variant4().setRawStoredState(State(false))
-                appPersonalityFeature.variant5().setRawStoredState(State(false))
             }
             updateCurrentState()
         }
@@ -100,42 +94,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
                 visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
                 appPersonalityFeature.variant1().setRawStoredState(State(false))
                 appPersonalityFeature.variant2().setRawStoredState(State(false))
-                appPersonalityFeature.variant4().setRawStoredState(State(false))
-                appPersonalityFeature.variant5().setRawStoredState(State(false))
-            }
-            updateCurrentState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onTrackersBlockingVariant4ExperimentalUIModeChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(checked))
-            appPersonalityFeature.variant4().setRawStoredState(State(checked))
-
-            if (checked) {
-                visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
-                appPersonalityFeature.variant1().setRawStoredState(State(false))
-                appPersonalityFeature.variant2().setRawStoredState(State(false))
-                appPersonalityFeature.variant3().setRawStoredState(State(false))
-                appPersonalityFeature.variant5().setRawStoredState(State(false))
-            }
-            updateCurrentState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onTrackersBlockingVariant5ExperimentalUIModeChanged(checked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(checked))
-            appPersonalityFeature.variant5().setRawStoredState(State(checked))
-
-            if (checked) {
-                visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
-                appPersonalityFeature.variant1().setRawStoredState(State(false))
-                appPersonalityFeature.variant2().setRawStoredState(State(false))
-                appPersonalityFeature.variant3().setRawStoredState(State(false))
-                appPersonalityFeature.variant4().setRawStoredState(State(false))
             }
             updateCurrentState()
         }
@@ -148,8 +106,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
                     variant1 = appPersonalityFeature.variant1().isEnabled(),
                     variant2 = appPersonalityFeature.variant2().isEnabled(),
                     variant3 = appPersonalityFeature.variant3().isEnabled(),
-                    variant4 = appPersonalityFeature.variant4().isEnabled(),
-                    variant5 = appPersonalityFeature.variant5().isEnabled(),
                 )
             }
         }

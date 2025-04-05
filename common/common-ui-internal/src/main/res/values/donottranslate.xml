@@ -36,9 +36,5 @@
     <string name="trackersBlockingVariant2ExperimentalUITitle">Enable Variant 2</string>
     <string name="trackersBlockingVariant2ExperimentalUIMessage">Persistent Green Shield + X Trackers Blocked animation</string>
     <string name="trackersBlockingVariant3ExperimentalUITitle">Enable Variant 3</string>
-    <string name="trackersBlockingVariant3ExperimentalUIMessage">#2 + Tab Switcher Tile + minibar + Logos Burst (3X only)</string>
-    <string name="trackersBlockingVariant4ExperimentalUITitle">Enable Variant 4</string>
-    <string name="trackersBlockingVariant4ExperimentalUIMessage">#2 + Tab Switcher Tile + minibar + Green Outer Burst with no logos (3X only)</string>
-    <string name="trackersBlockingVariant5ExperimentalUITitle">Enable Variant 5</string>
-    <string name="trackersBlockingVariant5ExperimentalUIMessage">Persistent Green Shield + X Trackers Blocked animation + minibar</string>
+    <string name="trackersBlockingVariant3ExperimentalUIMessage">Persistent Green Shield + X Trackers Blocked animation + Tab Switcher Tile animation</string>
 </resources>

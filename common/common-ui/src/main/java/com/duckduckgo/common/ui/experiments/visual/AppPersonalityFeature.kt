@@ -44,10 +44,4 @@ interface AppPersonalityFeature {
 
     @Toggle.DefaultValue(false)
     fun variant3(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun variant4(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun variant5(): Toggle
 }

@@ -164,8 +164,6 @@ import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
-import com.duckduckgo.app.browser.commands.Command.StartExperimentShieldPopAnimation
-import com.duckduckgo.app.browser.commands.Command.StartExperimentTrackersBurstAnimation
 import com.duckduckgo.app.browser.commands.Command.StartExperimentV2ShieldPopAnimation
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
@@ -242,7 +240,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -257,8 +254,6 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
-import com.duckduckgo.app.pixels.AppPixelName.TRACKERS_GREEN_BURST_ANIMATION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.TRACKERS_LOGOS_BURST_ANIMATION_SHOWN
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -266,11 +261,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_BURST
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.GREEN_SHIELD_COUNT_MINIBAR
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOGOS_BURST
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -4048,9 +4039,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             when {
                 appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled() -> handleVariant2()
-                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant5().isEnabled() -> handleVariant5()
-                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled() -> handleVariant3(hasKnownLogos, logos)
-                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant4().isEnabled() -> handleVariant4(logos)
+                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled() -> handleVariant2()
             }
         }
     }
@@ -4058,42 +4047,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun handleVariant2() {
         command.value = StartExperimentV2ShieldPopAnimation
         privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
-    }
-
-    private fun handleVariant5() {
-        command.value = StartExperimentShieldPopAnimation
-        privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT_MINIBAR, "true")
-    }
-
-    private suspend fun handleVariant3(
-        hasKnownLogos: Boolean,
-        logos: List<TrackerLogo>,
-    ) {
-        if (hasKnownLogos && logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD && trackersBurstAnimationPreferencesStore.fetchCount() < 3) {
-            trackersBurstAnimationPreferencesStore.incrementCount()
-            command.value = StartExperimentTrackersBurstAnimation(logos, false)
-            pixel.fire(
-                TRACKERS_LOGOS_BURST_ANIMATION_SHOWN,
-                mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != ESTABLISHED}"),
-            )
-            privacyDashboardExternalPixelParams.setPixelParams(LOGOS_BURST, "true")
-        } else {
-            command.value = StartExperimentShieldPopAnimation
-        }
-    }
-
-    private suspend fun handleVariant4(logos: List<TrackerLogo>) {
-        if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD && trackersBurstAnimationPreferencesStore.fetchCount() < 3) {
-            trackersBurstAnimationPreferencesStore.incrementCount()
-            command.value = StartExperimentTrackersBurstAnimation(logos, true)
-            pixel.fire(
-                TRACKERS_GREEN_BURST_ANIMATION_SHOWN,
-                mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != ESTABLISHED}"),
-            )
-            privacyDashboardExternalPixelParams.setPixelParams(GREEN_BURST, "true")
-        } else {
-            command.value = StartExperimentShieldPopAnimation
-        }
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
