@@ -134,4 +134,7 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(defaultValue = true)
     fun ignoreCaseOnUsernameComparisons(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = false)
+    fun siteSpecificFixes(): Toggle
 }

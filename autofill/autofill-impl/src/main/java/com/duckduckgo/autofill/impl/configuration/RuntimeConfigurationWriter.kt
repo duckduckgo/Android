@@ -30,7 +30,7 @@ interface RuntimeConfigurationWriter {
         emailAvailable: Boolean,
     ): String
 
-    fun generateContentScope(): String
+    fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
@@ -56,21 +56,39 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         return availableInputTypesAdapter.toJson(availableInputTypes)
     }
 
+    private fun generateSiteSpecificFixesJson(settingsJson: AutofillSiteSpecificFixesSettings): String {
+        if (!settingsJson.canApplySiteSpecificFixes) {
+            return ""
+        }
+
+        return """
+            "siteSpecificFixes": {
+                "state": "enabled",
+                "settings": {
+                    "javascriptConfig": ${settingsJson.javascriptConfigSiteSpecificFixes}
+                }
+            }
+        """.trimIndent()
+    }
+
     /*
     * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
     */
-    override fun generateContentScope(): String {
+    override fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String {
         return """
             contentScope = {
               "features": {
                 "autofill": {
                   "state": "enabled",
-                  "exceptions": []
+                  "exceptions": [],
+                  "features": {
+                    ${generateSiteSpecificFixesJson(settingsJson)}
+                  }
                 }
               },
               "unprotectedTemporary": []
             };
-        """.trimIndent()
+        """.trim()
     }
 
     /*
