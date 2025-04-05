@@ -31,7 +31,15 @@ sealed class PirScriptRequestData {
     ) : PirScriptRequestData()
 
     data class UserProfile(
-        val userProfile: ProfileQuery,
-        val extractedProfile: ExtractedProfile? = null,
+        val userProfile: ProfileQuery? = null,
+        val extractedProfile: ExtractedProfileParams? = null,
     ) : PirScriptRequestData()
 }
+
+data class ExtractedProfileParams(
+    val id: Int? = null,
+    val name: String? = null,
+    val profileUrl: String? = null,
+    val email: String? = null,
+    val fullName: String? = null,
+)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.service
+package com.duckduckgo.pir.internal.scan
 
 internal val supportedBrokers = listOf(
     "AdvancedBackgroundChecks",

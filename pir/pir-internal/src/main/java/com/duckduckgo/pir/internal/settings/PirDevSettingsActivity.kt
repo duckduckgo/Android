@@ -47,11 +47,12 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
+import com.duckduckgo.pir.internal.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.service.PirForegroundScanService
-import com.duckduckgo.pir.internal.service.PirRemoteWorkerService
-import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker
-import com.duckduckgo.pir.internal.service.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
+import com.duckduckgo.pir.internal.scan.PirForegroundScanService
+import com.duckduckgo.pir.internal.scan.PirRemoteWorkerService
+import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
@@ -61,7 +62,6 @@ import com.duckduckgo.pir.internal.store.db.PirScanLog
 import com.duckduckgo.pir.internal.store.db.ScanEventType.SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.internal.store.db.UserName
 import com.duckduckgo.pir.internal.store.db.UserProfile
-import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -115,6 +115,13 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
+        repository.getTotalScannedBrokersFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                binding.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, it)
+            }
+            .launchIn(lifecycleScope)
+
         workManager.getWorkInfosForUniqueWorkLiveData(TAG_SCHEDULED_SCAN)
             .observe(
                 this,
@@ -131,22 +138,23 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
         val allError = results.filterIsInstance<ErrorResult>()
         val brokersWithRecords = allExtracted.filter {
-            it.extractResults.isNotEmpty()
+            it.extractResults.isNotEmpty() && it.extractResults.any { result ->
+                result.score > 1
+            }
         }
-        val totalSitesScanned = allExtracted.size + allError.size
         val brokersWithRecordsCount = brokersWithRecords.size
 
         val brokersWithNoRecords = allExtracted.filter {
-            it.extractResults.isEmpty()
+            it.extractResults.isEmpty() || it.extractResults.none { result ->
+                result.score > 1
+            }
         }.size + allError.size
 
         val totalRecordCount = brokersWithRecords.sumOf {
-            it.extractResults.size
+            it.extractResults.filter { result -> result.score > 1 }.size
         }
 
         with(binding) {
-            this.statusSitesScanned.text =
-                getString(R.string.pirStatsStatusScanned, totalSitesScanned)
             this.statusTotalRecords.text =
                 getString(R.string.pirStatsStatusRecords, totalRecordCount)
             this.statusTotalBrokersFound.text =
@@ -157,6 +165,16 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupViews() {
+        binding.optOut.setOnClickListener {
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            startForegroundService(Intent(this, PirForegroundOptOutService::class.java))
+        }
+
+        binding.optOutDebug.setOnClickListener {
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            globalActivityStarter.start(this, PirDebugWebViewResultsScreenNoParams)
+        }
+
         binding.debugRunScan.setOnClickListener {
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
@@ -176,7 +194,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                                 state = binding.profileState.text,
                             ),
                             birthYear = binding.profileBirthYear.text.toInt(),
-                            age = LocalDate.now().year - binding.profileBirthYear.text.toInt(),
                         ),
                     )
                 }
@@ -191,6 +208,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 repository.deleteAllResults()
                 repository.deleteAllUserProfiles()
                 repository.deleteAllScanLogs()
+                repository.deleteAllOptOutData()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
@@ -220,7 +238,11 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             .build()
 
         val periodicWorkRequest =
-            PeriodicWorkRequest.Builder(PirScheduledScanRemoteWorker::class.java, 12, TimeUnit.HOURS)
+            PeriodicWorkRequest.Builder(
+                PirScheduledScanRemoteWorker::class.java,
+                12,
+                TimeUnit.HOURS,
+            )
                 .boundToPirProcess(appBuildConfig.applicationId)
                 .setConstraints(constraints)
                 .setInitialDelay(1, TimeUnit.MINUTES)

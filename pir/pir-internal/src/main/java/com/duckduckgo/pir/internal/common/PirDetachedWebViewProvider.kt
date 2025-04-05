@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.component
+package com.duckduckgo.pir.internal.common
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -32,15 +32,28 @@ import logcat.logcat
 
 interface PirDetachedWebViewProvider {
     /**
-     * This method returns an instance of webview created using the given [context] with every necessary
+     * This method returns an instance of WebView created using the given [context] with every necessary
      * configuration setup for pir to run.
      *
      * @param context in which the webview should run - could be service/activity
      * @param scriptToLoad the JS script that is needed for PIR to run.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
      */
-    fun getInstance(
+    fun createInstance(
         context: Context,
+        scriptToLoad: String,
+        onPageLoaded: (String?) -> Unit,
+    ): WebView
+
+    /**
+     * This method configures the [WebView] passed to be able to run pir scripts.
+     *
+     * @param webView in which PIR should run
+     * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param onPageLoaded callback to receive whenever a url has finished loading.
+     */
+    fun setupWebView(
+        webView: WebView,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
     ): WebView
@@ -49,12 +62,20 @@ interface PirDetachedWebViewProvider {
 @ContributesBinding(AppScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
-    override fun getInstance(
+    override fun createInstance(
         context: Context,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
     ): WebView {
-        return WebView(context).apply {
+        return setupWebView(WebView(context), scriptToLoad, onPageLoaded)
+    }
+
+    override fun setupWebView(
+        webView: WebView,
+        scriptToLoad: String,
+        onPageLoaded: (String?) -> Unit,
+    ): WebView {
+        return webView.apply {
             webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
                     view: WebView?,
