@@ -48,6 +48,20 @@
             app:layout_constraintTop_toTopOf="@+id/cardView"
             app:srcCompat="@drawable/ic_dax_icon" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/daxDialogDismissButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_0"
+            android:contentDescription="@null"
+            android:elevation="@dimen/keyline_2"
+            app:backgroundTint="?attr/daxColorSurface"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_24"
+            app:tint="?attr/daxColorPrimaryIcon" />
+
         <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
