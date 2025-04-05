@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.</string>
     <string name="duck_player_info_modal_button">Mám to!</string>
     <string name="duck_player_unavailable">Duck Player není dostupný</string>
-    <string name="duck_player_unavailable_description">Funkčnost přehrávače Duck Player ovlivnily nedávné změny na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
     <string name="duck_player_unavailable_learn_more">Více informací</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otevírat videa na YouTube v přehrávači Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otevřít Duck Player na nové kartě</string>

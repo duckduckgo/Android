@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Ietver mūsu VPN un Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Iegūsti Privacy Pro</string>
     <string name="subscriptionSettingRestore">Man ir abonements</string>
-    <string name="subscriptionSettingWaiting">Tavs abonements tiek aktivizēts</string>
-    <string name="subscriptionSettingWaitingSubtitle">Tas aizņem ilgāku laiku nekā parasti. Lūdzu, atgriezies vēlāk.</string>
     <string name="subscriptionSettingExpired">Tavs Privacy Pro abonements ir beidzies</string>
-    <string name="subscriptionSettingExpiredSubtitle">Abonē atkal, lai turpinātu izmantot Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Skatīt plānus</string>
     <string name="subscriptionSettingSectionSubscription">Abonements</string>
     <string name="subscriptionSettingRemoveFromDevice">Noņemt no šīs ierīces</string>

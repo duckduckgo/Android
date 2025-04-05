@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Apima mūsų VPN ir Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Gaukite „Privacy Pro“</string>
     <string name="subscriptionSettingRestore">Turiu prenumeratą</string>
-    <string name="subscriptionSettingWaiting">Jūsų prenumerata aktyvuojama</string>
-    <string name="subscriptionSettingWaitingSubtitle">Tai užtrunka ilgiau nei įprastai, prašome sugrįžti vėliau.</string>
     <string name="subscriptionSettingExpired">Jūsų „Privacy Pro“ prenumerata baigėsi</string>
-    <string name="subscriptionSettingExpiredSubtitle">Vėl užsiprenumeruokite, kad galėtumėte toliau naudoti „Privacy Pro“</string>
     <string name="subscriptionSettingExpiredViewPlans">Peržiūrėti planus</string>
     <string name="subscriptionSettingSectionSubscription">Prenumerata</string>
     <string name="subscriptionSettingRemoveFromDevice">Pašalinti iš šio įrenginio</string>

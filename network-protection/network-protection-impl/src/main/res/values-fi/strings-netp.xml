@@ -216,9 +216,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Käytössä</string>
-    <string name="netpSubscriptionSettingsConnecting">Yhdistetään…</string>
-    <string name="netpSubscriptionSettingsDisconnected">Pois käytöstä</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
