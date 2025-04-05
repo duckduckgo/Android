@@ -609,9 +609,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
-        private const val TRACKER_THRESHOLD = 5
-        private const val TRACKER_START_INDEX = 1
-        private const val TRACKER_LOGO_PREFIX = "exp_network_logo_"
+        private const val TRACKER_LOGO_PREFIX = "network_logo_"
     }
 }
 
