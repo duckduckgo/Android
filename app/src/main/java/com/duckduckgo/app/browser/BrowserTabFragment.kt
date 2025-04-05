@@ -144,6 +144,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -2712,8 +2713,14 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
+        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+            R.layout.include_duckduckgo_browser_experiment_webview
+        } else {
+            R.layout.include_duckduckgo_browser_webview
+        }
+
         webView = layoutInflater.inflate(
-            R.layout.include_duckduckgo_browser_webview,
+            webViewLayout,
             binding.webViewContainer,
             true,
         ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
