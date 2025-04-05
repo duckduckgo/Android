@@ -24,10 +24,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.mobile.android.vpn.feature.settings.ExceptionListsSettingStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -55,6 +57,34 @@ interface AppTpRemoteFeatures {
 
     @DefaultValue(true)
     fun setSearchDomains(): Toggle // kill switch
+
+    // TODO: make it possible to dynamically specify experiments without having to specify up front (2025-04-03)
+    @DefaultValue(false)
+    fun tdsExperiment001(): Toggle
+
+    @DefaultValue(false)
+    fun tdsExperiment002(): Toggle
+
+    @DefaultValue(false)
+    fun tdsExperiment003(): Toggle
+
+    @DefaultValue(false)
+    fun tdsExperiment004(): Toggle
+
+    @DefaultValue(false)
+    fun tdsExperiment005(): Toggle
+
+    @DefaultValue(false)
+    fun tdsExperiment006(): Toggle
+
+    enum class Cohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
+
+    companion object {
+        internal const val EXPERIMENT_PREFIX = "tds"
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -132,5 +162,11 @@ class AppTpRemoteFeaturesStore @Inject constructor(
 
     companion object {
         private const val PREFS_FILENAME = "com.duckduckgo.vpn.atp.remote.features.v1"
+    }
+}
+
+suspend fun FeatureTogglesInventory.activeAppTpTdsFlag(): Toggle? {
+    return this.getAllTogglesForParent("appTrackerProtection").firstOrNull {
+        it.featureName().name.startsWith(AppTpRemoteFeatures.EXPERIMENT_PREFIX) && it.isEnabled()
     }
 }
