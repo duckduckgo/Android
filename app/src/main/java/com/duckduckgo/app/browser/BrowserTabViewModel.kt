@@ -71,7 +71,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.animations.store.TrackersBurstAnimationPreferencesStore
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -478,7 +477,6 @@ class BrowserTabViewModel @Inject constructor(
     private val appPersonalityFeature: AppPersonalityFeature,
     private val userStageStore: UserStageStore,
     private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
-    private val trackersBurstAnimationPreferencesStore: TrackersBurstAnimationPreferencesStore,
 
 ) : WebViewClientListener,
     EditSavedSiteListener,
@@ -4031,7 +4029,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAnimationFinished(
         logos: List<TrackerLogo>,
-        hasKnownLogos: Boolean,
     ) {
         if (logos.isEmpty()) {
             return

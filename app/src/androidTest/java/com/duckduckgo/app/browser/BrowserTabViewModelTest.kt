@@ -73,7 +73,6 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.animations.store.TrackersBurstAnimationPreferencesStore
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -544,7 +543,6 @@ class BrowserTabViewModelTest {
 
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
     private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
-    private val mockTrackersBurstAnimationPreferencesStore: TrackersBurstAnimationPreferencesStore = mock()
 
     @Before
     fun before() = runTest {
@@ -730,7 +728,6 @@ class BrowserTabViewModelTest {
             appPersonalityFeature = fakeAppPersonalityFeature,
             userStageStore = mockUserStageStore,
             privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
-            trackersBurstAnimationPreferencesStore = mockTrackersBurstAnimationPreferencesStore,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6086,8 +6083,6 @@ class BrowserTabViewModelTest {
         testee.onAnimationFinished(logos, false)
 
         assertCommandNotIssued<Command.StartExperimentV2ShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentTrackersBurstAnimation>()
     }
 
     @Test
@@ -6103,8 +6098,6 @@ class BrowserTabViewModelTest {
         testee.onAnimationFinished(logos, true)
 
         assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentTrackersBurstAnimation>()
     }
 
     @Test
@@ -6120,8 +6113,6 @@ class BrowserTabViewModelTest {
         testee.onAnimationFinished(logos, true)
 
         assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentShieldPopAnimation>()
-        assertCommandNotIssued<Command.StartExperimentTrackersBurstAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {

@@ -28,16 +28,6 @@
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintBottom_toTopOf="@id/navigationBar">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/trackersBurstAnimationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="2dp"
-        app:layout_behavior="com.duckduckgo.app.browser.animations.TrackersBlockingAnimationViewBehavior"
-        app:lottie_imageAssetsFolder="images"
-        app:lottie_autoPlay="false"
-        app:lottie_loop="false" />
-
     <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
@@ -46,12 +36,6 @@
 
     <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
         android:id="@+id/fadeOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:omnibarPosition="top" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
-        android:id="@+id/delightfulOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
@@ -174,13 +158,6 @@
         android:id="@+id/fadeOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
-        android:id="@+id/delightfulOmnibarBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

@@ -20,34 +20,20 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.content.Context
-import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
-import com.duckduckgo.app.browser.omnibar.animations.TrackersLottieAssetDelegate
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
 class LottieExperimentTrackersAnimationHelper @Inject constructor() : ExperimentTrackersAnimationHelper {
 
-    private var trackersBurstAnimationView: LottieAnimationView? = null
     private var omnibarShieldAnimationView: LottieAnimationView? = null
 
     private val conflatedJob = ConflatedJob()
@@ -81,76 +67,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         }
     }
 
-    override fun startTrackersBurstAnimation(
-        context: Context,
-        trackersBurstAnimationView: LottieAnimationView,
-        omnibarShieldAnimationView: LottieAnimationView,
-        trackersCountAndBlockedViews: List<DaxTextView>,
-        omnibarTextInput: View,
-        omnibarPosition: OmnibarPosition,
-        minibarView: View,
-        logos: List<TrackerLogo>,
-        ignoreLogos: Boolean,
-    ) {
-        this.trackersBurstAnimationView = trackersBurstAnimationView
-        this.omnibarShieldAnimationView = omnibarShieldAnimationView
-
-        val negativeMarginPx = (-72).toPx()
-        val gravity = if (omnibarPosition == BOTTOM) Gravity.BOTTOM else Gravity.NO_GRAVITY
-        val layoutParams = trackersBurstAnimationView.layoutParams as CoordinatorLayout.LayoutParams
-        layoutParams.gravity = gravity
-        layoutParams.marginStart = negativeMarginPx
-        if (gravity == Gravity.BOTTOM) {
-            trackersBurstAnimationView.scaleY = -1f
-        } else {
-            layoutParams.topMargin = negativeMarginPx
-            trackersBurstAnimationView.scaleY = 1f
-        }
-        trackersBurstAnimationView.setLayoutParams(layoutParams)
-
-        omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
-
-        with(trackersBurstAnimationView) {
-            this.setCacheComposition(false)
-            this.setAnimation(R.raw.trackers_burst)
-            this.maintainOriginalImageBounds = true
-            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos, omnibarPosition == BOTTOM, ignoreLogos))
-            this.removeAllAnimatorListeners()
-            this.show()
-
-            this.addAnimatorListener(
-                object : AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {
-                        this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.show()
-                        conflatedJob += MainScope().launch {
-                            delay(800L)
-                            this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.setMaxProgress(1f)
-                            this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.playAnimation()
-                        }
-                    }
-
-                    override fun onAnimationEnd(animation: Animator) {
-                        animateViews(trackersCountAndBlockedViews, omnibarTextInput, 0L)
-                        this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.gone()
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {}
-
-                    override fun onAnimationRepeat(animation: Animator) {}
-                },
-            )
-
-            val isOmnibarTopAndMinibarGone = (omnibarPosition == TOP && minibarView.alpha < 1f)
-            val isOmnibarBottomAndMinibarGone = (omnibarPosition == BOTTOM && minibarView.alpha < 1f)
-            if (isOmnibarTopAndMinibarGone || isOmnibarBottomAndMinibarGone) {
-                this.setMaxProgress(1f)
-                this.playAnimation()
-            }
-        }
-    }
-
     override fun cancelAnimations() {
-        this.trackersBurstAnimationView?.cancelAnimation()
         this.omnibarShieldAnimationView?.cancelAnimation()
         conflatedJob.cancel()
     }

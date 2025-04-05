@@ -813,60 +813,6 @@ class BrowserTabFragment :
 
     private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
 
-    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>, ignoreLogos: Boolean) {
-        experimentTrackersAnimationHelper.startTrackersBurstAnimation(
-            context = requireContext(),
-            trackersBurstAnimationView = binding.trackersBurstAnimationView,
-            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                listOf(
-                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
-                )
-            } else {
-                listOf(
-                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
-                )
-            },
-            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.delightfulOmnibar.omnibarTextInput
-            } else {
-                binding.delightfulOmnibarBottom.omnibarTextInput
-            },
-            omnibarPosition = omnibar.omnibarPosition,
-            minibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.delightfulOmnibar.findViewById(R.id.minibar)
-            } else {
-                binding.delightfulOmnibarBottom.findViewById(R.id.minibar)
-            },
-            logos = logos,
-            ignoreLogos = ignoreLogos,
-        )
-    }
-
-    private fun showExperimentShieldPopAnimation() {
-        experimentTrackersAnimationHelper.startShieldPopAnimation(
-            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                listOf(
-                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.delightfulOmnibar.findViewById(R.id.trackersBlockedTextView),
-                )
-            } else {
-                listOf(
-                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.delightfulOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
-                )
-            },
-            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-                binding.delightfulOmnibar.omnibarTextInput
-            } else {
-                binding.delightfulOmnibarBottom.omnibarTextInput
-            },
-        )
-    }
-
     private fun showExperimentV2ShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
@@ -2083,8 +2029,6 @@ class BrowserTabFragment :
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
-            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos, it.ignoreLogos)
-            is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
             is Command.StartExperimentV2ShieldPopAnimation -> showExperimentV2ShieldPopAnimation()
             else -> {
                 // NO OP
@@ -2775,8 +2719,8 @@ class BrowserTabFragment :
                     )
                 }
 
-                override fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
-                    viewModel.onAnimationFinished(logos, hasKnownLogos)
+                override fun onTrackersCountFinished(logos: List<TrackerLogo>) {
+                    viewModel.onAnimationFinished(logos)
                 }
             },
         )

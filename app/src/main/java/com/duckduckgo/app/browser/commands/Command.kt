@@ -35,7 +35,6 @@ import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -270,7 +269,5 @@ sealed class Command {
     data object CloseCustomTab : Command()
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
-    data class StartExperimentTrackersBurstAnimation(val logos: List<TrackerLogo>, val ignoreLogos: Boolean) : Command()
-    data object StartExperimentShieldPopAnimation : Command()
     data object StartExperimentV2ShieldPopAnimation : Command()
 }

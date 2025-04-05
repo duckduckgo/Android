@@ -36,9 +36,4 @@
     <declare-styleable name="FadeOmnibarLayout">
         <attr name="omnibarPosition"/>
     </declare-styleable>
-
-    <!-- DelightfulOmnibarLayout-->
-    <declare-styleable name="DelightfulOmnibarLayout">
-        <attr name="omnibarPosition"/>
-    </declare-styleable>
 </resources>

@@ -270,7 +270,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             totalTrackerCount = trackersCount,
             trackerTextView = trackersBlockedCountAnimationView!!,
             onAnimationEnd = {
-                listener?.onAnimationFinished(experimentLogos.logos, experimentLogos.hasKnownLogos)
+                listener?.onAnimationFinished(experimentLogos.logos)
 
                 conflatedJob += MainScope().launch {
                     delay(1500L)

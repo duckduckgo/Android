@@ -853,7 +853,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         return isScrollingEnabled
     }
 
-    override fun onAnimationFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean) {
-        omnibarTextListener?.onTrackersCountFinished(logos, hasKnownLogos)
+    override fun onAnimationFinished(logos: List<TrackerLogo>) {
+        omnibarTextListener?.onTrackersCountFinished(logos)
     }
 }

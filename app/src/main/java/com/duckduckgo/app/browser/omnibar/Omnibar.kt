@@ -45,7 +45,6 @@ import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedList
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.DELIGHTFUL
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -87,8 +86,6 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
-                        binding.rootView.removeView(binding.delightfulOmnibar)
-                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
                     }
 
                     FADE -> {
@@ -98,18 +95,6 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
-                        binding.rootView.removeView(binding.delightfulOmnibar)
-                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
-                    }
-                    DELIGHTFUL -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
-
-                        // remove all other omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
             }
@@ -123,8 +108,6 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
-                        binding.rootView.removeView(binding.delightfulOmnibar)
-                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
                     }
 
                     FADE -> {
@@ -134,18 +117,6 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
-                        binding.rootView.removeView(binding.delightfulOmnibar)
-                        binding.rootView.removeView(binding.delightfulOmnibarBottom)
-                    }
-                    DELIGHTFUL -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.delightfulOmnibar)
-
-                        // remove all other omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
 
@@ -192,7 +163,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
-        fun onTrackersCountFinished(logos: List<TrackerLogo>, hasKnownLogos: Boolean)
+        fun onTrackersCountFinished(logos: List<TrackerLogo>)
     }
 
     data class OmnibarTextState(
@@ -220,7 +191,6 @@ class Omnibar(
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibar
                     FADE -> binding.fadeOmnibar
-                    DELIGHTFUL -> binding.delightfulOmnibar
                 }
             }
 
@@ -228,7 +198,6 @@ class Omnibar(
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibarBottom
                     FADE -> binding.fadeOmnibarBottom
-                    DELIGHTFUL -> binding.delightfulOmnibarBottom
                 }
             }
         }
@@ -484,11 +453,6 @@ class Omnibar(
                         scrollY = scrollY,
                         oldScrollY = oldScrollY,
                     )
-                    DELIGHTFUL -> binding.delightfulOmnibar.onScrollChanged(
-                        scrollableView = v,
-                        scrollY = scrollY,
-                        oldScrollY = oldScrollY,
-                    )
                 }
             }
 
@@ -499,11 +463,6 @@ class Omnibar(
                     }
 
                     FADE -> binding.fadeOmnibarBottom.onScrollChanged(
-                        scrollableView = v,
-                        scrollY = scrollY,
-                        oldScrollY = oldScrollY,
-                    )
-                    DELIGHTFUL -> binding.delightfulOmnibarBottom.onScrollChanged(
                         scrollableView = v,
                         scrollY = scrollY,
                         oldScrollY = oldScrollY,
@@ -522,16 +481,6 @@ class Omnibar(
 
                 OmnibarPosition.BOTTOM -> {
                     binding.fadeOmnibarBottom.resetTransitionDelayed()
-                }
-            }
-        } else if (omnibarType == DELIGHTFUL) {
-            when (omnibarPosition) {
-                OmnibarPosition.TOP -> {
-                    binding.delightfulOmnibar.resetTransitionDelayed()
-                }
-
-                OmnibarPosition.BOTTOM -> {
-                    binding.delightfulOmnibarBottom.resetTransitionDelayed()
                 }
             }
         }
