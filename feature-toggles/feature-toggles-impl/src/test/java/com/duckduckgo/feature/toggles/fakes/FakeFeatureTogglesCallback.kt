@@ -24,6 +24,7 @@ class FakeFeatureTogglesCallback constructor() : FeatureTogglesCallback {
     var locale = Locale.US
     var isReturningUser = true
     var isPrivacyProEligible = false
+    var sdkVersion = 28
 
     override fun onCohortAssigned(
         experimentName: String,
@@ -65,8 +66,13 @@ class FakeFeatureTogglesCallback constructor() : FeatureTogglesCallback {
             return targetPProEligible?.let { targetPProEligible == isPrivacyProEligible } ?: true
         }
 
+        fun matchMinSdkVersion(targetMinSdkVersion: Int?): Boolean {
+            return targetMinSdkVersion?.let { targetMinSdkVersion <= sdkVersion } ?: true
+        }
+
         return matchLocale(target.localeCountry, target.localeLanguage) &&
             matchPrivacyProEligible(target.isPrivacyProEligible) &&
-            matchReturningUser(target.isReturningUser)
+            matchReturningUser(target.isReturningUser) &&
+            matchMinSdkVersion(target.minSdkVersion)
     }
 }

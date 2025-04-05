@@ -105,3 +105,18 @@ class LocaleToggleTargetMatcher @Inject constructor(
         return isCountryMatching && isLanguageMatching
     }
 }
+
+@ContributesMultibinding(AppScope::class)
+class MinSdkToggleTargetMatcher @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : TargetMatcherPlugin {
+    override fun matchesTargetProperty(target: Target): Boolean {
+        val sdkInt = appBuildConfig.sdkInt
+
+        val isSdkIntMatching = target.minSdkVersion?.let {
+            sdkInt >= it
+        } ?: true
+
+        return isSdkIntMatching
+    }
+}
