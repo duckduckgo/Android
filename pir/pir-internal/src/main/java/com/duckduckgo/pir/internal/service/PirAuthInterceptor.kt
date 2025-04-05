@@ -46,7 +46,7 @@ class PirAuthInterceptor @Inject constructor(
 
         return if (authRequired) {
             val accessToken = runBlocking { subscriptions.getAccessToken() }
-                ?: throw IOException("Can't obtain access token for requestCan't obtain access token for request")
+                ?: throw IOException("Can't obtain access token for request")
 
             val authenticatedRequest = request.newBuilder()
                 .header("Authorization", "bearer $accessToken")
