@@ -110,6 +110,15 @@
                 app:primaryText="@string/netpForceRekey"
                 app:showSwitch="false"
                 />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/egressFailure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpEgressFailure"
+                app:showSwitch="false"
+                />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/changeEnvironment"
                 android:layout_width="match_parent"
