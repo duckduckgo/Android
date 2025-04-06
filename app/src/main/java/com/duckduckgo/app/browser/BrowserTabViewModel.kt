@@ -4068,8 +4068,6 @@ class BrowserTabViewModel @Inject constructor(
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
-        internal const val TRACKER_LOGO_ANIMATION_THRESHOLD = 2
-
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(
             Locale.US.country,
