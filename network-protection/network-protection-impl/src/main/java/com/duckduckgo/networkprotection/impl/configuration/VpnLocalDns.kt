@@ -60,6 +60,10 @@ private class VpnLocalDnsImpl(
 
     override fun lookup(hostname: String): List<InetAddress> {
         logcat { "Lookup for $hostname" }
+        if (vpnRemoteFeatures.localVpnControllerDns().isEnabled() == false) {
+            return defaultDns.lookup(hostname)
+        }
+
         return try {
             defaultDns.lookup(hostname)
         } catch (t: Throwable) {
@@ -73,7 +77,7 @@ private class VpnLocalDnsImpl(
     }
 
     private fun getRemoteDnsEntries(): Map<String, List<DnsEntry>> {
-        vpnRemoteFeatures.localDNS().getSettings()?.let { settings ->
+        vpnRemoteFeatures.localVpnControllerDns().getSettings()?.let { settings ->
             return try {
                 adapter.fromJson(settings)?.domains
             } catch (t: Throwable) {
@@ -88,7 +92,7 @@ private class VpnLocalDnsImpl(
     /*
     "settings": {
         "domains": {
-            "controller.duckduckgo.com": [
+            "controller.netp.duckduckgo.com": [
                 {
                     "address": "1.2.3.4",
                     "region": "use"
