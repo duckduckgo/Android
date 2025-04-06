@@ -56,14 +56,16 @@ private class VpnLocalDnsImpl(
 
     override fun lookup(hostname: String): List<InetAddress> {
         logcat { "Lookup for $hostname" }
+        return try {
+            defaultDns.lookup(hostname)
+        } catch (t: Throwable) {
+            val localResolution = localDomains[hostname] ?: fallbackDomains[hostname]
+            localResolution?.let { entries ->
+                logcat { "Hardcoded DNS for $hostname" }
 
-        val localResolution = localDomains[hostname] ?: fallbackDomains[hostname]
-
-        return localResolution?.let { entries ->
-            logcat { "Hardcoded DNS for $hostname" }
-
-            entries.map { InetAddress.getByName(it.address) }
-        } ?: defaultDns.lookup(hostname)
+                entries.map { InetAddress.getByName(it.address) }
+            } ?: throw t
+        }
     }
 
     private fun getRemoteDnsEntries(): Map<String, List<DnsEntry>> {
