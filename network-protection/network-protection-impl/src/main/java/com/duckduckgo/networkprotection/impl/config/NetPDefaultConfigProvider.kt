@@ -68,7 +68,7 @@ class RealNetPDefaultConfigProvider @Inject constructor(
     }
 
     override suspend fun routes(): Map<String, Int> = withContext(dispatcherProvider.io()) {
-        val isLocalDnsEnabled = vpnRemoteFeatures.runtimeIpRouteGeneration().isEnabled()
+        val isLocalDnsEnabled = vpnRemoteFeatures.localVpnControllerDns().isEnabled()
 
         return@withContext if (netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()) {
             val routes = if (isLocalDnsEnabled) {
