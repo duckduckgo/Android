@@ -170,7 +170,11 @@ class RealDuckChat @Inject constructor(
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let {
-            mapOf(QUERY to it)
+            mutableMapOf(QUERY to it).apply {
+                if (isDuckChatBang(it.toUri())) {
+                    put(BANG_QUERY_NAME, "true")
+                }
+            }
         } ?: emptyMap()
         openDuckChat(parameters)
     }
@@ -271,5 +275,6 @@ class RealDuckChat @Inject constructor(
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
+        private const val BANG_QUERY_NAME = "bang"
     }
 }
