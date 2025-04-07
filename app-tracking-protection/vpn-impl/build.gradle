@@ -137,6 +137,7 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':data-store-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
