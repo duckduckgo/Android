@@ -381,8 +381,9 @@ class AppSyncAccountRepository @Inject constructor(
                     throwable.asErrorResult().alsoFireAccountErrorPixel()
                     return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
                 }
-                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
-                    ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading received recovery code").alsoFireAccountErrorPixel()
+                val recoveryCode = kotlin.runCatching {
+                    Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
+                }.getOrNull() ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading received recovery code").alsoFireAccountErrorPixel()
                 syncStore.userId = recoveryCode.userId
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
