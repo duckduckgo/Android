@@ -55,8 +55,8 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
 class BrowserNavigationBarView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
+    private val context: Context,
+    private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
 
@@ -152,7 +152,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     override fun getBehavior(): Behavior<*> {
-        return BottomViewBehavior()
+        return BottomViewBehavior(context, attrs)
     }
 
     private fun renderView(viewState: ViewState) {
@@ -197,7 +197,10 @@ class BrowserNavigationBarView @JvmOverloads constructor(
      *
      * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
      */
-    private class BottomViewBehavior : Behavior<View>() {
+    private class BottomViewBehavior(
+        context: Context,
+        attrs: AttributeSet?,
+    ) : Behavior<View>(context, attrs) {
 
         override fun layoutDependsOn(
             parent: CoordinatorLayout,

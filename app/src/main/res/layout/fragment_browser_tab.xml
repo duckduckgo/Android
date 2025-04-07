@@ -84,7 +84,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_behavior="com.duckduckgo.app.browser.webview.BrowserContainerLayoutBehavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
         <FrameLayout
