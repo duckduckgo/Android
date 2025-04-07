@@ -1553,7 +1553,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr", null, null)),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null)),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1596,8 +1596,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1607,8 +1607,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1618,8 +1618,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1659,7 +1659,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         // foo feature is not an experiment and the target has a variantKey. As this is a mistake, that target is invalidated, hence assertTrue
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr", null, null)),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null)),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1703,9 +1703,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null),
-                Toggle.State.Target(null, null, "fr", null, null),
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, "fr", null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1750,9 +1750,197 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null),
-                Toggle.State.Target(null, null, "zh", null, null),
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, "zh", null, null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion not matching as sdkVersion is lower than minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 28
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 30
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 30),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is the same as minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 28
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is higher than minSdkVersion`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.FRANCE
+        featureTogglesCallback.sdkVersion = 30
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets matching and minSdkVersion matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale.US
+        featureTogglesCallback.sdkVersion = 30
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "minSdkVersion": 28
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, 28),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1842,8 +2030,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1851,8 +2039,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1860,7 +2048,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.variantFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1918,8 +2106,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1928,7 +2116,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1983,8 +2171,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1993,7 +2181,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -2034,7 +2222,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2075,7 +2263,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2116,7 +2304,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("mc", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2157,7 +2345,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2188,7 +2376,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US", null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US", null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2218,7 +2406,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2248,7 +2436,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2290,7 +2478,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
