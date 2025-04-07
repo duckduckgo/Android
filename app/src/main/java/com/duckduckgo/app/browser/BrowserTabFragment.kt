@@ -2843,6 +2843,8 @@ class BrowserTabFragment :
 
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
+        hideDaxBubbleCta()
+        renderer.showNewTab()
     }
 
     private fun hideDaxBubbleCta() {

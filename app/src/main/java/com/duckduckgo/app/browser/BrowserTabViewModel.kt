@@ -2817,16 +2817,18 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserClickCtaDismissButton(cta: Cta) {
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+            onUserDismissedCta(cta)
             if (cta is DaxBubbleCta) {
-                viewModelScope.launch {
-                    command.value = HideOnboardingDaxBubbleCta(cta)
-                    pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
-                }
+                command.value = HideOnboardingDaxBubbleCta(cta)
+                pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
             } else if (cta is OnboardingDaxDialogCta) {
-                viewModelScope.launch {
-                    command.value = HideOnboardingDaxDialog(cta)
-                    pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
+                command.value = HideOnboardingDaxDialog(cta)
+                pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
+                if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+                    val updatedCta = ctaViewModel.getEndStaticDialogCta()
+                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+                } else if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                    ctaViewModel.dismissPulseAnimation()
                 }
             }
         }
