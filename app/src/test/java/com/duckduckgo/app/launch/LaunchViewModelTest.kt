@@ -22,13 +22,10 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.fakes.FakePixel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -48,8 +45,6 @@ class LaunchViewModelTest {
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
 
-    private val fakePixel: FakePixel = FakePixel()
-
     private lateinit var testee: LaunchViewModel
 
     @After
@@ -62,7 +57,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -77,7 +71,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -92,7 +85,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -107,7 +99,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -120,7 +111,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -133,24 +123,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any<Home>())
-    }
-
-    @Test
-    fun whenSendingWelcomeScreenPixelThenSplashScreenShownPixelIsSent() = runTest {
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            fakePixel,
-        )
-
-        testee.sendWelcomeScreenPixel()
-
-        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
     }
 }

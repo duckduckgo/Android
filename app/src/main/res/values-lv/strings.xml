@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logotips</string>
-    <string name="duckDuckGoTagline">Tava aizsardzība ir mūsu prioritāte.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Aizsardzība. Privātums. Sirds miers.</string>
     <string name="yes">Jā</string>
     <string name="no">Nē</string>
     <string name="open">Atvērt</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Lejupielādes</string>
     <string name="tabSwitcherListViewMenu">Saraksta skats</string>
     <string name="tabSwitcherGridViewMenu">Režģa skats</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
+    <string name="inTheLast7Days">pēdējo 7 dienu laikā</string>
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Par</string>
-    <string name="aboutHeader">Sveicināti Duck pusē!</string>
-    <string name="aboutDescription">DuckDuckGo ir neatkarīgs 2008. gadā dibināts interneta privātuma uzņēmums ikvienam, kam ir apnikusi izsekošana tiešsaistē un kas vēlas vienkāršu risinājumu. Mēs esam pierādījums tam, ka tiešsaistē var iegūt reālu privātuma aizsardzību bez kompromisiem.\n\nDuckDuckGo pārlūkprogrammā ir visas funkcijas, ko gaidi no sava pārlūka: grāmatzīmes, cilnes, paroles u.c., kā arī vairāk nekā <annotation type="privacy_protection_link">desmit spēcīgu privātuma aizsardzības funkciju</annotation>, kas nav pieejamas vairumā populārāko pārlūkprogrammu pēc noklusējuma. Šis unikāli visaptverošais privātuma aizsardzības komplekts palīdz aizsargāt tavas darbības tiešsaistē, sākot no meklēšanas līdz pārlūkošanai, e-pasta sūtīšanai u.c.\n\nMūsu privātuma aizsardzība darbojas vienmēr – tev nav jāpārzina sarežģīti tehniskie aspekti vai iestatījumi. Tev vienkārši jālieto DuckDuckGo pārlūks visās savās ierīcēs, un privātums būs tavs standarta risinājums.\n\nBet, ja vēlies paskatīties, kas lācītim vēderā, vairāk informācijas par to, kā darbojas DuckDuckGo privātuma aizsardzība, vari atrast mūsu <annotation type="learn_more_link">palīdzības lapās</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo ir neatkarīgs interneta konfidencialitātes uzņēmums, kas dibināts 2008. gadā un ir pieejams visiem, kam ir apnikusi izsekošana tiešsaistē un kas vēlas vienkāršu risinājumu. Mēs esam pierādījums tam, ka tiešsaistē ir iespējams saņemt reālu privātuma aizsardzību bez kompromisiem.\n\nDuckDuckGo pārlūkprogrammā ir visi līdzekļi, ko vari sagaidīt no sava pārlūka: grāmatzīmes, cilnes, paroles un citas iespējas, kā arī vairāk nekā <annotation type="privacy_protection_link">desmit spēcīgas privātuma aizsardzības funkcijas</annotation>, kas pēc noklusējuma nav pieejamas vairumā populārāko pārlūkprogrammu. Šis unikāli visaptverošais privātuma aizsardzības komplekts palīdz aizsargāt tavas darbības tiešsaistē, sākot no meklēšanas līdz pārlūkošanai, e-pasta ziņojumu sūtīšanai u.c.\n\nMūsu privātuma aizsardzība darbojas bez nepieciešamības zināt tehniskas detaļas vai vajadzības tikt galā ar sarežģītiem iestatījumiem. Tev vienkārši jāsāk lietot DuckDuckGo pārlūks visās savās ierīcēs, un tavs privātums tiks nodrošināts pēc noklusējuma.\n\nTaču, ja tu vēlies paskatīties, kas lācītim vēderā, vairāk informācijas par to, kā darbojas DuckDuckGo privātuma aizsardzība, vari atrast mūsu <annotation type="learn_more_link">palīdzības lapās</annotation></string>
+    <string name="aboutHeaderNewTagLine">Aizsardzība. Privātums. Sirds miers.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Laipni lūgti Duck pusē!\n\nDuckDuckGo ir neatkarīgs tiešsaistes aizsardzības uzņēmums ikvienam, kurš vēlas atgūt kontroli pār savu personisko informāciju.\n\nMēs uzskatām, ka labākais veids, kā aizsargāt savu personisko informāciju no hakeriem, krāpniekiem un privātumu apdraudošiem uzņēmumiem, ir to neievākt vispār. Tāpēc miljoniem cilvēku <annotation type="chart_comparison">izvēlas DuckDuckGo, nevis Chrome un citas pārlūkprogrammas</annotation> meklēšanai un pārlūkošanai tiešsaistē. Mūsu iebūvētā meklētājprogramma ir līdzīga Google, taču tā neizsekotavus meklēšanas vaicājumus. Mūsu pārlūkošanas aizsardzība, piemēram, reklāmu izsekotāju bloķēšana un sīkfailu bloķēšana neļauj citiem uzņēmumiem ievākt tavus datus. Turklāt mūsu pārlūkprogramma ir bezmaksas — mēs pelnām ar <annotation type="privacy_respecting_ads">meklēšanas laikā rādītām reklāmām, kas ievēro privātumu</annotation>, nevis izmantojot tavus datus.Turklāt mēs piedāvājam arī <annotation type="ppro_help_page">Privacy Pro</annotation>, mūsu trīs vienā abonēšanas pakalpojumu, kas ir integrēts mūsu pārlūkprogrammā. Privacy Pro abonenti saņem vēl lielāku privātuma aizsardzību ar ātru un vienkāršu <annotation type="vpn_help_page">VPN</annotation>, kas palīdz pasargāt tavas darbības tiešsaistē, pakalpojumu, kas atrod un izdzēš tavu personisko informāciju no cilvēku meklētāju vietnēm, un pakalpojumu, kas atjauno tavu identitāti, ja tā tiek nozagta.\n\nAtgūsti kontroli pār savu personisko informāciju ar pārlūkprogrammu, kas paredzēta datu aizsardzībai, nevis datu apkopošanai.</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
-    <string name="systemSearchOnboardingText">Paldies, ka izvēlējies DuckDuckGo!\nTagad, izmantojot mūsu meklētāju vai lietotni, tavi meklējumi tiks aizsargāti.</string>
+    <string name="systemSearchOnboardingThanks">Paldies, ka izvēlējies DuckDuckGo!\nMūsu pārlūkprogrammas izmantošana palīdz aizsargāt tevi no hakeriem, krāpniekiem un uzņēmumiem, kas alkst pēc personu datiem.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloķē nedrošus izsekotājus.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Veic piespiedu šifrēšanu vietnēs.</string>
@@ -659,11 +663,91 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Aizvērt visas cilnes?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Vai tiešām vēlies aizvērt visas cilnes?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Atcelt</string>
     <string name="closeAppTabsConfirmationDialogClose">Aizvērt</string>
+
+    <string name="selectTabsMenuItem">Atlasīt cilnes</string>
+    <string name="selectAllTabsMenuItem">Atlasīt visus</string>
+    <string name="deselectAllTabsMenuItem">Noņemt atlasi visiem</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d atlasīts</string>
+    <string name="tabSelectedIndicator">Atlasītās cilnes indikators</string>
+    <string name="tabNotSelectedIndicator">Nav atlasīts cilnes indikators</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d saites no DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Kopīgot %1$d saites</item>
+        <item quantity="one">Kopīgot saiti</item>
+        <item quantity="other">Kopīgot %1$d saites</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai pievienot grāmatzīmi %1$d cilnēm?</item>
+        <item quantity="one">Vai pievienot grāmatzīmi atlasītajai cilnei?</item>
+        <item quantity="other">Vai pievienot grāmatzīmi %1$d cilnēm?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Pievienotas %1$d grāmatzīmes</item>
+        <item quantity="one">Pievienota grāmatzīme</item>
+        <item quantity="other">Pievienotas %1$d grāmatzīmes</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Grāmatzīme</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Pievienot grāmatzīmi %1$d cilnēm</item>
+        <item quantity="one">Pievienot grāmatzīmi cilnei</item>
+        <item quantity="other">Pievienot grāmatzīmi %1$d cilnēm</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Esošās grāmatzīmes netiks dublētas.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt visas %1$d cilnes?</item>
+        <item quantity="one">Aizvērt cilni?</item>
+        <item quantity="other">Aizvērt visas %1$d cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt vēl %1$d citas cilnes?</item>
+        <item quantity="one">Aizvērt vēl citu cilni?</item>
+        <item quantity="other">Aizvērt vēl %1$d citas cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt %1$d cilnes?</item>
+        <item quantity="one">Aizvērt cilni?</item>
+        <item quantity="other">Aizvērt %1$d cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai tiešām vēlies aizvērt visas cilnes?</item>
+        <item quantity="one">Vai tiešām vēlies aizvērt šo cilni?</item>
+        <item quantity="other">Vai tiešām vēlies aizvērt visas cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai tiešām vēlies aizvērt šīs cilnes?</item>
+        <item quantity="one">Vai tiešām vēlies aizvērt šo cilni?</item>
+        <item quantity="other">Vai tiešām vēlies aizvērt šīs cilnes?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt cilnes</item>
+        <item quantity="one">Aizvērt cilni</item>
+        <item quantity="other">Aizvērt cilnes</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt %1$d cilnes</item>
+        <item quantity="one">Aizvērt cilni</item>
+        <item quantity="other">Aizvērt %1$d cilnes</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Aizvērt citas cilnes</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">%1$d cilnes ir aizvērtas</item>
+        <item quantity="one">Cilne ir aizvērta</item>
+        <item quantity="other">%1$d cilnes ir aizvērtas</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">%1$d privātās cilnes</item>
+        <item quantity="one">%1$d privātā cilne</item>
+        <item quantity="other">%1$d privātās cilnes</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>
@@ -708,8 +792,8 @@
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
-    <string name="preOnboardingComparisonChartItem4">Bloķē kaitinošas reklāmas</string>
-    <string name="preOnboardingComparisonChartItem5">Ātri izdzēs pārlūkošanas datus</string>
+    <string name="preOnboardingComparisonChartItem4">Bloķēt izsekojošas reklāmas</string>
+    <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
     <string name="preOnboardingDaxDialog3Title">Lieliski! Apsveicam ar pievienošanos pīļu komandai.</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
@@ -799,5 +883,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne tagad</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloķē izsekotājus, lai aizsargātu tavu pārlūkošanu</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Pamest šo vietni</string>
+    <string name="maliciousSiteAdvancedCTA">Detalizēti</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ja uzskati, ka šī vietne ir droša, vari <a href=\"\">ziņot par kļūdu</a>. Tu joprojām vari apmeklēt šo vietni, apzinoties savu risku.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Pieņemt risku un apmeklēt vietni</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Ziņo par vietni, kas ir nepareizi atzīmēta kā ļaunprātīga.</string>
+    <string name="maliciousSiteLearnMoreTitle">Uzzināt vairāk</string>
+    <string name="maliciousSiteSettingTitle">Vietnes drošības brīdinājumi</string>
+    <string name="maliciousSiteToggleHint">Brīdiniet mani par vietnēm, kas atzīmētas kā pikšķerēšanas vai ļaunprātīgas programmatūras vietnes</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Šī līdzekļa atspējošana var apdraudēt tavu informāciju.</string>
 
 </resources>

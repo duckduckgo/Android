@@ -33,6 +33,7 @@ interface AppBuildConfig {
     val deviceLocale: Locale
     val isDefaultVariantForced: Boolean
     val buildDateTimeMillis: Long
+    val canSkipOnboarding: Boolean
 
     /**
      * You should call [variantName] in a background thread

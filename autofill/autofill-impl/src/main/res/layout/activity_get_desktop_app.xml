@@ -110,7 +110,7 @@
                 app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
                 android:layout_marginStart="@dimen/keyline_6"
                 android:layout_marginEnd="@dimen/keyline_6"
-                app:buttonSize="large"
+                app:daxButtonSize="large"
                 app:icon="@drawable/ic_share_android_16"
                 android:text="@string/autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText" />
 

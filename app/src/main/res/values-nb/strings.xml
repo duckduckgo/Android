@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="duckDuckGoTagline">Din beskyttelse, vår prioritet.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Beskyttelse. Personvern. Ro i sjelen.</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
     <string name="open">Åpne</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Nedlastinger</string>
     <string name="tabSwitcherListViewMenu">Listevisning</string>
     <string name="tabSwitcherGridViewMenu">Rutenettvisning</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt; de siste 7 dagene</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt;</string>
+    <string name="inTheLast7Days">de siste 7 dagene</string>
 
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Om</string>
-    <string name="aboutHeader">Velkommen til «the Duck Side»!</string>
-    <string name="aboutDescription">DuckDuckGo er et uavhengig personvernselskap som ble grunnlagt i 2008, for alle som er lei av å bli sporet på nettet og vil ha en enkel løsning. Vi er beviset på at ekte personvern er mulig på nettet uten å fire på kravene.\n\nDuckDuckGo-nettleseren inneholder funksjonene du kan forvente deg av en vanlig nettleser, som bokmerker, faner, passord og lignende, samt <annotation type="privacy_protection_link">en rekke kraftige personvernfunksjoner</annotation>, som ikke tilbys som standard i de fleste populære nettleserne. Disse usedvanlig omfattende personvernfunksjonene bidrar til å beskytte nettaktivitetene dine, fra søk til surfing, e-poster med mer.\n\nPersonvernfunksjonene fungerer uten at du behøver å kunne noe om de tekniske detaljene eller forholde deg til kompliserte innstillinger. Det eneste du behøver å gjøre, er å bytte nettleser til DuckDuckGo på alle enhetene dine, så får du personvern som standard.\n\nMen hvis du vil ta en titt under panseret, finner du mer informasjon om hvordan DuckDuckGos personvern fungerer på våre <annotation type="learn_more_link">hjelpesider</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo er et uavhengig personvernselskap som ble grunnlagt i 2008, for alle som er lei av å bli sporet på nettet og vil ha en enkel løsning. Vi er beviset på at ekte personvern er mulig på nettet uten å fire på kravene.DuckDuckGo-nettleseren inneholder funksjonene du kan forvente deg av en vanlig nettleser, som bokmerker, faner, passord og lignende, samt <annotation type="privacy_protection_link">en rekke kraftige personvernfunksjoner</annotation>, som ikke tilbys som standard i de fleste populære nettleserne. Disse usedvanlig omfattende personvernfunksjonene bidrar til å beskytte nettaktivitetene dine, fra søk til surfing, e-poster med mer.\n\nPersonvernfunksjonene fungerer uten at du behøver å kunne noe om de tekniske detaljene eller forholde deg til kompliserte innstillinger. Det eneste du behøver å gjøre, er å bytte nettleser til DuckDuckGo på alle enhetene dine, så får du personvern som standard.\n\nMen hvis du vil ta en titt under panseret, finner du mer informasjon om hvordan DuckDuckGos personvern fungerer på våre <annotation type="learn_more_link">hjelpesider</annotation></string>
+    <string name="aboutHeaderNewTagLine">Beskyttelse. Personvern. Ro i sjelen.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo er et uavhengig selskap som gir bedre personvern til alle som ønsker å ta tilbake kontrollen over personopplysninger på nettet.\n\nVi mener at den beste måten å beskytte personopplysninger mot hackere, svindlere og selskaper som krenker personvernet på, er å hindre at de samles inn i det hele tatt. Det er derfor millioner av mennesker <annotation type="chart_comparison">velger DuckDuckGo fremfor Chrome og andre nettlesere</annotation> for å søke og surfe på nettet. Vår innebygde søkemotor er som Google, men sporer aldri søkene dine. Og surfebeskyttelsene våre, som blokkering av annonsesporing og informasjonskapsler, hindrer andre selskaper i å samle inn opplysningene dine. Og dessuten er nettleseren vår gratis – vi tjener penger på <annotation type="privacy_respecting_ads">søkeannonser som respekterer personvernet</annotation>, ikke ved å utnytte dataene dine.I tillegg tilbyr vi <annotation type="ppro_help_page">Privacy Pro</annotation>, en tre-i-ett-abonnementstjeneste som er integrert i nettleseren vår. Privacy Pro-abonnenter får enda bedre personvern med en rask og enkel <annotation type="vpn_help_page">VPN</annotation>-tilkobling som bidrar til å sikre internettaktiviteten din, en tjeneste som finner og fjerner personlig informasjon om deg fra personsøk på nettet, og en tjeneste som gjenoppretter identiteten din hvis den skulle bli stjålet.\n\nTa tilbake kontrollen over personopplysningene dine med en nettleser som er utviklet for databeskyttelse, ikke datainnsamling.</string>
     <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Fra denne enheten</string>
     <string name="systemSearchAppNotFound">Programmet ble ikke funnet</string>
-    <string name="systemSearchOnboardingText">Takk for at du valgte DuckDuckGo!\nNår du bruker vårt søk eller app, er søkene dine beskyttet.</string>
+    <string name="systemSearchOnboardingThanks">Takk for at du valgte DuckDuckGo!\nVed å bruke nettleseren vår beskytter du deg selv mot hackere, svindlere og selskaper som samler store mengder data.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkerer utrygge sporere.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Tvinger kryptering av nettsteder.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra ovenfra og nedover og trykk på tilbake-knappen for å gå ut av fullskjerm</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Vil du lukke alle fanene?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Er du sikker på at du vil lukke alle fanene?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Avbryt</string>
     <string name="closeAppTabsConfirmationDialogClose">Lukk</string>
+
+    <string name="selectTabsMenuItem">Velg faner</string>
+    <string name="selectAllTabsMenuItem">Velg alle</string>
+    <string name="deselectAllTabsMenuItem">Fjern alle valg</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d valgt</string>
+    <string name="tabSelectedIndicator">Indikator for valgt fane</string>
+    <string name="tabNotSelectedIndicator">Indikator for ikke-valgt fane</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d lenker fra DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Del lenke</item>
+        <item quantity="other">Del %1$d lenker</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vil du bokmerke den valgte fanen?</item>
+        <item quantity="other">Vil du bokmerke %1$d faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bokmerke lagt til</item>
+        <item quantity="other">%1$d bokmerker lagt til</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Bokmerke</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bokmerk fanen</item>
+        <item quantity="other">Bokmerk %1$d faner</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Eksisterende bokmerker blir ikke duplisert.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vil du lukke fanen?</item>
+        <item quantity="other">Vil du lukke alle %1$d fanene?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vil du lukke den andre fanen?</item>
+        <item quantity="other">Vil du lukke de %1$d andre fanene?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vil du lukke fanen?</item>
+        <item quantity="other">Vil du lukke %1$d faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Er du sikker på at du vil lukke denne fanen?</item>
+        <item quantity="other">Er du sikker på at du vil lukke alle fanene?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Er du sikker på at du vil lukke denne fanen?</item>
+        <item quantity="other">Er du sikker på at du vil lukke disse fanene?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lukk fanen</item>
+        <item quantity="other">Lukk fanene</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lukk fane</item>
+        <item quantity="other">Lukk %1$d faner</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Lukk andre faner</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fane lukket</item>
+        <item quantity="other">%1$d faner lukket</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privat fane</item>
+        <item quantity="other">%1$d private faner</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Legg til alternativet privat talesøk i adressefeltet. Lydopptakene verken lagres eller deles med noen, inkludert DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Søk privat som standard</string>
     <string name="preOnboardingComparisonChartItem2">Blokker tredjepartssporere</string>
     <string name="preOnboardingComparisonChartItem3">Blokker popup-vinduer om informasjonskapsler</string>
-    <string name="preOnboardingComparisonChartItem4">Blokker påtrengende annonser</string>
-    <string name="preOnboardingComparisonChartItem5">Slett nettleserdata raskt</string>
+    <string name="preOnboardingComparisonChartItem4">Blokker sporende annonser</string>
+    <string name="preOnboardingComparisonChartItem5">Slett nettleserdata med én knapp</string>
     <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv et søk!</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">La DuckDuckGo beskytte mer av det du gjør på nettet</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gjør oss til standardnettleseren din slik at alle nettstedslenker åpnes i DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nå</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkerer sporere for å beskytte surfingen din</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du fjerner fanene og dataene dine, slettes sporingsblokkeringshistorikken din, og dette tallet tilbakestilles til null.\n\nSkjul dette banneret hvis du ikke vil se det i fanevisningen.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi det er mulig at den distribuerer skadelig programvare som er laget for å kompromittere enheten din eller stjele personopplysningene dine.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Dette nettstedet utgir seg muligens for å være et legitimt nettsted for å lure deg til å oppgi personopplysninger, som passord eller kredittkortnumre.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Forlat dette nettstedet</string>
+    <string name="maliciousSiteAdvancedCTA">Avansert</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener at dette nettstedet er trygt, kan du <a href=\"\">rapportere en feil</a>. Du kan besøke nettstedet på egen risiko.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Godta risikoen og gå til nettstedet</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Rapporter et nettsted som feilaktig er flagget som ondsinnet</string>
+    <string name="maliciousSiteLearnMoreTitle">Finn ut mer</string>
+    <string name="maliciousSiteSettingTitle">Sikkerhetsadvarsler om nettsteder</string>
+    <string name="maliciousSiteToggleHint">Varsle meg om nettsteder som er flagget for phishing eller skadelig programvare</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Deaktivering av denne funksjonen kan sette informasjonen din i fare.</string>
 
 </resources>

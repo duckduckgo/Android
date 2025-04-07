@@ -66,6 +66,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
@@ -710,49 +712,67 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenScreenLaunchedFromSnackbarThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserSnackbar)
-        val expectedParams = mapOf("source" to "browser_snackbar")
+        val expectedParams = mapOf("source" to "browser_snackbar", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromBrowserThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserOverflow)
-        val expectedParams = mapOf("source" to "overflow_menu")
+        val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSyncThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(Sync)
-        val expectedParams = mapOf("source" to "sync")
+        val expectedParams = mapOf("source" to "sync", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromDisablePromptThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(DisableInSettingsPrompt)
-        val expectedParams = mapOf("source" to "save_login_disable_prompt")
+        val expectedParams = mapOf("source" to "save_login_disable_prompt", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromNewTabShortcutThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(NewTabShortcut)
-        val expectedParams = mapOf("source" to "new_tab_page_shortcut")
+        val expectedParams = mapOf("source" to "new_tab_page_shortcut", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(SettingsActivity)
-        val expectedParams = mapOf("source" to "settings")
+        val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromInternalDevSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(InternalDevSettings)
-        val expectedParams = mapOf("source" to "internal_dev_settings")
+        val expectedParams = mapOf("source" to "internal_dev_settings", "has_credentials_saved" to "0")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
+    }
+
+    @Test
+    fun `when screen launched from settings activity and one credential saved then correct launch pixel sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(1))
+
+        testee.sendLaunchPixel(SettingsActivity)
+        val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "1")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
+    }
+
+    @Test
+    fun `when screen launched from browser menu and multiple credentials saved then correct launch pixel sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(7))
+
+        testee.sendLaunchPixel(BrowserOverflow)
+        val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
@@ -977,10 +997,38 @@ class AutofillSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenShowListModeWithNewFeatureEnabledThenSeeNewListMode() = runTest {
+        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = true))
+        testee.onInitialiseListMode()
+        testee.commands.test {
+            awaitItem().verifyHasCommandToShowListMode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenShowListModeWithNewScrollFeatureDisabledThenSeeLegacyListMode() = runTest {
+        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = false))
+        testee.onInitialiseListMode()
+        testee.commands.test {
+            awaitItem().verifyHasCommandToShowLegacyListMode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {
         val confirmationCommand = this.firstOrNull { it is LaunchDeleteAllPasswordsConfirmation }
         assertNotNull(confirmationCommand)
         assertEquals(expectedNumberOfCredentialsToDelete, (confirmationCommand as LaunchDeleteAllPasswordsConfirmation).numberToDelete)
+    }
+
+    private fun List<Command>.verifyHasCommandToShowListMode() {
+        assertNotNull(this.firstOrNull { it is ShowListMode })
+    }
+
+    private fun List<Command>.verifyHasCommandToShowLegacyListMode() {
+        assertNotNull(this.firstOrNull { it is ShowListModeLegacy })
     }
 
     private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowDeleteAllConfirmation() {

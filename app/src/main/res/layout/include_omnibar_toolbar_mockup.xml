@@ -22,7 +22,7 @@
     android:id="@+id/appBarLayoutMockup"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?daxColorSurface"
+    android:background="?daxColorToolbar"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <LinearLayout
@@ -82,7 +82,7 @@
             android:src="@drawable/ic_fire" />
     </FrameLayout>
 
-    <com.duckduckgo.app.browser.TabSwitcherButton
+    <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton
         android:id="@+id/tabsMenuMockup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

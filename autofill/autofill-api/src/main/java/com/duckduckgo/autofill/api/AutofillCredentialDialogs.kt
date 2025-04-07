@@ -88,10 +88,10 @@ interface CredentialUpdateExistingCredentialsDialog {
     sealed interface CredentialUpdateType : Parcelable {
 
         @Parcelize
-        object Username : CredentialUpdateType
+        data object Username : CredentialUpdateType
 
         @Parcelize
-        object Password : CredentialUpdateType
+        data object Password : CredentialUpdateType
     }
 
     companion object {

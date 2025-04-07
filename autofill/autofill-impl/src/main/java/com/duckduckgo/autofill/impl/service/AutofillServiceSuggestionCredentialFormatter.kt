@@ -73,7 +73,7 @@ class RealAutofillCredentialFormatter @Inject constructor(
 
     override fun getOpenDuckDuckGoSuggestionSpecs(): SuggestionUISpecs {
         return SuggestionUISpecs(
-            title = context.getString(R.string.autofill_service_suggestion_search_passwords),
+            title = context.getString(R.string.autofill_service_suggestion_open_passwords),
             subtitle = "",
             icon = R.drawable.ic_dax_silhouette_primary_24,
         )

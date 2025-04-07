@@ -28,6 +28,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
@@ -63,6 +64,7 @@ class ClearPersonalDataActionTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockPrivacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
+    private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -84,6 +86,7 @@ class ClearPersonalDataActionTest {
             privacyProtectionsPopupDataClearer = mockPrivacyProtectionsPopupDataClearer,
             sitePermissionsManager = mockSitePermissionsManager,
             navigationHistory = mockNavigationHistory,
+            webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -154,5 +157,11 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenPrivacyProtectionsPopupDataClearerIsInvoked() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockPrivacyProtectionsPopupDataClearer).clearPersonalData()
+    }
+
+    @Test
+    fun whenClearCalledThenWebTrackersAreCleared() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockWebTrackersBlockedRepository).deleteAll()
     }
 }

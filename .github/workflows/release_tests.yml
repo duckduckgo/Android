@@ -18,7 +18,7 @@ concurrency:
 jobs:
   run-release-tests:
     name: Run Release tests of tag version in Maestro
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -55,7 +55,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
 
       - name: Move APK to new folder
         if: always()
@@ -63,7 +63,7 @@ jobs:
 
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
-        uses: duckduckgo/native-github-asana-sync@v1.5
+        uses: duckduckgo/native-github-asana-sync@v1.6
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -87,7 +87,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.1
+        uses: duckduckgo/native-github-asana-sync@v1.6
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -99,7 +99,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v1.5
+        uses: duckduckgo/native-github-asana-sync@v1.6
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}

@@ -24,8 +24,8 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
@@ -35,17 +35,17 @@ enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
     LIGHT,
-    DARK_EXPERIMENT,
-    LIGHT_EXPERIMENT,
+    EXPERIMENT_DARK,
+    EXPERIMENT_LIGHT,
     ;
 
     fun getOptionIndex(): Int {
         return when (this) {
             SYSTEM_DEFAULT -> 1
-            LIGHT -> 2
-            DARK -> 3
-            LIGHT_EXPERIMENT -> 4
-            DARK_EXPERIMENT -> 5
+            DARK -> 2
+            LIGHT -> 3
+            EXPERIMENT_DARK -> 4
+            EXPERIMENT_LIGHT -> 5
         }
     }
 }
@@ -75,8 +75,8 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DARK -> R.style.Theme_DuckDuckGo_Dark
-        LIGHT_EXPERIMENT -> R.style.Theme_DuckDuckGo_Light_Experiment
-        DARK_EXPERIMENT -> R.style.Theme_DuckDuckGo_Dark_Experiment
+        EXPERIMENT_DARK -> R.style.Theme_DuckDuckGo_Dark_Experiment
+        EXPERIMENT_LIGHT -> R.style.Theme_DuckDuckGo_Light_Experiment
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }
@@ -89,7 +89,7 @@ private fun Context.getSystemDefaultTheme(): Int {
     }
 }
 
-private fun Context.isInNightMode(): Boolean {
+fun Context.isInNightMode(): Boolean {
     val mode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     return mode == Configuration.UI_MODE_NIGHT_YES
 }

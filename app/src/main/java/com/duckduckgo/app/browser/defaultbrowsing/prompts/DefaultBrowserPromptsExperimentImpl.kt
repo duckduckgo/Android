@@ -123,14 +123,23 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         initialValue = false,
     )
 
+    /**
+     * Model used to parse remote config setting. All values are integer strings, for example "1" or "20".
+     */
     @VisibleForTesting
-    data class FeatureSettings(
+    data class FeatureSettingsConfigModel(
+        val activeDaysUntilStage1: String,
+        val activeDaysUntilStage2: String,
+        val activeDaysUntilStop: String,
+    )
+
+    private data class FeatureSettings(
         val activeDaysUntilStage1: Int,
         val activeDaysUntilStage2: Int,
         val activeDaysUntilStop: Int,
     )
 
-    private val featureSettingsJsonAdapter = moshi.adapter(FeatureSettings::class.java)
+    private val featureSettingsJsonAdapter = moshi.adapter(FeatureSettingsConfigModel::class.java)
 
     /**
      * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501].
@@ -372,7 +381,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private suspend fun DefaultBrowserPromptsFeatureToggles.parseFeatureSettings(): FeatureSettings? = withContext(dispatchers.io()) {
         defaultBrowserAdditionalPrompts202501().getSettings()?.let { settings ->
             try {
-                featureSettingsJsonAdapter.fromJson(settings)
+                featureSettingsJsonAdapter.fromJson(settings)?.toFeatureSettings()
             } catch (e: Exception) {
                 Timber.e(e)
                 null
@@ -420,6 +429,13 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
     }
+
+    @Throws(NumberFormatException::class)
+    private fun FeatureSettingsConfigModel.toFeatureSettings() = FeatureSettings(
+        activeDaysUntilStage1 = activeDaysUntilStage1.toInt(),
+        activeDaysUntilStage2 = activeDaysUntilStage2.toInt(),
+        activeDaysUntilStop = activeDaysUntilStop.toInt(),
+    )
 
     companion object {
         const val FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS = 500L

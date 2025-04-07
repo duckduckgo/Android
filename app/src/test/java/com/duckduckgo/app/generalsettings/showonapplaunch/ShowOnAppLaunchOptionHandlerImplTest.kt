@@ -812,7 +812,19 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
+        override suspend fun markDeletable(tabIds: List<String>) {
+            TODO("Not yet implemented")
+        }
+
         override suspend fun undoDeletable(tab: TabEntity) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun deleteTabs(tabIds: List<String>) {
             TODO("Not yet implemented")
         }
 

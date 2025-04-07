@@ -32,10 +32,13 @@ import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
+import android.webkit.WebHistoryItem
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -75,20 +78,26 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
+import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
+import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
+import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
+import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.ShareLink
+import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
-import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
-import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -120,7 +129,10 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -133,7 +145,10 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxFireButtonCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -142,6 +157,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionH
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.MaliciousSiteStatus.PHISHING
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
@@ -192,6 +208,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -200,6 +218,9 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -209,6 +230,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -218,6 +240,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -407,6 +430,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
+    private val mockPagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin> = mock()
+
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -507,12 +532,18 @@ class BrowserTabViewModelTest {
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+    val mockStack: WebBackForwardList = mock()
+
+    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
 
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -576,6 +607,7 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
+            userBrowserProperties = mockUserBrowserProperties,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -611,6 +643,12 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
+        )
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+            defaultVisualExperimentStateFlow,
+        )
+        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(
+            defaultVisualExperimentNavBarStateFlow,
         )
 
         testee = BrowserTabViewModel(
@@ -668,7 +706,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
-            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector, mockPagesSettingPlugin),
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
@@ -680,10 +718,15 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
+            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
         )
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.title).thenReturn("title")
+        whenever(mockWebHistoryItem.url).thenReturn("http://example.com")
+        whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
     }
 
     @After
@@ -742,6 +785,17 @@ class BrowserTabViewModelTest {
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndMaliciousSiteBlockedThenKeyboardNotShown() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
+
+        testee.onViewVisible()
+
+        assertCommandNotIssued<ShowKeyboard>()
     }
 
     @Test
@@ -890,6 +944,43 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlPresentThenAddBookmarkButtonDisabled() {
         loadUrl("https://www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canSaveSite)
+    }
+
+    @Test
+    fun whenLoadUrlDoNotUpdateSiteMaliciousSiteStatus() {
+        val maliciousUri = "https://www.malicious.com".toUri()
+        testee.onReceivedMaliciousSiteWarning(
+            maliciousUri,
+            Feed.PHISHING,
+            exempted = false,
+            clientSideHit = false,
+            isMainframe = true,
+        )
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
+        )
+
+        assertEquals(PHISHING, testee.getSite()?.maliciousSiteStatus)
+    }
+
+    @Test
+    fun whenOnReceivedSafeSiteUpdateSiteMaliciousSiteStatus() {
+        val maliciousUri = "https://www.malicious.com".toUri()
+        testee.onReceivedMaliciousSiteWarning(
+            maliciousUri,
+            Feed.PHISHING,
+            exempted = false,
+            clientSideHit = false,
+            isMainframe = true,
+        )
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
+        )
+
+        testee.onReceivedMaliciousSiteSafe("https://www.example.com".toUri(), true)
+
+        assertNull(testee.getSite()?.maliciousSiteStatus)
     }
 
     @Test
@@ -1138,7 +1229,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
@@ -1149,7 +1240,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
@@ -1160,7 +1251,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedThenNotifyLoginDetector() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         overrideUrl("http://example.com")
 
@@ -1170,7 +1261,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenLoadingProgressReaches50ThenShowWebContent() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
 
@@ -1212,11 +1303,11 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         setBrowserShowing(true)
 
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
         assertEquals(100, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -1225,7 +1316,7 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(15)
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
     }
@@ -1233,7 +1324,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
         setBrowserShowing(false)
-        testee.progressChanged(10)
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -1286,7 +1377,7 @@ class BrowserTabViewModelTest {
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
         assertEquals(50, loadingViewState().progress)
     }
 
@@ -1572,6 +1663,17 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         assertFalse(browserViewState().browserShowing)
         assertFalse(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenMaliciousSiteWarningShowingByPressingBackThenHideMaliciousSiteBlocked() {
+        setupNavigation(isBrowsing = false, isMaliciousSiteBlocked = true, canGoBack = true, stepsToPreviousPage = 1)
+
+        val result = testee.onUserPressedBack()
+
+        assertFalse(browserViewState().browserShowing)
+        assertCommandIssued<HideWarningMaliciousSite>()
+        assertTrue(result)
     }
 
     @Test
@@ -2441,30 +2543,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCtaRefreshedAndMaliciousSiteBlockedThenViewStateUpdated() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        testee.browserViewState.value = browserViewState().copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+        )
+
+        testee.refreshCta()
+
+        assertTrue(testee.ctaViewState.value!!.isErrorShowing)
+    }
+
+    @Test
     fun whenCtaShownThenFirePixel() = runTest {
         val cta = HomePanelCta.AddWidgetAuto
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -2481,6 +2578,16 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
+    }
+
+    @Test
+    fun whenUserClickedDaxMainNetworkCtaOKButtonAndMaliciousSiteBlockedThenCtaIsNull() {
+        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "")
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+
+        assertNull(testee.ctaViewState.value?.cta)
     }
 
     @Test
@@ -2779,6 +2886,20 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserInDuckPlayerThenCannotReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserInDuckPlayerThenCannotAllowList() {
+        setupNavigation(skipHome = false, isBrowsing = true)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canChangePrivacyProtection)
     }
 
     @Test
@@ -3249,7 +3370,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProgressIs100ThenRefreshUserAgentCommandSent() {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         assertCommandIssued<Command.RefreshUserAgent>()
     }
@@ -3568,7 +3689,7 @@ class BrowserTabViewModelTest {
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
-        assertFalse(loadingViewState().privacyOn)
+        assertFalse(loadingViewState().trackersAnimationEnabled)
     }
 
     @Test
@@ -4824,10 +4945,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageIsChangedWithHttpError5XXThenUpdateCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
+    fun whenPageIsChangedWithHttpError5XXThenUpdate5xxCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
         testee.recordHttpErrorCode(statusCode = 504, url = "example2.com")
 
-        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
+        verify(mockHttpErrorPixels).update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 504)
     }
 
     @Test
@@ -5182,9 +5303,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+    fun whenTrackersBlockedCtaShownWithBrowserShowingThenPrivacyShieldIsHighlighted() = runTest {
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
 
         testee.onOnboardingDaxTypingAnimationFinished()
 
@@ -5192,8 +5314,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTrackersBlockedCtaShownWithMaliciousSiteBlockedThenPrivacyShieldIsNotHighlighted() = runTest {
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+        testee.onOnboardingDaxTypingAnimationFinished()
+
+        assertFalse(browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
     fun givenTrackersBlockedCtaShownWhenLaunchingTabSwitcherThenCtaIsDismissed() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.userLaunchingTabSwitcher()
@@ -5203,7 +5336,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenTrackersBlockedCtaShownWhenUserRequestOpeningNewTabThenCtaIsDismissed() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.userRequestedOpeningNewTab()
@@ -5213,7 +5346,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5232,7 +5365,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         setCta(cta)
 
         testee.onUserDismissedCta(cta)
@@ -5242,7 +5375,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -5592,7 +5725,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenHighlightsExperimentWhenUserClickedSkipInExperimentFireDialogThenSendCancelPixel() {
-        val cta = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
 
         testee.onUserClickCtaSecondaryButton(cta)
@@ -5741,8 +5874,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val sendResponseToJs = Command.SendResponseToJs(JsCallbackData(JSONObject(), "", "", ""))
-        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(sendResponseToJs)
+        val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
         testee.processJsCallbackMessage(
             DUCK_CHAT_FEATURE_NAME,
             "method",
@@ -5767,6 +5900,171 @@ class BrowserTabViewModelTest {
         ) { "someUrl" }
         verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
         assertCommandNotIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() = runTest {
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+
+        testee.onDuckChatMenuClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenPageFinishedWithMaliciousSiteBlockedThenDoNotUpdateSite() {
+        testee.browserViewState.value = testee.browserViewState.value?.copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+            maliciousSiteStatus = PHISHING,
+        )
+        val site: Site = mock()
+        whenever(site.url).thenReturn("http://malicious.com")
+        whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
+        testee.siteLiveData.value = site
+
+        testee.pageFinished(WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
+        assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
+    }
+
+    @Test
+    fun whenPageCommitVisibleWithMaliciousSiteBlockedThenDoNotUpdateSite() {
+        testee.browserViewState.value = testee.browserViewState.value?.copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+            maliciousSiteStatus = PHISHING,
+        )
+        val site: Site = mock()
+        whenever(site.url).thenReturn("http://malicious.com")
+        whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
+        testee.siteLiveData.value = site
+
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
+        assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
+    }
+
+    @Test
+    fun whenProgressChangedWithMaliciousSiteBlockedThenDoNotUpdateSite() {
+        testee.browserViewState.value = testee.browserViewState.value?.copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+            maliciousSiteStatus = PHISHING,
+        )
+        val site: Site = mock()
+        whenever(site.url).thenReturn("http://malicious.com")
+        whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
+        testee.siteLiveData.value = site
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
+        assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithMaliciousSiteBlockedThenDoNotPostCommand() {
+        testee.browserViewState.value = testee.browserViewState.value?.copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+            maliciousSiteStatus = PHISHING,
+        )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandNotIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithNotMaliciousSiteBlockedThenPostCommand() {
+        testee.browserViewState.value = testee.browserViewState.value?.copy(
+            browserShowing = true,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
+        )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
+        testee.browserViewState.value = browserViewState().copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true,
+            showPrivacyShield = HighlightableButton.Gone,
+            fireButton = HighlightableButton.Gone,
+        )
+        testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
+        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
+
+        testee.onMaliciousSiteUserAction(VisitSite, "http://example.com".toUri(), Feed.PHISHING, false)
+
+        assertEquals(
+            loadingViewState(),
+            loadingViewState().copy(
+                isLoading = true,
+                trackersAnimationEnabled = true,
+                progress = 20,
+                url = "http://example.com",
+            ),
+        )
+        assertEquals(
+            omnibarViewState(),
+            omnibarViewState().copy(
+                omnibarText = "http://example.com",
+                isEditing = false,
+                navigationChange = true,
+            ),
+        )
+    }
+
+    @Test
+    fun whenLeaveSiteAndCustomTabThenEmitCloseCustomTab() {
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, true)
+        assertCommandIssued<CloseCustomTab>()
+    }
+
+    @Test
+    fun whenLeaveSiteAndNotCustomTabThenEmitEscapeMaliciousSite() = runTest() {
+        val mockLiveSelectedTab = mock<LiveData<TabEntity>>()
+        whenever(mockLiveSelectedTab.value).thenReturn(TabEntity("ID"))
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(mockLiveSelectedTab)
+
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, false)
+
+        assertCommandIssued<EscapeMaliciousSite>()
+        assertCommandIssued<LaunchNewTab>()
+        verify(mockTabRepository).deleteTabAndSelectSource("ID")
+    }
+
+    @Test
+    fun whenLearnMoreThenEmitOpenBrokenSiteLearnMore() {
+        testee.onMaliciousSiteUserAction(LearnMore, "http://example.com".toUri(), Feed.PHISHING, false)
+        assertCommandIssued<OpenBrokenSiteLearnMore>()
+    }
+
+    @Test
+    fun whenReportErrorThenEmitOpenBrokenSiteLearnMore() {
+        testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), Feed.PHISHING, false)
+        assertCommandIssued<ReportBrokenSiteError>()
     }
 
     private fun aCredential(): LoginCredentials {
@@ -5930,14 +6228,20 @@ class BrowserTabViewModelTest {
     private fun setupNavigation(
         skipHome: Boolean = false,
         isBrowsing: Boolean,
+        isMaliciousSiteBlocked: Boolean = false,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
     ) {
         testee.skipHome = skipHome
         setBrowserShowing(isBrowsing)
+        setMaliciousSiteBlocked(isMaliciousSiteBlocked)
         val nav = buildWebNavigation(canGoForward = canGoForward, canGoBack = canGoBack, stepsToPreviousPage = stepsToPreviousPage)
         testee.navigationStateChanged(nav)
+    }
+
+    private fun setMaliciousSiteBlocked(isMaliciousSiteBlocked: Boolean) {
+        testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = isMaliciousSiteBlocked)
     }
 
     private fun captureCommands(): KArgumentCaptor<Command> {

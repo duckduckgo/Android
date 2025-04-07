@@ -209,6 +209,34 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
+    fun whenProcessDuckChatMessageWithCloseAIChatThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"closeAIChat","params":{"key":"value"}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithOpenAIChatSettingsThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"openAIChatSettings","params":{"key":"value"}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
     fun whenProcessDuckChatMessageWithUnknownMethodThenDoNothing() = runTest {
         givenInterfaceIsRegistered()
         whenever(mockWebView.url).thenReturn("https://duckduckgo.com")

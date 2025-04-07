@@ -94,6 +94,34 @@ fun Float.toDp(): Float = (this / Resources.getSystem().displayMetrics.density)
 
 fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)
 
+/**
+ * Returns context-aware and screen-specific DP from a pixels value.
+ *
+ * This takes into account theming and selects the right density in multi-screen setups.
+ */
+fun Int.toDp(context: Context): Int = (this / context.resources.displayMetrics.density).toInt()
+
+/**
+ * Returns context-aware and screen-specific pixels from a DP value.
+ *
+ * This takes into account theming and selects the right density in multi-screen setups.
+ */
+fun Int.toPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
+
+/**
+ * Returns context-aware and screen-specific DP from a pixels value.
+ *
+ * This takes into account theming and selects the right density in multi-screen setups.
+ */
+fun Float.toDp(context: Context): Float = (this / context.resources.displayMetrics.density)
+
+/**
+ * Returns context-aware and screen-specific pixels from a DP value.
+ *
+ * This takes into account theming and selects the right density in multi-screen setups.
+ */
+fun Float.toPx(context: Context): Float = (this * context.resources.displayMetrics.density)
+
 fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
     fitsSystemWindows = enabled
     var view = this
@@ -198,6 +226,10 @@ fun View.visibilityChanged(action: (View) -> Unit) {
             action(this)
         }
     }
+}
+
+fun View.fade(alpha: Float) {
+    this.alpha = alpha
 }
 
 /**

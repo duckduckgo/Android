@@ -34,22 +34,6 @@
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
 
-    <!-- Malicious Site -->
-    <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
-    <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
-    <string name="maliciousSiteLeaveCTA">Leave This Site</string>
-    <string name="maliciousSiteAdvancedCTA">Advanced</string>
-    <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
-    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
-    <string name="maliciousSiteReportErrorTitle">Report a site incorrectly flagged as malicious</string>
-    <string name="maliciousSiteLearnMoreTitle">Learn more</string>
-    <string name="maliciousSiteSettingTitle">Site Safety Warnings</string>
-    <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
-    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
-    <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
-
-
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
     <string name="brokenSitesLoginSmallHint">Site name (required)</string>
@@ -76,9 +60,9 @@
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
-    <!-- Appearance -->
-    <string name="experimentalUISettings">Experimental UI Settings</string>
-    <string name="experimentalUITitle">Enable visual design updates from O-A</string>
-    <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
+    <!-- Skip Onboarding (not user-facing) -->
+    <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <!--    Bottom Navigation Bar Experiment-->
+    <string name="refreshPage">Refresh Page</string>
 </resources>

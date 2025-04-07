@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Προτεραιότητά μας η προστασία σας.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Προστασία. Ιδιωτικότητα. Ηρεμία.</string>
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
     <string name="open">Άνοιγμα</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Λήψεις</string>
     <string name="tabSwitcherListViewMenu">Προβολή λίστας</string>
     <string name="tabSwitcherGridViewMenu">Προβολή πλέγματος</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s εφαρμογές παρακολούθησης αποκλείστηκαν &lt;/b&gt; τις τελευταίες 7 ημέρες</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s εφαρμογές παρακολούθησης αποκλείστηκαν &lt;/b&gt;</string>
+    <string name="inTheLast7Days">τις τελευταίες 7 ημέρες</string>
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Σχετικά</string>
-    <string name="aboutHeader">Καλωσορίσατε στην πλευρά της Πάπιας!</string>
-    <string name="aboutDescription">Το DuckDuckGo αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης DuckDuckGo διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε DuckDuckGo σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του DuckDuckGo στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
-    <string name="aboutDescriptionNew">Το DuckDuckGo αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης DuckDuckGo διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε DuckDuckGo σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του DuckDuckGo στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
+    <string name="aboutHeaderNewTagLine">Προστασία. Ιδιωτικότητα. Ηρεμία.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nΗ DuckDuckGo αποτελεί ανεξάρτητη εταιρεία διαδικτυακής προστασίας για οποιονδήποτε επιθυμεί να ανακτήσει τον έλεγχο των προσωπικών πληροφοριών του.\n\nΠιστεύουμε ότι ο καλύτερος τρόπος για να προστατέψετε τις προσωπικές πληροφορίες σας από χάκερ, απατεώνες και εταιρείες που παραβιάζουν την ιδιωτικότητα είναι να μη συλλέγονται καθόλου. Αυτός είναι ο λόγος για τον οποίον εκατομμύρια άνθρωποι <annotation type="chart_comparison">επιλέγουν το DuckDuckGo έναντι του Chrome και άλλων προγραμμάτων περιήγησης</annotation> για να πραγματοποιήσουν αναζητήσεις και να περιηγηθούν στο διαδίκτυο. Η ενσωματωμένη μηχανή αναζήτησής μας είναι σαν της Google, ωστόσο δεν παρακολουθεί ποτέ τις αναζητήσεις σας. Και οι προστασίες περιήγησής μας, όπως ο αποκλεισμός παρακολούθησης διαφημίσεων και ο αποκλεισμός cookie, βοηθούν ώστε να σταματήσουν άλλες εταιρείες να συλλέγουν τα δεδομένα σας. Και, φυσικά, το πρόγραμμα περιήγησής μας είναι δωρεάν. Κερδίζουμε χρήματα από <annotation type="privacy_respecting_ads">διαφημίσεις αναζήτησης που σέβονται την ιδιωτικότητα</annotation>, όχι από την εκμετάλλευση των δεδομένων σας.Επιπλέον, προσφέρουμε επίσης το <annotation type="ppro_help_page">Privacy Pro</annotation>, μια συνδρομητική υπηρεσία τρία σε ένα, ενσωματωμένη στο πρόγραμμα περιήγησής μας. Οι συνδρομητές του Privacy Pro απολαμβάνουν ακόμα μεγαλύτερη προστασία απορρήτου με ένα γρήγορο και απλό <annotation type="vpn_help_page">VPN</annotation>, που βοηθά στην ασφάλεια της διαδικτυακής δραστηριότητάς σας, μια υπηρεσία που εντοπίζει και αφαιρεί τα προσωπικά στοιχεία σας από ιστότοπους εύρεσης ατόμων και μια υπηρεσία που αποκαθιστά την ταυτότητά σας σε περίπτωση κλοπής.\n\nΑνακτήστε τον έλεγχο των προσωπικών πληροφοριών σας με το πρόγραμμα περιήγησης που έχει σχεδιαστεί για προστασία δεδομένων και όχι για συλλογή δεδομένων.</string>
     <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
-    <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
+    <string name="systemSearchOnboardingThanks">Σας ευχαριστούμε που επιλέξατε το DuckDuckGo!\nΗ χρήση του προγράμματος περιήγησής μας συμβάλλει στην προστασία σας από χάκερ, απατεώνες και εταιρείες που διψούν για δεδομένα.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
     <string name="systemSearchOnboardingFeatureOneText">Αποκλείει μη ασφαλείς παρακολουθήσεις.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Επιβάλλει την κρυπτογράφηση στους ιστότοπους.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Κλείσιμο όλων των καρτελών;</string>
     <string name="closeAppTabsConfirmationDialogDescription">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</string>
     <string name="closeAppTabsConfirmationDialogCancel">Ακύρωση</string>
     <string name="closeAppTabsConfirmationDialogClose">Κλείσιμο</string>
+
+    <string name="selectTabsMenuItem">Επιλογή καρτελών</string>
+    <string name="selectAllTabsMenuItem">Επιλογή όλων</string>
+    <string name="deselectAllTabsMenuItem">Αποεπιλογή όλων</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d επιλέχθηκαν</string>
+    <string name="tabSelectedIndicator">Ένδειξη επιλεγμένης καρτέλας</string>
+    <string name="tabNotSelectedIndicator">Ένδειξη μη επιλεγμένης καρτέλας</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d σύνδεσμοι από το DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κοινοποίηση συνδέσμου</item>
+        <item quantity="other">Κοινοποίηση %1$d συνδέσμων</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη στην επιλεγμένη καρτέλα;</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προστέθηκε σελιδοδείκτης</item>
+        <item quantity="other">Προστέθηκαν %1$d σελιδοδείκτες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Σελιδοδείκτης</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη σε καρτέλα</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Οι υπάρχοντες σελιδοδείκτες δεν θα αναπαραχθούν.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο και των %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο άλλης καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d ακόμα καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε αυτήν την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε αυτές τις καρτέλες;</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο καρτελών</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Κλείσιμο άλλων καρτελών</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Η καρτέλα έκλεισε</item>
+        <item quantity="other">%1$d καρτέλες έκλεισαν</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d ιδιωτική καρτέλα</item>
+        <item quantity="other">%1$d ιδιωτικές καρτέλες</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
     <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
-    <string name="preOnboardingComparisonChartItem5">Γρήγορη διαγραφή δεδομένων περιήγησης</string>
+    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός διαφημίσεων παρακολούθησης</string>
+    <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
     <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
     <string name="onboardingSearchDaxDialogTitle">Δοκίμασε μια αναζήτηση!</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Αφήστε το DuckDuckGo να προστατεύσει περισσότερα από όσα κάνετε στο διαδίκτυο</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Ορίστε μας ως το προεπιλεγμένο πρόγραμμα περιήγησής σας ώστε όλοι οι σύνδεσμοι του ιστότοπου να ανοίγουν στο DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Όχι τώρα</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Το DuckDuckGo αποκλείει εφαρμογές παρακολούθησης για να προστατεύσει την περιήγησή σας</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Η εκκαθάριση των καρτελών και των δεδομένων σας θα διαγράψει το ιστορικό αποκλεισμού εφαρμογών παρακολούθησης και θα μηδενίσει αυτόν τον αριθμό.\n\nΑποκρύψτε αυτό το banner αν προτιμάτε να μην το βλέπετε στην προβολή καρτελών.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Απόκρυψη banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ο ιστότοπος αυτός μπορεί να υποδύεται έναν νόμιμο ιστότοπο προκειμένου να σας εξαπατήσει ώστε να παράσχετε προσωπικές πληροφορίες, όπως κωδικούς πρόσβασης ή αριθμούς πιστωτικών καρτών.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Αποχωρήστε από τον ιστότοπο αυτόν</string>
+    <string name="maliciousSiteAdvancedCTA">Προχωρημένο</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Εάν πιστεύετε ότι αυτός ο ιστότοπος είναι ασφαλής, μπορείτε να <a href=\"\">αναφέρετε ένα σφάλμα</a>. Μπορείτε ακόμα να επισκεφθείτε τον ιστότοπο, με δική σας ευθύνη.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Αποδεχτείτε τον κίνδυνο και επισκεφτείτε τον ιστότοπο</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Αναφέρετε έναν ιστότοπο που έχει επισημανθεί λανθασμένα ως κακόβουλος</string>
+    <string name="maliciousSiteLearnMoreTitle">Μάθετε περισσότερα</string>
+    <string name="maliciousSiteSettingTitle">Προειδοποιήσεις ασφάλειας ιστότοπου</string>
+    <string name="maliciousSiteToggleHint">Να λάβω προειδοποίηση για ιστότοπους που έχουν επισημανθεί για ηλεκτρονικό ψάρεμα ή κακόβουλο λογισμικό</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Η απενεργοποίηση της λειτουργίας αυτής μπορεί να θέσει σε κίνδυνο τα στοιχεία σας.</string>
 
 </resources>

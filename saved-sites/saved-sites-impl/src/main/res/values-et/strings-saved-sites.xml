@@ -59,8 +59,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redigeeri järjehoidjat</string>
     <string name="favoriteDialogTitleEdit">Redigeeri lemmikut</string>
-    <string name="locationLabel">Asukoht</string>
-    <string name="folderLocationTitle">Vali asukoht</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Asukoht</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Vali asukoht</string>
     <string name="addFolder">Lisa kaust</string>
     <string name="editFolder">Redigeeri kausta</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Kas kustutada kaust ja selle sisu?"</string>

@@ -35,6 +35,7 @@ class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
         expiresOrRenewsAt = DAYS.toMillis(10),
         status = AUTO_RENEWABLE,
         platform = "google",
+        activeOffers = listOf(),
     )
 
     @Before

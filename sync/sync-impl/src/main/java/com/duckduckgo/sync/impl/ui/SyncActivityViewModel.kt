@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncState.OFF
@@ -56,6 +57,7 @@ import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -63,6 +65,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -78,6 +81,9 @@ class SyncActivityViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
 ) : ViewModel() {
 
+    private var syncStateObserverJob = ConflatedJob()
+    private var backgroundRefreshJob = ConflatedJob()
+
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
@@ -90,19 +96,32 @@ class SyncActivityViewModel @Inject constructor(
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
-        syncStateMonitor.syncState().onEach { syncState ->
-            val state = if (syncState == OFF) {
-                signedOutState()
-            } else {
-                signedInState()
-            }
-            viewState.value = state
-        }.onStart {
-            initViewStateThisDeviceState()
-            fetchRemoteDevices()
-            syncEngine.triggerSync(FEATURE_READ)
-        }.flowOn(dispatchers.io())
+        syncStateObserverJob += syncStateMonitor.syncState()
+            .onEach { syncState ->
+                val state = if (syncState == OFF) {
+                    signedOutState()
+                } else {
+                    signedInState()
+                }
+                viewState.value = state
+            }.onStart {
+                initViewStateThisDeviceState()
+                fetchRemoteDevices()
+                syncEngine.triggerSync(FEATURE_READ)
+                schedulePeriodicRefresh()
+            }.flowOn(dispatchers.io())
             .launchIn(viewModelScope)
+    }
+
+    private fun schedulePeriodicRefresh() {
+        backgroundRefreshJob += viewModelScope.launch(dispatchers.io()) {
+            while (isActive && syncFeatureToggle.automaticallyUpdateSyncSettings()) {
+                delay(SETTINGS_REFRESH_RATE_MS)
+                if (syncAccountRepository.isSignedIn()) {
+                    fetchRemoteDevices(showLoadingState = false)
+                }
+            }
+        }
     }
 
     private suspend fun checkIfDeviceSupported() {
@@ -215,8 +234,11 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchRemoteDevices() {
-        viewState.value = viewState.value.showDeviceListItemLoading()
+    private suspend fun fetchRemoteDevices(showLoadingState: Boolean = true) {
+        if (showLoadingState) {
+            viewState.value = viewState.value.showDeviceListItemLoading()
+        }
+
         val result = withContext(dispatchers.io()) {
             syncAccountRepository.getConnectedDevices()
         }
@@ -412,5 +434,6 @@ class SyncActivityViewModel @Inject constructor(
     companion object {
         private const val SOURCE_SYNC_DISABLED = "not_activated"
         private const val SOURCE_SYNC_ENABLED = "activated"
+        private const val SETTINGS_REFRESH_RATE_MS = 5_000L
     }
 }

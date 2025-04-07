@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Tvoja zaštita, naš prioritet.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Zaštita. Privatnost. Bezbrižnost.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
     <string name="open">Otvori</string>
@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Prikaz popisa</string>
     <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s alata za praćenje blokirano &lt;/b&gt; u posljednjih 7 dana</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s alata za praćenje blokirano &lt;/b&gt;</string>
+    <string name="inTheLast7Days">u posljednjih 7 dana</string>
+
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
     <string name="fireClearAll">Obriši sve kartice i podatke</string>
@@ -127,7 +132,7 @@
     <string name="settingsHeadingProtections">Zaštite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodba</string>
-    <string name="settingsHeadingAbout">O</string>
+    <string name="settingsHeadingAbout">O nama</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGou</string>
     <string name="settingsVersion">Verzija</string>
     <string name="leaveFeedback">Podijeli povratne informacije</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
     <string name="aboutActivityTitleNew">O</string>
-    <string name="aboutHeader">Dobrodošli na našu stranu!</string>
-    <string name="aboutDescription">DuckDuckGo neovisna je tvrtka za privatnost na internetu osnovana 2008. godine namijenjena svakome tko je umoran od toga da ga prate na internetu i želi jednostavno rješenje za to. Mi smo dokaz da je prava zaštita privatnosti na internetu moguća bez kompromisa.\n\nPreglednik DuckDuckGo dolazi sa značajkama koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštite privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo je neovisna tvrtka za privatnost na internetu osnovana 2008. godine za sve koji su umorni od praćenja na internetu i žele jednostavno rješenje. Mi smo dokaz da možeš dobiti pravu zaštitu privatnosti na internetu, bez kompromisa.\n\nPreglednik DuckDuckGo sadrži značajke koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštita privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
+    <string name="aboutHeaderNewTagLine">Zaštita. Privatnost. Bezbrižnost.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo je neovisna tvrtka za zaštitu privatnosti na internetu za svakoga tko želi preuzeti kontrolu nad svojim osobnim podacima.\n\nMi vjerujemo da je najbolji način zaštite tvojih osobnih podataka od hakera, prevaranata i tvrtki koje narušavaju privatnost spriječiti prikupljanje takvih podataka. Zato milijuni ljudi <annotation type="chart_comparison">biraju DuckDuckGo umjesto Chromea i drugih preglednika</annotation> za pretraživanje i pregledavanje interneta. Naša ugrađena tražilica je poput Googlea, ali nikad ne prati tvoja pretraživanja. Uz to, naša zaštita pri pregledavanju, poput blokiranja praćenja oglasa i blokiranja kolačića, pomaže spriječiti druge tvrtke da prikupljaju tvoje podatke. Napominjemo i da je naš preglednik besplatan — mi zarađujemo od <annotation type="privacy_respecting_ads">oglasa koji poštuju privatnost u pretraživaču</annotation>, a ne iskorištavanjem tvojih podataka.Osim toga, nudimo i <annotation type="ppro_help_page">Privacy Pro</annotation>, našu pretplatničku uslugu tri-u-jednom, integriranu u naš preglednik. Pretplatnici na Privacy Pro dobivaju još veću zaštitu privatnosti s brzim i jednostavnim <annotation type="vpn_help_page">VPN-om</annotation> koji pomaže osigurati tvoju online aktivnost, uslugom koja pronalazi i uklanja tvoje osobne podatke s web stranica za pronalaženje ljudi i uslugom koja vraća tvoj identitet u slučaju krađe.\n\nPreuzmi kontrolu nad svojim osobnim podacima uz preglednik dizajniran za zaštitu, a ne za prikupljanje podataka.</string>
     <string name="no_suggestions">Nema prijedloga</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sa ovog uređaja</string>
     <string name="systemSearchAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
-    <string name="systemSearchOnboardingText">Hvala što si odabrao/la DuckDuckGo!\nSada kada koristiš našu tražilicu ili aplikaciju, tvoje su pretrage zaštićene.</string>
+    <string name="systemSearchOnboardingThanks">Hvala ti na odabiru DuckDuckGoa!\nKorištenje našeg preglednika pomaže ti u zaštiti od hakera, prevaranata i tvrtki koje otimaju podatke.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacija DuckDuckGo također:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokira nesigurne alate za praćenje.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Prisiljava šifriranje na web-mjestima.</string>
@@ -659,11 +663,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Povucite prema dolje s vrha i dodirnite gumb za natrag kako biste izašli iz prikaza preko cijelog zaslona</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želiš li zatvoriti sve kartice?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Jesi li siguran da želiš zatvoriti sve kartice?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
+
+    <string name="selectTabsMenuItem">Odaberi kartice</string>
+    <string name="selectAllTabsMenuItem">Odaberi sve</string>
+    <string name="deselectAllTabsMenuItem">Poništi odabir svega</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Odabrano: %1$d</string>
+    <string name="tabSelectedIndicator">Indikator odabrane kartice</string>
+    <string name="tabNotSelectedIndicator">Indikator neodabrane kartice</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d poveznice s DuckDuckGoa</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Podijeli poveznice</item>
+        <item quantity="few">Podijeli %1$d poveznice</item>
+        <item quantity="many">Podijeli %1$d poveznica</item>
+        <item quantity="other">Podijeli %1$d poveznica</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Označiti odabranu karticu?</item>
+        <item quantity="few">Označiti %1$d kartice?</item>
+        <item quantity="many">Označiti %1$d kartica?</item>
+        <item quantity="other">Označiti %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodana je knjižna oznaka</item>
+        <item quantity="few">Dodane su %1$d knjižne oznake</item>
+        <item quantity="many">Dodano je %1$d knjižnih oznaka</item>
+        <item quantity="other">Dodano je %1$d knjižnih oznaka</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Knjižna oznaka</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Označi karticu</item>
+        <item quantity="few">Označi %1$d kartice</item>
+        <item quantity="many">Označi %1$d kartica</item>
+        <item quantity="other">Označi %1$d kartica</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Postojeće knjižne oznake neće se duplicirati.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti karticu?</item>
+        <item quantity="few">Zatvoriti sve %1$d kartice?</item>
+        <item quantity="many">Zatvoriti svih %1$d kartica?</item>
+        <item quantity="other">Zatvoriti svih %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti drugu karticu?</item>
+        <item quantity="few">Zatvoriti %1$d druge kartice?</item>
+        <item quantity="many">Zatvoriti %1$d drugih kartica?</item>
+        <item quantity="other">Zatvoriti %1$d drugih kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriti karticu?</item>
+        <item quantity="few">Zatvoriti %1$d kartice?</item>
+        <item quantity="many">Zatvoriti %1$d kartica?</item>
+        <item quantity="other">Zatvoriti %1$d kartica?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jesi li siguran da želiš zatvoriti ovu karticu?</item>
+        <item quantity="few">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+        <item quantity="many">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+        <item quantity="other">Jesi li siguran da želiš zatvoriti sve kartice?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jesi li siguran da želiš zatvoriti karticu?</item>
+        <item quantity="few">Sigurno želiš zatvoriti ove kartice?</item>
+        <item quantity="many">Sigurno želiš zatvoriti ove kartice?</item>
+        <item quantity="other">Sigurno želiš zatvoriti ove kartice?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori kartice</item>
+        <item quantity="many">Zatvori kartica</item>
+        <item quantity="other">Zatvori kartica</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori %1$d kartice</item>
+        <item quantity="many">Zatvori %1$d kartica</item>
+        <item quantity="other">Zatvori %1$d kartica</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zatvori druge kartice</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kartica zatvorena</item>
+        <item quantity="few">%1$d kartice zatvoreno</item>
+        <item quantity="many">%1$d kartica zatvoreno</item>
+        <item quantity="other">%1$d kartica zatvoreno</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Privatna kartica</item>
+        <item quantity="few">%1$d Privatne kartice</item>
+        <item quantity="many">%1$d Privatnih kartica</item>
+        <item quantity="other">%1$d Privatnih kartica</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
@@ -708,8 +805,8 @@
     <string name="preOnboardingComparisonChartItem1">Pretražuj privatno po zadanim postavkama</string>
     <string name="preOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
-    <string name="preOnboardingComparisonChartItem4">Blokiraj neželjene oglase</string>
-    <string name="preOnboardingComparisonChartItem5">Brzo izbriši podatke pregledavanja</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiraj reklame za praćenje</string>
+    <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Dobrodošli na našu stranu!</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
@@ -801,5 +898,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Neka DuckDuckGo zaštiti više onoga što radiš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Postavi nas kao svoj zadani preglednik kako bi se sve poveznice otvorile u DuckDuckGou.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne sad</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira alate za praćenje kako bi zaštitio tvoje pregledavanje</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Brisanjem svojih kartica i podataka izbrisat ćeš povijest blokiranja alata za praćenje i vratiti ovaj broj na nulu.\n\nSakrij ovaj baner ako ga ne želiš vidjeti u prikazu kartica.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Sakrij baner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Upozorenje: ova web lokacija može predstavljati sigurnosni rizik</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokirao ovu stranicu jer možda širi zlonamjerni softver izrađen da ugrozi tvoj uređaj ili ukrade tvoje osobne podatke.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ovo web-mjesto može se lažno predstavljati kao legitimno web-mjesto kako bi te prevarilo da uneseš svoje osobne podatke, kao što su lozinke ili brojevi kreditnih kartica.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Napusti ovo web-mjesto</string>
+    <string name="maliciousSiteAdvancedCTA">Napredno</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ako vjeruješ da je ovo web-mjesto sigurno, možeš <a href=\"\">prijaviti pogrešku</a>. Još uvijek možeš posjetiti web-mjesto na vlastitu odgovornost.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Prihvati rizik i posjeti web-mjesto</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Prijavi web-mjesto pogrešno označeno kao zlonamjerno</string>
+    <string name="maliciousSiteLearnMoreTitle">Saznajte više</string>
+    <string name="maliciousSiteSettingTitle">Sigurnosna upozorenja za web-mjesto</string>
+    <string name="maliciousSiteToggleHint">Upozori me na web-mjestima označenim zbog krađe identiteta ili zlonamjernog softvera.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Onemogućavanje ove značajke može ugroziti tvoje podatke.</string>
 
 </resources>

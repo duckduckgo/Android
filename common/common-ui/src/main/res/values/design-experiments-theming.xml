@@ -17,14 +17,38 @@
 <resources>
 
     <style name="Theme.DuckDuckGo.Dark.Experiment" parent="Theme.DuckDuckGo.Dark">
+        <item name="preferredStatusBarColor">@color/warm_gray90</item>
+        <item name="preferredNavigationBarColor">@color/warm_gray90</item>
+        <item name="daxColorBackground">@color/warm_gray90</item>
+        <item name="daxColorSurface">@color/gray87</item>
+        <item name="daxColorSurfaceTransparent">@color/dark_surface_tertiary</item>
+        <item name="daxColorWindow">@color/warm_gray85</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+        <item name="daxColorOmnibarStroke">@color/white_12</item>
+        <item name="daxColorControlFillPrimary">@color/dark_controls_fill_primary</item>
 
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
 
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
+        <item name="preferredStatusBarColor">@color/warm_gray15</item>
+        <item name="preferredNavigationBarColor">@color/warm_gray15</item>
+        <item name="daxColorBackground">@color/warm_gray15</item>
+        <item name="daxColorSurfaceTransparent">@color/light_surface_tertiary</item>
+        <item name="daxColorPrimaryIcon">@color/warm_gray85_84</item>
+        <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+        <item name="daxColorOmnibarStroke">@color/white</item>
+        <item name="daxColorControlFillPrimary">@color/light_controls_fill_primary</item>
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
 
     </style>
 

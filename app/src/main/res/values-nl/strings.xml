@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Jouw bescherming, onze prioriteit.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Bescherming. Privacy.Gemoedsrust.</string>
     <string name="yes">Ja</string>
     <string name="no">Nee</string>
     <string name="open">Openen</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Downloads</string>
     <string name="tabSwitcherListViewMenu">Lijstweergave</string>
     <string name="tabSwitcherGridViewMenu">Rasterweergave</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers geblokkeerd &lt;/b&gt; in de afgelopen 7 dagen</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers geblokkeerd &lt;/b&gt;</string>
+    <string name="inTheLast7Days">in de afgelopen 7 dagen</string>
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Over</string>
-    <string name="aboutHeader">Welkom bij de Duck kant!</string>
-    <string name="aboutDescription">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je privacy op internet écht beschermd kan worden zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige functies voor privacybescherming</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide privacybescherming helpt je online activiteiten te beschermen – of je nu zoekt, surft of mailt.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar DuckDuckGo op al je apparaten te installeren en geniet dan standaard van privacy.\n\nWil je toch een kijkje nemen onder de motorkap? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation> vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je echte privacybescherming online kunt krijgen zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige privacybeschermingsfuncties</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide set privacybeschermingen helpt je online activiteiten te beschermen, van zoeken tot browsen, e-mailen en meer.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar je browser op al je apparaten naar DuckDuckGo te veranderen en je krijgt standaard privacy.\n\nWil je toch iets meer weten? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation>vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
+    <string name="aboutHeaderNewTagLine">Bescherming. Privacy.Gemoedsrust.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welkom aan de Duck-kant!\n\nDuckDuckGo is het onafhankelijke onlinebeveiligingsbedrijf voor iedereen die weer controle wil krijgen over zijn of haar persoonlijke gegevens.\n\nWij zijn ervan overtuigd dat je je persoonlijke gegevens het beste tegen hackers, oplichters en privacy-invasieve bedrijven kunt beschermen door te voorkomen dat ze worden verzameld. Daarom kiezen miljoenen mensen <annotation type="chart_comparison">voor DuckDuckGo boven Chrome en andere browsers</annotation> om online te zoeken en te surfen. Onze ingebouwde zoekmachine is zoals Google, maar volgt je zoekopdrachten nooit. En met onze browsebescherming, zoals blokkering van advertentietrackers en cookieblokkering, voorkom je dat andere bedrijven je gegevens verzamelen. Bovendien is onze browser gratis - we verdienen geld met <annotation type="privacy_respecting_ads">zoekadvertenties die de privacy respecteren</annotation>, niet door je gegevens uit te buiten.\n\nDaarnaast bieden we ook <annotation type="ppro_help_page">Privacy Pro</annotation>, een drie-in-één abonnementsservice, geïntegreerd in onze browser. Abonnees van Privacy Pro krijgen nog meer privacybescherming met een snelle en eenvoudige <annotation type="vpn_help_page">VPN</annotation> die je online-activiteiten beschermt, een dienst die je persoonlijke gegevens opspoort en verwijdert van zoeksites om mensen op internet te vinden, en een dienst die je identiteit herstelt als deze wordt gestolen.\n\nKrijg weer de controle over je persoonlijke gegevens met de browser die is ontworpen voor gegevensbescherming, niet voor gegevensverzameling.</string>
     <string name="no_suggestions">Geen suggesties</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
-    <string name="systemSearchOnboardingText">Bedankt dat je voor DuckDuckGo heeft gekozen!\nAls je nu onze zoekmachine of app gebruikt, zijn je zoekopdrachten beschermd.</string>
+    <string name="systemSearchOnboardingThanks">Bedankt dat je voor DuckDuckGo hebt gekozen!\nDoor onze browser te gebruiken, blijf je beschermd tegen hackers, oplichters en bedrijven die gegevens indrinken als water.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkeert onveilige trackers.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Dwingt codering af op websites.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Sleep van boven naar beneden en tik op de knop \'Terug\' om het volledige scherm af te sluiten</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Alle tabbladen sluiten?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Weet je zeker dat je alle tabbladen wilt sluiten?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuleren</string>
     <string name="closeAppTabsConfirmationDialogClose">Sluiten</string>
+
+    <string name="selectTabsMenuItem">Tabbladen selecteren</string>
+    <string name="selectAllTabsMenuItem">Alles selecteren</string>
+    <string name="deselectAllTabsMenuItem">Alles deselecteren</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d geselecteerd</string>
+    <string name="tabSelectedIndicator">Tabblad geselecteerde indicator</string>
+    <string name="tabNotSelectedIndicator">Tabblad niet geselecteerde indicator</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links van DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Link %1$d delen</item>
+        <item quantity="other">Links %1$d delen</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Wil je %1$d tabblad als bladwijzer toevoegen?</item>
+        <item quantity="other">Wil je %1$d tabbladen als bladwijzer toevoegen?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d bladwijzer toegevoegd</item>
+        <item quantity="other">%1$d bladwijzers toegevoegd</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Toevoegen aan bladwijzers</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Tabblad als bladwijzer toevoegen</item>
+        <item quantity="other">%1$d Tabbladen als bladwijzer toevoegen</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Bestaande bladwijzers worden niet gedupliceerd.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d tabblad sluiten?</item>
+        <item quantity="other">Alle %1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ander %1$d tabblad sluiten?</item>
+        <item quantity="other">Andere %1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d tabblad sluiten?</item>
+        <item quantity="other">%1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Weet je zeker dat je dit tabblad wilt sluiten?</item>
+        <item quantity="other">Weet je zeker dat je alle tabbladen wilt sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Weet je zeker dat je het tabblad wilt sluiten?</item>
+        <item quantity="other">Weet je zeker dat je deze tabbladen wilt sluiten?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad sluiten</item>
+        <item quantity="other">Tabbladen sluiten</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad sluiten?</item>
+        <item quantity="other">%1$d Tabbladen sluiten</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Andere tabbladen sluiten</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad gesloten</item>
+        <item quantity="other">%1$d tabbladen gesloten</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privétabblad</item>
+        <item quantity="other">%1$d privétabbladen</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Voeg de optie \'Private spraakopdracht\' toe aan de adresbalk. Audio wordt niet opgeslagen en met niemand gedeeld, ook niet met DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
     <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Blokkeer enge advertenties</string>
-    <string name="preOnboardingComparisonChartItem5">Wis browsegegevens in een handomdraai</string>
+    <string name="preOnboardingComparisonChartItem4">Blokkeer trackingadvertenties</string>
+    <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
     <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Niet nu</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkeert trackers om je te beschermen tijdens het browsen  </string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Deze website verlaten</string>
+    <string name="maliciousSiteAdvancedCTA">Geavanceerd</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Je kunt <a href=\"\">een fout melden</a> als je denkt dat deze website veilig is. Je kunt de website nog steeds bezoeken op eigen risico.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Risico accepteren en site bezoeken</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Meld een website die ten onrechte als schadelijk is aangeduid</string>
+    <string name="maliciousSiteLearnMoreTitle">Meer informatie</string>
+    <string name="maliciousSiteSettingTitle">Waarschuwingen over de veiligheid van de website</string>
+    <string name="maliciousSiteToggleHint">Waarschuw me op websites die zijn aangeduid als phishing of malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Als je deze functie uitschakelt, kunnen je gegevens in gevaar komen.</string>
 
 </resources>

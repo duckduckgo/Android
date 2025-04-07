@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Вашата защита е наш приоритет.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Защита. Поверителност. Спокойствие.</string>
     <string name="yes">Да</string>
     <string name="no">Не</string>
     <string name="open">Отваряне</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
     <string name="tabSwitcherListViewMenu">Изглед в списък</string>
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt;</string>
+    <string name="inTheLast7Days">през последните 7 дни</string>
 
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
     <string name="aboutActivityTitleNew">За нас</string>
-    <string name="aboutHeader">Добре дошли на наша страна!</string>
-    <string name="aboutDescription">DuckDuckGo е независима компания, основана през 2008 г., за защита на личните данни в интернет за всеки, на когото му е омръзнало да бъде проследяван онлайн и иска лесно решение на проблема. Ние сме доказателство, че можете да получите реална и безкомпромисна защита на личните данни онлайн.\n\nБраузърът DuckDuckGo притежава функциите, които очаквате от един основен браузър, като отметки, раздели, пароли и много други, както и <annotation type="privacy_protection_link">редица мощни защити на поверителността</annotation>, които повечето популярни браузъри не предлагат по подразбиране. Този уникален и комплексен набор от защити на поверителността предлага сигурност при онлайн дейностите – търсене, сърфиране, изпращане на имейли и др.\n\nЗа да работят, нашите защити на поверителността не изискват да имате технически познания или да се извършвате сложни настройки. Необходимо е да използвате браузъра DuckDuckGo на всички Ваши устройства и ще получите поверителност по подразбиране.\n\nНо ако искате да надникнете зад кулисите и да разберете как работят защитите на поверителността на DuckDuckGo, можете да намерите повече информация на нашите <annotation type="learn_more_link">страници за помощ</annotation>.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo е независима компания за защита на личните данни в интернет, основана през 2008 г., предлагаща продукт, подходящ за всеки, на когото му е омръзнало да бъде проследяван онлайн и иска лесно решение. Ние сме доказателство, че можеш да получиш реална защита на личните данни онлайн без компромиси.\n\nБраузърът DuckDuckGo притежава функциите, които очаквате от един основен браузър, като отметки, раздели, пароли и много други, както и <annotation type="privacy_protection_link">редица мощни защити на поверителността</annotation>, които повечето популярни браузъри не предлагат по подразбиране. Този уникален и комплексен набор от защити на поверителността предлага сигурност при онлайн дейностите – търсене, сърфиране, изпращане на имейли и др.\n\nЗа да работят, нашите защити на поверителността не изискват да имате технически познания или да се извършвате сложни настройки. Необходимо е само да използвате браузъра DuckDuckGo на всички свои устройства и ще получите поверителност по подразбиране.\n\nНо ако искате да надникнете зад кулисите и да разберете как работят защитите на поверителността на DuckDuckGo, можете да намерите повече информация на нашите <annotation type="learn_more_link">страници за помощ</annotation>.</string>
+    <string name="aboutHeaderNewTagLine">Защита. Поверителност. Спокойствие.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo е независима компания за онлайн защита за всеки, който иска да си върне контрола върху личната информация.\n\nНие вярваме, че най-добрият начин за защита на личната информация от хакери, измамници и компании, които не зачитат поверителността, е тя изобщо да не бъде събирана. Ето защо милиони хора <annotation type="chart_comparison">избират DuckDuckGo пред Chrome и други браузъри</annotation> за търсене и сърфиране онлайн. Нашата вградена търсачка е като Google, но никога не следи какво търсите. А нашите защити при сърфиране, като блокиране на рекламни тракери и блокиране на бисквитки, помагат да спрем събирането на Вашите данни от други компании. Освен това нашият браузър е безплатен — ние печелим от <annotation type="privacy_respecting_ads">зачитащи поверителността реклами при търсене</annotation>, а не като използваме Вашите данни.\n\nВ допълнение към това предлагаме и <annotation type="ppro_help_page">Privacy Pro</annotation>, абонаментна услуга „три в едно“, интегрирана в нашия браузър. Абонатите на Privacy Pro получават още по-добра защита на личните данни с бърза и лесна <annotation type="vpn_help_page">VPN</annotation> услуга, която помага да защитите дейността си онлайн; услуга, която намира и премахва личната Ви информация от сайтове за търсене на хора; и услуга, която възстановява самоличността Ви, ако бъде открадната.\n\nВърнете си контрола върху личната информация с браузъра, предназначен за защита на данните, а не за събиране на данните.</string>
     <string name="no_suggestions">Няма предложения</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">От това устройство</string>
     <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
-    <string name="systemSearchOnboardingText">Благодарим ви, че избрахте DuckDuckGo!\nС използването на нашата търсачка или приложение вашите търсения са защитени.</string>
+    <string name="systemSearchOnboardingThanks">Благодарим Ви, че избрахте DuckDuckGo!\nИзползването на нашия браузър помага да се защитите от хакери, измамници и жадни за данни компании.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>
     <string name="systemSearchOnboardingFeatureOneText">Блокира опасни тракери.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Криптира уебсайтове принудително.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Плъзнете надолу от горния край и натиснете бутона за връщане, за да излезете от цял екран</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Затваряне на всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Сигурни ли сте, че искате да затворите всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отмени</string>
     <string name="closeAppTabsConfirmationDialogClose">Затваряне</string>
+
+    <string name="selectTabsMenuItem">Избиране на раздели</string>
+    <string name="selectAllTabsMenuItem">Избиране на всички</string>
+    <string name="deselectAllTabsMenuItem">Премахване на избора на всички</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d избрани</string>
+    <string name="tabSelectedIndicator">Индикатор за избран раздел</string>
+    <string name="tabNotSelectedIndicator">Индикатор за неизбран раздел</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d връзки от DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Споделяне на връзката</item>
+        <item quantity="other">Споделяне на връзки %1$d</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне отметка на избрания раздел?</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Отметката е добавена</item>
+        <item quantity="other">%1$d отметки са добавени</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Отметка</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне на отметка на раздела</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Съществуващите отметки няма да бъдат дублирани.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на всички %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d други раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите този раздел?</item>
+        <item quantity="other">Наистина ли искате да затворите всички раздели?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите раздела?</item>
+        <item quantity="other">Наистина ли искате да затворите тези раздели?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на разделите</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздел</item>
+        <item quantity="other">Затваряне на %1$d раздела</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Затваряне на другите раздели</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затворен раздел</item>
+        <item quantity="other">%1$d затворени раздела</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d поверителен раздел</item>
+        <item quantity="other">%1$d поверителни раздела</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокиране на досадни реклами</string>
-    <string name="preOnboardingComparisonChartItem5">Бързо изтриване на данните за сърфиране</string>
+    <string name="preOnboardingComparisonChartItem4">Блокиране на проследяващи реклами</string>
+    <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
     <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сега</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Напускане на този сайт</string>
+    <string name="maliciousSiteAdvancedCTA">Разширени</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ако смятате, че този уебсайт е безопасен, можете да <a href=\"\">съобщите за грешка</a>. Все пак можете да посетите уебсайта на свой собствен риск.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Поемане на риска и отваряне на сайта</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Докладване за сайт, който е отбелязан неправилно като злонамерен</string>
+    <string name="maliciousSiteLearnMoreTitle">Научете повече</string>
+    <string name="maliciousSiteSettingTitle">Предупреждения за безопасност на сайта</string>
+    <string name="maliciousSiteToggleHint">Предупреди ме за сайтове, отбелязани за фишинг или злонамерен софтуер</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Деактивирането на тази функция може да изложи информацията Ви на риск.</string>
 
 </resources>

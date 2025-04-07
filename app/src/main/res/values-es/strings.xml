@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotipo de DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Tu protección, nuestra prioridad.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Protección. Privacidad. Tranquilidad.</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="open">Abrir</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Descargas</string>
     <string name="tabSwitcherListViewMenu">Vista de lista</string>
     <string name="tabSwitcherGridViewMenu">Vista de cuadrícula</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s rastreadores bloqueados &lt;/b&gt; en los últimos 7 días</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s rastreadores bloqueados &lt;/b&gt;</string>
+    <string name="inTheLast7Days">en los últimos 7 días</string>
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Sobre</string>
-    <string name="aboutHeader">Bienvenidas al \"Lado Pato\"!</string>
-    <string name="aboutDescription">DuckDuckGo es la empresa de privacidad en internet independiente fundada en 2008 para quienes estén cansados de ser rastreados en línea y quieran una solución sencilla. Somos la prueba de que es posible obtener protección de privacidad real en línea sin concesiones.\n\nEl navegador DuckDuckGo incluye las funciones que esperas de un navegador de referencia, como favoritos, pestañas, contraseñas y más, así como más de <annotation type="privacy_protection_link">una docena de potentes funciones de protección de privacidad</annotation> que no ofrecen los navegadores más populares de forma predeterminada. Este conjunto completo de funciones de protección de privacidad ayuda a proteger tu actividad en línea, desde la búsqueda hasta la navegación, el correo electrónico y mucho más.\n\nNuestra protección de privacidad funciona sin necesidad de conocimientos técnicos y sin tener que lidiar con configuraciones complicadas. Lo único que tienes que hacer es cambiar el navegador a DuckDuckGo en todos tus dispositivos y obtener privacidad de forma predeterminada.\n\nSin embargo, si quieres conocer los entresijos, puedes encontrar más información sobre cómo funciona la protección de privacidad de DuckDuckGo en nuestras <annotation type="learn_more_link">páginas de ayuda</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo es la empresa de privacidad en internet independiente fundada en 2008 para quienes estén cansados de ser rastreados en línea y quieran una solución sencilla. Somos la prueba de que es posible obtener protección de privacidad real en línea sin concesiones.\n\nEl navegador DuckDuckGo incluye las funciones que esperas de un navegador de referencia, como favoritos, pestañas, contraseñas y más, así como más de <annotation type="privacy_protection_link">una docena de potentes funciones de protección de privacidad</annotation> que no ofrecen los navegadores más populares de forma predeterminada. Este conjunto completo de funciones de protección de privacidad ayuda a proteger tu actividad en línea, desde la búsqueda hasta la navegación, el correo electrónico y mucho más.\n\nNuestra protección de privacidad funciona sin necesidad de conocimientos técnicos y sin tener que lidiar con configuraciones complicadas. Lo único que tienes que hacer es cambiar el navegador a DuckDuckGo en todos tus dispositivos y obtener privacidad de forma predeterminada.\n\nSin embargo, si quieres conocer los entresijos, puedes encontrar más información sobre cómo funciona la protección de privacidad de DuckDuckGo en nuestras <annotation type="learn_more_link">páginas de ayuda</annotation></string>
+    <string name="aboutHeaderNewTagLine">Protección. Privacidad. Tranquilidad.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo es la empresa independiente de protección en Internet para quienes quieren recuperar el control de su información personal.\n\nCreemos que la mejor manera de proteger tu información personal contra hackers, estafadores y empresas que invaden la privacidad es evitar que se recopile. Por eso, millones de personas <annotation type="chart_comparison">eligen DuckDuckGo en lugar de Chrome y otros navegadores</annotation> para buscar y navegar en línea. Nuestro motor de búsqueda integrado es como Google, pero nunca rastrea tus búsquedas. Y nuestras protecciones de navegación, como el bloqueo de rastreadores de anuncios y el bloqueo de cookies, ayudan a impedir que otras empresas recopilen tus datos. ¡Ah! Y nuestro navegador es gratuito: ganamos dinero con <annotation type="privacy_respecting_ads">anuncios de búsqueda que respetan la privacidad</annotation>, no explotando tus datos.Además, también ofrecemos <annotation type="ppro_help_page">Privacy Pro</annotation>, un servicio de suscripción tres en uno, integrado en nuestro navegador. Los suscriptores de Privacy Pro obtienen aún más protección de privacidad con una <annotation type="vpn_help_page">VPN rápida y sencilla</annotation> que ayuda a proteger tu actividad en línea, un servicio que encuentra y elimina tu información personal de los sitios de búsqueda de personas y un servicio que restaura tu identidad en caso de que sea robada.\n\nRecupera el control de tu información personal con el navegador diseñado para proteger tus datos, no para recopilarlos.</string>
     <string name="no_suggestions">No hay sugerencias</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Desde este dispositivo</string>
     <string name="systemSearchAppNotFound">No se pudo encontrar la aplicación</string>
-    <string name="systemSearchOnboardingText">¡Gracias por elegir DuckDuckGo!\nAhora, cuando uses nuestra búsqueda o aplicación, tus búsquedas estarán protegidas.</string>
+    <string name="systemSearchOnboardingThanks">¡Gracias por elegir DuckDuckGo!\nEl uso de nuestro navegador te ayuda a protegerte contra piratas informáticos, estafadores y empresas ávidas de datos.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">La aplicación de DuckDuckGo también:</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloquea rastreadores poco seguros.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Fuerza el cifrado en sitios web.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arrastra hacia abajo desde la parte superior y pulsa el botón Atrás para salir de la pantalla completa</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">¿Cerrar todas las pestañas?</string>
     <string name="closeAppTabsConfirmationDialogDescription">¿Seguro que deseas cerrar todas las pestañas?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Cerrar</string>
+
+    <string name="selectTabsMenuItem">Seleccionar pestañas</string>
+    <string name="selectAllTabsMenuItem">Seleccionar todo</string>
+    <string name="deselectAllTabsMenuItem">Cancelar selección de todo</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d seleccionadas</string>
+    <string name="tabSelectedIndicator">Indicador de pestaña seleccionada</string>
+    <string name="tabNotSelectedIndicator">Indicador de pestaña no seleccionada</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d enlaces desde DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Compartir enlace</item>
+        <item quantity="other">Compartir %1$d enlaces</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Añadir pestaña seleccionada a marcadores?</item>
+        <item quantity="other">¿Añadir %1$d pestañas a marcadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcador añadido</item>
+        <item quantity="other">%1$d marcadores añadidos</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Añadir a marcadores</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Añadir pestaña a marcadores</item>
+        <item quantity="other">Añadir %1$d pestañas a marcadores</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Los marcadores existentes no se duplicarán.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cerrar pestaña?</item>
+        <item quantity="other">¿Cerrar todas las %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cierras otra pestaña?</item>
+        <item quantity="other">¿Cerrar otras %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cerrar pestaña?</item>
+        <item quantity="other">¿Cerrar %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Seguro que deseas cerrar esta pestaña?</item>
+        <item quantity="other">¿Seguro que deseas cerrar todas las pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Seguro que quieres cerrar esta pestaña?</item>
+        <item quantity="other">¿Seguro que quieres cerrar estas pestañas?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar pestañas</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar %1$d pestañas</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Cerrar otras pestañas</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pestaña cerrada</item>
+        <item quantity="other">%1$d pestañas cerradas</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d pestaña privada</item>
+        <item quantity="other">%1$d pestañas privadas</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Añadir la opción de búsqueda privada por voz a la barra de direcciones. El audio no se almacena ni se comparte con nadie, incluyendo DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Búsqueda privada por defecto</string>
     <string name="preOnboardingComparisonChartItem2">Bloquea rastreadores de terceros</string>
     <string name="preOnboardingComparisonChartItem3">Bloqueo de ventanas emergentes de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloqueo de anuncios escalofriantes</string>
-    <string name="preOnboardingComparisonChartItem5">Borra rápidamente los datos de navegación</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquea anuncios de rastreo</string>
+    <string name="preOnboardingComparisonChartItem5">Elimina los datos de navegación con un solo botón</string>
     <string name="preOnboardingDaxDialog3Title">¡Genial! Te damos la bienvenida al lado Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
     <string name="onboardingSearchDaxDialogTitle">Prueba una búsqueda!</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Deja que DuckDuckGo proteja más de lo que haces en línea</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Haznos tu navegador predeterminado para que todos los enlaces a sitios se abran en DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ahora no</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloquea rastreadores para proteger tu navegación</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Al borrar tus pestañas y datos, se eliminará el historial de bloqueo de rastreadores y se restablecerá este número a cero.\n\nOculta este banner si prefieres no verlo en la vista de pestañas.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Advertencia: este sitio puede suponer un riesgo para la seguridad</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloqueado esta página porque podría estar distribuyendo malware diseñado para comprometer tu dispositivo o robar tu información personal.\n<a href=\"\">Más información</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Este sitio web puede hacerse pasar por un sitio legítimo con el fin de engañarte para que proporciones información personal, como contraseñas o números de tarjetas de crédito.\n<a href=\"\">Más información</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Salir de este sitio</string>
+    <string name="maliciousSiteAdvancedCTA">Avanzado</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Si crees que este sitio web es seguro, puedes <a href=\"\">informar de un error</a>. Puedes seguir visitando el sitio web por tu cuenta y riesgo.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Aceptar el riesgo y visitar el sitio</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Informar de un sitio marcado incorrectamente como malicioso</string>
+    <string name="maliciousSiteLearnMoreTitle">Más información</string>
+    <string name="maliciousSiteSettingTitle">Advertencias de seguridad del sitio</string>
+    <string name="maliciousSiteToggleHint">Avisarme sobre sitios marcados como phishing o malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Más información</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Desactivar esta función puede poner en riesgo tu información.</string>
 
 </resources>

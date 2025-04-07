@@ -7,11 +7,9 @@ tags:
       commands:
             - launchApp:
                 clearState: true
-            - runFlow: ../shared/pre_onboarding.yaml
+            - runFlow: ../shared/skip_all_onboarding.yaml
             - inputText: "https://www.search-company.site/#ad-id-5"
             - pressKey: Enter
-            - assertVisible:
-                text: ".*Got It.*"
             - assertVisible:
                 id: "ad-id-5"
             - tapOn:
@@ -61,10 +59,6 @@ tags:
                 id: "com.duckduckgo.mobile.android:id/close"
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/close"
-            - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/newTab"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/newTab"
             - assertVisible:
                 id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
             - tapOn:

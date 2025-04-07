@@ -55,14 +55,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Primary Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/dax_button_primary_large_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Primary Large"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             app:icon="@drawable/ic_device_desktop_16" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -90,14 +90,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Secondary Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/dax_button_secondary_large_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Secondary Large"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             app:icon="@drawable/ic_arrow_down_24" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -125,14 +125,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Destructive Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
             android:id="@+id/dax_button_destructive_large_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Destructive Large"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             app:icon="@drawable/ic_reload_24" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
@@ -160,7 +160,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ghost Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/dax_button_ghost_large_icon"
@@ -168,7 +168,7 @@
             android:layout_height="wrap_content"
             android:text="Ghost Large"
             app:icon="@drawable/ic_globe_gray_16dp"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/dax_button_ghost_disabled"
@@ -195,7 +195,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ghost Destructive Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
             android:id="@+id/dax_button_ghost_destructive_large_icon"
@@ -203,7 +203,7 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_bell"
             android:text="Ghost Destructive Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
             android:id="@+id/dax_button_ghost_destructive_disabled"
@@ -230,7 +230,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ghost Alt Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
             android:id="@+id/dax_button_ghost_alt_large_icon"
@@ -238,7 +238,7 @@
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_bell"
             android:text="Ghost Alt Large"
-            app:buttonSize="large" />
+            app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
             android:id="@+id/dax_button_ghost_alt_disabled"

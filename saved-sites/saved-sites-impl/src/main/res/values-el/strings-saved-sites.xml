@@ -59,8 +59,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Επεξεργασία σελιδοδείκτη</string>
     <string name="favoriteDialogTitleEdit">Επεξεργασία αγαπημένων</string>
-    <string name="locationLabel">Τοποθεσία</string>
-    <string name="folderLocationTitle">Επιλέξτε τοποθεσία</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Τοποθεσία</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Επιλέξτε τοποθεσία</string>
     <string name="addFolder">Προσθήκη φακέλου</string>
     <string name="editFolder">Επεξεργασία φακέλου</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Διαγραφή φακέλου και των περιεχομένων του;"</string>

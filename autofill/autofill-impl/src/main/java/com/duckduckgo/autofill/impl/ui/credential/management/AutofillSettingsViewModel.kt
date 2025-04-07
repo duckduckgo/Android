@@ -70,6 +70,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
@@ -101,6 +102,7 @@ import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRe
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
@@ -191,8 +193,16 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private fun onShowListMode() {
-        _viewState.value = _viewState.value.copy(credentialMode = ListMode)
-        addCommand(ShowListMode)
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = _viewState.value.copy(credentialMode = ListMode)
+
+            val command = if (autofillFeature.newScrollBehaviourInPasswordManagementScreen().isEnabled()) {
+                ShowListMode
+            } else {
+                ShowListModeLegacy
+            }
+            addCommand(command)
+        }
     }
 
     fun onViewCredentials(
@@ -447,6 +457,7 @@ class AutofillSettingsViewModel @Inject constructor(
             val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
             val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
             val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+            Timber.v("Can import from Google Password Manager: $canImport")
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
         }
     }
@@ -655,10 +666,13 @@ class AutofillSettingsViewModel @Inject constructor(
      * There are multiple ways to launch this screen, so we include a source parameter to differentiate between them.
      */
     fun sendLaunchPixel(launchSource: AutofillSettingsLaunchSource) {
-        Timber.v("Opened autofill management screen from from %s", launchSource)
+        viewModelScope.launch {
+            Timber.v("Opened autofill management screen from from %s", launchSource)
 
-        val source = launchSource.asString()
-        pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
+            val source = launchSource.asString()
+            val hasCredentialsSaved = autofillStore.getCredentialCount().first() > 0
+            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
+        }
     }
 
     fun onUserConfirmationToClearNeverSavedSites() {
@@ -863,6 +877,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
+        object ShowListModeLegacy : Command()
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()

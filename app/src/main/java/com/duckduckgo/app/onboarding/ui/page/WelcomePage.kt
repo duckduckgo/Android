@@ -175,6 +175,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
+            var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL -> {
@@ -185,12 +186,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
-
-                    scheduleTypingAnimation(ctaText) {
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
                 COMPARISON_CHART -> {
@@ -206,16 +208,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.comparisonChart.root.show()
                     binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
 
-                    binding.daxDialogCta.comparisonChart.feature3.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem3)
-                    binding.daxDialogCta.comparisonChart.feature4.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem4)
-                    binding.daxDialogCta.comparisonChart.feature5.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem5)
-
-                    scheduleTypingAnimation(ctaText) {
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
                 ADDRESS_BAR_POSITION -> {
@@ -232,7 +232,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.addressBarPosition.root.show()
                     binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
 
-                    scheduleTypingAnimation(ctaText) {
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
                         setAddressBarPositionOptions(true)
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
@@ -245,8 +246,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         }
                         binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
+
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
             }
+            binding.sceneBg.setOnClickListener { afterAnimation() }
+            binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
         }
     }
 

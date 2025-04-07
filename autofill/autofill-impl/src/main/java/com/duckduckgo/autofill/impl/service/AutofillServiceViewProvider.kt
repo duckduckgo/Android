@@ -22,6 +22,7 @@ import android.app.slice.Slice
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.service.autofill.InlinePresentation
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.inline.InlinePresentationSpec
 import androidx.annotation.DrawableRes
@@ -137,6 +138,10 @@ class RealAutofillServiceViewProvider @Inject constructor(
             setImageViewResource(
                 R.id.ddgIcon,
                 iconRes,
+            )
+            setViewVisibility(
+                R.id.subtitle,
+                if (subtitle.isEmpty()) View.GONE else View.VISIBLE,
             )
         }
 }

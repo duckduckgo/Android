@@ -24,6 +24,8 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.PASSWORD
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
 import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
+import com.duckduckgo.autofill.noopDeduplicator
+import com.duckduckgo.autofill.noopGroupBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -57,12 +59,19 @@ class RealAutofillProviderSuggestionsTest {
         whenever(this.getOpenDuckDuckGoSuggestionSpecs()).thenReturn(SuggestionUISpecs("Search in DuckDuckGo", "", 0))
     }
 
+    private val autofillSuggestions = AutofillServiceSuggestions(
+        autofillStore = autofillStore,
+        appCredentialProvider = appCredentialProvider,
+        loginDeduplicator = noopDeduplicator(),
+        grouper = noopGroupBuilder(),
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+    )
+
     private val testee = RealAutofillProviderSuggestions(
         appBuildConfig = appBuildConfig,
-        autofillStore = autofillStore,
         viewProvider = mockViewProvider,
         suggestionsFormatter = suggestionFormatter,
-        appCredentialProvider = appCredentialProvider,
+        autofillSuggestions = autofillSuggestions,
     )
 
     @Test

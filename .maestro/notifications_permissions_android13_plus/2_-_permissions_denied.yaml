@@ -1,4 +1,6 @@
 appId: com.duckduckgo.mobile.android
+tags:
+  - permissionsTest
 ---
 - retry:
       maxRetries: 3
@@ -10,21 +12,9 @@ appId: com.duckduckgo.mobile.android
             - assertVisible:
                 text: ".*Allow DuckDuckGo to send you notifications.*"
             - tapOn: "Don’t allow"
-            - assertVisible:
-                text: ".*Welcome to DuckDuckGo!.*"
-                optional: true
-            - assertVisible:
-                text: ".*Ready for a faster browser that keeps you protected?.*"
-            - tapOn: "let's do it!"
-            - assertVisible:
-                text: "Protections activated!"
-            - tapOn: "choose your browser"
-            - tapOn: "cancel"
-            - assertVisible:
-                text: ".*where should I put your address bar?.*"
-            - tapOn: "next"
-            - assertVisible:
-                text: ".*Try a search!.*"
+
+            - runFlow: ../shared/skip_all_onboarding.yaml
+
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
             - tapOn:

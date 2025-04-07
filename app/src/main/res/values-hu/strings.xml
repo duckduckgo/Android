@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
-    <string name="duckDuckGoTagline">A prioritásunk, hogy megvédjünk téged.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Védelem. Adatvédelem. Nyugalom.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
     <string name="open">Megnyitás</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Letöltések</string>
     <string name="tabSwitcherListViewMenu">Listanézet</string>
     <string name="tabSwitcherGridViewMenu">Rácsnézet</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető letiltva &lt;/b&gt;</string>
+    <string name="inTheLast7Days">az elmúlt 7 napban</string>
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
     <string name="aboutActivityTitleNew">További információ</string>
-    <string name="aboutHeader">Isten hozott a Kacsa oldalon!</string>
-    <string name="aboutDescription">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
-    <string name="aboutDescriptionNew">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
+    <string name="aboutHeaderNewTagLine">Védelem. Adatvédelem. Nyugalom.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nA DuckDuckGo független online adatvédelmi cég azoknak kínál megoldást, akik vissza akarják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük be őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a cookie-k blokkolása, segítenek megakadályozni, hogy más cégek adatokat gyűjtsenek rólad. Ja, és a böngészőnk ingyenes — a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.Ezen felül kínáljuk a <annotation type="ppro_help_page">Privacy Pro</annotation> szolgáltatást is, egy három az egyben előfizetési csomagot, amely be van építve a böngészőnkbe. A Privacy Pro előfizetői még nagyobb adatvédelmet élvezhetnek egy gyors és egyszerű <annotation type="vpn_help_page">VPN-nel</annotation>, melynek segítségével biztonságossá tehető az online tevékenység oly módon, hogy a szolgáltatás megkeresi és eltávolítja a személyek keresésére alkalmas webhelyeken elérhető személyes adatokat, illetve eltulajdonítás esetén visszaállítja a személyazonosságot.\n\nVedd vissza az irányítást a személyes adataid felett a böngészővel, amelyet az adatgyűjtés helyett adatvédelemre terveztek!</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
-    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
+    <string name="systemSearchOnboardingThanks">Köszönjük, hogy a DuckDuckGót választod!\nBöngészőnk hozzájárul ahhoz, hogy védve legyél a hekkerektől, a csalóktól és az adataidra kíváncsi vállalatoktól.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyeken a titkosítást.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">A teljes képernyőről való kilépéshez végezz felülről lefelé húzást, és koppints a vissza gombra</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Összes lap bezárása?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Biztosan bezárod az összes lapot?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Mégsem</string>
     <string name="closeAppTabsConfirmationDialogClose">Bezárás</string>
+
+    <string name="selectTabsMenuItem">Válaszd ki a lapokat</string>
+    <string name="selectAllTabsMenuItem">Összes kijelölése</string>
+    <string name="deselectAllTabsMenuItem">Összes kijelölés törlése</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d kiválasztva</string>
+    <string name="tabSelectedIndicator">Kiválasztott lap jelzése</string>
+    <string name="tabNotSelectedIndicator">Ki nem választott lap jelzése</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d link a DuckDuckGótól</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Link megosztása</item>
+        <item quantity="other">%1$d link megosztása</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Hozzáadod a könyvjelzőkhöz a kiválasztott lapot?</item>
+        <item quantity="other">Hozzáadsz a könyvjelzőkhöz %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Könyvjelző hozzáadva</item>
+        <item quantity="other">%1$d könyvjelző hozzáadva</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Könyvjelző</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap hozzáadása a könyvjelzőkhöz</item>
+        <item quantity="other">%1$d lap hozzáadása a könyvjelzőkhöz</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">A meglévő könyvjelzők nem kettőződnek.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a lapot?</item>
+        <item quantity="other">Bezárod mind a(z) %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a másik lapot?</item>
+        <item quantity="other">Bezársz %1$d másik lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a lapot?</item>
+        <item quantity="other">Bezársz %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Biztosan bezárod ezt a lapot?</item>
+        <item quantity="other">Biztosan bezárod az összes lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Biztosan be akarod zárni ezt a lapot?</item>
+        <item quantity="other">Biztosan be akarod zárni ezeket a lapokat?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">Lapok bezárása</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">%1$d lap bezárása</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Többi lap bezárása</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárva</item>
+        <item quantity="other">%1$d lap bezárva</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privát lap</item>
+        <item quantity="other">%1$d privát lap</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Privát beszédhangalapú keresési opció hozzáadása a címsorhoz. A hangot nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
-    <string name="preOnboardingComparisonChartItem4">Gyanús hirdetések blokkolása</string>
-    <string name="preOnboardingComparisonChartItem5">Böngészési adatok gyors törlése</string>
+    <string name="preOnboardingComparisonChartItem4">Nyomon követő hirdetések blokkolása</string>
+    <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
     <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
@@ -777,8 +848,8 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
-    <string name="settingsAddressBarPositionTop">Fel</string>
-    <string name="settingsAddressBarPositionBottom">Alul</string>
+    <string name="settingsAddressBarPositionTop">Fent</string>
+    <string name="settingsAddressBarPositionBottom">Lent</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Most nem</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">A DuckDuckGo a böngészésed védelme érdekében blokkolja a nyomkövetőket</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
+    <string name="maliciousSiteAdvancedCTA">Haladó</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Helytelenül rosszindulatúnak jelölt webhely jelentése</string>
+    <string name="maliciousSiteLearnMoreTitle">További részletek</string>
+    <string name="maliciousSiteSettingTitle">Webhelybiztonsági figyelmeztetések</string>
+    <string name="maliciousSiteToggleHint">Figyelmeztetés az adathalászat vagy rosszindulatú programok miatt megjelölt webhelyekre</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
 
 </resources>

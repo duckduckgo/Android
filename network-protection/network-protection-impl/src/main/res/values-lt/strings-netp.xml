@@ -227,7 +227,7 @@
     <string name="netpCustomDnsSettingText">DNS serveris</string>
     <string name="netpPrivateDns">Privatus DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">„DuckDuckGo“ (blokuoti kenkėjišką programą)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">„DuckDuckGo“ (rizikingų domenų blokavimas)</string>
     <string name="netpCustomDnsDefaultOption">„DuckDuckGo“ (rekomenduojama)</string>
     <string name="netpCustomDnsCustom">Pasirinkti kitą</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 adresas</string>
@@ -238,8 +238,10 @@
     <string name="netpDdgDnsByLine">„DuckDuckGo“ nukreipia DNS užklausas per mūsų DNS serverius, kad tavo interneto tiekėjas negalėtų matyti, kokiose svetainėse lankaisi.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Blokuoti kenkėjišką programą</string>
-    <string name="netpDnsBlockMalwareByline">Blokuok kenkėjišką programinę įrangą, naudodamas DNS lygmens blokavimo sąrašą. Jei svetainė neįsikrauna, pabandyk išjungti blokavimą.</string>
+    <string name="netpDnsBlockMalwareHeader">Turinio blokavimas ir filtravimas</string>
+    <string name="netpDnsBlockMalwarePrimary">Blokuoti rizikingus domenus</string>
+    <string name="netpDnsBlockMalwareByline">Blokuoti daugiau nei 150 000 domenų, pažymėtų kaip talpinančių kenkėjiškas programas, sukčiavimo atakas ir internetinius sukčius, naudodamas DNS lygmens blokavimo sąrašą. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS blokavimo sąrašai</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Ar norėtum išskirti programas, kurios nesuderinamos su VPN?</string>

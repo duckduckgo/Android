@@ -57,6 +57,11 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        if (project.hasProperty('skip-onboarding')) {
+            buildConfigField "boolean", "CAN_SKIP_ONBOARDING", "true"
+        } else {
+            buildConfigField "boolean", "CAN_SKIP_ONBOARDING", "false"
+        }
         if (project.hasProperty('build-date-time')) {
             buildConfigField "long", "BUILD_DATE_MILLIS", "${System.currentTimeMillis()}"
         } else {
@@ -260,7 +265,6 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
-    implementation project(':common-ui-experiments')
     internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')

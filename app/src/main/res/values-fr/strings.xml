@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Votre protection, notre priorité.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Protection. Confidentialité. Tranquillité d\'esprit.</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
     <string name="open">Ouvrir</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Téléchargements</string>
     <string name="tabSwitcherListViewMenu">Vue liste</string>
     <string name="tabSwitcherGridViewMenu">Vue grille</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt; au cours des 7 derniers jours</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt;</string>
+    <string name="inTheLast7Days">au cours des 7 derniers jours</string>
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de DuckDuckGo</string>
     <string name="aboutActivityTitleNew">À propos</string>
-    <string name="aboutHeader">Bienvenue du côté Duck !</string>
-    <string name="aboutDescription">DuckDuckGo est une société indépendante de confidentialité sur internet fondée en 2008, destinée à tous ceux qui en ont assez d\'être suivis en ligne et qui veulent une solution simple. Nous sommes la preuve que vous pouvez bénéficier d\'une véritable protection de la confidentialité en ligne, sans avoir à faire de compromis.\n\nLe navigateur DuckDuckGo est doté des fonctionnalités que vous attendez d\'un navigateur de référence, comme les signets, les onglets et les mots de passe, entre autres, auxquels s\'ajoutent plus d\'<annotation type="privacy_protection_link">une douzaine de protections puissantes de la confidentialité</annotation> que la plupart des navigateurs populaires ne proposent pas par défaut.Cet ensemble unique et complet de protections de la confidentialité permet de préserver vos activités en ligne, de la recherche à la navigation, en passant par l\'envoi d\'e-mails, etc.\n\nInutile de s\'y connaître en détails techniques ou de gérer des paramètres complexes pour faire fonctionner nos protections de la confidentialité. Il vous suffit d\'opter pour le navigateur DuckDuckGo sur tous vos appareils afin de pouvoir bénéficier de la confidentialité par défaut.\n\nMais si vous voulez vous faire une idée, vous trouverez plus d\'informations sur le fonctionnement des protections de la confidentialité DuckDuckGo sur nos <annotation type="learn_more_link">pages d\'aide</annotation></string>
-    <string name="aboutDescriptionNew">DuckDuckGo est une société indépendante de confidentialité sur internet fondée en 2008, destinée à tous ceux qui en ont assez d\'être suivis en ligne et qui veulent une solution simple. Nous sommes la preuve que vous pouvez bénéficier d\'une véritable protection de la confidentialité en ligne, sans avoir à faire de compromis.\n\nLe navigateur DuckDuckGo est doté des fonctionnalités que vous attendez d\'un navigateur de référence, comme les signets, les onglets et les mots de passe, entre autres, auxquels s\'ajoutent plus d\'<annotation type="privacy_protection_link">une douzaine de protections puissantes de la confidentialité</annotation> que la plupart des navigateurs populaires ne proposent pas par défaut. Cet ensemble unique et complet de protections de la confidentialité permet de préserver vos activités en ligne, de la recherche à la navigation, en passant par l\'envoi d\'e-mails, etc.\n\nInutile de s\'y connaître en détails techniques ou de gérer des paramètres complexes pour faire fonctionner nos protections de la confidentialité. Il vous suffit d\'opter pour le navigateur DuckDuckGo sur tous vos appareils afin de pouvoir bénéficier de la confidentialité par défaut.\n\nMais si vous voulez vous faire une idée, vous trouverez plus d\'informations sur le fonctionnement des protections de la confidentialité DuckDuckGo sur nos <annotation type="learn_more_link">pages d\'aide</annotation></string>
+    <string name="aboutHeaderNewTagLine">Protection. Confidentialité. Tranquillité d\'esprit.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side !\n\nDuckDuckGo est l\'entreprise indépendante de protection en ligne pour tous ceux qui veulent reprendre le contrôle de leurs informations personnelles.\n\nNous croyons que la meilleure façon de protéger vos informations personnelles contre les pirates, les escrocs et les entreprises qui portent atteinte à la vie privée est d\'empêcher purement et simplement leur collecte. C\'est pour cette raison que des millions de personnes <annotation type="chart_comparison">choisissent DuckDuckGo plutôt que Chrome ou d\'autres navigateurs</annotation> pour effectuer leurs recherches et naviguer en ligne. Notre moteur de recherche intégré est similaire à Google, sauf qu\'il ne suit jamais vos recherches. Et nos protections de navigation, telles que le blocage des traqueurs publicitaires et le blocage des cookies, permettent d\'empêcher que d\'autres entreprises ne recueillent vos données. Et surtout, notre navigateur est gratuit : nous gagnons de l\'argent grâce aux <annotation type="privacy_respecting_ads">publicités de recherche respectueuses de la confidentialité</annotation> et non grâce à l\'exploitation de vos données.\n\nDe plus, nous proposons également <annotation type="ppro_help_page">Privacy Pro</annotation>, un service d\'abonnement trois en un intégré à notre navigateur. Les abonnés à Privacy Pro bénéficient d\'une protection de la confidentialité encore plus poussée grâce à un <annotation type="vpn_help_page">VPN</annotation> rapide et simple qui contribue à sécuriser votre activité en ligne, un service qui trouve et supprime vos informations personnelles des sites de recherche de personnes, et un service qui rétablit votre identité en cas de vol.\n\nReprenez le contrôle de vos informations personnelles avec le navigateur conçu pour la protection des données, pas pour leur collecte.</string>
     <string name="no_suggestions">Aucune suggestion</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
-    <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre outil de recherche ou notre application, vos recherches sont protégées.</string>
+    <string name="systemSearchOnboardingThanks">Merci d\'avoir choisi DuckDuckGo !\nL\'utilisation de notre navigateur vous permet de vous protéger contre les pirates, les escrocs et les entreprises avides de données.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'application DuckDuckGo offre également les fonctionnalités suivantes :</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloque les traqueurs dangereux.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Force le cryptage sur les sites Web.</string>
@@ -659,11 +663,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
     <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
+
+    <string name="selectTabsMenuItem">Sélectionner les onglets</string>
+    <string name="selectAllTabsMenuItem">Tout sélectionner</string>
+    <string name="deselectAllTabsMenuItem">Tout désélectionner</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d sélectionné(s)</string>
+    <string name="tabSelectedIndicator">Indicateur d\'onglet sélectionné</string>
+    <string name="tabNotSelectedIndicator">Indicateur d\'onglet non sélectionné</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d liens de DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Partager le lien</item>
+        <item quantity="other">Partager %1$d liens</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet sélectionné aux signets ?</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Signet ajouté</item>
+        <item quantity="other">%1$d signets ajoutés</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Ajouter aux signets</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet aux signets</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Les signets existants ne seront pas dupliqués.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer les %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer un autre onglet ?</item>
+        <item quantity="other">Fermer %1$d autres onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer cet onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer tous les onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer l\'onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer ces onglets ?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer les onglets</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer %1$d onglets</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Fermer les autres onglets</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Onglet fermé</item>
+        <item quantity="other">%1$d onglets fermés</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d onglet privé</item>
+        <item quantity="other">%1$d onglets privés</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Ajoutez l\'option Recherche vocale privée à la barre d\'adresse. L\'audio n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>
@@ -708,8 +779,8 @@
     <string name="preOnboardingComparisonChartItem1">Faire une recherche privée par défaut</string>
     <string name="preOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités douteuses</string>
-    <string name="preOnboardingComparisonChartItem5">Effacer rapidement les données de navigation</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités qui pistent</string>
+    <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
     <string name="preOnboardingDaxDialog3Title">Génial ! Bienvenue chez DuckDuckGo.</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
     <string name="onboardingSearchDaxDialogTitle">Essayez une recherche !</string>
@@ -797,5 +868,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Laissez DuckDuckGo protéger davantage ce que vous faites en ligne</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Choisissez-nous comme navigateur par défaut afin que tous les liens de site s\'ouvrent dans DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Pas maintenant</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloque les traqueurs pour protéger votre navigation</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ce site Web se fait peut-être passer pour un site légitime afin de vous inciter à communiquer des informations personnelles, telles que des mots de passe ou des numéros de carte bancaire.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Quitter ce site</string>
+    <string name="maliciousSiteAdvancedCTA">Options avancées</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Si vous pensez que ce site Web est sûr, vous pouvez <a href=\"\">signaler une erreur</a>. La visite du site Web se fera à vos risques et périls.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Signaler un site marqué à tort comme étant malveillant</string>
+    <string name="maliciousSiteLearnMoreTitle">En savoir plus</string>
+    <string name="maliciousSiteSettingTitle">Avertissements de sécurité du site</string>
+    <string name="maliciousSiteToggleHint">Mettez-moi en garde contre les sites signalés pour hameçonnage ou comme étant des logiciels malveillants</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="maliciousSiteSettingDisabled">La désactivation de cette fonctionnalité peut mettre vos informations en danger.</string>
 
 </resources>

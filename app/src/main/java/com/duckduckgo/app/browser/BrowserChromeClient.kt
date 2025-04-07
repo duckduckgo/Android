@@ -81,8 +81,7 @@ class BrowserChromeClient @Inject constructor(
         Timber.d("onProgressChanged ${webView.url}, ${webView.progress}")
         if (webView.progress == 0) return
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, webView.progress))
-        webViewClientListener?.progressChanged(webView.progress)
+        webViewClientListener?.progressChanged(webView.progress, WebViewNavigationState(navigationList, webView.progress))
         webViewClientListener?.onCertificateReceived(webView.certificate)
     }
 

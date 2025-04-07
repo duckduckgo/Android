@@ -17,14 +17,14 @@
 package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 
 interface TimestampBasedLoginSorter : Comparator<LoginCredentials>
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 @Named("LastUsedCredentialSorter")
 class LastUsedCredentialSorter @Inject constructor() : TimestampBasedLoginSorter {
 
@@ -54,7 +54,7 @@ class LastUsedCredentialSorter @Inject constructor() : TimestampBasedLoginSorter
     }
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 @Named("LastUpdatedCredentialSorter")
 class LastUpdatedCredentialSorter @Inject constructor() : TimestampBasedLoginSorter {
 

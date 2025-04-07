@@ -27,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="?daxColorSurface"
         app:layout_scrollFlags="scroll|enterAlways|snap">
 
@@ -35,7 +35,6 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             android:layout_marginHorizontal="@dimen/keyline_2"
@@ -94,7 +93,7 @@
                         android:id="@+id/daxIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center"
+                        android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
                         android:visibility="gone"
@@ -104,7 +103,7 @@
                         android:id="@+id/duckPlayerIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center"
+                        android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
                         android:visibility="gone"
@@ -114,7 +113,7 @@
                         android:id="@+id/searchIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center"
+                        android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="6dp"
                         android:src="@drawable/ic_find_search_20_a05" />
@@ -123,7 +122,7 @@
                         android:id="@+id/globeIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center"
+                        android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
                         android:visibility="gone"
@@ -279,7 +278,7 @@
                 android:src="@drawable/ic_fire" />
         </FrameLayout>
 
-        <com.duckduckgo.app.browser.TabSwitcherButton
+        <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton
             android:id="@+id/tabsMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

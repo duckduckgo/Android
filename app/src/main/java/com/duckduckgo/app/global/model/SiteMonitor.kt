@@ -166,9 +166,9 @@ class SiteMonitor(
 
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
+        if (maliciousSiteStatus != null) return MALICIOUS
         if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
         if (userAllowList || !isHttps) return UNPROTECTED
-        if (maliciousSiteStatus != null) return MALICIOUS
 
         if (!fullSiteDetailsAvailable) {
             Timber.i("Shield: not fullSiteDetailsAvailable for $domain")

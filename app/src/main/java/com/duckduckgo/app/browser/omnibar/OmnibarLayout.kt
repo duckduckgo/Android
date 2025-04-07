@@ -46,13 +46,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
@@ -61,15 +59,20 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTracker
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -85,7 +88,6 @@ import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -93,7 +95,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class OmnibarLayout @JvmOverloads constructor(
+open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -125,8 +127,6 @@ class OmnibarLayout @JvmOverloads constructor(
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
-    private val omnibarPosition: OmnibarPosition
-
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -154,6 +154,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
 
     private var decoration: Decoration? = null
+    private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
@@ -187,23 +188,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
-    init {
-        val attr =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
-        omnibarPosition =
-            OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
-
-        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_new_omnibar_bottom
-        } else {
-            R.layout.view_new_omnibar
-        }
-        inflate(context, layout, this)
-
-        AndroidSupportInjection.inject(this)
-    }
-
-    private fun omnibarViews(): List<View> = listOf(
+    internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
         omnibarTextInput,
         searchIcon,
@@ -238,9 +223,11 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
-    private val viewModel: OmnibarLayoutViewModel by lazy {
+    protected val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
             viewModelFactory,
@@ -249,6 +236,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
+
+    private var lastSeenPrivacyShield: PrivacyShield? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -267,7 +256,14 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
+        if (lastViewMode != null) {
+            Timber.d("Omnibar: onAttachedToWindow lastViewMode $lastViewMode")
+            decorateDeferred(lastViewMode!!)
+            lastViewMode = null
+        }
+
         if (decoration != null) {
+            Timber.d("Omnibar: onAttachedToWindow decoration $decoration")
             decorateDeferred(decoration!!)
             decoration = null
         }
@@ -403,7 +399,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun render(viewState: ViewState) {
+    open fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -414,13 +410,17 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        if (viewState.leadingIconState == PRIVACY_SHIELD) {
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+        } else {
+            lastSeenPrivacyShield = null
+        }
         renderButtons(viewState)
     }
 
-    private fun processCommand(command: OmnibarLayoutViewModel.Command) {
+    open fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
-            CancelTrackersAnimation -> {
+            Command.CancelAnimations -> {
                 cancelTrackersAnimation()
             }
 
@@ -428,7 +428,11 @@ class OmnibarLayout @JvmOverloads constructor(
                 startTrackersAnimation(command.entities)
             }
 
-            OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
+            is StartCookiesAnimation -> {
+                createCookiesAnimation(command.isCosmetic)
+            }
+
+            MoveCaretToFront -> {
                 moveCaretToFront()
             }
         }
@@ -533,14 +537,24 @@ class OmnibarLayout @JvmOverloads constructor(
     ) {
         Timber.d("Omnibar: renderCustomTabMode $viewState")
         configureCustomTabOmnibar(viewMode)
+        renderCustomTab(viewMode)
     }
 
     fun decorate(decoration: Decoration) {
+        Timber.d("Omnibar: decorate $decoration")
         if (isAttachedToWindow) {
             decorateDeferred(decoration)
         } else {
-            if (this.decoration == null) {
-                Timber.d("Omnibar: decorate not attached saving $decoration")
+            /* TODO (cbarreiro): This is a temporary solution to prevent one-time decorations causing mode to be lost when view is not attached
+             *  As a long-term solution, we should move mode to StateChange, and only have one-time decorations here
+             */
+            if (decoration is Mode) {
+                val lastMode = lastViewMode?.viewMode
+                if (lastMode !is CustomTab) {
+                    lastViewMode = decoration
+                }
+                this.decoration = null
+            } else if (this.decoration == null) {
                 this.decoration = decoration
             }
         }
@@ -560,7 +574,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onOutlineEnabled(decoration.enabled)
             }
 
-            CancelAnimations -> {
+            Decoration.CancelAnimations -> {
                 cancelTrackersAnimation()
             }
 
@@ -569,11 +583,11 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is LaunchCookiesAnimation -> {
-                createCookiesAnimation(decoration.isCosmetic)
+                viewModel.onAnimationStarted(decoration)
             }
 
             is ChangeCustomTabTitle -> {
-                updateCustomTabTitle(decoration)
+                viewModel.onCustomTabTitleUpdate(decoration)
             }
 
             is HighlightOmnibarItem -> {
@@ -597,30 +611,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun reduceDeferred(stateChange: StateChange) {
         viewModel.onExternalStateChange(stateChange)
-    }
-
-    override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
-        }
-    }
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
@@ -679,13 +669,16 @@ class OmnibarLayout @JvmOverloads constructor(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
     ) {
-        val shieldIcon = if (viewMode is ViewMode.Browser) {
-            shieldIcon
-        } else {
-            customTabToolbarContainer.customTabShieldIcon
-        }
+        renderIfChanged(privacyShield, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = privacyShield
+            val shieldIcon = if (viewMode is ViewMode.Browser) {
+                shieldIcon
+            } else {
+                customTabToolbarContainer.customTabShieldIcon
+            }
 
-        privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+            privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+        }
     }
 
     private fun renderOutline(enabled: Boolean) {
@@ -711,10 +704,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
             browserMenu.isVisible = true
 
-            customTabToolbarContainer.customTabDomain.text = customTab.domain
-            customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
-            customTabToolbarContainer.customTabDomainOnly.show()
-
             val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
             customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
             customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
@@ -724,19 +713,24 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun updateCustomTabTitle(decoration: ChangeCustomTabTitle) {
+    private fun renderCustomTab(viewMode: CustomTab) {
         Timber.d("Omnibar: updateCustomTabTitle $decoration")
-        customTabToolbarContainer.customTabTitle.text = decoration.title
 
-        decoration.domain?.let {
-            customTabToolbarContainer.customTabDomain.text = decoration.domain
+        viewMode.domain?.let {
+            customTabToolbarContainer.customTabDomain.text = viewMode.domain
+            customTabToolbarContainer.customTabDomainOnly.text = viewMode.domain
+            customTabToolbarContainer.customTabDomain.show()
+            customTabToolbarContainer.customTabDomainOnly.show()
         }
 
-        customTabToolbarContainer.customTabTitle.show()
-        customTabToolbarContainer.customTabDomainOnly.hide()
-        customTabToolbarContainer.customTabDomain.show()
-        customTabToolbarContainer.customTabShieldIcon.isInvisible = decoration.showDuckPlayerIcon
-        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = decoration.showDuckPlayerIcon
+        viewMode.title?.let {
+            customTabToolbarContainer.customTabTitle.text = viewMode.title
+            customTabToolbarContainer.customTabTitle.show()
+            customTabToolbarContainer.customTabDomainOnly.hide()
+        }
+
+        customTabToolbarContainer.customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
     }
 
     private fun calculateCustomTabBackgroundColor(color: Int): Int {
@@ -775,5 +769,29 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        }
+    }
+
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        }
+    }
+
+    override fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean,
+    ) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        }
     }
 }

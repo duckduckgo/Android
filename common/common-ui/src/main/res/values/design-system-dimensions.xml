@@ -38,6 +38,9 @@
     <dimen name="toolbarIconSize">24dp</dimen>
     <dimen name="toolbarOverflowPadding">10dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
+    <dimen name="experimentalToolbarSize">64dp</dimen>
+    <dimen name="experimentalMinibarSize">34dp</dimen>
+    <dimen name="experimentalOmnibarCardSize">44dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>
@@ -71,6 +74,9 @@
     <dimen name="gridItemIconSize">32dp</dimen>
     <dimen name="gridItemTextWidth">72dp</dimen>
     <dimen name="gridItemPreviewHeight">170dp</dimen>
+
+    <!-- Extended FAB -->
+    <dimen name="fabHeight">56dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">200dp</dimen>

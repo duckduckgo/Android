@@ -46,6 +46,7 @@
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
+    <attr name="daxColorSurfaceTransparent" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
@@ -67,6 +68,13 @@
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
+    <attr name="daxColorToolbar" format="color"/>
+    <attr name="daxColorBrowserOverlay" format="color"/>
+
+    <!-- Visual Design Specific Colors -->
+    <attr name="daxColorOmnibarStroke" format="color"/>
+    <attr name="daxColorControlFillPrimary" format="color"/>
+
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
@@ -125,12 +133,16 @@
     <color name="red70">#9A3216</color>
 
     <color name="purple50">#5132A9</color>
+    <color name="purple40">#A276FF</color>
 
     <color name="yellow50_14">#24FFCC33</color>
     <color name="yellow50">#FFCC33</color>
     <color name="yellow10">#FFF0C2</color>
 
+    <color name="green0">#D3FFCC</color>
     <color name="green50">#4CBA3C</color>
+    <color name="green70">#288419</color>
+    <color name="green80">#1A690D</color>
 
     <color name="gray100">#111111</color>
     <color name="gray95">#494949</color>
@@ -148,6 +160,7 @@
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
+    <color name="gray15">#F0F1F2</color>
     <color name="gray0">#FAFAFA</color>
 
     <color name="blue0">#CCDAFF</color>
@@ -160,7 +173,8 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
-    <color name="blue10">#803969EF</color>
+    <color name="blue10">#803969FF</color>
+    <color name="blue10_solid">#9CB4FF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>

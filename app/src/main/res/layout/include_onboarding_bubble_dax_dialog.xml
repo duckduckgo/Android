@@ -38,128 +38,133 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
         android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
-        app:edgePosition="top"
         app:arrowOffsetStart="6dp"
+        app:edgePosition="top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintWidth_max="600dp">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_5"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/daxBubbleDialogTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:typography="h2"
-                tools:text="@string/onboardingSearchDaxDialogTitle" />
-
-            <FrameLayout
+            <LinearLayout
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_1">
+                android:padding="@dimen/keyline_5"
+                android:orientation="vertical">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/hiddenTextCta"
+                    android:id="@+id/daxBubbleDialogTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    app:typography="body1"
-                    tools:text="@string/onboardingSearchDaxDialogDescription"
+                    app:typography="h2"
+                    tools:text="@string/onboardingSearchDaxDialogTitle" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/hiddenTextCta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        app:typography="body1"
+                        tools:text="@string/onboardingSearchDaxDialogDescription"
+                        tools:visibility="visible" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                        android:id="@+id/dialogTextCta"
+                        style="@style/Typography.DuckDuckGo.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textColor="?attr/daxColorPrimaryText" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/placeholder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="96dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_privacy_pro_128"
                     tools:visibility="visible" />
 
-                <com.duckduckgo.common.ui.view.TypeAnimationTextView
-                    android:id="@+id/dialogTextCta"
-                    style="@style/Typography.DuckDuckGo.Body1"
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/daxDialogOption1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:textColor="?attr/daxColorPrimaryText" />
-            </FrameLayout>
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:alpha="0"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/onboardingSearchDaxDialogOption1"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1" />
 
-            <ImageView
-                android:id="@+id/placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="96dp"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_privacy_pro_128"
-                tools:visibility="visible" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/daxDialogOption2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-4dp"
+                    android:alpha="0"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/onboardingSearchDaxDialogOption2"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxDialogOption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:alpha="0"
-                android:gravity="start|center_vertical"
-                android:text="@string/onboardingSearchDaxDialogOption1"
-                app:icon="@drawable/ic_find_search_16"
-                tools:alpha="1" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/daxDialogOption3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-4dp"
+                    android:alpha="0"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/onboardingSearchDaxDialogOption3"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxDialogOption2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-4dp"
-                android:alpha="0"
-                android:gravity="start|center_vertical"
-                android:text="@string/onboardingSearchDaxDialogOption2"
-                app:icon="@drawable/ic_find_search_16"
-                tools:alpha="1" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/daxDialogOption4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-4dp"
+                    android:alpha="0"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/onboardingSearchDaxDialogOption4"
+                    app:icon="@drawable/ic_wand_16"
+                    tools:alpha="1" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxDialogOption3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-4dp"
-                android:alpha="0"
-                android:gravity="start|center_vertical"
-                android:text="@string/onboardingSearchDaxDialogOption3"
-                app:icon="@drawable/ic_find_search_16"
-                tools:alpha="1" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:visibility="gone"
+                    app:daxButtonSize="large"
+                    tools:text="Primary Cta"
+                    tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxDialogOption4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-4dp"
-                android:alpha="0"
-                android:gravity="start|center_vertical"
-                android:text="@string/onboardingSearchDaxDialogOption4"
-                app:icon="@drawable/ic_wand_16"
-                tools:alpha="1" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/secondaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:daxButtonSize="large"
+                    tools:text="Secondary Cta"
+                    tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/primaryCta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:visibility="gone"
-                app:buttonSize="large"
-                tools:text="Primary Cta"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/secondaryCta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:buttonSize="large"
-                tools:text="Secondary Cta"
-                tools:visibility="visible" />
-
-        </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

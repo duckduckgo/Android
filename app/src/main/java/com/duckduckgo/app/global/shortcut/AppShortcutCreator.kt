@@ -35,6 +35,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -73,6 +74,7 @@ class AppShortcutCreator @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
+    private val duckChat: DuckChat,
     private val dispatchers: DispatcherProvider,
 ) {
 
@@ -83,6 +85,10 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildNewTabShortcut(context))
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
+
+            if (duckChat.isEnabled()) {
+                shortcutList.add(buildDuckChatShortcut(context))
+            }
 
             if (appBuildConfig.isInternalBuild()) {
                 shortcutList.add(buildAndroidDesignSystemShortcut(context))
@@ -151,10 +157,23 @@ class AppShortcutCreator @Inject constructor(
             .build().toShortcutInfo()
     }
 
+    private fun buildDuckChatShortcut(context: Context): ShortcutInfo {
+        val browserActivity = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
+        val stackBuilder = TaskStackBuilder.create(context)
+            .addNextIntent(browserActivity)
+
+        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
+            .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcuts_duck_ai))
+            .setIntents(stackBuilder.intents)
+            .build().toShortcutInfo()
+    }
+
     companion object {
         private const val SHORTCUT_ID_CLEAR_DATA = "clearData"
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
         private const val SHORTCUT_ID_DESIGN_SYSTEM_DEMO = "designSystemDemo"
+        private const val SHORTCUT_ID_DUCK_AI = "duckAI"
     }
 }

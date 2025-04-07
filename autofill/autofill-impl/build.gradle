@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'kotlin-parcelize'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -70,8 +71,10 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.room.ktx
     implementation AndroidX.biometric
+
+    ksp AndroidX.room.compiler
+    implementation AndroidX.room.ktx
 
     implementation "net.zetetic:android-database-sqlcipher:_"
     implementation "com.facebook.shimmer:shimmer:_"

@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Vaša zaščita je naša prednostna naloga.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Zaščita. Zasebnost. Zaupanje.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
     <string name="open">Odpri</string>
@@ -113,6 +113,11 @@
     <string name="downloadsMenuItemTitle">Prenosi</string>
     <string name="tabSwitcherListViewMenu">Pogled seznama</string>
     <string name="tabSwitcherGridViewMenu">Mrežni pogled</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">V zadnjih 7 dneh je bilo &lt;b&gt;blokiranih toliko sledilnikov: %1$s&lt;/b&gt;</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Št. blokiranih sledilnikov: %1$s &lt;/b&gt;</string>
+    <string name="inTheLast7Days">v zadnjih 7 dneh</string>
 
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
@@ -232,9 +237,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">O nas</string>
-    <string name="aboutHeader">Dobrodošli na strani Duck!</string>
-    <string name="aboutDescription">DuckDuckGo je neodvisno podjetje za zasebnost v internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo je neodvisno podjetje za zasebnost na internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
+    <string name="aboutHeaderNewTagLine">Zaščita. Zasebnost. Zaupanje.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo je neodvisno podjetje za spletno zaščito za vse, ki želijo znova prevzeti nadzor nad svojimi osebnimi podatki.\n\nVerjamemo, da je najboljši način za zaščito vaših osebnih podatkov pred hekerji, prevaranti in podjetji, ki posegajo v zasebnost, da preprečimo njihovo zbiranje. Zato na milijone ljudi za iskanje in brskanje po spletu <annotation type="chart_comparison">namesto brskalnika Chrome in drugih brskalnikov izbira DuckDuckGo</annotation>. Naš vgrajeni iskalnik je kot Google, vendar nikoli ne sledi vašim iskanjem. Naše zaščite pri brskanju, kot sta blokiranje sledilnikov oglasov in piškotkov, pomagajo drugim podjetjem preprečevati zbiranje vaših podatkov. In še to, naš brskalnik je brezplačen – zaslužimo z <annotation type="privacy_respecting_ads">oglasi v iskanju, ki spoštujejo zasebnost</annotation>, ne z izkoriščanjem vaših podatkov.\n\nPoleg tega ponujamo tudi <annotation type="ppro_help_page">Privacy Pro</annotation>, naročniško storitev tri v enem, integrirano v naš brskalnik. Naročniki na Privacy Pro dobijo še večjo zaščito zasebnosti s hitrim in preprostim omrežjem <annotation type="vpn_help_page">VPN</annotation>, ki pomaga zaščititi vašo spletno dejavnost, storitev, ki najde in odstrani vaše osebne podatke s spletnih mest za iskanje ljudi, ter storitev, ki obnovi vašo identiteto, če je ukradena.\n\nPrevzemite nadzor nad svojimi osebnimi podatki z brskalnikom, ki je zasnovan za varstvo podatkov, ne za zbiranje podatkov.</string>
     <string name="no_suggestions">Ni predlogov</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Iz te naprave</string>
     <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
-    <string name="systemSearchOnboardingText">Hvala, ker ste izbrali DuckDuckGo!\nZdaj, ko uporabljate naše iskalnike ali aplikacijo, so vaša iskanja zaščitena.</string>
+    <string name="systemSearchOnboardingThanks">Hvala, ker ste izbrali DuckDuckGo!\nZ uporabo našega brskalnika ste zaščiteni pred hekerji, goljufi in podjetji, ki želijo pridobiti podatke.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokira nevarne sledilce.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Prisilno šifriranje na spletiščih.</string>
@@ -659,11 +663,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Če želite zapustiti celozaslonski prikaz, z vrha zaslona povlecite navzdol in tapnite gumb za nazaj.</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želite zapreti vse zavihke?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Ali ste prepričani, da želite zapreti vse zavihke?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Prekliči</string>
     <string name="closeAppTabsConfirmationDialogClose">Zapri</string>
+
+    <string name="selectTabsMenuItem">Izberi zavihke</string>
+    <string name="selectAllTabsMenuItem">Izberi vse</string>
+    <string name="deselectAllTabsMenuItem">Počisti izbiro vsega</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Izbrano: %1$d</string>
+    <string name="tabSelectedIndicator">Indikator izbranega zavihka</string>
+    <string name="tabNotSelectedIndicator">Indikator neizbranega zavihka</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Povezave iz iskalnika DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Deli povezavo</item>
+        <item quantity="two">Deli %1$d povezavi</item>
+        <item quantity="few">Deli %1$d povezave</item>
+        <item quantity="other">Deli %1$d povezav</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite izbrani zavihek dodati med zaznamke?</item>
+        <item quantity="two">Želite %1$d zavihka dodati med zaznamke?</item>
+        <item quantity="few">Želite %1$d zavihke dodati med zaznamke?</item>
+        <item quantity="other">Želite %1$d zavihkov dodati med zaznamke?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zaznamek je dodan</item>
+        <item quantity="two">%1$d zaznamka sta dodana</item>
+        <item quantity="few">%1$d zaznamki so dodani</item>
+        <item quantity="other">%1$d zaznamkov je dodanih</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Zaznamek</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodaj zavihek med zaznamke</item>
+        <item quantity="two">Dodaj %1$d zavihka med zaznamke</item>
+        <item quantity="few">Dodaj %1$d zavihke med zaznamke</item>
+        <item quantity="other">Dodaj %1$d zavihkov med zaznamke</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Obstoječi zaznamki ne bodo podvojeni.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d zavihka?</item>
+        <item quantity="few">Želite zapreti vse %1$d zavihke?</item>
+        <item quantity="other">Želite zapreti vseh %1$d zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti drug zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d druga zavihka?</item>
+        <item quantity="few">Želite zapreti %1$d druge zavihke?</item>
+        <item quantity="other">Želite zapreti %1$d drugih zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d zavihka?</item>
+        <item quantity="few">Želite zapreti %1$d zavihke?</item>
+        <item quantity="other">Želite zapreti %1$d zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ali ste prepričani, da želite zapreti ta zavihek?</item>
+        <item quantity="two">Ali ste prepričani, da želite zapreti oba zavihka?</item>
+        <item quantity="few">Ali ste prepričani, da želite zapreti vse zavihke?</item>
+        <item quantity="other">Ali ste prepričani, da želite zapreti vse zavihke?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ali ste prepričani, da želite zapreti zavihek?</item>
+        <item quantity="two">Ali ste prepričani, da želite zapreti ta zavihka?</item>
+        <item quantity="few">Ali ste prepričani, da želite zapreti te zavihke?</item>
+        <item quantity="other">Ali ste prepričani, da želite zapreti te zavihke?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri zavihka</item>
+        <item quantity="few">Zapri zavihke</item>
+        <item quantity="other">Zapri zavihke</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri %1$d zavihka</item>
+        <item quantity="few">Zapri %1$d zavihke</item>
+        <item quantity="other">Zapri %1$d zavihkov</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zapri druge zavihke</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavihek je zaprt</item>
+        <item quantity="two">%1$d zavihka sta zaprta</item>
+        <item quantity="few">%1$d zavihki so zaprti</item>
+        <item quantity="other">%1$d zavihkov je zaprtih</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d zasebni zavihek</item>
+        <item quantity="two">%1$d zasebna zavihka</item>
+        <item quantity="few">%1$d zasebni zavihki</item>
+        <item quantity="other">%1$d zasebnih zavihkov</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti DuckDuckGo.</string>
@@ -708,8 +805,8 @@
     <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
     <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
-    <string name="preOnboardingComparisonChartItem4">Blokirajte srhljive oglase</string>
-    <string name="preOnboardingComparisonChartItem5">Hitro izbrišite podatke brskanja</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiraj oglase, ki sledijo</string>
+    <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
     <string name="onboardingSearchDaxDialogTitle">Preizkusi z iskanjem!</string>
@@ -801,5 +898,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne zdaj</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira sledilnike, da zaščiti vaše brskanje</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[To spletno mesto se morda predstavlja kot zakonito spletno mesto, da bi vas pretentalo, da posredujete osebne podatke, kot so gesla ali številke kreditnih kartic.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Zapustite to spletno mesto</string>
+    <string name="maliciousSiteAdvancedCTA">Napredno</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Če menite, da je to spletno mesto varno, lahko <a href=\"\">prijavite napako</a>. Spletno mesto lahko še vedno obiščete na lastno odgovornost.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Sprejmite tveganje in obiščite spletno mesto</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Prijavite spletno mesto, ki je napačno označeno kot zlonamerno</string>
+    <string name="maliciousSiteLearnMoreTitle">Več</string>
+    <string name="maliciousSiteSettingTitle">Varnostna opozorila spletnega mesta</string>
+    <string name="maliciousSiteToggleHint">Opozori me na spletnih mestih, označenih za lažno predstavljanje ali zlonamerno programsko opremo</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Če onemogočite to funkcijo, lahko ogrozite varnost svojih podatkov.</string>
 
 </resources>

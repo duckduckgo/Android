@@ -117,14 +117,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(20) // Value should come from the webView instance
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
-        testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).navigationStateChanged(any())
+        verify(mockWebViewClientListener).progressChanged(eq(20), any()) // Value should come from the webView instance
     }
 
     @UiThreadTest
@@ -133,8 +126,7 @@ class BrowserChromeClientTest {
         val mockWebView: WebView = mock()
         whenever(mockWebView.progress).thenReturn(0)
         testee.onProgressChanged(mockWebView, 10)
-        verify(mockWebViewClientListener, never()).navigationStateChanged(any())
-        verify(mockWebViewClientListener, never()).progressChanged(any())
+        verify(mockWebViewClientListener, never()).progressChanged(any(), any())
     }
 
     @UiThreadTest

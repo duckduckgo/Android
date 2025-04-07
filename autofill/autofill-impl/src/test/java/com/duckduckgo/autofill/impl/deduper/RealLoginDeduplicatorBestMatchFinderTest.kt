@@ -14,7 +14,6 @@ class RealLoginDeduplicatorBestMatchFinderTest {
     private val urlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
     private val matchTypeDetector = RealAutofillDeduplicationMatchTypeDetector(urlMatcher)
     private val testee = RealAutofillDeduplicationBestMatchFinder(
-        urlMatcher = urlMatcher,
         matchTypeDetector = matchTypeDetector,
     )
 

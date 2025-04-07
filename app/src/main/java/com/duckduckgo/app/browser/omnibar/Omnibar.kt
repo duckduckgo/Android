@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
@@ -39,13 +40,19 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -62,17 +69,54 @@ import timber.log.Timber
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
+    val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.rootView.removeView(binding.newOmnibarBottom)
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // remove bottom variant
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+
+                        // remove all fade omnibars
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    }
+
+                    FADE -> {
+                        // remove bottom variant
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+
+                        // remove all scrolling omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                    }
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(binding.newOmnibar)
+                when (omnibarType) {
+                    SCROLLING -> {
+                        // remove top variant
+                        binding.rootView.removeView(binding.newOmnibar)
+
+                        // remove all fade omnibars
+                        binding.rootView.removeView(binding.fadeOmnibar)
+                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    }
+
+                    FADE -> {
+                        // remove top variant
+                        binding.rootView.removeView(binding.fadeOmnibar)
+
+                        // remove all scrolling omnibars
+                        binding.rootView.removeView(binding.newOmnibar)
+                        binding.rootView.removeView(binding.newOmnibarBottom)
+                    }
+                }
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
@@ -132,6 +176,7 @@ class Omnibar(
         data class Browser(val url: String?) : ViewMode()
         data class CustomTab(
             val toolbarColor: Int,
+            val title: String?,
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
@@ -140,11 +185,17 @@ class Omnibar(
     private val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.newOmnibar
+                when (omnibarType) {
+                    SCROLLING -> binding.newOmnibar
+                    FADE -> binding.fadeOmnibar
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.newOmnibarBottom
+                when (omnibarType) {
+                    SCROLLING -> binding.newOmnibarBottom
+                    FADE -> binding.fadeOmnibarBottom
+                }
             }
         }
     }
@@ -189,6 +240,7 @@ class Omnibar(
         }
 
     fun setViewMode(viewMode: ViewMode) {
+        Timber.d("Omnibar: setViewMode $viewMode")
         when (viewMode) {
             Error -> {
                 newOmnibar.decorate(Mode(viewMode))
@@ -218,6 +270,13 @@ class Omnibar(
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
         newOmnibar.setOmnibarItemPressedListener(listener)
+    }
+
+    fun configureFadeOmnibarItemPressedListeners(listener: FadeOmnibarItemPressedListener) {
+        val omnibar = newOmnibar
+        if (omnibar is FadeOmnibarLayout) {
+            omnibar.setFadeOmnibarItemPressedListener(listener)
+        }
     }
 
     fun addTextListener(listener: TextListener) {
@@ -334,7 +393,7 @@ class Omnibar(
         customTabToolbarColor: Int,
         customTabDomainText: String?,
     ) {
-        newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
+        newOmnibar.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(
@@ -357,5 +416,22 @@ class Omnibar(
 
     fun voiceSearchDisabled(url: String?) {
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
+    }
+
+    fun getNavigationBar(): BrowserNavigationBarView? {
+        val omnibar = newOmnibar
+        return if (omnibar is FadeOmnibarLayout) {
+            omnibar.navigationBar
+        } else {
+            null
+        }
+    }
+}
+
+fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {
+    return if (experimentState.value.isEnabled) {
+        FADE
+    } else {
+        SCROLLING
     }
 }

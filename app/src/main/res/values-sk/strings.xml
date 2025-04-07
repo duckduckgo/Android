@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoTagline">Vaša ochrana, naša priorita.</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Ochrana. Súkromie. Pokoj v duši.</string>
     <string name="yes">Áno</string>
     <string name="no">Nie</string>
     <string name="open">Otvorené</string>
@@ -114,6 +114,11 @@
     <string name="tabSwitcherListViewMenu">Zobrazenie zoznamu</string>
     <string name="tabSwitcherGridViewMenu">Zobrazenie mriežky</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">Za posledných 7 dní &lt;b&gt;bolo zablokovaných %1$s sledovačov&lt;/b&gt;</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Bolo zablokovaných %1$s sledovačov &lt;/b&gt;</string>
+    <string name="inTheLast7Days">za posledných 7 dní</string>
+
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
     <string name="fireClearAll">Vymazať všetky karty a údaje</string>
@@ -127,7 +132,7 @@
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
     <string name="settingsHeadingCustomize">Prispôsobiť</string>
-    <string name="settingsHeadingAbout">O</string>
+    <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
     <string name="leaveFeedback">Zdieľať spätnú väzbu</string>
@@ -220,21 +225,20 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať dňa…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Iba ukončiť aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončiť 5 sekúnd neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončiť 5 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončiť 15 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončiť 30 minút neaktívnu aplikáciu</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Aplikácia bola zatvorená po 1 hodine neaktívnosti</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikácie, neaktívnej po dobu 5 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutActivityTitleNew">O</string>
-    <string name="aboutHeader">Vitajte na Duck Side!</string>
-    <string name="aboutDescription">DuckDuckGo je nezávislá spoločnosť na ochranu súkromia na internete založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžete získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré očakávate od prehliadača, ako sú záložky, karty, heslá a ďalšie funkcie, a viac ako <annotation type="privacy_protection_link">tuctom výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina populárnych prehliadačov štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť vaše online aktivity od vyhľadávania po prehliadanie, posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby ste museli poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získate predvolené súkromie.\n\nAk však máte záujem o podrobnejšie preskúmanie, viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdete na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
-    <string name="aboutDescriptionNew">DuckDuckGo je nezávislá spoločnosť zaoberajúca sa ochranou súkromia na internete, ktorá bola založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžeš získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré od prehliadača očakávaš, ako sú záložky, karty, heslá a ďalšie, a má viac ako <annotation type="privacy_protection_link">tucet výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina obľúbených štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť tvoje online aktivity od vyhľadávania cez prehliadanie, až po posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby si musel poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získaš predvolené súkromie.\n\nAk však chceš nahliadnuť pod kapotu a zistiť viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdeš ich na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
+    <string name="aboutHeaderNewTagLine">Ochrana. Súkromie. Pokoj v duši.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo je nezávislá spoločnosť na ochranu súkromia online pre každého, kto chce získať späť kontrolu nad svojimi osobnými údajmi.\n\nVeríme, že najlepším spôsobom, ako chrániť tvoje osobné údaje pred hackermi, podvodníkmi a spoločnosťami, ktoré narušujú súkromie, je zabrániť ich zhromažďovaniu. Preto si milióny ľudí <annotation type="chart_comparison">vyberajú DuckDuckGo pred prehliadačom Chrome a inými prehliadačmi</annotation> na online vyhľadávanie a prehliadanie. Náš vstavaný vyhľadávač je ako Google, ale nikdy nesleduje tvoje vyhľadávania. Naše ochrany prehliadania, ako je blokovanie sledovania reklám a blokovanie súborov cookie, pomáhajú zastaviť iné spoločnosti v zhromažďovaní tvojich údajov. A náš prehliadač je zadarmo – zarábame na <annotation type="privacy_respecting_ads">reklamách vo vyhľadávaní, ktoré rešpektujú súkromie</annotation>, a nie využívaním tvojich údajov.\n\nOkrem toho ponúkame aj <annotation type="ppro_help_page">Privacy Pro</annotation>, predplatenú službu 3v1, integrovanú do nášho prehliadača. Predplatitelia Privacy Pro získajú ešte väčšiu ochranu súkromia vďaka rýchlej a jednoduchej <annotation type="vpn_help_page">VPN</annotation>, ktorá pomáha zabezpečiť tvoju online aktivitu, službu, ktorá nájde a odstráni tvoje osobné údaje zo stránok na vyhľadávanie ľudí, a službu, ktorá obnoví tvoju identitu v prípade krádeže.\n\nZískaj späť kontrolu nad svojimi osobnými údajmi s prehliadačom určeným na ochranu údajov, nie na ich zhromažďovanie.</string>
     <string name="no_suggestions">Žiadne návrhy</string>
 
     <!-- Broken Site Activity -->
@@ -415,7 +419,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
     <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
-    <string name="systemSearchOnboardingText">Ďakujeme, že ste si vybrali aplikáciu DuckDuckGo!\nPri použití nášho vyhľadávača alebo aplikácie je vaše vyhľadávanie chránené.</string>
+    <string name="systemSearchOnboardingThanks">Ďakujeme, že si si vybral/a DuckDuckGo!\nPoužívanie nášho prehliadača ti pomôže chrániť sa pred hackermi, podvodníkmi a spoločnosťami bažiacimi po údajoch.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovanie.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrovanie na webových stránkach.</string>
@@ -659,11 +663,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Potiahnutím nadol z hora a ťuknutím na tlačidlo späť opustíte zobrazenie na celú obrazovku</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zatvoriť všetky karty?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Naozaj chcete zatvoriť všetky karty?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Zrušiť</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvoriť</string>
+
+    <string name="selectTabsMenuItem">Vybrať karty</string>
+    <string name="selectAllTabsMenuItem">Vybrať všetko</string>
+    <string name="deselectAllTabsMenuItem">Zrušiť výber všetkých</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d vybraných</string>
+    <string name="tabSelectedIndicator">Indikátor vybranej karty</string>
+    <string name="tabNotSelectedIndicator">Indikátor nevybranej karty</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d odkazov z DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zdieľať odkaz</item>
+        <item quantity="few">Zdieľať %1$d odkazy</item>
+        <item quantity="many">Zdieľať %1$d odkazov</item>
+        <item quantity="other">Zdieľať %1$d odkazov</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uložiť vybranú kartu medzi záložky?</item>
+        <item quantity="few">Uložiť %1$d karty medzi záložky?</item>
+        <item quantity="many">Uložiť %1$d karty medzi záložky?</item>
+        <item quantity="other">Uložiť %1$d kariet medzi záložky?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bola pridaná jedna záložka</item>
+        <item quantity="few">Boli pridané %1$d záložky</item>
+        <item quantity="many">Bolo pridaných %1$d záložiek</item>
+        <item quantity="other">Bolo pridaných %1$d záložiek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Záložka</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uložiť kartu medzi záložky</item>
+        <item quantity="few">Uložiť %1$d karty medzi záložky</item>
+        <item quantity="many">Uložiť %1$d kariet medzi záložky</item>
+        <item quantity="other">Uložiť %1$d kariet medzi záložky</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Existujúce záložky sa nebudú duplikovať.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriť túto kartu?</item>
+        <item quantity="few">Zatvoriť všetky %1$d karty?</item>
+        <item quantity="many">Zatvoriť všetkých %1$d kariet?</item>
+        <item quantity="other">Zatvoriť všetkých %1$d kariet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriť ďalšiu kartu?</item>
+        <item quantity="few">Zatvoriť ďalšie %1$d karty?</item>
+        <item quantity="many">Zatvoriť ďalších %1$d kariet?</item>
+        <item quantity="other">Zatvoriť ďalších %1$d kariet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriť kartu?</item>
+        <item quantity="few">Zatvoriť %1$d karty?</item>
+        <item quantity="many">Zatvoriť %1$d karty?</item>
+        <item quantity="other">Zatvoriť %1$d kariet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Naozaj chceš zatvoriť túto kartu?</item>
+        <item quantity="few">Naozaj chceš zatvoriť všetky karty?</item>
+        <item quantity="many">Naozaj chceš zatvoriť všetky karty?</item>
+        <item quantity="other">Naozaj chceš zatvoriť všetky karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Naozaj chceš zatvoriť túto kartu?</item>
+        <item quantity="few">Naozaj chceš zatvoriť tieto karty?</item>
+        <item quantity="many">Naozaj chceš zatvoriť tieto karty?</item>
+        <item quantity="other">Naozaj chceš zatvoriť tieto karty?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zatvoriť kartu</item>
+        <item quantity="few">Zatvoriť karty</item>
+        <item quantity="many">Zatvoriť karty</item>
+        <item quantity="other">Zatvoriť karty</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavrieť %1$d kartu</item>
+        <item quantity="few">Zavrieť %1$d karty</item>
+        <item quantity="many">Zavrieť %1$d karty</item>
+        <item quantity="other">Zavrieť %1$d kariet</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zatvoriť ostatné karty</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d zatvorená karta</item>
+        <item quantity="few">%1$d zatvorené karty</item>
+        <item quantity="many">%1$d zatvorených kariet</item>
+        <item quantity="other">%1$d zatvorených kariet</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d súkromná karta</item>
+        <item quantity="few">%1$d súkromné karty</item>
+        <item quantity="many">%1$d súkromných kariet</item>
+        <item quantity="other">%1$d súkromných kariet</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Do panela s adresou pridajte možnosť Súkromné hlasové vyhľadávanie. Zvuk sa neukladá ani sa s nikým nezdieľa, a to vrátane DuckDuckGo.</string>
@@ -708,8 +805,8 @@
     <string name="preOnboardingComparisonChartItem1">Predvolené vyhľadávanie so súkromím</string>
     <string name="preOnboardingComparisonChartItem2">Blokovať sledovanie tretími stranami</string>
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokovať nepríjemné reklamy</string>
-    <string name="preOnboardingComparisonChartItem5">Rýchle vymazanie údajov prehliadania</string>
+    <string name="preOnboardingComparisonChartItem4">Blokovať reklamy, ktoré sledujú</string>
+    <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
     <string name="preOnboardingDaxDialog3Title">Úžasné! Vitajte vo svete Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="onboardingSearchDaxDialogTitle">Skúste vyhľadávanie!</string>
@@ -801,5 +898,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Nechaj DuckDuckGo chrániť viac toho, čo robíš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás ako svoj predvolený prehliadač, aby sa všetky odkazy na stránky otvárali v DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Teraz nie</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokuje sledovače, aby chránil tvoje prehliadanie</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Táto webová lokalita sa môže vydávať za legitímnu lokalitu s cieľom oklamať vás k poskytnutiu osobných údajov, ako sú heslá alebo čísla kreditných kariet.\n<a href=\"\">Viac informácií</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Opustiť túto stránku</string>
+    <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ak si myslíš, že táto webová stránka je bezpečná, môžeš <a href=\"\">nahlásiť chybu</a>. Webovú stránku môžeš stále navštíviť na vlastné riziko.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Akceptovať riziko a navštíviť stránku</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Nahlás, že stránka je nesprávne označená stránku ako škodlivá.</string>
+    <string name="maliciousSiteLearnMoreTitle">Zistite viac</string>
+    <string name="maliciousSiteSettingTitle">Bezpečnostné upozornenia na lokalite</string>
+    <string name="maliciousSiteToggleHint">Upozorni ma na stránkach označených ako phishing alebo malvér.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Zistiť viac</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Deaktivácia tejto funkcie môže ohroziť tvoje údaje.</string>
 
 </resources>

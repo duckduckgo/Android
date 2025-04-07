@@ -12,7 +12,7 @@ concurrency:
 jobs:
   code_formatting:
     name: Code Formatting
-    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
 
     steps:
       - name: Checkout repository
@@ -34,7 +34,7 @@ jobs:
 
   unit_tests:
     name: Unit tests
-    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
 
     steps:
       - name: Checkout repository
@@ -67,7 +67,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
 
     steps:
       - name: Checkout repository
@@ -104,7 +104,7 @@ jobs:
           path: lint-report.zip
 
   android_tests:
-    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
     name: Android CI checks
 
     steps:
@@ -165,7 +165,7 @@ jobs:
 
   create_task_when_failed:
     name: Create Asana task when workflow failed
-    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
+    runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
     needs: [code_formatting, unit_tests, lint, android_tests]
     if: ${{ failure() }}
     steps:

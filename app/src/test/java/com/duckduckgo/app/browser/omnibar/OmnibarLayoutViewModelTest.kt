@@ -27,6 +27,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -60,6 +62,9 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
+    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
 
@@ -77,6 +82,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
+        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(defaultVisualExperimentNavBarStateFlow)
 
         initializeViewModel()
     }
@@ -113,6 +119,7 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
+            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
         )
     }
 
@@ -137,7 +144,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, "query")
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -280,7 +287,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
-        testee.onViewModeChanged(ViewMode.CustomTab(0, "example.com", false))
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -834,7 +841,7 @@ class OmnibarLayoutViewModelTest {
             StateChange.LoadingStateChange(
                 LoadingViewState(
                     isLoading = true,
-                    privacyOn = true,
+                    trackersAnimationEnabled = true,
                     progress = 100,
                     url = SERP_URL,
                 ),
@@ -886,7 +893,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -993,7 +1000,7 @@ class OmnibarLayoutViewModelTest {
             StateChange.LoadingStateChange(
                 LoadingViewState(
                     isLoading = true,
-                    privacyOn = true,
+                    trackersAnimationEnabled = true,
                     progress = 100,
                     url = loadedUrl,
                 ),
