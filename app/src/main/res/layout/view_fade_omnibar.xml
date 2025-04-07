@@ -67,8 +67,7 @@
                         android:id="@+id/omniBarContainerWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/experimentalOmnibarCardSize"
-                        android:layout_marginHorizontal="14dp"
-                        android:background="@drawable/fade_omnibar_outline">
+                        android:layout_marginHorizontal="14dp">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_gravity="center"

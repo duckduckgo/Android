@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -65,6 +66,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarOutline by lazy { ContextCompat.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.fade_omnibar_outline) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
+
+    private var focusAnimated = false
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
@@ -100,6 +103,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
         spacer.isVisible = false
 
+        Timber.d("OmnibarFocus: focusAnimated: $focusAnimated hasFocus ${viewState.hasFocus}")
+
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
             backIcon.show()
@@ -114,9 +119,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         omniBarContainer.isPressed = viewState.hasFocus
         if (viewState.hasFocus) {
-            amimateToFocusedState()
+            if (!focusAnimated) {
+                amimateToFocusedState()
+                focusAnimated = true
+            }
         } else {
-            animateToDefaultState()
+            if (focusAnimated) {
+                animateToDefaultState()
+                focusAnimated = false
+            }
         }
     }
 
