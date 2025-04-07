@@ -169,14 +169,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithBangQueryThenActivityStartedWithBangQuery() = runTest {
-        val settingsJson = """
-        {
-            "aiChatBangs": ["!ai","!aichat","!chat","!duckai"],
-            "aiChatBangRegex": "^(?!({bangs})${'$'}).*(?:{bangs}).*${'$'}"
-        }
-        """.trimIndent()
-
-        duckChatFeature.self().setRawStoredState(State(enable = true, settings = settingsJson))
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
         testee.openDuckChat(query = "example !ai")
@@ -192,14 +185,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenIsDuckChatUrlCalledWithBangQueryThenReturnTrue() = runTest {
-        val settingsJson = """
-        {
-            "aiChatBangs": ["!ai","!aichat","!chat","!duckai"],
-            "aiChatBangRegex": "^(?!({bangs})${'$'}).*(?:{bangs}).*${'$'}"
-        }
-        """.trimIndent()
-
-        duckChatFeature.self().setRawStoredState(State(enable = true, settings = settingsJson))
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.isDuckChatUrl(uri = "example !ai".toUri()))
@@ -278,5 +264,14 @@ class RealDuckChatTest {
     private fun setFeatureToggle(enabled: Boolean) {
         duckChatFeature.self().setRawStoredState(State(enabled))
         testee.onPrivacyConfigDownloaded()
+    }
+
+    companion object {
+        val SETTINGS_JSON = """
+        {
+            "aiChatBangs": ["!ai","!aichat","!chat","!duckai"],
+            "aiChatBangRegex": "^(?!({bangs})${'$'}).*(?:{bangs}).*${'$'}"
+        }
+        """.trimIndent()
     }
 }
