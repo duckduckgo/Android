@@ -167,7 +167,7 @@ class RealCaptchaResolver @Inject constructor(
                 }
             }
         }.getOrElse {
-            logcat { "PIR-CAPTCHA: Failure -> $this" }
+            logcat { "PIR-CAPTCHA: Failure -> $it" }
             CaptchaFailure(
                 type = InvalidRequest,
                 message = it.message ?: "Unknown error",

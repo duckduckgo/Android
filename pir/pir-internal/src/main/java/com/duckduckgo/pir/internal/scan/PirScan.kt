@@ -18,11 +18,14 @@ package com.duckduckgo.pir.internal.scan
 
 import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
@@ -30,12 +33,13 @@ import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.db.PirScanLog
-import com.duckduckgo.pir.internal.store.db.ScanEventType
+import com.duckduckgo.pir.internal.store.db.EventType
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -56,6 +60,7 @@ interface PirScan {
         brokers: List<String>,
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -66,6 +71,7 @@ interface PirScan {
     suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -86,7 +92,8 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
     private val pixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
-) : PirScan {
+    callbacks: PluginPoint<PirCallbacks>,
+) : PirScan, PirJob(callbacks) {
 
     private var profileQuery: ProfileQuery = ProfileQuery(
         firstName = "William",
@@ -112,16 +119,20 @@ class RealPirScan @Inject constructor(
         brokers: List<String>,
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
+        onJobStarted(coroutineScope)
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
         emitScanStartPixel(runType)
         // Clean up previous run's results
         runBlocking {
             if (runners.isNotEmpty()) {
-                stop()
+                runners.forEach {
+                    runBlocking { it.stop() }
+                }
                 runners.clear()
             }
-            repository.deleteAllResults()
+            repository.deleteAllScanResults()
             repository.getUserProfiles().also {
                 if (it.isNotEmpty()) {
                     // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
@@ -191,9 +202,10 @@ class RealPirScan @Inject constructor(
             logcat { "PIR-SCAN: Scan completed for all runners" }
             emitScanCompletedPixel(
                 runType,
-                startTimeMillis - currentTimeProvider.currentTimeMillis(),
+                currentTimeProvider.currentTimeMillis() - startTimeMillis,
                 maxWebViewCount,
             )
+            onJobCompleted()
             Result.success(Unit)
         }
     }
@@ -201,9 +213,10 @@ class RealPirScan @Inject constructor(
     override suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
         val brokers = repository.getAllBrokersForScan()
-        return execute(brokers, context, runType)
+        return execute(brokers, context, runType, coroutineScope)
     }
 
     override fun stop() {
@@ -211,23 +224,24 @@ class RealPirScan @Inject constructor(
         runners.forEach {
             runBlocking { it.stop() }
         }
+        onJobStopped()
     }
 
     private suspend fun emitScanStartPixel(runType: RunType) {
         if (runType == RunType.MANUAL) {
             pixelSender.reportManualScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_STARTED,
+                    eventType = EventType.MANUAL_SCAN_STARTED,
                 ),
             )
         } else {
             pixelSender.reportScheduledScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_STARTED,
+                    eventType = EventType.SCHEDULED_SCAN_STARTED,
                 ),
             )
         }
@@ -246,9 +260,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_COMPLETED,
+                    eventType = EventType.MANUAL_SCAN_COMPLETED,
                 ),
             )
         } else {
@@ -259,9 +273,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_COMPLETED,
+                    eventType = EventType.SCHEDULED_SCAN_COMPLETED,
                 ),
             )
         }

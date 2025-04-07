@@ -18,22 +18,29 @@ package com.duckduckgo.pir.internal.optout
 
 import android.content.Context
 import android.webkit.WebView
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
+import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
+import com.duckduckgo.pir.internal.store.db.EventType
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -49,6 +56,7 @@ interface PirOptOut {
     suspend fun execute(
         brokers: List<String>,
         context: Context,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -58,6 +66,7 @@ interface PirOptOut {
      */
     suspend fun executeForBrokersWithRecords(
         context: Context,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -70,6 +79,7 @@ interface PirOptOut {
     suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -78,14 +88,19 @@ interface PirOptOut {
     fun stop()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = PirOptOut::class,
+)
 @SingleInstanceIn(AppScope::class)
 class RealPirOptOut @Inject constructor(
     private val repository: PirRepository,
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
-) : PirOptOut {
+    private val currentTimeProvider: CurrentTimeProvider,
+    callbacks: PluginPoint<PirCallbacks>,
+) : PirOptOut, PirJob(callbacks) {
     private var profileQuery: ProfileQuery = ProfileQuery(
         firstName = "William",
         lastName = "Smith",
@@ -109,9 +124,12 @@ class RealPirOptOut @Inject constructor(
     override suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
+        onJobStarted(coroutineScope)
+        emitStartPixel()
         if (runners.isNotEmpty()) {
-            stop()
+            cleanRunners()
             runners.clear()
         }
         obtainProfile()
@@ -139,6 +157,8 @@ class RealPirOptOut @Inject constructor(
             }
 
             logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+            emitCompletedPixel()
+            onJobCompleted()
             Result.success(Unit)
         }
     }
@@ -146,10 +166,13 @@ class RealPirOptOut @Inject constructor(
     override suspend fun execute(
         brokers: List<String>,
         context: Context,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
+        onJobStarted(coroutineScope)
+        emitStartPixel()
         runBlocking {
             if (runners.isNotEmpty()) {
-                stop()
+                cleanRunners()
                 runners.clear()
             }
             obtainProfile()
@@ -198,6 +221,8 @@ class RealPirOptOut @Inject constructor(
                 }.awaitAll()
 
             logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+            emitCompletedPixel()
+            onJobCompleted()
             Result.success(Unit)
         }
     }
@@ -230,15 +255,41 @@ class RealPirOptOut @Inject constructor(
         }
     }
 
-    override suspend fun executeForBrokersWithRecords(context: Context): Result<Unit> {
-        val brokers = repository.getBrokersForOptOut()
-        return execute(brokers, context)
+    override suspend fun executeForBrokersWithRecords(
+        context: Context,
+        coroutineScope: CoroutineScope,
+    ): Result<Unit> {
+        val brokers = repository.getBrokersForOptOut(formOptOutOnly = true)
+        return execute(brokers, context, coroutineScope)
+    }
+
+    private fun cleanRunners() {
+        runners.forEach {
+            runBlocking { it.stop() }
+        }
     }
 
     override fun stop() {
         logcat { "PIR-OPT-OUT: Stopping all runners" }
-        runners.forEach {
-            runBlocking { it.stop() }
-        }
+        cleanRunners()
+        onJobStopped()
+    }
+
+    private suspend fun emitStartPixel() {
+        repository.saveScanLog(
+            PirEventLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                eventType = EventType.MANUAL_OPTOUT_STARTED,
+            ),
+        )
+    }
+
+    private suspend fun emitCompletedPixel() {
+        repository.saveScanLog(
+            PirEventLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                eventType = EventType.MANUAL_OPTOUT_COMPLETED,
+            ),
+        )
     }
 }

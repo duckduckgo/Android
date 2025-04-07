@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
         <activity
             android:name=".settings.PirDevSettingsActivity"
@@ -11,12 +12,16 @@
             android:label="@string/pirDevSimpleScanHeader" />
 
         <activity
-            android:name=".settings.PirScanResultsActivity"
-            android:label="@string/pirDevViewScanResults" />
+            android:name=".settings.PirDevScanActivity"
+            android:label="@string/pirDevScanTitle" />
+
+        <activity
+            android:name=".settings.PirDevOptOutActivity"
+            android:label="@string/pirDevOptOutTitle" />
 
         <activity
             android:name=".settings.PirWebViewActivity"
-            android:label="@string/pirDevViewScanResults" />
+            android:label="@string/pirDevDebugOptOutTitle" />
 
         <service
             android:name=".scan.PirForegroundScanService"

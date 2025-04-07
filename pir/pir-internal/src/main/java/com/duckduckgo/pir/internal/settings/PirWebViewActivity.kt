@@ -25,13 +25,14 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.internal.databinding.ActivityPirWebviewBinding
 import com.duckduckgo.pir.internal.optout.PirOptOut
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDebugWebViewResultsScreenNoParams::class)
+@ContributeToActivityStarter(PirDebugWebViewResultsScreenParams::class)
 class PirWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirOptOut: PirOptOut
@@ -40,12 +41,19 @@ class PirWebViewActivity : DuckDuckGoActivity() {
     lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityPirWebviewBinding by viewBinding()
+    private val params: PirDebugWebViewResultsScreenParams?
+        get() = intent.getActivityParams(PirDebugWebViewResultsScreenParams::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        val brokersToOptOut = params?.brokers
         lifecycleScope.launch(dispatcherProvider.io()) {
-            pirOptOut.debugExecute(listOf("Verecor"), binding.pirDebugWebView).also {
+            if (!brokersToOptOut.isNullOrEmpty()) {
+                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView, this).also {
+                    finish()
+                }
+            } else {
                 finish()
             }
         }
@@ -57,4 +65,4 @@ class PirWebViewActivity : DuckDuckGoActivity() {
     }
 }
 
-object PirDebugWebViewResultsScreenNoParams : ActivityParams
+data class PirDebugWebViewResultsScreenParams(val brokers: List<String>) : ActivityParams
