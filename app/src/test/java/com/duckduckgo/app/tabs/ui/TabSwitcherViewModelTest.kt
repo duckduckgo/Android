@@ -54,6 +54,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.S
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -85,6 +87,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -138,6 +141,9 @@ class TabSwitcherViewModelTest {
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
 
+    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+
     private lateinit var testee: TabSwitcherViewModel
 
     private var tabList = listOf(
@@ -166,6 +172,10 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+            defaultVisualExperimentStateFlow,
+        )
+
         initializeMockTabEntitesData()
         initializeViewModel()
     }
@@ -189,6 +199,7 @@ class TabSwitcherViewModelTest {
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
+            mockVisualDesignExperimentDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -815,7 +826,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = true,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -843,7 +855,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = true,
             isMoreMenuItemEnabled = false,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -854,11 +867,11 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = null)
+        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = null, isNewVisualDesignEnabled = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
-            isDuckChatVisible = true,
+            isDuckChatVisible = false,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -871,7 +884,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = true,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = true,
             fabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -899,7 +913,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = true,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.LIST,
@@ -910,11 +925,11 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsListThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = LIST)
+        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = LIST, isNewVisualDesignEnabled = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
-            isDuckChatVisible = true,
+            isDuckChatVisible = false,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -927,7 +942,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = true,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = true,
             fabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.GRID,
@@ -958,7 +974,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = false,
             isCloseAllTabsVisible = false,
             isMoreMenuItemEnabled = true,
-            isFabVisible = false,
+            isMainFabVisible = false,
+            isAIFabVisible = false,
             fabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -989,7 +1006,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = false,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -1020,7 +1038,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = false,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -1052,7 +1071,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = false,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
@@ -1083,7 +1103,8 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsDividerVisible = true,
             isCloseAllTabsVisible = false,
             isMoreMenuItemEnabled = true,
-            isFabVisible = true,
+            isMainFabVisible = true,
+            isAIFabVisible = false,
             fabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
