@@ -84,7 +84,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
             val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
-            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 8.toPx())
+            layoutParams.setMargins(layoutParams.leftMargin, 4.toPx(), layoutParams.rightMargin, 0.toPx())
             omnibarWrapper.layoutParams = layoutParams
         } else {
             navigationBar = navBar

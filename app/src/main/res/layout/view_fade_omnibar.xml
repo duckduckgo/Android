@@ -68,7 +68,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/experimentalOmnibarCardSize"
                         android:layout_marginHorizontal="14dp"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="0dp"
                         android:layout_marginBottom="2dp"
                         android:background="@drawable/fade_omnibar_outline">
 
