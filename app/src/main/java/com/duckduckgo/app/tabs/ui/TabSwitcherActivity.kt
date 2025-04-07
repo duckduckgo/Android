@@ -188,7 +188,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
-    private lateinit var tabsFab: ExtendedFloatingActionButton
 
     private var layoutTypeMenuItem: MenuItem? = null
     private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
@@ -215,7 +214,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureViewReferences()
         setupToolbar(toolbar)
         configureRecycler()
-        configureFab()
+        configureFabs()
         configureObservers()
         configureOnBackPressedListener()
 
@@ -224,18 +223,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
-    private fun configureFab() {
-        tabsFab = binding.tabsFab
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            tabsFab.apply {
-                show()
-                extend()
-                setOnClickListener {
-                    viewModel.onFabClicked()
-                }
+    private fun configureFabs() {
+        binding.mainFab.apply {
+            setOnClickListener {
+                viewModel.onFabClicked()
             }
-        } else {
-            tabsFab.hide()
+        }
+
+        binding.aiChatFab.setOnClickListener {
+            viewModel.onDuckChatMenuClicked(fromOverflowMenu = false)
         }
     }
 
@@ -317,7 +313,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun handleFabStateUpdates() {
         tabsRecycler.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
+            object : OnScrollListener() {
                 override fun onScrolled(
                     recyclerView: RecyclerView,
                     dx: Int,
@@ -325,9 +321,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
                     if (dy > 20) {
-                        tabsFab.shrink()
+                        binding.mainFab.shrink()
                     } else if (dy < -20) {
-                        tabsFab.extend()
+                        binding.mainFab.extend()
                     }
                 }
             },
@@ -590,7 +586,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val viewState = viewModel.selectionViewState.value
 
             val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
-            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.tabsFab, toolbar, viewState.dynamicInterface)
+            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.mainFab, binding.aiChatFab, toolbar, viewState.dynamicInterface)
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)

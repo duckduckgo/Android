@@ -34,7 +34,7 @@
         android:clipToPadding="false"
         android:paddingHorizontal="@dimen/keyline_2"
         android:paddingTop="@dimen/keyline_2"
-        android:paddingBottom="76dp"
+        android:paddingBottom="152dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
@@ -43,12 +43,33 @@
         tools:spanCount="2" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/tabsFab"
+        android:id="@+id/aiChatFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        android:visibility="gone"
+        app:layout_anchor="@id/spacer"
+        android:layout_gravity="top|end"
+        style="@style/Widget.DuckDuckGo.ExtendedFloatingActionButtonSecondary"
+        app:icon="@drawable/ic_ai_chat_outline_24" />
+
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:layout_gravity="top|end"
+        app:layout_anchorGravity="end"
+        app:layout_anchor="@id/mainFab"
+        />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/mainFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/keyline_4"
         tools:text="Test"
+        android:visibility="gone"
         app:icon="@drawable/ic_add_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

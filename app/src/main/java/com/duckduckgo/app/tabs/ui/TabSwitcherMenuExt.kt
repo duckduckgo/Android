@@ -35,7 +35,8 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
-    fab: ExtendedFloatingActionButton,
+    mainFab: ExtendedFloatingActionButton,
+    aiFab: ExtendedFloatingActionButton,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ) {
@@ -63,8 +64,8 @@ fun Menu.createDynamicInterface(
         setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
 
-    fab.apply {
-        if (dynamicMenu.isFabVisible) {
+    mainFab.apply {
+        if (dynamicMenu.isMainFabVisible) {
             when (dynamicMenu.fabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
@@ -81,6 +82,12 @@ fun Menu.createDynamicInterface(
         } else {
             hide()
         }
+    }
+
+    if (dynamicMenu.isAIFabVisible) {
+        aiFab.show()
+    } else {
+        aiFab.hide()
     }
 
     toolbar.navigationIcon = when (dynamicMenu.backButtonType) {
