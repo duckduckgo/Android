@@ -208,12 +208,18 @@
     </style>
 
     <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
-        <item name="backgroundTint">@color/fabBackgroundTint</item>
-        <item name="iconTint">@color/fabIconTint</item>
-        <item name="android:textColor">@color/fabTextColor</item>
+        <item name="backgroundTint">?attr/daxColorFabPrimaryContainer</item>
+        <item name="iconTint">?attr/daxColorFabPrimaryIcon</item>
+        <item name="android:textColor">?attr/daxColorFabPrimaryText</item>
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay</item>
         <item name="fabSize">normal</item>
         <item name="android:height">@dimen/fabHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ExtendedFloatingActionButtonSecondary" parent="Widget.DuckDuckGo.ExtendedFloatingActionButton">
+        <item name="backgroundTint">?attr/daxColorFabSecondaryContainer</item>
+        <item name="iconTint">?attr/daxColorFabSecondaryIcon</item>
+        <item name="android:textColor">?attr/daxColorFabSecondaryText</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay">

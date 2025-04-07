@@ -85,6 +85,13 @@
     <attr name="daxColorButtonDestructiveGhostContainer" format="color"/>
     <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
 
+    <attr name="daxColorFabPrimaryContainer" format="color"/>
+    <attr name="daxColorFabPrimaryText" format="color"/>
+    <attr name="daxColorFabPrimaryIcon" format="color"/>
+    <attr name="daxColorFabSecondaryContainer" format="color"/>
+    <attr name="daxColorFabSecondaryText" format="color"/>
+    <attr name="daxColorFabSecondaryIcon" format="color"/>
+
     <attr name="daxColorButtonPrimaryText" format="color"/>
     <attr name="daxColorButtonPrimaryTextPressed" format="color"/>
     <attr name="daxColorButtonSecondaryText" format="color"/>
@@ -165,6 +172,7 @@
 
     <color name="blue0">#CCDAFF</color>
     <color name="blue0_50">#80CCDAFF</color>
+    <color name="blue10">#803969FF</color>
     <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
     <color name="blue30_20">#337295F6</color>
@@ -173,8 +181,6 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
-    <color name="blue10">#803969FF</color>
-    <color name="blue10_solid">#9CB4FF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
