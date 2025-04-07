@@ -124,7 +124,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     override fun onAnimationEnd(animation: Animator) {
                         animateOmnibarIn(omnibarViews).start()
                         tryToStartCookiesAnimation(context, omnibarViews)
-                        listener?.onAnimationFinished(emptyList())
+                        listener?.onAnimationFinished()
                     }
 
                     override fun onAnimationCancel(animation: Animator) {
@@ -377,14 +377,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                             doOnEnd {
                                                 cookieView.gone()
                                                 isCookiesAnimationRunning = false
-                                                listener?.onAnimationFinished(emptyList())
+                                                listener?.onAnimationFinished()
                                             },
                                         )
                                         start()
                                     }
                                 } else {
                                     isCookiesAnimationRunning = false
-                                    listener?.onAnimationFinished(emptyList())
+                                    listener?.onAnimationFinished()
                                 }
                             },
                         )
@@ -411,7 +411,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                         cookieScene.gone()
                     } else {
                         isCookiesAnimationRunning = false
-                        listener?.onAnimationFinished(emptyList())
+                        listener?.onAnimationFinished()
                     }
                 }
 

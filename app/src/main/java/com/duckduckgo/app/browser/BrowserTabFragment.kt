@@ -104,7 +104,6 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
-import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -548,9 +547,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
 
-    @Inject
-    lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
-
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -814,7 +810,7 @@ class BrowserTabFragment :
 
     private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
 
-    private fun showExperimentV2ShieldPopAnimation() {
+    private fun showTrackersExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
             trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
@@ -1317,7 +1313,6 @@ class BrowserTabFragment :
     override fun onStop() {
         alertDialog?.dismiss()
         experimentTrackersAnimationHelper.cancelAnimations()
-        experimentTrackersCountAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -2030,7 +2025,7 @@ class BrowserTabFragment :
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
-            is Command.StartExperimentV2ShieldPopAnimation -> showExperimentV2ShieldPopAnimation()
+            is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }

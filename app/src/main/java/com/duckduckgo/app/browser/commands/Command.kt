@@ -269,5 +269,5 @@ sealed class Command {
     data object CloseCustomTab : Command()
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
-    data object StartExperimentV2ShieldPopAnimation : Command()
+    data object StartTrackersExperimentShieldPopAnimation : Command()
 }

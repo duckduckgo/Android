@@ -6082,11 +6082,11 @@ class BrowserTabViewModelTest {
 
         testee.onAnimationFinished(logos)
 
-        assertCommandNotIssued<Command.StartExperimentV2ShieldPopAnimation>()
+        assertCommandNotIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartV2ShieldPopAnimation() = runTest {
+    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
         val logos = listOf<TrackerLogo>(mock())
         // Variant 2 is enabled
         fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
@@ -6097,11 +6097,11 @@ class BrowserTabViewModelTest {
 
         testee.onAnimationFinished(logos)
 
-        assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartV2ShieldPopAnimation() = runTest {
+    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
         val logos = listOf<TrackerLogo>(mock())
         // Variant 3 is enabled
         fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
@@ -6112,7 +6112,7 @@ class BrowserTabViewModelTest {
 
         testee.onAnimationFinished(logos)
 
-        assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {

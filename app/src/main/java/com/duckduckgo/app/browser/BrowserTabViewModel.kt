@@ -163,7 +163,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
-import com.duckduckgo.app.browser.commands.Command.StartExperimentV2ShieldPopAnimation
+import com.duckduckgo.app.browser.commands.Command.StartTrackersExperimentShieldPopAnimation
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
@@ -4049,7 +4049,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleVariant2() {
-        command.value = StartExperimentV2ShieldPopAnimation
+        command.value = StartTrackersExperimentShieldPopAnimation
         privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
     }
 
