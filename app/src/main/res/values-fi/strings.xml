@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vedä yläreunasta alaspäin ja poistu koko näytöstä painamalla takaisin-painiketta</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Sulje kaikki välilehdet?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Haluatko varmasti sulkea kaikki välilehdet?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Peruuta</string>
     <string name="closeAppTabsConfirmationDialogClose">Sulje</string>
+
+    <string name="selectTabsMenuItem">Valitse välilehdet</string>
+    <string name="selectAllTabsMenuItem">Valitse kaikki</string>
+    <string name="deselectAllTabsMenuItem">Poista kaikkien valinta</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d valittu</string>
+    <string name="tabSelectedIndicator">Välilehti valittu ‑ilmaisin</string>
+    <string name="tabNotSelectedIndicator">Välilehteä ei valittu ‑ilmaisin</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linkkiä DuckDuckGolta</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jaa linkki</item>
+        <item quantity="other">Jaa %1$d linkkiä</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lisätäänkö valittu välilehti kirjanmerkkeihin?</item>
+        <item quantity="other">Lisätäänkö %1$d välilehteä kirjanmerkkeihin?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kirjanmerkki lisättiin</item>
+        <item quantity="other">%1$d kirjanmerkkiä lisättiin</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Kirjanmerkki</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lisää välilehti kirjanmerkkeihin</item>
+        <item quantity="other">Lisää %1$d välilehteä kirjanmerkkeihin</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Olemassa olevia kirjanmerkkejä ei kopioida.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Suljetaanko välilehti?</item>
+        <item quantity="other">Suljetaanko kaikki %1$d välilehteä?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Suljetaanko toinen välilehti?</item>
+        <item quantity="other">Suljetaanko %1$d muuta välilehteä?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Suljetaanko välilehti?</item>
+        <item quantity="other">Suljetaanko %1$d välilehteä?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Haluatko varmasti sulkea tämän välilehden?</item>
+        <item quantity="other">Haluatko varmasti sulkea kaikki välilehdet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Haluatko varmasti sulkea tämän välilehden?</item>
+        <item quantity="other">Haluatko varmasti sulkea nämä välilehdet?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sulje välilehti</item>
+        <item quantity="other">Sulje välilehdet</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sulje välilehti</item>
+        <item quantity="other">Sulje %1$d välilehteä</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Sulje muut välilehdet</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Välilehti suljettiin</item>
+        <item quantity="other">%1$d välilehteä suljettiin</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d yksityinen välilehti</item>
+        <item quantity="other">%1$d yksityistä välilehteä</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lisää yksityinen äänihakuvaihtoehto osoitepalkkiin. Ääntä ei tallenneta eikä jaeta kenellekään, edes DuckDuckGolle.</string>

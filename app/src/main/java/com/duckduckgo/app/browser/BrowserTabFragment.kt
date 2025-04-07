@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -1227,7 +1228,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
                 if (anchorToNavigationBar) {
-                    val anchorView = binding.navigationBar.popupMenuAnchor
+                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
                     popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
                 } else {
                     popupMenu.show(binding.rootView, omnibar.toolbar)
@@ -2776,8 +2777,14 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
+        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+            R.layout.include_duckduckgo_browser_experiment_webview
+        } else {
+            R.layout.include_duckduckgo_browser_webview
+        }
+
         webView = layoutInflater.inflate(
-            R.layout.include_duckduckgo_browser_webview,
+            webViewLayout,
             binding.webViewContainer,
             true,
         ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
@@ -2815,16 +2822,13 @@ class BrowserTabFragment :
                 }
             }
 
-            it.setOnTouchListener { _, _ ->
+            it.setOnTouchListener { webView, event ->
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
                 false
             }
-
-            it.setOnScrollChangeListener(omnibar)
-            omnibar.resetScrollPosition()
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
@@ -4393,6 +4397,10 @@ class BrowserTabFragment :
 
     fun onTabSwipedAway() {
         viewModel.onTabSwipedAway()
+    }
+
+    fun launchTabSwitcherAfterTabsUndeleted() {
+        viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
     }
 }
 

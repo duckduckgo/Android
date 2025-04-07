@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Ziehe von oben nach unten und tippe auf die Zurück-Schaltfläche, um den Vollbildmodus zu verlassen</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Alle Tabs schließen?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Bist du sicher, dass du alle Tabs schließen möchtest?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Abbrechen</string>
     <string name="closeAppTabsConfirmationDialogClose">Schließen</string>
+
+    <string name="selectTabsMenuItem">Tabs auswählen</string>
+    <string name="selectAllTabsMenuItem">Alle auswählen</string>
+    <string name="deselectAllTabsMenuItem">Alle abwählen</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d ausgewählt</string>
+    <string name="tabSelectedIndicator">Anzeige „Registerkarte ausgewählt“</string>
+    <string name="tabNotSelectedIndicator">Anzeige „Registerkarte nicht ausgewählt“</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links von DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Link teilen</item>
+        <item quantity="other">%1$d Links teilen</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ausgewählten Tab mit Lesezeichen versehen?</item>
+        <item quantity="other">%1$d Tabs mit Lesezeichen versehen?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lesezeichen hinzugefügt</item>
+        <item quantity="other">%1$d Lesezeichen hinzugefügt</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Zu Lesezeichen hinzufügen</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab mit Lesezeichen versehen</item>
+        <item quantity="other">%1$d Tabs mit Lesezeichen versehen</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Bestehende Lesezeichen werden nicht kopiert.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab schließen?</item>
+        <item quantity="other">Alle %1$d Tabs schließen?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Anderen Tab schließen?</item>
+        <item quantity="other">%1$d andere Tabs schließen?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab schließen?</item>
+        <item quantity="other">%1$d Tabs schließen?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bist du sicher, dass du diesen Tab schließen möchtest?</item>
+        <item quantity="other">Bist du sicher, dass du alle Tabs schließen möchtest?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bist du sicher, dass du diesen Tab schließen möchtest?</item>
+        <item quantity="other">Bist du sicher, dass du diese Tabs schließen möchtest?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab schließen</item>
+        <item quantity="other">Tabs schließen</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab schließen</item>
+        <item quantity="other">%1$d Tabs schließen</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Andere Tabs schließen</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tab geschlossen</item>
+        <item quantity="other">%1$d Tabs geschlossen</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privater Tab</item>
+        <item quantity="other">%1$d private Tabs</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Füge die Option „Private Sprachsuche“ zur Adressleiste hinzu.Audio wird weder gespeichert noch an Dritte weitergegeben, auch nicht an DuckDuckGo.</string>

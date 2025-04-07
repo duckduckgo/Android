@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
+import kotlin.math.max
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -69,6 +70,9 @@ abstract class TabsDao {
     @Delete
     abstract fun deleteTab(tab: TabEntity)
 
+    @Query("delete from tabs where tabId in (:tabIds)")
+    abstract fun deleteTabs(tabIds: List<String>)
+
     @Query("delete from tabs where deletable is 1")
     abstract fun deleteTabsMarkedAsDeletable()
 
@@ -87,11 +91,38 @@ abstract class TabsDao {
     }
 
     @Transaction
+    open fun markTabsAsDeletable(tabIds: List<String>) {
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = true))
+            }
+        }
+    }
+
+    @Transaction
     open fun undoDeletableTab(tab: TabEntity) {
         // ensure the tab is in the DB
         val dbTab = tab(tab.tabId)
         dbTab?.let {
             updateTab(dbTab.copy(deletable = false))
+        }
+    }
+
+    @Transaction
+    open fun undoDeletableTabs(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
+        // ensure the tab is in the DB
+        var lastTabPosition = selectedTab()?.position ?: 0
+        tabIds.forEach { tabId ->
+            tab(tabId)?.let { tab ->
+                updateTab(tab.copy(deletable = false))
+                lastTabPosition = max(lastTabPosition, tab.position)
+            }
+        }
+
+        if (moveActiveTabToEnd) {
+            selectedTab()?.let { activeTab ->
+                updateTab(activeTab.copy(position = lastTabPosition + 1))
+            }
         }
     }
 
@@ -102,6 +133,19 @@ abstract class TabsDao {
             return
         }
         lastTab()?.let {
+            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
+        }
+    }
+
+    @Transaction
+    open fun deleteTabsAndUpdateSelection(tabIds: List<String>) {
+        deleteTabs(tabIds)
+
+        if (selectedTab() != null) {
+            return
+        }
+
+        firstTab()?.let {
             insertTabSelection(TabSelectionEntity(tabId = it.tabId))
         }
     }

@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Sleep van boven naar beneden en tik op de knop \'Terug\' om het volledige scherm af te sluiten</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Alle tabbladen sluiten?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Weet je zeker dat je alle tabbladen wilt sluiten?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuleren</string>
     <string name="closeAppTabsConfirmationDialogClose">Sluiten</string>
+
+    <string name="selectTabsMenuItem">Tabbladen selecteren</string>
+    <string name="selectAllTabsMenuItem">Alles selecteren</string>
+    <string name="deselectAllTabsMenuItem">Alles deselecteren</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d geselecteerd</string>
+    <string name="tabSelectedIndicator">Tabblad geselecteerde indicator</string>
+    <string name="tabNotSelectedIndicator">Tabblad niet geselecteerde indicator</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links van DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Link %1$d delen</item>
+        <item quantity="other">Links %1$d delen</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Wil je %1$d tabblad als bladwijzer toevoegen?</item>
+        <item quantity="other">Wil je %1$d tabbladen als bladwijzer toevoegen?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d bladwijzer toegevoegd</item>
+        <item quantity="other">%1$d bladwijzers toegevoegd</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Toevoegen aan bladwijzers</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Tabblad als bladwijzer toevoegen</item>
+        <item quantity="other">%1$d Tabbladen als bladwijzer toevoegen</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Bestaande bladwijzers worden niet gedupliceerd.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d tabblad sluiten?</item>
+        <item quantity="other">Alle %1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ander %1$d tabblad sluiten?</item>
+        <item quantity="other">Andere %1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d tabblad sluiten?</item>
+        <item quantity="other">%1$d tabbladen sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Weet je zeker dat je dit tabblad wilt sluiten?</item>
+        <item quantity="other">Weet je zeker dat je alle tabbladen wilt sluiten?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Weet je zeker dat je het tabblad wilt sluiten?</item>
+        <item quantity="other">Weet je zeker dat je deze tabbladen wilt sluiten?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad sluiten</item>
+        <item quantity="other">Tabbladen sluiten</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad sluiten?</item>
+        <item quantity="other">%1$d Tabbladen sluiten</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Andere tabbladen sluiten</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tabblad gesloten</item>
+        <item quantity="other">%1$d tabbladen gesloten</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privétabblad</item>
+        <item quantity="other">%1$d privétabbladen</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Voeg de optie \'Private spraakopdracht\' toe aan de adresbalk. Audio wordt niet opgeslagen en met niemand gedeeld, ook niet met DuckDuckGo.</string>

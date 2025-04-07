@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arrastra hacia abajo desde la parte superior y pulsa el botón Atrás para salir de la pantalla completa</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">¿Cerrar todas las pestañas?</string>
     <string name="closeAppTabsConfirmationDialogDescription">¿Seguro que deseas cerrar todas las pestañas?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Cerrar</string>
+
+    <string name="selectTabsMenuItem">Seleccionar pestañas</string>
+    <string name="selectAllTabsMenuItem">Seleccionar todo</string>
+    <string name="deselectAllTabsMenuItem">Cancelar selección de todo</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d seleccionadas</string>
+    <string name="tabSelectedIndicator">Indicador de pestaña seleccionada</string>
+    <string name="tabNotSelectedIndicator">Indicador de pestaña no seleccionada</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d enlaces desde DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Compartir enlace</item>
+        <item quantity="other">Compartir %1$d enlaces</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Añadir pestaña seleccionada a marcadores?</item>
+        <item quantity="other">¿Añadir %1$d pestañas a marcadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcador añadido</item>
+        <item quantity="other">%1$d marcadores añadidos</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Añadir a marcadores</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Añadir pestaña a marcadores</item>
+        <item quantity="other">Añadir %1$d pestañas a marcadores</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Los marcadores existentes no se duplicarán.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cerrar pestaña?</item>
+        <item quantity="other">¿Cerrar todas las %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cierras otra pestaña?</item>
+        <item quantity="other">¿Cerrar otras %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Cerrar pestaña?</item>
+        <item quantity="other">¿Cerrar %1$d pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Seguro que deseas cerrar esta pestaña?</item>
+        <item quantity="other">¿Seguro que deseas cerrar todas las pestañas?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">¿Seguro que quieres cerrar esta pestaña?</item>
+        <item quantity="other">¿Seguro que quieres cerrar estas pestañas?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar pestañas</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar %1$d pestañas</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Cerrar otras pestañas</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pestaña cerrada</item>
+        <item quantity="other">%1$d pestañas cerradas</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d pestaña privada</item>
+        <item quantity="other">%1$d pestañas privadas</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Añadir la opción de búsqueda privada por voz a la barra de direcciones. El audio no se almacena ni se comparte con nadie, incluyendo DuckDuckGo.</string>

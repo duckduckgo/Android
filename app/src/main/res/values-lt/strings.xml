@@ -670,11 +670,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vilkite žemyn iš viršaus ir bakstelėkite grįžties mygtuką, kad išeitumėte iš viso ekrano režimo</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Uždaryti visus skirtukus?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Ar tikrai norite uždaryti visus skirtukus?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
     <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
+
+    <string name="selectTabsMenuItem">Pasirinkite skirtukus</string>
+    <string name="selectAllTabsMenuItem">Pasirinkti viską</string>
+    <string name="deselectAllTabsMenuItem">Atžymėti visus</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d pasirinkta</string>
+    <string name="tabSelectedIndicator">Pasirinkto skirtuko indikatorius</string>
+    <string name="tabNotSelectedIndicator">Nepasirinkto skirtuko indikatorius</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d nuorodų iš „DuckDuckGo“</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bendrinti nuorodą</item>
+        <item quantity="few">Bendrinti %1$d nuorodas</item>
+        <item quantity="many">Bendrinti %1$d nuorodas</item>
+        <item quantity="other">Bendrinti %1$d nuorodų</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pažymėti pasirinktą skirtuką?</item>
+        <item quantity="few">Pažymėti %1$d skirtukus?</item>
+        <item quantity="many">Pažymėti %1$d skirtukus?</item>
+        <item quantity="other">Pažymėti %1$d skirtukus?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Žymė pridėtos</item>
+        <item quantity="few">%1$d žymės pridėtos</item>
+        <item quantity="many">%1$d žymės pridėtos</item>
+        <item quantity="other">%1$d žymių pridėta</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Žymė</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pažymėti skirtuką</item>
+        <item quantity="few">Pažymėti %1$d skirtukus</item>
+        <item quantity="many">Pažymėti %1$d skirtukus</item>
+        <item quantity="other">Pažymėti %1$d skirtukų</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Esamos žymės nebus kopijuojamos.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką?</item>
+        <item quantity="few">Uždaryti visus %1$d skirtukus?</item>
+        <item quantity="many">Uždaryti visus %1$d skirtukus?</item>
+        <item quantity="other">Uždaryti visus %1$d skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti kitą skirtuką?</item>
+        <item quantity="few">Uždaryti %1$d kitus skirtukus?</item>
+        <item quantity="many">Uždaryti %1$d kitus skirtukus?</item>
+        <item quantity="other">Uždaryti %1$d kitų skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką?</item>
+        <item quantity="few">Uždaryti %1$d skirtukus?</item>
+        <item quantity="many">Uždaryti %1$d skirtukus?</item>
+        <item quantity="other">Uždaryti %1$d skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ar tikrai norite uždaryti šį skirtuką?</item>
+        <item quantity="few">Ar tikrai norite uždaryti visus skirtukus?</item>
+        <item quantity="many">Ar tikrai norite uždaryti visus skirtukus?</item>
+        <item quantity="other">Ar tikrai norite uždaryti visus skirtukus?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ar tikrai norite uždaryti šį skirtuką?</item>
+        <item quantity="few">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+        <item quantity="many">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+        <item quantity="other">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti skirtukus</item>
+        <item quantity="many">Uždaryti skirtukus</item>
+        <item quantity="other">Uždaryti skirtukus</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti %1$d skirtukus</item>
+        <item quantity="many">Uždaryti %1$d skirtuko</item>
+        <item quantity="other">Uždaryti %1$d skirtukų</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Uždaryti kitus skirtukus</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Skirtukas uždarytas</item>
+        <item quantity="few">%1$d skirtukai uždaryti</item>
+        <item quantity="many">%1$d skirtuko uždaryta</item>
+        <item quantity="other">%1$d skirtukų uždaryti</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privatus skirtukas</item>
+        <item quantity="few">%1$d privatūs skirtukai</item>
+        <item quantity="many">%1$d privataus skirtuko</item>
+        <item quantity="other">%1$d privačiu skirtukų</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>

@@ -16,18 +16,11 @@
 
 package com.duckduckgo.app.browser.navigation.bar
 
-import android.view.ViewTreeObserver
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.marginBottom
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
@@ -52,22 +45,13 @@ class BrowserNavigationBarViewIntegration(
     browserNavigationBarObserver: BrowserNavigationBarObserver,
 ) {
 
-    private val navigationBarView: BrowserNavigationBarView = browserTabFragmentBinding.navigationBar
+    val navigationBarView: BrowserNavigationBarView = omnibar.getNavigationBar()?.also {
+        // if the navigation bar is embedded inside of the omnibar, we remove the ones that was added directly to the Fragment's Coordinator layout
+        browserTabFragmentBinding.rootView.removeView(browserTabFragmentBinding.navigationBar)
+    } ?: browserTabFragmentBinding.navigationBar
 
     private var stateObserverJob: Job? = null
     private var keyboardVisibilityJob: Job? = null
-
-    private val topFadeOmnibarOffsetChangedListener = ViewTreeObserver.OnPreDrawListener {
-        val ratio = browserTabFragmentBinding.fadeOmnibar.getShiftRatio()
-        updateNavigationBarMargin(-ratio)
-        true
-    }
-
-    private val bottomFadeOmnibarPreDrawListener = ViewTreeObserver.OnPreDrawListener {
-        val ratio = browserTabFragmentBinding.fadeOmnibarBottom.getShiftRatio()
-        updateNavigationBarMargin(-ratio)
-        true
-    }
 
     init {
         stateObserverJob = lifecycleScope.launch {
@@ -108,51 +92,9 @@ class BrowserNavigationBarViewIntegration(
                 }
             }
         }
-
-        when (omnibar.omnibarPosition) {
-            TOP -> {
-                when (omnibar.omnibarType) {
-                    SCROLLING -> {
-                        // no-op
-                    }
-
-                    FADE -> {
-                        browserTabFragmentBinding.fadeOmnibar.viewTreeObserver.addOnPreDrawListener(topFadeOmnibarOffsetChangedListener)
-                    }
-                }
-            }
-
-            BOTTOM -> {
-                when (omnibar.omnibarType) {
-                    SCROLLING -> {
-                        // no-op
-                    }
-
-                    FADE -> {
-                        browserTabFragmentBinding.fadeOmnibarBottom.viewTreeObserver.addOnPreDrawListener(bottomFadeOmnibarPreDrawListener)
-                    }
-                }
-            }
-        }
     }
 
     private fun onDisabled() {
         keyboardVisibilityJob?.cancel()
-        browserTabFragmentBinding.fadeOmnibar.viewTreeObserver.removeOnPreDrawListener(topFadeOmnibarOffsetChangedListener)
-        browserTabFragmentBinding.fadeOmnibarBottom.viewTreeObserver.removeOnPreDrawListener(bottomFadeOmnibarPreDrawListener)
-    }
-
-    private fun updateNavigationBarMargin(offsetPercentage: Float) {
-        if (navigationBarView.isAttachedToWindow) {
-            val margin = (navigationBarView.measuredHeight * offsetPercentage).toInt()
-            if (margin != navigationBarView.marginBottom) {
-                val constraintLayout = browserTabFragmentBinding.rootContainer
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(constraintLayout)
-                constraintSet.setMargin(navigationBarView.id, ConstraintSet.BOTTOM, margin)
-                constraintSet.connect(browserTabFragmentBinding.rootContainer.id, ConstraintSet.BOTTOM, navigationBarView.id, ConstraintSet.TOP, 0)
-                constraintSet.applyTo(constraintLayout)
-            }
-        }
     }
 }

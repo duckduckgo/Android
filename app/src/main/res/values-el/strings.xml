@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Κλείσιμο όλων των καρτελών;</string>
     <string name="closeAppTabsConfirmationDialogDescription">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</string>
     <string name="closeAppTabsConfirmationDialogCancel">Ακύρωση</string>
     <string name="closeAppTabsConfirmationDialogClose">Κλείσιμο</string>
+
+    <string name="selectTabsMenuItem">Επιλογή καρτελών</string>
+    <string name="selectAllTabsMenuItem">Επιλογή όλων</string>
+    <string name="deselectAllTabsMenuItem">Αποεπιλογή όλων</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d επιλέχθηκαν</string>
+    <string name="tabSelectedIndicator">Ένδειξη επιλεγμένης καρτέλας</string>
+    <string name="tabNotSelectedIndicator">Ένδειξη μη επιλεγμένης καρτέλας</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d σύνδεσμοι από το DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κοινοποίηση συνδέσμου</item>
+        <item quantity="other">Κοινοποίηση %1$d συνδέσμων</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη στην επιλεγμένη καρτέλα;</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προστέθηκε σελιδοδείκτης</item>
+        <item quantity="other">Προστέθηκαν %1$d σελιδοδείκτες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Σελιδοδείκτης</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη σε καρτέλα</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Οι υπάρχοντες σελιδοδείκτες δεν θα αναπαραχθούν.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο και των %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο άλλης καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d ακόμα καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε αυτήν την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε αυτές τις καρτέλες;</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο καρτελών</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Κλείσιμο άλλων καρτελών</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Η καρτέλα έκλεισε</item>
+        <item quantity="other">%1$d καρτέλες έκλεισαν</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d ιδιωτική καρτέλα</item>
+        <item quantity="other">%1$d ιδιωτικές καρτέλες</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>

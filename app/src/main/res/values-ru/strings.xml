@@ -670,11 +670,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Закрыть все вкладки?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Вы точно хотите закрыть все вкладки?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
     <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
+
+    <string name="selectTabsMenuItem">Выберите вкладки</string>
+    <string name="selectAllTabsMenuItem">Выбрать все</string>
+    <string name="deselectAllTabsMenuItem">Снять выделение всех элементов</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Выбрано: %1$d</string>
+    <string name="tabSelectedIndicator">Указатель выбранной вкладки</string>
+    <string name="tabNotSelectedIndicator">Указатель невыбранной вкладки</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Ссылок из DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поделиться ссылкой</item>
+        <item quantity="few">Поделиться %1$d ссылками</item>
+        <item quantity="many">Поделиться %1$d ссылками</item>
+        <item quantity="other">Поделиться ссылками (%1$d)</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Добавить выбранную вкладку в закладки?</item>
+        <item quantity="few">Добавить %1$d вкладки в закладки?</item>
+        <item quantity="many">Добавить %1$d вкладок в закладки?</item>
+        <item quantity="other">Добавить вкладки в закладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закладка добавлена</item>
+        <item quantity="few">Добавлено %1$d закладки</item>
+        <item quantity="many">Добавлено %1$d закладок</item>
+        <item quantity="other">Закладки добавлены (%1$d)</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Добавить в закладки</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Сохранить вкладку</item>
+        <item quantity="few">Сохранить %1$d вкладки</item>
+        <item quantity="many">Сохранить %1$d вкладок</item>
+        <item quantity="other">Сохранить вкладки (%1$d)</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Существующие закладки дублироваться не будут.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку?</item>
+        <item quantity="few">Закрыть все %1$d вкладки?</item>
+        <item quantity="many">Закрыть все %1$d вкладок?</item>
+        <item quantity="other">Закрыть все вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть другую вкладку?</item>
+        <item quantity="few">Закрыть еще %1$d вкладки?</item>
+        <item quantity="many">Закрыть еще %1$d вкладок?</item>
+        <item quantity="other">Закрыть остальные вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку?</item>
+        <item quantity="few">Закрыть %1$d вкладки?</item>
+        <item quantity="many">Закрыть %1$d вкладок?</item>
+        <item quantity="other">Закрыть вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Вы точно хотите закрыть эту вкладку?</item>
+        <item quantity="few">Вы точно хотите закрыть все вкладки?</item>
+        <item quantity="many">Вы точно хотите закрыть все вкладки?</item>
+        <item quantity="other">Вы точно хотите закрыть все вкладки?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Действительно закрыть эту вкладку?</item>
+        <item quantity="few">Действительно закрыть эти вкладки?</item>
+        <item quantity="many">Действительно закрыть эти вкладки?</item>
+        <item quantity="other">Действительно закрыть эти вкладки?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку</item>
+        <item quantity="few">Закрыть вкладки</item>
+        <item quantity="many">Закрыть вкладки</item>
+        <item quantity="other">Закрыть вкладки</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку</item>
+        <item quantity="few">Закрыть %1$d вкладки</item>
+        <item quantity="many">Закрыть %1$d вкладок</item>
+        <item quantity="other">Закрыть вкладки (%1$d)</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Закрыть остальные вкладки</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Вкладка закрыта</item>
+        <item quantity="few">Закрыто %1$d вкладки</item>
+        <item quantity="many">Закрыто %1$d вкладок</item>
+        <item quantity="other">Вкладки закрыты (%1$d)</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d приватная вкладка</item>
+        <item quantity="few">%1$d приватных вкладки</item>
+        <item quantity="many">%1$d приватных вкладок</item>
+        <item quantity="other">Приватных вкладок: %1$d</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавить опцию «Частный голосовой поиск» в адресную строку. Ваш голосовой запрос не сохраняется и никуда не передается, даже в DuckDuckGo.</string>

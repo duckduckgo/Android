@@ -53,7 +53,7 @@ internal class HttpErrorDailyReportingWorkerTest {
 
             verify(mockHttpErrorPixels).fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
             verify(mockHttpErrorPixels).fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY)
-            verify(mockHttpErrorPixels).fireCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
+            verify(mockHttpErrorPixels).fire5xxCountPixels()
             assertEquals(result, ListenableWorker.Result.success())
         }
 }

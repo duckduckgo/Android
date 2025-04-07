@@ -670,11 +670,104 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Přetažením dolů z horní části a klepnutím na tlačítko zpět ukončíš zobrazení na celou obrazovku</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zavřít všechny karty?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Opravdu chceš zavřít všechny karty?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Zrušit</string>
     <string name="closeAppTabsConfirmationDialogClose">Zavřít</string>
+
+    <string name="selectTabsMenuItem">Vybrat karty</string>
+    <string name="selectAllTabsMenuItem">Vybrat vše</string>
+    <string name="deselectAllTabsMenuItem">Zrušit výběr všeho</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Vybráno: %1$d</string>
+    <string name="tabSelectedIndicator">Indikátor vybrané karty</string>
+    <string name="tabNotSelectedIndicator">Indikátor nevybrané karty</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Odkazů z DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sdílet odkaz</item>
+        <item quantity="few">Sdílet %1$d odkazy</item>
+        <item quantity="many">Sdílet %1$d odkazu</item>
+        <item quantity="other">Sdílet %1$d odkazů</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Přidat vybranou kartu do záložek?</item>
+        <item quantity="few">Přidat %1$d karty do záložek?</item>
+        <item quantity="many">Přidat %1$d karty do záložek?</item>
+        <item quantity="other">Přidat %1$d karet do záložek?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Záložku jsme přidali</item>
+        <item quantity="few">Přidali jsme %1$d záložky</item>
+        <item quantity="many">Přidali jsme %1$d záložky</item>
+        <item quantity="other">Přidali jsme %1$d záložek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Záložka</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Přidat kartu do záložek</item>
+        <item quantity="few">Přidat %1$d karty do záložek</item>
+        <item quantity="many">Přidat %1$d karty do záložek</item>
+        <item quantity="other">Přidat %1$d karet do záložek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Existující záložky nebudou duplikovány.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu?</item>
+        <item quantity="few">Zavřít %1$d karty?</item>
+        <item quantity="many">Zavřít všech %1$d karet?</item>
+        <item quantity="other">Zavřít všech %1$d karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít další kartu?</item>
+        <item quantity="few">Zavřít %1$d další karty?</item>
+        <item quantity="many">Zavřít %1$d další karty?</item>
+        <item quantity="other">Zavřít %1$d dalších karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu?</item>
+        <item quantity="few">Zavřít %1$d karty?</item>
+        <item quantity="many">Zavřít %1$d karty?</item>
+        <item quantity="other">Zavřít %1$d karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Opravdu chceš zavřít tuhle kartu?</item>
+        <item quantity="few">Opravdu chceš zavřít všechny karty?</item>
+        <item quantity="many">Opravdu chceš zavřít všechny karty?</item>
+        <item quantity="other">Opravdu chceš zavřít všechny karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Opravdu chceš tuhle kartu zavřít?</item>
+        <item quantity="few">Opravdu chceš tyhle karty zavřít?</item>
+        <item quantity="many">Opravdu chceš tyhle karty zavřít?</item>
+        <item quantity="other">Opravdu chceš tyhle karty zavřít?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu</item>
+        <item quantity="few">Zavřít karty</item>
+        <item quantity="many">Zavřít karty</item>
+        <item quantity="other">Zavřít karty</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu</item>
+        <item quantity="few">Zavřít %1$d karty</item>
+        <item quantity="many">Zavřít %1$d karty</item>
+        <item quantity="other">Zavřít %1$d karet</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zavřít další karty</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Karta zavřena</item>
+        <item quantity="few">%1$d karty zavřeny</item>
+        <item quantity="many">%1$d karty zavřeno</item>
+        <item quantity="other">%1$d karet zavřeno</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d soukromá karta</item>
+        <item quantity="few">%1$d soukromé karty</item>
+        <item quantity="many">%1$d soukromých karet</item>
+        <item quantity="other">%1$d soukromých karet</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>

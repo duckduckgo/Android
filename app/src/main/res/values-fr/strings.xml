@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
     <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
+
+    <string name="selectTabsMenuItem">Sélectionner les onglets</string>
+    <string name="selectAllTabsMenuItem">Tout sélectionner</string>
+    <string name="deselectAllTabsMenuItem">Tout désélectionner</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d sélectionné(s)</string>
+    <string name="tabSelectedIndicator">Indicateur d\'onglet sélectionné</string>
+    <string name="tabNotSelectedIndicator">Indicateur d\'onglet non sélectionné</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d liens de DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Partager le lien</item>
+        <item quantity="other">Partager %1$d liens</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet sélectionné aux signets ?</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Signet ajouté</item>
+        <item quantity="other">%1$d signets ajoutés</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Ajouter aux signets</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet aux signets</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Les signets existants ne seront pas dupliqués.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer les %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer un autre onglet ?</item>
+        <item quantity="other">Fermer %1$d autres onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer cet onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer tous les onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer l\'onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer ces onglets ?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer les onglets</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer %1$d onglets</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Fermer les autres onglets</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Onglet fermé</item>
+        <item quantity="other">%1$d onglets fermés</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d onglet privé</item>
+        <item quantity="other">%1$d onglets privés</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Ajoutez l\'option Recherche vocale privée à la barre d\'adresse. L\'audio n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>

@@ -669,11 +669,91 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Aizvērt visas cilnes?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Vai tiešām vēlies aizvērt visas cilnes?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Atcelt</string>
     <string name="closeAppTabsConfirmationDialogClose">Aizvērt</string>
+
+    <string name="selectTabsMenuItem">Atlasīt cilnes</string>
+    <string name="selectAllTabsMenuItem">Atlasīt visus</string>
+    <string name="deselectAllTabsMenuItem">Noņemt atlasi visiem</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d atlasīts</string>
+    <string name="tabSelectedIndicator">Atlasītās cilnes indikators</string>
+    <string name="tabNotSelectedIndicator">Nav atlasīts cilnes indikators</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d saites no DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Kopīgot %1$d saites</item>
+        <item quantity="one">Kopīgot saiti</item>
+        <item quantity="other">Kopīgot %1$d saites</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai pievienot grāmatzīmi %1$d cilnēm?</item>
+        <item quantity="one">Vai pievienot grāmatzīmi atlasītajai cilnei?</item>
+        <item quantity="other">Vai pievienot grāmatzīmi %1$d cilnēm?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Pievienotas %1$d grāmatzīmes</item>
+        <item quantity="one">Pievienota grāmatzīme</item>
+        <item quantity="other">Pievienotas %1$d grāmatzīmes</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Grāmatzīme</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Pievienot grāmatzīmi %1$d cilnēm</item>
+        <item quantity="one">Pievienot grāmatzīmi cilnei</item>
+        <item quantity="other">Pievienot grāmatzīmi %1$d cilnēm</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Esošās grāmatzīmes netiks dublētas.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt visas %1$d cilnes?</item>
+        <item quantity="one">Aizvērt cilni?</item>
+        <item quantity="other">Aizvērt visas %1$d cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt vēl %1$d citas cilnes?</item>
+        <item quantity="one">Aizvērt vēl citu cilni?</item>
+        <item quantity="other">Aizvērt vēl %1$d citas cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt %1$d cilnes?</item>
+        <item quantity="one">Aizvērt cilni?</item>
+        <item quantity="other">Aizvērt %1$d cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai tiešām vēlies aizvērt visas cilnes?</item>
+        <item quantity="one">Vai tiešām vēlies aizvērt šo cilni?</item>
+        <item quantity="other">Vai tiešām vēlies aizvērt visas cilnes?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Vai tiešām vēlies aizvērt šīs cilnes?</item>
+        <item quantity="one">Vai tiešām vēlies aizvērt šo cilni?</item>
+        <item quantity="other">Vai tiešām vēlies aizvērt šīs cilnes?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt cilnes</item>
+        <item quantity="one">Aizvērt cilni</item>
+        <item quantity="other">Aizvērt cilnes</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">Aizvērt %1$d cilnes</item>
+        <item quantity="one">Aizvērt cilni</item>
+        <item quantity="other">Aizvērt %1$d cilnes</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Aizvērt citas cilnes</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">%1$d cilnes ir aizvērtas</item>
+        <item quantity="one">Cilne ir aizvērta</item>
+        <item quantity="other">%1$d cilnes ir aizvērtas</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="zero">%1$d privātās cilnes</item>
+        <item quantity="one">%1$d privātā cilne</item>
+        <item quantity="other">%1$d privātās cilnes</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>

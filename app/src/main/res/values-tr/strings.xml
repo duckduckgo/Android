@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Tam ekrandan çıkmak için yukarıdan aşağı sürükleyin ve geri düğmesine dokunun</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Tüm sekmeler kapatılsın mı?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
     <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
+
+    <string name="selectTabsMenuItem">Sekmeleri Seç</string>
+    <string name="selectAllTabsMenuItem">Tümünü Seç</string>
+    <string name="deselectAllTabsMenuItem">Tümünün Seçimini Kaldır</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Seçildi</string>
+    <string name="tabSelectedIndicator">Seçili sekme göstergesi</string>
+    <string name="tabNotSelectedIndicator">Seçili olmayan sekme göstergesi</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">DuckDuckGo\'dan %1$d bağlantı</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bağlantıyı Paylaş</item>
+        <item quantity="other">%1$d Bağlantıyı Paylaş</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Seçili sekmeye yer işareti eklensin mi?</item>
+        <item quantity="other">%1$d sekmeye yer işareti eklensin mi?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Yer işareti eklendi</item>
+        <item quantity="other">%1$d yer işareti eklendi</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Yer imi</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeye Yer İşareti Ekle</item>
+        <item quantity="other">%1$d Sekmeyi Yer İşareti Ekle</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Mevcut yer imleri çoğaltılmayacaktır.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatılsın mı?</item>
+        <item quantity="other">%1$d sekmenin tümü kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Diğer sekme kapatılsın mı?</item>
+        <item quantity="other">Diğer %1$d sekme kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatılsın mı?</item>
+        <item quantity="other">%1$d sekme kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bu sekmeyi kapatmak istediğinizden emin misiniz?</item>
+        <item quantity="other">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi kapatmak istediğinizden emin misiniz?</item>
+        <item quantity="other">Bu sekmeleri kapatmak istediğinizden emin misiniz?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi Kapat</item>
+        <item quantity="other">Sekmeleri Kapat</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi Kapat</item>
+        <item quantity="other">%1$d Sekmeyi Kapat</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Diğer Sekmeleri Kapat</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatıldı</item>
+        <item quantity="other">%1$d sekme kapatıldı</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Gizli Sekme</item>
+        <item quantity="other">%1$d Gizli Sekme</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>

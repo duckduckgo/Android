@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">Træk ned fra toppen og tryk på tilbage-knappen for at forlade fuld skærm</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Luk alle faner?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Er du sikker på, at du vil lukke alle faner?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuller</string>
     <string name="closeAppTabsConfirmationDialogClose">Luk</string>
+
+    <string name="selectTabsMenuItem">Vælg faner</string>
+    <string name="selectAllTabsMenuItem">Vælg alle</string>
+    <string name="deselectAllTabsMenuItem">Fravælg alle</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d valgt</string>
+    <string name="tabSelectedIndicator">Indikator for valgt fane</string>
+    <string name="tabNotSelectedIndicator">Indikator for ikke-valgt fane</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links fra DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Del link</item>
+        <item quantity="other">Del %1$d links</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Føj fane til bogmærker?</item>
+        <item quantity="other">Føj %1$d faner til bogmærker?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bogmærke tilføjet</item>
+        <item quantity="other">%1$d bogmærker tilføjet</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Bogmærke</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Føj fane til bogmærker</item>
+        <item quantity="other">Føj %1$d faner til bogmærker</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Eksisterende bogmærker duplikeres ikke.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Luk fane?</item>
+        <item quantity="other">Lukke alle %1$d faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Luk anden fane?</item>
+        <item quantity="other">Luk %1$d andre faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Luk fane?</item>
+        <item quantity="other">Luk %1$d faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Er du sikker på, at du vil lukke denne fane?</item>
+        <item quantity="other">Er du sikker på, at du vil lukke alle faner?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Er du sikker på, at du vil lukke denne fane?</item>
+        <item quantity="other">Er du sikker på, at du vil lukke disse faner?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Luk fane</item>
+        <item quantity="other">Luk faner</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Luk fane</item>
+        <item quantity="other">Luk %1$d faner</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Luk andre faner</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fane lukket</item>
+        <item quantity="other">%1$d faner lukket</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Privat fane</item>
+        <item quantity="other">%1$d Private faner</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>

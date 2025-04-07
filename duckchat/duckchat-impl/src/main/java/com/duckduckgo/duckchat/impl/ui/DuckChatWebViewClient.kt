@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.impl.ui
 
 import android.graphics.Bitmap
 import android.webkit.WebView

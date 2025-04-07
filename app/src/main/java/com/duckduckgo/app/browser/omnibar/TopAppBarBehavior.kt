@@ -32,8 +32,17 @@ class TopAppBarBehavior(
     private val omnibar: OmnibarBehaviour,
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
+
+    private companion object {
+        private val viewsExemptedFromOffset = setOf(
+            R.id.browserLayout,
+            R.id.webViewFullScreenContainer,
+            R.id.navigationBar,
+        )
+    }
+
     override fun layoutDependsOn(parent: CoordinatorLayout, child: AppBarLayout, dependency: View): Boolean {
-        if (dependency.id != R.id.browserLayout && dependency.id != R.id.webViewFullScreenContainer) {
+        if (!viewsExemptedFromOffset.contains(dependency.id)) {
             offsetBottomByToolbar(dependency)
         }
 

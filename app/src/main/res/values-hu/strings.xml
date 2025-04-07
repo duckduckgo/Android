@@ -668,11 +668,78 @@
     <!-- Full screen message-->
     <string name="fullScreenMessage">A teljes képernyőről való kilépéshez végezz felülről lefelé húzást, és koppints a vissza gombra</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Összes lap bezárása?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Biztosan bezárod az összes lapot?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Mégsem</string>
     <string name="closeAppTabsConfirmationDialogClose">Bezárás</string>
+
+    <string name="selectTabsMenuItem">Válaszd ki a lapokat</string>
+    <string name="selectAllTabsMenuItem">Összes kijelölése</string>
+    <string name="deselectAllTabsMenuItem">Összes kijelölés törlése</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d kiválasztva</string>
+    <string name="tabSelectedIndicator">Kiválasztott lap jelzése</string>
+    <string name="tabNotSelectedIndicator">Ki nem választott lap jelzése</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d link a DuckDuckGótól</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Link megosztása</item>
+        <item quantity="other">%1$d link megosztása</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Hozzáadod a könyvjelzőkhöz a kiválasztott lapot?</item>
+        <item quantity="other">Hozzáadsz a könyvjelzőkhöz %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Könyvjelző hozzáadva</item>
+        <item quantity="other">%1$d könyvjelző hozzáadva</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Könyvjelző</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap hozzáadása a könyvjelzőkhöz</item>
+        <item quantity="other">%1$d lap hozzáadása a könyvjelzőkhöz</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">A meglévő könyvjelzők nem kettőződnek.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a lapot?</item>
+        <item quantity="other">Bezárod mind a(z) %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a másik lapot?</item>
+        <item quantity="other">Bezársz %1$d másik lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bezárod a lapot?</item>
+        <item quantity="other">Bezársz %1$d lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Biztosan bezárod ezt a lapot?</item>
+        <item quantity="other">Biztosan bezárod az összes lapot?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Biztosan be akarod zárni ezt a lapot?</item>
+        <item quantity="other">Biztosan be akarod zárni ezeket a lapokat?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">Lapok bezárása</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">%1$d lap bezárása</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Többi lap bezárása</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lap bezárva</item>
+        <item quantity="other">%1$d lap bezárva</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d privát lap</item>
+        <item quantity="other">%1$d privát lap</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Privát beszédhangalapú keresési opció hozzáadása a címsorhoz. A hangot nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
