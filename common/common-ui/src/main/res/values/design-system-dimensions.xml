@@ -40,6 +40,7 @@
     <dimen name="toolbarIconPadding">3dp</dimen>
     <dimen name="experimentalToolbarSize">60dp</dimen>
     <dimen name="experimentalOmnibarCardSize">44dp</dimen>
+    <dimen name="experimentalOmnibarCardPressedSize">48dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>
