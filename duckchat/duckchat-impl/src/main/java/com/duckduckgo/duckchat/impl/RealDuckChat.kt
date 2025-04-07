@@ -79,7 +79,9 @@ interface DuckChatInternal : DuckChat {
 }
 
 data class DuckChatSettingJson(
-    val aiChatURL: String,
+    val aiChatURL: String?,
+    val aiChatBangs: List<String>?,
+    val aiChatBangRegex: String?,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -105,25 +107,19 @@ class RealDuckChat @Inject constructor(
         moshi.adapter(DuckChatSettingJson::class.java)
     }
 
-    /** Cached DuckChat is enabled flag */
     private var isDuckChatEnabled = false
-
-    /** Cached value of whether we should show DuckChat in the menu or not */
     private var showInBrowserMenu = false
-
-    /** Cached DuckChat web link */
     private var duckChatLink = DUCK_CHAT_WEB_LINK
+    private var bangRegex: Regex? = null
 
     init {
         if (isMainProcess) {
-            cacheDuckChatLink()
-            cacheShowInBrowser()
+            cacheConfig()
         }
     }
 
     override fun onPrivacyConfigDownloaded() {
-        cacheDuckChatLink()
-        cacheShowInBrowser()
+        cacheConfig()
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
@@ -228,6 +224,8 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun isDuckChatUrl(uri: Uri): Boolean {
+        if (isDuckChatBang(uri)) return true
+
         if (uri.host != DUCKDUCKGO_HOST) {
             return false
         }
@@ -237,30 +235,36 @@ class RealDuckChat @Inject constructor(
         }.getOrDefault(false)
     }
 
+    private fun isDuckChatBang(uri: Uri): Boolean {
+        return bangRegex?.containsMatchIn(uri.toString()) == true
+    }
+
     override suspend fun wasOpenedBefore(): Boolean {
         return duckChatFeatureRepository.wasOpenedBefore()
     }
 
-    private fun cacheDuckChatLink() {
+    private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
-            duckChatLink = duckChatFeature.self().getSettings()?.let {
-                runCatching {
-                    val settingsJson = jsonAdapter.fromJson(it)
-                    settingsJson?.aiChatURL
-                }.getOrDefault(DUCK_CHAT_WEB_LINK)
-            } ?: DUCK_CHAT_WEB_LINK
+            isDuckChatEnabled = duckChatFeature.self().isEnabled()
+
+            val settingsString = duckChatFeature.self().getSettings()
+            val settingsJson = settingsString?.let {
+                runCatching { jsonAdapter.fromJson(it) }.getOrNull()
+            }
+            duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
+            settingsJson?.aiChatBangs?.let { bangs ->
+                val bangAlternation = bangs.joinToString("|") { it }
+                bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
+            }
+            cacheShowInBrowser()
         }
     }
 
     private fun cacheShowInBrowser() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            isDuckChatEnabled = duckChatFeature.self().isEnabled()
-            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
-        }
+        showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
     }
 
     companion object {
-        /** Default link to DuckChat that identifies Android as the source */
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
