@@ -58,7 +58,6 @@ interface AppTpRemoteFeatures {
     @DefaultValue(true)
     fun setSearchDomains(): Toggle // kill switch
 
-    // TODO: make it possible to dynamically specify experiments without having to specify up front (2025-04-03)
     @DefaultValue(false)
     fun tdsExperiment001(): Toggle
 
