@@ -4034,23 +4034,17 @@ class BrowserTabViewModel @Inject constructor(
         command.value = GenerateWebViewPreviewImage
     }
 
-    fun onAnimationFinished(
-        logos: List<TrackerLogo>,
-    ) {
-        if (logos.isEmpty()) {
-            return
-        }
+    fun onAnimationFinished(logos: List<TrackerLogo>) {
+        if (logos.isEmpty()) return
+
         viewModelScope.launch {
-            when {
-                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant2().isEnabled() -> handleVariant2()
-                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant3().isEnabled() -> handleVariant2()
+            if (appPersonalityFeature.self().isEnabled() &&
+                (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant3().isEnabled())
+            ) {
+                command.value = StartTrackersExperimentShieldPopAnimation
+                privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
             }
         }
-    }
-
-    private fun handleVariant2() {
-        command.value = StartTrackersExperimentShieldPopAnimation
-        privacyDashboardExternalPixelParams.setPixelParams(GREEN_SHIELD_COUNT, "true")
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
