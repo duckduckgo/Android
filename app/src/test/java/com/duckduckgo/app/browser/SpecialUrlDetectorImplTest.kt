@@ -307,6 +307,20 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsNotDuckChatUrlThenSearchQueryTypeDetected() {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
+    fun whenUrlIsDuckChatUrlThenDuckChatTypeDetected() {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is ShouldLaunchDuckChatLink)
+    }
+
+    @Test
     fun whenUrlIsParametrizedQueryThenSearchQueryTypeDetected() {
         val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
         assertEquals("foo site:duckduckgo.com", type.query)
