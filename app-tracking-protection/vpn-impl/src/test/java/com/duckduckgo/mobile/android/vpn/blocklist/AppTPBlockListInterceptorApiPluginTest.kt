@@ -19,12 +19,9 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -37,42 +34,19 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-// TODO: currently copied from feature-toggles-impl, but might be a better way to share this (2025-04-02)
-class RealFeatureTogglesInventory @Inject constructor(
-    private val toggles: DaggerSet<FeatureTogglesInventory>,
-    private val dispatcherProvider: DispatcherProvider,
-) : FeatureTogglesInventory {
-    override suspend fun getAll(): List<Toggle> = withContext(dispatcherProvider.io()) {
-        return@withContext toggles.flatMap { it.getAll() }.distinctBy { it.featureName() }
-    }
-
-    override suspend fun getAllTogglesForParent(name: String): List<Toggle> = withContext(dispatcherProvider.io()) {
-        return@withContext getAll().filter { it.featureName().parentName == name }
-    }
-
-    override suspend fun getAllActiveExperimentToggles(): List<Toggle> = withContext(dispatcherProvider.io()) {
-        return@withContext getAll().filter { it.getCohort() != null && it.isEnabled() }
-    }
-}
-
 @SuppressLint("DenyListedApi")
 class AppTPBlockListInterceptorApiPluginTest {
-
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
 
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
@@ -99,17 +73,16 @@ class AppTPBlockListInterceptorApiPluginTest {
             featureName = "appTrackerProtection",
         ).build().create(TestBlockListFeature::class.java)
 
-        inventory = RealFeatureTogglesInventory(
-            setOf(
-                FakeFeatureTogglesInventory(
-                    features = listOf(
-                        testBlockListFeature.tdsNextExperimentTest(),
-                        testBlockListFeature.tdsNextExperimentAnotherTest(),
-                    ),
+        inventory = mock<FeatureTogglesInventory>()
+
+        runBlocking {
+            whenever(inventory.getAllTogglesForParent(Mockito.anyString())).thenReturn(
+                listOf(
+                    testBlockListFeature.tdsNextExperimentTest(),
+                    testBlockListFeature.tdsNextExperimentAnotherTest(),
                 ),
-            ),
-            coroutineRule.testDispatcherProvider,
-        )
+            )
+        }
 
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true)),
@@ -231,12 +204,6 @@ class AppTPBlockListInterceptorApiPluginTest {
                 State.Cohort(name = TREATMENT.cohortName, weight = if (useTreatment) 1 else 0),
             ),
         )
-    }
-}
-
-class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureTogglesInventory {
-    override suspend fun getAll(): List<Toggle> {
-        return features
     }
 }
 
