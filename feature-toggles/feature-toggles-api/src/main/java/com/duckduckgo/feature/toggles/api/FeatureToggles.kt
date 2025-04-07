@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
@@ -192,6 +193,11 @@ interface Toggle {
     fun getSettings(): String?
 
     /**
+     * @return the list of domain exceptions`exceptions` of the feature or empty list if not present in the remote config
+     */
+    fun getExceptions(): List<FeatureException>
+
+    /**
      * @return a [Cohort] if one has been assigned or `null` otherwise.
      */
     fun getCohort(): Cohort?
@@ -218,6 +224,7 @@ interface Toggle {
         val cohorts: List<Cohort> = emptyList(),
         val assignedCohort: Cohort? = null,
         val settings: String? = null,
+        val exceptions: List<FeatureException> = emptyList(),
     ) {
         data class Target(
             val variantKey: String?,
@@ -516,6 +523,10 @@ internal class ToggleImpl constructor(
     }
 
     override fun getSettings(): String? = store.get(key)?.settings
+
+    override fun getExceptions(): List<FeatureException> {
+        return store.get(key)?.exceptions.orEmpty()
+    }
 
     override fun getCohort(): Cohort? {
         return store.get(key)?.assignedCohort

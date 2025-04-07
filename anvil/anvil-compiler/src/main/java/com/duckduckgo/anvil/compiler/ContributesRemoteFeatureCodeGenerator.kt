@@ -486,7 +486,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         if (compareAndSetHash(_hash)) return true
                     }
         
-                    val exceptions = parseExceptions(feature)
+                    val exceptions = parseExceptions(feature.exceptions)
+                    // TODO: Remove once migrating everything to getExceptions()
                     exceptionStore.insertAll(exceptions)
         
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
@@ -498,6 +499,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             targets = emptyList(),
                             cohorts = emptyList(),
                             settings = feature.settings?.toString(),
+                            exceptions = exceptions,
                         )
                     )
         
@@ -532,6 +534,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     )
                                 } ?: emptyList()
                                 val settings = jsonToggle?.settings?.toString()
+                                val subFeatureExceptions = parseExceptions(jsonToggle.exceptions)
                                 this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -543,6 +546,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         targets = targets,
                                         cohorts = cohorts,
                                         settings = settings,                                        
+                                        exceptions = subFeatureExceptions,                                        
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -641,13 +645,13 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
     private fun createParseExceptions(module: ModuleDescriptor): FunSpec {
         return FunSpec.builder("parseExceptions")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter("jsonFeature", FqName("JsonFeature").asClassName(module).copy(nullable = true))
+            .addParameter("exceptions", List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)))
             .addCode(
                 CodeBlock.builder()
                     .add(
                         """
                             val featureExceptions = mutableListOf<%T>()
-                            jsonFeature?.exceptions?.map { ex ->
+                            exceptions?.map { ex ->
                                 featureExceptions.add(%T(ex.domain, ex.reason))
                             }
                             return featureExceptions.toList()
@@ -803,6 +807,14 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
                     )
                     .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
+                    .addParameter(
+                        ParameterSpec
+                            .builder(
+                                "exceptions",
+                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                            )
+                            .build(),
+                    )
                     .build(),
             )
             .addProperty(
@@ -839,6 +851,13 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
                     .initializer("settings")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec.builder(
+                    "exceptions",
+                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
+                ).initializer("exceptions")
                     .build(),
             )
             .build()

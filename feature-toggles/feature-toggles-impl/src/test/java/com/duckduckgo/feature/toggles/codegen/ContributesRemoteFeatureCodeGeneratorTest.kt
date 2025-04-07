@@ -25,6 +25,7 @@ import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -3794,6 +3795,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 {
                     "hash": "1",
                     "state": "disabled",
+                    "exceptions": [
+                        {
+                            "domain": "foo.com"
+                        },
+                        {
+                            "domain": "bar.de",
+                            "reason": "bar.de"
+                        }
+                    ],
                     "settings": {
                         "foo": "foo/value",
                         "bar": {
@@ -3808,6 +3818,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
+                            "exceptions": [
+                                {
+                                    "domain": "foo.com"
+                                },
+                                {
+                                    "domain": "baz.de",
+                                    "reason": "baz.de"
+                                }
+                            ],
                             "settings": {
                                 "foo": "foo/value",
                                 "bar": {
@@ -3845,21 +3864,31 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         val topLevelStateConfig = testFeature.self().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
         val topLevelConfig = testFeature.self().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        val topLevelExceptions = testFeature.self().getExceptions()
         assertTrue(topLevelStateConfig.size == 2)
         assertEquals("foo/value", topLevelStateConfig["foo"])
         assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelStateConfig["bar"])
         assertTrue(topLevelConfig.size == 2)
         assertEquals("foo/value", topLevelConfig["foo"])
         assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelConfig["bar"])
+        assertEquals(
+            listOf(FeatureException("foo.com", null), FeatureException("bar.de", "bar.de")),
+            topLevelExceptions,
+        )
 
         var stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
         var config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        var exceptions = testFeature.fooFeature().getExceptions()
         assertTrue(stateConfig.size == 2)
         assertEquals("foo/value", stateConfig["foo"])
         assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), stateConfig["bar"])
         assertTrue(config.size == 2)
         assertEquals("foo/value", config["foo"])
         assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), config["bar"])
+        assertEquals(
+            listOf(FeatureException("foo.com", null), FeatureException("baz.de", "baz.de")),
+            exceptions,
+        )
 
         // Delete config key, should remove
         assertTrue(
@@ -3901,12 +3930,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
         config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        exceptions = testFeature.fooFeature().getExceptions()
         assertTrue(stateConfig.size == 1)
         assertEquals("foo/value", stateConfig["foo"])
         assertNull(stateConfig["bar"])
         assertTrue(config.size == 1)
         assertEquals("foo/value", config["foo"])
         assertNull(config["bar"])
+        assertTrue(exceptions.isEmpty())
 
         // delete config, returns empty
         assertTrue(
@@ -3941,8 +3972,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
         config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        exceptions = testFeature.fooFeature().getExceptions()
         assertTrue(stateConfig.isEmpty())
         assertTrue(config.isEmpty())
+        assertTrue(exceptions.isEmpty())
 
         // re-add config different values
         assertTrue(
@@ -3952,9 +3985,19 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 {
                     "hash": "4",
                     "state": "disabled",
+                    "exceptions": [
+                        {
+                            "domain": "foo.com"
+                        }
+                    ],
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
+                            "exceptions": [
+                                {
+                                    "domain": "bar.com"
+                                }
+                            ],
                             "settings": {
                                 "x": "x/value",
                                 "y": "y/value"
@@ -3991,6 +4034,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(config.size == 2)
         assertEquals("x/value", config["x"])
         assertEquals("y/value", config["y"])
+        assertEquals(
+            listOf(FeatureException("foo.com", null)),
+            testFeature.self().getExceptions(),
+        )
+        assertEquals(
+            listOf(FeatureException("bar.com", null)),
+            testFeature.fooFeature().getExceptions(),
+        )
     }
 
     private fun generatedFeatureNewInstance(): Any {
