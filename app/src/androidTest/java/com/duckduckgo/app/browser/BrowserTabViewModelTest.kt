@@ -145,7 +145,6 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxFireButtonCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
@@ -172,7 +171,6 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -186,7 +184,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -5721,16 +5718,6 @@ class BrowserTabViewModelTest {
         testee.fireCustomTabRefreshPixel()
 
         verify(refreshPixelSender).sendCustomTabRefreshPixel()
-    }
-
-    @Test
-    fun givenHighlightsExperimentWhenUserClickedSkipInExperimentFireDialogThenSendCancelPixel() {
-        val cta = DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-
-        testee.onUserClickCtaSecondaryButton(cta)
-
-        verify(mockPixel).fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
     }
 
     @Test

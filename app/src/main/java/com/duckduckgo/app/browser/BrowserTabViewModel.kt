@@ -2809,10 +2809,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
-                val updatedCta = refreshCta()
-                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-            } else if (cta is BrokenSitePromptDialogCta) {
+            if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
         }
