@@ -383,7 +383,10 @@ class AppSyncAccountRepository @Inject constructor(
                 }
                 val recoveryCode = kotlin.runCatching {
                     Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
-                }.getOrNull() ?: return Error(code = CONNECT_FAILED.code, reason = "Connect: Error reading received recovery code").alsoFireAccountErrorPixel()
+                }.getOrNull() ?: return Error(
+                    code = CONNECT_FAILED.code,
+                    reason = "Connect: Error reading received recovery code",
+                ).alsoFireAccountErrorPixel()
                 syncStore.userId = recoveryCode.userId
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
