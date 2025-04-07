@@ -67,6 +67,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             navigationBar = navBar
         }
+
+        outlineProvider = null
     }
 
     override fun render(viewState: ViewState) {
