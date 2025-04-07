@@ -63,7 +63,7 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <FrameLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContainerWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/experimentalOmnibarCardSize"
@@ -89,7 +89,7 @@
                                     android:id="@+id/pageLoadingIndicator"
                                     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
-                                    android:layout_height="4dp"
+                                    android:layout_height="2dp"
                                     android:progressDrawable="@drawable/loading_progress_experiment"
                                     android:visibility="invisible"
                                     app:layout_constraintBottom_toBottomOf="parent"
@@ -335,7 +335,7 @@
 
                         </com.google.android.material.card.MaterialCardView>
 
-                    </FrameLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
 
             </androidx.appcompat.widget.Toolbar>

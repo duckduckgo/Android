@@ -16,18 +16,14 @@
 
 package com.duckduckgo.app.browser.omnibar.experiments
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.setMargins
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -39,7 +35,6 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
-import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 
 @InjectWith(FragmentScope::class)
@@ -61,9 +56,19 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     var navigationBar: BrowserNavigationBarView? = null
         private set
 
-    private val omnibarPressedHeight by lazy { resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardPressedSize) }
+    private val omnibarPressedHeight by lazy {
+        resources.getDimensionPixelSize(
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardPressedSize,
+        )
+    }
     private val omnibarDefaultHeight by lazy { resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardSize) }
+    private val omnibarFocusedExtraWidth by lazy {
+        resources.getDimensionPixelSize(
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarWithIncrease,
+        )
+    }
     private val omnibarOutline by lazy { ContextCompat.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.fade_omnibar_outline) }
+    private var omnibarWidth: Int = 0
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -86,6 +91,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
 
         outlineProvider = null
+        omnibarWidth = omnibarWrapper.width
     }
 
     override fun render(viewState: ViewState) {
@@ -121,12 +127,20 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun amimateToFocusedState(){
+    private fun amimateToFocusedState() {
         val heightAnimator = ValueAnimator.ofInt(omnibarDefaultHeight, omnibarPressedHeight)
         heightAnimator.duration = DEFAULT_ANIMATION_DURATION
         heightAnimator.addUpdateListener { valueAnimator ->
             val animatedValue = valueAnimator.animatedValue as Int
             omnibarWrapper.layoutParams.height = animatedValue
+            omnibarWrapper.requestLayout()
+        }
+
+        val widthAnimator = ValueAnimator.ofInt(omnibarWrapper.width, omnibarWrapper.width + omnibarFocusedExtraWidth)
+        widthAnimator.duration = DEFAULT_ANIMATION_DURATION
+        widthAnimator.addUpdateListener { valueAnimator ->
+            val animatedValue = valueAnimator.animatedValue as Int
+            omnibarWrapper.layoutParams.width = animatedValue
             omnibarWrapper.requestLayout()
         }
 
@@ -137,18 +151,26 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             omnibarOutline?.alpha = alpha
             omnibarWrapper.background = omnibarOutline
         }
-
-        heightAnimator.start()
         outlineAnimator.start()
+        heightAnimator.start()
+        // widthAnimator.start()
     }
 
-    private fun animateToDefaultState(){
+    private fun animateToDefaultState() {
         val heightAnimator = ValueAnimator.ofInt(omnibarPressedHeight, omnibarDefaultHeight)
         heightAnimator.duration = DEFAULT_ANIMATION_DURATION
 
         heightAnimator.addUpdateListener { valueAnimator ->
             val animatedValue = valueAnimator.animatedValue as Int
             omnibarWrapper.layoutParams.height = animatedValue
+            omnibarWrapper.requestLayout()
+        }
+
+        val widthAnimator = ValueAnimator.ofInt(omnibarWrapper.width, omnibarWidth)
+        widthAnimator.duration = DEFAULT_ANIMATION_DURATION
+        widthAnimator.addUpdateListener { valueAnimator ->
+            val animatedValue = valueAnimator.animatedValue as Int
+            omnibarWrapper.layoutParams.width = animatedValue
             omnibarWrapper.requestLayout()
         }
 
@@ -159,9 +181,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             omnibarOutline?.alpha = alpha
             omnibarWrapper.background = omnibarOutline
         }
+        outlineAnimator.start()
 
         heightAnimator.start()
-        outlineAnimator.start()
+        // widthAnimator.start()
     }
 
     fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
@@ -177,7 +200,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
     }
-
 }
 
 interface FadeOmnibarItemPressedListener {
