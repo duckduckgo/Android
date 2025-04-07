@@ -156,7 +156,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         privacyDashboardExternalPixelParams.setPixelParams(PixelParameter.NO_ANIMATION, "true")
     }
 
-    override fun startExperimentVariant2To5Animation(
+    override fun startExperimentVariant2OrVariant3Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,
@@ -174,8 +174,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val experimentLogos = getExperimentLogos(context, entities)
-        if (experimentLogos.logos.isEmpty()) {
+        val logos = getLogos(context, entities)
+        if (logos.isEmpty()) {
             tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
             return
         }
@@ -186,7 +186,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         )
 
         animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities.size, experimentLogos, omnibarViews, shieldViews)
+        animateTrackersBlockedCountView(context, entities.size, logos, omnibarViews, shieldViews)
     }
 
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
@@ -234,7 +234,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun animateTrackersBlockedCountView(
         context: Context,
         trackersCount: Int,
-        experimentLogos: ExperimentLogos,
+        logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
     ) {
@@ -250,7 +250,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    updateTrackersCountWithAnimation(context, trackersCount, experimentLogos, omnibarViews, shieldViews)
+                    updateTrackersCountWithAnimation(context, trackersCount, logos, omnibarViews, shieldViews)
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -261,7 +261,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun updateTrackersCountWithAnimation(
         context: Context,
         trackersCount: Int,
-        experimentLogos: ExperimentLogos,
+        logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
     ) {
@@ -270,7 +270,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             totalTrackerCount = trackersCount,
             trackerTextView = trackersBlockedCountAnimationView!!,
             onAnimationEnd = {
-                listener?.onAnimationFinished(experimentLogos.logos)
+                listener?.onAnimationFinished(logos)
 
                 conflatedJob += MainScope().launch {
                     delay(1500L)
@@ -496,33 +496,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
-    private fun getExperimentLogos(
-        context: Context,
-        entities: List<Entity>,
-    ): ExperimentLogos {
-        fun isKnownEntity(name: String): Boolean {
-            return name.contains("Facebook", true) ||
-                name.contains("Google LLC", true) ||
-                name.contains("Amazon", true)
-        }
-
-        // We want to prioritize known entities
-        val sortedEntities = entities.toSet().sortedWith(compareBy { if (isKnownEntity(it.name)) 0 else 1 })
-        val imageLogos = sortedEntities.mapNotNull {
-            TrackersRenderer().networkLogoIcon(context, it.name, TRACKER_LOGO_PREFIX)?.let { resId ->
-                ImageLogo(resId)
-            }
-        }
-
-        return if (imageLogos.size >= 3) {
-            val logos = imageLogos.take(3)
-            val hasKnownLogos = logos.any { sortedEntities.any { isKnownEntity(it.name) } }
-            ExperimentLogos(logos, hasKnownLogos)
-        } else {
-            ExperimentLogos(emptyList(), false)
-        }
-    }
-
     private fun stopTrackersCountAnimation() {
         trackersBlockedAnimationView?.gone()
         trackersBlockedCountAnimationView?.gone()
@@ -609,7 +582,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
-        private const val TRACKER_LOGO_PREFIX = "network_logo_"
     }
 }
 
@@ -621,8 +593,3 @@ sealed class TrackerLogo() {
 
     class StackedLogo(val resId: Int = R.drawable.network_logo_more) : TrackerLogo()
 }
-
-internal data class ExperimentLogos(
-    val logos: List<ImageLogo>,
-    val hasKnownLogos: Boolean,
-)

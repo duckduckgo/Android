@@ -153,7 +153,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object StartExperimentVariant1Animation : Command()
-        data class StartExperimentVariant2To5Animation(val entities: List<Entity>?) : Command()
+        data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
     }
 
@@ -631,7 +631,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
                                 appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
                                     command.send(
-                                        Command.StartExperimentVariant2To5Animation(decoration.entities),
+                                        Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
                                     )
                                 }
 

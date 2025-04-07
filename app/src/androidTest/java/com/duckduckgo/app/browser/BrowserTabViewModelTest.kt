@@ -6080,7 +6080,7 @@ class BrowserTabViewModelTest {
     fun whenOnAnimationFinishedAndLogosIsEmptyThenDoNothing() = runTest {
         val logos = emptyList<TrackerLogo>()
 
-        testee.onAnimationFinished(logos, false)
+        testee.onAnimationFinished(logos)
 
         assertCommandNotIssued<Command.StartExperimentV2ShieldPopAnimation>()
     }
@@ -6095,7 +6095,7 @@ class BrowserTabViewModelTest {
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
 
-        testee.onAnimationFinished(logos, true)
+        testee.onAnimationFinished(logos)
 
         assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
     }
@@ -6110,7 +6110,7 @@ class BrowserTabViewModelTest {
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
 
-        testee.onAnimationFinished(logos, true)
+        testee.onAnimationFinished(logos)
 
         assertCommandIssued<Command.StartExperimentV2ShieldPopAnimation>()
     }

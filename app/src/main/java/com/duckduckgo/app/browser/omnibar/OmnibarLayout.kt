@@ -64,7 +64,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2To5Animation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2OrVariant3Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -467,8 +467,8 @@ open class OmnibarLayout @JvmOverloads constructor(
                 startExperimentVariant1Animation()
             }
 
-            is StartExperimentVariant2To5Animation -> {
-                startExperimentVariant2To5Animation(command.entities)
+            is StartExperimentVariant2OrVariant3Animation -> {
+                startExperimentVariant2OrVariant3Animation(command.entities)
             }
         }
     }
@@ -730,12 +730,12 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startExperimentVariant2To5Animation(events: List<Entity>?) {
+    private fun startExperimentVariant2OrVariant3Animation(events: List<Entity>?) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
 
-            animatorHelper.startExperimentVariant2To5Animation(
+            animatorHelper.startExperimentVariant2OrVariant3Animation(
                 context = context,
                 shieldAnimationView = shieldIconExperiment,
                 trackersBlockedAnimationView = trackersBlockedAnimation,

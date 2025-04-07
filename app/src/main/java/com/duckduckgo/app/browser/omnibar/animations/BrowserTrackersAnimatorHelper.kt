@@ -50,7 +50,7 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
     )
 
-    fun startExperimentVariant2To5Animation(
+    fun startExperimentVariant2OrVariant3Animation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,

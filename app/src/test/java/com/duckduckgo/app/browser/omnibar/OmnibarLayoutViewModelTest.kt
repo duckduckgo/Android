@@ -922,7 +922,7 @@ class OmnibarLayoutViewModelTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2To5AnimationCommandSent() = runTest {
+    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2Or3AnimationCommandSent() = runTest {
         testee.onOmnibarFocusChanged(false, SERP_URL)
         val trackers = givenSomeTrackers()
         // Variant 2 is enabled
@@ -935,7 +935,7 @@ class OmnibarLayoutViewModelTest {
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.StartExperimentVariant2To5Animation::class)
+            awaitItem().assertCommand(Command.StartExperimentVariant2OrVariant3Animation::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
