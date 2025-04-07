@@ -20,8 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -39,7 +38,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -61,8 +59,7 @@ class AppTPBlockListInterceptorApiPluginTest {
     private val configAdapter = moshi.adapter(Config::class.java)
 
     private val pixel = mock<Pixel>()
-    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
-    private val prefs = InMemorySharedPreferences()
+    private val sharedPreferencesProvider = FakeSharedPreferencesProvider()
 
     private lateinit var deviceShieldPixels: DeviceShieldPixels
 
@@ -83,10 +80,6 @@ class AppTPBlockListInterceptorApiPluginTest {
                 ),
             )
         }
-
-        whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true)),
-        ).thenReturn(prefs)
 
         deviceShieldPixels = RealDeviceShieldPixels(pixel, sharedPreferencesProvider)
 
