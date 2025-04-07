@@ -24,7 +24,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="14dp"
     android:paddingTop="@dimen/keyline_2"
-    android:paddingBottom="@dimen/keyline_2"
+    android:paddingBottom="@dimen/keyline_1"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout
