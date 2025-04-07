@@ -45,7 +45,7 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
 ) : AutofillSiteSpecificFixesStore {
 
     private data class SiteSpecificFixesConfigJson(
-        val javascriptConfig: JSONObject? = null,
+        val javascriptConfig: JSONObject = JSONObject(),
     )
 
     private val jsonAdapter: JsonAdapter<SiteSpecificFixesConfigJson> by lazy {
@@ -54,17 +54,30 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
 
     override suspend fun getConfig(): AutofillSiteSpecificFixesSettings {
         return withContext(dispatchers.io()) {
-            val isSiteSpecificFicesEnabled = autofillFeature.siteSpecificFixes().isEnabled()
-            val settings = autofillFeature.siteSpecificFixes().getSettings()?.let {
-                runCatching {
-                    jsonAdapter.fromJson(it)
-                }.getOrNull()
+            val isSiteSpecificFixesEnabled = autofillFeature.siteSpecificFixes().isEnabled()
+            val settings = if (isSiteSpecificFixesEnabled) {
+                autofillFeature.siteSpecificFixes().getSettings()?.let {
+                    runCatching {
+                        jsonAdapter.fromJson(it)
+                    }.getOrNull()
+                }
+            } else {
+                null
             }
-            val settingsJson = if (isSiteSpecificFicesEnabled && settings != null) settings.javascriptConfig.toString() else "\"{}\""
+
+            val settingsJson = if (isSiteSpecificFixesEnabled && settings != null) {
+                settings.javascriptConfig.toString()
+            } else {
+                JAVASCRIPT_CONFIG_DEFAULT
+            }
             AutofillSiteSpecificFixesSettings(
                 javascriptConfigSiteSpecificFixes = settingsJson,
-                canApplySiteSpecificFixes = isSiteSpecificFicesEnabled,
+                canApplySiteSpecificFixes = isSiteSpecificFixesEnabled,
             )
         }
+    }
+
+    companion object {
+        internal const val JAVASCRIPT_CONFIG_DEFAULT = "{}"
     }
 }
