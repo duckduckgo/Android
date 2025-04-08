@@ -265,7 +265,7 @@ class RealPirOptOut @Inject constructor(
 
     private fun cleanRunners() {
         runners.forEach {
-            runBlocking { it.stop() }
+            it.stop()
         }
     }
 

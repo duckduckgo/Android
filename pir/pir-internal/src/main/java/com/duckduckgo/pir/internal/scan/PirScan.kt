@@ -128,7 +128,7 @@ class RealPirScan @Inject constructor(
         runBlocking {
             if (runners.isNotEmpty()) {
                 runners.forEach {
-                    runBlocking { it.stop() }
+                    it.stop()
                 }
                 runners.clear()
             }
@@ -222,8 +222,9 @@ class RealPirScan @Inject constructor(
     override fun stop() {
         logcat { "PIR-SCAN: Stopping all runners" }
         runners.forEach {
-            runBlocking { it.stop() }
+            it.stop()
         }
+        runners.clear()
         onJobStopped()
     }
 

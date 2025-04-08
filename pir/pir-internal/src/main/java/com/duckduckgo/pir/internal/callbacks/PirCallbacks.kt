@@ -31,4 +31,4 @@ interface PirCallbacks {
     boundType = PirCallbacks::class,
 )
 @Suppress("unused")
-interface PirCallbacksPluginPoint
+private interface PirCallbacksPluginPoint

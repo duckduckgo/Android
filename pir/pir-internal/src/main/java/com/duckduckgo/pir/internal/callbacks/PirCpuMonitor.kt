@@ -45,7 +45,6 @@ class PirCpuMonitor @Inject constructor(
     private val monitorJob = ConflatedJob()
 
     override fun onPirJobStarted(coroutineScope: CoroutineScope) {
-        monitorJob.cancel()
         monitorJob += coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobStarted " }
             delay(10_000) // Add delay before measuring
