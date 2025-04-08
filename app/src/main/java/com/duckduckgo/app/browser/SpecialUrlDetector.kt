@@ -63,7 +63,7 @@ class SpecialUrlDetectorImpl(
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
-                } else if (duckChat.isDuckChatUrl(uri) && aiChatQueryDetectionFeature.self().isEnabled()) {
+                } else if (aiChatQueryDetectionFeature.self().isEnabled() && duckChat.isDuckChatUrl(uri)) {
                     UrlType.ShouldLaunchDuckChatLink
                 } else {
                     UrlType.SearchQuery(uriString)
