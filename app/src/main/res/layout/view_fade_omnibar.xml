@@ -79,17 +79,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <View
-                                android:id="@+id/transitionedOmnibarBackground"
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:alpha="0"
-                                android:background="@drawable/fade_omnibar_transitioned_background"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
                             <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/trackersAnimation"
                                 android:layout_width="wrap_content"
@@ -151,6 +140,19 @@
                                     android:padding="6dp"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_find_search_20_a05" />
+
+                                <ImageView
+                                    android:id="@+id/backIcon"
+                                    android:layout_width="@dimen/toolbarIcon"
+                                    android:layout_height="@dimen/toolbarIcon"
+                                    android:layout_gravity="center"
+                                    android:background="?selectableItemBackgroundBorderless"
+                                    android:contentDescription="@string/back"
+                                    android:gravity="center"
+                                    android:padding="@dimen/toolbarIconPadding"
+                                    android:scaleType="center"
+                                    android:src="@drawable/ic_arrow_left_24e"
+                                    android:visibility="gone" />
 
                                 <ImageView
                                     android:id="@+id/globeIcon"

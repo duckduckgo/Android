@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
@@ -44,6 +46,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
+    private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
 
     /**
      * Returns the [BrowserNavigationBarView] reference if it's embedded inside of this omnibar layout, otherwise, returns null.
@@ -84,6 +87,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
         spacer.isVisible = false
 
+        val showBackArrow = viewState.hasFocus
+        if (showBackArrow) {
+            backIcon.show()
+            searchIcon.gone()
+            shieldIcon.gone()
+            daxIcon.gone()
+            globeIcon.gone()
+            duckPlayerIcon.gone()
+        } else {
+            backIcon.gone()
+        }
+
         omniBarContainer.isPressed = viewState.hasFocus
         if (viewState.hasFocus) {
             omnibarCard.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
@@ -97,9 +112,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         aiChat.setOnClickListener {
             fadeOmnibarItemPressedListener?.onDuckChatButtonPressed()
         }
+        backIcon.setOnClickListener {
+            fadeOmnibarItemPressedListener?.onBackButtonPressed()
+        }
     }
 }
 
 interface FadeOmnibarItemPressedListener {
     fun onDuckChatButtonPressed()
+    fun onBackButtonPressed()
 }
