@@ -176,9 +176,12 @@ class RealDuckChat @Inject constructor(
             } else {
                 originalQuery
             }
-            mutableMapOf(QUERY to cleanedQuery).apply {
-                if (hasDuckChatBang) {
-                    put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
+            mutableMapOf<String, String>().apply {
+                if (cleanedQuery.isNotEmpty()) {
+                    put(QUERY, cleanedQuery)
+                    if (hasDuckChatBang) {
+                        put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
+                    }
                 }
             }
         } ?: emptyMap()

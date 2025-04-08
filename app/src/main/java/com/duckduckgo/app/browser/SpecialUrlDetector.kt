@@ -26,6 +26,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
@@ -43,6 +44,7 @@ class SpecialUrlDetectorImpl(
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -61,7 +63,7 @@ class SpecialUrlDetectorImpl(
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
-                } else if (duckChat.isDuckChatUrl(uri)) {
+                } else if (duckChat.isDuckChatUrl(uri) && aiChatQueryDetectionFeature.self().isEnabled()) {
                     UrlType.ShouldLaunchDuckChatLink
                 } else {
                     UrlType.SearchQuery(uriString)
