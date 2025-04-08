@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.scan
+package com.duckduckgo.pir.internal.common
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.scan.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
+import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -42,17 +46,32 @@ interface BrokerStepsParser {
         stepsJson: String,
     ): BrokerStep?
 
-    data class BrokerStep(
-        var brokerName: String? = null,
-        val stepType: String,
-        val scanType: String,
-        val actions: List<BrokerAction>,
-    )
+    sealed class BrokerStep(
+        open val brokerName: String = "", // this will be set later / not coming from json
+        open val stepType: String,
+        open val actions: List<BrokerAction>,
+    ) {
+        data class ScanStep(
+            override val brokerName: String = "", // this will be set later / not coming from json
+            override val stepType: String,
+            override val actions: List<BrokerAction>,
+            val scanType: String,
+        ) : BrokerStep(brokerName, stepType, actions)
+
+        data class OptOutStep(
+            override val brokerName: String = "", // this will be set later / not coming from json
+            override val stepType: String,
+            override val actions: List<BrokerAction>,
+            val optOutType: String,
+            val profilesToOptOut: List<ExtractedProfile> = emptyList(),
+        ) : BrokerStep(brokerName, stepType, actions)
+    }
 }
 
 @ContributesBinding(AppScope::class)
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
+    private val repository: PirRepository,
 ) : BrokerStepsParser {
     val adapter: JsonAdapter<BrokerStep> by lazy {
         Moshi.Builder()
@@ -63,10 +82,16 @@ class RealBrokerStepsParser @Inject constructor(
                     .withSubtype(BrokerAction.Click::class.java, "click")
                     .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
                     .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchInfo::class.java, "getCaptchaInfo")
+                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
-            ).add(KotlinJsonAdapterFactory())
+            )
+            .add(
+                PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
+                    .withSubtype(ScanStep::class.java, "scan")
+                    .withSubtype(OptOutStep::class.java, "optOut"),
+            )
+            .add(KotlinJsonAdapterFactory())
             .build()
             .adapter(BrokerStep::class.java)
     }
@@ -76,8 +101,19 @@ class RealBrokerStepsParser @Inject constructor(
         stepsJson: String,
     ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            adapter.fromJson(stepsJson)?.apply {
-                this.brokerName = brokerName
+            adapter.fromJson(stepsJson)?.run {
+                if (this is OptOutStep) {
+                    this.copy(
+                        brokerName = brokerName,
+                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
+                            it.result
+                        }?.map {
+                            it.scrapedData
+                        } ?: emptyList(),
+                    )
+                } else {
+                    (this as ScanStep).copy(brokerName = brokerName)
+                }
             }
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }

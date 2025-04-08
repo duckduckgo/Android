@@ -23,22 +23,25 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ScanLogDao {
-    @Query("SELECT * FROM pir_events_log ORDER BY eventTimeInMillis")
-    fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
+interface OptOutResultsDao {
+    @Query("SELECT * FROM pir_opt_out_action_log ORDER BY completionTimeInMillis")
+    fun getOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
 
-    @Query("SELECT * FROM pir_broker_scan_log ORDER BY eventTimeInMillis")
-    fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
+    @Query("SELECT * FROM pir_opt_out_complete_brokers ORDER BY endTimeInMillis")
+    fun getOptOutCompletedBrokerFlow(): Flow<List<OptOutCompletedBroker>>
+
+    @Query("SELECT * FROM pir_opt_out_complete_brokers ORDER BY endTimeInMillis")
+    suspend fun getAllOptOutCompletedBrokers(): List<OptOutCompletedBroker>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertEventLog(pirScanLog: PirEventLog)
+    fun insertOptOutActionLog(optOutActionLog: OptOutActionLog)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBrokerScanEvent(pirBrokerScanLog: PirBrokerScanLog)
+    fun insertOptOutCompletedBroker(optOutCompletedBroker: OptOutCompletedBroker)
 
-    @Query("DELETE from pir_events_log")
-    fun deleteAllEventLogs()
+    @Query("DELETE from pir_opt_out_action_log")
+    fun deleteAllOptOutActionLog()
 
-    @Query("DELETE from pir_broker_scan_log")
-    fun deleteAllBrokerScanEvents()
+    @Query("DELETE from pir_opt_out_complete_brokers")
+    fun deleteAllOptOutCompletedBroker()
 }

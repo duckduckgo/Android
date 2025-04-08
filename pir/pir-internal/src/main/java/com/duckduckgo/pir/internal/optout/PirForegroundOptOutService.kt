@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.service
+package com.duckduckgo.pir.internal.optout
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -28,8 +28,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
-import com.duckduckgo.pir.internal.scan.PirScan
-import com.duckduckgo.pir.internal.scan.PirScan.RunType.MANUAL
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
@@ -47,9 +45,9 @@ import logcat.LogcatLogger
 import logcat.logcat
 
 @InjectWith(scope = ServiceScope::class)
-class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
+class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
     @Inject
-    lateinit var pirScan: PirScan
+    lateinit var pirOptOut: PirOptOut
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -72,20 +70,27 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         flags: Int,
         startId: Int,
     ): Int {
-        logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
+        logcat { "PIR-OPT-OUT: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
         val notification: Notification =
-            createNotification(getString(R.string.pirNotificationMessageInProgress))
+            createNotification(getString(R.string.pirOptOutNotificationMessageInProgress))
         startForeground(1, notification)
 
         synchronized(this) {
             launch(serviceDispatcher) {
                 async {
-                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService, MANUAL)
+                    val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
+
+                    val result = if (!brokers.isNullOrEmpty()) {
+                        pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService, this)
+                    } else {
+                        pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService, this)
+                    }
+
                     if (result.isSuccess) {
                         notificationManagerCompat.checkPermissionAndNotify(
                             applicationContext,
                             NOTIF_ID_STATUS_COMPLETE,
-                            createNotification(getString(R.string.pirNotificationMessageComplete)),
+                            createNotification(getString(R.string.pirOptOutNotificationMessageComplete)),
                         )
                     }
                     stopSelf()
@@ -93,13 +98,13 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             }
         }
 
-        logcat { "PIR-SCAN: START_NOT_STICKY" }
+        logcat { "PIR-OPT-OUT: START_NOT_STICKY" }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
-        logcat { "PIR-SCAN: PIR service destroyed" }
-        pirScan.stop()
+        logcat { "PIR-OPT-OUT: PIR service destroyed" }
+        pirOptOut.stop()
     }
 
     private fun createNotification(message: String): Notification {
@@ -115,10 +120,14 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         )
 
         return NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-            .setContentTitle(getString(R.string.pirNotificationTitle))
+            .setContentTitle(getString(R.string.pirOptOutNotificationTitle))
             .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(pendingIntent)
             .build()
+    }
+
+    companion object {
+        internal const val EXTRA_BROKER_TO_OPT_OUT = "EXTRA_BROKER_TO_OPT_OUT"
     }
 }
