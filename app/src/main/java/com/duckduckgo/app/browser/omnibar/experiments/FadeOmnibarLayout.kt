@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -50,6 +51,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarWrapper: View by lazy { findViewById(R.id.omniBarContainerWrapper) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
+    private val omnibarIconContainer: View by lazy { findViewById(R.id.endIconsContainer) }
 
     /**
      * Returns the [BrowserNavigationBarView] reference if it's embedded inside of this omnibar layout, otherwise, returns null.
@@ -57,21 +59,33 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     var navigationBar: BrowserNavigationBarView? = null
         private set
 
-    private val omnibarPressedHeight by lazy {
+    private val omnibarDefaultHeight by lazy { resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardSize) }
+    private val omnibarFocusedHeight by lazy {
         resources.getDimensionPixelSize(
-            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardPressedSize,
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardFocusedHeight,
         )
     }
-    private val omnibarDefaultHeight by lazy { resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardSize) }
+    private val omnibarDefaultMargin by lazy { resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardMargin) }
+    private val omnibarFocusedMargin by lazy {
+        resources.getDimensionPixelSize(
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarCardFocusedMargin,
+        )
+    }
+    private val omnibarDefaultIconsMargin by lazy {
+        resources.getDimensionPixelSize(
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarIconsMargin,
+        )
+    }
+    private val omnibarFocusedIconsMargin by lazy {
+        resources.getDimensionPixelSize(
+            com.duckduckgo.mobile.android.R.dimen.experimentalOmnibarIconsFocusedMargin,
+        )
+    }
     private val omnibarOutline by lazy { ContextCompat.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.fade_omnibar_outline) }
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
     private var focusAnimated = false
-    private var sizeIncreaseDp = 4f
-    private val sizeIncreasePx by lazy { sizeIncreaseDp.toPx() }
-    private var omnibarTargetWidth = 0f
-    private var omnibarWidth = 0
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
@@ -92,14 +106,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
 
         outlineProvider = null
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        Timber.d("OmnibarFocus: omnibarWidth: ${omnibarWrapper.width}")
-        omnibarWidth = omnibarWrapper.width
-        omnibarTargetWidth = omnibarWrapper.width + sizeIncreasePx
     }
 
     override fun render(viewState: ViewState) {
@@ -143,25 +149,37 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    /**
+     * In focused state the Omnibar will grow 2dp in each direction
+     * It will also show an outline to indicate that the Omnibar is focused
+     * We need to compensate the size increase so that the icons don't move too
+     */
     private fun animateOmnibarFocusedState(focused: Boolean) {
         var startMargin = 0
         var endMargin = 0
+        var iconsStartMargin = 0
+        var iconsEndMargin = 0
         var startHeight = 0
         var endHeight = 0
 
         if (focused) {
-            startMargin = 14.toPx()
-            endMargin = 12.toPx()
+            startMargin = omnibarDefaultMargin
+            endMargin = omnibarFocusedMargin
+            iconsStartMargin = omnibarDefaultIconsMargin
+            iconsEndMargin = omnibarFocusedIconsMargin
             startHeight = omnibarDefaultHeight
-            endHeight = omnibarPressedHeight
+            endHeight = omnibarFocusedHeight
         } else {
-            startMargin = 12.toPx()
-            endMargin = 14.toPx()
-            startHeight = omnibarPressedHeight
+            startMargin = omnibarFocusedMargin
+            endMargin = omnibarDefaultMargin
+            iconsStartMargin = omnibarFocusedIconsMargin
+            iconsEndMargin = omnibarDefaultIconsMargin
+            startHeight = omnibarFocusedHeight
             endHeight = omnibarDefaultHeight
         }
 
         val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
+        val iconsLayoutParams = omnibarIconContainer.layoutParams as ConstraintLayout.LayoutParams
         val animator = ValueAnimator.ofFloat(0f, 1f)
         animator.duration = DEFAULT_ANIMATION_DURATION
 
@@ -170,6 +188,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
             val animatedHeight = (startHeight + (endHeight - startHeight) * fraction).toInt()
             val animatedMargin = (startMargin + (endMargin - startMargin) * fraction).toInt()
+            val animatedIconsMargin = (iconsStartMargin + (iconsEndMargin - iconsStartMargin) * fraction).toInt()
 
             layoutParams.height = animatedHeight
             layoutParams.leftMargin = animatedMargin
@@ -177,6 +196,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
             omnibarWrapper.layoutParams = layoutParams
             omnibarWrapper.requestLayout()
+
+            iconsLayoutParams.leftMargin = animatedIconsMargin
+            iconsLayoutParams.rightMargin = animatedIconsMargin
+            omnibarIconContainer.layoutParams = iconsLayoutParams
+            omnibarIconContainer.requestLayout()
         }
 
         val outlineAnimator = if (focused) {

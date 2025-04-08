@@ -123,6 +123,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/keyline_1"
+                                    android:layout_marginEnd="@dimen/keyline_1"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent">
@@ -314,7 +315,6 @@
                                         android:layout_width="@dimen/toolbarIcon"
                                         android:layout_height="@dimen/toolbarIcon"
                                         android:layout_gravity="center"
-                                        android:layout_marginEnd="@dimen/keyline_1"
                                         android:background="?attr/selectableItemBackgroundBorderless"
                                         android:contentDescription="@string/browserPopupMenu"
                                         android:padding="@dimen/toolbarIconPadding"
