@@ -49,6 +49,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarWrapper: View by lazy { findViewById(R.id.omniBarContainerWrapper) }
+    private val omnibarTrailingIconsContainer: View by lazy { findViewById(R.id.endIconsContainer) }
+    private val omnibarLeadingIconsContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val omnibarIconContainer: View by lazy { findViewById(R.id.endIconsContainer) }
@@ -179,10 +181,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
 
         val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
-        val iconsLayoutParams = omnibarIconContainer.layoutParams as ConstraintLayout.LayoutParams
+        val trailingIconsLayoutParams = omnibarTrailingIconsContainer.layoutParams as ConstraintLayout.LayoutParams
+        val leadingIconsLayoutParams = omnibarLeadingIconsContainer.layoutParams as ConstraintLayout.LayoutParams
+
         val animator = ValueAnimator.ofFloat(0f, 1f)
         animator.duration = DEFAULT_ANIMATION_DURATION
-
         animator.addUpdateListener { valueAnimator ->
             val fraction = valueAnimator.animatedValue as Float
 
@@ -193,14 +196,16 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             layoutParams.height = animatedHeight
             layoutParams.leftMargin = animatedMargin
             layoutParams.rightMargin = animatedMargin
-
             omnibarWrapper.layoutParams = layoutParams
             omnibarWrapper.requestLayout()
 
-            iconsLayoutParams.leftMargin = animatedIconsMargin
-            iconsLayoutParams.rightMargin = animatedIconsMargin
-            omnibarIconContainer.layoutParams = iconsLayoutParams
-            omnibarIconContainer.requestLayout()
+            leadingIconsLayoutParams.leftMargin = animatedIconsMargin
+            omnibarLeadingIconsContainer.layoutParams = leadingIconsLayoutParams
+            omnibarLeadingIconsContainer.requestLayout()
+
+            trailingIconsLayoutParams.rightMargin = animatedIconsMargin
+            omnibarTrailingIconsContainer.layoutParams = trailingIconsLayoutParams
+            omnibarTrailingIconsContainer.requestLayout()
         }
 
         val outlineAnimator = if (focused) {

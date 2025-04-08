@@ -113,6 +113,7 @@
                                     android:id="@+id/shieldIcon"
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
+                                    android:layout_marginStart="@dimen/keyline_1"
                                     android:importantForAccessibility="no"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
