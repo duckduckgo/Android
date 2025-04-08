@@ -132,90 +132,68 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         omniBarContainer.isPressed = viewState.hasFocus
         if (viewState.hasFocus) {
             if (!focusAnimated) {
-                animateSizeChange(true)
+                animateOmnibarFocusedState(focused = true)
                 focusAnimated = true
             }
         } else {
             if (focusAnimated) {
-                animateSizeChange(false)
+                animateOmnibarFocusedState(focused = false)
                 focusAnimated = false
             }
         }
     }
 
-    private fun animateSizeChange(shouldIncrease: Boolean) {
-        if (shouldIncrease) {
-            val startMargin = 14.toPx()
-            val pressedMargin = 12.toPx()
+    private fun animateOmnibarFocusedState(focused: Boolean) {
+        var startMargin = 0
+        var endMargin = 0
+        var startHeight = 0
+        var endHeight = 0
 
-            val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
-
-            val animator = ValueAnimator.ofFloat(0f, 1f)
-            animator.duration = DEFAULT_ANIMATION_DURATION
-
-            animator.addUpdateListener { valueAnimator ->
-                val fraction = valueAnimator.animatedValue as Float
-
-                // Interpolate height and margin values
-                val animatedHeight = (omnibarDefaultHeight + (omnibarPressedHeight - omnibarDefaultHeight) * fraction).toInt()
-                val animatedMargin = (startMargin + (pressedMargin - startMargin) * fraction).toInt()
-
-                // Update LayoutParams
-                layoutParams.height = animatedHeight
-                layoutParams.leftMargin = animatedMargin
-                layoutParams.rightMargin = animatedMargin
-
-                omnibarWrapper.layoutParams = layoutParams
-                omnibarWrapper.requestLayout()
-            }
-
-            val outlineAnimator = ValueAnimator.ofInt(0, 255)
-            outlineAnimator.duration = DEFAULT_ANIMATION_DURATION
-            outlineAnimator.addUpdateListener { animation ->
-                val alpha = animation.animatedValue as Int
-                omnibarOutline?.alpha = alpha
-                omnibarWrapper.background = omnibarOutline
-            }
-
-            animator.start()
-            outlineAnimator.start()
+        if (focused) {
+            startMargin = 14.toPx()
+            endMargin = 12.toPx()
+            startHeight = omnibarDefaultHeight
+            endHeight = omnibarPressedHeight
         } else {
-            val startMargin = 12.toPx()
-            val pressedMargin = 14.toPx()
-
-            val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
-
-            val animator = ValueAnimator.ofFloat(0f, 1f)
-            animator.duration = DEFAULT_ANIMATION_DURATION
-
-            animator.addUpdateListener { valueAnimator ->
-                val fraction = valueAnimator.animatedValue as Float
-
-                // Interpolate height and margin values
-
-                val animatedHeight = (omnibarPressedHeight + (omnibarDefaultHeight - omnibarPressedHeight) * fraction).toInt()
-                val animatedMargin = (startMargin + (pressedMargin - startMargin) * fraction).toInt()
-
-                // Update LayoutParams
-                layoutParams.height = animatedHeight
-                layoutParams.leftMargin = animatedMargin
-                layoutParams.rightMargin = animatedMargin
-
-                omnibarWrapper.layoutParams = layoutParams
-                omnibarWrapper.requestLayout()
-            }
-
-            val outlineAnimator = ValueAnimator.ofInt(255, 0)
-            outlineAnimator.duration = DEFAULT_ANIMATION_DURATION
-            outlineAnimator.addUpdateListener { animation ->
-                val alpha = animation.animatedValue as Int
-                omnibarOutline?.alpha = alpha
-                omnibarWrapper.background = omnibarOutline
-            }
-
-            animator.start()
-            outlineAnimator.start()
+            startMargin = 12.toPx()
+            endMargin = 14.toPx()
+            startHeight = omnibarPressedHeight
+            endHeight = omnibarDefaultHeight
         }
+
+        val layoutParams = omnibarWrapper.layoutParams as LinearLayout.LayoutParams
+        val animator = ValueAnimator.ofFloat(0f, 1f)
+        animator.duration = DEFAULT_ANIMATION_DURATION
+
+        animator.addUpdateListener { valueAnimator ->
+            val fraction = valueAnimator.animatedValue as Float
+
+            val animatedHeight = (startHeight + (endHeight - startHeight) * fraction).toInt()
+            val animatedMargin = (startMargin + (endMargin - startMargin) * fraction).toInt()
+
+            layoutParams.height = animatedHeight
+            layoutParams.leftMargin = animatedMargin
+            layoutParams.rightMargin = animatedMargin
+
+            omnibarWrapper.layoutParams = layoutParams
+            omnibarWrapper.requestLayout()
+        }
+
+        val outlineAnimator = if (focused) {
+            ValueAnimator.ofInt(0, 255)
+        } else {
+            ValueAnimator.ofInt(255, 0)
+        }
+
+        outlineAnimator.duration = DEFAULT_ANIMATION_DURATION
+        outlineAnimator.addUpdateListener { animation ->
+            val alpha = animation.animatedValue as Int
+            omnibarOutline?.alpha = alpha
+            omnibarWrapper.background = omnibarOutline
+        }
+
+        animator.start()
+        outlineAnimator.start()
     }
 
     fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
