@@ -317,7 +317,6 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenUrlIsNotDuckChatUrlAndFeatureIsEnabledThenSearchQueryTypeDetected() {
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is SearchQuery)
@@ -326,7 +325,6 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenUrlIsDuckChatUrlAndFeatureIsEnabledThenDuckChatTypeDetected() {
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is ShouldLaunchDuckChatLink)
@@ -334,8 +332,6 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsDuckChatUrlAndFeatureIsDisabledThenSearchQueryTypeDetected() {
-        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
-        whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is SearchQuery)
