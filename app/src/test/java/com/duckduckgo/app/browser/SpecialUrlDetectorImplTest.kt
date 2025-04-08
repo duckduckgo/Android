@@ -311,7 +311,7 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsNotDuckChatUrlThenSearchQueryTypeDetected() {
+    fun whenUrlIsNotDuckChatUrlAndFeatureIsEnabledThenSearchQueryTypeDetected() {
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockToggle)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
