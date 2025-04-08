@@ -17,28 +17,26 @@ package com.duckduckgo.app.browser.tabs.adapter
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.RecyclerView
 
 /**
  * [ViewHolder] implementation for handling [Fragment]s. Used in [FragmentStateAdapter].
  */
-class FragmentViewHolder private constructor(container: FrameLayout) :
+class FragmentViewHolder private constructor(container: FragmentContainerView) :
     RecyclerView.ViewHolder(container) {
-    val container: FrameLayout
-        get() = itemView as FrameLayout
+    val container: FragmentContainerView
+        get() = itemView as FragmentContainerView
 
     companion object {
         @JvmStatic
         fun create(parent: ViewGroup): FragmentViewHolder {
-            val container = FrameLayout(parent.context)
-            container.setLayoutParams(
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                ),
+            val container = FragmentContainerView(parent.context)
+            container.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
-            container.setId(View.generateViewId())
+            container.id = View.generateViewId()
             container.isSaveEnabled = false
             return FragmentViewHolder(container)
         }
