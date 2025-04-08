@@ -416,7 +416,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     void addViewToContainer(@NonNull View v, @NonNull FrameLayout container) {
         if (container.getChildCount() > 1) {
-            Timber.d("FragmentStateAdapter: container has more than one child");
+            throw new IllegalStateException("Design assumption violated.");
         }
 
         if (v.getParent() == container) {
