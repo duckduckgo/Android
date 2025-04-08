@@ -88,14 +88,14 @@ class RealMaliciousSiteRepository @Inject constructor(
     }
 
     override suspend fun getFilters(hash: String): List<FilterSet>? {
-        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.map { (type, filters) ->
+        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.mapNotNull { (type, filters) ->
             FilterSet(
                 filters = filters.map { Filter(it.hash, it.regex) },
                 feed = when (type) {
                     PHISHING.name -> PHISHING
                     MALWARE.name -> MALWARE
                     SCAM.name -> SCAM
-                    else -> throw IllegalArgumentException("Unknown feed $type")
+                    else -> return@mapNotNull null
                 },
             )
         }
