@@ -178,7 +178,7 @@ class RealDuckChatTest {
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example%20!ai&bang=true&ia=chat&duckai=5",
+                url = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
             ),
         )
         verify(mockContext).startActivity(any())

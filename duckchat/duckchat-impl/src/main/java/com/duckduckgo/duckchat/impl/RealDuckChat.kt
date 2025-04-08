@@ -169,14 +169,25 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChat(query: String?) {
-        val parameters = query?.let {
-            mutableMapOf(QUERY to it).apply {
-                if (isDuckChatBang(it.toUri())) {
+        val parameters = query?.let { originalQuery ->
+            val hasDuckChatBang = isDuckChatBang(originalQuery.toUri())
+            val cleanedQuery = if (hasDuckChatBang) {
+                stripBang(originalQuery)
+            } else {
+                originalQuery
+            }
+            mutableMapOf(QUERY to cleanedQuery).apply {
+                if (hasDuckChatBang) {
                     put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
                 }
             }
         } ?: emptyMap()
         openDuckChat(parameters)
+    }
+
+    private fun stripBang(query: String): String {
+        val bangPattern = Regex("!\\w+")
+        return query.replace(bangPattern, "").trim()
     }
 
     override fun openDuckChatWithAutoPrompt(query: String) {
