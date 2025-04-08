@@ -267,10 +267,11 @@ class RealDuckChat @Inject constructor(
                 runCatching { jsonAdapter.fromJson(it) }.getOrNull()
             }
             duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
-            settingsJson?.aiChatBangs?.let { bangs ->
-                val bangAlternation = bangs.joinToString("|") { it }
-                bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
-            }
+            settingsJson?.aiChatBangs?.takeIf { it.isNotEmpty() }
+                ?.let { bangs ->
+                    val bangAlternation = bangs.joinToString("|") { it }
+                    bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
+                }
             cacheShowInBrowser()
         }
     }

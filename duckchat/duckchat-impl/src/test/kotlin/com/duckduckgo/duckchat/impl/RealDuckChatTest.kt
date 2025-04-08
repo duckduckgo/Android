@@ -62,8 +62,7 @@ class RealDuckChatTest {
     @get:org.junit.Rule
     var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
 
-    private val mockDuckPlayerFeatureRepository: DuckChatFeatureRepository =
-        mock()
+    private val mockDuckPlayerFeatureRepository: DuckChatFeatureRepository = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
@@ -194,6 +193,30 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithEmptyBangsThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_EMPTY_BANGS))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithNoBangsThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_NO_BANGS))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithNoRegexThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_NO_REGEX))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenActivityStartedWithQueryAndAutoPrompt() = runTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
@@ -271,8 +294,27 @@ class RealDuckChatTest {
     companion object {
         val SETTINGS_JSON = """
         {
-            "aiChatBangs": ["!ai","!aichat","!chat","!duckai"],
-            "aiChatBangRegex": "^(?!({bangs})${'$'}).*(?:{bangs}).*${'$'}"
+            "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_EMPTY_BANGS = """
+        {
+            "aiChatBangs": [],
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_NO_BANGS = """
+        {
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_NO_REGEX = """
+        {
+            "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
         }
         """.trimIndent()
     }
