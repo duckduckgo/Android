@@ -32,9 +32,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import timber.log.Timber
@@ -51,9 +51,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarWrapper: View by lazy { findViewById(R.id.omniBarContainerWrapper) }
     private val omnibarTrailingIconsContainer: View by lazy { findViewById(R.id.endIconsContainer) }
     private val omnibarLeadingIconsContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
-    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
-    private val omnibarIconContainer: View by lazy { findViewById(R.id.endIconsContainer) }
 
     /**
      * Returns the [BrowserNavigationBarView] reference if it's embedded inside of this omnibar layout, otherwise, returns null.
