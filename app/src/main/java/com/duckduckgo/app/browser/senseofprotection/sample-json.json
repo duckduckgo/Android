@@ -1,0 +1,45 @@
+{
+    "senseOfProtection": {
+        "state": "disabled",
+        "exceptions": [],
+        "features": {
+            "senseOfProtectionNewUserExperimentApr25": {
+                "state": "disabled",
+                "target" : {
+                    "isReturningUser" : false
+                },
+                "cohorts": [
+                    {
+                        "name": "modifiedControl",
+                        "weight": 0
+                    },
+                    {
+                        "name": "variant1",
+                        "weight": 0
+                    },
+                    {
+                        "name": "variant2",
+                        "weight": 0
+                    }
+                ]
+            },
+            "senseOfProtectionExistingUserExperimentApr25": {
+                "state": "disabled",
+                "cohorts": [
+                    {
+                        "name": "modifiedControl",
+                        "weight": 0
+                    },
+                    {
+                        "name": "variant1",
+                        "weight": 0
+                    },
+                    {
+                        "name": "variant2",
+                        "weight": 0
+                    }
+                ]
+            }
+        },
+    }
+}
