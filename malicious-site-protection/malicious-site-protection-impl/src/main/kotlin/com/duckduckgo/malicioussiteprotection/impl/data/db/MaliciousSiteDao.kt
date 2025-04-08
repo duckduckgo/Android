@@ -70,8 +70,8 @@ interface MaliciousSiteDao {
     @Query("DELETE FROM revisions")
     suspend fun deleteRevisions()
 
-    @Query("SELECT EXISTS(SELECT 1 FROM hash_prefixes WHERE hashPrefix = :prefix LIMIT 1)")
-    suspend fun hashPrefixExists(prefix: String): Boolean
+    @Query("SELECT * FROM hash_prefixes WHERE hashPrefix = :prefix LIMIT 1")
+    suspend fun getHashPrefix(prefix: String): HashPrefixEntity?
 
     @Query("SELECT * FROM filters WHERE hash = :hash LIMIT 1")
     suspend fun getFilter(hash: String): FilterEntity?
