@@ -24,6 +24,7 @@ import androidx.lifecycle.liveData
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -131,6 +132,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
 
+    @Mock
+    private lateinit var mockSenseOfProtectionExperiment: SenseOfProtectionExperiment
+
     private lateinit var fakeTabSwitcherDataStore: TabSwitcherPrefsDataStore
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
@@ -184,7 +188,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             tabManagerFeatureFlags,
-            tabSwitcherAnimationFeature,
+            mockSenseOfProtectionExperiment,
             mockWebTrackersBlockedAppRepository,
             tabSwitcherDataStore,
             faviconManager,

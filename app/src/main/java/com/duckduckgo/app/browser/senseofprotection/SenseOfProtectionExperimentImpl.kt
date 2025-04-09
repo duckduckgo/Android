@@ -20,9 +20,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -44,7 +42,6 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 ) : SenseOfProtectionExperiment {
 
     override fun isEnabled(cohort: CohortName): Boolean {
-
         return if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
             // A user might have already been enrolled in the new user experiment so we need to check they are not part of a cohort before we can
             // enroll them into the existing user experiment

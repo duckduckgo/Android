@@ -26,11 +26,11 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import java.util.Date
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
 class SenseOfProtectionExperimentImplTest {
 
