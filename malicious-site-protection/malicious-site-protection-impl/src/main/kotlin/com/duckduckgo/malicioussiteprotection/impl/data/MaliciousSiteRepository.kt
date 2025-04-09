@@ -30,6 +30,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetRespons
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
+import com.duckduckgo.malicioussiteprotection.impl.domain.WriteInProgressException
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
@@ -51,10 +52,16 @@ import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import timber.log.Timber
 
 interface MaliciousSiteRepository {
+    /**
+     * @throws WriteInProgressException if a write is in progress
+     */
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
+
+    /**
+     * @throws WriteInProgressException if a write is in progress
+     */
     suspend fun getFilters(hash: String): FilterSet?
     suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
@@ -78,8 +85,7 @@ class RealMaliciousSiteRepository @Inject constructor(
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
         return withContext(dispatcherProvider.io()) {
             if (isWriting.get()) {
-                Timber.d("Skipped containsHashPrefix because writing is in progress")
-                return@withContext false
+                throw WriteInProgressException()
             }
             maliciousSiteDao.hashPrefixExists(hashPrefix)
         }
@@ -88,8 +94,7 @@ class RealMaliciousSiteRepository @Inject constructor(
     override suspend fun getFilters(hash: String): FilterSet? {
         return withContext(dispatcherProvider.io()) {
             if (isWriting.get()) {
-                Timber.d("Skipped getFilters because writing is in progress")
-                return@withContext null
+                throw WriteInProgressException()
             }
             maliciousSiteDao.getFilter(hash)?.let {
                 FilterSet(

@@ -41,6 +41,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+class WriteInProgressException : Exception("Write in progress")
+
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
@@ -83,17 +85,21 @@ class RealMaliciousSiteProtection @Inject constructor(
         val hash = generateHash(hostname)
         val hashPrefix = hash.substring(0, 8)
 
-        if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-            timber.d("should not block (no hash) $hashPrefix,  $canonicalUriString")
-            return ConfirmedResult(Safe)
-        }
-        maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
-            filterSet.filters.let {
-                if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
-                    timber.d("should block $canonicalUriString")
-                    return ConfirmedResult(Malicious(filterSet.feed))
+        try {
+            if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
+                timber.d("should not block (no hash) $hashPrefix,  $canonicalUriString")
+                return ConfirmedResult(Safe)
+            }
+            maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
+                filterSet.filters.let {
+                    if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
+                        timber.d("should block $canonicalUriString")
+                        return ConfirmedResult(Malicious(filterSet.feed))
+                    }
                 }
             }
+        } catch (e: WriteInProgressException) {
+            timber.d("Write in progress, go to network")
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
