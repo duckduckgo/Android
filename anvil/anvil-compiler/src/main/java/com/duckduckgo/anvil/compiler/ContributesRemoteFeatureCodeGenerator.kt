@@ -1088,7 +1088,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         BOUND_TYPE,
         FEATURE_NAME,
         SETTINGS_STORE,
-        TOGGLE_STORE
+        TOGGLE_STORE,
     }
 
     private fun AnnotationReference.remoteFeatureStoreValueOrNull(): ClassReference? {
