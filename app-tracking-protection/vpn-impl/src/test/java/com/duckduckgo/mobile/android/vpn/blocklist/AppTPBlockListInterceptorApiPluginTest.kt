@@ -75,8 +75,8 @@ class AppTPBlockListInterceptorApiPluginTest {
         runBlocking {
             whenever(inventory.getAllTogglesForParent(Mockito.anyString())).thenReturn(
                 listOf(
-                    testBlockListFeature.tdsNextExperimentTest(),
-                    testBlockListFeature.tdsNextExperimentAnotherTest(),
+                    testBlockListFeature.atpTdsNextExperimentTest(),
+                    testBlockListFeature.atpTdsNextExperimentAnotherTest(),
                 ),
             )
         }
@@ -88,13 +88,13 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when multiple experiments enabled, use the first one`() {
-        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
+        testBlockListFeature.atpTdsNextExperimentTest().setRawStoredState(
             makeExperiment(
                 controlUrl = "controlUrl1",
                 treatmentUrl = "treatmentUrl1",
             ),
         )
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(
             makeExperiment(
                 controlUrl = "controlUrl2",
                 treatmentUrl = "treatmentUrl2",
@@ -105,19 +105,19 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when cohort is treatment use treatment URL`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment(useTreatment = true))
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment(useTreatment = true))
         checkEndpointIntercept("treatmentUrl")
     }
 
     @Test
     fun `when cohort is control use control URL`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         checkEndpointIntercept("controlUrl")
     }
 
     @Test
     fun `when feature is for next URL rollout then use next url`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -142,7 +142,7 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when annotation not present, even if experiment present, ignore and proceed as normal`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         // even though there's an experiment, we expect the request to not be altered,
         // as the requesting method doesn't have the annotation
         checkEndpointIntercept(APPTP_TDS_PATH, requestMethodName = "endpointNotRequiringTds")
@@ -150,14 +150,14 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when experiment request succeeds, doesn't send failure pixel`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         checkEndpointIntercept("controlUrl", expectedResponseCode = 200)
         verifyNoInteractions(pixel)
     }
 
     @Test
     fun `when experiment request fails, sends failure pixel`() {
-        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
         verify(pixel).fire(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName, mapOf("code" to "400"))
     }
@@ -217,10 +217,10 @@ interface TestBlockListFeature {
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
-    fun tdsNextExperimentTest(): Toggle
+    fun atpTdsNextExperimentTest(): Toggle
 
     @Toggle.DefaultValue(false)
-    fun tdsNextExperimentAnotherTest(): Toggle
+    fun atpTdsNextExperimentAnotherTest(): Toggle
 
     @Toggle.DefaultValue(false)
     fun nonMatchingFeatureName(): Toggle
