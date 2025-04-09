@@ -73,7 +73,7 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
         return withContext(dispatcherProvider.io()) {
-            maliciousSiteDao.getHashPrefix(hashPrefix) != null
+            maliciousSiteDao.hashPrefixExists(hashPrefix)
         }
     }
 
