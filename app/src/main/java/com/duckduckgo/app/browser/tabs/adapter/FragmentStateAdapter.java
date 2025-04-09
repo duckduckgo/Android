@@ -525,57 +525,21 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             return;
         }
 
-        if (!shouldDelayFragmentTransactions()) {
-            if (fragment.isAdded() && !fragment.isHidden()) {
-                mFragmentManager.beginTransaction().hide(fragment).commitNow();
-            }
-        } else {
-            if (mFragmentManager.isDestroyed()) {
-                return; // nothing we can do
-            }
-            mLifecycle.addObserver(
-                    new LifecycleEventObserver() {
-                        @Override
-                        public void onStateChanged(
-                                @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                            if (shouldDelayFragmentTransactions()) {
-                                return;
-                            }
-                            source.getLifecycle().removeObserver(this);
-                            hideFragment(itemId);
-                        }
-                    });
+        if (fragment.isAdded() && !fragment.isHidden()) {
+            mFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss();
         }
     }
 
     public void clearFragments() {
-        if (!shouldDelayFragmentTransactions()) {
-            FragmentTransaction transaction = mFragmentManager.beginTransaction();
-            for (int i = 0; i < mFragments.size(); i++) {
-                long key = mFragments.keyAt(i);
-                Fragment fragment = mFragments.get(key);
-                if (fragment != null) {
-                    transaction.remove(fragment);
-                }
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        for (int i = 0; i < mFragments.size(); i++) {
+            long key = mFragments.keyAt(i);
+            Fragment fragment = mFragments.get(key);
+            if (fragment != null) {
+                transaction.remove(fragment);
             }
-            transaction.commitNow();
-        } else {
-            if (mFragmentManager.isDestroyed()) {
-                return; // nothing we can do
-            }
-            mLifecycle.addObserver(
-                    new LifecycleEventObserver() {
-                        @Override
-                        public void onStateChanged(
-                                @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                            if (shouldDelayFragmentTransactions()) {
-                                return;
-                            }
-                            source.getLifecycle().removeObserver(this);
-                            clearFragments();
-                        }
-                    });
         }
+        transaction.commit();
     }
 
     private void showFragment(long itemId) {
@@ -585,26 +549,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             return;
         }
 
-        if (!shouldDelayFragmentTransactions()) {
-            if (fragment.isAdded() && fragment.isHidden()) {
-                mFragmentManager.beginTransaction().show(fragment).commitNow();
-            }
-        } else {
-            if (mFragmentManager.isDestroyed()) {
-                return; // nothing we can do
-            }
-            mLifecycle.addObserver(
-                    new LifecycleEventObserver() {
-                        @Override
-                        public void onStateChanged(
-                                @NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                            if (shouldDelayFragmentTransactions()) {
-                                return;
-                            }
-                            source.getLifecycle().removeObserver(this);
-                            showFragment(itemId);
-                        }
-                    });
+        if (fragment.isAdded() && fragment.isHidden()) {
+            mFragmentManager.beginTransaction().show(fragment).commitNow();
         }
     }
 
