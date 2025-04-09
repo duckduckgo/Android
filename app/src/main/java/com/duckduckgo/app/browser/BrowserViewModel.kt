@@ -363,10 +363,7 @@ class BrowserViewModel @Inject constructor(
     fun onBookmarksActivityResult(url: String) {
         if (swipingTabsFeature.isEnabled) {
             launch {
-                val existingTab = tabRepository.flowTabs
-                    .firstOrNull()
-                    ?.firstOrNull { tab -> tab.url == url }
-
+                val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
                     command.value = Command.OpenInNewTab(url)
                 } else {

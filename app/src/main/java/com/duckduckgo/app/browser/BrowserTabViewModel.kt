@@ -2720,7 +2720,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
-                val emptyTab = tabRepository.flowTabs.firstOrNull()?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
                 } else {
