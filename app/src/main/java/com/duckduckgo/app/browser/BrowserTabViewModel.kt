@@ -247,7 +247,6 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -2817,18 +2816,19 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserClickCtaDismissButton(cta: Cta) {
         viewModelScope.launch {
-            onUserDismissedCta(cta)
+            ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
-                pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
-                pixel.fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to cta.ctaPixelParam))
                 if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
                     val updatedCta = ctaViewModel.getEndStaticDialogCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
                 } else if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-                    ctaViewModel.dismissPulseAnimation()
+                    if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                        ctaViewModel.dismissPulseAnimation()
+                        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                    }
                 }
             }
         }

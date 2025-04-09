@@ -74,6 +74,7 @@ interface Cta {
     val shownPixel: Pixel.PixelName?
     val okPixel: Pixel.PixelName?
     val cancelPixel: Pixel.PixelName?
+    val closePixel: Pixel.PixelName?
 
     fun pixelShownParameters(): Map<String, String>
     fun pixelCancelParameters(): Map<String, String>
@@ -102,6 +103,7 @@ sealed class OnboardingDaxDialogCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
+    override val closePixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -178,6 +180,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_SERP_CTA,
         onboardingStore,
         appInstallStore,
@@ -215,6 +218,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
         onboardingStore,
         appInstallStore,
@@ -275,6 +279,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_NETWORK_CTA_1,
         onboardingStore,
         appInstallStore,
@@ -331,6 +336,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
         onboardingStore,
         appInstallStore,
@@ -366,6 +372,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         DAX_FIRE_DIALOG_CTA,
         onboardingStore,
         appInstallStore,
@@ -401,6 +408,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
         onboardingStore,
         appInstallStore,
@@ -461,6 +469,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_ONBOARDING_END_CTA,
         onboardingStore,
         appInstallStore,
@@ -512,6 +521,7 @@ sealed class DaxBubbleCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName? = null,
+    override val closePixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -743,6 +753,7 @@ sealed class HomePanelCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
+    override val closePixel: Pixel.PixelName? = null,
 ) : Cta, ViewCta {
 
     override fun showCta(
@@ -790,6 +801,7 @@ class BrokenSitePromptDialogCta : Cta {
     override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN
     override val okPixel: Pixel.PixelName = SITE_NOT_WORKING_WEBSITE_BROKEN
     override val cancelPixel: Pixel.PixelName? = null
+    override val closePixel: Pixel.PixelName? = null
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf()
 
