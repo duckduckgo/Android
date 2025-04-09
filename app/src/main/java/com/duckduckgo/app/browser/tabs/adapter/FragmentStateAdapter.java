@@ -206,7 +206,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @NonNull
     @Override
     public final FragmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return FragmentViewHolder.create(parent);
+        if (mSwipingTabsFeature != null && mSwipingTabsFeature.isTabSwipingFixEnabled()) {
+            return FragmentContainerViewHolder.create(parent);
+        } else {
+            return FrameLayoutViewHolder.create(parent);
+        }
     }
 
     @Override
