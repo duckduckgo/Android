@@ -174,19 +174,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val logos = getLogos(context, entities)
-        if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
-            return
-        }
-
         trackersBlockedAnimationView.text = context.resources.getQuantityString(
             R.plurals.trackersBlockedAnimationMessage,
             entities.size,
         )
 
         animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities.size, logos, omnibarViews, shieldViews)
+        animateTrackersBlockedCountView(context, entities.size, omnibarViews, shieldViews)
     }
 
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
@@ -234,7 +228,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun animateTrackersBlockedCountView(
         context: Context,
         trackersCount: Int,
-        logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
     ) {
@@ -250,7 +243,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    updateTrackersCountWithAnimation(context, trackersCount, logos, omnibarViews, shieldViews)
+                    updateTrackersCountWithAnimation(context, trackersCount, omnibarViews, shieldViews)
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -261,7 +254,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private fun updateTrackersCountWithAnimation(
         context: Context,
         trackersCount: Int,
-        logos: List<TrackerLogo>,
         omnibarViews: List<View>,
         shieldViews: List<View>,
     ) {
@@ -270,7 +262,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             totalTrackerCount = trackersCount,
             trackerTextView = trackersBlockedCountAnimationView!!,
             onAnimationEnd = {
-                listener?.onAnimationFinished(logos)
+                listener?.onAnimationFinished()
 
                 conflatedJob += MainScope().launch {
                     delay(1500L)

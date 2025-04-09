@@ -109,5 +109,5 @@ interface TrackersAnimatorListener {
      * Notifies the end of the animation.
      * The callback is not be invoked when a partial animation is paused.
      */
-    fun onAnimationFinished(logos: List<TrackerLogo> = emptyList())
+    fun onAnimationFinished()
 }

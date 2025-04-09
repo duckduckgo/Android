@@ -143,7 +143,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -2715,8 +2714,8 @@ class BrowserTabFragment :
                     )
                 }
 
-                override fun onTrackersCountFinished(logos: List<TrackerLogo>) {
-                    viewModel.onAnimationFinished(logos)
+                override fun onTrackersCountFinished() {
+                    viewModel.onAnimationFinished()
                 }
             },
         )

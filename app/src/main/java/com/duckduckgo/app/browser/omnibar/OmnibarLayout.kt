@@ -70,7 +70,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
@@ -878,7 +877,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    override fun onAnimationFinished(logos: List<TrackerLogo>) {
-        omnibarTextListener?.onTrackersCountFinished(logos)
+    override fun onAnimationFinished() {
+        omnibarTextListener?.onTrackersCountFinished()
     }
 }
