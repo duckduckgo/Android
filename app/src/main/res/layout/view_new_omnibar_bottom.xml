@@ -188,7 +188,7 @@
                     <com.duckduckgo.common.ui.view.KeyboardAwareEditText
                         android:id="@+id/omnibarTextInput"
                         style="@style/Base.V7.Widget.AppCompat.EditText"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:fontFamily="sans-serif"
@@ -204,6 +204,7 @@
                         android:layout_gravity="center_vertical"
                         android:textSize="16sp"
                         android:textStyle="normal"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
