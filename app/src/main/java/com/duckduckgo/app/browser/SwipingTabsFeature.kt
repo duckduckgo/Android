@@ -28,6 +28,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 interface SwipingTabsFeature {
     // The main kill switch for the feature
     @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
     fun self(): Toggle
 
     // The toggle used for staged rollout to external users
