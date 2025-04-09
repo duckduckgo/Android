@@ -44,12 +44,8 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
     private val moshi: Moshi,
 ) : AutofillSiteSpecificFixesStore {
 
-    private data class SiteSpecificFixesConfigJson(
-        val javascriptConfig: JSONObject = JSONObject(),
-    )
-
-    private val jsonAdapter: JsonAdapter<SiteSpecificFixesConfigJson> by lazy {
-        moshi.adapter(SiteSpecificFixesConfigJson::class.java)
+    private val jsonAdapter: JsonAdapter<JSONObject> by lazy {
+        moshi.adapter(JSONObject::class.java)
     }
 
     override suspend fun getConfig(): AutofillSiteSpecificFixesSettings {
@@ -66,7 +62,7 @@ class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
             }
 
             val settingsJson = if (isSiteSpecificFixesEnabled && settings != null) {
-                settings.javascriptConfig.toString()
+                settings.toString()
             } else {
                 JAVASCRIPT_CONFIG_DEFAULT
             }

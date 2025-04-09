@@ -28,7 +28,7 @@ class AutofillSiteSpecificFixesSettingsImplTest {
     private val feature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-    private val adapter = moshi.adapter(Config::class.java)
+    private val adapter = moshi.adapter(JSONObject::class.java)
 
     private val testee = AutofillSiteSpecificFixesSettingsImpl(
         autofillFeature = feature,
@@ -77,15 +77,9 @@ class AutofillSiteSpecificFixesSettingsImplTest {
     }
 
     companion object {
-        private val POPULATED_CONFIG = Config(
-            javascriptConfig = JSONObject().also {
-                it.put("key", "value")
-            },
-        )
+        private val POPULATED_CONFIG = JSONObject().also {
+            it.put("key", "value")
+        }
         private const val POPULATED_CONFIG_JSON = """{"key":"value"}"""
     }
-
-    private data class Config(
-        val javascriptConfig: JSONObject? = null,
-    )
 }

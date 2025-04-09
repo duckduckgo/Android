@@ -92,9 +92,7 @@ class RealRuntimeConfigurationWriterTest {
                   "features": {
                     "siteSpecificFixes": {
                         "state": "enabled",
-                        "settings": {
-                            "javascriptConfig": ${populatedJsConfig()}
-                        }
+                        "settings": ${populatedJsConfig()}
                     }
                   }
                 }
@@ -183,11 +181,7 @@ class RealRuntimeConfigurationWriterTest {
 
     data class SiteSpecificFixes(
         @Json(name = "state") val state: String,
-        @Json(name = "settings") val settings: Settings,
-    )
-
-    data class Settings(
-        @Json(name = "javascriptConfig") val javascriptConfig: Map<String, Any> = emptyMap(),
+        @Json(name = "settings") val settings: Map<String, Any> = emptyMap(),
     )
 
     private fun assertContentScopeJsonCorrect(

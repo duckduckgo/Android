@@ -64,9 +64,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         return """
             "siteSpecificFixes": {
                 "state": "enabled",
-                "settings": {
-                    "javascriptConfig": ${settingsJson.javascriptConfigSiteSpecificFixes}
-                }
+                "settings": ${settingsJson.javascriptConfigSiteSpecificFixes}
             }
         """.trimIndent()
     }
