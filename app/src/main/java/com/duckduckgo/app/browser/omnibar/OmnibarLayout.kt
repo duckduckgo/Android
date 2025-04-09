@@ -75,7 +75,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -133,7 +132,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     sealed class StateChange {
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
-        data class PrivacyStateChange(val privacyShieldViewState: PrivacyShieldViewState) : StateChange()
     }
 
     @Inject

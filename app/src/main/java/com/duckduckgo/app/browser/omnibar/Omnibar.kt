@@ -50,7 +50,6 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
@@ -314,11 +313,6 @@ class Omnibar(
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
         Timber.d("Omnibar: renderOmnibarViewState $viewState")
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
-    }
-
-    fun renderPrivacyViewState(privacyShieldViewState: PrivacyShieldViewState) {
-        Timber.d("Omnibar: renderPrivacyViewState $privacyShieldViewState")
-        newOmnibar.reduce(StateChange.PrivacyStateChange(privacyShieldViewState))
     }
 
     fun setPrivacyShield(privacyShield: PrivacyShield) {

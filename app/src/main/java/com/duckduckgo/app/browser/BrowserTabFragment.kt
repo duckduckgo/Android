@@ -3905,7 +3905,6 @@ class BrowserTabFragment :
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
                     omnibar.setPrivacyShield(viewState.privacyShield)
-                    omnibar.renderPrivacyViewState(viewState)
                 }
             }
         }

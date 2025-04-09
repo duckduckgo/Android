@@ -44,7 +44,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
@@ -505,7 +504,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         when (stateChange) {
             is OmnibarStateChange -> onExternalOmnibarStateChanged(stateChange.omnibarViewState)
             is StateChange.LoadingStateChange -> onExternalLoadingStateChanged(stateChange.loadingViewState)
-            is StateChange.PrivacyStateChange -> onExternalPrivacyStateChanged(stateChange.privacyShieldViewState)
         }
     }
 
@@ -555,17 +553,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasQueryChanged = false,
                     urlLoaded = loadingState.url,
                 ),
-            )
-        }
-    }
-
-    private fun onExternalPrivacyStateChanged(privacyState: PrivacyShieldViewState) {
-        Timber.d("Omnibar: onExternalPrivacyStateChanged $privacyState")
-        _viewState.update {
-            it.copy(
-                privacyShield = privacyState.privacyShield,
-                trackersBlocked = privacyState.trackersBlocked,
-                previouslyTrackersBlocked = privacyState.previousTrackesBlocked,
             )
         }
     }
