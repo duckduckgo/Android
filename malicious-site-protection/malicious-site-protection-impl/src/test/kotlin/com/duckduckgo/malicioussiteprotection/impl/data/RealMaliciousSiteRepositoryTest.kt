@@ -124,15 +124,15 @@ class RealMaliciousSiteRepositoryTest {
     @Test
     fun getFilters_returnsFiltersWhenHashExists() = runTest {
         val hash = "testHash"
-        val filters = listOf(FilterEntity(hash, "regex", PHISHING.name))
+        val filters = FilterEntity(hash, "regex", PHISHING.name)
 
         whenever(maliciousSiteDao.getFilter(hash)).thenReturn(filters)
 
         val result = repository.getFilters(hash)
-        val expected = FilterSet(filters.map { Filter(it.hash, it.regex) }, PHISHING)
+        val expected = FilterSet(Filter(filters.hash, filters.regex), PHISHING)
 
-        assertTrue(result?.all { it.feed == expected.feed }!!)
-        assertEquals(result.firstOrNull()?.filters, expected.filters)
+        assertTrue(result?.feed == expected.feed)
+        assertEquals(result?.filters, expected.filters)
     }
 
     @Test

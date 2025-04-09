@@ -87,12 +87,12 @@ class RealMaliciousSiteProtection @Inject constructor(
             timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
             return ConfirmedResult(Safe)
         }
-        maliciousSiteRepository.getFilters(hash)?.forEach { filterSet ->
-            filterSet.filters.firstOrNull {
-                Pattern.compile(it.regex).matcher(canonicalUri.toString()).find()
-            }?.let {
-                timber.d("should block $canonicalUri")
-                return ConfirmedResult(Malicious(filterSet.feed))
+        maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
+            filterSet.filters.let {
+                if (Pattern.compile(it.regex).matcher(canonicalUri.toString()).find()) {
+                    timber.d("should block $canonicalUri")
+                    return ConfirmedResult(Malicious(filterSet.feed))
+                }
             }
         }
         appCoroutineScope.launch(dispatchers.io()) {

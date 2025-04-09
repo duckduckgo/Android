@@ -74,7 +74,7 @@ interface MaliciousSiteDao {
     suspend fun getHashPrefix(hashPrefix: String): HashPrefixEntity?
 
     @Query("SELECT * FROM filters WHERE hash = :hash")
-    suspend fun getFilter(hash: String): List<FilterEntity>?
+    suspend fun getFilter(hash: String): FilterEntity?
 
     @Transaction
     suspend fun updateHashPrefixes(

@@ -53,7 +53,7 @@ import kotlinx.coroutines.withTimeout
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
-    suspend fun getFilters(hash: String): List<FilterSet>?
+    suspend fun getFilters(hash: String): FilterSet?
     suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
     suspend fun loadHashPrefixes(): Result<Unit>
@@ -75,14 +75,14 @@ class RealMaliciousSiteRepository @Inject constructor(
         return maliciousSiteDao.getHashPrefix(hashPrefix) != null
     }
 
-    override suspend fun getFilters(hash: String): List<FilterSet>? {
-        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.map { (type, filters) ->
+    override suspend fun getFilters(hash: String): FilterSet? {
+        return maliciousSiteDao.getFilter(hash)?.let {
             FilterSet(
-                filters = filters.map { Filter(it.hash, it.regex) },
-                feed = when (type) {
+                filters = Filter(it.hash, it.regex),
+                feed = when (it.type) {
                     PHISHING.name -> PHISHING
                     MALWARE.name -> MALWARE
-                    else -> throw IllegalArgumentException("Unknown feed $type")
+                    else -> throw IllegalArgumentException("Unknown feed $it.type")
                 },
             )
         }
