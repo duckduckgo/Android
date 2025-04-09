@@ -22,9 +22,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
@@ -33,7 +33,6 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICK
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
