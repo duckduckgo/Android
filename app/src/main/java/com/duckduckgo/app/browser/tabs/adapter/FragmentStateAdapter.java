@@ -359,7 +359,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         // { f:notAdded, v:created, v:attached } -> illegal state
         // { f:notAdded, v:created, v:notAttached } -> illegal state
         if (!fragment.isAdded() && view != null) {
-            throw new IllegalStateException("Design assumption violated.");
+            throwDesignAssumptionViolatedException();
         }
 
         // { f:added, v:notCreated, v:notAttached} -> schedule callback for when created
@@ -450,7 +450,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         Object lock = containerLocks.computeIfAbsent(container, k -> new Object());
         synchronized(lock) {
             if (container.getChildCount() > 1) {
-                throw new IllegalStateException("Design assumption violated.");
+                throwDesignAssumptionViolatedException();
             }
 
             if (v.getParent() == container) {
@@ -467,6 +467,16 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
             container.addView(v);
         }
+    }
+
+    private void throwDesignAssumptionViolatedException() {
+        throw new IllegalStateException(
+            String.format(
+                "Design assumption violated: Fix1 enabled: %s, Fix2 enabled: %s",
+                mSwipingTabsFeature.isTabSwipingFix1Enabled(),
+                mSwipingTabsFeature.isTabSwipingFix2Enabled()
+            )
+        );
     }
 
     @Override
