@@ -72,38 +72,44 @@ class RealMaliciousSiteRepository @Inject constructor(
 ) : MaliciousSiteRepository {
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
-        return maliciousSiteDao.getHashPrefix(hashPrefix) != null
+        return withContext(dispatcherProvider.io()) {
+            maliciousSiteDao.getHashPrefix(hashPrefix) != null
+        }
     }
 
     override suspend fun getFilters(hash: String): FilterSet? {
-        return maliciousSiteDao.getFilter(hash)?.let {
-            FilterSet(
-                filters = Filter(it.hash, it.regex),
-                feed = when (it.type) {
-                    PHISHING.name -> PHISHING
-                    MALWARE.name -> MALWARE
-                    else -> throw IllegalArgumentException("Unknown feed $it.type")
-                },
-            )
+        return withContext(dispatcherProvider.io()) {
+            maliciousSiteDao.getFilter(hash)?.let {
+                FilterSet(
+                    filters = Filter(it.hash, it.regex),
+                    feed = when (it.type) {
+                        PHISHING.name -> PHISHING
+                        MALWARE.name -> MALWARE
+                        else -> throw IllegalArgumentException("Unknown feed $it.type")
+                    },
+                )
+            }
         }
     }
 
     override suspend fun matches(hashPrefix: String): MatchesResult {
         return try {
-            withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
-                maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
-                    val feed = when (it.feed.uppercase()) {
-                        PHISHING.name -> PHISHING
-                        MALWARE.name -> MALWARE
-                        else -> null
+            withContext(dispatcherProvider.io()) {
+                withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
+                    maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
+                        val feed = when (it.feed.uppercase()) {
+                            PHISHING.name -> PHISHING
+                            MALWARE.name -> MALWARE
+                            else -> null
+                        }
+                        if (feed != null) {
+                            Match(it.hostname, it.url, it.regex, it.hash, feed)
+                        } else {
+                            null
+                        }
                     }
-                    if (feed != null) {
-                        Match(it.hostname, it.url, it.regex, it.hash, feed)
-                    } else {
-                        null
-                    }
-                }
-            }.let { MatchesResult.Result(it) }
+                }.let { MatchesResult.Result(it) }
+            }
         } catch (e: TimeoutCancellationException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
             MatchesResult.Ignored
