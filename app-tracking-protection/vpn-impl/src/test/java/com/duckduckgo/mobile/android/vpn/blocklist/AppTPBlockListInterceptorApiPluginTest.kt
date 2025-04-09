@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -29,10 +30,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
+import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -81,7 +84,13 @@ class AppTPBlockListInterceptorApiPluginTest {
             )
         }
 
-        deviceShieldPixels = RealDeviceShieldPixels(pixel, sharedPreferencesProvider)
+        deviceShieldPixels = RealDeviceShieldPixels(
+            pixel,
+            sharedPreferencesProvider,
+            mock<AppTpTDSPixelsPlugin>(),
+            mock<CoroutineScope>(),
+            mock<DispatcherProvider>(),
+        )
 
         interceptor = AppTPBlockListInterceptorApiPlugin(inventory, moshi, deviceShieldPixels)
     }
