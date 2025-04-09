@@ -21,11 +21,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Message
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat
@@ -43,6 +45,7 @@ interface PirDetachedWebViewProvider {
         context: Context,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
+        onPageLoadFailed: (String?) -> Unit,
     ): WebView
 
     /**
@@ -56,6 +59,7 @@ interface PirDetachedWebViewProvider {
         webView: WebView,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
+        onPageLoadFailed: (String?) -> Unit,
     ): WebView
 }
 
@@ -66,14 +70,16 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
         context: Context,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
+        onPageLoadFailed: (String?) -> Unit,
     ): WebView {
-        return setupWebView(WebView(context), scriptToLoad, onPageLoaded)
+        return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed)
     }
 
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
         onPageLoaded: (String?) -> Unit,
+        onPageLoadFailed: (String?) -> Unit,
     ): WebView {
         return webView.apply {
             webChromeClient = object : WebChromeClient() {
@@ -90,6 +96,9 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
                 }
             }
             webViewClient = object : WebViewClient() {
+                private var requestedUrl: String? = null
+                private var receivedError: Boolean = false
+
                 @SuppressLint("RequiresFeature")
                 override fun shouldOverrideUrlLoading(
                     view: WebView?,
@@ -104,16 +113,40 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
                     favicon: Bitmap?,
                 ) {
                     super.onPageStarted(view, url, favicon)
-                    logcat { "PIR-SCAN: webview loading $url" }
-                    view?.evaluateJavascript("javascript:$scriptToLoad", null)
+                    logcat { "PIR-SCAN: __________________________" }
+                    logcat { "PIR-SCAN: webview onPageStarted $url" }
+                    requestedUrl = url
+                    receivedError = false
                 }
 
                 override fun onPageFinished(
                     view: WebView?,
                     url: String?,
                 ) {
+                    if (!receivedError) {
+                        logcat { "PIR-SCAN: webview onPageFinished receivedError $receivedError requestedUrl $requestedUrl for url $url" }
+                        view?.evaluateJavascript("javascript:$scriptToLoad", null)
+                        onPageLoaded(url)
+                    }
                     super.onPageFinished(view, url)
-                    onPageLoaded(url)
+                }
+
+                override fun onReceivedError(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    error: WebResourceError?,
+                ) {
+                    if (request?.isForMainFrame == true &&
+                        requestedUrl == request.url.toString() &&
+                        requestedUrl != DBP_INITIAL_URL
+                    ) {
+                        logcat {
+                            "PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} mainframe ${request.isForMainFrame}"
+                        }
+                        receivedError = true
+                        onPageLoadFailed(requestedUrl)
+                    }
+                    super.onReceivedError(view, request, error)
                 }
             }
             settings.apply {
