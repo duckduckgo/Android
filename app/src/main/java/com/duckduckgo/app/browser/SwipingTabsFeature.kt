@@ -38,5 +38,9 @@ interface SwipingTabsFeature {
 
     // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
     @Toggle.DefaultValue(false)
-    fun tabSwipingFix(): Toggle
+    fun tabSwipingFix1(): Toggle
+
+    // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
+    @Toggle.DefaultValue(false)
+    fun tabSwipingFix2(): Toggle
 }
