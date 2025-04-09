@@ -553,6 +553,13 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             return;
         }
 
+        if (fragment.getView() != null) {
+            ViewParent viewParent = fragment.getView().getParent();
+            if (viewParent != null) {
+                ((FrameLayout) viewParent).removeAllViews();
+            }
+        }
+
         if (fragment.isAdded() && !fragment.isHidden()) {
             mFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss();
         }
