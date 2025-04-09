@@ -16,21 +16,6 @@
 
 package com.duckduckgo.pir.internal.common
 
-import java.io.File
-
-internal fun getMaximumParallelRunners(): Int {
-    return try {
-        // Get the directory containing CPU info
-        val cpuDir = File("/sys/devices/system/cpu/")
-        // Filter folders matching the pattern "cpu[0-9]+"
-        val cpuFiles = cpuDir.listFiles { file -> file.name.matches(Regex("cpu[0-9]+")) }
-        cpuFiles?.size ?: Runtime.getRuntime().availableProcessors()
-    } catch (e: Exception) {
-        // In case of an error, fall back to availableProcessors
-        Runtime.getRuntime().availableProcessors()
-    }
-}
-
 internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
     return if (this.isEmpty()) {
         emptyList()
