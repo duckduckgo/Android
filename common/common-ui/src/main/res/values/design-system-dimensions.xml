@@ -54,6 +54,7 @@
 
     <!-- Navigation Bar -->
     <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>
+    <dimen name="experimentalNavigationBarPaddingBottom">8dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>

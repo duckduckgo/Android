@@ -39,9 +39,9 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -68,16 +68,28 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarCardMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginHorizontal) }
     private val omnibarCardMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop) }
     private val omnibarCardMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom) }
-    private val omnibarCardFocusedMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginHorizontal) }
+    private val omnibarCardFocusedMarginHorizontal by lazy {
+        resources.getDimensionPixelSize(
+            CommonR.dimen.experimentalOmnibarCardFocusedMarginHorizontal,
+        )
+    }
     private val omnibarCardFocusedMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginTop) }
     private val omnibarCardFocusedMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginBottom) }
     private val omnibarContentPadding by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarContentPadding) }
-    private val omnibarContentFocusedPaddingHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarContentFocusedPaddingHorizontal) }
-    private val omnibarContentFocusedPaddingVertical by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarContentFocusedPaddingVertical) }
+    private val omnibarContentFocusedPaddingHorizontal by lazy {
+        resources.getDimensionPixelSize(
+            CommonR.dimen.experimentalOmnibarContentFocusedPaddingHorizontal,
+        )
+    }
+    private val omnibarContentFocusedPaddingVertical by lazy {
+        resources.getDimensionPixelSize(
+            CommonR.dimen.experimentalOmnibarContentFocusedPaddingVertical,
+        )
+    }
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
-    private var focusAnimator : ValueAnimator? = null
+    private var focusAnimator: ValueAnimator? = null
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -148,9 +160,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     /**
-     * In focused state the Omnibar will grow 2dp in each direction
-     * It will also show an outline to indicate that the Omnibar is focused
-     * We need to compensate the size increase so that the icons don't move too
+     * In focused state the Omnibar card will grow 4dp in each direction, where 2dp of that  will be taken by the card's outline.
+     * The growth is achieved by decreasing the card's margins.
+     *
+     * At the same time, we need to compensate the size increase so that the icons don't move too,
+     * so we add horizontal padding to the card's container equal to the 4dp of growth.
+     *
+     * We also add additional 2dp of vertical padding so that content (like progress bar) doesn't overlap with the outline.
      */
     private fun animateOmnibarFocusedState(focused: Boolean) {
         focusAnimator?.cancel()

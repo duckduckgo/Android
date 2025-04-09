@@ -25,7 +25,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="14dp"
     android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
-    android:paddingBottom="8dp"
+    android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout
