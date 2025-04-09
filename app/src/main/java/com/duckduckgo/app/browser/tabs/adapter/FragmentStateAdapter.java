@@ -46,7 +46,10 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider;
 import com.duckduckgo.app.browser.tabs.TabManager;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,6 +98,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final FragmentManager mFragmentManager;
+
+    @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
+    final SwipingTabsFeatureProvider mSwipingTabsFeature;
 
     // Fragment bookkeeping
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
@@ -146,6 +152,24 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             @NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         mFragmentManager = fragmentManager;
         mLifecycle = lifecycle;
+        mSwipingTabsFeature = null;
+        super.setHasStableIds(true);
+    }
+
+    /**
+     * @param fragmentManager of {@link ViewPager2}'s host
+     * @param lifecycle of {@link ViewPager2}'s host
+     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
+     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
+     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
+     */
+    public FragmentStateAdapter(
+            @NonNull FragmentManager fragmentManager,
+            @NonNull Lifecycle lifecycle,
+            SwipingTabsFeatureProvider swipingTabsFeature) {
+        mFragmentManager = fragmentManager;
+        mLifecycle = lifecycle;
+        mSwipingTabsFeature = swipingTabsFeature;
         super.setHasStableIds(true);
     }
 
