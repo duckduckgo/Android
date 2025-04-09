@@ -570,6 +570,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
@@ -2432,7 +2433,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabAndEmptyTabExistsThenSelectTheEmptyTab() = runTest {
         val emptyTabId = "EMPTY_TAB"
-        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(emptyTabId))))
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity(emptyTabId)))
         testee.userRequestedOpeningNewTab()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
