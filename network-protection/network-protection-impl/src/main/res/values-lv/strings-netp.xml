@@ -217,9 +217,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Iespējots</string>
-    <string name="netpSubscriptionSettingsConnecting">Notiek savienojuma izveide…</string>
-    <string name="netpSubscriptionSettingsDisconnected">Atspējots</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

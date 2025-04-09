@@ -216,9 +216,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Aktiveret</string>
-    <string name="netpSubscriptionSettingsConnecting">Forbinder ...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Deaktiveret</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

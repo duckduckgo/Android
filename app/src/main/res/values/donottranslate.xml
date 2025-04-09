@@ -19,15 +19,6 @@
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
-    <!-- Network Protection -->
-    <string name="netpSettingsTitle">VPN</string>
-    <string name="netpSettingsNeverEnabled">Secure your network connection</string>
-    <string name="netpSettingsConnected">Enabled</string>
-    <string name="netpSettingsConnecting">Connecting…</string>
-    <string name="netpSettingsDisconnected">Disabled</string>
-    <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
-    <string name="netpUnlockedSnackbarAction">Open</string>
-
     <!-- Sasquatch -->
     <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
