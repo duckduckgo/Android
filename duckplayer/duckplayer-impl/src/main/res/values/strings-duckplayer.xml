@@ -33,7 +33,6 @@
     <string name="duck_player_info_modal_text">Duck Player lets you watch YouTube without targeted ads in DuckDuckGo and what you watch won’t influence your recommendations.</string>
     <string name="duck_player_info_modal_button">Got it!</string>
     <string name="duck_player_unavailable">Duck Player Unavailable</string>
-    <string name="duck_player_unavailable_description">Duck Player\'s functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding.</string>
     <string name="duck_player_unavailable_learn_more">Learn More</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Open YouTube Videos in Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Open Duck Player in a new tab</string>

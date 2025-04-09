@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediģēt vaicājumu pirms meklēšanas</string>
-    <string name="settingsAutocompleteEnabled">Automātiski pabeigt ieteikumus</string>
     <string name="autocompleteRemoveItemTitle">Vai noņemt meklēšanas ieteikumu?</string>
     <string name="autocompleteRemoveItemCancel">Atcelt</string>
     <string name="autocompleteRemoveItemRemove">Noņemt</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
-    <string name="settingsHeadingPrivacy">Privātums</string>
     <string name="settingsHeadingProtections">Aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
-    <string name="settingsHeadingCustomize">Pielāgošana</string>
     <string name="settingsHeadingAbout">Par</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
     <string name="leaveFeedbackNew">Sūtīt atsauksmi</string>
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
-    <string name="settingsEmailProtectionSubtitle">Bloķē e-pasta izsekotājus un paslēp savu adresi</string>
-    <string name="settingsHeadingMore">Vairāk no DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Nākamie soļi</string>
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Atspējots</string>
     <string name="settingsSubtitleNotificationsEnabled">Iespējots</string>
     <string name="settingsDefaultBrowserTitle">Noklusējuma pārlūks</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo ir tavs noklusējuma pārlūks</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Padari DuckDuckGo par savu noklusējuma pārlūku</string>
     <string name="settingsPrivateSearchTitle">Privāta meklēšana</string>
     <string name="settingsGeneral" instruction="List item for general settings">Vispārīgi</string>
-    <string name="settingsPrivateSearchDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
-    <string name="settingsHeadingSettings">Iestatījumi</string>
     <string name="settingsHeadingMainSettings">Citi iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datu notīrīšana</string>
     <string name="settingsAddWidget">Pievienot logrīku sākuma ekrānam</string>
     <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privāta meklēšana</string>
-    <string name="privateSearchTitle">Ir iespējota privātā meklēšana</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search ir tava noklusējuma meklētājprogramma, tāpēc vari meklēt tīmeklī, netiekot izsekotam.</string>
-    <string name="privateSearchHeadingSearchSettings">Meklēšanas iestatījumi</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Ir iespējota tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nekad tevi neizseko, un mēs cenšamies pēc iespējas labāk aizsargāt tavu konfidencialitāti. Mēs nepārtraukti uzturam un uzlabojam aizsardzības slāņus, lai pasargātu no jaunākajām izsekošanas metodēm un nodrošinātu dažādu veidu aizsardzību, ko citas pārlūkprogrammas pēc noklusējuma nepiedāvā. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
-    <string name="cookiePopupProtectionDescription">Noraidi uznirstošos logus un samazini sīkfailus</string>
-    <string name="cookiePopupProtectionEnabled">Iespējots</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearData">Automātiski notīrīt datus…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Sākuma ekrānam pievienots logrīks %1$s</string>
-    <string name="settingsAddHomeScreenWidget">Sākuma ekrāna logrīks</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Pārlūko privāti, izmantojot mūsu Mac lietotni</string>
-    <string name="macos_settings_title">DuckDuckGo Mac pārlūks</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nē, es tos pārvaldīšu pats</string>
 
-    <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
@@ -655,10 +633,6 @@
     <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows pārlūks</string>
-    <string name="windows_settings_description">Pārlūko privāti ar mūsu Windows lietotni</string>
-    <string name="windows_settings_description_ready">Pieejama lejupielāde</string>
-    <string name="windows_settings_description_list">Tu esi sarakstā!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
@@ -764,7 +738,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Paroles</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Paroles un automātiskā aizpildīšana</string>
     <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>

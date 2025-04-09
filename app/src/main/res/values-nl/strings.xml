@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Bewerk query alvorens te zoeken</string>
-    <string name="settingsAutocompleteEnabled">Suggesties voor automatisch aanvullen weergeven</string>
     <string name="autocompleteRemoveItemTitle">Zoeksuggestie verwijderen?</string>
     <string name="autocompleteRemoveItemCancel">Annuleren</string>
     <string name="autocompleteRemoveItemRemove">Verwijderen</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
-    <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsHeadingProtections">Bescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
-    <string name="settingsHeadingCustomize">Aanpassen</string>
     <string name="settingsHeadingAbout">Over</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
     <string name="leaveFeedbackNew">Verstuur feedback</string>
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
-    <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
-    <string name="settingsHeadingMore">Meer over DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Volgende stappen</string>
     <string name="settingsLightTheme">Licht</string>
     <string name="settingsTheme">Thema</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Uitgeschakeld</string>
     <string name="settingsSubtitleNotificationsEnabled">Ingeschakeld</string>
     <string name="settingsDefaultBrowserTitle">Standaardbrowser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is je standaardbrowser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">DuckDuckGo instellen als standaardbrowser</string>
     <string name="settingsPrivateSearchTitle">Privé-zoekopdracht</string>
     <string name="settingsGeneral" instruction="List item for general settings">Algemeen</string>
-    <string name="settingsPrivateSearchDescription">Standaard ingeschakeld</string>
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
-    <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
-    <string name="settingsHeadingSettings">Instellingen</string>
     <string name="settingsHeadingMainSettings">Overige Instellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Gegevens wissen</string>
     <string name="settingsAddWidget">Widget toevoegen aan startscherm</string>
     <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privé-zoekopdracht</string>
-    <string name="privateSearchTitle">Private Search is ingeschakeld</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search is je standaardzoekmachine, zodat je op het web kunt zoeken zonder gevolgd te worden.</string>
-    <string name="privateSearchHeadingSearchSettings">Zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Bescherming tegen webtracking is ingeschakeld</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
-    <string name="cookiePopupProtectionDescription">Ban deze pop-ups en beperk het aantal cookies tot een minimum</string>
-    <string name="cookiePopupProtectionEnabled">Ingeschakeld</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearData">Gegevens automatisch wissen...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget toegevoegd aan startscherm</string>
-    <string name="settingsAddHomeScreenWidget">Startschermwidget</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Browse privé met onze app voor Mac</string>
-    <string name="macos_settings_title">DuckDuckGo-browser voor Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nee, ik beheer ze zelf</string>
 
-    <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
     <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
@@ -655,10 +633,6 @@
     <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-browser voor Windows</string>
-    <string name="windows_settings_description">Browse privé met onze app voor Windows</string>
-    <string name="windows_settings_description_ready">Download beschikbaar</string>
-    <string name="windows_settings_description_list">Je staat op de lijst!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Sleep van boven naar beneden en tik op de knop \'Terug\' om het volledige scherm af te sluiten</string>
@@ -751,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuleren</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Wachtwoorden</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Wachtwoorden en automatisch invullen</string>
     <string name="autofillLoginSavedSnackbarMessage">Wachtwoord opgeslagen</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Wachtwoord bijgewerkt</string>

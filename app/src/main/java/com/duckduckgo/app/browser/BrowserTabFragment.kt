@@ -1026,7 +1026,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
-        hideKeyboardImmediately()
+        hideKeyboard()
         voiceSearchLauncher.launch(requireActivity())
     }
 
@@ -1967,7 +1967,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                hideKeyboardImmediately()
+                hideKeyboard()
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
@@ -2622,6 +2622,10 @@ class BrowserTabFragment :
             object : FadeOmnibarItemPressedListener {
                 override fun onDuckChatButtonPressed() {
                     onOmnibarDuckChatPressed(omnibar.getText())
+                }
+
+                override fun onBackButtonPressed() {
+                    hideKeyboard()
                 }
             },
         )
@@ -3381,15 +3385,6 @@ class BrowserTabFragment :
         isDoneCounting: Boolean,
     ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
-    }
-
-    private fun hideKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now hiding")
-            omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
-        }
     }
 
     private fun hideKeyboard() {

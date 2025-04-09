@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
     <string name="duck_player_info_modal_button">Rozumiem!</string>
     <string name="duck_player_unavailable">Duck Player jest niedostępny</string>
-    <string name="duck_player_unavailable_description">Ostatnie zmiany w serwisie YouTube miały wpływ na działanie Duck Player. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie.</string>
     <string name="duck_player_unavailable_learn_more">Dowiedz się więcej</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otwieraj filmy z YouTube w odtwarzaczu Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otwieraj Duck Player w nowej karcie</string>
