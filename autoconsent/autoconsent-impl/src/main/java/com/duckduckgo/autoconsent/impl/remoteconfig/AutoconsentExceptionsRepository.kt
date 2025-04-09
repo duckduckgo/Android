@@ -53,21 +53,19 @@ class RealAutoconsentExceptionsRepository @Inject constructor(
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        loadToMemory()
     }
 
     private fun loadToMemory() {
-        if (isMainProcess) {
-            exceptions.clear()
-            exceptions.addAll(autoconsentFeature.self().getExceptions())
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                exceptions.clear()
+                exceptions.addAll(autoconsentFeature.self().getExceptions())
+            }
         }
     }
 
     override fun onPrivacyConfigDownloaded() {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        loadToMemory()
     }
 }

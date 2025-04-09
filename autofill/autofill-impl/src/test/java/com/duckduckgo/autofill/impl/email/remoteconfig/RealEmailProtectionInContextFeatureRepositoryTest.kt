@@ -1,5 +1,6 @@
 package com.duckduckgo.autofill.impl.email.remoteconfig
 
+import android.annotation.SuppressLint
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -11,6 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class RealEmailProtectionInContextFeatureRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()

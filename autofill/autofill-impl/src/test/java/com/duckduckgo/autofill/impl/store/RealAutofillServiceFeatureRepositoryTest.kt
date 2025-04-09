@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.store
 
+import android.annotation.SuppressLint
 import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.impl.service.store.RealAutofillServiceFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -28,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class RealAutofillServiceFeatureRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
