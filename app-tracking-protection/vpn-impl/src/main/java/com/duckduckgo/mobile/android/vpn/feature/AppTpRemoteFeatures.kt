@@ -76,6 +76,18 @@ interface AppTpRemoteFeatures {
     @DefaultValue(false)
     fun atpTdsExperiment006(): Toggle
 
+    @DefaultValue(false)
+    fun atpTdsExperiment007(): Toggle
+
+    @DefaultValue(false)
+    fun atpTdsExperiment008(): Toggle
+
+    @DefaultValue(false)
+    fun atpTdsExperiment009(): Toggle
+
+    @DefaultValue(false)
+    fun atpTdsExperiment010(): Toggle
+
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
