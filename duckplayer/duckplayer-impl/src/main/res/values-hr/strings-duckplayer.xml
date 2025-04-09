@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
     <string name="duck_player_info_modal_button">Shvaćam!</string>
     <string name="duck_player_unavailable">Duck Player je nedostupan</string>
-    <string name="duck_player_unavailable_description">Na funkcionalnost Duck Playera utjecale su nedavne promjene na YouTubeu. Radimo na rješavanju ovih problema i cijenimo tvoje razumijevanje.</string>
     <string name="duck_player_unavailable_learn_more">Saznajte više</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvaraj YouTube videozapise u Duck Playeru</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvori Duck Player u novoj kartici</string>

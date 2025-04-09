@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Включает услуги: VPN и и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
     <string name="subscriptionSettingGet">Перейти на Privacy Pro</string>
     <string name="subscriptionSettingRestore">У меня уже есть подписка</string>
-    <string name="subscriptionSettingWaiting">Ваша подписка активируется</string>
-    <string name="subscriptionSettingWaitingSubtitle">Этот процесс занимает больше времени, чем обычно. Вернитесь сюда чуть позже.</string>
     <string name="subscriptionSettingExpired">Срок действия вашей подписки Privacy Pro истек</string>
-    <string name="subscriptionSettingExpiredSubtitle">Чтобы использовать Privacy Pro, подпишитесь заново</string>
     <string name="subscriptionSettingExpiredViewPlans">Просмотреть тарифы</string>
     <string name="subscriptionSettingSectionSubscription">По подписке</string>
     <string name="subscriptionSettingRemoveFromDevice">Удалить с этого устройства</string>

@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Tartalmazza a VPN-megoldásunkat és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
     <string name="subscriptionSettingGet">Privacy Pro előfizetése</string>
     <string name="subscriptionSettingRestore">Van előfizetésem</string>
-    <string name="subscriptionSettingWaiting">Az előfizetésed aktiválása folyamatban van</string>
-    <string name="subscriptionSettingWaitingSubtitle">Ez a szokásosnál tovább tart, nézz vissza később.</string>
     <string name="subscriptionSettingExpired">Lejárt a Privacy Pro-előfizetésed</string>
-    <string name="subscriptionSettingExpiredSubtitle">Fizess elő újra, hogy tovább használhasd a Privacy Pro szolgáltatást</string>
     <string name="subscriptionSettingExpiredViewPlans">Csomagok megtekintése</string>
     <string name="subscriptionSettingSectionSubscription">Előfizetés</string>
     <string name="subscriptionSettingRemoveFromDevice">Eltávolítás erről az eszközről</string>
