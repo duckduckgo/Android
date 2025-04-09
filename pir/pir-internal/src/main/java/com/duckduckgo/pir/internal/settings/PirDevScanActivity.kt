@@ -157,17 +157,17 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                     repository.replaceUserProfile(
                         UserProfile(
                             userName = UserName(
-                                firstName = binding.profileFirstName.text,
-                                middleName = binding.profileMiddleName.text.ifBlank {
+                                firstName = binding.profileFirstName.text.trim(),
+                                middleName = binding.profileMiddleName.text.trim().ifBlank {
                                     null
                                 },
-                                lastName = binding.profileLastName.text,
+                                lastName = binding.profileLastName.text.trim(),
                             ),
                             addresses = Address(
-                                city = binding.profileCity.text,
-                                state = binding.profileState.text,
+                                city = binding.profileCity.text.trim(),
+                                state = binding.profileState.text.trim(),
                             ),
-                            birthYear = binding.profileBirthYear.text.toInt(),
+                            birthYear = binding.profileBirthYear.text.trim().toInt(),
                         ),
                     )
                 }
