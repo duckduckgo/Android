@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Έχετε τον νου σας στις αποκλεισμένες εφαρμογές παρακολούθησης</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Λάβετε ενημερώσεις σχετικά με μπλοκαρισμένες προσπάθειες παρακολούθησης στην ενότητα ειδοποιήσεων.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Δεν μπορείτε να χρησιμοποιήσετε το App Tracking Protection λόγω του VPN σας; Μεταβείτε στο DuckDuckGo VPN, το μόνο συμβατό VPN. <annotation type="ppro_upsell_link">Μάθετε περισσότερα</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked">Το <b>App Tracking Protection απενεργοποιήθηκε</b>\nΑπενεργοποίησε το VPN σας το App Tracking Protection; Χρησιμοποιήστε τον διακόπτη πιο πάνω για να το ενεργοποιήσετε ξανά.\n\nΑποκτήστε το DuckDuckGo VPN — το μοναδικό VPN που λειτουργεί με το App Tracking Protection. <annotation type="ppro_upsell_link">Μάθετε περισσότερα</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Πηγαίνετε την ιδιωτικότητά σας στο επόμενο επίπεδο</string>
+    <string name="apptp_PproUpsellBannerMessage">Το DuckDuckGo έχει το μοναδικό VPN που είναι συμβατό με το App Tracking Protection. Ενεργοποιήστε το με μια επί πληρωμή συνδρομή Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Μάθετε περισσότερα</string>
+
 </resources>
