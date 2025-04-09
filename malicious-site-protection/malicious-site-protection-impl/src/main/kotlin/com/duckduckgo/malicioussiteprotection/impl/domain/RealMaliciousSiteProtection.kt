@@ -80,9 +80,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             return ConfirmedResult(Safe)
         }
 
-        val hash = messageDigest
-            .digest(hostname.toByteArray(Charsets.UTF_8))
-            .joinToString("") { "%02x".format(it) }
+        val hash = generateHash(hostname)
         val hashPrefix = hash.substring(0, 8)
 
         if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
@@ -123,5 +121,16 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
         timber.d("wait for confirmation $canonicalUriString")
         return IsMaliciousResult.WaitForConfirmation
+    }
+
+    private fun generateHash(hostname: String): String {
+        val digestBytes = messageDigest.digest(hostname.toByteArray(Charsets.UTF_8))
+        val sb = StringBuilder(digestBytes.size * 2)
+        for (byte in digestBytes) {
+            val value = byte.toInt() and 0xFF
+            sb.append(Character.forDigit(value shr 4, 16))
+            sb.append(Character.forDigit(value and 0x0F, 16))
+        }
+        return sb.toString()
     }
 }
