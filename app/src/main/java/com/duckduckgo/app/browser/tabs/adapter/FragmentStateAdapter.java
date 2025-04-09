@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import timber.log.Timber;
 
@@ -119,6 +120,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     boolean mIsInGracePeriod = false;
 
     private boolean mHasStaleFragments = false;
+
+    // Used for synchronizing access to the container when adding fragment views
+    private final ConcurrentHashMap<FrameLayout, Object> containerLocks = new ConcurrentHashMap<>();
 
     // Add a LinkedList to store itemIds in FIFO order
     private final ArrayDeque<Long> itemIdQueue = new ArrayDeque<>();
@@ -443,23 +447,26 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     void addViewToContainer(@NonNull View v, @NonNull FrameLayout container) {
-        if (container.getChildCount() > 1) {
-            throw new IllegalStateException("Design assumption violated.");
-        }
+        Object lock = containerLocks.computeIfAbsent(container, k -> new Object());
+        synchronized(lock) {
+            if (container.getChildCount() > 1) {
+                throw new IllegalStateException("Design assumption violated.");
+            }
 
-        if (v.getParent() == container) {
-            return;
-        }
+            if (v.getParent() == container) {
+                return;
+            }
 
-        if (container.getChildCount() > 0) {
-            container.removeAllViews();
-        }
+            if (container.getChildCount() > 0) {
+                container.removeAllViews();
+            }
 
-        if (v.getParent() != null) {
-            ((ViewGroup) v.getParent()).removeView(v);
-        }
+            if (v.getParent() != null) {
+                ((ViewGroup) v.getParent()).removeView(v);
+            }
 
-        container.addView(v);
+            container.addView(v);
+        }
     }
 
     @Override
