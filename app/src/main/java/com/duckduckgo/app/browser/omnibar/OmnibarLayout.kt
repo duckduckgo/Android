@@ -542,7 +542,6 @@ open class OmnibarLayout @JvmOverloads constructor(
         val showBrowserMenu: Boolean,
         val showBrowserMenuHighlight: Boolean,
         val showChatMenu: Boolean,
-        val experimentalIconsEnabled: Boolean
     )
 
     private var previousButtonState: ButtonState? = null
@@ -556,7 +555,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             showBrowserMenu = viewState.showBrowserMenu,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
             showChatMenu = viewState.showChatMenu,
-            experimentalIconsEnabled = viewState.experimentalIconsEnabled
         )
 
         if (!isInitialRender && newButtonState != previousButtonState) {

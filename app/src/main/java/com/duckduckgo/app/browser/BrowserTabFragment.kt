@@ -4351,9 +4351,6 @@ class BrowserTabFragment :
 
     fun launchTabSwitcherAfterTabsUndeleted() {
         viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
-
-        private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.openDuckChat(query)
     }
 }
 
