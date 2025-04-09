@@ -39,12 +39,18 @@
     <dimen name="toolbarOverflowPadding">10dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
     <dimen name="experimentalToolbarSize">60dp</dimen>
-    <dimen name="experimentalOmnibarCardSize">44dp</dimen>
-    <dimen name="experimentalOmnibarCardFocusedHeight">48dp</dimen>
-    <dimen name="experimentalOmnibarCardMargin">14dp</dimen>
-    <dimen name="experimentalOmnibarCardFocusedMargin">12dp</dimen>
-    <dimen name="experimentalOmnibarIconsMargin">4dp</dimen>
-    <dimen name="experimentalOmnibarIconsFocusedMargin">6dp</dimen>
+    <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginBottom">8dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">12dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginTop">0dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginBottom">4dp</dimen>
+    <dimen name="experimentalOmnibarContentPadding">0dp</dimen>
+    <dimen name="experimentalOmnibarContentFocusedPaddingHorizontal">4dp</dimen>
+    <dimen name="experimentalOmnibarContentFocusedPaddingVertical">@dimen/experimentalOmnibarOutlineFocusedWidth</dimen>
+    <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
+    <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>
