@@ -28,15 +28,7 @@ class SwipingTabsFeatureProvider @Inject constructor(
         swipingTabsFeature.self().isEnabled() && swipingTabsFeature.enabledForUsers().isEnabled()
     }
 
-    val isTabSwipingFix1Enabled by lazy {
-        swipingTabsFeature.tabSwipingFix1().isEnabled()
-    }
-
-    val isTabSwipingFix2Enabled by lazy {
-        swipingTabsFeature.tabSwipingFix2().isEnabled()
-    }
-
-    val isTabSwipingFix3Enabled by lazy {
-        swipingTabsFeature.tabSwipingFix3().isEnabled()
+    val isTabSwipingFixEnabled by lazy {
+        swipingTabsFeature.tabSwipingFix().isEnabled()
     }
 }
