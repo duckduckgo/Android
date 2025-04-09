@@ -46,10 +46,12 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.net.SocketTimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import timber.log.Timber
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
@@ -71,14 +73,24 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val pixels: Pixel,
 ) : MaliciousSiteRepository {
 
+    private val isWriting = AtomicBoolean(false)
+
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
         return withContext(dispatcherProvider.io()) {
+            if (isWriting.get()) {
+                Timber.d("Skipped containsHashPrefix because writing is in progress")
+                return@withContext false
+            }
             maliciousSiteDao.hashPrefixExists(hashPrefix)
         }
     }
 
     override suspend fun getFilters(hash: String): FilterSet? {
         return withContext(dispatcherProvider.io()) {
+            if (isWriting.get()) {
+                Timber.d("Skipped getFilters because writing is in progress")
+                return@withContext null
+            }
             maliciousSiteDao.getFilter(hash)?.let {
                 FilterSet(
                     filters = Filter(it.hash, it.regex),
@@ -180,7 +192,11 @@ class RealMaliciousSiteRepository @Inject constructor(
                 PHISHING -> maliciousSiteDatasetService::getPhishingFilterSet
                 MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
             },
-        ) { maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed)) }
+        ) {
+            isWriting.set(true)
+            maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed))
+            isWriting.set(false)
+        }
     }
 
     private suspend fun loadHashPrefixes(
@@ -196,7 +212,11 @@ class RealMaliciousSiteRepository @Inject constructor(
                 PHISHING -> maliciousSiteDatasetService::getPhishingHashPrefixes
                 MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
             },
-        ) { maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed)) }
+        ) {
+            isWriting.set(true)
+            maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed))
+            isWriting.set(false)
+        }
     }
 
     private fun FilterSetResponse.toFilterSetWithRevision(feed: Feed): FilterSetWithRevision {
