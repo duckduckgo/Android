@@ -59,22 +59,22 @@ interface AppTpRemoteFeatures {
     fun setSearchDomains(): Toggle // kill switch
 
     @DefaultValue(false)
-    fun tdsExperiment001(): Toggle
+    fun atpTdsExperiment001(): Toggle
 
     @DefaultValue(false)
-    fun tdsExperiment002(): Toggle
+    fun atpTdsExperiment002(): Toggle
 
     @DefaultValue(false)
-    fun tdsExperiment003(): Toggle
+    fun atpTdsExperiment003(): Toggle
 
     @DefaultValue(false)
-    fun tdsExperiment004(): Toggle
+    fun atpTdsExperiment004(): Toggle
 
     @DefaultValue(false)
-    fun tdsExperiment005(): Toggle
+    fun atpTdsExperiment005(): Toggle
 
     @DefaultValue(false)
-    fun tdsExperiment006(): Toggle
+    fun atpTdsExperiment006(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
@@ -82,7 +82,7 @@ interface AppTpRemoteFeatures {
     }
 
     companion object {
-        internal const val EXPERIMENT_PREFIX = "tds"
+        internal const val EXPERIMENT_PREFIX = "atpTds"
     }
 }
 
