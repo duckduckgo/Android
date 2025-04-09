@@ -1,5 +1,6 @@
 package com.duckduckgo.autofill.impl.feature.plugin
 
+import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -11,6 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class RealAutofillFeatureRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()

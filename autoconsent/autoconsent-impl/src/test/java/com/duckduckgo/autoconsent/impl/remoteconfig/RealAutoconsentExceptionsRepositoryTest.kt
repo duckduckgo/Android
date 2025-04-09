@@ -16,27 +16,25 @@
 
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
-import org.junit.Before
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class RealAutoconsentExceptionsRepositoryTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val autoconsentFeature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
-
-    @Before
-    fun setup() {
-        autoconsentFeature.self().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
+    private val autoconsentFeature: AutoconsentFeature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java).apply {
+        self().setRawStoredState(Toggle.State(exceptions = exceptions))
     }
 
     @Test
@@ -47,7 +45,8 @@ class RealAutoconsentExceptionsRepositoryTest {
             autoconsentFeature,
             isMainProcess = true,
         )
-        assertEquals(exception, repository.exceptions.first())
+
+        assertEquals(exceptions, repository.exceptions)
     }
 
     @Test
@@ -59,13 +58,13 @@ class RealAutoconsentExceptionsRepositoryTest {
             isMainProcess = true,
         )
 
-        assertEquals(listOf(exception), repository.exceptions)
+        assertEquals(exceptions, repository.exceptions)
         autoconsentFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
         repository.onPrivacyConfigDownloaded()
         assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }
 
     companion object {
-        val exception = FeatureException("example.com", "reason")
+        val exceptions = listOf(FeatureException("example.com", "reason"))
     }
 }

@@ -1,5 +1,6 @@
 package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
@@ -11,6 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 class RealMaliciousSiteProtectionRCRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
