@@ -28,6 +28,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -95,11 +96,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             navigationBar = navBar
 
             // When omnibar is at the bottom, we're adding an additional space at the top
-            toolbarContainer.setPadding(
-                0,
-                toolbarContainerPaddingTopWhenAtBottom,
-                0,
-                0,
+            toolbarContainer.updatePadding(
+                top = toolbarContainerPaddingTopWhenAtBottom,
+            )
+
+            // at the same time, we remove that space from the navigation bar which now sits below the omnibar
+            navBar.findViewById<LinearLayout>(R.id.rootView).updatePadding(
+                top = 0,
             )
         }
 

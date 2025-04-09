@@ -17,14 +17,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/preferredNavigationBarColor"
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingHorizontal="14dp"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingBottom="@dimen/keyline_1"
+    android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
+    android:paddingBottom="8dp"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout
@@ -67,8 +68,8 @@
 
     <FrameLayout
         android:id="@+id/fireButton"
-        android:layout_width="80dp"
-        android:layout_height="@dimen/bottomNavIconContainer"
+        android:layout_width="@dimen/bottomNavFireIconContainerWidth"
+        android:layout_height="@dimen/bottomNavFireIconContainerHeight"
         android:background="@drawable/bottom_nav_fire_button_background"
         android:foreground="@drawable/bottom_nav_fire_button_foreground">
 
