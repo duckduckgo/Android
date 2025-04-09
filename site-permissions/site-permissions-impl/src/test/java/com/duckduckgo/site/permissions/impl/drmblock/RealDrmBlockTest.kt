@@ -18,7 +18,7 @@ package com.duckduckgo.site.permissions.impl.drmblock
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.nhaarman.mockitokotlin2.any

@@ -152,27 +152,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                         }
-                        if (!customStorePresence.exceptionStorePresent) {
-                            addFunction(
-                                FunSpec.builder("providesNoopExceptionsStore")
-                                    .addAnnotation(Provides::class.asClassName())
-                                    .addAnnotation(
-                                        AnnotationSpec.builder(RemoteFeatureStoreNamed::class.asClassName())
-                                            .addMember("value = %T::class", boundType.asClassName())
-                                            .build(),
-                                    )
-                                    .addCode(
-                                        CodeBlock.of(
-                                            """
-                                                return %T.EMPTY_STORE
-                                            """.trimIndent(),
-                                            FeatureExceptions::class.asClassName(),
-                                        ),
-                                    )
-                                    .returns(FeatureExceptions.Store::class.asClassName())
-                                    .build(),
-                            )
-                        }
                         addFunction(
                             FunSpec.builder("provides${boundType.shortName}Inventory")
                                 .addAnnotation(Provides::class.asClassName())
@@ -267,20 +246,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             .addParameter(
                                 ParameterSpec
                                     .builder(
-                                        "exceptionStore",
-                                        FeatureExceptions.Store::class,
-                                    )
-                                    .addAnnotation(
-                                        AnnotationSpec
-                                            .builder(RemoteFeatureStoreNamed::class).addMember("value = %T::class", boundType.asClassName())
-                                            .build(),
-
-                                    )
-                                    .build(),
-                            )
-                            .addParameter(
-                                ParameterSpec
-                                    .builder(
                                         "settingsStore",
                                         FeatureSettings.Store::class,
                                     )
@@ -296,16 +261,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
                             .addParameter("variantManager", variantManager.asClassName(module))
                             .addParameter("context", context.asClassName(module))
-                            .build(),
-                    )
-                    .addProperty(
-                        PropertySpec
-                            .builder(
-                                "exceptionStore",
-                                FeatureExceptions.Store::class,
-                                KModifier.PRIVATE,
-                            )
-                            .initializer("exceptionStore")
                             .build(),
                     )
                     .addProperty(
@@ -400,18 +355,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             .returns(FeatureSettings.Store::class.java.asClassName())
                             .build(),
                     )
-                    .addFunction(
-                        FunSpec.builder("bindOptionalExceptionsStore")
-                            .addModifiers(KModifier.ABSTRACT)
-                            .addAnnotation(BindsOptionalOf::class.asClassName())
-                            .addAnnotation(
-                                AnnotationSpec.builder(RemoteFeatureStoreNamed::class.asClassName())
-                                    .addMember("value = %T::class", boundType.asClassName())
-                                    .build(),
-                            )
-                            .returns(FeatureExceptions.Store::class.java.asClassName())
-                            .build(),
-                    )
                     .build(),
             )
         }
@@ -487,8 +430,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     }
         
                     val exceptions = parseExceptions(feature.exceptions)
-                    // TODO: Remove once migrating everything to getExceptions()
-                    exceptionStore.insertAll(exceptions)
         
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
                     this.feature.get().invokeMethod("self").setRawStoredState(
@@ -656,11 +597,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             }
                             return featureExceptions.toList()
                         """.trimIndent(),
-                        FeatureExceptions.FeatureException::class.fqName.asClassName(module),
-                        FeatureExceptions.FeatureException::class.fqName.asClassName(module),
+                        FeatureException::class.fqName.asClassName(module),
+                        FeatureException::class.fqName.asClassName(module),
                     ).build(),
             )
-            .returns(List::class.asClassName().parameterizedBy(FeatureExceptions.FeatureException::class.asClassName()))
+            .returns(List::class.asClassName().parameterizedBy(FeatureException::class.asClassName()))
             .build()
     }
 
@@ -1025,7 +966,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             }
         }
 
-        var exceptionStore = false
         var settingsStore = false
         var toggleStore = false
 
@@ -1077,20 +1017,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     )
                 }
 
-                requireFeatureAndStoreCrossReference(vmClass, this)
-            }
-        }
-        with(annotation.exceptionsStoreOrNull()) {
-            exceptionStore = this != null
-            if (this != null) {
-                if (this.directSuperTypeReferences()
-                    .none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }
-                ) {
-                    throw AnvilCompilationException(
-                        "${vmClass.fqName} [exceptionsStore] must extend [FeatureExceptions.Store]",
-                        element = vmClass.clazz.identifyingElement,
-                    )
-                }
                 requireFeatureAndStoreCrossReference(vmClass, this)
             }
         }
@@ -1152,30 +1078,33 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         }
 
         return CustomStorePresence(
-            exceptionStorePresent = exceptionStore,
             toggleStorePresent = toggleStore,
             settingsStorePresent = settingsStore,
         )
     }
 
+    private enum class ContributesRemoteFeatureValues {
+        SCOPE,
+        BOUND_TYPE,
+        FEATURE_NAME,
+        SETTINGS_STORE,
+        TOGGLE_STORE,
+    }
+
     private fun AnnotationReference.remoteFeatureStoreValueOrNull(): ClassReference? {
-        return argumentAt("value", 0)?.value()
+        return argumentAt("value", ContributesRemoteFeatureValues.SCOPE.ordinal)?.value()
     }
 
     private fun AnnotationReference.featureNameOrNull(): String? {
-        return argumentAt("featureName", 2)?.value()
+        return argumentAt("featureName", ContributesRemoteFeatureValues.FEATURE_NAME.ordinal)?.value()
     }
 
     private fun AnnotationReference.settingsStoreOrNull(): ClassReference? {
-        return argumentAt("settingsStore", 3)?.value()
-    }
-
-    private fun AnnotationReference.exceptionsStoreOrNull(): ClassReference? {
-        return argumentAt("exceptionsStore", 4)?.value()
+        return argumentAt("settingsStore", ContributesRemoteFeatureValues.SETTINGS_STORE.ordinal)?.value()
     }
 
     private fun AnnotationReference.toggleStoreOrNull(): ClassReference? {
-        return argumentAt("toggleStore", 5)?.value()
+        return argumentAt("toggleStore", ContributesRemoteFeatureValues.TOGGLE_STORE.ordinal)?.value()
     }
 
     private fun ClassReference.declaredFunctions(): List<MemberFunctionReference> {
@@ -1208,6 +1137,5 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
 
 private data class CustomStorePresence(
     val settingsStorePresent: Boolean = false,
-    val exceptionStorePresent: Boolean = false,
     val toggleStorePresent: Boolean = false,
 )

@@ -17,7 +17,7 @@
 package com.duckduckgo.user.agent.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.user.agent.store.UserAgentRepository
 import java.util.concurrent.CopyOnWriteArrayList

@@ -21,7 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,7 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface MediaPlaybackRepository {
-    val exceptions: CopyOnWriteArrayList<FeatureExceptions.FeatureException>
+    val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
 @ContributesBinding(
@@ -51,7 +51,7 @@ class RealMediaPlaybackRepository @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
 ) : MediaPlaybackRepository, PrivacyConfigCallbackPlugin {
 
-    override val exceptions = CopyOnWriteArrayList<FeatureExceptions.FeatureException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
         loadToMemory()
