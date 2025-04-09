@@ -179,11 +179,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             entities.size,
         )
 
-        animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(context, entities.size, omnibarViews, shieldViews)
+        animateTrackersBlockedView(omnibarViews, trackersBlockedAnimationView)
+        animateTrackersBlockedCountView(context, entities.size, omnibarViews, shieldViews, trackersBlockedCountAnimationView)
     }
 
-    private fun animateTrackersBlockedView(omnibarViews: List<View>) {
+    private fun animateTrackersBlockedView(omnibarViews: List<View>, trackersBlockedAnimationView: DaxTextView) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 500L
             startOffset = 100L
@@ -209,8 +209,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             addAnimation(slideInAnimation)
         }
 
-        trackersBlockedAnimationView?.show()
-        trackersBlockedAnimationView?.startAnimation(animationSet)
+        trackersBlockedAnimationView.show()
+        trackersBlockedAnimationView.startAnimation(animationSet)
 
         animationSet.setAnimationListener(
             object : Animation.AnimationListener {
@@ -230,13 +230,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         trackersCount: Int,
         omnibarViews: List<View>,
         shieldViews: List<View>,
+        trackersBlockedCountAnimationView: DaxTextView,
     ) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 200L
         }
 
-        trackersBlockedCountAnimationView?.show()
-        trackersBlockedCountAnimationView?.startAnimation(fadeInAnimation)
+        trackersBlockedCountAnimationView.show()
+        trackersBlockedCountAnimationView.startAnimation(fadeInAnimation)
 
         fadeInAnimation.setAnimationListener(
             object : Animation.AnimationListener {
