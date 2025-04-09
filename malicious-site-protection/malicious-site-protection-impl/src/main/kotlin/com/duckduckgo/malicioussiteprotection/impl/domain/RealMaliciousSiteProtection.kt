@@ -70,6 +70,8 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
 
         val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
+        val canonicalUriString = canonicalUri.toString()
+        val urlString = url.toString()
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
@@ -84,13 +86,13 @@ class RealMaliciousSiteProtection @Inject constructor(
         val hashPrefix = hash.substring(0, 8)
 
         if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-            timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+            timber.d("should not block (no hash) $hashPrefix,  $canonicalUriString")
             return ConfirmedResult(Safe)
         }
         maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
             filterSet.filters.let {
-                if (Pattern.compile(it.regex).matcher(canonicalUri.toString()).find()) {
-                    timber.d("should block $canonicalUri")
+                if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
+                    timber.d("should block $canonicalUriString")
                     return ConfirmedResult(Malicious(filterSet.feed))
                 }
             }
@@ -99,7 +101,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
                     is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(url.toString()).find() &&
+                        Pattern.compile(match.regex).matcher(urlString).find() &&
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
@@ -109,17 +111,17 @@ class RealMaliciousSiteProtection @Inject constructor(
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUri")
-                    is Safe -> timber.d("should not block (no match) $canonicalUri")
-                    is Ignored -> timber.d("should not block (ignored) $canonicalUri")
+                    is Malicious -> timber.d("should block (matches) $canonicalUriString")
+                    is Safe -> timber.d("should not block (no match) $canonicalUriString")
+                    is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
-                timber.e(e, "shouldBlock $canonicalUri")
+                timber.e(e, "shouldBlock $canonicalUriString")
                 confirmationCallback(Safe)
             }
         }
-        timber.d("wait for confirmation $canonicalUri")
+        timber.d("wait for confirmation $canonicalUriString")
         return IsMaliciousResult.WaitForConfirmation
     }
 }
