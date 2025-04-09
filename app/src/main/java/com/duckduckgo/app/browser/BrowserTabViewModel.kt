@@ -2011,7 +2011,6 @@ class BrowserTabViewModel @Inject constructor(
                 privacyShieldViewState.value = previousPrivacyShieldState.copy(
                     privacyShield = privacyProtection,
                     trackersBlocked = site?.trackerCount ?: 0,
-                    previousTrackesBlocked = previousPrivacyShieldState.trackersBlocked,
                 )
             }
             withContext(dispatchers.io()) {
