@@ -664,7 +664,7 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getSelectedDisableProtection()?.getPixelDefinitions()?.forEach {
-                pixel.fire(it.pixelName, it.params)
+                firePixel(it.pixelName, it.params)
             }
         }
     }
@@ -673,7 +673,7 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getSelectedDisableAppProtection()?.getPixelDefinitions()?.forEach {
-                pixel.fire(it.pixelName, it.params)
+                firePixel(it.pixelName, it.params)
             }
         }
     }
@@ -756,7 +756,7 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail()?.getPixelDefinitions()?.forEach {
-                pixel.fire(it.pixelName, it.params)
+                firePixel(it.pixelName, it.params)
             }
         }
     }
@@ -769,7 +769,7 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getProtectionDisabledAppFromAll()?.getPixelDefinitions()?.forEach {
-                pixel.fire(it.pixelName, it.params)
+                firePixel(it.pixelName, it.params)
             }
         }
     }
@@ -785,7 +785,7 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getSelectedRemoveAppTP()?.getPixelDefinitions()?.forEach {
-                pixel.fire(it.pixelName, it.params)
+                firePixel(it.pixelName, it.params)
             }
         }
     }
