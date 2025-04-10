@@ -219,7 +219,7 @@ class CtaViewModel @Inject constructor(
         if (daxOnboardingActive() && allOnboardingCtasShown()) {
             Timber.d("Auto completing DAX ONBOARDING")
             userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETED)
+            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
         }
     }
 
