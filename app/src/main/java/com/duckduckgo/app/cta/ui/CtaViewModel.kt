@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onUserDismissedCta(cta: Cta) {
+    suspend fun onUserDismissedCta(cta: Cta, viaCloseBtn: Boolean = false) {
         withContext(dispatchers.io()) {
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.userDismissedPrompt()
@@ -175,6 +175,11 @@ class CtaViewModel @Inject constructor(
 
             cta.cancelPixel?.let {
                 pixel.fire(it, cta.pixelCancelParameters())
+            }
+            if (viaCloseBtn) {
+                cta.closePixel?.let {
+                    pixel.fire(it, cta.pixelCancelParameters())
+                }
             }
 
             dismissedCtaDao.insert(DismissedCta(cta.ctaId))
