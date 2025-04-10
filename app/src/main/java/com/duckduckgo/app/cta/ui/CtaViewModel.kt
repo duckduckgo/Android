@@ -203,11 +203,12 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
+        showBrokenSitePrompt: Boolean,
     ): Cta? {
         return withContext(dispatcher) {
             markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
-                getBrowserCta(site)
+                getBrowserCta(site, showBrokenSitePrompt)
             } else {
                 getHomeCta()
             }
@@ -306,7 +307,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?): Cta? {
+    private suspend fun getBrowserCta(site: Site?, showBrokenSitePrompt: Boolean): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -320,7 +321,7 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)) {
+                return if (showBrokenSitePrompt) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null

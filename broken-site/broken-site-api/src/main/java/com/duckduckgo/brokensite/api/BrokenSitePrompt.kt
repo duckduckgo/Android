@@ -30,7 +30,7 @@ interface BrokenSitePrompt {
 
     fun resetRefreshCount()
 
-    fun getUserRefreshesCount(reset: Boolean): Int
+    fun getUserRefreshesCount(): Int
 
     suspend fun shouldShowBrokenSitePrompt(url: String): Boolean
 
