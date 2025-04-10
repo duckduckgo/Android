@@ -150,7 +150,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Ignored
         }
 
-        return withContext(dispatchers.computation()) {
+        return withContext(dispatchers.io()) {
             val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
             val isForIframe = (isForIframe(request) && belongsToCurrentPage)
 
