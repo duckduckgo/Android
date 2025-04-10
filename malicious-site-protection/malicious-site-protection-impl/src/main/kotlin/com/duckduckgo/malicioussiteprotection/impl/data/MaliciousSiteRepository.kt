@@ -22,7 +22,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
@@ -35,9 +37,11 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.ScamFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.ScamHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
@@ -52,7 +56,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
 interface MaliciousSiteRepository {
-    suspend fun containsHashPrefix(hashPrefix: String): Boolean
+    suspend fun getFeedForHashPrefix(hashPrefix: String): Feed?
     suspend fun getFilters(hash: String): List<FilterSet>?
     suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
@@ -69,20 +73,29 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDatasetService: MaliciousSiteDatasetService,
     private val dispatcherProvider: DispatcherProvider,
     private val pixels: Pixel,
+    private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature,
 ) : MaliciousSiteRepository {
 
-    override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
-        return maliciousSiteDao.getHashPrefix(hashPrefix) != null
+    override suspend fun getFeedForHashPrefix(hashPrefix: String): Feed? {
+        return maliciousSiteDao.getHashPrefix(hashPrefix)?.type?.let {
+            when (it) {
+                PHISHING.name -> PHISHING
+                MALWARE.name -> MALWARE
+                SCAM.name -> SCAM
+                else -> null
+            }
+        }
     }
 
     override suspend fun getFilters(hash: String): List<FilterSet>? {
-        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.map { (type, filters) ->
+        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.mapNotNull { (type, filters) ->
             FilterSet(
                 filters = filters.map { Filter(it.hash, it.regex) },
                 feed = when (type) {
                     PHISHING.name -> PHISHING
                     MALWARE.name -> MALWARE
-                    else -> throw IllegalArgumentException("Unknown feed $type")
+                    SCAM.name -> SCAM
+                    else -> return@mapNotNull null
                 },
             )
         }
@@ -95,6 +108,7 @@ class RealMaliciousSiteRepository @Inject constructor(
                     val feed = when (it.feed.uppercase()) {
                         PHISHING.name -> PHISHING
                         MALWARE.name -> MALWARE
+                        SCAM.name -> SCAM
                         else -> null
                     }
                     if (feed != null) {
@@ -153,7 +167,11 @@ class RealMaliciousSiteRepository @Inject constructor(
     ) {
         val revision = latestRevision.getRevisionForFeed(feed)
         val data: T? = if (networkRevision > revision) {
-            getFunction(revision)
+            if (feed == SCAM && !maliciousSiteProtectionFeature.scamProtectionEnabled()) {
+                null
+            } else {
+                getFunction(revision)
+            }
         } else {
             null
         }
@@ -173,6 +191,7 @@ class RealMaliciousSiteRepository @Inject constructor(
             when (feed) {
                 PHISHING -> maliciousSiteDatasetService::getPhishingFilterSet
                 MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
+                SCAM -> maliciousSiteDatasetService::getScamFilterSet
             },
         ) { maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed)) }
     }
@@ -189,6 +208,7 @@ class RealMaliciousSiteRepository @Inject constructor(
             when (feed) {
                 PHISHING -> maliciousSiteDatasetService::getPhishingHashPrefixes
                 MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
+                SCAM -> maliciousSiteDatasetService::getScamHashPrefixes
             },
         ) { maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed)) }
     }
@@ -199,6 +219,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         return when (feed) {
             PHISHING -> PhishingFilterSetWithRevision(insert, delete, revision, replace)
             MALWARE -> MalwareFilterSetWithRevision(insert, delete, revision, replace)
+            SCAM -> ScamFilterSetWithRevision(insert, delete, revision, replace)
         }
     }
 
@@ -206,6 +227,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         return when (feed) {
             PHISHING -> PhishingHashPrefixesWithRevision(insert, delete, revision, replace)
             MALWARE -> MalwareHashPrefixesWithRevision(insert, delete, revision, replace)
+            SCAM -> ScamHashPrefixesWithRevision(insert, delete, revision, replace)
         }
     }
 

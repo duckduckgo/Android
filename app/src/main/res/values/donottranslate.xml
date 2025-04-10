@@ -56,4 +56,7 @@
 
     <!--    Bottom Navigation Bar Experiment-->
     <string name="refreshPage">Refresh Page</string>
+
+    <!-- Malicious Site Protection -->
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blocked this page because it may be trying to deceive or manipulate you into transferring money, buying counterfeit goods, or installing malware under false pretenses.\n<a href="">Learn more</a>]]></string>
 </resources>

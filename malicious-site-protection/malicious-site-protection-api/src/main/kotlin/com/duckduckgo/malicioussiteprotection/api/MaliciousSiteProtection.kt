@@ -33,6 +33,7 @@ interface MaliciousSiteProtection {
     enum class Feed {
         PHISHING,
         MALWARE,
+        SCAM,
     }
 
     sealed class IsMaliciousResult {
