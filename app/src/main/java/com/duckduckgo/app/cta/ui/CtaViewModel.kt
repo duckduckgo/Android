@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onUserDismissedCta(cta: Cta) {
+    suspend fun onUserDismissedCta(cta: Cta, viaCloseBtn: Boolean = false) {
         withContext(dispatchers.io()) {
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.userDismissedPrompt()
@@ -175,6 +175,11 @@ class CtaViewModel @Inject constructor(
 
             cta.cancelPixel?.let {
                 pixel.fire(it, cta.pixelCancelParameters())
+            }
+            if (viaCloseBtn) {
+                cta.closePixel?.let {
+                    pixel.fire(it, cta.pixelCancelParameters())
+                }
             }
 
             dismissedCtaDao.insert(DismissedCta(cta.ctaId))
@@ -368,7 +373,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            noBrowserCtaExperiment || daxDialogEndShown() || hideTips()
+            noBrowserCtaExperiment || daxDialogEndShown() || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 
@@ -376,7 +381,7 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
-            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips()
+            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 

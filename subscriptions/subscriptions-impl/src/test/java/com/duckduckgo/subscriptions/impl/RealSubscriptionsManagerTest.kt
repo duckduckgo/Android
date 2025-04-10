@@ -787,7 +787,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(invalidTokenError = true)
+        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -806,7 +806,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(invalidTokenError = true)
+        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginFails()
 
@@ -820,6 +820,38 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
+    }
+
+    @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithUnknownAccountErrorThenSignOutAndReturnFailure() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+
+        // Simulating the scenario where account was removed from BE.
+        givenV2AccessTokenRefreshFails(errorCode = "unknown_account")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+
+        // Verify user was signed out.
+        assertFalse(subscriptionsManager.isSignedIn())
+        assertNull(authRepository.getAccessTokenV2())
+        assertNull(authRepository.getRefreshTokenV2())
+        assertNull(authRepository.getAccount())
+        assertNull(authRepository.getSubscription())
+
+        // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
+        verify(authClient, never()).authorize(any())
+        verify(authClient, never()).storeLogin(any(), any(), any())
+
+        // This isn't the case of invalid refresh token, so the related pixels should not be sent.
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
     }
 
     @Test
@@ -1144,6 +1176,39 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
 
             verify(pixelSender).reportRestoreAfterPurchaseAttemptSuccess()
+            verify(pixelSender).reportSubscriptionActivated()
+            verifyNoMoreInteractions(pixelSender)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseIsSuccessfulAndAccountWasRestoredThenPixelIsSent() = runTest {
+        givenUserIsNotSignedIn()
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        givenSubscriptionSucceedsWithoutEntitlements(status = EXPIRED.statusName)
+        givenConfirmPurchaseSucceeds()
+        givenAccessTokenSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseState = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseState)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.purchase(mock(), planId = "", offerId = null)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseState.emit(PurchaseState.Purchased("any", "any"))
+            givenSubscriptionSucceedsWithEntitlements()
+
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(pixelSender).reportPurchaseSuccess()
+            verify(pixelSender).reportPurchaseWithRestoredAccount(any())
             verify(pixelSender).reportSubscriptionActivated()
             verifyNoMoreInteractions(pixelSender)
 
@@ -1630,9 +1695,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateV2TokensSucceeds()
     }
 
-    private suspend fun givenV2AccessTokenRefreshFails(invalidTokenError: Boolean = false) {
-        val exception = if (invalidTokenError) {
-            val responseBody = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+    private suspend fun givenV2AccessTokenRefreshFails(errorCode: String? = null) {
+        val exception = if (errorCode != null) {
+            val responseBody = """{"error":"$errorCode"}""".toResponseBody("text/json".toMediaTypeOrNull())
             HttpException(Response.error<Void>(400, responseBody))
         } else {
             RuntimeException()

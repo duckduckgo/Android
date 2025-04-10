@@ -144,9 +144,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -518,9 +518,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var newTabPageProvider: NewTabPageProvider
-
-    @Inject
-    lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
 
     @Inject
     lateinit var safeWebViewFeature: SafeWebViewFeature
@@ -970,9 +967,7 @@ class BrowserTabFragment :
     private fun configureEditModeChangeDetection() {
         if (swipingTabsFeature.isEnabled) {
             omnibar.isInEditMode.onEach { isInEditMode ->
-                if (isActiveTab) {
-                    browserActivity?.onEditModeChanged(isInEditMode)
-                }
+                browserActivity?.onEditModeChanged(isInEditMode)
             }.launchIn(lifecycleScope)
         }
     }
@@ -1029,7 +1024,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
-        hideKeyboardImmediately()
+        hideKeyboard()
         voiceSearchLauncher.launch(requireActivity())
     }
 
@@ -1181,7 +1176,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
                 if (anchorToNavigationBar) {
-                    val anchorView = binding.navigationBar.popupMenuAnchor
+                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
                     popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
                 } else {
                     popupMenu.show(binding.rootView, omnibar.toolbar)
@@ -1931,6 +1926,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -1970,7 +1966,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                hideKeyboardImmediately()
+                hideKeyboard()
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
@@ -2626,6 +2622,10 @@ class BrowserTabFragment :
                 override fun onDuckChatButtonPressed() {
                     onOmnibarDuckChatPressed(omnibar.getText())
                 }
+
+                override fun onBackButtonPressed() {
+                    hideKeyboard()
+                }
             },
         )
     }
@@ -2716,8 +2716,14 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
+        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+            R.layout.include_duckduckgo_browser_experiment_webview
+        } else {
+            R.layout.include_duckduckgo_browser_webview
+        }
+
         webView = layoutInflater.inflate(
-            R.layout.include_duckduckgo_browser_webview,
+            webViewLayout,
             binding.webViewContainer,
             true,
         ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
@@ -2755,16 +2761,13 @@ class BrowserTabFragment :
                 }
             }
 
-            it.setOnTouchListener { _, _ ->
+            it.setOnTouchListener { webView, event ->
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
                 false
             }
-
-            it.setOnScrollChangeListener(omnibar)
-            omnibar.resetScrollPosition()
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
@@ -2845,6 +2848,13 @@ class BrowserTabFragment :
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
+        daxBubbleCta.hideDaxBubbleCta(binding)
+        hideDaxBubbleCta()
+        renderer.showNewTab()
+        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
@@ -3381,15 +3391,6 @@ class BrowserTabFragment :
         isDoneCounting: Boolean,
     ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
-    }
-
-    private fun hideKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now hiding")
-            omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
-        }
     }
 
     private fun hideKeyboard() {
@@ -4120,6 +4121,10 @@ class BrowserTabFragment :
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
+
+                setOnDismissCtaClicked {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                }
             }
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4145,6 +4150,9 @@ class BrowserTabFragment :
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
                 onSuggestedOptionsSelected,
+                {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                },
             )
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4270,15 +4278,11 @@ class BrowserTabFragment :
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
 
-                val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
-                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                        webViewPrintDocumentAdapter,
-                        onStartCallback = { viewModel.onStartPrint() },
-                        onFinishCallback = { viewModel.onFinishPrint() },
-                    )
-                } else {
-                    webViewPrintDocumentAdapter
-                }
+                val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+                    webViewPrintDocumentAdapter,
+                    onStartCallback = { viewModel.onStartPrint() },
+                    onFinishCallback = { viewModel.onFinishPrint() },
+                )
                 printManager.print(
                     url,
                     printAdapter,
@@ -4336,6 +4340,10 @@ class BrowserTabFragment :
 
     fun onTabSwipedAway() {
         viewModel.onTabSwipedAway()
+    }
+
+    fun launchTabSwitcherAfterTabsUndeleted() {
+        viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
     }
 }
 

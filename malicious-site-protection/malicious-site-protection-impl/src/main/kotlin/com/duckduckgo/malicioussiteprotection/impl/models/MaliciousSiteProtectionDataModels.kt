@@ -34,7 +34,7 @@ data class Filter(
 )
 
 class FilterSet(
-    val filters: List<Filter>,
+    val filters: Filter,
     val feed: Feed,
 )
 

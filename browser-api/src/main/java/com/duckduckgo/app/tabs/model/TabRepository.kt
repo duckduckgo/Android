@@ -84,7 +84,13 @@ interface TabRepository {
 
     suspend fun markDeletable(tab: TabEntity)
 
+    suspend fun markDeletable(tabIds: List<String>)
+
     suspend fun undoDeletable(tab: TabEntity)
+
+    suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean = false)
+
+    suspend fun deleteTabs(tabIds: List<String>)
 
     /**
      * Deletes from the DB all tabs that are marked as "deletable"
@@ -120,6 +126,8 @@ interface TabRepository {
     suspend fun setIsUserNew(isUserNew: Boolean)
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
+
+    suspend fun getTabs(): List<TabEntity>
 
     fun getOpenTabCount(): Int
 

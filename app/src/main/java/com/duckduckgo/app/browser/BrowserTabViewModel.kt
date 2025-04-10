@@ -104,6 +104,7 @@ import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
+import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -246,7 +247,6 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -260,7 +260,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -297,9 +296,9 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatJSHelper
-import com.duckduckgo.duckchat.impl.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -383,7 +382,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -2720,7 +2719,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
-                val emptyTab = tabRepository.flowTabs.first().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
                 } else {
@@ -2809,16 +2808,25 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
-                val updatedCta = refreshCta()
-                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-            } else if (cta is BrokenSitePromptDialogCta) {
+            if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
-            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-                pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
-                val updatedCta = ctaViewModel.getEndStaticDialogCta()
-                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+        }
+    }
+
+    fun onUserClickCtaDismissButton(cta: Cta) {
+        viewModelScope.launch {
+            ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
+            if (cta is DaxBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(cta)
+            } else if (cta is OnboardingDaxDialogCta) {
+                command.value = HideOnboardingDaxDialog(cta)
+                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                    if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                        ctaViewModel.dismissPulseAnimation()
+                    }
+                }
             }
         }
     }
@@ -2971,6 +2979,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         onUserDismissedCta(ctaViewState.value?.cta)
+    }
+
+    fun onLaunchTabSwitcherAfterTabsUndeletedRequest() {
+        command.value = LaunchTabSwitcher
     }
 
     private fun fireDailyLaunchPixel() {
@@ -3438,19 +3450,22 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun updateHttpErrorCount(statusCode: Int) {
-        when {
-            // 400 errors
-            statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
-            )
-            // all 4xx errors apart from 400
-            statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
-            )
-            // all 5xx errors
-            statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
-                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
-            )
+        viewModelScope.launch(dispatchers.io()) {
+            when {
+                // 400 errors
+                statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR -> httpErrorPixels.get().updateCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
+                )
+                // all 4xx errors apart from 400
+                statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
+                )
+                // all 5xx errors
+                statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX -> httpErrorPixels.get().update5xxCountPixel(
+                    HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
+                    statusCode,
+                )
+            }
         }
     }
 

@@ -144,7 +144,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, "query")
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -287,7 +287,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
-        testee.onViewModeChanged(ViewMode.CustomTab(0, "example.com", false))
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -893,7 +893,7 @@ class OmnibarLayoutViewModelTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

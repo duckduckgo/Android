@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül nézheted a YouTube-ot, és a megtekintett tartalmak nem befolyásolják a neked szóló ajánlásokat.</string>
     <string name="duck_player_info_modal_button">Megvan!</string>
     <string name="duck_player_unavailable">A Duck Player nem érhető el</string>
-    <string name="duck_player_unavailable_description">A YouTube legutóbbi módosításai érintik a Duck Player működését. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
     <string name="duck_player_unavailable_learn_more">További részletek</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">YouTube-videók megnyitása a Duck Playerrel</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Nyisd meg a Duck Playert egy új lapon</string>

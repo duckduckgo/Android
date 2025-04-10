@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnScrollChangeListener
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -30,6 +29,7 @@ import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
@@ -64,6 +64,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
@@ -71,7 +72,7 @@ class Omnibar(
     val omnibarPosition: OmnibarPosition,
     val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
-) : OnScrollChangeListener {
+) {
 
     init {
         when (omnibarPosition) {
@@ -85,6 +86,7 @@ class Omnibar(
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
+
                     FADE -> {
                         // remove bottom variant
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
@@ -106,6 +108,7 @@ class Omnibar(
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
+
                     FADE -> {
                         // remove top variant
                         binding.rootView.removeView(binding.fadeOmnibar)
@@ -174,6 +177,7 @@ class Omnibar(
         data class Browser(val url: String?) : ViewMode()
         data class CustomTab(
             val toolbarColor: Int,
+            val title: String?,
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
@@ -227,7 +231,7 @@ class Omnibar(
         newOmnibar.omnibarTextInput.rootView
     }
 
-    val isInEditMode = newOmnibar.isEditingFlow
+    val isInEditMode = newOmnibar.isEditingFlow.distinctUntilChanged()
 
     var isScrollingEnabled: Boolean
         get() =
@@ -237,6 +241,7 @@ class Omnibar(
         }
 
     fun setViewMode(viewMode: ViewMode) {
+        Timber.d("Omnibar: setViewMode $viewMode")
         when (viewMode) {
             Error -> {
                 newOmnibar.decorate(Mode(viewMode))
@@ -389,7 +394,7 @@ class Omnibar(
         customTabToolbarColor: Int,
         customTabDomainText: String?,
     ) {
-        newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
+        newOmnibar.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(
@@ -414,53 +419,12 @@ class Omnibar(
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 
-    override fun onScrollChange(
-        v: View,
-        scrollX: Int,
-        scrollY: Int,
-        oldScrollX: Int,
-        oldScrollY: Int,
-    ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // no-op
-                    }
-                    FADE -> binding.fadeOmnibar.onScrollChanged(
-                        scrollableView = v,
-                        scrollY = scrollY,
-                        oldScrollY = oldScrollY,
-                    )
-                }
-            }
-
-            OmnibarPosition.BOTTOM -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // no-op
-                    }
-                    FADE -> binding.fadeOmnibarBottom.onScrollChanged(
-                        scrollableView = v,
-                        scrollY = scrollY,
-                        oldScrollY = oldScrollY,
-                    )
-                }
-            }
-        }
-    }
-
-    fun resetScrollPosition() {
-        if (omnibarType == FADE) {
-            when (omnibarPosition) {
-                OmnibarPosition.TOP -> {
-                    binding.fadeOmnibar.resetTransitionDelayed()
-                }
-
-                OmnibarPosition.BOTTOM -> {
-                    binding.fadeOmnibarBottom.resetTransitionDelayed()
-                }
-            }
+    fun getNavigationBar(): BrowserNavigationBarView? {
+        val omnibar = newOmnibar
+        return if (omnibar is FadeOmnibarLayout) {
+            omnibar.navigationBar
+        } else {
+            null
         }
     }
 }

@@ -39,6 +39,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -84,6 +85,7 @@ object PrivacyModule {
         privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
+        webTrackingRepository: WebTrackersBlockedRepository,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -102,6 +104,7 @@ object PrivacyModule {
             privacyProtectionsPopupDataClearer,
             navigationHistory,
             dispatcherProvider,
+            webTrackingRepository,
         )
     }
 

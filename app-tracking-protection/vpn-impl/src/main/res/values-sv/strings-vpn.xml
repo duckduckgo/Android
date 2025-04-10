@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Håll ett öga på blockerade spårare</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Få uppdateringar om blockerade spårningsförsök i dina meddelanden.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Kan du inte använda App Tracking Protection på grund av din VPN? Byt till DuckDuckGo VPN – den enda VPN-tjänsten som är kompatibel. <annotation type="ppro_upsell_link">Läs mer</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection är inaktiverat</b>\nHar din VPN-tjänst inaktiverat App Tracking Protection? Använd reglaget ovan för att återaktivera det.\n\nSkaffa DuckDuckGo VPN – den enda VPN-tjänsten som fungerar med App Tracking Protection. <annotation type="ppro_upsell_link">Läs mer</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Ta din integritet till nästa nivå</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo har den enda VPN-tjänsten som är kompatibel med App Tracking Protection. Aktivera det med ett betalt abonnemang på Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Läs mer</string>
+
 </resources>

@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
-    <string name="settingsAutocompleteEnabled">Показване на предложенията за автоматично довършване</string>
     <string name="autocompleteRemoveItemTitle">Премахване на предложение за търсене?</string>
     <string name="autocompleteRemoveItemCancel">Отмени</string>
     <string name="autocompleteRemoveItemRemove">Премахване</string>
@@ -114,6 +113,11 @@
     <string name="tabSwitcherListViewMenu">Изглед в списък</string>
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt;</string>
+    <string name="inTheLast7Days">през последните 7 дни</string>
+
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
@@ -123,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
-    <string name="settingsHeadingPrivacy">Поверителност</string>
     <string name="settingsHeadingProtections">Защити</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
-    <string name="settingsHeadingCustomize">Персонализиране</string>
     <string name="settingsHeadingAbout">За нас</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Споделяне на отзив</string>
     <string name="leaveFeedbackNew">Изпратете отзив</string>
     <string name="settingsEmailProtectionTitle">Защита на имейл</string>
-    <string name="settingsEmailProtectionSubtitle">Блокирайте имейл тракерите и скрийте своя адрес</string>
-    <string name="settingsHeadingMore">Още от DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Следващи стъпки</string>
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
@@ -150,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Деактивирано</string>
     <string name="settingsSubtitleNotificationsEnabled">Активирано</string>
     <string name="settingsDefaultBrowserTitle">Браузър по подразбиране</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo е браузърът по подразбиране</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Направете DuckDuckGo браузър по подразбиране</string>
     <string name="settingsPrivateSearchTitle">поверително търсене</string>
     <string name="settingsGeneral" instruction="List item for general settings">Обща информация</string>
-    <string name="settingsPrivateSearchDescription">Активирано по подразбиране</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
-    <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
-    <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsHeadingMainSettings">Други Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Изчистване на данни</string>
     <string name="settingsAddWidget">Добавяне на приспособлението към началния екран</string>
     <string name="settingsAddressBarPosition">Задайте позицията на адресната лента</string>
@@ -170,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">поверително търсене</string>
-    <string name="privateSearchTitle">Private Search е разрешено</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search е търсачката по подразбиране, затова можете да търсите в мрежата, без да бъдете проследявани.</string>
-    <string name="privateSearchHeadingSearchSettings">Настройки за търсене</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Още настройки за търсене</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Персонализирайте езика за търсене, региона и др.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Още настройки за търсене</string>
@@ -190,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Защитата от проследяване в мрежата е активирана</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo никога не Ви проследява и се стремим да защитим Вашата поверителност във възможно най-голяма степен. Непрекъснато поддържаме и развиваме слоеве на защита, за да сме в крак с новите методи за проследяване и да осигуряваме много защити, които другите браузъри не предлагат по подразбиране. <u><a href=\"\">Научете повече</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
-    <string name="cookiePopupProtectionDescription">Отървете се от тези изскачащи прозорци и намалете бисквитките</string>
-    <string name="cookiePopupProtectionEnabled">Активирано</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -213,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
 
-    <string name="settingsAutomaticallyClearWhat">Автоматично изчистване…</string>
     <string name="settingsAutomaticallyClearData">Автоматично изчистване на данните…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматично изчистване…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
@@ -601,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Уиджетът %1$s е добавен към началния екран</string>
-    <string name="settingsAddHomeScreenWidget">Уиджет на началния екран</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Сърфирайте поверително с нашето приложение за Mac</string>
-    <string name="macos_settings_title">Браузър DuckDuckGo за Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Изтеглени файлове</string>
@@ -641,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Не, аз ще ги управлявам</string>
 
-    <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Изскачащият прозорец е скрит</string>
     <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 
@@ -650,19 +633,82 @@
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Браузър DuckDuckGo за Windows</string>
-    <string name="windows_settings_description">Сърфирайте поверително с нашето приложение за Windows</string>
-    <string name="windows_settings_description_ready">Налично за изтегляне</string>
-    <string name="windows_settings_description_list">Вече сте в списъка!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Плъзнете надолу от горния край и натиснете бутона за връщане, за да излезете от цял екран</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Затваряне на всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Сигурни ли сте, че искате да затворите всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отмени</string>
     <string name="closeAppTabsConfirmationDialogClose">Затваряне</string>
+
+    <string name="selectTabsMenuItem">Избиране на раздели</string>
+    <string name="selectAllTabsMenuItem">Избиране на всички</string>
+    <string name="deselectAllTabsMenuItem">Премахване на избора на всички</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d избрани</string>
+    <string name="tabSelectedIndicator">Индикатор за избран раздел</string>
+    <string name="tabNotSelectedIndicator">Индикатор за неизбран раздел</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d връзки от DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Споделяне на връзката</item>
+        <item quantity="other">Споделяне на връзки %1$d</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне отметка на избрания раздел?</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Отметката е добавена</item>
+        <item quantity="other">%1$d отметки са добавени</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Отметка</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поставяне на отметка на раздела</item>
+        <item quantity="other">Поставяне на отметка на %1$d раздела</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Съществуващите отметки няма да бъдат дублирани.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на всички %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d други раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела?</item>
+        <item quantity="other">Затваряне на %1$d раздела?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите този раздел?</item>
+        <item quantity="other">Наистина ли искате да затворите всички раздели?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Наистина ли искате да затворите раздела?</item>
+        <item quantity="other">Наистина ли искате да затворите тези раздели?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на разделите</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затваряне на раздел</item>
+        <item quantity="other">Затваряне на %1$d раздела</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Затваряне на другите раздели</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Затворен раздел</item>
+        <item quantity="other">%1$d затворени раздела</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d поверителен раздел</item>
+        <item quantity="other">%1$d поверителни раздела</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
@@ -679,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отмени</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автоматично попълване</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
@@ -796,5 +841,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сега</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Напускане на този сайт</string>
+    <string name="maliciousSiteAdvancedCTA">Разширени</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Ако смятате, че този уебсайт е безопасен, можете да <a href=\"\">съобщите за грешка</a>. Все пак можете да посетите уебсайта на свой собствен риск.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Поемане на риска и отваряне на сайта</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Докладване за сайт, който е отбелязан неправилно като злонамерен</string>
+    <string name="maliciousSiteLearnMoreTitle">Научете повече</string>
+    <string name="maliciousSiteSettingTitle">Предупреждения за безопасност на сайта</string>
+    <string name="maliciousSiteToggleHint">Предупреди ме за сайтове, отбелязани за фишинг или злонамерен софтуер</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Деактивирането на тази функция може да изложи информацията Ви на риск.</string>
 
 </resources>

@@ -216,9 +216,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Etkin</string>
-    <string name="netpSubscriptionSettingsConnecting">Bağlantı kuruluyor...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Devre Dışı</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

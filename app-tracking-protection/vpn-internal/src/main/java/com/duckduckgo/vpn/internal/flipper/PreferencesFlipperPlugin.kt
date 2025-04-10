@@ -48,7 +48,8 @@ class PreferencesFlipperPlugin @Inject constructor(
     private var connection: FlipperConnection? = null
 
     private val onSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-        val descriptor = this.sharedPreferences[sharedPreferences] ?: return@OnSharedPreferenceChangeListener
+        // We assume it could happen sharedPreferences are not initialised here, but not anywhere else in this file
+        val descriptor = runCatching { this.sharedPreferences[sharedPreferences] }.getOrNull() ?: return@OnSharedPreferenceChangeListener
 
         connection?.send(
             "sharedPreferencesChange",

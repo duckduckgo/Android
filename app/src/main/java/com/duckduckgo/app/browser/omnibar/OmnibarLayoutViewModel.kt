@@ -30,6 +30,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
@@ -136,8 +139,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data object CancelTrackersAnimation : Command()
+        data object CancelAnimations : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
     }
 
@@ -163,7 +167,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
         if (hasFocus) {
             viewModelScope.launch {
-                command.send(Command.CancelTrackersAnimation)
+                command.send(Command.CancelAnimations)
             }
 
             _viewState.update {
@@ -290,46 +294,51 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
+        val currentViewMode = _viewState.value.viewMode
         Timber.d("Omnibar: onViewModeChanged $viewMode")
-        when (viewMode) {
-            is CustomTab -> {
-                _viewState.update {
-                    it.copy(
-                        viewMode = viewMode,
-                        showClearButton = false,
-                        showVoiceSearch = false,
-                        showBrowserMenu = true,
-                        showTabsMenu = false,
-                        showFireIcon = false,
-                    )
-                }
-            }
-
-            else -> {
-                val scrollingEnabled = viewMode != NewTab
-                val hasFocus = _viewState.value.hasFocus
-                val leadingIcon = if (hasFocus) {
-                    LeadingIconState.SEARCH
-                } else {
-                    when (viewMode) {
-                        Error, SSLWarning, MaliciousSiteWarning -> GLOBE
-                        NewTab -> SEARCH
-                        else -> SEARCH
+        if (currentViewMode is CustomTab) {
+            Timber.d("Omnibar: custom tab mode enabled, sending updates there")
+        } else {
+            when (viewMode) {
+                is CustomTab -> {
+                    _viewState.update {
+                        it.copy(
+                            viewMode = viewMode,
+                            showClearButton = false,
+                            showVoiceSearch = false,
+                            showBrowserMenu = true,
+                            showTabsMenu = false,
+                            showFireIcon = false,
+                        )
                     }
                 }
 
-                _viewState.update {
-                    it.copy(
-                        viewMode = viewMode,
-                        leadingIconState = leadingIcon,
-                        scrollingEnabled = scrollingEnabled,
-                        showVoiceSearch = shouldShowVoiceSearch(
-                            hasFocus = _viewState.value.hasFocus,
-                            query = _viewState.value.omnibarText,
-                            hasQueryChanged = false,
-                            urlLoaded = _viewState.value.url,
-                        ),
-                    )
+                else -> {
+                    val scrollingEnabled = viewMode != NewTab
+                    val hasFocus = _viewState.value.hasFocus
+                    val leadingIcon = if (hasFocus) {
+                        LeadingIconState.SEARCH
+                    } else {
+                        when (viewMode) {
+                            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
+                            NewTab -> SEARCH
+                            else -> SEARCH
+                        }
+                    }
+
+                    _viewState.update {
+                        it.copy(
+                            viewMode = viewMode,
+                            leadingIconState = leadingIcon,
+                            scrollingEnabled = scrollingEnabled,
+                            showVoiceSearch = shouldShowVoiceSearch(
+                                hasFocus = _viewState.value.hasFocus,
+                                query = _viewState.value.omnibarText,
+                                hasQueryChanged = false,
+                                urlLoaded = _viewState.value.url,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -572,19 +581,44 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
     }
 
-    fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
-        Timber.d("Omnibar: LaunchTrackersAnimation")
-        if (!decoration.entities.isNullOrEmpty()) {
-            val hasFocus = _viewState.value.hasFocus
-            if (!hasFocus) {
-                _viewState.update {
-                    it.copy(
-                        leadingIconState = PRIVACY_SHIELD,
-                    )
-                }
+    fun onAnimationStarted(decoration: Decoration) {
+        when (decoration) {
+            is LaunchCookiesAnimation -> {
                 viewModelScope.launch {
-                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                    command.send(Command.StartCookiesAnimation(decoration.isCosmetic))
                 }
+            }
+
+            is LaunchTrackersAnimation -> {
+                Timber.d("Omnibar: LaunchTrackersAnimation")
+                if (!decoration.entities.isNullOrEmpty()) {
+                    val hasFocus = _viewState.value.hasFocus
+                    if (!hasFocus) {
+                        _viewState.update {
+                            it.copy(
+                                leadingIconState = PRIVACY_SHIELD,
+                            )
+                        }
+                        viewModelScope.launch {
+                            command.send(Command.StartTrackersAnimation(decoration.entities))
+                        }
+                    }
+                }
+            }
+
+            else -> {
+                // no-op
+            }
+        }
+    }
+
+    fun onStartedTransforming() {
+        viewModelScope.launch {
+            command.send(Command.CancelAnimations)
+            _viewState.update {
+                it.copy(
+                    highlightPrivacyShield = HighlightableButton.Gone,
+                )
             }
         }
     }
@@ -624,6 +658,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                     urlLoaded = url,
                 ),
             )
+        }
+    }
+
+    fun onCustomTabTitleUpdate(decoration: ChangeCustomTabTitle) {
+        val customTabMode = viewState.value.viewMode
+        if (customTabMode is CustomTab) {
+            _viewState.update {
+                it.copy(
+                    viewMode = customTabMode.copy(title = decoration.title),
+                )
+            }
         }
     }
 }

@@ -24,50 +24,67 @@
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/toolbarContainer"
+    <LinearLayout
+        android:id="@+id/rootContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?daxColorToolbar">
+        android:orientation="vertical"
+        app:layout_scrollFlags="scroll|enterAlways|snap">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/experimentalToolbarSize"
-            app:contentInsetEnd="0dp"
-            app:contentInsetStart="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/toolbarContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/daxColorToolbar">
 
-            <include
-                android:id="@+id/customTabToolbarContainer"
-                layout="@layout/include_custom_tab_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/experimentalToolbarSize"
+                app:contentInsetEnd="0dp"
+                app:contentInsetStart="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                <include
+                    android:id="@+id/customTabToolbarContainer"
+                    layout="@layout/include_custom_tab_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    android:layout_marginBottom="@dimen/keyline_3"
                     style="@style/Widget.DuckDuckGo.OmnibarCardView"
-                    android:stateListAnimator="@drawable/fade_omnibar_state_selector">
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
+                    android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
+                    app:strokeColor="?daxColorAccentBlue"
+                    app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
+                    android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/experimentalOmnibarContentPadding">
+
+                        <ProgressBar
+                            android:id="@+id/pageLoadingIndicator"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:progressDrawable="@drawable/loading_progress"
+                            android:visibility="invisible"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            tools:progress="50"
+                            tools:visibility="visible" />
 
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/trackersAnimation"
@@ -86,6 +103,7 @@
                             android:id="@+id/shieldIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/keyline_1"
                             android:importantForAccessibility="no"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
@@ -96,6 +114,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/keyline_1"
+                            android:layout_marginEnd="@dimen/keyline_1"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -130,6 +149,19 @@
                                 android:padding="6dp"
                                 android:scaleType="center"
                                 android:src="@drawable/ic_find_search_20_a05" />
+
+                            <ImageView
+                                android:id="@+id/backIcon"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:layout_gravity="center"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/back"
+                                android:gravity="center"
+                                android:padding="@dimen/toolbarIconPadding"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_arrow_left_24e"
+                                android:visibility="gone" />
 
                             <ImageView
                                 android:id="@+id/globeIcon"
@@ -209,208 +241,171 @@
                             android:textSize="16sp"
                             android:textStyle="normal"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                            app:layout_constraintEnd_toStartOf="@id/endIconsContainer"
                             app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <ImageView
-                            android:id="@+id/clearTextButton"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/endIconsContainer"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/keyline_1"
-                            android:background="?selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/clearButtonContentDescription"
-                            android:padding="@dimen/toolbarIconPadding"
-                            android:src="@drawable/ic_close_24"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:visibility="visible" />
+                            android:layout_height="match_parent"
+                            app:layout_constraintEnd_toEndOf="parent">
 
-                        <ImageView
-                            android:id="@+id/voiceSearchButton"
-                            android:layout_width="@dimen/toolbarIcon"
-                            android:layout_height="@dimen/toolbarIcon"
-                            android:background="?selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/voiceSearchIconContentDescription"
-                            android:padding="@dimen/toolbarIconPadding"
-                            android:scaleType="center"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/spacer"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_microphone_24"
-                            tools:visibility="visible" />
+                            <ImageView
+                                android:id="@+id/clearTextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/keyline_1"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/clearButtonContentDescription"
+                                android:padding="@dimen/toolbarIconPadding"
+                                android:src="@drawable/ic_close_24"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:visibility="visible" />
 
-                        <View
-                            android:id="@+id/spacer"
-                            android:layout_width="10dp"
-                            android:layout_height="0dp"
-                            android:importantForAccessibility="no"
-                            app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
-                            app:layout_constraintEnd_toStartOf="@id/aiChat"
-                            app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+                            <ImageView
+                                android:id="@+id/voiceSearchButton"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/voiceSearchIconContentDescription"
+                                android:padding="@dimen/toolbarIconPadding"
+                                android:scaleType="center"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/spacer"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_microphone_24"
+                                tools:visibility="visible" />
 
-                        <com.duckduckgo.common.ui.view.divider.VerticalDivider
-                            android:id="@+id/verticalDivider"
-                            android:layout_width="1dp"
-                            android:layout_height="24dp"
-                            android:layout_marginVertical="@dimen/keyline_2"
-                            android:importantForAccessibility="no"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/aiChat"
-                            app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            <View
+                                android:id="@+id/spacer"
+                                android:layout_width="10dp"
+                                android:layout_height="0dp"
+                                android:importantForAccessibility="no"
+                                app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
+                                app:layout_constraintEnd_toStartOf="@id/aiChat"
+                                app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
 
-                        <ImageView
-                            android:id="@+id/aiChat"
-                            android:layout_width="@dimen/toolbarIcon"
-                            android:layout_height="@dimen/toolbarIcon"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="@dimen/keyline_1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/browserPopupMenu"
-                            android:padding="@dimen/toolbarIconPadding"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_ai_chat_outline_24"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:visibility="visible" />
+                            <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                                android:id="@+id/verticalDivider"
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:layout_marginVertical="@dimen/keyline_2"
+                                android:importantForAccessibility="no"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/aiChat"
+                                app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <ImageView
+                                android:id="@+id/aiChat"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:layout_gravity="center"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/browserPopupMenu"
+                                android:padding="@dimen/toolbarIconPadding"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_ai_chat_outline_24"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:visibility="visible" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
+            </androidx.appcompat.widget.Toolbar>
 
-
-        </androidx.appcompat.widget.Toolbar>
-
-        <ProgressBar
-            android:id="@+id/pageLoadingIndicator"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:progressDrawable="@drawable/loading_progress"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:progress="50"
-            tools:visibility="visible" />
-
-        <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
-            android:id="@+id/tabsMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_0"
-            android:background="?selectableItemBackgroundBorderless"
-            android:padding="@dimen/keyline_2"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/browserMenu"
-            app:layout_constraintStart_toEndOf="@id/fireIconMenu"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <FrameLayout
-            android:id="@+id/browserMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/keyline_0"
-            android:padding="@dimen/keyline_2"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/browserMenuImageView"
+            <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
+                android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:src="@drawable/ic_menu_vertical_24" />
+                android:layout_marginHorizontal="@dimen/keyline_0"
+                android:background="?selectableItemBackgroundBorderless"
+                android:padding="@dimen/keyline_2"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/browserMenu"
+                app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <View
-                android:id="@+id/browserMenuHighlight"
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_gravity="end"
-                android:background="@drawable/ic_circle_7_accent_blue"
-                android:visibility="gone" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/fireIconMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="6dp"
-            android:padding="@dimen/keyline_2"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/fireIconImageView"
+            <FrameLayout
+                android:id="@+id/browserMenu"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:src="@drawable/ic_fire" />
-        </FrameLayout>
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/keyline_0"
+                android:padding="@dimen/keyline_2"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <include
-            android:id="@+id/findInPage"
-            layout="@layout/include_find_in_page"
-            android:layout_width="0dp"
-            android:layout_height="?attr/actionBarSize"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/browserMenuImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/browserPopupMenu"
+                    android:src="@drawable/ic_menu_vertical_24" />
 
-        <LinearLayout
-            android:id="@+id/minibar"
+                <View
+                    android:id="@+id/browserMenuHighlight"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_gravity="end"
+                    android:background="@drawable/ic_circle_7_accent_blue"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fireIconMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:padding="@dimen/keyline_2"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/fireIconImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/browserPopupMenu"
+                    android:src="@drawable/ic_fire" />
+            </FrameLayout>
+
+            <include
+                android:id="@+id/findInPage"
+                layout="@layout/include_find_in_page"
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+            android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingVertical="@dimen/keyline_2"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="bottom" />
 
-            <ImageView
-                android:id="@+id/minibarShield"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/keyline_1"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:gravity="center"
-                android:src="@drawable/ic_shield_exploration" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/minibarText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:padding="@dimen/keyline_1"
-                android:text="domain.com"
-                app:typography="caption"
-                tools:ignore="HardcodedText" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </merge>

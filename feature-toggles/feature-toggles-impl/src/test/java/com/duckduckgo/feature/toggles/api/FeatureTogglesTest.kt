@@ -155,7 +155,7 @@ class FeatureTogglesTest {
         toggleStore.set(
             "test_forcesDefaultVariant",
             State(
-                targets = listOf(State.Target("na", localeCountry = null, localeLanguage = null, null, null)),
+                targets = listOf(State.Target("na", localeCountry = null, localeLanguage = null, null, null, null)),
             ),
         )
         assertNull(provider.variantKey)
@@ -427,7 +427,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target("ma", localeCountry = null, localeLanguage = null, null, null)),
+            targets = listOf(State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -445,7 +445,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null, null, null)),
+            targets = listOf(State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -463,7 +463,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(State.Target("zz", localeCountry = null, localeLanguage = null, null, null)),
+            targets = listOf(State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -490,8 +490,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
             ),
         )
 
@@ -511,8 +511,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
-                State.Target("zz", localeCountry = null, localeLanguage = null, null, null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                State.Target("zz", localeCountry = null, localeLanguage = null, null, null, null),
             ),
         )
 

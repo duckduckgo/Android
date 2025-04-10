@@ -63,7 +63,7 @@ jobs:
 
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
-        uses: duckduckgo/native-github-asana-sync@v1.5
+        uses: duckduckgo/native-github-asana-sync@v1.6.1
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -87,7 +87,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.1
+        uses: duckduckgo/native-github-asana-sync@v1.6.1
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -99,7 +99,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v1.5
+        uses: duckduckgo/native-github-asana-sync@v1.6.1
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}

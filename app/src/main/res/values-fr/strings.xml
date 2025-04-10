@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifier la requête avant la recherche</string>
-    <string name="settingsAutocompleteEnabled">Afficher les suggestions de saisie semi-automatique</string>
     <string name="autocompleteRemoveItemTitle">Supprimer la suggestion de recherche ?</string>
     <string name="autocompleteRemoveItemCancel">Annuler</string>
     <string name="autocompleteRemoveItemRemove">Supprimer</string>
@@ -114,6 +113,11 @@
     <string name="tabSwitcherListViewMenu">Vue liste</string>
     <string name="tabSwitcherGridViewMenu">Vue grille</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt; au cours des 7 derniers jours</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt;</string>
+    <string name="inTheLast7Days">au cours des 7 derniers jours</string>
+
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
     <string name="fireClearAll">Effacer tous les onglets et données</string>
@@ -123,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
-    <string name="settingsHeadingPrivacy">Confidentialité</string>
     <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Apparence</string>
-    <string name="settingsHeadingCustomize">Personnaliser</string>
     <string name="settingsHeadingAbout">À propos</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Partagez vos commentaires</string>
     <string name="leaveFeedbackNew">Envoyer vos remarques</string>
     <string name="settingsEmailProtectionTitle">Protection des e-mails</string>
-    <string name="settingsEmailProtectionSubtitle">Bloquez les traqueurs d\'e-mails et masquez votre adresse</string>
-    <string name="settingsHeadingMore">Plus de la part de DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Étapes suivantes</string>
     <string name="settingsLightTheme">Clair</string>
     <string name="settingsTheme">Thème</string>
@@ -150,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Désactivé</string>
     <string name="settingsSubtitleNotificationsEnabled">Activé</string>
     <string name="settingsDefaultBrowserTitle">Navigateur par défaut</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo est votre navigateur par défaut</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Faites de DuckDuckGo votre navigateur par défaut</string>
     <string name="settingsPrivateSearchTitle">Recherche privée</string>
     <string name="settingsGeneral" instruction="List item for general settings">Général</string>
-    <string name="settingsPrivateSearchDescription">Activation par défaut</string>
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
-    <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
-    <string name="settingsHeadingSettings">Paramètres</string>
     <string name="settingsHeadingMainSettings">Autres paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
     <string name="settingsAddWidget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
@@ -170,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Recherche privée</string>
-    <string name="privateSearchTitle">Private Search est activé</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search est votre moteur de recherche par défaut, qui vous permet d\'effectuer des recherches sur le Web sans être suivi(e).</string>
-    <string name="privateSearchHeadingSearchSettings">Paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
@@ -190,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionIsEnabledTitle">La protection contre le pistage sur le Web est activée</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ne vous suit jamais et fait de son mieux pour préserver votre vie privée. Nous ne cessons d\'entretenir et de développer des couches de protection pour ne jamais nous laisser dépasser par les nouvelles méthodes de pistage. Nous fournissons aussi de nombreuses protections que les autres navigateurs ne proposent pas par défaut. <u><a href=\"\">En savoir plus</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
-    <string name="cookiePopupProtectionDescription">Bannissez ces fenêtres contextuelles et réduisez les cookies au minimum</string>
-    <string name="cookiePopupProtectionEnabled">Activé</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -213,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
 
-    <string name="settingsAutomaticallyClearWhat">Effacer automatiquement…</string>
     <string name="settingsAutomaticallyClearData">Effacer automatiquement les données…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Effacer automatiquement…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Aucune</string>
@@ -601,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget ajouté à l\'écran d\'accueil</string>
-    <string name="settingsAddHomeScreenWidget">Widget écran d\'accueil</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Naviguez incognito avec notre application pour Mac</string>
-    <string name="macos_settings_title">Navigateur DuckDuckGo pour Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Téléchargements</string>
@@ -641,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Non, je les gérerai moi-même</string>
 
-    <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Fenêtre contextuelle masquée</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies gérés</string>
 
@@ -650,19 +633,82 @@
     <string name="downloadsNotifyMeSubtitle">Recevez une notification lorsque les téléchargements sont terminés.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Navigateur DuckDuckGo pour Windows</string>
-    <string name="windows_settings_description">Naviguez incognito avec notre application pour Windows</string>
-    <string name="windows_settings_description_ready">Téléchargement disponible</string>
-    <string name="windows_settings_description_list">Vous êtes sur la liste !</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
     <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
+
+    <string name="selectTabsMenuItem">Sélectionner les onglets</string>
+    <string name="selectAllTabsMenuItem">Tout sélectionner</string>
+    <string name="deselectAllTabsMenuItem">Tout désélectionner</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d sélectionné(s)</string>
+    <string name="tabSelectedIndicator">Indicateur d\'onglet sélectionné</string>
+    <string name="tabNotSelectedIndicator">Indicateur d\'onglet non sélectionné</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d liens de DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Partager le lien</item>
+        <item quantity="other">Partager %1$d liens</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet sélectionné aux signets ?</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Signet ajouté</item>
+        <item quantity="other">%1$d signets ajoutés</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Ajouter aux signets</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ajouter l\'onglet aux signets</item>
+        <item quantity="other">Ajouter %1$d onglets aux signets</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Les signets existants ne seront pas dupliqués.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer les %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer un autre onglet ?</item>
+        <item quantity="other">Fermer %1$d autres onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet ?</item>
+        <item quantity="other">Fermer %1$d onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer cet onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer tous les onglets ?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Voulez-vous vraiment fermer l\'onglet ?</item>
+        <item quantity="other">Voulez-vous vraiment fermer ces onglets ?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer les onglets</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fermer l\'onglet</item>
+        <item quantity="other">Fermer %1$d onglets</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Fermer les autres onglets</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Onglet fermé</item>
+        <item quantity="other">%1$d onglets fermés</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d onglet privé</item>
+        <item quantity="other">%1$d onglets privés</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Ajoutez l\'option Recherche vocale privée à la barre d\'adresse. L\'audio n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>
@@ -679,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuler</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Mots de passe</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Mots de passe et saisie automatique</string>
     <string name="autofillLoginSavedSnackbarMessage">Le mot de passe a été enregistré</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Le mot de passe a été modifié</string>
@@ -796,5 +841,25 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Laissez DuckDuckGo protéger davantage ce que vous faites en ligne</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Choisissez-nous comme navigateur par défaut afin que tous les liens de site s\'ouvrent dans DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Pas maintenant</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloque les traqueurs pour protéger votre navigation</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ce site Web se fait peut-être passer pour un site légitime afin de vous inciter à communiquer des informations personnelles, telles que des mots de passe ou des numéros de carte bancaire.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Quitter ce site</string>
+    <string name="maliciousSiteAdvancedCTA">Options avancées</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Si vous pensez que ce site Web est sûr, vous pouvez <a href=\"\">signaler une erreur</a>. La visite du site Web se fera à vos risques et périls.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Signaler un site marqué à tort comme étant malveillant</string>
+    <string name="maliciousSiteLearnMoreTitle">En savoir plus</string>
+    <string name="maliciousSiteSettingTitle">Avertissements de sécurité du site</string>
+    <string name="maliciousSiteToggleHint">Mettez-moi en garde contre les sites signalés pour hameçonnage ou comme étant des logiciels malveillants</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="maliciousSiteSettingDisabled">La désactivation de cette fonctionnalité peut mettre vos informations en danger.</string>
 
 </resources>

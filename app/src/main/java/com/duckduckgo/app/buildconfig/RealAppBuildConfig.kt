@@ -109,9 +109,6 @@ class RealAppBuildConfig @Inject constructor(
     override val canSkipOnboarding: Boolean
         get() = BuildConfig.CAN_SKIP_ONBOARDING || isInternalBuild()
 
-    override val visualDesignExperimentEnabledByDefault: Boolean
-        get() = BuildConfig.VISUAL_DESIGN_EXPERIMENT_ENABLED_BY_DEFAULT
-
     private fun getDownloadsDirectory(): File {
         val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (!downloadDirectory.exists()) {

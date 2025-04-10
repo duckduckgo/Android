@@ -115,19 +115,19 @@
                 "name": "Decode any %XX escapes present in the hostname",
                 "siteURL": "http://www.%73ome%73ite.com",
                 "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": ["windows-browser"]
             },
             {
                 "name": "Discard any leading and/or trailing full-stops",
                 "siteURL": "http://.www.somesite.com.",
                 "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": ["windows-browser"]
             },
             {
                 "name": "Replace sequences of two or more full-stops with a single full-stop.",
                 "siteURL": "http://www..example...com",
                 "expectDomain": "www.example.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": ["windows-browser"]
             },
             {
                 "name": "If the hostname is a numeric IPv4 address, reduce it to the canonical dotted quad form.",

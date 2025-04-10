@@ -269,6 +269,7 @@ class RealSubscriptionsManager @Inject constructor(
     private var purchaseStateJob: Job? = null
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
+    private var purchaseFlowStartedUsingRestoredAccount: Boolean = false
 
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
@@ -469,6 +470,11 @@ class RealSubscriptionsManager @Inject constructor(
                 }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
+                if (purchaseFlowStartedUsingRestoredAccount) {
+                    purchaseFlowStartedUsingRestoredAccount = false
+                    val hasEmail = !authRepository.getAccount()?.email.isNullOrBlank()
+                    pixelSender.reportPurchaseWithRestoredAccount(hasEmail)
+                }
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
             } else {
@@ -484,6 +490,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
+        purchaseFlowStartedUsingRestoredAccount = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -575,6 +582,15 @@ class RealSubscriptionsManager @Inject constructor(
             validateTokens(tokens, jwks)
         } catch (e: HttpException) {
             if (e.code() == 400) {
+                if (parseError(e)?.error == "unknown_account") {
+                    /*
+                        Refresh token appears to be valid, but the related account doesn't exist in BE.
+                        After the subscription expires, BE eventually deletes the account, so this is expected.
+                     */
+                    signOut()
+                    throw e
+                }
+
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
@@ -810,16 +826,20 @@ class RealSubscriptionsManager @Inject constructor(
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 
+            var restoredAccount = false
+
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
+                restoredAccount = isSignedIn()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
                         recoverSubscriptionFromStore()
-                        removeExpiredSubscriptionOnCancelledPurchase =
-                            accountId != null && accountId != authRepository.getAccount()?.externalId
+                        val accountIdChanged = accountId != null && accountId != authRepository.getAccount()?.externalId
+                        removeExpiredSubscriptionOnCancelledPurchase = accountIdChanged
+                        restoredAccount = accountIdChanged
                     }
                 }
             }
@@ -840,6 +860,8 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
 
+            purchaseFlowStartedUsingRestoredAccount = restoredAccount
+
             logcat(LogPriority.DEBUG) { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
             playBillingManager.launchBillingFlow(
@@ -853,6 +875,7 @@ class RealSubscriptionsManager @Inject constructor(
             logcat(LogPriority.ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
+            purchaseFlowStartedUsingRestoredAccount = false
         }
     }
 

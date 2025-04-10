@@ -60,10 +60,6 @@ tags:
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/close"
             - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/newTab"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/newTab"
-            - assertVisible:
                 id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
