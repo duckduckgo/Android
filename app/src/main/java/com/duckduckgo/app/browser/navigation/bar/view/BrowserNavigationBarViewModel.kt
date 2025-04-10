@@ -23,7 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
@@ -58,17 +57,31 @@ class BrowserNavigationBarViewModel @Inject constructor(
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    private val isCustomTab = MutableStateFlow(false)
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = combine(
         _viewState.asStateFlow(),
+        isCustomTab,
         tabRepository.flowTabs,
         visualDesignExperimentDataStore.navigationBarState,
-    ) { state, tabs, navigationBarState ->
+    ) { state, isCustomTab, tabs, navigationBarState ->
         state.copy(
             isVisible = navigationBarState.isEnabled,
             tabsCount = tabs.size,
             shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
-        )
+        ).let { newState ->
+            if (isCustomTab) {
+                newState.copy(
+                    newTabButtonVisible = false,
+                    autofillButtonVisible = false,
+                    bookmarksButtonVisible = false,
+                    fireButtonVisible = false,
+                    tabsButtonVisible = false,
+                )
+            } else {
+                newState
+            }
+        }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     fun onFireButtonClicked() {
@@ -99,6 +112,10 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _commands.trySend(NotifyBookmarksButtonClicked)
     }
 
+    fun setCustomTab(customTab: Boolean) {
+        isCustomTab.update { customTab }
+    }
+
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             NewTab -> {
@@ -119,17 +136,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         autofillButtonVisible = false,
                         fireButtonVisible = true,
                         tabsButtonVisible = true,
-                    )
-                }
-            }
-
-            CustomTab -> {
-                _viewState.update {
-                    it.copy(
-                        newTabButtonVisible = false,
-                        autofillButtonVisible = false,
-                        fireButtonVisible = false,
-                        tabsButtonVisible = false,
                     )
                 }
             }

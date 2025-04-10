@@ -1052,7 +1052,7 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
-            browserNavigationBarIntegration.configureCustomTabViewMode()
+            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 

@@ -81,6 +81,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
     var browserNavigationBarObserver: BrowserNavigationBarObserver? = null
 
+    fun setCustomTab(isCustomTab: Boolean) {
+        doOnAttach {
+            viewModel.setCustomTab(isCustomTab)
+        }
+    }
+
     fun setViewMode(viewMode: ViewMode) {
         doOnAttach {
             viewModel.setViewMode(viewMode)
@@ -172,7 +178,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     enum class ViewMode {
         NewTab,
         Browser,
-        CustomTab,
     }
 
     /**
