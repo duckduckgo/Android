@@ -2824,6 +2824,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                        ctaViewModel.dismissPulseAnimation()
                     }
                 }
             }
