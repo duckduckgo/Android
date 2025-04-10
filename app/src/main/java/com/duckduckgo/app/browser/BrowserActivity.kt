@@ -209,6 +209,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             getSelectedTabId = tabManager::getSelectedTabId,
             getTabById = ::getTabById,
             requestAndWaitForNewTab = ::requestAndWaitForNewTab,
+            swipingTabsFeature = swipingTabsFeature,
         )
     }
 

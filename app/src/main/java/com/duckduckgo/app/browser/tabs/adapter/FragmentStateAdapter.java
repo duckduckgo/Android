@@ -46,12 +46,16 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider;
 import com.duckduckgo.app.browser.tabs.TabManager;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import timber.log.Timber;
 
@@ -96,6 +100,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final FragmentManager mFragmentManager;
 
+    @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
+    final SwipingTabsFeatureProvider mSwipingTabsFeature;
+
     // Fragment bookkeeping
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final LongSparseArray<Fragment> mFragments = new LongSparseArray<>();
@@ -113,6 +120,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     boolean mIsInGracePeriod = false;
 
     private boolean mHasStaleFragments = false;
+
+    // Used for synchronizing access to the container when adding fragment views
+    private final ConcurrentHashMap<FrameLayout, Object> containerLocks = new ConcurrentHashMap<>();
 
     // Add a LinkedList to store itemIds in FIFO order
     private final ArrayDeque<Long> itemIdQueue = new ArrayDeque<>();
@@ -146,6 +156,24 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             @NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         mFragmentManager = fragmentManager;
         mLifecycle = lifecycle;
+        mSwipingTabsFeature = null;
+        super.setHasStableIds(true);
+    }
+
+    /**
+     * @param fragmentManager of {@link ViewPager2}'s host
+     * @param lifecycle of {@link ViewPager2}'s host
+     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
+     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
+     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
+     */
+    public FragmentStateAdapter(
+            @NonNull FragmentManager fragmentManager,
+            @NonNull Lifecycle lifecycle,
+            SwipingTabsFeatureProvider swipingTabsFeature) {
+        mFragmentManager = fragmentManager;
+        mLifecycle = lifecycle;
+        mSwipingTabsFeature = swipingTabsFeature;
         super.setHasStableIds(true);
     }
 
@@ -182,7 +210,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @NonNull
     @Override
     public final FragmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return FragmentViewHolder.create(parent);
+        if (mSwipingTabsFeature != null && mSwipingTabsFeature.isTabSwipingFix1Enabled()) {
+            return FragmentContainerViewHolder.create(parent);
+        } else {
+            return FrameLayoutViewHolder.create(parent);
+        }
     }
 
     @Override
@@ -327,7 +359,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         // { f:notAdded, v:created, v:attached } -> illegal state
         // { f:notAdded, v:created, v:notAttached } -> illegal state
         if (!fragment.isAdded() && view != null) {
-            throw new IllegalStateException("Design assumption violated.");
+            throwDesignAssumptionViolatedException();
         }
 
         // { f:added, v:notCreated, v:notAttached} -> schedule callback for when created
@@ -415,23 +447,36 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     void addViewToContainer(@NonNull View v, @NonNull FrameLayout container) {
-        if (container.getChildCount() > 1) {
-            throw new IllegalStateException("Design assumption violated.");
-        }
+        Object lock = containerLocks.computeIfAbsent(container, k -> new Object());
+        synchronized(lock) {
+            if (container.getChildCount() > 1) {
+                throwDesignAssumptionViolatedException();
+            }
 
-        if (v.getParent() == container) {
-            return;
-        }
+            if (v.getParent() == container) {
+                return;
+            }
 
-        if (container.getChildCount() > 0) {
-            container.removeAllViews();
-        }
+            if (container.getChildCount() > 0) {
+                container.removeAllViews();
+            }
 
-        if (v.getParent() != null) {
-            ((ViewGroup) v.getParent()).removeView(v);
-        }
+            if (v.getParent() != null) {
+                ((ViewGroup) v.getParent()).removeView(v);
+            }
 
-        container.addView(v);
+            container.addView(v);
+        }
+    }
+
+    private void throwDesignAssumptionViolatedException() {
+        throw new IllegalStateException(
+            String.format(
+                "Design assumption violated: Fix1 enabled: %s, Fix2 enabled: %s",
+                mSwipingTabsFeature.isTabSwipingFix1Enabled(),
+                mSwipingTabsFeature.isTabSwipingFix2Enabled()
+            )
+        );
     }
 
     @Override
@@ -519,10 +564,22 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     }
 
     private void hideFragment(long itemId) {
+        // do not attempt to hide fragments if the ViewPager is in a transient state
+        if (shouldDelayFragmentTransactions() && mSwipingTabsFeature.isTabSwipingFix2Enabled()) {
+            return;
+        }
+
         Fragment fragment = mFragments.get(itemId);
 
         if (fragment == null) {
             return;
+        }
+
+        if (fragment.getView() != null) {
+            ViewParent viewParent = fragment.getView().getParent();
+            if (viewParent != null) {
+                ((FrameLayout) viewParent).removeAllViews();
+            }
         }
 
         if (fragment.isAdded() && !fragment.isHidden()) {
