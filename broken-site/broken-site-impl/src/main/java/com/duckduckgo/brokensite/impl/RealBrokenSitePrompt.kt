@@ -70,25 +70,24 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.resetRefreshCount()
     }
 
-    override fun getUserRefreshesCount(reset: Boolean): Int {
+    override fun getUserRefreshesCount(): Int {
         return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
             currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
             currentTimeProvider.localDateTimeNow(),
         ).also {
-            if (it >= REFRESH_COUNT_LIMIT && reset) {
+            if (it >= REFRESH_COUNT_LIMIT) {
                 brokenSiteReportRepository.resetRefreshCount()
             }
         }
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
-        if (!isFeatureEnabled() || getUserRefreshesCount(reset = true) < REFRESH_COUNT_LIMIT || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+        if (!isFeatureEnabled() || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
             val reason = when {
                 !isFeatureEnabled() -> "DISABLED"
                 duckGoUrlDetector.isDuckDuckGoUrl(url) -> "DDG"
-                else -> "COUNT TOO LOW (${getUserRefreshesCount(reset = false)})"
+                else -> "SOMETHING WEIRD HAPPENED for $url"
             }
-
             Timber.d("KateTest--> should NOT show bc $reason")
             return false
         }

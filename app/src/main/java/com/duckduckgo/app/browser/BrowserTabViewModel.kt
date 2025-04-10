@@ -265,6 +265,9 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
+import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
+import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -468,6 +471,7 @@ class BrowserTabViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val blockListPixelsPlugin: BlockListPixelsPlugin,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2759,11 +2763,13 @@ class BrowserTabViewModel @Inject constructor(
             val isBrowserShowing = currentBrowserViewState().browserShowing
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
+            val showBrokenSitePrompt = shouldPromptForBrokenSiteReport()
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
                     isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
+                    showBrokenSitePrompt,
                 )
             }
             val isOnboardingComplete = withContext(dispatchers.io()) {
@@ -3946,26 +3952,41 @@ class BrowserTabViewModel @Inject constructor(
         newTabPixels.get().fireNewTabDisplayed()
     }
 
-    private fun fireReloadPixelIfRefreshCountMet() {
-        if (brokenSitePrompt.getUserRefreshesCount(reset = false) >= REFRESH_COUNT_LIMIT) {
-            Timber.d("KateTest--> Sending 3x reload pixel from BTVM fireReloadPixelIfRefreshCountMet")
-            pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+    private suspend fun shouldPromptForBrokenSiteReport(): Boolean {
+        return withContext(dispatchers.io()) {
+            val refreshCount = brokenSitePrompt.getUserRefreshesCount()
+            when (refreshCount) {
+                0, 1 -> false
+                2 -> {
+                    blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
+                        pixel.fire(it.pixelName, it.params)
+                    }
+                    pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+                    Timber.d("KateTest--> send pixel only bc 2 refreshes")
+                    false
+                }
+                else -> {
+                    blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
+                        pixel.fire(it.pixelName, it.params)
+                    }
+                    pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+                    Timber.d("KateTest--> should show bc 3 refreshes")
+                    site?.let { brokenSitePrompt.shouldShowBrokenSitePrompt(it.url) } ?: false
+                }
+            }
         }
     }
 
     fun handleMenuRefreshAction() {
         refreshPixelSender.sendMenuRefreshPixels()
-        fireReloadPixelIfRefreshCountMet()
     }
 
     fun handlePullToRefreshAction() {
         refreshPixelSender.sendPullToRefreshPixels()
-        fireReloadPixelIfRefreshCountMet()
     }
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
-        fireReloadPixelIfRefreshCountMet()
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
@@ -4031,8 +4052,6 @@ class BrowserTabViewModel @Inject constructor(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
-
-        private const val REFRESH_COUNT_LIMIT = 3
 
         private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
         private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix
