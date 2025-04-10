@@ -1,6 +1,7 @@
 package com.duckduckgo.malicioussiteprotection.impl.data
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
@@ -63,7 +64,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
         whenever(maliciousSiteDatasetService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
 
-        repository.loadFilters()
+        repository.loadFilters(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService).getPhishingFilterSet(latestRevision.first().revision)
         verify(maliciousSiteDao).updateFilters(any<PhishingFilterSetWithRevision>())
@@ -77,7 +78,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
 
-        repository.loadFilters()
+        repository.loadFilters(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService, never()).getPhishingFilterSet(any())
         verify(maliciousSiteDao, never()).updateFilters(any())
@@ -93,7 +94,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
         whenever(maliciousSiteDatasetService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
 
-        repository.loadHashPrefixes()
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService).getPhishingHashPrefixes(latestRevision.first().revision)
         verify(maliciousSiteDao).updateHashPrefixes(any<PhishingHashPrefixesWithRevision>())
@@ -107,7 +108,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
 
-        repository.loadHashPrefixes()
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService, never()).getPhishingHashPrefixes(any())
         verify(maliciousSiteDao, never()).updateHashPrefixes(any())
