@@ -136,6 +136,7 @@ class Omnibar(
         fun onCustomTabClosePressed()
         fun onCustomTabPrivacyDashboardPressed()
         fun onVoiceSearchPressed()
+        fun onDuckChatButtonPressed()
     }
 
     interface FindInPageListener {

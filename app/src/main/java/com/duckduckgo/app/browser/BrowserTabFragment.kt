@@ -892,6 +892,14 @@ class BrowserTabFragment :
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
         }
+
+        binding.includeNewBrowserTab.newTabLayout.apply {
+            setOnClickListener {
+                if (omnibar.omnibarTextInput.isFocused) {
+                    binding.focusDummy.requestFocus()
+                }
+            }
+        }
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -2616,6 +2624,10 @@ class BrowserTabFragment :
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
                 }
+
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
+                }
             },
         )
         omnibar.configureFadeOmnibarItemPressedListeners(
@@ -3408,6 +3420,14 @@ class BrowserTabFragment :
             Timber.v("Keyboard now showing")
             showKeyboard(omnibar.omnibarTextInput)
             omnibar.showOutline(true)
+            omnibar.textInputRootView.post {
+                val rootView = omnibar.textInputRootView
+                val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
+                keyboardVisibilityUtil.addKeyboardHiddenListener {
+                    binding.focusDummy.requestFocus()
+                    omnibar.showOutline(false)
+                }
+            }
         }
     }
 
