@@ -47,9 +47,10 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.net.SocketTimeoutException
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
@@ -80,11 +81,11 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val pixels: Pixel,
 ) : MaliciousSiteRepository {
 
-    private val isWriting = AtomicBoolean(false)
+    private val writeMutex = Mutex()
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
         return withContext(dispatcherProvider.io()) {
-            if (isWriting.get()) {
+            if (writeMutex.isLocked) {
                 throw WriteInProgressException()
             }
             maliciousSiteDao.hashPrefixExists(hashPrefix)
@@ -93,7 +94,7 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun getFilters(hash: String): FilterSet? {
         return withContext(dispatcherProvider.io()) {
-            if (isWriting.get()) {
+            if (writeMutex.isLocked) {
                 throw WriteInProgressException()
             }
             maliciousSiteDao.getFilter(hash)?.let {
@@ -198,9 +199,9 @@ class RealMaliciousSiteRepository @Inject constructor(
                 MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
             },
         ) {
-            isWriting.set(true)
-            maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed))
-            isWriting.set(false)
+            writeMutex.withLock {
+                maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed))
+            }
         }
     }
 
@@ -218,9 +219,9 @@ class RealMaliciousSiteRepository @Inject constructor(
                 MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
             },
         ) {
-            isWriting.set(true)
-            maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed))
-            isWriting.set(false)
+            writeMutex.withLock {
+                maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed))
+            }
         }
     }
 

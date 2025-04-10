@@ -99,7 +99,8 @@ class RealMaliciousSiteProtection @Inject constructor(
                 }
             }
         } catch (e: WriteInProgressException) {
-            timber.d("Write in progress, go to network")
+            timber.d("Write in progress, ignoring")
+            return ConfirmedResult(Ignored)
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
