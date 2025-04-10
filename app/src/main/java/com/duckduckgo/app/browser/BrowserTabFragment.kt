@@ -967,9 +967,7 @@ class BrowserTabFragment :
     private fun configureEditModeChangeDetection() {
         if (swipingTabsFeature.isEnabled) {
             omnibar.isInEditMode.onEach { isInEditMode ->
-                if (isActiveTab) {
-                    browserActivity?.onEditModeChanged(isInEditMode)
-                }
+                browserActivity?.onEditModeChanged(isInEditMode)
             }.launchIn(lifecycleScope)
         }
     }
@@ -1026,7 +1024,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
-        hideKeyboardImmediately()
+        hideKeyboard()
         voiceSearchLauncher.launch(requireActivity())
     }
 
@@ -1928,6 +1926,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -1967,7 +1966,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                hideKeyboardImmediately()
+                hideKeyboard()
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
@@ -2623,6 +2622,10 @@ class BrowserTabFragment :
                 override fun onDuckChatButtonPressed() {
                     onOmnibarDuckChatPressed(omnibar.getText())
                 }
+
+                override fun onBackButtonPressed() {
+                    hideKeyboard()
+                }
             },
         )
     }
@@ -2845,6 +2848,13 @@ class BrowserTabFragment :
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
+        daxBubbleCta.hideDaxBubbleCta(binding)
+        hideDaxBubbleCta()
+        renderer.showNewTab()
+        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
@@ -3381,15 +3391,6 @@ class BrowserTabFragment :
         isDoneCounting: Boolean,
     ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
-    }
-
-    private fun hideKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now hiding")
-            omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
-        }
     }
 
     private fun hideKeyboard() {
@@ -4120,6 +4121,10 @@ class BrowserTabFragment :
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
+
+                setOnDismissCtaClicked {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                }
             }
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4145,6 +4150,9 @@ class BrowserTabFragment :
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
                 onSuggestedOptionsSelected,
+                {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                },
             )
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()

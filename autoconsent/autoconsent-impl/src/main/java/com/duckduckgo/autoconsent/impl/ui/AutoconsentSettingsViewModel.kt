@@ -27,7 +27,6 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONS
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_ON
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_SHOWN
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -41,13 +40,16 @@ import kotlinx.coroutines.launch
 class AutoconsentSettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val pixel: Pixel,
-    private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel() {
     data class ViewState(
         val autoconsentEnabled: Boolean,
     )
+
     sealed class Command {
-        data class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL, @StringRes val titleId: Int = R.string.autoconsentTitle) : Command()
+        data class LaunchLearnMoreWebPage(
+            val url: String = LEARN_MORE_URL,
+            @StringRes val titleId: Int = R.string.autoconsentTitle,
+        ) : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -57,9 +59,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     init {
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            pixel.fire(SETTINGS_AUTOCONSENT_SHOWN)
-        }
+        pixel.fire(SETTINGS_AUTOCONSENT_SHOWN)
     }
 
     fun commands(): Flow<Command> {
@@ -68,15 +68,13 @@ class AutoconsentSettingsViewModel @Inject constructor(
 
     fun onUserToggleAutoconsent(enabled: Boolean) {
         viewModelScope.launch {
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                pixel.fire(
-                    if (enabled) {
-                        SETTINGS_AUTOCONSENT_ON
-                    } else {
-                        SETTINGS_AUTOCONSENT_OFF
-                    },
-                )
-            }
+            pixel.fire(
+                if (enabled) {
+                    SETTINGS_AUTOCONSENT_ON
+                } else {
+                    SETTINGS_AUTOCONSENT_OFF
+                },
+            )
             autoconsent.changeSetting(enabled)
             viewStateFlow.emit(ViewState(autoconsent.isSettingEnabled()))
         }

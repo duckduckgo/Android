@@ -202,6 +202,10 @@ class TabDataRepository @Inject constructor(
         tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
+    override suspend fun getTabs() = withContext(dispatchers.io()) {
+        tabsDao.tabs()
+    }
+
     override fun getOpenTabCount(): Int {
         return tabsDao.tabs().size
     }

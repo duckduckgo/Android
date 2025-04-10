@@ -162,7 +162,7 @@ class TabSwitcherViewModelTest {
 
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
-        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
+        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")

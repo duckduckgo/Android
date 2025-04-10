@@ -64,6 +64,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
@@ -230,7 +231,7 @@ class Omnibar(
         newOmnibar.omnibarTextInput.rootView
     }
 
-    val isInEditMode = newOmnibar.isEditingFlow
+    val isInEditMode = newOmnibar.isEditingFlow.distinctUntilChanged()
 
     var isScrollingEnabled: Boolean
         get() =

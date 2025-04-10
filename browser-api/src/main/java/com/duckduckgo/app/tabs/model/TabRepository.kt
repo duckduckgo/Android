@@ -127,6 +127,8 @@ interface TabRepository {
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
 
+    suspend fun getTabs(): List<TabEntity>
+
     fun getOpenTabCount(): Int
 
     /**

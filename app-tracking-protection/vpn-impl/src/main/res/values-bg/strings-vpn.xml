@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Следете блокираните тракери</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Получавайте актуализации за блокирани опити за проследяване в чекмеджето за известия.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Не можете да използвате App Tracking Protection заради VPN-а си? Преминете към DuckDuckGo VPN — единственият съвместим VPN. <annotation type="ppro_upsell_link">Научете повече</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection е деактивирана</b>\nВашата VPN услуга ли деактивира App Tracking Protection? Използвайте превключвателя по-горе, за да го активирате отново.\n\nВземете DuckDuckGo VPN — единствената VPN, която работи с App Tracking Protection. <annotation type="ppro_upsell_link">Научете повече</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Издигнете поверителността си на по-високо ниво</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo има единствената VPN услуга, която е съвместима с App Tracking Protection. Активирайте с платен абонамент за Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Научете повече</string>
+
 </resources>

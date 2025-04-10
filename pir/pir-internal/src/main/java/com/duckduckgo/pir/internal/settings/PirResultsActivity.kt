@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,18 +28,25 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalResultsBinding
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.NavigateResult
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirResultsScreenNoParams::class)
+@ContributeToActivityStarter(PirResultsScreenParams::class)
 class PirResultsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: PirRepository
@@ -46,7 +54,13 @@ class PirResultsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    private val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
     private val binding: ActivityPirInternalResultsBinding by viewBinding()
+
+    private val params: PirResultsScreenParams?
+        get() = intent.getActivityParams(PirResultsScreenParams::class.java)
+
+    private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,39 +70,101 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
-        repository.getAllResultsFlow()
+        adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+        binding.scanLogList.adapter = adapter
+
+        when (params) {
+            is PirEventsResultsScreen -> {
+                setTitle(R.string.pirDevViewRunEvents)
+                showAllEvents()
+            }
+
+            is PirScanResultsScreen -> {
+                setTitle(R.string.pirDevViewScanResults)
+                showScanResults()
+            }
+
+            is PirOptOutResultsScreen -> {
+                setTitle(R.string.pirDevViewOptOutResults)
+                showOptOutResults()
+            }
+
+            null -> {}
+        }
+    }
+
+    private fun showOptOutResults() {
+        repository.getAllOptOutActionLogFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                render(it)
+            .onEach { optOutEvents ->
+                optOutEvents.map { result ->
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.append("Time: ${formatter.format(Date(result.completionTimeInMillis))}\n")
+                    stringBuilder.append("BROKER NAME: ${result.brokerName}\n")
+                    stringBuilder.append("EXTRACTED PROFILE: ${result.extractedProfile}\n")
+                    stringBuilder.append("ACTION EXECUTED: ${result.actionType}\n")
+                    stringBuilder.append("IS ERROR: ${result.isError}\n")
+                    stringBuilder.append("RAW RESULT: ${result.result}\n")
+                    stringBuilder.toString()
+                }.also {
+                    render(it)
+                }
             }
             .launchIn(lifecycleScope)
     }
 
-    private fun render(results: List<ScanResult>) {
-        val stringBuilder = StringBuilder()
-        results.forEach {
-            stringBuilder.append("BROKER NAME: ${it.brokerName}\nACTION EXECUTED: ${it.actionType}\n")
-            when (it) {
-                is NavigateResult -> {
-                    stringBuilder.append("URL TO NAVIGATE: ${it.url}\n")
-                }
+    private fun showScanResults() {
+        repository.getAllScanResultsFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { scanResults ->
+                scanResults.map {
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.append("BROKER NAME: ${it.brokerName}\nACTION EXECUTED: ${it.actionType}\n")
+                    when (it) {
+                        is NavigateResult -> {
+                            stringBuilder.append("URL TO NAVIGATE: ${it.url}\n")
+                        }
 
-                is ExtractedProfileResult -> {
-                    stringBuilder.append("PROFILE QUERY:\n ${it.profileQuery} \n")
-                    stringBuilder.append("EXTRACTED DATA:\n")
-                    it.extractResults.forEach { extract ->
-                        stringBuilder.append("> ${extract.scrapedData.profileUrl?.profileUrl} \n")
+                        is ExtractedProfileResult -> {
+                            val records = it.extractResults.filter {
+                                it.result
+                            }.size
+                            stringBuilder.append("VALID RECORDS FOUND COUNT: $records\n")
+                        }
+
+                        is ErrorResult -> {
+                            stringBuilder.append("*ERROR ENCOUNTERED: ${it.message}\n")
+                        }
                     }
-                }
-
-                is ErrorResult -> {
-                    stringBuilder.append("*ERROR ENCOUNTERED: ${it.message}\n")
+                    stringBuilder.toString()
+                }.also {
+                    render(it)
                 }
             }
-            stringBuilder.append("--------------------------\n")
-        }
-        binding.simpleScanResults.text = stringBuilder.toString()
+            .launchIn(lifecycleScope)
+    }
+
+    private fun showAllEvents() {
+        repository.getAllEventLogsFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { scanEvents ->
+                scanEvents.map { result ->
+                    "Time: ${formatter.format(Date(result.eventTimeInMillis))}\nEVENT: ${result.eventType}\n"
+                }.also {
+                    render(it)
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun render(results: List<String>) {
+        adapter.clear()
+        adapter.addAll(results)
     }
 }
 
-object PirResultsScreenNoParams : ActivityParams
+sealed class PirResultsScreenParams : ActivityParams {
+    data object PirEventsResultsScreen : PirResultsScreenParams()
+    data object PirScanResultsScreen : PirResultsScreenParams()
+    data object PirOptOutResultsScreen : PirResultsScreenParams()
+}

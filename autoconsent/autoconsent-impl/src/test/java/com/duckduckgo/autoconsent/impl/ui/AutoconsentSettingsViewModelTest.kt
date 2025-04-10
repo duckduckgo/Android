@@ -26,9 +26,6 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.settings.api.SettingsPageFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -43,20 +40,16 @@ class AutoconsentSettingsViewModelTest {
 
     private val autoconsent: Autoconsent = FakeAutoconsent()
     private val pixel: FakePixel = FakePixel()
-    private val newSettingsFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     private lateinit var viewModel: AutoconsentSettingsViewModel
 
     @Before
     fun setup() {
-        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = false))
         pixel.firedPixels.clear()
     }
 
     @Test
     fun whenViewModelCreatedThenAutoConsentShownPixelFired() {
-        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
-
         initViewModel()
 
         assertEquals(1, pixel.firedPixels.size)
@@ -99,8 +92,6 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOnPixelIsFired() {
-        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
-
         initViewModel()
 
         viewModel.onUserToggleAutoconsent(true)
@@ -122,8 +113,6 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOffPixelIsFired() {
-        newSettingsFeature.newSettingsPage().setRawStoredState(State(remoteEnableState = true))
-
         initViewModel()
 
         viewModel.onUserToggleAutoconsent(false)
@@ -133,7 +122,7 @@ class AutoconsentSettingsViewModelTest {
     }
 
     private fun initViewModel() {
-        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel, newSettingsFeature)
+        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel)
     }
 
     internal class FakeAutoconsent : Autoconsent {
