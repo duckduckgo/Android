@@ -40,8 +40,7 @@ class PirScheduledScanRemoteWorker(
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    private val serviceJob = SupervisorJob()
-    private val serviceScope = CoroutineScope(dispatcherProvider.io() + serviceJob)
+    private val serviceScope by lazy { CoroutineScope(dispatcherProvider.io() + SupervisorJob()) }
 
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
