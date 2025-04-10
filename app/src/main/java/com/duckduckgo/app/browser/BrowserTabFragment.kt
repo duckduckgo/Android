@@ -2845,6 +2845,7 @@ class BrowserTabFragment :
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
         renderer.showNewTab()
+        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
