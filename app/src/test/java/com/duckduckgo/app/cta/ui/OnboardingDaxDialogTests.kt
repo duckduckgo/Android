@@ -42,6 +42,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -78,13 +79,16 @@ class OnboardingDaxDialogTests {
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
+    private val mockSubscriptions: Subscriptions = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -99,7 +103,7 @@ class OnboardingDaxDialogTests {
             coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector,
             extendedOnboardingFeatureToggles,
-            subscriptions = mock(),
+            mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
             mockUserBrowserProperties,
