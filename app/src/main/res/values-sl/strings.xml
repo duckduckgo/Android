@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je omogočena za spletno mesto %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je onemogočena za spletno mesto %1$s</string>
     <string name="undoSnackbarAction">Prekliči spremembe</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Blokiran sledilnik</item>
+        <item quantity="two">Blokirana sledilnika</item>
+        <item quantity="few">Blokirani sledilniki</item>
+        <item quantity="other">Blokiranih sledilnikov</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Prenesi sliko</string>

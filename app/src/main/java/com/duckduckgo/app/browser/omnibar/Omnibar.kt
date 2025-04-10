@@ -161,6 +161,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
+        fun onTrackersCountFinished()
     }
 
     data class OmnibarTextState(
@@ -224,6 +225,10 @@ class Omnibar(
 
     val shieldIcon: LottieAnimationView by lazy {
         newOmnibar.shieldIcon
+    }
+
+    val shieldIconExperiment: LottieAnimationView by lazy {
+        newOmnibar.shieldIconExperiment
     }
 
     val textInputRootView: View by lazy {
@@ -379,6 +384,10 @@ class Omnibar(
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
         newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+    }
+
+    fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 
     fun cancelTrackersAnimation() {

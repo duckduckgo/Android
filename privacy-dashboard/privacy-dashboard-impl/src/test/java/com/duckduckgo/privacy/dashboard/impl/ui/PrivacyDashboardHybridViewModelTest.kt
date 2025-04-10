@@ -36,6 +36,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -96,6 +97,8 @@ class PrivacyDashboardHybridViewModelTest {
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val pluginPoint = FakePluginPoint(protectionTogglePlugin)
 
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
+
     private val toggleReports: ToggleReports = mock {
         runBlocking { whenever(mock.shouldPrompt()).thenReturn(false) }
     }
@@ -117,6 +120,7 @@ class PrivacyDashboardHybridViewModelTest {
             privacyProtectionTogglePlugin = pluginPoint,
             toggleReports = toggleReports,
             moshi = Moshi.Builder().build(),
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
     }
 

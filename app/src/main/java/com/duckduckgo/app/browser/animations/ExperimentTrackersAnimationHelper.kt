@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.app.browser.animations
 
-import com.duckduckgo.app.global.model.PrivacyShield
+import android.view.View
+import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
-data class PrivacyShieldViewState(
-    val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
-    val trackersBlocked: Int = 0,
-)
+interface ExperimentTrackersAnimationHelper {
+
+    fun startShieldPopAnimation(
+        omnibarShieldAnimationView: LottieAnimationView,
+        trackersCountAndBlockedViews: List<DaxTextView>,
+        omnibarTextInput: View,
+    )
+
+    fun cancelAnimations()
+}

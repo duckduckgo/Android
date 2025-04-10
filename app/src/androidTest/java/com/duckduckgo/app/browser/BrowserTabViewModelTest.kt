@@ -117,6 +117,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -208,6 +209,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -249,6 +251,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -538,6 +541,9 @@ class BrowserTabViewModelTest {
     private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
 
+    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -720,6 +726,9 @@ class BrowserTabViewModelTest {
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            appPersonalityFeature = fakeAppPersonalityFeature,
+            userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6066,6 +6075,45 @@ class BrowserTabViewModelTest {
     fun whenReportErrorThenEmitOpenBrokenSiteLearnMore() {
         testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), Feed.PHISHING, false)
         assertCommandIssued<ReportBrokenSiteError>()
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndLogosIsEmptyThenDoNothing() = runTest {
+        val logos = emptyList<TrackerLogo>()
+
+        testee.onAnimationFinished(logos)
+
+        assertCommandNotIssued<Command.StartTrackersExperimentShieldPopAnimation>()
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        val logos = listOf<TrackerLogo>(mock())
+        // Variant 2 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished(logos)
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        val logos = listOf<TrackerLogo>(mock())
+        // Variant 3 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished(logos)
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {

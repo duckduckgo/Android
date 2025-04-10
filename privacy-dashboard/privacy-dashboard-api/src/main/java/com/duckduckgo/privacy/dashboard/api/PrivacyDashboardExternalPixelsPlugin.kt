@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.privacy.dashboard.api
 
-import com.duckduckgo.app.global.model.PrivacyShield
+interface PrivacyDashboardExternalPixelParams {
 
-data class PrivacyShieldViewState(
-    val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
-    val trackersBlocked: Int = 0,
-)
+    fun getPixelParams(): Map<String, String>
+
+    fun setPixelParams(key: String, value: String)
+
+    fun clearPixelParams()
+}

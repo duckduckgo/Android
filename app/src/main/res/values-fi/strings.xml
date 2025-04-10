@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja käytössä: %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja ei käytössä: %1$s</string>
     <string name="undoSnackbarAction">Kumoa</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">seurantatoiminto estetty</item>
+        <item quantity="other">seurantatoimintoa estetty</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lataa kuva</string>

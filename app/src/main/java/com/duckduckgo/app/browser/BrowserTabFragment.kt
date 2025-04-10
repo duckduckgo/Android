@@ -103,6 +103,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -144,6 +145,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -234,6 +236,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -537,6 +540,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
+    @Inject
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
+
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -652,7 +661,21 @@ class BrowserTabFragment :
         override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
-            viewModel.onAutoConsentPopUpHandled(isCosmetic)
+            launch {
+                context?.let {
+                    if (appPersonalityFeature.self().isEnabled() &&
+                        !appPersonalityFeature.variant1().isEnabled() &&
+                        viewModel.trackersCount().isNotEmpty()
+                    ) {
+                        if (isCosmetic) {
+                            delay(COOKIES_ANIMATION_DELAY)
+                        }
+                        omnibar.enqueueCookiesAnimation(isCosmetic)
+                    } else {
+                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
+                    }
+                }
+            }
         }
 
         override fun onResultReceived(
@@ -785,6 +808,28 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
+
+    private fun showTrackersExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                listOf(
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar.omnibarTextInput
+            } else {
+                binding.newOmnibarBottom.omnibarTextInput
+            },
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1195,7 +1240,13 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = omnibar.shieldIcon,
+            anchor = if (appPersonalityFeature.self().isEnabled() &&
+                !appPersonalityFeature.variant1().isEnabled()
+            ) {
+                omnibar.shieldIconExperiment
+            } else {
+                omnibar.shieldIcon
+            },
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1232,6 +1283,7 @@ class BrowserTabFragment :
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
         val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
+            viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
@@ -1259,6 +1311,7 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -1971,6 +2024,7 @@ class BrowserTabFragment :
                 launchPopupMenu(it.anchorToNavigationBar)
             }
 
+            is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }
@@ -2662,6 +2716,10 @@ class BrowserTabFragment :
                         state.hasFocus,
                         true,
                     )
+                }
+
+                override fun onTrackersCountFinished() {
+                    viewModel.onAnimationFinished()
                 }
             },
         )

@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
@@ -43,6 +44,22 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
+    fun startExperimentVariant1Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        omnibarViews: List<View>,
+    )
+
+    fun startExperimentVariant2OrVariant3Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        shieldViews: List<View>,
+        entities: List<Entity>?,
+    )
+
     /**
      * This method creates or enqueues cookie consent animation.
      *
@@ -54,10 +71,12 @@ interface BrowserTrackersAnimatorHelper {
     fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     )
 
     /**
