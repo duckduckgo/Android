@@ -2821,12 +2821,8 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = HideOnboardingDaxBubbleCta(cta)
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
-                if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-                    val updatedCta = ctaViewModel.getEndStaticDialogCta()
-                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-                } else if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
-                        ctaViewModel.dismissPulseAnimation()
                         browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                     }
                 }
