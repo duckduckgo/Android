@@ -73,7 +73,6 @@ class RealMaliciousSiteProtection @Inject constructor(
 
         val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
         val canonicalUriString = canonicalUri.toString()
-        val urlString = url.toString()
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
@@ -106,7 +105,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
                     is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(urlString).find() &&
+                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
