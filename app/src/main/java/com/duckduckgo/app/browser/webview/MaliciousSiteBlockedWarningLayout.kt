@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.webview
 
 import android.content.Context
 import android.text.SpannableStringBuilder
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
@@ -97,6 +98,11 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 actionHandler()
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.color = currentTextColor
+                ds.isUnderlineText = true
             }
         }
         val htmlContent = context.getString(errorResource).html(context)
