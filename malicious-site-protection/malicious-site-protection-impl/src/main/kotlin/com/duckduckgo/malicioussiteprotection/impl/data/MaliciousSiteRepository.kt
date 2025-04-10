@@ -103,7 +103,7 @@ class RealMaliciousSiteRepository @Inject constructor(
                     feed = when (it.type) {
                         PHISHING.name -> PHISHING
                         MALWARE.name -> MALWARE
-                        else -> throw IllegalArgumentException("Unknown feed $it.type")
+                        else -> return@let null
                     },
                 )
             }
