@@ -217,6 +217,12 @@ class AppTpTDSPixelsPlugin @Inject constructor(private val inventory: FeatureTog
                 toggle = activeToggle,
                 conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
+            MetricsPixel(
+                metric = "didFailToDownloadTDS",
+                value = "1",
+                toggle = activeToggle,
+                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+            ),
         )
     }
 }
@@ -239,6 +245,10 @@ internal suspend fun AppTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail(): 
 
 internal suspend fun AppTpTDSPixelsPlugin.getProtectionDisabledAppFromAll(): MetricsPixel? {
     return this.getMetrics().firstOrNull { it.metric == "protectionDisabledAppFromAll" }
+}
+
+internal suspend fun AppTpTDSPixelsPlugin.didFailToDownloadTDS(): MetricsPixel? {
+    return this.getMetrics().firstOrNull { it.metric == "didFailToDownloadTDS" }
 }
 
 suspend fun FeatureTogglesInventory.activeAppTpTdsFlag(): Toggle? {
