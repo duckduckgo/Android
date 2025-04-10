@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
+import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromAll
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDetail
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
@@ -934,7 +935,11 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int) {
-        firePixel(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED, mapOf("code" to statusCode.toString()))
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params.plus(mapOf("code" to statusCode.toString())))
+            }
+        }
     }
 
     private fun firePixel(

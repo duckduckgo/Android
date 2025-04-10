@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -167,10 +168,10 @@ class AppTPBlockListInterceptorApiPluginTest {
     }
 
     @Test
-    fun `when experiment request fails, sends failure pixel`() {
+    fun `when experiment request fails, sends failure pixel`() = runTest {
         testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName, mapOf("code" to "400"))
+        verify(pixel).fire("experiment_metrics_atpTdsNextExperimentAnotherTest_control", mapOf("code" to "400"))
     }
 
     private fun getUrl(path: String): String = "$APPTP_TDS_BASE_URL$path"
