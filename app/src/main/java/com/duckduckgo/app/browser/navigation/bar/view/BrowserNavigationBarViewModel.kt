@@ -21,18 +21,21 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +46,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
@@ -50,7 +54,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val tabRepository: TabRepository,
     private val dispatcherProvider: DispatcherProvider,
-
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -84,36 +87,52 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _commands.trySend(NotifyMenuButtonClicked)
     }
 
-    fun onBackButtonClicked() {
-        _commands.trySend(NotifyBackButtonClicked)
+    fun onNewTabButtonClicked() {
+        _commands.trySend(NotifyNewTabButtonClicked)
     }
 
-    fun onBackButtonLongClicked() {
-        _commands.trySend(NotifyBackButtonLongClicked)
+    fun onAutofillButtonClicked() {
+        _commands.trySend(NotifyAutofillButtonClicked)
     }
 
-    fun onForwardButtonClicked() {
-        _commands.trySend(NotifyForwardButtonClicked)
+    fun onBookmarksButtonClicked() {
+        _commands.trySend(NotifyBookmarksButtonClicked)
     }
 
-    fun setCanGoBack(canGoBack: Boolean) {
-        _viewState.update {
-            it.copy(backArrowButtonEnabled = canGoBack)
-        }
-    }
+    fun setViewMode(viewMode: ViewMode) {
+        when (viewMode) {
+            NewTab -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = false,
+                        autofillButtonVisible = true,
+                        fireButtonVisible = true,
+                        tabsButtonVisible = true,
+                    )
+                }
+            }
 
-    fun setCanGoForward(canGoForward: Boolean) {
-        _viewState.update {
-            it.copy(forwardArrowButtonEnabled = canGoForward)
-        }
-    }
+            Browser -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        fireButtonVisible = true,
+                        tabsButtonVisible = true,
+                    )
+                }
+            }
 
-    fun setCustomTab(customTab: Boolean) {
-        _viewState.update {
-            it.copy(
-                fireButtonVisible = !customTab,
-                tabsButtonVisible = !customTab,
-            )
+            CustomTab -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = false,
+                        autofillButtonVisible = false,
+                        fireButtonVisible = false,
+                        tabsButtonVisible = false,
+                    )
+                }
+            }
         }
     }
 
@@ -125,12 +144,16 @@ class BrowserNavigationBarViewModel @Inject constructor(
         data object NotifyBackButtonClicked : Command()
         data object NotifyBackButtonLongClicked : Command()
         data object NotifyForwardButtonClicked : Command()
+        data object NotifyNewTabButtonClicked : Command()
+        data object NotifyAutofillButtonClicked : Command()
+        data object NotifyBookmarksButtonClicked : Command()
     }
 
     data class ViewState(
         val isVisible: Boolean = false,
-        val backArrowButtonEnabled: Boolean = false,
-        val forwardArrowButtonEnabled: Boolean = false,
+        val newTabButtonVisible: Boolean = false,
+        val autofillButtonVisible: Boolean = true,
+        val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,

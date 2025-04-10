@@ -953,6 +953,18 @@ class BrowserTabFragment :
             override fun onForwardButtonClicked() {
                 onForwardArrowClicked()
             }
+
+            override fun onNewTabButtonClicked() {
+                viewModel.onNavigationBarNewTabButtonClicked()
+            }
+
+            override fun onAutofillButtonClicked() {
+                viewModel.onNavigationBarAutofillButtonClicked()
+            }
+
+            override fun onBookmarksButtonClicked() {
+                viewModel.onNavigationBarBookmarksButtonClicked()
+            }
         }
 
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
@@ -979,7 +991,7 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonLongPressed() {
-        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+        launch { viewModel.onNewTabMenuItemClicked(longPress = true) }
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -991,10 +1003,6 @@ class BrowserTabFragment :
         hasFocus: Boolean = true,
     ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
-    }
-
-    private fun onOmnibarNewTabRequested() {
-        viewModel.userRequestedOpeningNewTab()
     }
 
     private fun onOmnibarCustomTabClosed() {
@@ -1042,7 +1050,7 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
-            browserNavigationBarIntegration.configureCustomTab()
+            browserNavigationBarIntegration.configureCustomTabViewMode()
         }
     }
 
@@ -1084,14 +1092,13 @@ class BrowserTabFragment :
                 }
             }
             onMenuItemClicked(newTabMenuItem) {
-                onOmnibarNewTabRequested()
+                viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(duckChatMenuItem) {
                 viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
-                browserActivity?.launchBookmarks()
-                pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+                viewModel.onBookmarksMenuItemClicked()
             }
             onMenuItemClicked(fireproofWebsiteMenuItem) {
                 viewModel.onFireproofWebsiteMenuClicked()
@@ -1420,6 +1427,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
+        browserNavigationBarIntegration.configureNewTabViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1438,6 +1446,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1450,6 +1459,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1475,6 +1485,7 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
@@ -1564,6 +1575,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibar.setViewMode(ViewMode.SSLWarning)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         maliciousWarningView.gone()
@@ -1970,6 +1982,10 @@ class BrowserTabFragment :
             is Command.LaunchPopupMenu -> {
                 hideKeyboard()
                 launchPopupMenu(it.anchorToNavigationBar)
+            }
+
+            is Command.LaunchBookmarksActivity -> {
+                browserActivity?.launchBookmarks()
             }
 
             else -> {
@@ -4028,8 +4044,6 @@ class BrowserTabFragment :
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
                 val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)
                 viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(bookmark = bookmark)
-
-                browserNavigationBarIntegration.renderBrowserViewState(viewState)
             }
         }
 
@@ -4229,6 +4243,7 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
+            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }
