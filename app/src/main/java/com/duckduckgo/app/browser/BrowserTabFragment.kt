@@ -1083,14 +1083,6 @@ class BrowserTabFragment :
                     viewModel.handleMenuRefreshAction()
                 }
             }
-            onMenuItemClicked(refreshLongMenuItem) {
-                viewModel.onRefreshRequested(triggeredByUser = true)
-                if (isActiveCustomTab()) {
-                    viewModel.fireCustomTabRefreshPixel()
-                } else {
-                    viewModel.handleMenuRefreshAction()
-                }
-            }
             onMenuItemClicked(newTabMenuItem) {
                 viewModel.onNewTabMenuItemClicked()
             }

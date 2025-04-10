@@ -708,12 +708,6 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
             }
             .launchIn(viewModelScope)
-
-        visualDesignExperimentDataStore.navigationBarState
-            .onEach { navigationBarState ->
-                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = !navigationBarState.isEnabled)
-            }
-            .launchIn(viewModelScope)
     }
 
     fun loadData(
