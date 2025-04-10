@@ -967,9 +967,7 @@ class BrowserTabFragment :
     private fun configureEditModeChangeDetection() {
         if (swipingTabsFeature.isEnabled) {
             omnibar.isInEditMode.onEach { isInEditMode ->
-                if (isActiveTab) {
-                    browserActivity?.onEditModeChanged(isInEditMode)
-                }
+                browserActivity?.onEditModeChanged(isInEditMode)
             }.launchIn(lifecycleScope)
         }
     }
