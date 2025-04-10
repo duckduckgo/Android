@@ -106,7 +106,6 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenAllRequirementsMetThenShouldShowBrokenSitePromptReturnsTrue() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
-        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(2)
 
@@ -116,19 +115,8 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenFeatureEnabledAndUserRefreshesCountIsLessThanThreeThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
-        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
-        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(2)
-
-        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
-
-        assertFalse(result)
-    }
-
-    @Test
     fun whenFeatureEnabledAndUrlIsDuckDuckGoThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
-        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
         whenever(mockDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
 
         val result = testee.shouldShowBrokenSitePrompt("https://duckduckgo.com")
@@ -149,7 +137,6 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenFeatureEnabledAndUserHasDismissedMaxDismissStreakTimesThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
-        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(3)
 
