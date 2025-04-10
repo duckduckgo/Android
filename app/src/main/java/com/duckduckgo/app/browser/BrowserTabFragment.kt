@@ -144,6 +144,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -1060,10 +1063,20 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
+        val popupMenuResourceType = if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            // when bottom navigation bar is enabled, we always inflate the popup menu from the bottom
+            BrowserPopupMenu.ResourceType.BOTTOM
+        } else {
+            when (settingsDataStore.omnibarPosition) {
+                TOP -> BrowserPopupMenu.ResourceType.TOP
+                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+            }
+        }
+
         popupMenu = BrowserPopupMenu(
             context = requireContext(),
             layoutInflater = layoutInflater,
-            settingsDataStore.omnibarPosition,
+            popupMenuResourceType = popupMenuResourceType,
         )
         popupMenu.apply {
             onMenuItemClicked(forwardMenuItem) {
