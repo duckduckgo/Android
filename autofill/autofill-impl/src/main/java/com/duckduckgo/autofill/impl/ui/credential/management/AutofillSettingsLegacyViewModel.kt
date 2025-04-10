@@ -27,17 +27,10 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Unknown
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -58,43 +51,43 @@ import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Disabled
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.ListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Activated
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Deactivated
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FailedToObtainStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FetchingActivationStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.InitialiseViewAfterUnlock
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.OfferUserUndoDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.OfferUserUndoMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowDeviceUnsupportedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowListModeLegacy
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.Disabled
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.EditingNewEntry
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.ListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.Locked
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialModeCommand.ShowEditCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.Activated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.Deactivated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.FailedToObtainStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.FetchingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.NotADuckAddress
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.NotManageable
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.DuckAddressStatus.SettingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
@@ -123,7 +116,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
-class AutofillSettingsViewModel @Inject constructor(
+class AutofillSettingsLegacyViewModel @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val clipboardInteractor: AutofillClipboardInteractor,
     private val deviceAuthenticator: DeviceAuthenticator,
@@ -195,7 +188,10 @@ class AutofillSettingsViewModel @Inject constructor(
 
     private fun onShowListMode() {
         viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(credentialMode = ListMode)
+            _viewState.value = _viewState.value.copy(
+                credentialMode = ListMode,
+                showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
+            )
 
             val command = if (autofillFeature.newScrollBehaviourInPasswordManagementScreen().isEnabled()) {
                 ShowListMode
@@ -570,7 +566,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onSearchQueryChanged(searchText: String) {
         Timber.v("Search query changed: %s", searchText)
         searchQueryFilter.value = searchText
-        val showAutofillEnabledToggle = searchText.isEmpty()
+        val showAutofillEnabledToggle = searchText.isEmpty() && autofillFeature.settingsScreen().isEnabled().not()
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
     }
 
@@ -781,20 +777,6 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun userCancelledSendBreakageReport() {
         pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
-    }
-
-    private fun AutofillSettingsLaunchSource.asString(): String {
-        return when (this) {
-            SettingsActivity -> "settings"
-            BrowserOverflow -> "overflow_menu"
-            Sync -> "sync"
-            DisableInSettingsPrompt -> "save_login_disable_prompt"
-            NewTabShortcut -> "new_tab_page_shortcut"
-            BrowserSnackbar -> "browser_snackbar"
-            InternalDevSettings -> "internal_dev_settings"
-            Unknown -> "unknown"
-            else -> this.name
-        }
     }
 
     fun userReturnedFromSyncSettings() {

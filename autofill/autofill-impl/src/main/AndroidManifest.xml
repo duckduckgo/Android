@@ -25,6 +25,12 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".ui.settings.AutofillSettings"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Autofill Service runs on its own process https://app.asana.com/0/72649045549333/1209537052601451 -->
         <activity
             android:name=".service.AutofillProviderFillSuggestionActivity"
