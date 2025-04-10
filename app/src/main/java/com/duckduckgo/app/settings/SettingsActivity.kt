@@ -49,6 +49,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboardi
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettingsLegacy
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
@@ -70,6 +71,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenLegacy
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -326,6 +328,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is LaunchDefaultBrowser -> launchDefaultAppScreen()
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
+            is LaunchAutofillSettingsLegacy -> launchScreen(AutofillSettingsScreenLegacy(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)

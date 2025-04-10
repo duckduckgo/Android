@@ -46,6 +46,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboardi
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettingsLegacy
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
@@ -63,6 +64,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingPr
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -105,6 +107,7 @@ class SettingsViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
+    private val autofillFeature: AutofillFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -125,6 +128,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchDefaultBrowser : Command()
         data class LaunchEmailProtection(val url: String) : Command()
         data object LaunchEmailProtectionNotSupported : Command()
+        data object LaunchAutofillSettingsLegacy : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
@@ -253,7 +257,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAutofillSettingsClick() {
-        viewModelScope.launch { command.send(LaunchAutofillSettings) }
+        viewModelScope.launch {
+            if (autofillFeature.settingsScreen().isEnabled()) {
+                command.send(LaunchAutofillSettings)
+            } else {
+                command.send(LaunchAutofillSettingsLegacy)
+            }
+        }
     }
 
     fun onAccessibilitySettingClicked() {

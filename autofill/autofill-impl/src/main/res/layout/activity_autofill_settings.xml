@@ -13,49 +13,88 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.credential.management.AutofillManagementActivity">
+    android:fadeScrollbars="false"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:scrollbars="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical">
 
-        <FrameLayout
+        <include
+            android:id="@+id/includeToolbar"
+            layout="@layout/include_default_toolbar" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/passwordsListItem"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorToolbar">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:leadingIcon="@drawable/ic_key_24e"
+            app:leadingIconBackground="circular"
+            app:primaryText="@string/autofillSettingsPasswordsEntry"
+            app:secondaryText="123" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/autofillEnabledToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillSettingsAutofillToggleLabel"
+            app:showSwitch="true" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/autofillInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="14dp"
+            android:text=""
+            app:textType="secondary"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/topDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillSettingsImportSectionLabel" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importPasswordsOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillSettingsImportFromGoogleLabel" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/syncDesktopPasswordsOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillSettingsImportFromDesktopSync" />
+
+        <LinearLayout
+            android:id="@+id/excludedSitesSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorToolbar"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+                android:layout_height="wrap_content" />
 
-            <com.duckduckgo.common.ui.view.SearchBarView
-                android:id="@+id/search_bar"
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/excludedSitesOption"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/keyline_2"
-                android:visibility="gone"
-                app:clearActionContentDescription="@string/autofillManagementSearchClearDescription"
-                app:searchHint="@string/autofillManagementSearchLogins" />
-        </FrameLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+                android:layout_height="wrap_content"
+                app:primaryText="@string/autofillSettingsResetExcludedSitesTitle"/>
+        </LinearLayout>
+    </LinearLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+</ScrollView>

@@ -46,15 +46,15 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loaded
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loading
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ViewState
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.ReevalutePromotions
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ListModeCommand.ShowUserReportSentMessage
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsLegacyViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
@@ -126,7 +126,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     lateinit var grouper: CredentialGrouper
 
     val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
+        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsLegacyViewModel::class.java]
     }
 
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
@@ -332,7 +332,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
-    private fun processCommand(command: AutofillSettingsViewModel.ListModeCommand) {
+    private fun processCommand(command: AutofillSettingsLegacyViewModel.ListModeCommand) {
         when (command) {
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
