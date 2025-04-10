@@ -26,8 +26,10 @@ import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevisi
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,8 +96,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateHashPrefixes(hashPrefixes)
 
-        assertNotNull(dao.getHashPrefix("prefix2"))
-        assertNull(dao.getHashPrefix("prefix1"))
+        assertTrue(dao.hashPrefixExists("prefix2"))
+        assertFalse(dao.hashPrefixExists("prefix1"))
     }
 
     @Test
@@ -110,8 +112,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateHashPrefixes(hashPrefixes)
 
-        assertNotNull(dao.getHashPrefix("prefix2"))
-        assertNotNull(dao.getHashPrefix("prefix1"))
+        assertTrue(dao.hashPrefixExists("prefix2"))
+        assertTrue(dao.hashPrefixExists("prefix1"))
     }
 
     @Test
@@ -161,8 +163,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateHashPrefixes(hashPrefixes)
 
-        assertNotNull(dao.getHashPrefix("prefix1"))
-        assertNull(dao.getHashPrefix("prefix2"))
+        assertTrue(dao.hashPrefixExists("prefix1"))
+        assertFalse(dao.hashPrefixExists("prefix2"))
     }
 
     @Test
@@ -178,7 +180,7 @@ class MaliciousSiteDaoTest {
 
         dao.updateHashPrefixes(hashPrefixes)
 
-        assertNull(dao.getHashPrefix("prefix1"))
-        assertNotNull(dao.getHashPrefix("prefix2"))
+        assertFalse(dao.hashPrefixExists("prefix1"))
+        assertTrue(dao.hashPrefixExists("prefix2"))
     }
 }
