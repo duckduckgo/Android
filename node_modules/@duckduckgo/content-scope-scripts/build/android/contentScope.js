@@ -6060,7 +6060,7 @@
      *   | {name: "play.use", remember: "0" | "1"}
      *   | {name: "play.use.thumbnail"}
      *   | {name: "play.do_not_use", remember: "0" | "1"}
-     *   | {name: "play.do_not_use.thumbnail"}} input
+     *   | {name: "play.do_not_use.dismiss"}} input
      */
     constructor(input) {
       this.input = input;
@@ -6078,7 +6078,7 @@
         case "play.do_not_use": {
           return { remember: this.input.remember };
         }
-        case "play.do_not_use.thumbnail":
+        case "play.do_not_use.dismiss":
           return {};
         default:
           throw new Error("unreachable");
@@ -7571,10 +7571,10 @@
             return this.mobileOptOut(e.detail.remember).catch(console.error);
           });
           drawer.addEventListener(DDGVideoDrawerMobile.DISMISS, () => {
-            return this.mobileOptOut(false).catch(console.error);
+            return this.dismissOverlay();
           });
           drawer.addEventListener(DDGVideoDrawerMobile.THUMBNAIL_CLICK, () => {
-            return this.videoThumbnailClick();
+            return this.dismissOverlay();
           });
           drawer.addEventListener(DDGVideoDrawerMobile.OPT_IN, (e) => {
             return this.mobileOptIn(e.detail.remember, params).catch(console.error);
@@ -7735,8 +7735,8 @@
       }
       this.destroy();
     }
-    videoThumbnailClick() {
-      const pixel = new Pixel({ name: "play.do_not_use.thumbnail" });
+    dismissOverlay() {
+      const pixel = new Pixel({ name: "play.do_not_use.dismiss" });
       this.messages.sendPixel(pixel);
       return this.destroy();
     }

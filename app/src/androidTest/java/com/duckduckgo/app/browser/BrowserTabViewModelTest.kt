@@ -2417,7 +2417,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
-        testee.userRequestedOpeningNewTab()
+        testee.onNewTabMenuItemClicked()
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
         verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
@@ -2425,7 +2425,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabAndNoEmptyTabExistsThenNewTabCommandIssued() {
         tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
-        testee.userRequestedOpeningNewTab()
+        testee.onNewTabMenuItemClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
@@ -2436,7 +2436,7 @@ class BrowserTabViewModelTest {
     fun whenUserRequestedToOpenNewTabAndEmptyTabExistsThenSelectTheEmptyTab() = runTest {
         val emptyTabId = "EMPTY_TAB"
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity(emptyTabId)))
-        testee.userRequestedOpeningNewTab()
+        testee.onNewTabMenuItemClicked()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
@@ -2448,7 +2448,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
-        testee.userRequestedOpeningNewTab(longPress = true)
+        testee.onNewTabMenuItemClicked(longPress = true)
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
@@ -5342,7 +5342,7 @@ class BrowserTabViewModelTest {
         val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-        testee.userRequestedOpeningNewTab()
+        testee.onNewTabMenuItemClicked()
 
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
