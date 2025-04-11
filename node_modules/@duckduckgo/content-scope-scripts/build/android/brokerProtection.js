@@ -6554,18 +6554,46 @@
 
   // src/features/broker-protection/captcha-services/utils/token.js
   init_define_import_meta_trackerLookup();
-  function injectTokenIntoElement({ captchaContainerElement, elementName, token }) {
-    const element = getElementByTagName(captchaContainerElement, elementName);
+
+  // src/features/broker-protection/captcha-services/utils/element.js
+  init_define_import_meta_trackerLookup();
+  function isElementType(element, tag) {
+    if (Array.isArray(tag)) {
+      return tag.some((t) => isElementType(element, t));
+    }
+    return element.tagName.toLowerCase() === tag.toLowerCase();
+  }
+
+  // src/features/broker-protection/captcha-services/utils/token.js
+  function injectTokenIntoElement({ captchaContainerElement, captchaInputElement, elementName, token }) {
+    let element;
+    if (captchaInputElement) {
+      element = captchaInputElement;
+    } else if (elementName) {
+      element = getElementByTagName(captchaContainerElement, elementName);
+    } else {
+      return PirError.create(`[injectTokenIntoElement] must pass in either captcha input element or element name`);
+    }
     if (!element) {
-      return PirError.create(`[injectTokenIntoElement] could not find element with name ${elementName}`);
+      return PirError.create(`[injectTokenIntoElement] could not find element to inject token into`);
     }
     return safeCallWithError(
       () => {
-        element.innerHTML = token;
-        return PirSuccess.create({ injected: true });
+        if (isInputElement(element) && ["text", "hidden"].includes(element.type) || isTextAreaElement(element)) {
+          element.value = token;
+          return PirSuccess.create({ injected: true });
+        } else {
+          return PirError.create(`[injectTokenIntoElement] element is neither a text input or textarea`);
+        }
       },
-      { errorMessage: `[injectTokenIntoElement] error injecting token into element ${elementName}` }
+      { errorMessage: `[injectTokenIntoElement] error injecting token into element` }
     );
+  }
+  function isInputElement(element) {
+    return isElementType(element, "input");
+  }
+  function isTextAreaElement(element) {
+    return isElementType(element, "textarea");
   }
 
   // src/features/broker-protection/actions/captcha-callback.js
@@ -6647,9 +6675,11 @@
      * @param {HTMLElement} captchaContainerElement
      */
     getCaptchaIdentifier(captchaContainerElement) {
-      return safeCallWithError(
-        () => getSiteKeyFromSearchParam({ captchaElement: this._getCaptchaElement(captchaContainerElement), siteKeyAttrName: "k" }),
-        { errorMessage: "[ReCaptchaProvider.getCaptchaIdentifier] could not extract site key" }
+      return Promise.resolve(
+        safeCallWithError(
+          () => getSiteKeyFromSearchParam({ captchaElement: this._getCaptchaElement(captchaContainerElement), siteKeyAttrName: "k" }),
+          { errorMessage: "[ReCaptchaProvider.getCaptchaIdentifier] could not extract site key" }
+        )
       );
     }
     getSupportingCodeToInject() {
@@ -6689,6 +6719,114 @@
   };
   _config = new WeakMap();
 
+  // src/features/broker-protection/captcha-services/providers/image.js
+  init_define_import_meta_trackerLookup();
+
+  // src/features/broker-protection/captcha-services/utils/image.js
+  init_define_import_meta_trackerLookup();
+  function svgToBase64Jpg(svgElement, backgroundColor = "white") {
+    const svgString = new XMLSerializer().serializeToString(svgElement);
+    const svgDataUrl = "data:image/svg+xml;base64," + btoa(svgString);
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Could not get 2D context from canvas"));
+          return;
+        }
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const jpgBase64 = canvas.toDataURL("image/jpeg");
+        resolve(jpgBase64);
+      };
+      img.onerror = (error) => {
+        reject(error);
+      };
+      img.src = svgDataUrl;
+    });
+  }
+  function imageToBase64(imageElement) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw Error("[imageToBase64] Could not get 2D context from canvas");
+    }
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
+    ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    const base64String = canvas.toDataURL("image/jpeg");
+    return base64String;
+  }
+
+  // src/features/broker-protection/captcha-services/providers/image.js
+  var ImageProvider = class {
+    getType() {
+      return "image";
+    }
+    /**
+     * @param {HTMLElement} captchaImageElement - The captcha image element
+     */
+    isSupportedForElement(captchaImageElement) {
+      if (!captchaImageElement) {
+        return false;
+      }
+      return isElementType(captchaImageElement, ["img", "svg"]);
+    }
+    /**
+     * @param {HTMLElement} captchaImageElement - The captcha image element
+     */
+    async getCaptchaIdentifier(captchaImageElement) {
+      if (isSVGElement(captchaImageElement)) {
+        return await svgToBase64Jpg(captchaImageElement);
+      }
+      if (isImgElement(captchaImageElement)) {
+        return imageToBase64(captchaImageElement);
+      }
+      return PirError.create(
+        `[ImageProvider.getCaptchaIdentifier] could not extract Base64 from image with tag name: ${captchaImageElement.tagName}`
+      );
+    }
+    getSupportingCodeToInject() {
+      return null;
+    }
+    /**
+     * @param {HTMLElement} captchaInputElement - The captcha input element
+     */
+    canSolve(captchaInputElement) {
+      return isElementType(captchaInputElement, ["input", "textarea"]);
+    }
+    /**
+     * @param {HTMLInputElement} captchaInputElement - The captcha input element
+     * @param {string} token - The solved captcha token
+     */
+    injectToken(captchaInputElement, token) {
+      return injectTokenIntoElement({ captchaInputElement, token });
+    }
+    /**
+     * @param {HTMLElement} _captchaInputElement - The element containing the captcha
+     * @param {string} _token - The solved captcha token
+     */
+    getSolveCallback(_captchaInputElement, _token) {
+      return stringifyFunction({
+        functionBody: function callbackNoop() {
+        },
+        functionName: "callbackNoop",
+        args: {}
+      });
+    }
+  };
+  function isSVGElement(element) {
+    return isElementType(element, "svg");
+  }
+  function isImgElement(element) {
+    return isElementType(element, "img");
+  }
+
   // src/features/broker-protection/captcha-services/providers/registry.js
   var captchaFactory = new CaptchaFactory();
   captchaFactory.registerProvider(
@@ -6705,6 +6843,7 @@
       responseElementName: "g-recaptcha-response"
     })
   );
+  captchaFactory.registerProvider(new ImageProvider());
 
   // src/features/broker-protection/captcha-services/get-captcha-provider.js
   function getCaptchaProvider(captchaContainer, captchaType) {
@@ -6853,7 +6992,7 @@
     }
     return SuccessResponse.create({ actionID, actionType, response: { code: captchaProvider.getSupportingCodeToInject() } });
   }
-  function getCaptchaInfo2(action, root = document) {
+  async function getCaptchaInfo2(action, root = document) {
     const { id: actionID, actionType, captchaType, selector } = action;
     if (!captchaType) {
       return getCaptchaInfo(action, root);
@@ -6867,7 +7006,7 @@
     if (PirError.isError(captchaProvider)) {
       return createError(captchaProvider.error.message);
     }
-    const captchaIdentifier = captchaProvider.getCaptchaIdentifier(captchaContainer);
+    const captchaIdentifier = await captchaProvider.getCaptchaIdentifier(captchaContainer);
     if (!captchaIdentifier) {
       return createError(`could not extract captcha identifier from the container with selector ${selector}`);
     }
@@ -6968,7 +7107,7 @@
         case "fillForm":
           return fillForm(action, data(action, inputData, "extractedProfile"), root);
         case "getCaptchaInfo":
-          return getCaptchaInfo2(action, root);
+          return await getCaptchaInfo2(action, root);
         case "solveCaptcha":
           return solveCaptcha2(action, data(action, inputData, "token"), root);
         default: {
