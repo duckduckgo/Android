@@ -66,18 +66,7 @@ class PixelParamRemovalInterceptorTest {
     }
 
     @Test
-    fun whenSendPixelRedactOSVersion() {
-        testPixels.filter { it.second == PixelParameter.removeOSVersion() }.map { it.first }.forEach { pixelName ->
-            val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val interceptedUrl = pixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
-            assertNotNull(interceptedUrl.queryParameter("atb"))
-            assertNotNull(interceptedUrl.queryParameter("appVersion"))
-            assertNull(interceptedUrl.queryParameter("os_version"))
-        }
-    }
-
-    @Test
-    fun whenSendPixelRedactAtbAndAppAndOSVersion() {
+    fun whenSendPixelRedactAtbAndAppVersion() {
         testPixels.filter { it.second.containsAll(PixelParameter.removeAll()) }
             .map { it.first }
             .forEach { pixelName ->
@@ -85,17 +74,15 @@ class PixelParamRemovalInterceptorTest {
                 val interceptedUrl = pixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
                 assertNull(interceptedUrl.queryParameter("atb"))
                 assertNull(interceptedUrl.queryParameter("appVersion"))
-                assertNull(interceptedUrl.queryParameter("os_version"))
             }
     }
 
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&os_version=1.0&test=1"
         private val testPixels = listOf(
-            "atb_and_version_and_os_redacted" to PixelParameter.removeAll(),
+            "atb_and_version_redacted" to PixelParameter.removeAll(),
             "atb_redacted" to PixelParameter.removeAtb(),
             "version_redacted" to PixelParameter.removeVersion(),
-            "os_version_redacted" to PixelParameter.removeOSVersion(),
         )
     }
 }
