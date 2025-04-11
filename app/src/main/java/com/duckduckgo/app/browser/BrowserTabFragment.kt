@@ -1238,6 +1238,11 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
+        // we need to prevent new tab initialization while clearing data, because it can mess up onboarding state after the process is restarted
+        if (swipingTabsFeature.isEnabled && (requireActivity() as? BrowserActivity)?.isDataClearingInProgress == true) {
+            return
+        }
+
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
         val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
