@@ -22,6 +22,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
@@ -93,7 +95,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
@@ -599,7 +601,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (tabSwitcherAnimationFeature.self().isEnabled()) {
+            return if (senseOfProtectionExperiment.isEnabled(cohort = VARIANT_2)) {
                 if (!isAnimationTileDismissed) {
                     val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
