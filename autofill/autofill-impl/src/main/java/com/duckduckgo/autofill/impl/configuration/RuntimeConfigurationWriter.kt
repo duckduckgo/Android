@@ -69,9 +69,6 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         """.trimIndent()
     }
 
-    /*
-    * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
-    */
     override fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String {
         return """
             contentScope = {
