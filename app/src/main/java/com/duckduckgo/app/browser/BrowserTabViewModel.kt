@@ -178,8 +178,11 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
+import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -467,6 +470,9 @@ class BrowserTabViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
+    private val siteErrorHandler: StringSiteErrorHandler,
+    private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -541,7 +547,15 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     private var autoCompleteJob = ConflatedJob()
+
     private var site: Site? = null
+        set(value) {
+            field = value
+            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+                siteErrorHandler.assignErrorsAndClearCache(value)
+                siteHttpErrorHandler.assignErrorsAndClearCache(value)
+            }
+        }
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -3391,27 +3405,35 @@ class BrowserTabViewModel @Inject constructor(
         error: String,
         url: String,
     ) {
-        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-        // called triggering a buildSite.
-        if (url != site?.url) {
-            site = siteFactory.buildSite(url = url, tabId = tabId)
+        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
+        } else {
+            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+            // called triggering a buildSite.
+            if (url != site?.url) {
+                site = siteFactory.buildSite(url = url, tabId = tabId)
+            }
+            site?.onErrorDetected(error)
         }
         Timber.d("recordErrorCode $error in ${site?.url}")
-        site?.onErrorDetected(error)
     }
 
     override fun recordHttpErrorCode(
         statusCode: Int,
         url: String,
     ) {
-        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-        // called triggering a buildSite.
-        if (url != site?.url) {
-            site = siteFactory.buildSite(url = url, tabId = tabId)
+        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
+        } else {
+            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+            // called triggering a buildSite.
+            if (url != site?.url) {
+                site = siteFactory.buildSite(url = url, tabId = tabId)
+            }
+            site?.onHttpErrorDetected(statusCode)
         }
         Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
         updateHttpErrorCount(statusCode)
-        site?.onHttpErrorDetected(statusCode)
     }
 
     fun onAutofillMenuSelected() {
