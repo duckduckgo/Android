@@ -279,14 +279,12 @@ class RealPirRunStateHandler @Inject constructor(
     private fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
         pixelSender.reportRecordOptOutStarted(
             brokerName = state.brokerName,
-            recordId = state.extractedProfile.profileUrl?.identifier ?: "Unavailable",
         )
     }
 
     private suspend fun handleRecordOptOutCompleted(state: BrokerRecordOptOutCompleted) {
         pixelSender.reportRecordOptOutCompleted(
             brokerName = state.brokerName,
-            recordId = state.extractedProfile.profileUrl?.identifier ?: "Unavailable",
             totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
             isSuccess = state.isSubmitSuccess,
         )

@@ -133,27 +133,23 @@ interface PirPixelSender {
     )
 
     /**
-     * Tells us whenever an opt-out is started for a specific record on a broker
+     * Tells us whenever an opt-out is started for a record on a broker
      *
      * @param brokerName for which the opt-out is started for
-     * @param recordId for which the opt-out is started for
      */
     fun reportRecordOptOutStarted(
         brokerName: String,
-        recordId: String,
     )
 
     /**
      * Tells us whenever an opt-out is completed - could mean that the opt-out for the record was successful or failed.
      *
      * @param brokerName for which the opt-out is for
-     * @param recordId for which the opt-out is started for
      * @param totalTimeInMillis How long it took to complete the opt-out for the record.
      * @param isSuccess - if result was not an error, it is a success.
      */
     fun reportRecordOptOutCompleted(
         brokerName: String,
-        recordId: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
     )
@@ -255,24 +251,20 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportRecordOptOutStarted(
         brokerName: String,
-        recordId: String,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_RECORD_ID to recordId,
         )
         fire(PIR_INTERNAL_OPT_OUT_RECORD_STARTED, params)
     }
 
     override fun reportRecordOptOutCompleted(
         brokerName: String,
-        recordId: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_RECORD_ID to recordId,
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
             PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
@@ -321,7 +313,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_WEBVIEW_COUNT = "totalParallelWebViews"
         private const val PARAM_KEY_TOTAL_BROKER_SUCCESS = "totalBrokerSuccess"
         private const val PARAM_KEY_TOTAL_BROKER_FAILED = "totalBrokerFailed"
-        private const val PARAM_KEY_RECORD_ID = "recordId"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
     }
 }
