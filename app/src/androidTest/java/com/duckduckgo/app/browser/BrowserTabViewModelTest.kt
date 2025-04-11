@@ -591,6 +591,7 @@ class BrowserTabViewModelTest {
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
+        whenever(subscriptions.isEligible()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -607,7 +608,7 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
-            subscriptions = mock(),
+            subscriptions = subscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             userBrowserProperties = mockUserBrowserProperties,
@@ -2527,7 +2528,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
-        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage)
         assertFalse(testee.ctaViewState.value!!.isBrowserShowing)
     }
 
@@ -2541,7 +2542,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
-        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage)
         assertTrue(testee.ctaViewState.value!!.isBrowserShowing)
     }
 

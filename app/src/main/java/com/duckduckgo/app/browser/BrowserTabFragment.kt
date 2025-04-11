@@ -4110,7 +4110,7 @@ class BrowserTabFragment :
                         hideNewTab()
                     }
 
-                    viewState.daxOnboardingComplete && !viewState.isErrorShowing -> {
+                    viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
                         showNewTab()
                     }
