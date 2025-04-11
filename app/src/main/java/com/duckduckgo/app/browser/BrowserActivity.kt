@@ -763,7 +763,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
             isLaunchFromClearDataAction: Boolean = false,
-            isLaunchFromDedicatedWebView: Boolean = false,
             openDuckChat: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
