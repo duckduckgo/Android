@@ -691,7 +691,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     private val MIGRATION_57_TO_58: Migration = object : Migration(57, 58) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
-                "DROP TABLE IF NOT EXISTS `refreshes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "DROP TABLE IF EXISTS `refreshes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "`timestamp` INTEGER NOT NULL)",
             )
         }

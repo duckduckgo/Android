@@ -94,16 +94,6 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenGetUserRefreshesCountThenGetAndUpdateUserRefreshesBetweenCalled() {
-        val now = LocalDateTime.now()
-        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
-
-        testee.getUserRefreshesCount()
-
-        verify(mockBrokenSiteReportRepository).getAndUpdateUserRefreshesBetween(now.minusSeconds(REFRESH_COUNT_WINDOW), now)
-    }
-
-    @Test
     fun whenAllRequirementsMetThenShouldShowBrokenSitePromptReturnsTrue() = runTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
