@@ -272,8 +272,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
-import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
-import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -2786,7 +2784,7 @@ class BrowserTabViewModel @Inject constructor(
             val isBrowserShowing = currentBrowserViewState().browserShowing
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
-            val showBrokenSitePrompt = shouldPromptForBrokenSiteReport()
+            val showBrokenSitePrompt = shouldShowPromptForBrokenSiteReport()
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
@@ -4005,29 +4003,14 @@ class BrowserTabViewModel @Inject constructor(
         newTabPixels.get().fireNewTabDisplayed()
     }
 
-    private suspend fun shouldPromptForBrokenSiteReport(): Boolean {
-        return withContext(dispatchers.io()) {
-            val refreshCount = brokenSitePrompt.getUserRefreshesCount()
-            when (refreshCount) {
-                0, 1 -> false
-                2 -> {
-                    blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-                        pixel.fire(it.pixelName, it.params)
-                    }
-                    pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
-                    Timber.d("KateTest--> send pixel only bc 2 refreshes")
-                    false
-                }
-                else -> {
-                    blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-                        pixel.fire(it.pixelName, it.params)
-                    }
-                    pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-                    Timber.d("KateTest--> should show bc 3 refreshes")
-                    site?.let { brokenSitePrompt.shouldShowBrokenSitePrompt(it.url) } ?: false
-                }
-            }
+    private suspend fun shouldShowPromptForBrokenSiteReport(): Boolean {
+        val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
+        refreshPixelSender.sendBreakageRefreshPixels(detectedRefreshPatterns)
+        if (3 in detectedRefreshPatterns) {
+            Timber.d("KateTest--> should show bc 3 refreshes")
+            return site?.url?.let { brokenSitePrompt.shouldShowBrokenSitePrompt(it) } ?: false
         }
+        return false
     }
 
     fun handleMenuRefreshAction() {

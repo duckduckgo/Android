@@ -70,15 +70,8 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.resetRefreshCount()
     }
 
-    override fun getUserRefreshesCount(): Int {
-        return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
-            currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
-            currentTimeProvider.localDateTimeNow(),
-        ).also {
-            if (it >= REFRESH_COUNT_LIMIT) {
-                brokenSiteReportRepository.resetRefreshCount()
-            }
-        }
+    override fun getUserRefreshesCount(): Set<Int> {
+        return brokenSiteReportRepository.checkForRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {

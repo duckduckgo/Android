@@ -59,7 +59,7 @@ interface BrokenSiteReportRepository {
 
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
+    fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
 }
 
 class RealBrokenSiteReportRepository(
@@ -67,7 +67,7 @@ class RealBrokenSiteReportRepository(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val brokenSitePromptDataStore: BrokenSitePromptDataStore,
-    private val brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
+    private val brokenSiteRefreshesInMemoryStore: BrokenSiteRefreshesInMemoryStore,
 ) : BrokenSiteReportRepository {
 
     override suspend fun getLastSentDay(hostname: String): String? {
@@ -153,15 +153,15 @@ class RealBrokenSiteReportRepository(
     }
 
     override fun resetRefreshCount() {
-        brokenSitePromptInMemoryStore.resetRefreshCount()
+        brokenSiteRefreshesInMemoryStore.resetRefreshCount()
     }
 
     override fun addRefresh(url: Uri, localDateTime: LocalDateTime) {
-        brokenSitePromptInMemoryStore.addRefresh(url, localDateTime)
+        brokenSiteRefreshesInMemoryStore.addRefresh(url, localDateTime)
     }
 
-    override fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
-        return brokenSitePromptInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)
+    override fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
+        return brokenSiteRefreshesInMemoryStore.checkForRefreshPatterns(currentDateTime)
     }
 
     private fun convertToShortDate(dateString: String): String {
