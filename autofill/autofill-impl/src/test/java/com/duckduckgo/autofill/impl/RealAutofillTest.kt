@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
+import com.duckduckgo.autofill.impl.feature.plugin.AutofillFeatureRepository
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import java.util.concurrent.CopyOnWriteArrayList

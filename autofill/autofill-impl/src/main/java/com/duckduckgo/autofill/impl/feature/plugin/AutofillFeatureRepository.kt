@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.mediaplayback.store
+package com.duckduckgo.autofill.impl.feature.plugin
 
-import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -31,27 +31,27 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface MediaPlaybackRepository {
-    val exceptions: CopyOnWriteArrayList<FeatureExceptions.FeatureException>
+interface AutofillFeatureRepository {
+    val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = MediaPlaybackRepository::class,
-)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
 )
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutofillFeatureRepository::class,
+)
 @SingleInstanceIn(AppScope::class)
-class RealMediaPlaybackRepository @Inject constructor(
-    private val mediaPlaybackFeature: MediaPlaybackFeature,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+class RealAutofillFeatureRepository @Inject constructor(
+    private val feature: AutofillFeature,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
-) : MediaPlaybackRepository, PrivacyConfigCallbackPlugin {
+) : AutofillFeatureRepository, PrivacyConfigCallbackPlugin {
 
-    override val exceptions = CopyOnWriteArrayList<FeatureExceptions.FeatureException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
         loadToMemory()
@@ -62,10 +62,10 @@ class RealMediaPlaybackRepository @Inject constructor(
     }
 
     private fun loadToMemory() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
                 exceptions.clear()
-                exceptions.addAll(mediaPlaybackFeature.self().getExceptions())
+                exceptions.addAll(feature.self().getExceptions())
             }
         }
     }

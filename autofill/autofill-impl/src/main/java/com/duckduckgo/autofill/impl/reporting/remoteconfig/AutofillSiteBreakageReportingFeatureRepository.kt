@@ -14,56 +14,57 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.service.store
+package com.duckduckgo.autofill.impl.reporting.remoteconfig
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-interface AutofillFeatureRepository {
-    fun insertAll(newList: List<AutofillServiceException>)
-    val exceptions: CopyOnWriteArrayList<String>
+interface AutofillSiteBreakageReportingFeatureRepository {
+    val exceptions: List<String>
 }
 
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutofillSiteBreakageReportingFeatureRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class RealAutofillFeatureRepository @Inject constructor(
-    private val autofillServiceDatabase: AutofillServiceDatabase,
+class AutofillSiteBreakageReportingFeatureRepositoryImpl @Inject constructor(
+    private val feature: AutofillSiteBreakageReportingFeature,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
-    @ProcessName private val processName: String,
-    @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider,
-) : AutofillFeatureRepository {
-
-    private val dao = autofillServiceDatabase.exceptionsDao()
+) : AutofillSiteBreakageReportingFeatureRepository, PrivacyConfigCallbackPlugin {
 
     override val exceptions = CopyOnWriteArrayList<String>()
 
     init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            Timber.i("DDGAutofillService: Init AutofillFeatureRepository from $processName")
-            if (isMainProcess || processName == ":autofill") {
-                loadToMemory()
-            }
-        }
+        loadToMemory()
     }
 
-    override fun insertAll(newList: List<AutofillServiceException>) {
-        dao.updateAll(newList)
+    override fun onPrivacyConfigDownloaded() {
         loadToMemory()
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        dao.getAll().map { exceptions.add(it.domain) }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                exceptions.clear()
+                exceptions.addAll(feature.self().getExceptions().map { it.domain })
+            }
+        }
     }
 }

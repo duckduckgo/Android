@@ -25,7 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
     boundType = EmailProtectionInContextSignupFeature::class,
     featureName = "incontextSignup",
     settingsStore = EmailProtectionInContextRemoteSettingsPersister::class,
-    exceptionsStore = EmailProtectionInContextRemoteExceptionsPersister::class,
 )
 @Suppress("unused")
 private interface UnusedEmailProtectionInContextSignupRemoteFeatureCodegenTrigger

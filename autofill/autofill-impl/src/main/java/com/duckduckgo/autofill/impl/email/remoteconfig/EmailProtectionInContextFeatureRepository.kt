@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.mediaplayback.store
+package com.duckduckgo.autofill.impl.email.remoteconfig
 
-import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -31,27 +30,27 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface MediaPlaybackRepository {
-    val exceptions: CopyOnWriteArrayList<FeatureExceptions.FeatureException>
+interface EmailProtectionInContextFeatureRepository {
+    val exceptions: CopyOnWriteArrayList<String>
 }
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = MediaPlaybackRepository::class,
+    boundType = EmailProtectionInContextFeatureRepository::class,
 )
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RealMediaPlaybackRepository @Inject constructor(
-    private val mediaPlaybackFeature: MediaPlaybackFeature,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+class RealEmailProtectionInContextFeatureRepository @Inject constructor(
+    private val feature: EmailProtectionInContextSignupFeature,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
-) : MediaPlaybackRepository, PrivacyConfigCallbackPlugin {
+) : EmailProtectionInContextFeatureRepository, PrivacyConfigCallbackPlugin {
 
-    override val exceptions = CopyOnWriteArrayList<FeatureExceptions.FeatureException>()
+    override val exceptions = CopyOnWriteArrayList<String>()
 
     init {
         loadToMemory()
@@ -62,10 +61,10 @@ class RealMediaPlaybackRepository @Inject constructor(
     }
 
     private fun loadToMemory() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
                 exceptions.clear()
-                exceptions.addAll(mediaPlaybackFeature.self().getExceptions())
+                exceptions.addAll(feature.self().getExceptions().map { it.domain })
             }
         }
     }

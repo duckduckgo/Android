@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.email.remoteconfig
 
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
