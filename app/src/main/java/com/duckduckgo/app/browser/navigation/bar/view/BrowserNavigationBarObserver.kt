@@ -46,4 +46,16 @@ interface BrowserNavigationBarObserver {
     @EmptySuper
     fun onForwardButtonClicked() {
     }
+
+    @EmptySuper
+    fun onNewTabButtonClicked() {
+    }
+
+    @EmptySuper
+    fun onAutofillButtonClicked() {
+    }
+
+    @EmptySuper
+    fun onBookmarksButtonClicked() {
+    }
 }

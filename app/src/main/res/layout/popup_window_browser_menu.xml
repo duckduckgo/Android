@@ -96,13 +96,6 @@
                 android:id="@+id/includeDuckChatMenuItem"
                 layout="@layout/view_menu_item_duck_chat" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/refreshLongMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_reload_16"
-                app:primaryText="@string/refreshPage" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"

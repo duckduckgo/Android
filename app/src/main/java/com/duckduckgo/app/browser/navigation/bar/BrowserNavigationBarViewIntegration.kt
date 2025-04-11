@@ -20,8 +20,9 @@ import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -66,13 +67,16 @@ class BrowserNavigationBarViewIntegration(
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
     }
 
-    fun renderBrowserViewState(viewState: BrowserViewState) {
-        navigationBarView.setCanGoBack(viewState.canGoBack)
-        navigationBarView.setCanGoForward(viewState.canGoForward)
-    }
-
     fun configureCustomTab() {
         navigationBarView.setCustomTab(isCustomTab = true)
+    }
+
+    fun configureBrowserViewMode() {
+        navigationBarView.setViewMode(Browser)
+    }
+
+    fun configureNewTabViewMode() {
+        navigationBarView.setViewMode(NewTab)
     }
 
     fun onDestroyView() {

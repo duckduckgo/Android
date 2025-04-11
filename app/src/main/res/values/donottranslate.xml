@@ -54,6 +54,4 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
-    <!--    Bottom Navigation Bar Experiment-->
-    <string name="refreshPage">Refresh Page</string>
 </resources>
