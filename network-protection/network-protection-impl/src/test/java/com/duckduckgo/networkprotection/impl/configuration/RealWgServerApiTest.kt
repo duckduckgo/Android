@@ -152,19 +152,20 @@ class RealWgServerApiTest {
     fun whenRegisterInProductionThenDownloadGeoswitchingData() = runTest {
         productionApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())
     }
 
     @Test
     fun whenRegisterInInternalThenDownloadGeoswitchingData() = runTest {
         internalApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())
     }
 
     @Test
     fun whenUserPreferredCountrySetThenRegisterPublicKeyShouldRequestForCountry() = runTest {
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(PreferredLocation("nl"))
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()))
+            .thenReturn(PreferredLocation("nl"))
 
         assertEquals(
             WgServerData(
@@ -181,7 +182,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenUserPreferredLocationSetThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())).thenReturn(
             PreferredLocation(countryCode = "us", cityName = "Des Moines"),
         )
 
@@ -202,7 +203,7 @@ class RealWgServerApiTest {
     fun whenUserPreferredLocationSetAndInternalDebugServerSelectedThenRegisterPublicKeyShouldReturnDebugServer() = runTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())).thenReturn(
             PreferredLocation(countryCode = "us", cityName = "Des Moines"),
         )
 
