@@ -254,6 +254,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
+    var isDataClearingInProgress: Boolean = false
+
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
@@ -690,6 +692,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         dialog.setOnCancelListener {
             pixel.fire(FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        }
+        dialog.clearStarted = {
+            isDataClearingInProgress = true
         }
         dialog.show()
     }
