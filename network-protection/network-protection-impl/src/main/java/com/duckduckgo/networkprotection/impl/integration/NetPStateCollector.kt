@@ -29,13 +29,18 @@ import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListReposito
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
-import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
 import org.json.JSONObject
 
 @ContributesMultibinding(ActivityScope::class)
@@ -46,9 +51,9 @@ class NetPStateCollector @Inject constructor(
     private val connectionQualityStore: ConnectionQualityStore,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
-    private val netpSubscriptionManager: NetpSubscriptionManager,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val subscriptions: Subscriptions,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
@@ -56,7 +61,18 @@ class NetPStateCollector @Inject constructor(
         return JSONObject().apply {
             put("enabled", isNetpRunning)
             put("CGNATed", isCGNATed())
-            put("subscriptionActive", netpSubscriptionManager.getVpnStatus().isActive())
+            JSONObject().apply {
+                val active = subscriptions.getSubscriptionStatus().isActive()
+                put("isActive", active)
+                val vpnEntitlement = kotlin.runCatching {
+                    subscriptions.getEntitlementStatus()
+                        .firstOrNull()?.contains(NetP) ?: false
+                }.getOrElse { false }
+                put("hasVpnEntitlement", vpnEntitlement)
+            }.also {
+                put("subscriptionState", it)
+            }
+
             appPackageId?.let {
                 put("reportedAppProtected", !netPExclusionListRepository.getExcludedAppPackages().contains(it))
             }
@@ -87,5 +103,12 @@ class NetPStateCollector @Inject constructor(
         }
 
         return false
+    }
+
+    private fun SubscriptionStatus.isActive(): Boolean {
+        return when (this) {
+            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> true
+            else -> false
+        }
     }
 }
