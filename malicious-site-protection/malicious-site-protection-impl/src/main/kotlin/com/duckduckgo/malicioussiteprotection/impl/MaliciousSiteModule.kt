@@ -32,6 +32,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import java.io.File
 import java.security.MessageDigest
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -56,6 +57,7 @@ class MaliciousSiteModule {
     fun provideMaliciousSiteProtectionDatabase(context: Context): MaliciousSitesDatabase {
         return Room.databaseBuilder(context, MaliciousSitesDatabase::class.java, "malicious_sites.db")
             .addMigrations(*ALL_MIGRATIONS)
+            .setTransactionExecutor(Executors.newSingleThreadExecutor())
             .fallbackToDestructiveMigration()
             .build()
     }
