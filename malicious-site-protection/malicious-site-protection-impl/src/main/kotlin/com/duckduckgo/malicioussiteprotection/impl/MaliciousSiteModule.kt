@@ -57,6 +57,7 @@ class MaliciousSiteModule {
     fun provideMaliciousSiteProtectionDatabase(context: Context): MaliciousSitesDatabase {
         return Room.databaseBuilder(context, MaliciousSitesDatabase::class.java, "malicious_sites.db")
             .addMigrations(*ALL_MIGRATIONS)
+            .setQueryExecutor(Executors.newFixedThreadPool(4))
             .setTransactionExecutor(Executors.newSingleThreadExecutor())
             .fallbackToDestructiveMigration()
             .build()
