@@ -126,12 +126,12 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabItemsFlow,
         tabRepository.tabSwitcherData,
-        visualDesignExperimentDataStore.experimentState
+        visualDesignExperimentDataStore.experimentState,
     ) { viewState, tabs, tabSwitcherData, experimentState ->
         viewState.copy(
             tabItems = tabs,
             layoutType = tabSwitcherData.layoutType,
-            isNewVisualDesignEnabled = experimentState.isEnabled
+            isNewVisualDesignEnabled = experimentState.isEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 

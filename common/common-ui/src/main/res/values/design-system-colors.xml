@@ -92,7 +92,7 @@
     <attr name="daxColorFabSecondaryText" format="color"/>
     <attr name="daxColorFabSecondaryIcon" format="color"/>
 
-    <attr name="daxColorTabButtonBackground" format="color"/>
+    <attr name="daxColorTabHighlight" format="color"/>
 
     <attr name="daxColorButtonPrimaryText" format="color"/>
     <attr name="daxColorButtonPrimaryTextPressed" format="color"/>

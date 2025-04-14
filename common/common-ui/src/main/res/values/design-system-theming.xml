@@ -201,7 +201,7 @@
         <item name="daxColorFabSecondaryIcon">@color/black</item>
 
         <!-- Tab -->
-        <item name="daxColorTabButtonBackground">@color/gray40</item>
+        <item name="daxColorTabHighlight">@color/gray50</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
@@ -307,7 +307,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
 
         <!-- Tab -->
-        <item name="daxColorTabButtonBackground">@color/gray70</item>
+        <item name="daxColorTabHighlight">@color/gray60</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>

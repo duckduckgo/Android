@@ -20,13 +20,13 @@
             <item android:state_pressed="true">
                 <shape android:shape="rectangle">
                     <corners android:radius="4dp" />
-                    <solid android:color="?attr/daxColorTabButtonBackground" />
+                    <solid android:color="?attr/daxColorTabHighlight" />
                 </shape>
             </item>
             <item>
                 <shape android:shape="rectangle">
                     <corners android:radius="4dp" />
-                    <solid android:color="?attr/daxColorTabButtonBackground" />
+                    <solid android:color="?attr/daxColorTabHighlight" />
                 </shape>
             </item>
         </selector>

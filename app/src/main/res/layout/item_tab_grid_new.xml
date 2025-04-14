@@ -66,11 +66,10 @@
         <ImageView
             android:id="@+id/selectionIndicator"
             android:contentDescription="@string/tabNotSelectedIndicator"
-            android:padding="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/shape_grey_circle_24"
-            android:visibility="invisible"
+            android:src="@drawable/shape_grey_circle_24_new"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />
@@ -97,7 +96,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="9dp"
+            app:cardCornerRadius="@dimen/keyline_2"
             app:cardElevation="@dimen/keyline_empty"
             android:layout_marginTop="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
