@@ -54,11 +54,4 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
-    <!--    Bottom Navigation Bar Experiment-->
-    <string name="refreshPage">Refresh Page</string>
-
-    <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Got it! I\'ll skip the other tips.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Show Tutorial</string>
 </resources>
