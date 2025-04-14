@@ -685,9 +685,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
         )
-        dialog.clearStarted = {
-            removeObservers()
-        }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
             pixel.fire(FIRE_DIALOG_CANCEL)
@@ -695,6 +692,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         dialog.clearStarted = {
             isDataClearingInProgress = true
+            removeObservers()
         }
         dialog.show()
     }
