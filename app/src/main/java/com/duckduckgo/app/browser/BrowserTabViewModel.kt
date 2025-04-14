@@ -4043,6 +4043,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchBookmarksActivity
     }
 
+    fun openDuckChat(query: String?) {
+        if (query?.isNotEmpty() == true) {
+            duckChat.openDuckChatWithAutoPrompt(query)
+        } else {
+            duckChat.openDuckChat()
+        }
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
