@@ -148,7 +148,7 @@
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
-                                android:background="?selectableItemBackgroundBorderless"
+                                android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
                                 android:padding="@dimen/toolbarIconPadding"
@@ -246,13 +246,13 @@
 
                             <ImageView
                                 android:id="@+id/clearTextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="@dimen/keyline_1"
-                                android:background="?selectableItemBackgroundBorderless"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/clearButtonContentDescription"
                                 android:padding="@dimen/toolbarIconPadding"
                                 android:src="@drawable/ic_close_24"
+                                android:scaleType="center"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
@@ -263,7 +263,7 @@
                                 android:id="@+id/voiceSearchButton"
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
-                                android:background="?selectableItemBackgroundBorderless"
+                                android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/voiceSearchIconContentDescription"
                                 android:padding="@dimen/toolbarIconPadding"
                                 android:scaleType="center"
@@ -276,7 +276,7 @@
 
                             <View
                                 android:id="@+id/spacer"
-                                android:layout_width="10dp"
+                                android:layout_width="5dp"
                                 android:layout_height="0dp"
                                 android:importantForAccessibility="no"
                                 app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
@@ -285,7 +285,7 @@
 
                             <com.duckduckgo.common.ui.view.divider.VerticalDivider
                                 android:id="@+id/verticalDivider"
-                                android:layout_width="1dp"
+                                android:layout_width="5dp"
                                 android:layout_height="24dp"
                                 android:layout_marginVertical="@dimen/keyline_2"
                                 android:importantForAccessibility="no"
@@ -299,7 +299,7 @@
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
-                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/browserPopupMenu"
                                 android:padding="@dimen/toolbarIconPadding"
                                 android:scaleType="center"

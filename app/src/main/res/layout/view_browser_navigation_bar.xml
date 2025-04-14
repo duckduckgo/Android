@@ -36,7 +36,7 @@
             android:id="@+id/newTabButton"
             android:layout_width="@dimen/bottomNavIconContainer"
             android:layout_height="@dimen/bottomNavIconContainer"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/selectable_item_experimental_background"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -53,7 +53,7 @@
             android:id="@+id/autofillButton"
             android:layout_width="@dimen/bottomNavIconContainer"
             android:layout_height="@dimen/bottomNavIconContainer"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/selectable_item_experimental_background"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -77,7 +77,7 @@
         android:id="@+id/bookmarksButton"
         android:layout_width="@dimen/bottomNavIconContainer"
         android:layout_height="@dimen/bottomNavIconContainer"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:background="@drawable/selectable_item_experimental_background">
 
         <ImageView
             android:id="@+id/bookmarksImageView"
@@ -118,7 +118,7 @@
         android:id="@+id/tabsButton"
         android:layout_width="@dimen/bottomNavIconContainer"
         android:layout_height="@dimen/bottomNavIconContainer"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:background="@drawable/selectable_item_experimental_background">
 
         <ImageView
             android:id="@+id/tabsImageView"
@@ -138,7 +138,7 @@
         android:id="@+id/menuButton"
         android:layout_width="@dimen/bottomNavIconContainer"
         android:layout_height="@dimen/bottomNavIconContainer"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:background="@drawable/selectable_item_experimental_background">
 
         <ImageView
             android:id="@+id/menuIconImageView"
