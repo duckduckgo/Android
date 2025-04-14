@@ -22,8 +22,6 @@ tags:
           text: "got it"
       - assertVisible:
           text: ".*browsing activity with the fire button.*"
-      - assertVisible:
-          id: daxDialogDismissButton
       - tapOn:
           id: daxDialogDismissButton
       - assertNotVisible:
