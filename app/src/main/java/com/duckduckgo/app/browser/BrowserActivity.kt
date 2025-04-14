@@ -35,9 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -102,7 +100,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -335,12 +333,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         }
                     }
                 }
-            }
-        }
-
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            lifecycleScope.launch {
-                viewModel.deletableTabsFlow.flowWithLifecycle(lifecycle, RESUMED).collect()
             }
         }
     }
@@ -651,18 +643,31 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {
-        TabSwitcherSnackbar(
-            anchorView = binding.fragmentContainer,
-            message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
-            action = getString(R.string.tabClosedUndo),
-            showAction = true,
-            onAction = { viewModel.undoDeletableTabs(tabIds) },
-            onDismiss = { viewModel.purgeDeletableTabs() },
-        ).show()
+        lifecycleScope.launch {
+            // allow the tab fragment to initialize for the snackbar
+            delay(500)
+
+            val anchorView = when (settingsDataStore.omnibarPosition) {
+                TOP -> binding.fragmentContainer
+                BOTTOM -> currentTab?.omnibar?.newOmnibar ?: binding.fragmentContainer
+            }
+            TabSwitcherSnackbar(
+                anchorView = anchorView,
+                message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+                action = getString(R.string.tabClosedUndo),
+                showAction = true,
+                onAction = { viewModel.undoDeletableTabs(tabIds) },
+                onDismiss = { viewModel.purgeDeletableTabs() },
+            ).show()
+        }
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
+    }
+
+    fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
+        viewModel.onTabsDeletedInTabSwitcher(tabIds)
     }
 
     fun clearTabsAndRecreate() {

@@ -183,7 +183,7 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: OmnibarLayout by lazy {
+    val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 when (omnibarType) {
