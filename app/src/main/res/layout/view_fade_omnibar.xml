@@ -248,14 +248,14 @@
                                 android:id="@+id/clearTextButton"
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
+                                android:layout_marginEnd="@dimen/keyline_0"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/clearButtonContentDescription"
-                                android:padding="@dimen/toolbarIconPadding"
                                 android:src="@drawable/ic_close_24"
                                 android:scaleType="center"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/spacer"
+                                app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                                 app:layout_constraintTop_toTopOf="parent"
                                 tools:visibility="visible" />
 
@@ -263,13 +263,13 @@
                                 android:id="@+id/voiceSearchButton"
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
+                                android:layout_marginEnd="@dimen/keyline_0"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/voiceSearchIconContentDescription"
-                                android:padding="@dimen/toolbarIconPadding"
                                 android:scaleType="center"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/spacer"
+                                app:layout_constraintEnd_toStartOf="@+id/verticalDivider"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:srcCompat="@drawable/ic_microphone_24"
                                 tools:visibility="visible" />
@@ -279,19 +279,20 @@
                                 android:layout_width="5dp"
                                 android:layout_height="0dp"
                                 android:importantForAccessibility="no"
-                                app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
-                                app:layout_constraintEnd_toStartOf="@id/aiChat"
-                                app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/verticalDivider"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                            <View
                                 android:id="@+id/verticalDivider"
-                                android:layout_width="5dp"
+                                android:layout_width="1dp"
                                 android:layout_height="24dp"
-                                android:layout_marginVertical="@dimen/keyline_2"
+                                android:layout_marginHorizontal="2dp"
+                                android:background="?daxColorLines"
+                                android:layout_marginStart="5dp"
                                 android:importantForAccessibility="no"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/aiChat"
-                                app:layout_constraintStart_toEndOf="@id/voiceSearchButton"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
@@ -301,7 +302,6 @@
                                 android:layout_gravity="center"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/browserPopupMenu"
-                                android:padding="@dimen/toolbarIconPadding"
                                 android:scaleType="center"
                                 android:src="@drawable/ic_ai_chat_outline_24"
                                 android:visibility="gone"
