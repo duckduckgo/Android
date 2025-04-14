@@ -34,13 +34,13 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?daxColorSurface">
+            android:background="?attr/daxColorToolbar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbarSorting"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
+                android:background="?attr/daxColorToolbar"
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
@@ -148,13 +148,13 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface">
+            android:background="?attr/daxColorToolbar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
+                android:background="?attr/daxColorToolbar"
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
