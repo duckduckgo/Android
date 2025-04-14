@@ -563,7 +563,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             showBrowserMenu = viewState.showBrowserMenu,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
             showChatMenu = duckChat.showInAddressBar() && (viewState.showChatMenu || viewState.viewMode is NewTab),
-            showSpacer = viewState.showClearButton || viewState.showVoiceSearch
+            showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
         if (!isInitialRender && newButtonState != previousButtonState && !viewState.isLoading) {

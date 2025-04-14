@@ -1113,7 +1113,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            if(!duckChat.showInAddressBar()) {
+            if (!duckChat.showInAddressBar()) {
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = false
             }
         }
