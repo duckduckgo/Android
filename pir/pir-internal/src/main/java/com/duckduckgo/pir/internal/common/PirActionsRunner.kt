@@ -34,6 +34,8 @@ import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
+import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
@@ -170,9 +172,16 @@ internal class RealPirActionsRunner(
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokersToExecute" }
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokersToExecute.size}" }
-            detachedWebView = pirDetachedWebViewProvider.createInstance(context, pirScriptToLoad) {
-                onLoadingComplete(it, profileQuery)
-            }
+            detachedWebView = pirDetachedWebViewProvider.createInstance(
+                context,
+                pirScriptToLoad,
+                onPageLoaded = {
+                    onLoadingComplete(it, profileQuery)
+                },
+                onPageLoadFailed = {
+                    onLoadingFailed(it)
+                },
+            )
 
             initializeRunner()
         }
@@ -194,9 +203,16 @@ internal class RealPirActionsRunner(
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokersToExecute" }
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokersToExecute.size}" }
-            detachedWebView = pirDetachedWebViewProvider.setupWebView(webView, pirScriptToLoad) {
-                onLoadingComplete(it, profileQuery)
-            }
+            detachedWebView = pirDetachedWebViewProvider.setupWebView(
+                webView,
+                pirScriptToLoad,
+                onPageLoaded = {
+                    onLoadingComplete(it, profileQuery)
+                },
+                onPageLoadFailed = {
+                    onLoadingFailed(it)
+                },
+            )
             initializeRunner()
         }
         return awaitResult()
@@ -237,10 +253,13 @@ internal class RealPirActionsRunner(
                     ),
                 ),
             )
+        } else if (commandsFlow.value is Command.RecoverFromFailedUrlLoad && url == RECOVERY_URL) {
+            logcat { "PIR-RUNNER ($this): Completing broker due to recovery" }
+            nextCommand(BrokerCompleted(commandsFlow.value.state, isSuccess = false))
         } else if (commandsFlow.value is LoadUrl) {
             // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
             // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Completed loading for ${commandsFlow.value}" }
+            logcat { "PIR-RUNNER ($this): Completed loading for ${commandsFlow.value}" }
             nextCommand(
                 ExecuteBrokerAction(
                     commandsFlow.value.state.copy(
@@ -249,7 +268,16 @@ internal class RealPirActionsRunner(
                 ),
             )
         } else {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Ignoring $url as next action has been pushed" }
+            logcat { "PIR-RUNNER ($this): Ignoring $url as next action has been pushed" }
+        }
+    }
+
+    private fun onLoadingFailed(url: String?) {
+        logcat { "PIR-RUNNER: Recovering from loading $url failure" }
+        coroutineScope.launch(dispatcherProvider.main()) {
+            nextCommand(
+                Command.RecoverFromFailedUrlLoad(commandsFlow.value.state),
+            )
         }
     }
 
@@ -267,8 +295,12 @@ internal class RealPirActionsRunner(
                 cleanUpRunner()
             }
             // TODO add loading timeout
-            is LoadUrl -> withContext(dispatcherProvider.main()) {
+            is LoadUrl -> coroutineScope.launch(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
+            }
+
+            is Command.RecoverFromFailedUrlLoad -> coroutineScope.launch(dispatcherProvider.main()) {
+                detachedWebView!!.loadUrl(RECOVERY_URL)
             }
 
             is HandleNextProfileForBroker -> handleNextProfileForBroker(command.state)
@@ -991,6 +1023,10 @@ internal class RealPirActionsRunner(
             override val state: State,
         ) : Command(State())
 
+        data class RecoverFromFailedUrlLoad(
+            override val state: State,
+        ) : Command(State())
+
         data class BrokerCompleted(
             override val state: State,
             val isSuccess: Boolean,
@@ -1035,8 +1071,4 @@ internal class RealPirActionsRunner(
         val currentExtractedProfileIndex: Int = 0,
         val extractedProfile: List<ExtractedProfile> = emptyList(),
     )
-
-    companion object {
-        private const val DBP_INITIAL_URL = "dbp://blank"
-    }
 }

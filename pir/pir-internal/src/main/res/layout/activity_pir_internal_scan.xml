@@ -172,12 +172,6 @@
                 android:layout_marginHorizontal="@dimen/keyline_4" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/statusTotalAllClear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/records"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
