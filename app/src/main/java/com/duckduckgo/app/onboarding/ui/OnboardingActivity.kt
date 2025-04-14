@@ -63,6 +63,12 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun onSkipClicked() {
+        viewModel.onOnboardingSkipped()
+        startActivity(BrowserActivity.intent(this@OnboardingActivity))
+        finish()
+    }
+
     private fun onOnboardingDone() {
         viewModel.onOnboardingDone()
         startActivity(BrowserActivity.intent(this@OnboardingActivity))
