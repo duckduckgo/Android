@@ -106,7 +106,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val tabItemsFlow = tabRepository.flowTabs
+    private val tabSwitcherItemsFlow = tabRepository.flowTabs
         .debounce(100.milliseconds)
         .conflate()
         .flatMapLatest { tabEntities ->
@@ -119,32 +119,37 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
+    val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
+
     private val _selectionViewState = MutableStateFlow(SelectionViewState())
     val selectionViewState = combine(
         _selectionViewState,
-        tabItemsFlow,
+        tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-    ) { viewState, tabs, tabSwitcherData ->
+    ) { viewState, tabSwitcherItems, tabSwitcherData ->
         viewState.copy(
-            tabItems = tabs,
+            tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
-
-    val tabItemsLiveData: LiveData<List<TabSwitcherItem>> = tabItemsFlow.asLiveData()
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    val tabItems: List<TabSwitcherItem>
+    // all tab items, including the animated tile
+    val tabSwitcherItems: List<TabSwitcherItem>
         get() {
             return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                selectionViewState.value.tabItems
+                selectionViewState.value.tabSwitcherItems
             } else {
-                tabItemsLiveData.value.orEmpty()
+                tabSwitcherItemsLiveData.value.orEmpty()
             }
         }
+
+    // only the actual browser tabs
+    val tabs: List<Tab>
+        get() = tabSwitcherItems.filterIsInstance<Tab>()
 
     private val recentlySavedBookmarks = mutableListOf<Bookmark>()
 
@@ -168,10 +173,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
         if (swipingTabsFeature.isEnabled) {
-            val newTab = tabItems
-                .filterIsInstance<Tab>()
-                .firstOrNull { tabItem -> tabItem.isNewTabPage }
-
+            val newTab = tabs.firstOrNull { tabItem -> tabItem.isNewTabPage }
             if (newTab != null) {
                 tabRepository.select(tabId = newTab.id)
             } else {
@@ -227,7 +229,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
 
-        _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabItems.map { tab -> tab.id })) }
+        _selectionViewState.update { it.copy(mode = Selection(selectedTabs = tabs.map { tab -> tab.id })) }
     }
 
     fun onDeselectAllTabs() {
@@ -241,7 +243,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS)
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY, type = Daily())
 
-        val selectedTabs = tabItems
+        val selectedTabs = tabs
             .filterIsInstance<SelectableTab>()
             .filter { it.isSelected && !it.isNewTabPage }
 
@@ -305,7 +307,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has indicated they want to close all tabs
     fun onCloseAllTabsRequested() {
-        command.value = Command.CloseAllTabsRequest(tabItems.size)
+        command.value = Command.CloseAllTabsRequest(tabs.size)
 
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY, type = Daily())
@@ -322,7 +324,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         val selectedTabs = selectionMode.selectedTabs
-        val allTabsCount = tabItems.size
+        val allTabsCount = tabs.size
         command.value = if (allTabsCount == selectedTabs.size) {
             Command.CloseAllTabsRequest(allTabsCount)
         } else {
@@ -336,7 +338,7 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY, type = Daily())
 
         val selectedTabs = selectionMode.selectedTabs
-        val otherTabsIds = (tabItems.map { it.id }) - selectedTabs.toSet()
+        val otherTabsIds = (tabs.map { it.id }) - selectedTabs.toSet()
         if (otherTabsIds.isNotEmpty()) {
             command.value = Command.CloseTabsRequest(otherTabsIds, isClosingOtherTabs = true)
         }
@@ -349,7 +351,7 @@ class TabSwitcherViewModel @Inject constructor(
                 unselectTabs(tabIds)
             }
 
-            if (tabItems.size == tabIds.size) {
+            if (tabs.size == tabIds.size) {
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
@@ -375,12 +377,12 @@ class TabSwitcherViewModel @Inject constructor(
 
     // user has confirmed they want to close all tabs -> mark all tabs as deletable and show undo snackbar
     fun onCloseAllTabsConfirmed() {
-        onCloseTabsConfirmed(tabItems.map { it.id })
+        onCloseTabsConfirmed(tabs.map { it.id })
     }
 
     fun onTabCloseInNormalModeRequested(tab: Tab, swipeGestureUsed: Boolean = false) {
         viewModelScope.launch {
-            if (tabItems.size == 1) {
+            if (tabs.size == 1) {
                 if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                     // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                     markTabAsDeletable(tab, swipeGestureUsed)
@@ -524,9 +526,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     private suspend fun saveSiteBookmark(tabId: String) = withContext(dispatcherProvider.io()) {
-        val targetTabItem = tabItems.firstOrNull { it.id == tabId }
-        val targetTab = targetTabItem?.takeIf { it is Tab }?.let { it as Tab }
-
+        val targetTab = tabs.firstOrNull { it.id == tabId }
         val targetTabUrl = targetTab?.tabEntity?.url
         val isUrlNotBlank = targetTabUrl?.isNotBlank() ?: false
 
@@ -609,15 +609,16 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class SelectionViewState(
-        val tabItems: List<TabSwitcherItem> = emptyList(),
+        val tabSwitcherItems: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
         val layoutType: LayoutType? = null,
     ) {
+        val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTabPage = tabItems.size == 1 && tabItems.mapNotNull { it as? Tab }.any { it.isNewTabPage }
+                val isThereOnlyNewTabPage = tabs.size == 1 && tabs.first().isNewTabPage
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,
@@ -646,10 +647,10 @@ class TabSwitcherViewModel @Inject constructor(
             }
 
             is Selection -> {
-                val areAllTabsSelected = numSelectedTabs == tabItems.size
+                val areAllTabsSelected = numSelectedTabs == tabs.size
                 val isSomethingSelected = numSelectedTabs > 0
                 val isNtpTheOnlySelectedTab = numSelectedTabs == 1 &&
-                    tabItems.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
+                    tabs.any { it is SelectableTab && it.isSelected && it.isNewTabPage }
                 val isSelectionActionable = isSomethingSelected && !isNtpTheOnlySelectedTab
                 DynamicInterface(
                     isFireButtonVisible = false,

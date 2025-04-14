@@ -384,7 +384,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             lifecycleScope.launch {
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateData(it.tabItems)
+                    tabsAdapter.updateData(it.tabSwitcherItems)
 
                     updateToolbarTitle(it.mode)
                     updateTabGridItemDecorator()
@@ -393,7 +393,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                     invalidateOptionsMenu()
 
-                    if (firstTimeLoadingTabsList && it.tabItems.isNotEmpty()) {
+                    if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
                         firstTimeLoadingTabsList = false
                         scrollToActiveTab()
                     }
@@ -406,7 +406,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 }
             }
 
-            viewModel.tabItemsLiveData.observe(this) { tabSwitcherItems ->
+            viewModel.tabSwitcherItemsLiveData.observe(this) { tabSwitcherItems ->
                 tabsAdapter.updateData(tabSwitcherItems)
 
                 val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
@@ -722,9 +722,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabMoved(from: Int, to: Int) {
         if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val isTrackerAnimationInfoPanelVisible = viewModel.tabItems.firstOrNull() is TrackerAnimationInfoPanel
+            val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.firstOrNull() is TrackerAnimationInfoPanel
             val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
-            val tabSwitcherItemCount = viewModel.tabItems.size
+            val tabSwitcherItemCount = viewModel.tabSwitcherItems.size
 
             val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
             if (canSwap) {
@@ -733,7 +733,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
             }
         } else {
-            val tabCount = viewModel.tabItems.size
+            val tabCount = viewModel.tabSwitcherItems.size
             val canSwap = from in 0..< tabCount && to in 0..< tabCount
             if (canSwap) {
                 tabsAdapter.onTabMoved(from, to)
@@ -848,7 +848,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun removeObservers() {
-        viewModel.tabItemsLiveData.removeObservers(this)
+        viewModel.tabSwitcherItemsLiveData.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
     }
 
