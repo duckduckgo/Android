@@ -265,6 +265,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -467,6 +468,7 @@ class BrowserTabViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val blockListPixelsPlugin: BlockListPixelsPlugin,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2755,11 +2757,13 @@ class BrowserTabViewModel @Inject constructor(
             val isBrowserShowing = currentBrowserViewState().browserShowing
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
+            val showBrokenSitePrompt = shouldShowPromptForBrokenSiteReport()
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
                     isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
+                    showBrokenSitePrompt,
                 )
             }
             val contextDaxDialogsShown = withContext(dispatchers.io()) {
@@ -3961,6 +3965,16 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onNewTabShown() {
         newTabPixels.get().fireNewTabDisplayed()
+    }
+
+    private suspend fun shouldShowPromptForBrokenSiteReport(): Boolean {
+        val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
+        refreshPixelSender.sendBreakageRefreshPixels(detectedRefreshPatterns)
+        if (3 in detectedRefreshPatterns) {
+            Timber.d("KateTest--> should show bc 3 refreshes")
+            return site?.url?.let { brokenSitePrompt.shouldShowBrokenSitePrompt(it) } ?: false
+        }
+        return false
     }
 
     fun handleMenuRefreshAction() {
