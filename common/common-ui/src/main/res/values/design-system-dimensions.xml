@@ -87,7 +87,7 @@
     <dimen name="gridItemImageSize">56dp</dimen>
     <dimen name="gridItemIconSize">32dp</dimen>
     <dimen name="gridItemTextWidth">72dp</dimen>
-    <dimen name="gridItemPreviewHeight">170dp</dimen>
+    <dimen name="gridItemPreviewHeight">162dp</dimen>
 
     <!-- Extended FAB -->
     <dimen name="fabHeight">56dp</dimen>

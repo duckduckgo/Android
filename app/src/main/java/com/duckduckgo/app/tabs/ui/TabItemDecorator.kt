@@ -56,7 +56,7 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
         recyclerView: RecyclerView,
         state: RecyclerView.State,
     ) {
-        val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
+        val adapter = recyclerView.adapter as? TabSwitcherAdapterBase ?: return
         recyclerView.children.forEach { child ->
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->

@@ -74,6 +74,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -88,7 +89,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
@@ -154,17 +154,31 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
+    @Inject
+    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter: TabSwitcherAdapter by lazy {
-        TabSwitcherAdapter(
-            this,
-            webViewPreviewPersister,
-            this,
-            faviconManager,
-            dispatchers,
-            trackerCountAnimator,
-        )
+    private val tabsAdapter: TabSwitcherAdapterBase by lazy {
+        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            NewTabSwitcherAdapter(
+                this,
+                webViewPreviewPersister,
+                this,
+                faviconManager,
+                dispatchers,
+                trackerCountAnimator,
+            )
+        } else {
+            TabSwitcherAdapter(
+                this,
+                webViewPreviewPersister,
+                this,
+                faviconManager,
+                dispatchers,
+                trackerCountAnimator,
+            )
+        }
     }
 
     private val onScrolledListener = object : OnScrollListener() {
