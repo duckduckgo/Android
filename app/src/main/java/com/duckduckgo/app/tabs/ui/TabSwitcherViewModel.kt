@@ -153,7 +153,8 @@ class TabSwitcherViewModel @Inject constructor(
         get() = requireNotNull(selectionViewState.value.mode as Selection)
 
     sealed class Command {
-        data class Close(val skipTabPurge: Boolean = false) : Command()
+        data object Close : Command()
+        data class CloseAndShowUndoMessage(val deletedTabIds: List<String>) : Command()
         data class CloseTabsRequest(val tabIds: List<String>, val isClosingOtherTabs: Boolean = false) : Command()
         data class CloseAllTabsRequest(val numTabs: Int) : Command()
         data object ShowAnimatedTileDismissalDialog : Command()
@@ -180,7 +181,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabRepository.add()
         }
 
-        command.value = Command.Close()
+        command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
         } else {
@@ -200,7 +201,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
         } else {
             tabRepository.select(tabId)
-            command.value = Command.Close()
+            command.value = Command.Close
             pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         }
     }
@@ -355,11 +356,11 @@ class TabSwitcherViewModel @Inject constructor(
                 if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                     // mark tabs as deletable, the undo snackbar will be displayed when the tab switcher is closed
                     tabRepository.markDeletable(tabIds)
-                    command.value = Command.Close(skipTabPurge = true)
+                    command.value = Command.CloseAndShowUndoMessage(tabIds)
                 } else {
                     // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                     deleteTabs(tabIds)
-                    command.value = Command.Close()
+                    command.value = Command.Close
                 }
             } else {
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
@@ -383,11 +384,11 @@ class TabSwitcherViewModel @Inject constructor(
                 if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
                     // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                     markTabAsDeletable(tab, swipeGestureUsed)
-                    command.value = Command.Close(skipTabPurge = true)
+                    command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
                 } else {
                     // the last tab can be deleted immediately because no snackbar is needed and the tab switcher will be closed
                     deleteTabs(listOf(tab.id))
-                    command.value = Command.Close()
+                    command.value = Command.Close
                 }
             } else {
                 markTabAsDeletable(tab, swipeGestureUsed)
@@ -456,7 +457,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
-            command.value = Command.Close()
+            command.value = Command.Close
         }
     }
 
@@ -466,7 +467,7 @@ class TabSwitcherViewModel @Inject constructor(
         if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
-            command.value = Command.Close()
+            command.value = Command.Close
         }
     }
 

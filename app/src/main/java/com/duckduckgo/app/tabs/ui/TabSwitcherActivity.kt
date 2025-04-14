@@ -63,6 +63,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAndShowUndoMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
@@ -89,6 +90,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
@@ -548,8 +550,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Close -> {
-                skipTabPurge = command.skipTabPurge
+            Close -> {
+                finishAfterTransition()
+            }
+            is CloseAndShowUndoMessage -> {
+                skipTabPurge = true
+                setResult(
+                    RESULT_OK,
+                    Intent().apply {
+                        putStringArrayListExtra(EXTRA_KEY_DELETED_TAB_IDS, ArrayList(command.deletedTabIds))
+                    },
+                )
                 finishAfterTransition()
             }
             is CloseAllTabsRequest -> {
@@ -964,6 +975,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         const val EXTRA_KEY_SELECTED_TAB = "selected"
+        const val EXTRA_KEY_DELETED_TAB_IDS = "deletedTabIds"
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
