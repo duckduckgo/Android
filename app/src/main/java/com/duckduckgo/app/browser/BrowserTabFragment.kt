@@ -1038,7 +1038,7 @@ class BrowserTabFragment :
 
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onBrowserMenuClicked()
+        viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -1074,8 +1074,8 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            // when bottom navigation bar is enabled, we always inflate the popup menu from the bottom
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
             when (settingsDataStore.omnibarPosition) {
@@ -2756,7 +2756,7 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+        val webViewLayout = if (!isActiveCustomTab() && visualDesignExperimentDataStore.getOmnibarType() == FADE) {
             R.layout.include_duckduckgo_browser_experiment_webview
         } else {
             R.layout.include_duckduckgo_browser_webview

@@ -49,13 +49,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
-                <include
-                    android:id="@+id/customTabToolbarContainer"
-                    layout="@layout/include_custom_tab_toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone" />
-
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/omniBarContainer"
                     style="@style/Widget.DuckDuckGo.OmnibarCardView"
@@ -63,9 +56,9 @@
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
+                    android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     app:strokeColor="?daxColorAccentBlue"
-                    app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
-                    android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom">
+                    app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
@@ -324,6 +317,24 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.appcompat.widget.Toolbar>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="@dimen/experimentalToolbarSize"
+                android:layout_marginHorizontal="@dimen/keyline_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/browserMenu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <include
+                    android:id="@+id/customTabToolbarContainer"
+                    layout="@layout/include_custom_tab_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
                 android:id="@+id/tabsMenu"
