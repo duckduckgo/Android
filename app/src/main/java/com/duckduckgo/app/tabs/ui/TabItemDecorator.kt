@@ -27,24 +27,37 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
-class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
+class TabItemDecorator(context: Context, experimentStore: VisualDesignExperimentDataStore) : RecyclerView.ItemDecoration() {
+    private val borderPadding = if (experimentStore.experimentState.value.isEnabled) BORDER_PADDING_NEW else BORDER_PADDING
+    private val activeTabBorderColor = if (experimentStore.experimentState.value.isEnabled) {
+        CommonR.attr.daxColorTabHighlight
+    } else {
+        CommonR.attr.daxColorBackgroundInverted
+    }
+    private val selectionBorderWidth = if (experimentStore.experimentState.value.isEnabled) {
+        ACTIVE_TAB_BORDER_WIDTH
+    } else {
+        SELECTION_BORDER_WIDTH
+    }
+
     private val activeTabBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
         strokeWidth = ACTIVE_TAB_BORDER_WIDTH
 
         val typedValue = TypedValue()
-        context.theme.resolveAttribute(CommonR.attr.daxColorBackgroundInverted, typedValue, true)
+        context.theme.resolveAttribute(activeTabBorderColor, typedValue, true)
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 
     private val selectionBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
-        strokeWidth = SELECTION_BORDER_WIDTH
+        strokeWidth = selectionBorderWidth
 
         val typedValue = TypedValue()
         context.theme.resolveAttribute(CommonR.attr.daxColorAccentBlue, typedValue, true)
@@ -81,11 +94,11 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
     }
 
     private fun View.getBounds(): RectF {
-        val leftPosition = left + translationX - paddingLeft - BORDER_PADDING
-        val rightPosition = right + translationX + paddingRight + BORDER_PADDING
+        val leftPosition = left + translationX - paddingLeft - borderPadding
+        val rightPosition = right + translationX + paddingRight + borderPadding
 
-        val topPosition = top + translationY - paddingTop - BORDER_PADDING
-        val bottomPosition = bottom + translationY + paddingBottom + BORDER_PADDING
+        val topPosition = top + translationY - paddingTop - borderPadding
+        val bottomPosition = bottom + translationY + paddingBottom + borderPadding
 
         return RectF(leftPosition, topPosition, rightPosition, bottomPosition)
     }
@@ -95,5 +108,6 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
         private val ACTIVE_TAB_BORDER_WIDTH = 2.toPx().toFloat()
         private val SELECTION_BORDER_WIDTH = 4.toPx().toFloat()
         private val BORDER_PADDING = 3.toPx().toFloat()
+        private val BORDER_PADDING_NEW = 1.toPx().toFloat()
     }
 }
