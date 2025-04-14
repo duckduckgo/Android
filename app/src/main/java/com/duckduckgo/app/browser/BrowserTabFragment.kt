@@ -623,7 +623,7 @@ class BrowserTabFragment :
             result.data?.let { intent ->
                 intent.extras?.let { extras ->
                     val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
-                    if (deletedTabIds != null && deletedTabIds.size > 0) {
+                    if (!deletedTabIds.isNullOrEmpty()) {
                         (activity as? BrowserActivity?)?.onTabsDeletedInTabSwitcher(deletedTabIds)
                     }
                 }
