@@ -46,7 +46,6 @@
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
-    <attr name="daxColorSurfaceTransparent" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
@@ -72,8 +71,9 @@
     <attr name="daxColorBrowserOverlay" format="color"/>
 
     <!-- Visual Design Specific Colors -->
-    <attr name="daxColorOmnibarStroke" format="color"/>
     <attr name="daxColorControlFillPrimary" format="color"/>
+    <attr name="daxColorControlFillSecondary" format="color"/>
+    <attr name="daxColorControlFillTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>

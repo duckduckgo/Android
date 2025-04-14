@@ -164,7 +164,7 @@
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                app:tint="?daxColorNavigationBarIconEnabled"
+                app:tint="?daxColorPrimaryIcon"
                 android:src="@drawable/ic_menu_vertical_24" />
         </FrameLayout>
 

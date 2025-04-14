@@ -147,7 +147,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/browserPopupMenu"
             android:src="@drawable/ic_menu_vertical_24"
-            app:tint="?daxColorNavigationBarIconEnabled" />
+            app:tint="?daxColorPrimaryIcon" />
     </FrameLayout>
 
 </LinearLayout>
