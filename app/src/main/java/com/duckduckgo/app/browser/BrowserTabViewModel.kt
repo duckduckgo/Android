@@ -112,6 +112,7 @@ import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
+import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
@@ -382,7 +383,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -706,12 +706,6 @@ class BrowserTabViewModel @Inject constructor(
         defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
-            }
-            .launchIn(viewModelScope)
-
-        visualDesignExperimentDataStore.navigationBarState
-            .onEach { navigationBarState ->
-                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = !navigationBarState.isEnabled)
             }
             .launchIn(viewModelScope)
     }
@@ -1231,9 +1225,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewTab() {
+    private fun openNewTab() {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModelScope.launch {
+                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                if (emptyTab != null) {
+                    tabRepository.select(tabId = emptyTab)
+                } else {
+                    command.value = LaunchNewTab
+                }
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
+
+        onUserDismissedCta(ctaViewState.value?.cta)
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -2712,23 +2720,10 @@ class BrowserTabViewModel @Inject constructor(
         defaultBrowserPromptsExperiment.onPopupMenuLaunched()
     }
 
-    fun userRequestedOpeningNewTab(
+    fun onNewTabMenuItemClicked(
         longPress: Boolean = false,
     ) {
-        command.value = GenerateWebViewPreviewImage
-
-        if (swipingTabsFeature.isEnabled) {
-            viewModelScope.launch {
-                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
-                if (emptyTab != null) {
-                    tabRepository.select(tabId = emptyTab)
-                } else {
-                    command.value = LaunchNewTab
-                }
-            }
-        } else {
-            command.value = LaunchNewTab
-        }
+        openNewTab()
 
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
@@ -2742,8 +2737,10 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
 
-        onUserDismissedCta(ctaViewState.value?.cta)
+    fun onNavigationBarNewTabButtonClicked() {
+        openNewTab()
     }
 
     fun onCtaShown() {
@@ -2765,13 +2762,13 @@ class BrowserTabViewModel @Inject constructor(
                     siteLiveData.value,
                 )
             }
-            val isOnboardingComplete = withContext(dispatchers.io()) {
+            val contextDaxDialogsShown = withContext(dispatchers.io()) {
                 ctaViewModel.areBubbleDaxDialogsCompleted()
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
                 cta = cta,
-                daxOnboardingComplete = isOnboardingComplete,
+                isOnboardingCompleteInNewTabPage = contextDaxDialogsShown,
                 isBrowserShowing = isBrowserShowing,
                 isErrorShowing = isErrorShowing,
             )
@@ -3418,6 +3415,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAutofillMenuSelected() {
+        launchAutofillSettings()
+    }
+
+    fun onNavigationBarAutofillButtonClicked() {
+        launchAutofillSettings()
+    }
+
+    private fun launchAutofillSettings() {
         command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
     }
 
@@ -4023,6 +4028,19 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onTabSwipedAway() {
         command.value = GenerateWebViewPreviewImage
+    }
+
+    fun onBookmarksMenuItemClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+        launchBookmarksActivity()
+    }
+
+    fun onNavigationBarBookmarksButtonClicked() {
+        launchBookmarksActivity()
+    }
+
+    private fun launchBookmarksActivity() {
+        command.value = LaunchBookmarksActivity
     }
 
     companion object {

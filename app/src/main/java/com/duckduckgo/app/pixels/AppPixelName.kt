@@ -50,6 +50,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
     ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
+    // Temporary Pixel
+    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
+
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
     BROWSER_PULL_TO_REFRESH("m_browser_pull_to_refresh"),
@@ -414,10 +417,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
-
-    DEDICATED_WEBVIEW_NEW_TAB_REQUESTED("m_dedicated_webview_new_tab_requested"),
-    DEDICATED_WEBVIEW_NEW_TAB_OPENING("m_dedicated_webview_new_tab_opening"),
-    DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
 
     BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 
