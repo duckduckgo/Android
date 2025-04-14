@@ -205,7 +205,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -214,7 +214,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -226,7 +226,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -299,7 +299,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -316,6 +316,17 @@ class TabSwitcherViewModelTest {
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
         assertEquals(testee.selectionViewState.value.mode, Selection())
+    }
+
+    @Test
+    fun whenAllTabsClosedThenCloseAndShowUndoMessageCommandFired() = runTest {
+        prepareSelectionMode()
+
+        val tabIds = tabList.map { it.tabId }
+        testee.onCloseTabsConfirmed(tabIds)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseAndShowUndoMessage(tabIds), commandCaptor.lastValue)
     }
 
     @Test
@@ -517,7 +528,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).deleteTabs(listOf(tab.id))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -626,7 +637,7 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
