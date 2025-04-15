@@ -441,4 +441,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Obserwuj zablokowane trackery</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Otrzymuj bieżące powiadomienia o zablokowanych próbach śledzenia w szufladzie powiadomień.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Nie możesz korzystać z App Tracking Protection z powodu wykorzystywanej sieci VPN? Przejdź na DuckDuckGo VPN — jedyną zgodną sieć VPN. <annotation type="ppro_upsell_link">Dowiedz się więcej</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection wyłączona</b>\nCzy wykorzystywana sieć VPN wyłączyła App Tracking Protection? Użyj przełącznika powyżej, aby ponownie ją włączyć.\n\nPobierz DuckDuckGo VPN — jedyny VPN, który działa z funkcją App Tracking Protection. <annotation type="ppro_upsell_link">Dowiedz się więcej</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Przenieś prywatność na wyższy poziom</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo oferuje jedyną sieć VPN zgodną z funkcją App Tracking Protection. Można ją aktywować z płatną subskrypcją Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Dowiedz się więcej</string>
+
 </resources>

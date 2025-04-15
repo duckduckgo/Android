@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Blokkolt nyomkövetők szemmel tartása</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Az értesítési fiókodban tájékoztatunk a blokkolt nyomkövetési kísérletekről.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Nem tudod használni az App Tracking Protection funkciót a VPN-ed miatt? Válts a DuckDuckGo VPN-re – az egyetlen VPN, amely kompatibilis vele. <annotation type="ppro_upsell_link">További információk</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>Az App Tracking Protection ki van kapcsolva</b>\nA VPN-ed kikapcsolta az App Tracking Protectiont? Az újbóli engedélyezéshez használd a fenti váltógombot.\n\nSzerezd be a DuckDuckGo VPN-t – az egyetlen VPN, amely működik az App Tracking Protection funkcióval. <annotation type="ppro_upsell_link">További információk</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Magasabb szintű adatvédelem</string>
+    <string name="apptp_PproUpsellBannerMessage">A DuckDuckGo VPN az egyetlen, amely kompatibilis az App Tracking Protectionnel. Aktiváld a fizetős Privacy Pro-előfizetéssel.</string>
+    <string name="apptp_PproUpsellBannerAction">További részletek</string>
+
 </resources>

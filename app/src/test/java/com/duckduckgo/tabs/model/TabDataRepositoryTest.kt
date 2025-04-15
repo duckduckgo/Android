@@ -21,13 +21,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -39,6 +42,8 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.time.Instant
 import java.time.LocalDateTime
@@ -52,7 +57,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,6 +90,17 @@ class TabDataRepositoryTest {
     private val mockDuckPlayer: DuckPlayer = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
+
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+
+    private val mockWebViewSessionStorage: WebViewSessionStorage = mock()
+
+    private val mockAdClickManager: AdClickManager = mock()
+
+    @Before
+    fun before() {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
+    }
 
     @After
     fun after() {
@@ -579,6 +597,39 @@ class TabDataRepositoryTest {
         assertEquals(1, inactiveTabCount)
     }
 
+    @Test
+    fun whenDeleteTabsThenTabsDeletedAndDataCleared() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+
+        testee.deleteTabs(tabIds)
+
+        verify(mockDao).deleteTabsAndUpdateSelection(tabIds)
+        tabIds.forEach { tabId ->
+            assertNull(testee.retrieveSiteData(tabId).value)
+            verify(mockWebViewSessionStorage).deleteSession(tabId)
+            verify(mockAdClickManager).clearTabId(tabId)
+        }
+    }
+
+    @Test
+    fun whenPurgeDeletableTabsThenPurgeDeletableTabsAndClearData() = runTest {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
+
+        val testee = tabDataRepository()
+        val tabIds = listOf("tabid1", "tabid2")
+        whenever(mockDao.getDeletableTabIds()).thenReturn(tabIds)
+
+        testee.purgeDeletableTabs()
+
+        verify(mockDao).purgeDeletableTabsAndUpdateSelection()
+        tabIds.forEach { tabId ->
+            assertNull(testee.retrieveSiteData(tabId).value)
+            verify(mockWebViewSessionStorage).deleteSession(tabId)
+            verify(mockAdClickManager).clearTabId(tabId)
+        }
+    }
+
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
@@ -609,6 +660,9 @@ class TabDataRepositoryTest {
             timeProvider,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
+            mockAdClickManager,
+            mockWebViewSessionStorage,
+            tabManagerFeatureFlags,
         )
     }
 

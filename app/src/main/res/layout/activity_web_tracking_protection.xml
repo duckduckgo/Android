@@ -39,49 +39,22 @@
 
             <ImageView
                 android:id="@+id/webTrackingProtectionHeaderImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/keyline_3"
-                android:padding="@dimen/keyline_2"
-                app:srcCompat="@drawable/web_tracking_header_image"
-                tools:ignore="ContentDescription"
-                tools:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/webTrackingProtectionHeaderImageNew"
                 android:layout_width="128dp"
                 android:layout_height="96dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                android:visibility="gone"
-                app:srcCompat="@drawable/shield_check_128"
-                tools:visibility="visible" />
+                app:srcCompat="@drawable/shield_check_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/webTrackingProtectionTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:gravity="center"
-                android:text="@string/webTrackingProtectionIsEnabledTitle"
-                app:typography="h2"
-                tools:visibility="gone" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/webTrackingProtectionTitleNew"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
                 android:text="@string/webTrackingProtectionTitle"
-                android:visibility="gone"
-                app:typography="h2"
-                tools:visibility="visible" />
+                app:typography="h2" />
 
             <com.duckduckgo.common.ui.view.StatusIndicatorView
                 android:id="@+id/statusIndicator"
@@ -89,26 +62,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_1"
-                android:visibility="gone"
-                app:indicatorStatus="alwaysOn"
-                tools:visibility="visible" />
+                app:indicatorStatus="alwaysOn" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/webTrackingProtectionDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingStart="@dimen/keyline_4"
-                android:paddingTop="@dimen/keyline_2"
-                android:paddingEnd="@dimen/keyline_4"
-                android:paddingBottom="@dimen/keyline_4"
-                android:text="@string/globalPrivacyControlDescription"
-                app:textType="secondary"
-                app:typography="body2"
-                tools:visibility="gone" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/webTrackingProtectionDescriptionNew"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_5"
@@ -116,10 +73,8 @@
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:gravity="center"
                 android:text="@string/webTrackingProtectionDescriptionNew"
-                android:visibility="gone"
                 app:textType="secondary"
-                app:typography="body2"
-                tools:visibility="visible" />
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"

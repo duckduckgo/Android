@@ -16,27 +16,56 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/preferredNavigationBarColor"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingTop="@dimen/keyline_3"
-    android:paddingBottom="@dimen/keyline_3"
-    android:paddingHorizontal="14dp">
+    android:paddingHorizontal="14dp"
+    android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
+    android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
     <FrameLayout
-        android:id="@+id/backArrowButton"
-        android:layout_width="@dimen/bottomNavIconContainer"
-        android:layout_height="@dimen/bottomNavIconContainer"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/backArrowIconImageView"
-            android:layout_width="@dimen/bottomNavIcon"
-            android:layout_height="@dimen/bottomNavIcon"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_arrow_left_24e" />
+        <FrameLayout
+            android:id="@+id/newTabButton"
+            android:layout_width="@dimen/bottomNavIconContainer"
+            android:layout_height="@dimen/bottomNavIconContainer"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/newTabButtonImageView"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/newTabMenuItem"
+                android:src="@drawable/ic_add_24e" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/autofillButton"
+            android:layout_width="@dimen/bottomNavIconContainer"
+            android:layout_height="@dimen/bottomNavIconContainer"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/autofillButtonImageView"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/autofillManagementScreenTitle"
+                android:src="@drawable/ic_key_24e" />
+        </FrameLayout>
+
     </FrameLayout>
 
     <Space
@@ -45,17 +74,18 @@
         android:layout_weight="1" />
 
     <FrameLayout
-        android:id="@+id/forwardArrowButton"
+        android:id="@+id/bookmarksButton"
         android:layout_width="@dimen/bottomNavIconContainer"
         android:layout_height="@dimen/bottomNavIconContainer"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
-            android:id="@+id/forwardArrowIconImageView"
+            android:id="@+id/bookmarksImageView"
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            android:src="@drawable/ic_arrow_right_24e" />
+            android:contentDescription="@string/bookmarksMenuTitle"
+            android:src="@drawable/ic_bookmarks_stacked_24e" />
     </FrameLayout>
 
     <Space
@@ -65,16 +95,17 @@
 
     <FrameLayout
         android:id="@+id/fireButton"
-        android:layout_width="80dp"
-        android:layout_height="@dimen/bottomNavIconContainer"
-        android:foreground="@drawable/bottom_nav_fire_button_foreground"
-        android:background="@drawable/bottom_nav_fire_button_background">
+        android:layout_width="@dimen/bottomNavFireIconContainerWidth"
+        android:layout_height="@dimen/bottomNavFireIconContainerHeight"
+        android:background="@drawable/bottom_nav_fire_button_background"
+        android:foreground="@drawable/bottom_nav_fire_button_foreground">
 
         <ImageView
             android:id="@+id/fireIconImageView"
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
+            android:contentDescription="@string/fireMenu"
             android:src="@drawable/ic_fire_new_24e" />
     </FrameLayout>
 
@@ -94,6 +125,7 @@
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
+            android:contentDescription="@string/tabsMenuItem"
             android:src="@drawable/ic_tab_switcher_experiment" />
     </FrameLayout>
 
@@ -113,8 +145,9 @@
             android:layout_width="@dimen/bottomNavIcon"
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
-            app:tint="?daxColorNavigationBarIconEnabled"
-            android:src="@drawable/ic_menu_vertical_24" />
+            android:contentDescription="@string/browserPopupMenu"
+            android:src="@drawable/ic_menu_vertical_24"
+            app:tint="?daxColorNavigationBarIconEnabled" />
     </FrameLayout>
 
 </LinearLayout>

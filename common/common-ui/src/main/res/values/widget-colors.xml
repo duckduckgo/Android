@@ -41,4 +41,7 @@
     <color name="searchWidgetSearchBarTrailingIconColor">@color/black84</color>
     <color name="emptyFavoriteDescriptionTextColor">@color/black60</color>
     <color name="emptyFavoriteActionTextColor">@color/blue50</color>
+    <color name="fabBackgroundTint">@color/blue10_solid</color>
+    <color name="fabIconTint">@color/blue70</color>
+    <color name="fabTextColor">@color/blue70</color>
 </resources>

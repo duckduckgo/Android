@@ -2,23 +2,112 @@
     color-scheme: light dark;
 }
 
-.wrapper *, .wrapper *::before, .wrapper *::after {
+/**
+NB: box-shadows and border-radius properties are not visible on both Windows and macOS platforms.
+This is due to the use of a native solution for rendering the autofill tooltip within a webview,
+which has its own box-shadow and border-radius settings.
+*/
+
+:host {
+    /* --- Design Tokens --- */
+    /* Colors - Text */
+    --t-text-primary: #1C1F21;
+    --t-text-secondary: rgba(28, 31, 33, 0.72);
+    --t-text-primary-dark: rgba(255, 255, 255, .84);
+    --t-text-secondary-dark: rgba(255, 255, 255, .60);
+
+    /* Colors - Backgrounds */
+    --t-backdrop-mac: #F2F0F0;
+    --t-backdrop-mac-dark: #646264;
+    --t-backdrop-windows: #FFF;
+    --t-backdrop-windows-dark: #333;
+
+    /* Colors - Interactive States */
+    --t-mac-interactive: #3969EF;
+    --t-mac-interactive-text: #FFF;
+    --t-windows-interactive: #f0f0f0;
+    --t-windows-interactive-dark: #3f3f3f;
+    
+
+    /* ICON COLORS -- LIGHT*/
+    /* PRIMARY 1C1F21 84% */
+
+    /* ICON COLORS -- DARK */
+    /* PRIMARY FFF 84% */
+
+    /* --- PLATFORM BASE SETTINGS (MacOS default) --- */
+    /* Colors */
+    --color-primary: var(--t-text-primary);
+    --color-secondary: var(--t-text-secondary);
+    --color-primary-dark: var(--t-text-primary-dark);
+    --color-secondary-dark: var(--t-text-secondary-dark);
+    --bg: var(--t-backdrop-mac);
+    --bg-dark: var(--t-backdrop-mac-dark);
+
+    /* Typography */
+    --font-size-primary: 13px;
+    --font-size-secondary: 11px;
+    --font-weight: 500;
+
+    /* Layout & Spacing */
+    --padding: 6px;
+    --hr-margin: 5px 9px;
+    --border-radius: 4px;
+
+    /* Interactive Elements */
+    --hover-color-primary: var(--t-mac-interactive-text);
+    --hover-color-secondary: var(--t-mac-interactive-text);
+    --hover-color-primary-dark: var(--t-mac-interactive-text);
+    --hover-color-secondary-dark: var(--t-mac-interactive-text);
+    --hover-bg: var(--t-mac-interactive);
+    --hover-bg-dark: var(--t-mac-interactive);
+    --hover-effect: invert(100%);
+    --hover-effect-dark: invert(100%);
+}
+
+/* --- PLATFORM OVERRIDES - Windows --- */
+:host:has([data-platform="windows"]) {
+    /* Colors */
+    --bg: var(--t-backdrop-windows);
+    --bg-dark: var(--t-backdrop-windows-dark);
+    
+    /* Typography */
+    --font-size-primary: 14px;
+    --font-size-secondary: 12px;
+    --font-weight: 400;
+    
+    /* Layout & Spacing */
+    --padding: 0px;
+    --hr-margin: 4px 0px;
+    --border-radius: 3px;
+    
+    /* Interactive Elements */
+    --hover-color-primary: var(--t-text-primary);
+    --hover-color-secondary: var(--t-text-secondary);
+    --hover-color-primary-dark: var(--t-text-primary-dark);
+    --hover-color-secondary-dark: var(--t-text-secondary-dark);
+    --hover-bg: var(--t-windows-interactive);
+    --hover-bg-dark: var(--t-windows-interactive-dark);
+    --hover-effect: none;
+    --hover-effect-dark: invert(100%);
+}
+
+.wrapper *,
+.wrapper *::before,
+.wrapper *::after {
     box-sizing: border-box;
 }
+
 .wrapper {
     position: fixed;
     top: 0;
     left: 0;
-    padding: 0;
-    font-family: 'DDG_ProximaNova', 'Proxima Nova', system-ui, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
     z-index: 2147483647;
+    padding: 0;
+    font-family: system-ui;
+    -webkit-font-smoothing: antialiased;
 }
-.wrapper--data {
-    font-family: 'SF Pro Text', system-ui, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
+
 .wrapper:not(.top-autofill) .tooltip {
     position: absolute;
     width: 300px;
@@ -26,77 +115,78 @@
     transform: translate(-1000px, -1000px);
     z-index: 2147483647;
 }
+
 .tooltip--data, #topAutofill {
-    background-color: rgba(242, 240, 240, 1);
-    -webkit-backdrop-filter: blur(40px);
-    backdrop-filter: blur(40px);
+    background-color: var(--bg);
 }
+
 @media (prefers-color-scheme: dark) {
     .tooltip--data, #topAutofill {
-        background: rgb(100, 98, 102, .9);
+        background: var(--bg-dark);
     }
 }
+
 .tooltip--data {
-    padding: 6px;
-    font-size: 13px;
-    line-height: 14px;
     width: 315px;
     max-height: 290px;
+    padding: var(--padding);
+    font-size: var(--font-size-primary);
+    line-height: 14px;
     overflow-y: auto;
 }
+
 .top-autofill .tooltip--data {
     min-height: 100vh;
 }
+
 .tooltip--data.tooltip--incontext-signup {
     width: 360px;
 }
+
 .wrapper:not(.top-autofill) .tooltip--data {
     top: 100%;
     left: 100%;
-    border: 0.5px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.32);
 }
-@media (prefers-color-scheme: dark) {
-    .wrapper:not(.top-autofill) .tooltip--data {
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-}
+
 .wrapper:not(.top-autofill) .tooltip--email {
     top: calc(100% + 6px);
     right: calc(100% - 48px);
     padding: 8px;
     border: 1px solid #D0D0D0;
     border-radius: 10px;
-    background-color: #FFFFFF;
+    background-color: #FFF;
     font-size: 14px;
     line-height: 1.3;
-    color: #333333;
+    color: #333;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
+
 .tooltip--email__caret {
     position: absolute;
     transform: translate(-1000px, -1000px);
     z-index: 2147483647;
 }
+
 .tooltip--email__caret::before,
 .tooltip--email__caret::after {
     content: "";
+    display: block;
     width: 0;
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    display: block;
-    border-bottom: 8px solid #D0D0D0;
     position: absolute;
+    border-bottom: 8px solid #D0D0D0;
     right: -28px;
 }
+
 .tooltip--email__caret::before {
     border-bottom-color: #D0D0D0;
     top: -1px;
 }
+
 .tooltip--email__caret::after {
-    border-bottom-color: #FFFFFF;
+    border-bottom-color: #FFF;
     top: 0px;
 }
 
@@ -112,10 +202,18 @@
     border-radius: 6px;
     text-align: left;
 }
+
 .tooltip__button.currentFocus,
 .wrapper:not(.top-autofill) .tooltip__button:hover {
-    background-color: #3969EF;
-    color: #FFFFFF;
+    background-color: var(--hover-bg);
+    color: var(--hover-color-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    .tooltip__button.currentFocus,
+    .wrapper:not(.top-autofill) .tooltip__button:hover {
+        background-color: var(--hover-bg-dark);
+    }
 }
 
 /* Data autofill tooltip specific */
@@ -125,25 +223,29 @@
     flex-direction: row;
     justify-content: flex-start;
     font-size: inherit;
-    font-weight: 500;
+    font-weight: var(--font-weight);
     line-height: 16px;
     text-align: left;
-    border-radius: 3px;
+    border-radius: var(--border-radius);
 }
+
 .tooltip--data__item-container {
     max-height: 220px;
     overflow: auto;
 }
+
 .tooltip__button--data:first-child {
     margin-top: 0;
 }
+
 .tooltip__button--data:last-child {
     margin-bottom: 0;
 }
+
 .tooltip__button--data::before {
     content: '';
-    flex-shrink: 0;
     display: block;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     margin: 0 8px;
@@ -151,11 +253,12 @@
     background-repeat: no-repeat;
     background-position: center center;
 }
+
 #provider_locked::after {
     position: absolute;
     content: '';
-    flex-shrink: 0;
     display: block;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     margin: 0 8px;
@@ -163,62 +266,92 @@
     background-repeat: no-repeat;
     background-position: right bottom;
 }
+
 .tooltip__button--data.currentFocus:not(.tooltip__button--data--bitwarden)::before,
 .wrapper:not(.top-autofill) .tooltip__button--data:not(.tooltip__button--data--bitwarden):hover::before {
-    filter: invert(100%);
+    filter: var(--hover-effect)
 }
+
+/* Icon effects */
 @media (prefers-color-scheme: dark) {
-    .tooltip__button--data:not(.tooltip__button--data--bitwarden)::before,
     .tooltip__button--data:not(.tooltip__button--data--bitwarden)::before {
         filter: invert(100%);
         opacity: .9;
     }
+
+    .tooltip__button--data.currentFocus:not(.tooltip__button--data--bitwarden)::before,
+    .wrapper:not(.top-autofill) .tooltip__button--data:not(.tooltip__button--data--bitwarden):hover::before {
+        filter: var(--hover-effect-dark)
+    }
 }
+
 .tooltip__button__text-container {
     margin: auto 0;
 }
+
 .label {
     display: block;
     font-weight: 400;
     letter-spacing: -0.25px;
-    color: rgba(0,0,0,.8);
-    font-size: 13px;
+    color: var(--color-primary);
+    font-size: var(--font-size-primary);
     line-height: 1;
 }
+
 .label + .label {
-    margin-top: 2px;
+    margin-top: 3px;
 }
+
 .label.label--medium {
-    font-weight: 500;
+    font-weight: var(--font-weight);
     letter-spacing: -0.25px;
-    color: rgba(0,0,0,.9);
 }
+
 .label.label--small {
-    font-size: 11px;
+    font-size: var(--font-size-secondary);
     font-weight: 400;
     letter-spacing: 0.06px;
-    color: rgba(0,0,0,0.6);
+    color: var(--color-secondary);
 }
+
 @media (prefers-color-scheme: dark) {
     .tooltip--data .label {
-        color: #ffffff;
+        color: var(--color-primary-dark);
     }
+
     .tooltip--data .label--medium {
-        color: #ffffff;
+        color: var(--color-primary-dark);
     }
+
     .tooltip--data .label--small {
-        color: #cdcdcd;
+        color: var(--color-secondary-dark);
     }
 }
+
 .tooltip__button.currentFocus .label,
 .wrapper:not(.top-autofill) .tooltip__button:hover .label {
-    color: #FFFFFF;
+    color: var(--hover-color-primary);
+    
+    &.label--small {
+        color: var(--hover-color-secondary);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .tooltip__button.currentFocus .label,
+    .wrapper:not(.top-autofill) .tooltip__button:hover .label {
+        color: var(--hover-color-primary-dark);
+        
+        &.label--small {
+            color: var(--hover-color-secondary-dark);
+        }
+    }
 }
 
 .tooltip__button--secondary {
     font-size: 13px;
     padding: 5px 9px;
-    border-radius: 3px;
+    border-radius: var(--border-radius);
     margin: 0;
 }
 
@@ -248,7 +381,7 @@
 
 hr {
     display: block;
-    margin: 5px 9px;
+    margin: var(--hr-margin);
     border: none; /* reset the border */
     border-top: 1px solid rgba(0,0,0,.1);
 }

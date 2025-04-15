@@ -24,7 +24,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding

@@ -218,9 +218,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Įjungta</string>
-    <string name="netpSubscriptionSettingsConnecting">Jungiamasi...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Išjungta</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

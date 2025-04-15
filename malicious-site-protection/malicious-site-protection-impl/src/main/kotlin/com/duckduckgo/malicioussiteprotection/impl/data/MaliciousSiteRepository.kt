@@ -30,6 +30,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetRespons
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
+import com.duckduckgo.malicioussiteprotection.impl.domain.WriteInProgressException
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
@@ -48,12 +49,21 @@ import dagger.SingleInstanceIn
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
 interface MaliciousSiteRepository {
+    /**
+     * @throws WriteInProgressException if a write is in progress
+     */
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
-    suspend fun getFilters(hash: String): List<FilterSet>?
+
+    /**
+     * @throws WriteInProgressException if a write is in progress
+     */
+    suspend fun getFilters(hash: String): FilterSet?
     suspend fun matches(hashPrefix: String): MatchesResult
     suspend fun loadFilters(): Result<Unit>
     suspend fun loadHashPrefixes(): Result<Unit>
@@ -71,39 +81,53 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val pixels: Pixel,
 ) : MaliciousSiteRepository {
 
+    private val writeMutex = Mutex()
+
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
-        return maliciousSiteDao.getHashPrefix(hashPrefix) != null
+        return withContext(dispatcherProvider.io()) {
+            if (writeMutex.isLocked) {
+                throw WriteInProgressException()
+            }
+            maliciousSiteDao.hashPrefixExists(hashPrefix)
+        }
     }
 
-    override suspend fun getFilters(hash: String): List<FilterSet>? {
-        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.map { (type, filters) ->
-            FilterSet(
-                filters = filters.map { Filter(it.hash, it.regex) },
-                feed = when (type) {
-                    PHISHING.name -> PHISHING
-                    MALWARE.name -> MALWARE
-                    else -> throw IllegalArgumentException("Unknown feed $type")
-                },
-            )
+    override suspend fun getFilters(hash: String): FilterSet? {
+        return withContext(dispatcherProvider.io()) {
+            if (writeMutex.isLocked) {
+                throw WriteInProgressException()
+            }
+            maliciousSiteDao.getFilter(hash)?.let {
+                FilterSet(
+                    filters = Filter(it.hash, it.regex),
+                    feed = when (it.type) {
+                        PHISHING.name -> PHISHING
+                        MALWARE.name -> MALWARE
+                        else -> return@let null
+                    },
+                )
+            }
         }
     }
 
     override suspend fun matches(hashPrefix: String): MatchesResult {
         return try {
-            withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
-                maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
-                    val feed = when (it.feed.uppercase()) {
-                        PHISHING.name -> PHISHING
-                        MALWARE.name -> MALWARE
-                        else -> null
+            withContext(dispatcherProvider.io()) {
+                withTimeout(MATCHES_ENDPOINT_TIMEOUT) {
+                    maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
+                        val feed = when (it.feed.uppercase()) {
+                            PHISHING.name -> PHISHING
+                            MALWARE.name -> MALWARE
+                            else -> null
+                        }
+                        if (feed != null) {
+                            Match(it.hostname, it.url, it.regex, it.hash, feed)
+                        } else {
+                            null
+                        }
                     }
-                    if (feed != null) {
-                        Match(it.hostname, it.url, it.regex, it.hash, feed)
-                    } else {
-                        null
-                    }
-                }
-            }.let { MatchesResult.Result(it) }
+                }.let { MatchesResult.Result(it) }
+            }
         } catch (e: TimeoutCancellationException) {
             pixels.fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
             MatchesResult.Ignored
@@ -174,7 +198,11 @@ class RealMaliciousSiteRepository @Inject constructor(
                 PHISHING -> maliciousSiteDatasetService::getPhishingFilterSet
                 MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
             },
-        ) { maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed)) }
+        ) {
+            writeMutex.withLock {
+                maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed))
+            }
+        }
     }
 
     private suspend fun loadHashPrefixes(
@@ -190,7 +218,11 @@ class RealMaliciousSiteRepository @Inject constructor(
                 PHISHING -> maliciousSiteDatasetService::getPhishingHashPrefixes
                 MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
             },
-        ) { maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed)) }
+        ) {
+            writeMutex.withLock {
+                maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed))
+            }
+        }
     }
 
     private fun FilterSetResponse.toFilterSetWithRevision(feed: Feed): FilterSetWithRevision {

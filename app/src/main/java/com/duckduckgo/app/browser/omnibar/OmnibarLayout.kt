@@ -31,6 +31,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -768,5 +769,29 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        }
+    }
+
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        }
+    }
+
+    override fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean,
+    ) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        }
     }
 }

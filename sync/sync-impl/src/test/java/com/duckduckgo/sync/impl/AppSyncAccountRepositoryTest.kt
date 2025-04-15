@@ -721,6 +721,20 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenPollingConnectionAndKeysReceivesMalformedJsonThenReturnConnectFailedError() {
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncStore.userId).thenReturn(userId)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.secretKey).thenReturn(secretKey)
+        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
+        whenever(nativeLib.sealOpen(connectDeviceSuccess.data, primaryKey, secretKey)).thenReturn("{ malformed json")
+
+        val result = syncRepo.pollConnectionKeys() as Error
+
+        assertEquals(CONNECT_FAILED.code, result.code)
+    }
+
+    @Test
     fun whenGetThisConnectedDeviceThenReturnExpectedDevice() {
         givenAuthenticatedDevice()
         whenever(syncStore.deviceId).thenReturn(deviceId)

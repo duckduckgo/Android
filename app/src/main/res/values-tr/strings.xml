@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
-    <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
     <string name="autocompleteRemoveItemTitle">Arama önerisi kaldırılsın mı?</string>
     <string name="autocompleteRemoveItemCancel">Vazgeç</string>
     <string name="autocompleteRemoveItemRemove">Kaldır</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
-    <string name="settingsHeadingPrivacy">Gizlilik</string>
     <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
-    <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
     <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
-    <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
-    <string name="settingsHeadingMore">DuckDuckGo\'dan Daha Fazlası</string>
     <string name="settingsHeadingNextSteps">Sonraki Adımlar</string>
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Devre Dışı</string>
     <string name="settingsSubtitleNotificationsEnabled">Etkin</string>
     <string name="settingsDefaultBrowserTitle">Varsayılan Tarayıcı</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo varsayılan tarayıcınızdır</string>
-    <string name="settingsDefaultBrowserNotSetDescription">DuckDuckGo\'yu varsayılan tarayıcınız yapın</string>
     <string name="settingsPrivateSearchTitle">Gizli Arama</string>
     <string name="settingsGeneral" instruction="List item for general settings">Genel</string>
-    <string name="settingsPrivateSearchDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
-    <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
-    <string name="settingsHeadingSettings">Ayarlar</string>
     <string name="settingsHeadingMainSettings">Diğer Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Veri Temizleme</string>
     <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Gizli Arama</string>
-    <string name="privateSearchTitle">Private Search Etkinleştirildi</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
-    <string name="privateSearchHeadingSearchSettings">Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Web İzleme Engelleyici Etkinleştirildi</string>
     <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
-    <string name="cookiePopupProtectionDescription">Bu açılır pencereleri kaldırın ve çerezleri en aza indirin</string>
-    <string name="cookiePopupProtectionEnabled">Etkin</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
-    <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Temizle...</string>
     <string name="settingsAutomaticallyClearData">Verileri Otomatik Olarak Temizle…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget ana ekrana eklendi</string>
-    <string name="settingsAddHomeScreenWidget">Ana Ekran Widget\'ı</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_title">DuckDuckGo Mac Tarayıcısı</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Hayır, Kendim Yöneteceğim</string>
 
-    <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
@@ -655,19 +633,82 @@
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows Tarayıcısı</string>
-    <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
-    <string name="windows_settings_description_ready">İndirme mevcut</string>
-    <string name="windows_settings_description_list">Listedesiniz!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Tam ekrandan çıkmak için yukarıdan aşağı sürükleyin ve geri düğmesine dokunun</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Tüm sekmeler kapatılsın mı?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
     <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
+
+    <string name="selectTabsMenuItem">Sekmeleri Seç</string>
+    <string name="selectAllTabsMenuItem">Tümünü Seç</string>
+    <string name="deselectAllTabsMenuItem">Tümünün Seçimini Kaldır</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Seçildi</string>
+    <string name="tabSelectedIndicator">Seçili sekme göstergesi</string>
+    <string name="tabNotSelectedIndicator">Seçili olmayan sekme göstergesi</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">DuckDuckGo\'dan %1$d bağlantı</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bağlantıyı Paylaş</item>
+        <item quantity="other">%1$d Bağlantıyı Paylaş</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Seçili sekmeye yer işareti eklensin mi?</item>
+        <item quantity="other">%1$d sekmeye yer işareti eklensin mi?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Yer işareti eklendi</item>
+        <item quantity="other">%1$d yer işareti eklendi</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Yer imi</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeye Yer İşareti Ekle</item>
+        <item quantity="other">%1$d Sekmeyi Yer İşareti Ekle</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Mevcut yer imleri çoğaltılmayacaktır.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatılsın mı?</item>
+        <item quantity="other">%1$d sekmenin tümü kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Diğer sekme kapatılsın mı?</item>
+        <item quantity="other">Diğer %1$d sekme kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatılsın mı?</item>
+        <item quantity="other">%1$d sekme kapatılsın mı?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bu sekmeyi kapatmak istediğinizden emin misiniz?</item>
+        <item quantity="other">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi kapatmak istediğinizden emin misiniz?</item>
+        <item quantity="other">Bu sekmeleri kapatmak istediğinizden emin misiniz?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi Kapat</item>
+        <item quantity="other">Sekmeleri Kapat</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekmeyi Kapat</item>
+        <item quantity="other">%1$d Sekmeyi Kapat</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Diğer Sekmeleri Kapat</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sekme kapatıldı</item>
+        <item quantity="other">%1$d sekme kapatıldı</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Gizli Sekme</item>
+        <item quantity="other">%1$d Gizli Sekme</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
@@ -684,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Şifreler</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Şifreler ve Otomatik Doldurma</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>

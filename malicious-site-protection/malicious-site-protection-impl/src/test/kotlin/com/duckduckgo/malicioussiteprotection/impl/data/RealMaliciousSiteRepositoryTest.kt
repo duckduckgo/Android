@@ -4,7 +4,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
-import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
@@ -114,7 +113,7 @@ class RealMaliciousSiteRepositoryTest {
     fun containsHashPrefix_returnsTrueWhenHashPrefixExists() = runTest {
         val hashPrefix = "testPrefix"
 
-        whenever(maliciousSiteDao.getHashPrefix(hashPrefix)).thenReturn(HashPrefixEntity(hashPrefix, PHISHING.name))
+        whenever(maliciousSiteDao.hashPrefixExists(hashPrefix)).thenReturn(true)
 
         val result = repository.containsHashPrefix(hashPrefix)
 
@@ -124,15 +123,15 @@ class RealMaliciousSiteRepositoryTest {
     @Test
     fun getFilters_returnsFiltersWhenHashExists() = runTest {
         val hash = "testHash"
-        val filters = listOf(FilterEntity(hash, "regex", PHISHING.name))
+        val filters = FilterEntity(hash, "regex", PHISHING.name)
 
         whenever(maliciousSiteDao.getFilter(hash)).thenReturn(filters)
 
         val result = repository.getFilters(hash)
-        val expected = FilterSet(filters.map { Filter(it.hash, it.regex) }, PHISHING)
+        val expected = FilterSet(Filter(filters.hash, filters.regex), PHISHING)
 
-        assertTrue(result?.all { it.feed == expected.feed }!!)
-        assertEquals(result.firstOrNull()?.filters, expected.filters)
+        assertTrue(result?.feed == expected.feed)
+        assertEquals(result?.filters, expected.filters)
     }
 
     @Test

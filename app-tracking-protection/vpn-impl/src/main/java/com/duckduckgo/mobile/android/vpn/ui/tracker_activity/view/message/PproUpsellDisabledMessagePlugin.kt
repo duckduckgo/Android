@@ -75,6 +75,6 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
     companion object {
         internal const val PRIORITY_PPRO_DISABLED = PRIORITY_DISABLED - 1
         private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"
-        private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_disabled"
+        private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_apptrackingprotection_android__disabled"
     }
 }

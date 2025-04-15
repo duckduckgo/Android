@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
-    <string name="settingsAutocompleteEnabled">Mostrar sugestões de preenchimento automático</string>
     <string name="autocompleteRemoveItemTitle">Remover sugestão de pesquisa?</string>
     <string name="autocompleteRemoveItemCancel">Cancelar</string>
     <string name="autocompleteRemoveItemRemove">Remover</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Definições</string>
     <string name="settingsMenuItemTitle">Definições</string>
-    <string name="settingsHeadingPrivacy">Privacidade</string>
     <string name="settingsHeadingProtections">Proteções</string>
     <string name="settingsHeadingAppearance">Aparência</string>
-    <string name="settingsHeadingCustomize">Personalizar</string>
     <string name="settingsHeadingAbout">Acerca de</string>
     <string name="settingsAboutDuckduckgo">Sobre o DuckDuckGo</string>
     <string name="settingsVersion">Versão</string>
     <string name="leaveFeedback">Partilhar comentários</string>
     <string name="leaveFeedbackNew">Enviar comentário</string>
     <string name="settingsEmailProtectionTitle">Proteção de e-mail</string>
-    <string name="settingsEmailProtectionSubtitle">Bloqueie rastreadores de e-mail e oculte o seu endereço.</string>
-    <string name="settingsHeadingMore">Mais da DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Passos seguintes</string>
     <string name="settingsLightTheme">Claro</string>
     <string name="settingsTheme">Tema</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Desativado</string>
     <string name="settingsSubtitleNotificationsEnabled">Ativado</string>
     <string name="settingsDefaultBrowserTitle">Navegador predefinido</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo é o teu navegador predefinido</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Faz do DuckDuckGo o teu navegador predefinido</string>
     <string name="settingsPrivateSearchTitle">Pesquisa Privada</string>
     <string name="settingsGeneral" instruction="List item for general settings">Gerais</string>
-    <string name="settingsPrivateSearchDescription">Ativado por predefinição</string>
     <string name="settingsWebTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
-    <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
-    <string name="settingsHeadingSettings">Definições</string>
     <string name="settingsHeadingMainSettings">Outros ajustes</string>
     <string name="settingsPermissionsSetting">Permissões</string>
     <string name="settingsSyncSetting">Sincronização e cópia de segurança</string>
-    <string name="settingsFireButton">Botão de proteção</string>
     <string name="settingsDataClearing">Limpeza de Dados</string>
     <string name="settingsAddWidget">Adicionar widget ao ecrã inicial</string>
     <string name="settingsAddressBarPosition">Define a Posição da Barra de Endereços</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Pesquisa Privada</string>
-    <string name="privateSearchTitle">A Private Search está ativada</string>
     <string name="privateSearchDescription">O DuckDuckGo Private Search é o teu motor de pesquisa predefinido, para que possas pesquisar a web sem seres rastreado.</string>
-    <string name="privateSearchHeadingSearchSettings">Definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
-    <string name="webTrackingProtectionIsEnabledTitle">A proteção contra rastreamento na Internet está ativada</string>
     <string name="webTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[O DuckDuckGo nunca te rastreia. Queremos proteger a tua privacidade ao máximo. Mantemos e desenvolvemos continuamente camadas de proteção para acompanharmos os novos métodos de rastreamento e oferecermos muitas proteções que outros navegadores não oferecem por predefinição. <u><a href=\"\">Sabe mais</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet.\n<a href=\"\">Sabe mais</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
-    <string name="cookiePopupProtectionDescription">Livra-te destes pop-ups e minimiza os cookies</string>
-    <string name="cookiePopupProtectionEnabled">Ativado</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Botão de proteção</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
 
-    <string name="settingsAutomaticallyClearWhat">Limpar automaticamente…</string>
     <string name="settingsAutomaticallyClearData">Limpar os dados automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Limpar automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nenhum</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget adicionado ao ecrã inicial</string>
-    <string name="settingsAddHomeScreenWidget">Widget da página principal</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Navegue em privado com a nossa aplicação para Mac</string>
-    <string name="macos_settings_title">Navegador DuckDuckGo para Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Transferências</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Não, prefiro ser eu</string>
 
-    <string name="autoconsentSetting">Gerir pop-ups de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ocultado</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies geridos</string>
 
@@ -655,19 +633,82 @@
     <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Navegador DuckDuckGo para Windows</string>
-    <string name="windows_settings_description">Navegue em privado com a nossa aplicação para Windows</string>
-    <string name="windows_settings_description_ready">Transferência disponível</string>
-    <string name="windows_settings_description_list">Já está na lista!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arraste para baixo a partir da parte superior e toque no botão de retrocesso para sair do ecrã completo</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fechar todos os separadores?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Tens a certeza de que pretendes fechar todos os separadores?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Fechar</string>
+
+    <string name="selectTabsMenuItem">Selecionar separadores</string>
+    <string name="selectAllTabsMenuItem">Selecionar tudo</string>
+    <string name="deselectAllTabsMenuItem">Desmarcar tudo</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d selecionados</string>
+    <string name="tabSelectedIndicator">Indicador de separador selecionado</string>
+    <string name="tabNotSelectedIndicator">Indicador de separador não selecionado</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links do DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Partilhar link</item>
+        <item quantity="other">Partilhar %1$d links</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Adicionar separador selecionado aos marcadores?</item>
+        <item quantity="other">Adicionar %1$d separadores aos marcadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcador adicionado</item>
+        <item quantity="other">%1$d marcadores adicionados</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Adicionar aos marcadores</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Adicionar separador aos marcadores</item>
+        <item quantity="other">Adicionar %1$d separadores aos marcadores</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Os marcadores existentes não serão duplicados.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador?</item>
+        <item quantity="other">Fechar os %1$d separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar outro separador?</item>
+        <item quantity="other">Fechar %1$d outros separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador?</item>
+        <item quantity="other">Fechar %1$d separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tens a certeza de que queres fechar este separador?</item>
+        <item quantity="other">Tens a certeza de que queres fechar todos os separadores?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Tens a certeza de que queres fechar este separador?</item>
+        <item quantity="other">Tens a certeza de que queres fechar estes separadores?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar separadores</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar %1$d separadores</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Fechar outros separadores</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Separador fechado</item>
+        <item quantity="other">%1$d separadores fechados</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d Separador privado</item>
+        <item quantity="other">%1$d Separadores privados</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adicionar opção de pesquisa privada por voz à barra de endereços. O áudio não é armazenado nem partilhado com ninguém, incluindo o DuckDuckGo.</string>
@@ -684,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancelar</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Palavras-passe</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Palavras-passe e preenchimento automático</string>
     <string name="autofillLoginSavedSnackbarMessage">Palavra-passe guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Palavra-passe atualizada</string>

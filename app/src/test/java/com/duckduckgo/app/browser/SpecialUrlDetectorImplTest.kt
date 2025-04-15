@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -68,6 +69,10 @@ class SpecialUrlDetectorImplTest {
 
     val mockDuckChat: DuckChat = mock()
 
+    val mockAIChatQueryDetectionFeature: AIChatQueryDetectionFeature = mock()
+
+    val mockAIChatQueryDetectionFeatureToggle: Toggle = mock()
+
     @Before
     fun setup() = runTest {
         testee = SpecialUrlDetectorImpl(
@@ -78,9 +83,12 @@ class SpecialUrlDetectorImplTest {
             externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
+            aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
+        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
+        whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
     }
 
     @Test
@@ -304,6 +312,29 @@ class SpecialUrlDetectorImplTest {
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is ShouldLaunchPrivacyProLink)
+    }
+
+    @Test
+    fun whenUrlIsNotDuckChatUrlAndFeatureIsEnabledThenSearchQueryTypeDetected() {
+        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
+    fun whenUrlIsDuckChatUrlAndFeatureIsEnabledThenDuckChatTypeDetected() {
+        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is ShouldLaunchDuckChatLink)
+    }
+
+    @Test
+    fun whenUrlIsDuckChatUrlAndFeatureIsDisabledThenSearchQueryTypeDetected() {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
     }
 
     @Test

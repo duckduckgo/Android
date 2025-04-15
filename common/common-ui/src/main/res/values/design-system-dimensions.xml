@@ -38,9 +38,23 @@
     <dimen name="toolbarIconSize">24dp</dimen>
     <dimen name="toolbarOverflowPadding">10dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
-    <dimen name="experimentalToolbarSize">64dp</dimen>
-    <dimen name="experimentalMinibarSize">34dp</dimen>
-    <dimen name="experimentalOmnibarCardSize">44dp</dimen>
+    <dimen name="experimentalToolbarSize">60dp</dimen>
+    <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginBottom">12dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">12dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginTop">0dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginBottom">8dp</dimen>
+    <dimen name="experimentalOmnibarContentPadding">0dp</dimen>
+    <dimen name="experimentalOmnibarContentFocusedPaddingHorizontal">4dp</dimen>
+    <dimen name="experimentalOmnibarContentFocusedPaddingVertical">@dimen/experimentalOmnibarOutlineFocusedWidth</dimen>
+    <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
+    <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
+
+    <!-- Navigation Bar -->
+    <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>
+    <dimen name="experimentalNavigationBarPaddingBottom">8dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>
@@ -74,6 +88,9 @@
     <dimen name="gridItemIconSize">32dp</dimen>
     <dimen name="gridItemTextWidth">72dp</dimen>
     <dimen name="gridItemPreviewHeight">170dp</dimen>
+
+    <!-- Extended FAB -->
+    <dimen name="fabHeight">56dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">200dp</dimen>

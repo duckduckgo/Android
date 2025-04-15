@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 
@@ -48,7 +49,8 @@ class TabSwitcherItemDiffCallback(
                 oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
-                    oldItem.tabEntity.url == newItem.tabEntity.url
+                    oldItem.tabEntity.url == newItem.tabEntity.url &&
+                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
             }
             else -> false
         }
@@ -76,6 +78,10 @@ class TabSwitcherItemDiffCallback(
 
                 if (oldItem.tabEntity.tabPreviewFile != newItem.tabEntity.tabPreviewFile) {
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
+                }
+
+                if ((oldItem as? SelectableTab)?.isSelected != (newItem as? SelectableTab)?.isSelected) {
+                    diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
             }
             oldItem is TabSwitcherItem.TrackerAnimationInfoPanel && newItem is TabSwitcherItem.TrackerAnimationInfoPanel -> {
@@ -127,5 +133,6 @@ class TabSwitcherItemDiffCallback(
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
         const val DIFF_ALPHA = "alpha"
+        const val DIFF_KEY_SELECTION = "selection"
     }
 }

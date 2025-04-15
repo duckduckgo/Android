@@ -49,6 +49,9 @@
   function registerMessageSecret(secret) {
     messageSecret = secret;
   }
+  function getGlobal() {
+    return globalObj;
+  }
   var exemptionLists = {};
   function shouldExemptUrl(type, url) {
     for (const regex of exemptionLists[type]) {
@@ -1719,7 +1722,7 @@
   };
 
   // src/trackers.js
-  function isTrackerOrigin(trackerLookup, originHostname = document.location.hostname) {
+  function isTrackerOrigin(trackerLookup, originHostname = getGlobal().document.location.hostname) {
     const parts = originHostname.split(".").reverse();
     let node = trackerLookup;
     for (const sub of parts) {

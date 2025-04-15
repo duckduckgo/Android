@@ -29,7 +29,6 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.OS_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -55,15 +54,11 @@ class PixelParamRemovalInterceptor @Inject constructor(
         val url = chain.request().url.newBuilder().apply {
             val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
             val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
-            val oses = pixels.filter { it.second.contains(OS_VERSION) }.map { it.first }
             if (atbs.any { pixel.startsWith(it) }) {
                 removeAllQueryParameters(AppUrl.ParamKey.ATB)
             }
             if (versions.any { pixel.startsWith(it) }) {
                 removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
-            }
-            if (oses.any { pixel.startsWith(it) }) {
-                removeAllQueryParameters(Pixel.PixelParameter.OS_VERSION)
             }
         }.build()
 
@@ -105,6 +100,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP.pixelName to PixelParameter.removeAll(),
             AppPixelName.SETTINGS_SYNC_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
     <string name="duck_player_info_modal_button">Sapratu!</string>
     <string name="duck_player_unavailable">Duck Player nav pieejams</string>
-    <string name="duck_player_unavailable_description">Nesen ieviestās YouTube izmaiņas ir ietekmējušas Duck Player funkcionalitāti. Mēs strādājam, lai novērstu šīs problēmas, un novērtējam tavu sapratni.</string>
     <string name="duck_player_unavailable_learn_more">Uzzināt vairāk</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Atvērt YouTube video ar Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Atveriet Duck Player jaunā cilnē</string>

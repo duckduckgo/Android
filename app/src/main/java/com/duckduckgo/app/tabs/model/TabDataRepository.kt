@@ -20,11 +20,14 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
@@ -59,6 +62,9 @@ class TabDataRepository @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val adClickManager: AdClickManager,
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -196,6 +202,10 @@ class TabDataRepository @Inject constructor(
         tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
+    override suspend fun getTabs() = withContext(dispatchers.io()) {
+        tabsDao.tabs()
+    }
+
     override fun getOpenTabCount(): Int {
         return tabsDao.tabs().size
     }
@@ -271,9 +281,32 @@ class TabDataRepository @Inject constructor(
         siteData.remove(tab.tabId)
     }
 
+    override suspend fun deleteTabs(tabIds: List<String>) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.deleteTabsAndUpdateSelection(tabIds)
+            clearAllSiteData(tabIds)
+        }
+    }
+
+    private fun clearAllSiteData(tabIds: List<String>) {
+        tabIds.forEach { tabId ->
+            webViewSessionStorage.deleteSession(tabId)
+            adClickManager.clearTabId(tabId)
+            deleteOldPreviewImages(tabId)
+            deleteOldFavicon(tabId)
+            siteData.remove(tabId)
+        }
+    }
+
     override suspend fun markDeletable(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
             tabsDao.markTabAsDeletable(tab)
+        }
+    }
+
+    override suspend fun markDeletable(tabIds: List<String>) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.markTabsAsDeletable(tabIds)
         }
     }
 
@@ -283,7 +316,16 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.undoDeletableTabs(tabIds, moveActiveTabToEnd)
+        }
+    }
+
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            clearAllSiteData(getDeletableTabIds())
+        }
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }

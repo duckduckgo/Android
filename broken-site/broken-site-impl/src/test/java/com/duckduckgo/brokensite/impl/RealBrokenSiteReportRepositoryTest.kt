@@ -40,7 +40,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
-    private val mockDataStore: BrokenSitePomptDataStore = mock()
+    private val mockDataStore: BrokenSitePromptDataStore = mock()
     private val mockInMemoryStore: BrokenSitePromptInMemoryStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
@@ -114,6 +114,7 @@ class RealBrokenSiteReportRepositoryTest {
         testee.cleanupOldEntries()
 
         verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
+        verify(mockDataStore).deleteAllExpiredDismissals(any(), any())
     }
 
     @Test
@@ -144,29 +145,12 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenResetDismissStreakCalledThenDismissStreakIsSetToZero() = runTest {
-        testee.resetDismissStreak()
-
-        verify(mockDataStore).setDismissStreak(0)
-    }
-
-    @Test
     fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
         val nextShownDate = LocalDateTime.now()
 
         testee.setNextShownDate(nextShownDate)
 
         verify(mockDataStore).setNextShownDate(nextShownDate)
-    }
-
-    @Test
-    fun whenGetDismissStreakCalledThenReturnDismissStreak() = runTest {
-        val dismissStreak = 5
-        whenever(mockDataStore.getDismissStreak()).thenReturn(dismissStreak)
-
-        val result = testee.getDismissStreak()
-
-        assertEquals(dismissStreak, result)
     }
 
     @Test
@@ -177,6 +161,35 @@ class RealBrokenSiteReportRepositoryTest {
         val result = testee.getNextShownDate()
 
         assertEquals(nextShownDate, result)
+    }
+
+    @Test
+    fun whenAddDismissalCalledThenNewDismissalEventIsAdded() = runTest {
+        val newDismissal = LocalDateTime.now()
+
+        testee.addDismissal(newDismissal)
+
+        verify(mockDataStore).addDismissal(newDismissal)
+    }
+
+    @Test
+    fun whenClearAllDismissalsCalledThenAllDismissalEventsRemoved() = runTest {
+        testee.clearAllDismissals()
+
+        verify(mockDataStore).clearAllDismissals()
+    }
+
+    @Test
+    fun whenGetDismissalCountBetweenCalledThenDismissalCountBetweenDatesReturned() = runTest {
+        val dismissalCount = 2
+        whenever(mockDataStore.getDismissalCountBetween(any(), any())).thenReturn(dismissalCount)
+
+        val result = testee.getDismissalCountBetween(
+            LocalDateTime.now().minusDays(3),
+            LocalDateTime.now(),
+        )
+
+        assertEquals(dismissalCount, result)
     }
 
     @Test

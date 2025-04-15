@@ -47,8 +47,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
-    ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
+    ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
     ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
+
+    // Temporary Pixel
+    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -341,9 +344,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_UP_BUTTON_PRESSED("m_tab_manager_exit_back_arrow"),
     TAB_MANAGER_BACK_BUTTON_PRESSED("m_tab_manager_exit_other"),
     TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"),
+    TAB_MANAGER_SELECT_MODE_MENU_PRESSED("m_tab_manager_select_mode_menu_clicked"),
     TAB_MANAGER_MENU_NEW_TAB_PRESSED("m_tab_manager_menu_new_tab"),
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED("m_tab_manager_menu_close_all_tabs"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY("m_tab_manager_menu_close_all_tabs_daily"),
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY("m_tab_manager_menu_close_all_tabs_confirm_daily"),
     TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
     TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
     TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
@@ -352,6 +358,26 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_OPENED_FROM_SERP("m_tab_manager_open_from_serp"),
     TAB_MANAGER_OPENED_FROM_SITE("m_tab_manager_open_from_website"),
     TAB_MANAGER_OPENED_FROM_NEW_TAB("m_tab_manager_open_from_newtabpage"),
+    TAB_MANAGER_CLOSE_TABS("m_tab_manager_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_DAILY("m_tab_manager_close_tabs_daily"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED("m_tab_manager_confirm_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY("m_tab_manager_confirm_close_tabs_daily"),
+    TAB_MANAGER_MENU_SELECT_TABS("m_tab_manager_menu_select_tabs"),
+    TAB_MANAGER_MENU_SELECT_TABS_DAILY("m_tab_manager_menu_select_tabs_daily"),
+    TAB_MANAGER_TAB_SELECTED("m_tab_manager_tab_selected"),
+    TAB_MANAGER_TAB_DESELECTED("m_tab_manager_tab_deselected"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL("m_tab_manager_select_mode_menu_select_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY("m_tab_manager_select_mode_menu_select_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL("m_tab_manager_select_mode_menu_deselect_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY("m_tab_manager_select_mode_menu_deselect_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS("m_tab_manager_select_mode_menu_share_links"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY("m_tab_manager_select_mode_menu_share_links_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS("m_tab_manager_select_mode_menu_bookmark_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY("m_tab_manager_select_mode_menu_bookmark_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS("m_tab_manager_select_mode_menu_close_other_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS("m_tab_manager_select_mode_menu_close_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_daily"),
 
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
@@ -391,10 +417,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
-
-    DEDICATED_WEBVIEW_NEW_TAB_REQUESTED("m_dedicated_webview_new_tab_requested"),
-    DEDICATED_WEBVIEW_NEW_TAB_OPENING("m_dedicated_webview_new_tab_opening"),
-    DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
 
     BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 

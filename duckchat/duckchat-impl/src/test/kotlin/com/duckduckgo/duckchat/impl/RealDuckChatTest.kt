@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
@@ -25,6 +26,10 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -49,6 +54,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class RealDuckChatTest {
@@ -56,8 +62,7 @@ class RealDuckChatTest {
     @get:org.junit.Rule
     var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
 
-    private val mockDuckPlayerFeatureRepository: DuckChatFeatureRepository =
-        mock()
+    private val mockDuckPlayerFeatureRepository: DuckChatFeatureRepository = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
@@ -89,25 +94,25 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenSetShowInBrowserMenuSetTrue_thenPixelOnIsSent() = runTest {
+    fun whenSetShowInBrowserMenuSetTrueThenPixelOnIsSent() = runTest {
         testee.setShowInBrowserMenuUserSetting(true)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
     }
 
     @Test
-    fun whenSetShowInBrowserMenuSetFalse_thenPixelOffIsSent() = runTest {
+    fun whenSetShowInBrowserMenuSetFalseThenPixelOffIsSent() = runTest {
         testee.setShowInBrowserMenuUserSetting(false)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
     }
 
     @Test
-    fun whenDuckChatIsEnabled_isEnabledReturnsTrue() = runTest {
+    fun whenDuckChatIsEnabledThenReturnTrue() = runTest {
         val result = testee.isEnabled()
         assertTrue(result)
     }
 
     @Test
-    fun whenDuckChatIsDisabled_isEnabledReturnsFalse() = runTest {
+    fun whenDuckChatIsDisabledThenReturnFalse() = runTest {
         setFeatureToggle(false)
 
         val result = testee.isEnabled()
@@ -115,7 +120,7 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun observeShowInBrowserMenuUserSetting_emitsCorrectValues() = runTest {
+    fun whenObserveShowInBrowserMenuUserSettingThenEmitCorrectValues() = runTest {
         whenever(mockDuckPlayerFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
         val results = testee.observeShowInBrowserMenuUserSetting().take(2).toList()
@@ -124,13 +129,13 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenFeatureEnabled_showInBrowserMenuReturnsValueFromRepository() {
+    fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
         val result = testee.showInBrowserMenu()
         assertTrue(result)
     }
 
     @Test
-    fun whenFeatureDisabled_showInBrowserMenuReturnsFalse() {
+    fun whenFeatureDisabledThenShowInBrowserMenuReturnsFalse() {
         setFeatureToggle(false)
 
         val result = testee.showInBrowserMenu()
@@ -138,7 +143,7 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalled_activityStarted() = runTest {
+    fun whenOpenDuckChatCalledThenActivityStarted() = runTest {
         testee.openDuckChat()
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -151,7 +156,7 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() = runTest {
+    fun whenOpenDuckChatCalledWithQueryThenActivityStartedWithQuery() = runTest {
         testee.openDuckChat(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -164,7 +169,71 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() = runTest {
+    fun whenOpenDuckChatCalledWithBangQueryThenActivityStartedWithBangQuery() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
+        testee.onPrivacyConfigDownloaded()
+
+        testee.openDuckChat(query = "example !ai")
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
+            ),
+        )
+        verify(mockContext).startActivity(any())
+        verify(mockDuckPlayerFeatureRepository).registerOpened()
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithBangsButNoQueryThenActivityStartedWithoutPrompt() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
+        testee.onPrivacyConfigDownloaded()
+
+        testee.openDuckChat(query = "!ai !image")
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            ),
+        )
+        verify(mockContext).startActivity(any())
+        verify(mockDuckPlayerFeatureRepository).registerOpened()
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryThenReturnTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithEmptyBangsThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_EMPTY_BANGS))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithNoBangsThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_NO_BANGS))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckChatUrlCalledWithBangQueryWithNoRegexThenReturnFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON_NO_REGEX))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl(uri = "example !ai".toUri()))
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenActivityStartedWithQueryAndAutoPrompt() = runTest {
         testee.openDuckChatWithAutoPrompt(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
@@ -177,22 +246,22 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLink_isDuckChatUrl() {
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLinkThenIsDuckChatUrl() {
         assertTrue(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
     }
 
     @Test
-    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsNotDuckChatLink_isNotDuckChatUrl() {
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsNotDuckChatLinkThenIsNotDuckChatUrl() {
         assertFalse(testee.isDuckChatUrl("https://duckduckgo.com/?q=test".toUri()))
     }
 
     @Test
-    fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_isNotDuckChatUrl() {
+    fun whenIsNotDuckDuckGoHostAndDuckChatEnabledThenIsNotDuckChatUrl() {
         assertFalse(testee.isDuckChatUrl("https://example.com/?ia=chat".toUri()))
     }
 
     @Test
-    fun `when was opened before queried, then repo state is returned`() = runTest {
+    fun whenWasOpenedBeforeQueriedThenRepoStateIsReturned() = runTest {
         whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
 
         assertTrue(testee.wasOpenedBefore())
@@ -236,5 +305,33 @@ class RealDuckChatTest {
     private fun setFeatureToggle(enabled: Boolean) {
         duckChatFeature.self().setRawStoredState(State(enabled))
         testee.onPrivacyConfigDownloaded()
+    }
+
+    companion object {
+        val SETTINGS_JSON = """
+        {
+            "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_EMPTY_BANGS = """
+        {
+            "aiChatBangs": [],
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_NO_BANGS = """
+        {
+            "aiChatBangRegex": "^(?!({bangs})${'$'})(?=.*({bangs})(?=${'$'}|\\s)).+${'$'}"
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_NO_REGEX = """
+        {
+            "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+        }
+        """.trimIndent()
     }
 }

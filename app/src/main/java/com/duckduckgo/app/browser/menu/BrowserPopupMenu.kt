@@ -24,9 +24,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBottomBinding
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.BOTTOM
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
@@ -35,227 +34,206 @@ import com.duckduckgo.mobile.android.R.drawable
 class BrowserPopupMenu(
     private val context: Context,
     layoutInflater: LayoutInflater,
-    private val omnibarPosition: OmnibarPosition,
+    private val popupMenuResourceType: ResourceType,
 ) : PopupMenu(
     layoutInflater,
-    resourceId = if (omnibarPosition == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
+    resourceId = if (popupMenuResourceType == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
     width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
 ) {
     private val topBinding = PopupWindowBrowserMenuBinding.bind(contentView)
     private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
 
     init {
-        contentView = when (omnibarPosition) {
+        contentView = when (popupMenuResourceType) {
             TOP -> topBinding.root
             BOTTOM -> bottomBinding.root
         }
     }
 
-    internal val navigationButtonsContainer: View by lazy {
-        when (omnibarPosition) {
-            TOP -> topBinding.navigationButtonsContainer
-            BOTTOM -> bottomBinding.navigationButtonsContainer
-        }
-    }
-
     internal val backMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.backMenuItem
             BOTTOM -> bottomBinding.backMenuItem
         }
     }
 
     internal val forwardMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.forwardMenuItem
             BOTTOM -> bottomBinding.forwardMenuItem
         }
     }
 
     internal val refreshMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.refreshMenuItem
             BOTTOM -> bottomBinding.refreshMenuItem
         }
     }
 
-    internal val navigationButtonsSectionDivider: View by lazy {
-        when (omnibarPosition) {
-            TOP -> topBinding.navigationButtonsSectionDivider
-            BOTTOM -> bottomBinding.navigationButtonsSectionDivider
-        }
-    }
-
-    internal val refreshLongMenuItem: View by lazy {
-        when (omnibarPosition) {
-            TOP -> topBinding.refreshLongMenuItem
-            BOTTOM -> bottomBinding.refreshLongMenuItem
-        }
-    }
-
     internal val printPageMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.printPageMenuItem
             BOTTOM -> bottomBinding.printPageMenuItem
         }
     }
 
     internal val newTabMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.newTabMenuItem
             BOTTOM -> bottomBinding.newTabMenuItem
         }
     }
 
     internal val defaultBrowserMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
             BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
         }
     }
 
     internal val duckChatMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.includeDuckChatMenuItem.duckChatMenuItem
             BOTTOM -> bottomBinding.includeDuckChatMenuItem.duckChatMenuItem
         }
     }
 
     internal val sharePageMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.sharePageMenuItem
             BOTTOM -> bottomBinding.sharePageMenuItem
         }
     }
 
     internal val bookmarksMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.bookmarksMenuItem
             BOTTOM -> bottomBinding.bookmarksMenuItem
         }
     }
 
     internal val downloadsMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.downloadsMenuItem
             BOTTOM -> bottomBinding.downloadsMenuItem
         }
     }
 
     internal val settingsMenuItem: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.settingsMenuItem
             BOTTOM -> bottomBinding.settingsMenuItem
         }
     }
 
     internal val addBookmarksMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.addBookmarksMenuItem
             BOTTOM -> bottomBinding.addBookmarksMenuItem
         }
     }
 
     internal val fireproofWebsiteMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.fireproofWebsiteMenuItem
             BOTTOM -> bottomBinding.fireproofWebsiteMenuItem
         }
     }
 
     internal val createAliasMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.createAliasMenuItem
             BOTTOM -> bottomBinding.createAliasMenuItem
         }
     }
 
     internal val changeBrowserModeMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.changeBrowserModeMenuItem
             BOTTOM -> bottomBinding.changeBrowserModeMenuItem
         }
     }
 
     internal val openInAppMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.openInAppMenuItem
             BOTTOM -> bottomBinding.openInAppMenuItem
         }
     }
 
     internal val findInPageMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.findInPageMenuItem
             BOTTOM -> bottomBinding.findInPageMenuItem
         }
     }
 
     internal val addToHomeMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.addToHomeMenuItem
             BOTTOM -> bottomBinding.addToHomeMenuItem
         }
     }
 
     internal val privacyProtectionMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.privacyProtectionMenuItem
             BOTTOM -> bottomBinding.privacyProtectionMenuItem
         }
     }
 
     internal val brokenSiteMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.brokenSiteMenuItem
             BOTTOM -> bottomBinding.brokenSiteMenuItem
         }
     }
 
     internal val autofillMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.autofillMenuItem
             BOTTOM -> bottomBinding.autofillMenuItem
         }
     }
 
     internal val runningInDdgBrowserMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.runningInDdgBrowserMenuItem
             BOTTOM -> bottomBinding.runningInDdgBrowserMenuItem
         }
     }
 
     internal val siteOptionsMenuDivider: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.siteOptionsMenuDivider
             BOTTOM -> bottomBinding.siteOptionsMenuDivider
         }
     }
 
     internal val browserOptionsMenuDivider: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.browserOptionsMenuDivider
             BOTTOM -> bottomBinding.browserOptionsMenuDivider
         }
     }
 
     internal val settingsMenuDivider: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.settingsMenuDivider
             BOTTOM -> bottomBinding.settingsMenuDivider
         }
     }
 
     internal val customTabsMenuDivider: View by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.customTabsMenuDivider
             BOTTOM -> bottomBinding.customTabsMenuDivider
         }
     }
 
     internal val openInDdgBrowserMenuItem: MenuItemView by lazy {
-        when (omnibarPosition) {
+        when (popupMenuResourceType) {
             TOP -> topBinding.openInDdgBrowserMenuItem
             BOTTOM -> bottomBinding.openInDdgBrowserMenuItem
         }
@@ -269,9 +247,6 @@ class BrowserPopupMenu(
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         refreshMenuItem.isEnabled = browserShowing
-        navigationButtonsContainer.isVisible = viewState.navigationButtonsVisible
-        navigationButtonsSectionDivider.isVisible = viewState.navigationButtonsVisible
-        refreshLongMenuItem.isVisible = !viewState.navigationButtonsVisible && browserShowing
 
         printPageMenuItem.isEnabled = browserShowing
 
@@ -358,5 +333,10 @@ class BrowserPopupMenu(
             newTabMenuItem.isVisible = true
             siteOptionsMenuDivider.isVisible = true
         }
+    }
+
+    enum class ResourceType {
+        TOP,
+        BOTTOM,
     }
 }

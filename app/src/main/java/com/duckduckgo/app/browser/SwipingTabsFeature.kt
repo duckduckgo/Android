@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -27,13 +28,19 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface SwipingTabsFeature {
     // The main kill switch for the feature
     @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
     fun self(): Toggle
 
-    // The toggle used to enable the feature for internal users
+    // The toggle used for staged rollout to external users
     @Toggle.DefaultValue(false)
-    fun onForInternalUsers(): Toggle
+    @InternalAlwaysEnabled
+    fun enabledForUsers(): Toggle
 
-    // The toggle used to enable the feature for external users
+    // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
     @Toggle.DefaultValue(false)
-    fun onForExternalUsers(): Toggle
+    fun tabSwipingFix1(): Toggle
+
+    // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
+    @Toggle.DefaultValue(false)
+    fun tabSwipingFix2(): Toggle
 }

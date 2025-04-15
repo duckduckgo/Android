@@ -441,4 +441,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Měj přehled o zablokovaných trackerech</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Nech si posílat aktualizace o zablokovaných pokusech o sledování na lištu s oznámeními.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Nemůžeš používat funkci App Tracking Protection kvůli své VPN? Přejdi na DuckDuckGo VPN – jedinou kompatibilní VPN. <annotation type="ppro_upsell_link">Další informace</annotation></string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>Funkce App Tracking Protection je zakázaná</b>\nZakázala tvoje VPN funkci App Tracking Protection? Přepínačem nahoře ji znovu zapneš.\n\nPořiď si DuckDuckGo VPN – jedinou VPN, která funguje s funkcí App Tracking Protection. <annotation type="ppro_upsell_link">Další informace</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Posuň ochranu svého soukromí na vyšší úroveň</string>
+    <string name="apptp_PproUpsellBannerMessage">Jedinou VPN, která je kompatibilní s funkcí App Tracking Protection, má DuckDuckGo. Aktivovat ji můžeš s předplatným Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Více informací</string>
+
 </resources>

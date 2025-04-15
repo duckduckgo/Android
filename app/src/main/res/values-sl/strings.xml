@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi poizvedbo pred iskanjem</string>
-    <string name="settingsAutocompleteEnabled">Pokaži predloge za samodokončanje</string>
     <string name="autocompleteRemoveItemTitle">Želite odstraniti predlog iskanja?</string>
     <string name="autocompleteRemoveItemCancel">Prekliči</string>
     <string name="autocompleteRemoveItemRemove">Odstrani</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavitve</string>
     <string name="settingsMenuItemTitle">Nastavitve</string>
-    <string name="settingsHeadingPrivacy">Zasebnost</string>
     <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
-    <string name="settingsHeadingCustomize">Prilagodi</string>
     <string name="settingsHeadingAbout">O nas</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
     <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
-    <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
-    <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Naslednji koraki</string>
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Onemogočeno</string>
     <string name="settingsSubtitleNotificationsEnabled">Omogočeno</string>
     <string name="settingsDefaultBrowserTitle">Privzet brskalnik</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je vaš privzeti brskalnik</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nastavite DuckDuckGo kot privzet brskalnik</string>
     <string name="settingsPrivateSearchTitle">zasebno iskanje</string>
     <string name="settingsGeneral" instruction="List item for general settings">Splošno</string>
-    <string name="settingsPrivateSearchDescription">Privzeto omogočeno</string>
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="settingsWebTrackingProtectionDescription">Privzeto omogočeno</string>
-    <string name="settingsHeadingSettings">Nastavitve</string>
     <string name="settingsHeadingMainSettings">Druge nastavitve</string>
     <string name="settingsPermissionsSetting">Dovoljenja</string>
     <string name="settingsSyncSetting">Sinhronizacija in varnostno kopiranje</string>
-    <string name="settingsFireButton">Gumb Fire Button</string>
     <string name="settingsDataClearing">Počiščenje podatkov</string>
     <string name="settingsAddWidget">Dodajte pripomoček na domači zaslon</string>
     <string name="settingsAddressBarPosition">Nastavitev položaja naslovne vrstice</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">zasebno iskanje</string>
-    <string name="privateSearchTitle">Zasebno iskanje je omogočeno</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
-    <string name="privateSearchHeadingSearchSettings">Nastavitve iskanja</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Zaščita spletnega sledenja je omogočena</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
-    <string name="cookiePopupProtectionDescription">Odpravite ta pojavna okna in kar najbolj zmanjšajte uporabljene piškotke</string>
-    <string name="cookiePopupProtectionEnabled">Omogočeno</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Gumb Fire Button</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
 
-    <string name="settingsAutomaticallyClearWhat">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearData">Samodejno počisti podatke…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Pripomoček %1$s je bil dodan na domači zaslon</string>
-    <string name="settingsAddHomeScreenWidget">Pripomoček na domačem zaslonu</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
-    <string name="macos_settings_title">Brskalnik DuckDuckGo za računalnike Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, upravljanje prepusti meni</string>
 
-    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
@@ -655,19 +633,108 @@
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Brskalnik DuckDuckGo za računalnike Windows</string>
-    <string name="windows_settings_description">Brskajte zasebno z našo aplikacijo za sistem Windows</string>
-    <string name="windows_settings_description_ready">Na voljo za prenos</string>
-    <string name="windows_settings_description_list">Na seznamu ste!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Če želite zapustiti celozaslonski prikaz, z vrha zaslona povlecite navzdol in tapnite gumb za nazaj.</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želite zapreti vse zavihke?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Ali ste prepričani, da želite zapreti vse zavihke?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Prekliči</string>
     <string name="closeAppTabsConfirmationDialogClose">Zapri</string>
+
+    <string name="selectTabsMenuItem">Izberi zavihke</string>
+    <string name="selectAllTabsMenuItem">Izberi vse</string>
+    <string name="deselectAllTabsMenuItem">Počisti izbiro vsega</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Izbrano: %1$d</string>
+    <string name="tabSelectedIndicator">Indikator izbranega zavihka</string>
+    <string name="tabNotSelectedIndicator">Indikator neizbranega zavihka</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Povezave iz iskalnika DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Deli povezavo</item>
+        <item quantity="two">Deli %1$d povezavi</item>
+        <item quantity="few">Deli %1$d povezave</item>
+        <item quantity="other">Deli %1$d povezav</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite izbrani zavihek dodati med zaznamke?</item>
+        <item quantity="two">Želite %1$d zavihka dodati med zaznamke?</item>
+        <item quantity="few">Želite %1$d zavihke dodati med zaznamke?</item>
+        <item quantity="other">Želite %1$d zavihkov dodati med zaznamke?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zaznamek je dodan</item>
+        <item quantity="two">%1$d zaznamka sta dodana</item>
+        <item quantity="few">%1$d zaznamki so dodani</item>
+        <item quantity="other">%1$d zaznamkov je dodanih</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Zaznamek</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Dodaj zavihek med zaznamke</item>
+        <item quantity="two">Dodaj %1$d zavihka med zaznamke</item>
+        <item quantity="few">Dodaj %1$d zavihke med zaznamke</item>
+        <item quantity="other">Dodaj %1$d zavihkov med zaznamke</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Obstoječi zaznamki ne bodo podvojeni.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d zavihka?</item>
+        <item quantity="few">Želite zapreti vse %1$d zavihke?</item>
+        <item quantity="other">Želite zapreti vseh %1$d zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti drug zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d druga zavihka?</item>
+        <item quantity="few">Želite zapreti %1$d druge zavihke?</item>
+        <item quantity="other">Želite zapreti %1$d drugih zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Želite zapreti zavihek?</item>
+        <item quantity="two">Želite zapreti %1$d zavihka?</item>
+        <item quantity="few">Želite zapreti %1$d zavihke?</item>
+        <item quantity="other">Želite zapreti %1$d zavihkov?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ali ste prepričani, da želite zapreti ta zavihek?</item>
+        <item quantity="two">Ali ste prepričani, da želite zapreti oba zavihka?</item>
+        <item quantity="few">Ali ste prepričani, da želite zapreti vse zavihke?</item>
+        <item quantity="other">Ali ste prepričani, da želite zapreti vse zavihke?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ali ste prepričani, da želite zapreti zavihek?</item>
+        <item quantity="two">Ali ste prepričani, da želite zapreti ta zavihka?</item>
+        <item quantity="few">Ali ste prepričani, da želite zapreti te zavihke?</item>
+        <item quantity="other">Ali ste prepričani, da želite zapreti te zavihke?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri zavihka</item>
+        <item quantity="few">Zapri zavihke</item>
+        <item quantity="other">Zapri zavihke</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zapri zavihek</item>
+        <item quantity="two">Zapri %1$d zavihka</item>
+        <item quantity="few">Zapri %1$d zavihke</item>
+        <item quantity="other">Zapri %1$d zavihkov</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zapri druge zavihke</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavihek je zaprt</item>
+        <item quantity="two">%1$d zavihka sta zaprta</item>
+        <item quantity="few">%1$d zavihki so zaprti</item>
+        <item quantity="other">%1$d zavihkov je zaprtih</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d zasebni zavihek</item>
+        <item quantity="two">%1$d zasebna zavihka</item>
+        <item quantity="few">%1$d zasebni zavihki</item>
+        <item quantity="other">%1$d zasebnih zavihkov</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti DuckDuckGo.</string>
@@ -684,7 +751,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Gesla</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Gesla in samodejno izpolnjevanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Geslo je shranjeno</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Geslo je posodobljeno</string>

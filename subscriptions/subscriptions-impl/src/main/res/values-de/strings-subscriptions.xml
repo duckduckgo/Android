@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Dazu gehört unser VPN und Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Privacy Pro kaufen</string>
     <string name="subscriptionSettingRestore">Ich habe ein Abonnement</string>
-    <string name="subscriptionSettingWaiting">Dein Abonnement wird aktiviert</string>
-    <string name="subscriptionSettingWaitingSubtitle">Das dauert länger als gewöhnlich, bitte versuche es später noch einmal.</string>
     <string name="subscriptionSettingExpired">Dein Privacy Pro Abonnement ist abgelaufen</string>
-    <string name="subscriptionSettingExpiredSubtitle">Abonniere erneut, um Privacy Pro weiter zu nutzen</string>
     <string name="subscriptionSettingExpiredViewPlans">Tarife anzeigen</string>
     <string name="subscriptionSettingSectionSubscription">Abonnement</string>
     <string name="subscriptionSettingRemoveFromDevice">Von diesem Gerät entfernen</string>

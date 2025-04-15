@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
-    <string name="settingsAutocompleteEnabled">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
     <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
-    <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
     <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
-    <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
     <string name="leaveFeedbackNew">Αποστολή σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
-    <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
-    <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Επόμενα βήματα</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Απενεργοποιήθηκε</string>
     <string name="settingsSubtitleNotificationsEnabled">Ενεργοποιήθηκε</string>
     <string name="settingsDefaultBrowserTitle">Προεπιλεγμένο πρόγραμμα περιήγησης</string>
-    <string name="settingsDefaultBrowserSetDescription">Το DuckDuckGo αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsPrivateSearchTitle">ιδιωτική αναζήτηση</string>
     <string name="settingsGeneral" instruction="List item for general settings">Γενικά</string>
-    <string name="settingsPrivateSearchDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
-    <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsHeadingMainSettings">Άλλες Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
-    <string name="settingsFireButton">Κουμπί Φωτιά</string>
     <string name="settingsDataClearing">Διαγραφή δεδομένων</string>
     <string name="settingsAddWidget">Προσθήκη μικροεφαρμογής στην Αρχική οθόνη</string>
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
-    <string name="privateSearchTitle">Η λειτουργία Private Search είναι ενεργοποιημένη</string>
     <string name="privateSearchDescription">Το DuckDuckGo Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
-    <string name="privateSearchHeadingSearchSettings">Ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Η προστασία παρακολούθησης ιστού είναι ενεργοποιημένη</string>
     <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[Το DuckDuckGo δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
-    <string name="cookiePopupProtectionDescription">Εξαλείψτε αυτά τα αναδυόμενα παράθυρα και ελαχιστοποιήστε τα cookies</string>
-    <string name="cookiePopupProtectionEnabled">Ενεργοποιήθηκε</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
 
-    <string name="settingsAutomaticallyClearWhat">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearData">Αυτόματη απαλοιφή δεδομένων...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
-    <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
@@ -646,7 +625,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Όχι, θα τα διαχειρίζομαι εγώ προσωπικά</string>
 
-    <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
@@ -655,19 +633,82 @@
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Windows</string>
-    <string name="windows_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Windows</string>
-    <string name="windows_settings_description_ready">Διαθέσιμη λήψη</string>
-    <string name="windows_settings_description_list">Είστε στη λίστα!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Κλείσιμο όλων των καρτελών;</string>
     <string name="closeAppTabsConfirmationDialogDescription">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</string>
     <string name="closeAppTabsConfirmationDialogCancel">Ακύρωση</string>
     <string name="closeAppTabsConfirmationDialogClose">Κλείσιμο</string>
+
+    <string name="selectTabsMenuItem">Επιλογή καρτελών</string>
+    <string name="selectAllTabsMenuItem">Επιλογή όλων</string>
+    <string name="deselectAllTabsMenuItem">Αποεπιλογή όλων</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d επιλέχθηκαν</string>
+    <string name="tabSelectedIndicator">Ένδειξη επιλεγμένης καρτέλας</string>
+    <string name="tabNotSelectedIndicator">Ένδειξη μη επιλεγμένης καρτέλας</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d σύνδεσμοι από το DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κοινοποίηση συνδέσμου</item>
+        <item quantity="other">Κοινοποίηση %1$d συνδέσμων</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη στην επιλεγμένη καρτέλα;</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προστέθηκε σελιδοδείκτης</item>
+        <item quantity="other">Προστέθηκαν %1$d σελιδοδείκτες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Σελιδοδείκτης</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Προσθήκη σελιδοδείκτη σε καρτέλα</item>
+        <item quantity="other">Προσθήκη σελιδοδείκτη σε %1$d καρτέλες</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Οι υπάρχοντες σελιδοδείκτες δεν θα αναπαραχθούν.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο και των %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο άλλης καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d ακόμα καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας;</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε αυτήν την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Θέλετε σίγουρα να κλείσετε την καρτέλα;</item>
+        <item quantity="other">Θέλετε σίγουρα να κλείσετε αυτές τις καρτέλες;</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο καρτελών</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο %1$d καρτελών</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Κλείσιμο άλλων καρτελών</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Η καρτέλα έκλεισε</item>
+        <item quantity="other">%1$d καρτέλες έκλεισαν</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d ιδιωτική καρτέλα</item>
+        <item quantity="other">%1$d ιδιωτικές καρτέλες</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>
@@ -684,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Κωδικοί πρόσβασης</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
