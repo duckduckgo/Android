@@ -520,7 +520,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
-        when (selectionViewState.value.dynamicInterface.fabType) {
+        when (selectionViewState.value.dynamicInterface.mainFabType) {
             FabType.NEW_TAB -> onNewTabRequested()
             FabType.CLOSE_TABS -> onCloseSelectedTabsRequested()
         }
@@ -648,7 +648,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isMoreMenuItemEnabled = !isThereOnlyNewTabPage,
                     isMainFabVisible = true,
                     isAIFabVisible = isNewVisualDesignEnabled,
-                    fabType = FabType.NEW_TAB,
+                    mainFabType = FabType.NEW_TAB,
                     backButtonType = ARROW,
                     layoutButtonType = when (layoutType) {
                         GRID -> LayoutButtonType.LIST
@@ -682,7 +682,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isMoreMenuItemEnabled = true,
                     isMainFabVisible = isSomethingSelected,
                     isAIFabVisible = false,
-                    fabType = FabType.CLOSE_TABS,
+                    mainFabType = FabType.CLOSE_TABS,
                     backButtonType = CLOSE,
                     layoutButtonType = LayoutButtonType.HIDDEN,
                 )
@@ -707,7 +707,7 @@ class TabSwitcherViewModel @Inject constructor(
             val isMoreMenuItemEnabled: Boolean,
             val isMainFabVisible: Boolean,
             val isAIFabVisible: Boolean,
-            val fabType: FabType,
+            val mainFabType: FabType,
             val backButtonType: BackButtonType,
             val layoutButtonType: LayoutButtonType,
         )

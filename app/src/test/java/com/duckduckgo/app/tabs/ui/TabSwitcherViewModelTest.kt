@@ -828,7 +828,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.NEW_TAB,
+            mainFabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -857,7 +857,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = false,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.NEW_TAB,
+            mainFabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -886,7 +886,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = true,
-            fabType = FabType.NEW_TAB,
+            mainFabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -915,7 +915,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.NEW_TAB,
+            mainFabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.LIST,
         )
@@ -944,7 +944,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = true,
-            fabType = FabType.NEW_TAB,
+            mainFabType = FabType.NEW_TAB,
             backButtonType = BackButtonType.ARROW,
             layoutButtonType = LayoutButtonType.GRID,
         )
@@ -976,7 +976,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = false,
             isAIFabVisible = false,
-            fabType = FabType.CLOSE_TABS,
+            mainFabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -1008,7 +1008,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.CLOSE_TABS,
+            mainFabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -1040,7 +1040,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.CLOSE_TABS,
+            mainFabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -1073,7 +1073,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.CLOSE_TABS,
+            mainFabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )
@@ -1105,7 +1105,7 @@ class TabSwitcherViewModelTest {
             isMoreMenuItemEnabled = true,
             isMainFabVisible = true,
             isAIFabVisible = false,
-            fabType = FabType.CLOSE_TABS,
+            mainFabType = FabType.CLOSE_TABS,
             backButtonType = BackButtonType.CLOSE,
             layoutButtonType = LayoutButtonType.HIDDEN,
         )

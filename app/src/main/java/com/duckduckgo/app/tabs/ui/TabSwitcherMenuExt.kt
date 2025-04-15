@@ -66,7 +66,7 @@ fun Menu.createDynamicInterface(
 
     mainFab.apply {
         if (dynamicMenu.isMainFabVisible) {
-            when (dynamicMenu.fabType) {
+            when (dynamicMenu.mainFabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
                     icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24)
