@@ -108,8 +108,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minWidth="@dimen/toolbarIcon"
-                            android:layout_marginStart="@dimen/keyline_1"
-                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:layout_marginStart="@dimen/keyline_0"
+                            android:layout_marginEnd="@dimen/keyline_0"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -143,19 +143,18 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:importantForAccessibility="no"
-                                android:padding="6dp"
-                                android:scaleType="center"
-                                android:src="@drawable/ic_find_search_20_a05" />
+                                android:padding="@dimen/keyline_2"
+                                android:src="@drawable/ic_find_search_24" />
 
                             <ImageView
                                 android:id="@+id/backIcon"
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
+                                android:padding="@dimen/keyline_2"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
-                                android:scaleType="center"
                                 android:src="@drawable/ic_arrow_left_24e"
                                 android:visibility="gone" />
 
@@ -166,8 +165,9 @@
                                 android:scaleType="center"
                                 android:layout_gravity="center"
                                 android:importantForAccessibility="no"
+                                android:padding="@dimen/keyline_2"
                                 android:visibility="gone"
-                                app:srcCompat="@drawable/ic_globe_20" />
+                                app:srcCompat="@drawable/ic_globe_24" />
 
                             <FrameLayout
                                 android:id="@+id/sceneRoot"

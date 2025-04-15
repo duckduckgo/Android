@@ -31,7 +31,7 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="@dimen/keyline_4"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
         android:layout_marginBottom="12dp"
         android:background="@drawable/fade_omnibar_field_background"
         android:orientation="horizontal"
@@ -48,7 +48,7 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_find_search_20_a05" />
+            android:src="@drawable/ic_find_search_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/omnibarTextInputMockup"
@@ -56,7 +56,7 @@
             android:layout_height="match_parent"
             android:gravity="start|center"
             android:maxLines="1"
-            android:paddingStart="5dp"
+            android:paddingStart="3dp"
             android:paddingEnd="8dp"
             android:text="@string/omnibarInputHint"
             android:textColor="?attr/daxColorSecondaryText" />
