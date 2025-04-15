@@ -245,7 +245,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         binding.aiChatFab.setOnClickListener {
-            viewModel.onDuckChatMenuClicked(fromOverflowMenu = false)
+            viewModel.onDuckChatFabClicked()
         }
     }
 

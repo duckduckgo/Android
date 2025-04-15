@@ -543,15 +543,21 @@ class TabSwitcherViewModel @Inject constructor(
         return@withContext null
     }
 
+    fun onDuckChatFabClicked() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+
+            duckChat.openDuckChat()
+        }
+    }
+
     fun onDuckChatMenuClicked(fromOverflowMenu: Boolean = true) {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
 
-            if (fromOverflowMenu) {
-                val wasUsedBefore = duckChat.wasOpenedBefore()
-                val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
-            }
+            val wasUsedBefore = duckChat.wasOpenedBefore()
+            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
 
             duckChat.openDuckChat()
         }
