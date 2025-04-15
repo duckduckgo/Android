@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hopp over</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Skjønner! Jeg hopper over de andre tipsene.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle fanene, historikken og nettleserdataene dine med to trykk på Fire Button 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis veiledning</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
