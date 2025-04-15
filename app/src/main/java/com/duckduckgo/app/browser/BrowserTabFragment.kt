@@ -827,7 +827,7 @@ class BrowserTabFragment :
     private fun showTrackersExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
                 listOf(
                     binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
                     binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
@@ -838,7 +838,7 @@ class BrowserTabFragment :
                     binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
                 )
             },
-            omnibarTextInput = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+            omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
                 binding.newOmnibar.omnibarTextInput
             } else {
                 binding.newOmnibarBottom.omnibarTextInput
