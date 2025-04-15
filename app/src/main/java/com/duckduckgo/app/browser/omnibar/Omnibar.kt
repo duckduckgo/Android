@@ -28,7 +28,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
@@ -62,8 +61,6 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
-import com.google.android.material.appbar.AppBarLayout.GONE
-import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
@@ -208,7 +205,7 @@ class Omnibar(
         }
     }
 
-    private val findInPage: IncludeFindInPageBinding by lazy {
+    private val findInPage: FindInPage by lazy {
         newOmnibar.findInPage
     }
 
@@ -325,17 +322,17 @@ class Omnibar(
     }
 
     fun hideFindInPage() {
-        if (findInPage.findInPageContainer.visibility != GONE) {
+        if (newOmnibar.isFindInPageVisible()) {
             binding.focusDummy.requestFocus()
-            findInPage.findInPageContainer.gone()
+            newOmnibar.hideFindInPage()
             findInPage.findInPageInput.hideKeyboard()
             findInPage.findInPageInput.text.clear()
         }
     }
 
     fun showFindInPageView(viewState: FindInPageViewState) {
-        if (findInPage.findInPageContainer.visibility != VISIBLE) {
-            findInPage.findInPageContainer.show()
+        if (!newOmnibar.isFindInPageVisible()) {
+            newOmnibar.showFindInPage()
             findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
                 findInPage.findInPageInput.showKeyboard()
             }
