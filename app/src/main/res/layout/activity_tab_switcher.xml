@@ -34,7 +34,7 @@
         android:clipToPadding="false"
         android:paddingHorizontal="@dimen/keyline_2"
         android:paddingTop="@dimen/keyline_2"
-        android:paddingBottom="152dp"
+        android:paddingBottom="@dimen/keyline_2"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
