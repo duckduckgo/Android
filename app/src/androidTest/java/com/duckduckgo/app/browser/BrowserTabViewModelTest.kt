@@ -121,7 +121,6 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -6189,17 +6188,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnAnimationFinishedAndLogosIsEmptyThenDoNothing() = runTest {
-        val logos = emptyList<TrackerLogo>()
-
-        testee.onAnimationFinished(logos)
-
-        assertCommandNotIssued<Command.StartTrackersExperimentShieldPopAnimation>()
-    }
-
-    @Test
     fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        val logos = listOf<TrackerLogo>(mock())
         // Variant 2 is enabled
         fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
         fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
@@ -6207,14 +6196,13 @@ class BrowserTabViewModelTest {
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
 
-        testee.onAnimationFinished(logos)
+        testee.onAnimationFinished()
 
         assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     @Test
     fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        val logos = listOf<TrackerLogo>(mock())
         // Variant 3 is enabled
         fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
         fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
@@ -6222,7 +6210,7 @@ class BrowserTabViewModelTest {
         fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
         fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
 
-        testee.onAnimationFinished(logos)
+        testee.onAnimationFinished()
 
         assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
