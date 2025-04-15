@@ -74,7 +74,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/omniBarContainerMockup"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingHorizontal="@dimen/keyli">
+        android:paddingHorizontal="@dimen/keyline_4">
 
         <FrameLayout
             android:id="@+id/backArrowButton"
