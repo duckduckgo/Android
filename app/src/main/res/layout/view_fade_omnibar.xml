@@ -58,13 +58,13 @@
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                     android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     app:strokeColor="?daxColorAccentBlue"
+                    app:contentPadding="@dimen/experimentalOmnibarContentPadding"
                     app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="@dimen/experimentalOmnibarContentPadding">
+                        android:layout_height="match_parent">
 
                         <ProgressBar
                             android:id="@+id/pageLoadingIndicator"
@@ -319,6 +319,13 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <include
+                        android:id="@+id/findInPage"
+                        layout="@layout/include_fade_omnibar_find_in_page"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.appcompat.widget.Toolbar>
@@ -404,16 +411,6 @@
                     android:contentDescription="@string/browserPopupMenu"
                     android:src="@drawable/ic_fire" />
             </FrameLayout>
-
-            <include
-                android:id="@+id/findInPage"
-                layout="@layout/include_find_in_page"
-                android:layout_width="0dp"
-                android:layout_height="?attr/actionBarSize"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/shieldIconExperiment"

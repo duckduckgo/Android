@@ -521,24 +521,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOutlineEnabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(true)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.hasFocus)
-        }
-    }
-
-    @Test
-    fun whenOutlineDisabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(false)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.hasFocus)
-        }
-    }
-
-    @Test
     fun whenClearTextButtonPressedThenViewStateCorrect() = runTest {
         testee.onClearTextButtonPressed()
         testee.viewState.test {
@@ -1087,6 +1069,57 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when showFindInPage and hideFindInPage called, then update the view state`() = runTest {
+        testee.showFindInPage()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.findInPageVisible)
+        }
+
+        testee.hideFindInPage()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.findInPageVisible)
+        }
+    }
+
+    @Test
+    fun `when find in page visible, then outline also visible`() = runTest {
+        testee.showFindInPage()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.outlineVisible)
+        }
+
+        testee.hideFindInPage()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.outlineVisible)
+        }
+    }
+
+    @Test
+    fun `when omnibar focused, then outline visible`() = runTest {
+        testee.onOmnibarFocusChanged(hasFocus = true, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.outlineVisible)
+        }
+
+        testee.onOmnibarFocusChanged(hasFocus = false, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.outlineVisible)
         }
     }
 

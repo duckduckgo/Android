@@ -145,7 +145,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         val experimentalIconsEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
+        val findInPageVisible: Boolean = false,
     ) {
+
+        val outlineVisible: Boolean = hasFocus || findInPageVisible
+
         fun shouldUpdateOmnibarText(): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
         }
@@ -370,15 +374,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 privacyShield = privacyShield,
-            )
-        }
-    }
-
-    fun onOutlineEnabled(enabled: Boolean) {
-        Timber.d("Omnibar: onOutlineEnabled")
-        _viewState.update {
-            it.copy(
-                hasFocus = enabled,
             )
         }
     }
@@ -705,6 +700,18 @@ class OmnibarLayoutViewModel @Inject constructor(
                     viewMode = customTabMode.copy(title = decoration.title),
                 )
             }
+        }
+    }
+
+    fun showFindInPage() {
+        _viewState.update {
+            it.copy(findInPageVisible = true)
+        }
+    }
+
+    fun hideFindInPage() {
+        _viewState.update {
+            it.copy(findInPageVisible = false)
         }
     }
 }
