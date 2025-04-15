@@ -18,7 +18,7 @@ package com.duckduckgo.cookies.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 @Entity(tableName = "first_party_cookie_policy")
 data class FirstPartyCookiePolicyEntity(

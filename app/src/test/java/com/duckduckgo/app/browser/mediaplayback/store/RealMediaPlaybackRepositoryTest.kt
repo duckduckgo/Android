@@ -3,7 +3,7 @@ package com.duckduckgo.app.browser.mediaplayback.store
 import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.TestScope

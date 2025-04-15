@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
