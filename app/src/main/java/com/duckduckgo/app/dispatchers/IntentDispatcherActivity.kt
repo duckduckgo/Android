@@ -46,7 +46,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             dispatch(it)
         }.launchIn(lifecycleScope)
 
-        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
         viewModel.onIntentReceived(intent, surfaceColor, isExternal = true)
     }
 
