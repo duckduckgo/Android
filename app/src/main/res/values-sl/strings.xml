@@ -848,6 +848,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Petka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tukaj sem že bil/-a</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Razumem! Druge nasvete bom preskočil/-a.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne pozabite: Z gumbom Fire Button 🔥 lahko z dvema dotikoma izbrišete vse zavihke, zgodovino in podatke o brskanju.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vadnico</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
