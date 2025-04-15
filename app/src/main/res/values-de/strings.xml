@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Datenschutz aktiviert für %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Datenschutz deaktiviert für %1$s</string>
     <string name="undoSnackbarAction">Rückgängig machen</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker blockiert</item>
+        <item quantity="other">Tracker blockiert</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Bild herunterladen</string>

@@ -51,6 +51,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(false)
     fun allowDnsBlockMalware(): Toggle
+
+    @DefaultValue(false)
+    fun localVpnControllerDns(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

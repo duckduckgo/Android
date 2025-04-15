@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protection de la confidentialité activée pour %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Protection de la confidentialité désactivée pour %1$s</string>
     <string name="undoSnackbarAction">Annuler</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Traqueur bloqué</item>
+        <item quantity="other">Traqueurs bloqués</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Télécharger l\'image</string>

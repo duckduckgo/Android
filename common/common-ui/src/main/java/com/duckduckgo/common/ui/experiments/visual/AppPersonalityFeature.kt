@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.apppersonality
+package com.duckduckgo.common.ui.experiments.visual
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -36,27 +36,12 @@ interface AppPersonalityFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
-    /**
-     * @return `true` when the remote config has the global "trackersBlockedAnimation" appPersonality
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
     @Toggle.DefaultValue(false)
-    fun trackersBlockedAnimation(): Toggle
+    fun variant1(): Toggle
 
-    /**
-     * @return `true` when the remote config has the global "launchScreenAnimation" appPersonality
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
     @Toggle.DefaultValue(false)
-    fun launchScreenAnimation(): Toggle
+    fun variant2(): Toggle
 
-    /**
-     * @return `true` when the remote config has the global "tabSwitcherResonance" appPersonality
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
     @Toggle.DefaultValue(false)
-    fun tabSwitcherResonance(): Toggle
+    fun variant3(): Toggle
 }

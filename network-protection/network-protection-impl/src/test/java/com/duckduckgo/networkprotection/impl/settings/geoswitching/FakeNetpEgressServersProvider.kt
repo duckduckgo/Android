@@ -16,11 +16,12 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
+import com.duckduckgo.networkprotection.impl.configuration.EligibleLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 
 class FakeNetpEgressServersProvider : NetpEgressServersProvider {
-    override suspend fun updateServerLocationsAndReturnPreferred(): PreferredLocation? {
+    override suspend fun updateServerLocationsAndReturnPreferred(eligibleLocations: List<EligibleLocation>): PreferredLocation? {
         TODO("Not yet implemented")
     }
 
