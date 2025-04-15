@@ -67,4 +67,16 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
+
+    /**
+     * Returns the DuckChat AddressBarSettings.
+     */
+    fun getAddressBarSettings(): AddressBarSettings
 }
+
+data class AddressBarSettings(
+    val isAnimationEnabled: Boolean,
+    val changeBoundsDuration: Long,
+    val fadeDuration: Long,
+    val tension: Float,
+)

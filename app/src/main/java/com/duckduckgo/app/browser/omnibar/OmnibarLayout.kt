@@ -219,13 +219,13 @@ open class OmnibarLayout @JvmOverloads constructor(
             ordering = TransitionSet.ORDERING_TOGETHER
             addTransition(
                 ChangeBounds().apply {
-                    duration = 400
-                    interpolator = OvershootInterpolator(1.3f)
+                    duration = duckChat.getAddressBarSettings().changeBoundsDuration
+                    interpolator = OvershootInterpolator(duckChat.getAddressBarSettings().tension)
                 },
             )
             addTransition(
                 Fade().apply {
-                    duration = 200
+                    duration = duckChat.getAddressBarSettings().fadeDuration
                     addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
@@ -566,7 +566,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
-        if (!isInitialRender && newButtonState != previousButtonState && !viewState.isLoading) {
+        if (duckChat.getAddressBarSettings().isAnimationEnabled && !isInitialRender && newButtonState != previousButtonState && !viewState.isLoading) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
 

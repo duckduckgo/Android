@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.AddressBarSettings
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -93,6 +94,11 @@ data class DuckChatSettingJson(
     val aiChatURL: String?,
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
+    val addressBarEntryPoint: Boolean,
+    val addressBarAnimation: Boolean,
+    val addressBarChangeBoundsDuration: Long,
+    val addressBarFadeDuration: Long,
+    val addressBarTension: Float,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -123,6 +129,13 @@ class RealDuckChat @Inject constructor(
     private var showInAddressBar = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
+    private var isAddressBarEntryPointEnabled: Boolean = false
+    private var addressBarSettings = AddressBarSettings(
+        isAnimationEnabled = false,
+        changeBoundsDuration = 400L,
+        fadeDuration = 200L,
+        tension = 1.3F,
+    )
 
     init {
         if (isMainProcess) {
@@ -142,12 +155,12 @@ class RealDuckChat @Inject constructor(
         }
 
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
-        cacheSettings()
+        cacheUserSettings()
     }
 
     override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) {
         duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
-        cacheSettings()
+        cacheUserSettings()
     }
 
     override fun isEnabled(): Boolean {
@@ -190,7 +203,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun showInAddressBar(): Boolean {
-        return showInAddressBar
+        return showInAddressBar && isAddressBarEntryPointEnabled
     }
 
     override fun openDuckChat(query: String?) {
@@ -286,6 +299,10 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.wasOpenedBefore()
     }
 
+    override fun getAddressBarSettings(): AddressBarSettings {
+        return addressBarSettings
+    }
+
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
@@ -300,11 +317,18 @@ class RealDuckChat @Inject constructor(
                     val bangAlternation = bangs.joinToString("|") { it }
                     bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
                 }
-            cacheSettings()
+            isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
+            addressBarSettings = AddressBarSettings(
+                isAnimationEnabled = settingsJson?.addressBarAnimation ?: false,
+                changeBoundsDuration = settingsJson?.addressBarChangeBoundsDuration ?: 400L,
+                fadeDuration = settingsJson?.addressBarFadeDuration ?: 200L,
+                tension = settingsJson?.addressBarTension ?: 1.3F,
+            )
+            cacheUserSettings()
         }
     }
 
-    private fun cacheSettings() {
+    private fun cacheUserSettings() {
         showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
     }
