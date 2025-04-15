@@ -87,6 +87,7 @@
                             android:paddingStart="@dimen/keyline_4"
                             android:saveEnabled="false"
                             android:scaleType="centerCrop"
+                            android:layout_marginEnd="@dimen/keyline_1"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
                             app:layout_constraintTop_toTopOf="parent"
@@ -114,19 +115,21 @@
 
                             <ImageView
                                 android:id="@+id/daxIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_1"
+                                android:scaleType="center"
                                 android:visibility="gone"
                                 app:srcCompat="@drawable/ic_ddg_logo" />
 
                             <ImageView
                                 android:id="@+id/duckPlayerIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
+                                android:scaleType="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_1"
                                 android:visibility="gone"
@@ -151,18 +154,17 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
-                                android:padding="@dimen/toolbarIconPadding"
                                 android:scaleType="center"
                                 android:src="@drawable/ic_arrow_left_24e"
                                 android:visibility="gone" />
 
                             <ImageView
                                 android:id="@+id/globeIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
+                                android:layout_width="@dimen/toolbarIcon"
+                                android:layout_height="@dimen/toolbarIcon"
+                                android:scaleType="center"
                                 android:layout_gravity="center"
                                 android:importantForAccessibility="no"
-                                android:padding="@dimen/keyline_1"
                                 android:visibility="gone"
                                 app:srcCompat="@drawable/ic_globe_20" />
 
@@ -242,6 +244,7 @@
                             android:id="@+id/endIconsContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
+                            android:layout_marginEnd="@dimen/keyline_0"
                             app:layout_constraintEnd_toEndOf="parent">
 
                             <ImageView
