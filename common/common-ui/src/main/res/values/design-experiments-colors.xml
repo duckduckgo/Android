@@ -75,7 +75,4 @@
     <attr name="daxColorFireButtonTwo" format="color"/>
     <attr name="daxColorFireButtonThree" format="color"/>
 
-    <!-- Browser Navigation Bar colors -->
-    <attr name="daxColorNavigationBarIconDisabled" format="color"/>
-
 </resources>
