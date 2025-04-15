@@ -214,7 +214,7 @@ class NewTabSwitcherAdapter(
                         R.string.tabSelectedIndicator,
                     )
                 } else {
-                    holder.selectionIndicator.setImageResource(com.duckduckgo.mobile.android.R.drawable.shape_grey_circle_24_new)
+                    holder.selectionIndicator.setImageResource(com.duckduckgo.mobile.android.R.drawable.shape_grey_circle_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(
                         R.string.tabNotSelectedIndicator,
                     )

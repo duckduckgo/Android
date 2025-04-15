@@ -130,6 +130,8 @@
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
+
+        <item name="tabItemSelectionCircleWidth">2dp</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
