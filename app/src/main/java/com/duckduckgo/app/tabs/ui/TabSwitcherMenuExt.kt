@@ -31,12 +31,13 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Layout
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
 import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
     mainFab: ExtendedFloatingActionButton,
-    aiFab: ExtendedFloatingActionButton,
+    aiFab: FloatingActionButton,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ) {
@@ -69,11 +70,11 @@ fun Menu.createDynamicInterface(
             when (dynamicMenu.mainFabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
-                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24_solid_color)
                 }
                 FabType.CLOSE_TABS -> {
                     text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24_solid_color)
                 }
             }
 
