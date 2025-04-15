@@ -32,6 +32,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -64,6 +65,7 @@ class OmnibarLayoutViewModelTest {
     private val tabRepository: TabRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
+    private val duckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl()
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
@@ -119,6 +121,45 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenViewModelAttachedAndDuckChatAndChatInBrowserEnabledThenDuckChatIconEnabled() = runTest {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        whenever(duckChat.showInBrowserMenu()).thenReturn(true)
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChat)
+        }
+    }
+
+    @Test
+    fun whenViewModelAttachedAndDuckChatOnlyEnabledThenDuckChatIconDisabled() = runTest {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChat)
+        }
+    }
+
+    @Test
+    fun whenViewModelAttachedAndDuckChatDisabledThenDuckChatIconEnabled() = runTest {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChat)
+        }
+    }
+
     private fun initializeViewModel() {
         testee = OmnibarLayoutViewModel(
             tabRepository = tabRepository,
@@ -128,6 +169,7 @@ class OmnibarLayoutViewModelTest {
             duckPlayer = duckPlayer,
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
+            duckChat = duckChat,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
