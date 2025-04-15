@@ -91,7 +91,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi poizvedbo pred iskanjem</string>
-    <string name="settingsAutocompleteEnabled">Pokaži predloge za samodokončanje</string>
     <string name="autocompleteRemoveItemTitle">Želite odstraniti predlog iskanja?</string>
     <string name="autocompleteRemoveItemCancel">Prekliči</string>
     <string name="autocompleteRemoveItemRemove">Odstrani</string>
@@ -135,18 +134,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavitve</string>
     <string name="settingsMenuItemTitle">Nastavitve</string>
-    <string name="settingsHeadingPrivacy">Zasebnost</string>
     <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
-    <string name="settingsHeadingCustomize">Prilagodi</string>
     <string name="settingsHeadingAbout">O nas</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
     <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
-    <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
-    <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Naslednji koraki</string>
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
@@ -162,18 +157,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Onemogočeno</string>
     <string name="settingsSubtitleNotificationsEnabled">Omogočeno</string>
     <string name="settingsDefaultBrowserTitle">Privzet brskalnik</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je vaš privzeti brskalnik</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nastavite DuckDuckGo kot privzet brskalnik</string>
     <string name="settingsPrivateSearchTitle">zasebno iskanje</string>
     <string name="settingsGeneral" instruction="List item for general settings">Splošno</string>
-    <string name="settingsPrivateSearchDescription">Privzeto omogočeno</string>
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="settingsWebTrackingProtectionDescription">Privzeto omogočeno</string>
-    <string name="settingsHeadingSettings">Nastavitve</string>
     <string name="settingsHeadingMainSettings">Druge nastavitve</string>
     <string name="settingsPermissionsSetting">Dovoljenja</string>
     <string name="settingsSyncSetting">Sinhronizacija in varnostno kopiranje</string>
-    <string name="settingsFireButton">Gumb Fire Button</string>
     <string name="settingsDataClearing">Počiščenje podatkov</string>
     <string name="settingsAddWidget">Dodajte pripomoček na domači zaslon</string>
     <string name="settingsAddressBarPosition">Nastavitev položaja naslovne vrstice</string>
@@ -182,9 +171,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">zasebno iskanje</string>
-    <string name="privateSearchTitle">Zasebno iskanje je omogočeno</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
-    <string name="privateSearchHeadingSearchSettings">Nastavitve iskanja</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
@@ -202,15 +189,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Zaščita spletnega sledenja je omogočena</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
-    <string name="cookiePopupProtectionDescription">Odpravite ta pojavna okna in kar najbolj zmanjšajte uporabljene piškotke</string>
-    <string name="cookiePopupProtectionEnabled">Omogočeno</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Gumb Fire Button</string>
@@ -225,7 +208,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
 
-    <string name="settingsAutomaticallyClearWhat">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearData">Samodejno počisti podatke…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
@@ -613,11 +595,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Pripomoček %1$s je bil dodan na domači zaslon</string>
-    <string name="settingsAddHomeScreenWidget">Pripomoček na domačem zaslonu</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
-    <string name="macos_settings_title">Brskalnik DuckDuckGo za računalnike Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
@@ -653,7 +632,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, upravljanje prepusti meni</string>
 
-    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
@@ -662,10 +640,6 @@
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Brskalnik DuckDuckGo za računalnike Windows</string>
-    <string name="windows_settings_description">Brskajte zasebno z našo aplikacijo za sistem Windows</string>
-    <string name="windows_settings_description_ready">Na voljo za prenos</string>
-    <string name="windows_settings_description_list">Na seznamu ste!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Če želite zapustiti celozaslonski prikaz, z vrha zaslona povlecite navzdol in tapnite gumb za nazaj.</string>
@@ -784,7 +758,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Gesla</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Gesla in samodejno izpolnjevanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Geslo je shranjeno</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Geslo je posodobljeno</string>

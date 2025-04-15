@@ -145,7 +145,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -589,7 +590,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    private lateinit var omnibar: Omnibar
+    lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -623,6 +624,20 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+
+    private val tabSwitcherActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Handle any result data if needed
+            result.data?.let { intent ->
+                intent.extras?.let { extras ->
+                    val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
+                    if (!deletedTabIds.isNullOrEmpty()) {
+                        (activity as? BrowserActivity?)?.onTabsDeletedInTabSwitcher(deletedTabIds)
+                    }
+                }
+            }
+        }
+    }
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -998,6 +1013,18 @@ class BrowserTabFragment :
             override fun onForwardButtonClicked() {
                 onForwardArrowClicked()
             }
+
+            override fun onNewTabButtonClicked() {
+                viewModel.onNavigationBarNewTabButtonClicked()
+            }
+
+            override fun onAutofillButtonClicked() {
+                viewModel.onNavigationBarAutofillButtonClicked()
+            }
+
+            override fun onBookmarksButtonClicked() {
+                viewModel.onNavigationBarBookmarksButtonClicked()
+            }
         }
 
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
@@ -1012,9 +1039,7 @@ class BrowserTabFragment :
     private fun configureEditModeChangeDetection() {
         if (swipingTabsFeature.isEnabled) {
             omnibar.isInEditMode.onEach { isInEditMode ->
-                if (isActiveTab) {
-                    browserActivity?.onEditModeChanged(isInEditMode)
-                }
+                browserActivity?.onEditModeChanged(isInEditMode)
             }.launchIn(lifecycleScope)
         }
     }
@@ -1024,7 +1049,7 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonLongPressed() {
-        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+        launch { viewModel.onNewTabMenuItemClicked(longPress = true) }
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -1036,10 +1061,6 @@ class BrowserTabFragment :
         hasFocus: Boolean = true,
     ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
-    }
-
-    private fun onOmnibarNewTabRequested() {
-        viewModel.userRequestedOpeningNewTab()
     }
 
     private fun onOmnibarCustomTabClosed() {
@@ -1061,7 +1082,7 @@ class BrowserTabFragment :
 
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onBrowserMenuClicked()
+        viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -1071,7 +1092,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
-        hideKeyboardImmediately()
+        hideKeyboard()
         voiceSearchLauncher.launch(requireActivity())
     }
 
@@ -1097,10 +1118,20 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
+            BrowserPopupMenu.ResourceType.BOTTOM
+        } else {
+            when (settingsDataStore.omnibarPosition) {
+                TOP -> BrowserPopupMenu.ResourceType.TOP
+                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+            }
+        }
+
         popupMenu = BrowserPopupMenu(
             context = requireContext(),
             layoutInflater = layoutInflater,
-            settingsDataStore.omnibarPosition,
+            popupMenuResourceType = popupMenuResourceType,
         )
         popupMenu.apply {
             onMenuItemClicked(forwardMenuItem) {
@@ -1120,23 +1151,14 @@ class BrowserTabFragment :
                     viewModel.handleMenuRefreshAction()
                 }
             }
-            onMenuItemClicked(refreshLongMenuItem) {
-                viewModel.onRefreshRequested(triggeredByUser = true)
-                if (isActiveCustomTab()) {
-                    viewModel.fireCustomTabRefreshPixel()
-                } else {
-                    viewModel.handleMenuRefreshAction()
-                }
-            }
             onMenuItemClicked(newTabMenuItem) {
-                onOmnibarNewTabRequested()
+                viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(duckChatMenuItem) {
                 viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
-                browserActivity?.launchBookmarks()
-                pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+                viewModel.onBookmarksMenuItemClicked()
             }
             onMenuItemClicked(fireproofWebsiteMenuItem) {
                 viewModel.onFireproofWebsiteMenuClicked()
@@ -1274,11 +1296,17 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        val intent = TabSwitcherActivity.intent(activity, tabId)
+        tabSwitcherActivityResult.launch(intent)
     }
 
     override fun onResume() {
         super.onResume()
+
+        // we need to prevent new tab initialization while clearing data, because it can mess up onboarding state after the process is restarted
+        if (swipingTabsFeature.isEnabled && (requireActivity() as? BrowserActivity)?.isDataClearingInProgress == true) {
+            return
+        }
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
         val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
@@ -1473,6 +1501,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
+        browserNavigationBarIntegration.configureNewTabViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1491,6 +1520,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1503,6 +1533,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1528,6 +1559,7 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
@@ -1617,6 +1649,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibar.setViewMode(ViewMode.SSLWarning)
+        browserNavigationBarIntegration.configureBrowserViewMode()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         maliciousWarningView.gone()
@@ -1981,6 +2014,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -2020,8 +2054,12 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                hideKeyboardImmediately()
+                hideKeyboard()
                 launchPopupMenu(it.anchorToNavigationBar)
+            }
+
+            is Command.LaunchBookmarksActivity -> {
+                browserActivity?.launchBookmarks()
             }
 
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
@@ -2677,6 +2715,10 @@ class BrowserTabFragment :
                 override fun onDuckChatButtonPressed() {
                     onOmnibarDuckChatPressed(omnibar.getText())
                 }
+
+                override fun onBackButtonPressed() {
+                    hideKeyboard()
+                }
             },
         )
     }
@@ -2771,7 +2813,7 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+        val webViewLayout = if (!isActiveCustomTab() && visualDesignExperimentDataStore.getOmnibarType() == FADE) {
             R.layout.include_duckduckgo_browser_experiment_webview
         } else {
             R.layout.include_duckduckgo_browser_webview
@@ -2903,6 +2945,13 @@ class BrowserTabFragment :
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
+        daxBubbleCta.hideDaxBubbleCta(binding)
+        hideDaxBubbleCta()
+        renderer.showNewTab()
+        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
@@ -3439,15 +3488,6 @@ class BrowserTabFragment :
         isDoneCounting: Boolean,
     ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
-    }
-
-    private fun hideKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now hiding")
-            omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
-        }
     }
 
     private fun hideKeyboard() {
@@ -4083,8 +4123,6 @@ class BrowserTabFragment :
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
                 val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)
                 viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(bookmark = bookmark)
-
-                browserNavigationBarIntegration.renderBrowserViewState(viewState)
             }
         }
 
@@ -4149,7 +4187,7 @@ class BrowserTabFragment :
                         hideNewTab()
                     }
 
-                    viewState.daxOnboardingComplete && !viewState.isErrorShowing -> {
+                    viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
                         showNewTab()
                     }
@@ -4178,6 +4216,10 @@ class BrowserTabFragment :
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
+
+                setOnDismissCtaClicked {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                }
             }
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4203,6 +4245,9 @@ class BrowserTabFragment :
                 { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onTypingAnimationFinished,
                 onSuggestedOptionsSelected,
+                {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                },
             )
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
@@ -4277,6 +4322,7 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
+            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }

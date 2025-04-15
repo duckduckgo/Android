@@ -90,7 +90,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
-    <string name="settingsAutocompleteEnabled">Afișează sugestiile de completare automată</string>
     <string name="autocompleteRemoveItemTitle">Dorești să elimini sugestia de căutare?</string>
     <string name="autocompleteRemoveItemCancel">Anulare</string>
     <string name="autocompleteRemoveItemRemove">Elimină</string>
@@ -134,18 +133,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Setări</string>
     <string name="settingsMenuItemTitle">Setări</string>
-    <string name="settingsHeadingPrivacy">Confidențialitate</string>
     <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
-    <string name="settingsHeadingCustomize">Personalizare</string>
     <string name="settingsHeadingAbout">Despre</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Trimite feedback</string>
     <string name="leaveFeedbackNew">Trimite feedback</string>
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
-    <string name="settingsEmailProtectionSubtitle">Blochează tehnologiile de urmărire prin e-mail și ascunde-ți adresa</string>
-    <string name="settingsHeadingMore">Mai multe de la DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Pașii următori</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
@@ -161,18 +156,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Dezactivat</string>
     <string name="settingsSubtitleNotificationsEnabled">Activat</string>
     <string name="settingsDefaultBrowserTitle">Browser implicit</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo este browserul tău implicit</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Setează DuckDuckGo ca browser implicit</string>
     <string name="settingsPrivateSearchTitle">Căutare Confidențială</string>
     <string name="settingsGeneral" instruction="List item for general settings">Generalități</string>
-    <string name="settingsPrivateSearchDescription">Activat în mod implicit</string>
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
-    <string name="settingsHeadingSettings">Setări</string>
     <string name="settingsHeadingMainSettings">Alte Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
-    <string name="settingsFireButton">Butonul Foc</string>
     <string name="settingsDataClearing">Ștergerea datelor</string>
     <string name="settingsAddWidget">Adaugă un widget la ecranul de întâmpinare</string>
     <string name="settingsAddressBarPosition">Setează poziția barei de adrese</string>
@@ -181,9 +170,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Căutare Confidențială</string>
-    <string name="privateSearchTitle">Private Search este activată</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
-    <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
@@ -201,15 +188,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Protecția împotriva urmăririi pe web este activată</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
-    <string name="cookiePopupProtectionDescription">Elimină aceste ferestre pop-up și minimizează modulele cookie</string>
-    <string name="cookiePopupProtectionEnabled">Activat</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
@@ -224,7 +207,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
 
-    <string name="settingsAutomaticallyClearWhat">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearData">Șterge automat datele…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
@@ -612,11 +594,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget adăugat la ecranul de pornire</string>
-    <string name="settingsAddHomeScreenWidget">Widget pe ecranul de pornire</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Browserul DuckDuckGo pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -652,7 +631,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nu, le voi gestiona personal</string>
 
-    <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
     <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 
@@ -661,10 +639,6 @@
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Browserul DuckDuckGo pentru Windows</string>
-    <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
-    <string name="windows_settings_description_ready">Descărcare disponibilă</string>
-    <string name="windows_settings_description_list">Ești pe listă!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trage în jos din partea superioară și atinge butonul înapoi pentru a ieși din ecranul complet</string>
@@ -770,7 +744,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Parole</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Parole și completare automată</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>

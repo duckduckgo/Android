@@ -88,7 +88,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
     <string name="autocompleteRemoveItemTitle">Remove search suggestion?</string>
     <string name="autocompleteRemoveItemCancel">Cancel</string>
     <string name="autocompleteRemoveItemRemove">Remove</string>
@@ -132,18 +131,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
-    <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Appearance</string>
-    <string name="settingsHeadingCustomize">Customize</string>
     <string name="settingsHeadingAbout">About</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="leaveFeedbackNew">Send Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
-    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
-    <string name="settingsHeadingMore">More From DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Next Steps</string>
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
@@ -159,18 +154,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Disabled</string>
     <string name="settingsSubtitleNotificationsEnabled">Enabled</string>
     <string name="settingsDefaultBrowserTitle">Default Browser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
     <string name="settingsPrivateSearchTitle">Private Search</string>
     <string name="settingsGeneral" instruction="List item for general settings">General</string>
-    <string name="settingsPrivateSearchDescription">Enabled by default</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
-    <string name="settingsHeadingSettings">Settings</string>
     <string name="settingsHeadingMainSettings">Other Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Data Clearing</string>
     <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
@@ -179,9 +168,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
-    <string name="privateSearchTitle">Private Search is Enabled</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.</string>
-    <string name="privateSearchHeadingSearchSettings">Search Settings</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
@@ -199,15 +186,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Web Tracking Protection is Enabled</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>
-    <string name="cookiePopupProtectionDescription">Banish these pop-ups &amp; minimize cookies</string>
-    <string name="cookiePopupProtectionEnabled">Enabled</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -222,7 +205,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatically Clear…</string>
     <string name="settingsAutomaticallyClearData">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
@@ -610,11 +592,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget added to home screen</string>
-    <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Mac Browser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -650,7 +629,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">No, I\'ll Manage Them Myself</string>
 
-    <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up Hidden</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies Managed</string>
 
@@ -659,10 +637,6 @@
     <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows Browser</string>
-    <string name="windows_settings_description">Browse privately with our app for Windows</string>
-    <string name="windows_settings_description_ready">Download available</string>
-    <string name="windows_settings_description_list">You\'re on the list!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Drag down from the top and tap the back button to exit full screen</string>
@@ -755,7 +729,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Passwords</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Passwords &amp; Autofill</string>
     <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>

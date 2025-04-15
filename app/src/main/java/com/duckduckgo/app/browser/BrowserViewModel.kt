@@ -67,20 +67,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -152,14 +147,6 @@ class BrowserViewModel @Inject constructor(
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
-
-    val deletableTabsFlow = tabRepository.flowDeletableTabs
-        .map { tabs -> tabs.map { tab -> tab.tabId } }
-        .filter { it.isNotEmpty() }
-        .distinctUntilChanged()
-        .debounce(100.milliseconds)
-        .conflate()
-        .onEach { onDeletableTabsChanged(it) }
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -363,10 +350,7 @@ class BrowserViewModel @Inject constructor(
     fun onBookmarksActivityResult(url: String) {
         if (swipingTabsFeature.isEnabled) {
             launch {
-                val existingTab = tabRepository.flowTabs
-                    .first()
-                    .firstOrNull { tab -> tab.url == url }
-
+                val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
                     command.value = Command.OpenInNewTab(url)
                 } else {
@@ -456,8 +440,8 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    private fun onDeletableTabsChanged(deletableTabs: List<String>) {
-        command.value = ShowUndoDeleteTabsMessage(deletableTabs)
+    fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
+        command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 }
 

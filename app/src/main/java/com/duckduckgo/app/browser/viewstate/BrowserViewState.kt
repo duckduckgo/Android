@@ -58,7 +58,6 @@ data class BrowserViewState(
     val maliciousSiteStatus: MaliciousSiteStatus? = null,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     val showDuckChatOption: Boolean = false,
-    val navigationButtonsVisible: Boolean = true,
 )
 
 sealed class HighlightableButton {

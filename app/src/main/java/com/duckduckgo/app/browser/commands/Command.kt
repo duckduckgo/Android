@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -257,6 +258,7 @@ sealed class Command {
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class HideBrokenSitePromptCta(val brokenSitePromptDialogCta: BrokenSitePromptDialogCta) : Command()
+    data class HideOnboardingDaxBubbleCta(val daxBubbleCta: DaxBubbleCta) : Command()
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     data object AutocompleteItemRemoved : Command()
     object OpenDuckPlayerSettings : Command()
@@ -269,5 +271,6 @@ sealed class Command {
     data object CloseCustomTab : Command()
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
+    data object LaunchBookmarksActivity : Command()
     data object StartTrackersExperimentShieldPopAnimation : Command()
 }

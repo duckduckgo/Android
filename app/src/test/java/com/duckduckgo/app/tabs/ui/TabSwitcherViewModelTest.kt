@@ -156,7 +156,7 @@ class TabSwitcherViewModelTest {
 
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
-        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
+        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
@@ -191,7 +191,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
         )
         testee.command.observeForever(mockCommandObserver)
-        testee.tabItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
+        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
 
     @After
@@ -205,7 +205,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -214,7 +214,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -226,7 +226,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -299,7 +299,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -316,6 +316,17 @@ class TabSwitcherViewModelTest {
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
         assertEquals(testee.selectionViewState.value.mode, Selection())
+    }
+
+    @Test
+    fun whenAllTabsClosedThenCloseAndShowUndoMessageCommandFired() = runTest {
+        prepareSelectionMode()
+
+        val tabIds = tabList.map { it.tabId }
+        testee.onCloseTabsConfirmed(tabIds)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseAndShowUndoMessage(tabIds), commandCaptor.lastValue)
     }
 
     @Test
@@ -517,7 +528,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).deleteTabs(listOf(tab.id))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -615,7 +626,7 @@ class TabSwitcherViewModelTest {
         val tabIdCaptor = argumentCaptor<String>()
         whenever(mockTabRepository.getTab(tabIdCaptor.capture())).thenAnswer { _ -> tabList.first { it.tabId == tabIdCaptor.lastValue } }
 
-        testee.tabItemsLiveData.blockingObserve()
+        testee.tabSwitcherItemsLiveData.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
@@ -626,7 +637,7 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close(), commandCaptor.lastValue)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -636,7 +647,7 @@ class TabSwitcherViewModelTest {
 
         val tabId = tabList.first().tabId
 
-        testee.tabItemsLiveData.blockingObserve()
+        testee.tabSwitcherItemsLiveData.blockingObserve()
         testee.onCloseTabsConfirmed(listOf(tabId))
 
         verify(mockTabRepository).markDeletable(listOf(tabId))
@@ -798,7 +809,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNormalModeAndNoTabsThenVerifyDynamicInterface() {
-        val viewState = SelectionViewState(tabItems = emptyList(), mode = Normal, layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = emptyList(), mode = Normal, layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
@@ -826,7 +837,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndOneNewTabPageThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
@@ -854,7 +865,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
@@ -882,7 +893,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = GRID)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = GRID)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
@@ -910,7 +921,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsListThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Normal, layoutType = LIST)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = LIST)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabVisible = true,
@@ -941,7 +952,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), false),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Selection(emptyList()), layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(emptyList()), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
@@ -972,7 +983,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
@@ -1003,7 +1014,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1"), true),
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
@@ -1035,7 +1046,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", "http://cnn.com"), true),
             SelectableTab(TabEntity("3"), false),
         )
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
@@ -1066,7 +1077,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = SelectionViewState(tabItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabVisible = false,
@@ -1105,7 +1116,7 @@ class TabSwitcherViewModelTest {
         initializeMockTabEntitesData()
         initializeViewModel()
 
-        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(3, items.size)
         assert(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
@@ -1126,7 +1137,7 @@ class TabSwitcherViewModelTest {
         initializeMockTabEntitesData()
         initializeViewModel()
 
-        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(2, items.size)
         items.forEach { item ->
@@ -1146,7 +1157,7 @@ class TabSwitcherViewModelTest {
         initializeMockTabEntitesData()
         initializeViewModel(FakeTabSwitcherDataStore())
 
-        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(2, items.size)
         items.forEach { item ->
@@ -1169,7 +1180,7 @@ class TabSwitcherViewModelTest {
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
 
-        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertTrue(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
     }
@@ -1188,7 +1199,7 @@ class TabSwitcherViewModelTest {
 
         testee.onTrackerAnimationTileNegativeButtonClicked()
 
-        val items = testee.tabItemsLiveData.blockingObserve() ?: listOf()
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
     }
