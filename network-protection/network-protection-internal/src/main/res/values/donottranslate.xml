@@ -29,6 +29,7 @@
     <string name="netpDevSettingConnectionQuality">Connection Quality</string>
     <string name="netpPcapRecording">Enable PCAP recording</string>
     <string name="netpForceRekey">Force Rekey</string>
+    <string name="netpEgressFailure">Simulate egress failure</string>
     <string name="netpUnsafeWifiDetectionPrimary">Unsafe Wi-Fi detection</string>
     <string name="netpUnsafeWifiDetectionByline">Get notified when connected to unsafe Wi-Fi without a VPN.</string>
     <string name="netpBlockMalwarePrimary">Block Malware</string>
