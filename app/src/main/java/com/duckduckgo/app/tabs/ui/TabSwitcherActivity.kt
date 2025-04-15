@@ -86,6 +86,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -351,9 +352,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     dy: Int,
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (dy > 20) {
+                    if (dy.toDp() > FAB_SCROLL_THRESHOLD) {
                         binding.mainFab.shrink()
-                    } else if (dy < -20) {
+                    } else if (dy.toDp() < -FAB_SCROLL_THRESHOLD) {
                         binding.mainFab.extend()
                     }
                 }
@@ -1005,5 +1006,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
+        private const val FAB_SCROLL_THRESHOLD = 7
     }
 }
