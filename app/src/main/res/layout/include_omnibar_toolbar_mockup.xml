@@ -54,7 +54,6 @@
             android:layout_height="match_parent"
             android:gravity="start|center"
             android:maxLines="1"
-            android:layout_marginStart="-2dp"
             android:paddingEnd="8dp"
             android:text="@string/omnibarInputHint"
             android:textColor="?attr/daxColorSecondaryText" />
