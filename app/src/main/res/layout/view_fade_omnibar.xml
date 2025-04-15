@@ -295,6 +295,7 @@
                                 android:background="?daxColorLines"
                                 android:layout_marginStart="5dp"
                                 android:importantForAccessibility="no"
+                                tools:ignore="MissingVerticalDivider"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/aiChat"
                                 app:layout_constraintTop_toTopOf="parent" />
