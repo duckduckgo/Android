@@ -21,6 +21,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -182,11 +183,12 @@ class AppTpRemoteFeaturesStore @Inject constructor(
 
 @ContributesMultibinding(AppScope::class)
 class AppTpTDSPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 
-    override suspend fun getMetrics(): List<MetricsPixel> {
-        val activeToggle = inventory.activeAppTpTdsFlag() ?: return emptyList()
+    override suspend fun getMetrics(): List<MetricsPixel> = withContext(dispatchers.io()) {
+        val activeToggle = inventory.activeAppTpTdsFlag() ?: return@withContext emptyList()
 
-        return listOf(
+        return@withContext listOf(
             MetricsPixel(
                 metric = "selectedRemoveTrackingProtectionFeature",
                 value = "1",
