@@ -39,6 +39,14 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
+     * Checks whether DuckChat should be shown in address bar based on user settings.
+     * Uses cached values - does not perform disk I/O.
+     *
+     * @return true if DuckChat should be shown, false otherwise.
+     */
+    fun showInAddressBar(): Boolean
+
+    /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
     fun openDuckChat(query: String? = null)
@@ -59,4 +67,16 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
+
+    /**
+     * Returns the DuckChat AddressBarSettings.
+     */
+    fun getAddressBarSettings(): AddressBarSettings
 }
+
+data class AddressBarSettings(
+    val isAnimationEnabled: Boolean,
+    val changeBoundsDuration: Long,
+    val fadeDuration: Long,
+    val tension: Float,
+)

@@ -26,7 +26,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,13 +41,18 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val showInBrowserMenu: Boolean = false,
+        val showInAddressBar: Boolean = false,
     )
 
-    val viewState = duckChat.observeShowInBrowserMenuUserSetting()
-        .map { showInBrowserMenu ->
-            ViewState(showInBrowserMenu)
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    val viewState = combine(
+        duckChat.observeShowInBrowserMenuUserSetting(),
+        duckChat.observeShowInAddressBarUserSetting(),
+    ) { showInBrowserMenu, showInAddressBar ->
+        ViewState(
+            showInBrowserMenu = showInBrowserMenu,
+            showInAddressBar = showInAddressBar,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
         data class OpenLearnMore(val learnMoreLink: String) : Command()
@@ -59,9 +64,19 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setShowInAddressBarUserSetting(checked)
+        }
+    }
+
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
         }
+    }
+
+    fun isAddressBarEntryPointEnabled(): Boolean {
+        return duckChat.isAddressBarEntryPointEnabled()
     }
 }
