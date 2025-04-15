@@ -195,7 +195,7 @@
                     android:textSize="16sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/spacer"
+                    app:layout_constraintEnd_toStartOf="@id/spacer1X"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -234,7 +234,7 @@
                 </LinearLayout>
 
                 <FrameLayout
-                    android:id="@+id/spacer"
+                    android:id="@+id/spacer1X"
                     android:layout_width="32dp"
                     android:layout_height="match_parent"
                     android:visibility="gone"

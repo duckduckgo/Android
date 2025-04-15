@@ -212,8 +212,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-    internal val spacer: FrameLayout by lazy { findViewById(R.id.spacer) }
-    internal val spacer2X: FrameLayout by lazy { findViewById(R.id.spacer2X) }
+    internal val spacer1X: FrameLayout? by lazy { findViewById(R.id.spacer1X) }
+    internal val spacer2X: FrameLayout? by lazy { findViewById(R.id.spacer2X) }
     internal val omniBarButtonTransitionSet: TransitionSet by lazy {
         TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
@@ -572,16 +572,16 @@ open class OmnibarLayout @JvmOverloads constructor(
 
         if (!newButtonState.showVoiceSearch) {
             clearTextButton.isInvisible = !newButtonState.showClearButton
-            spacer.isVisible = newButtonState.showSpacer
-            spacer2X.isVisible = false
+            spacer1X?.isVisible = newButtonState.showSpacer
+            spacer2X?.isVisible = false
         } else {
             clearTextButton.isVisible = newButtonState.showClearButton
             if (newButtonState.showClearButton) {
-                spacer2X.isVisible = newButtonState.showSpacer
-                spacer.isVisible = false
+                spacer2X?.isVisible = newButtonState.showSpacer
+                spacer1X?.isVisible = false
             } else {
-                spacer.isVisible = newButtonState.showSpacer
-                spacer2X.isVisible = false
+                spacer1X?.isVisible = newButtonState.showSpacer
+                spacer2X?.isVisible = false
             }
         }
         voiceSearchButton.isInvisible = !newButtonState.showVoiceSearch

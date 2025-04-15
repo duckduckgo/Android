@@ -196,7 +196,7 @@
                     android:textSize="16sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/secondaryButtonContainer"
+                    app:layout_constraintEnd_toStartOf="@id/spacer1X"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -233,6 +233,24 @@
                         tools:visibility="visible" />
 
                 </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/spacer1X"
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/spacer2X"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <FrameLayout
+                    android:id="@+id/spacer2X"
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
