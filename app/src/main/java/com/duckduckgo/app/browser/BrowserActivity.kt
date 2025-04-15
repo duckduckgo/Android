@@ -85,6 +85,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -698,7 +699,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchSettings() {
-        startActivity(SettingsActivity.intent(this))
+        globalActivityStarter.start(this, SettingsScreenNoParams)
     }
 
     fun launchSitePermissionsSettings() {
