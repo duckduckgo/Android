@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Viska viis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu Fire Button 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
