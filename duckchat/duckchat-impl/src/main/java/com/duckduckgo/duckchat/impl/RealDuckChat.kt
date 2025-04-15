@@ -88,6 +88,11 @@ interface DuckChatInternal : DuckChat {
      * Calls onClose when a close event is emitted.
      */
     fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
+
+    /**
+     * Returns whether address bar entry point is enabled or not.
+     */
+    fun isAddressBarEntryPointEnabled(): Boolean
 }
 
 data class DuckChatSettingJson(
@@ -196,6 +201,10 @@ class RealDuckChat @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun isAddressBarEntryPointEnabled(): Boolean {
+        return isAddressBarEntryPointEnabled
     }
 
     override fun showInBrowserMenu(): Boolean {

@@ -590,7 +590,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = newButtonState.showBrowserMenu
         browserMenuHighlight.isVisible = newButtonState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newButtonState.showChatMenu
-        toolbarContainer.requestLayout()
+
+        if (duckChat.getAddressBarSettings().isAnimationEnabled) {
+            toolbarContainer.requestLayout()
+        }
 
         isInitialRender = false
         previousButtonState = newButtonState

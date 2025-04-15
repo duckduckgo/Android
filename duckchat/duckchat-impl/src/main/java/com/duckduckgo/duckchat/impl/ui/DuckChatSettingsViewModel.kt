@@ -75,4 +75,8 @@ class DuckChatSettingsViewModel @Inject constructor(
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
         }
     }
+
+    fun isAddressBarEntryPointEnabled() : Boolean {
+        return duckChat.isAddressBarEntryPointEnabled()
+    }
 }

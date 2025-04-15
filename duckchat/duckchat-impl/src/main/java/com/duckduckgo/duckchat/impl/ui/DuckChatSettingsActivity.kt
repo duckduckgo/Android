@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -73,6 +74,8 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+
+        binding.showDuckChatInAddressBarToggle.isVisible = viewModel.isAddressBarEntryPointEnabled()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
     }
