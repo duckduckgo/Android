@@ -15,7 +15,19 @@ tags:
           text: "search or type URL"
       - inputText: "https://duckduckgo.com/pro"
       - pressKey: Enter
-      - assertVisible:
-          text: "Privacy Pro"
-      - assertVisible:
-          text: "Subscribe to Privacy Pro"
+      - runFlow:
+          when:
+            visible:
+              text: "Privacy Pro"
+          commands:
+            - assertVisible:
+                text: "Subscribe to Privacy Pro"
+      - runFlow:
+          when:
+            visible:
+              id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+          commands:
+            - copyTextFrom:
+                id: "omnibarTextInput"
+            - assertTrue: ${maestro.copiedText == "https://duckduckgo.com/pro"}
+
