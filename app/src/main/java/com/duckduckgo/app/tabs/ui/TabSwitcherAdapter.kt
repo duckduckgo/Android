@@ -63,19 +63,15 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Comp
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import com.duckduckgo.mobile.android.R as AndroidR
-import com.duckduckgo.mobile.android.R as commonR
-import java.io.File
-import java.security.MessageDigest
-import kotlin.Int
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
-private const val GRID_ITEM_HEIGHT_DP = 170
+import java.io.File
+import java.security.MessageDigest
+import com.duckduckgo.mobile.android.R as AndroidR
+import com.duckduckgo.mobile.android.R as CommonR
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -218,10 +214,10 @@ class TabSwitcherAdapter(
         when (tab) {
             is SelectableTab -> {
                 if (tab.isSelected) {
-                    holder.selectionIndicator.setImageResource(commonR.drawable.ic_check_blue_round_24)
+                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_round_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabSelectedIndicator)
                 } else {
-                    holder.selectionIndicator.setImageResource(commonR.drawable.shape_grey_circle_24)
+                    holder.selectionIndicator.setImageResource(CommonR.drawable.shape_grey_circle_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabNotSelectedIndicator)
                 }
                 holder.selectionIndicator.show()
@@ -354,7 +350,9 @@ class TabSwitcherAdapter(
                 outWidth: Int,
                 outHeight: Int,
             ): Resource<Bitmap> {
-                resource.get().height = GRID_ITEM_HEIGHT_DP.toPx()
+                resource.get().height = context.resources.getDimension(
+                    CommonR.dimen.gridItemPreviewHeight,
+                ).toInt()
                 return resource
             }
 

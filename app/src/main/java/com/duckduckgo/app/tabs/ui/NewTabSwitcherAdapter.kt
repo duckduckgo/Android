@@ -60,13 +60,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import java.io.File
-import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
-private const val GRID_ITEM_HEIGHT_DP = 170
+import java.io.File
+import java.security.MessageDigest
+import com.duckduckgo.mobile.android.R as CommonR
 
 class NewTabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -136,7 +135,7 @@ class NewTabSwitcherAdapter(
 
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
-                    stringRes = R.string.trackersBlockedInTheLast7days,
+                    stringRes = com.duckduckgo.app.browser.R.string.trackersBlockedInTheLast7days,
                     totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
                     trackerTextView = holder.binding.infoPanelText,
                 )
@@ -353,7 +352,9 @@ class NewTabSwitcherAdapter(
                 outWidth: Int,
                 outHeight: Int,
             ): Resource<Bitmap> {
-                resource.get().height = GRID_ITEM_HEIGHT_DP.toPx()
+                resource.get().height = context.resources.getDimension(
+                    CommonR.dimen.gridItemPreviewHeightNew,
+                ).toInt()
                 return resource
             }
 
