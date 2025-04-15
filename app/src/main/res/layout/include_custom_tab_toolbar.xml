@@ -45,19 +45,19 @@
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/customTabDuckPlayerIcon"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:importantForAccessibility="no"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
-        app:layout_constraintEnd_toStartOf="@+id/customTabTitle"
-        app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/ic_duckplayer"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/customTabTitle"
+        app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/customTabTitle"
@@ -69,7 +69,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:paddingTop="10dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/customTabDomain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,14 +80,12 @@
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/customTabDomain"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="86dp"
-        android:layout_marginEnd="@dimen/keyline_2"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@id/customTabTitle"
         app:layout_constraintStart_toStartOf="@id/customTabTitle"
         app:layout_constraintTop_toBottomOf="@id/customTabTitle"
@@ -97,16 +95,17 @@
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/customTabDomainOnly"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="86dp"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingTop="10dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/customTabDomain"
+        app:layout_constraintEnd_toEndOf="@id/customTabTitle"
         app:layout_constraintStart_toStartOf="@id/customTabTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body2"
         tools:text="www.example.com"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
