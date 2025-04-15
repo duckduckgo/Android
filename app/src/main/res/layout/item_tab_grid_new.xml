@@ -53,13 +53,14 @@
 
         <ImageView
             android:id="@+id/close"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:contentDescription="@string/closeContentDescription"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/keyline_2"
-            android:background="@drawable/tab_close_button"
-            android:src="@drawable/ic_close_24_tab"
+            android:src="@drawable/ic_close_solid_16"
+            android:background="@drawable/selectable_circular_ripple"
+            app:tint="?attr/daxColorTabHighlight"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
