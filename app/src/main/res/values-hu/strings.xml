@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Adatvédelem engedélyezve a következőhöz: %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Adatvédelem letiltva a következőhöz: %1$s</string>
     <string name="undoSnackbarAction">Visszavonás</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Nyomkövető blokkolva</item>
+        <item quantity="other">Nyomkövetők blokkolva</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Kép letöltése</string>

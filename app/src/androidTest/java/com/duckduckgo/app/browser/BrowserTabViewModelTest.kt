@@ -213,6 +213,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -254,6 +255,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -548,6 +550,9 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
 
+    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -736,6 +741,9 @@ class BrowserTabViewModelTest {
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
+            appPersonalityFeature = fakeAppPersonalityFeature,
+            userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6177,6 +6185,34 @@ class BrowserTabViewModelTest {
 
         verify(mockSiteErrorHandler).assignErrorsAndClearCache(site)
         verify(mockSiteHttpErrorHandler).assignErrorsAndClearCache(site)
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        // Variant 2 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished()
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        // Variant 3 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished()
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {
