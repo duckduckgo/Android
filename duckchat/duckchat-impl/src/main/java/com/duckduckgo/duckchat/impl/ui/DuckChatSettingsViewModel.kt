@@ -76,7 +76,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
-    fun isAddressBarEntryPointEnabled() : Boolean {
+    fun isAddressBarEntryPointEnabled(): Boolean {
         return duckChat.isAddressBarEntryPointEnabled()
     }
 }
