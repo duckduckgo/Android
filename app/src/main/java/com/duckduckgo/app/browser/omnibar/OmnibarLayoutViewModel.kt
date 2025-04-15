@@ -506,6 +506,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                showChat = shouldShowAIChat(),
             )
         }
     }
