@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Batti cinque!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Sono già stato qui prima</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Ho capito! Salterò gli altri suggerimenti.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ricorda: puoi eliminare tutte le schede, la cronologia e i dati di navigazione con due tocchi sul pulsante Fire Button 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Mostra il tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
