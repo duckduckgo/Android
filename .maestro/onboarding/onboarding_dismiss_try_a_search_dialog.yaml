@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "Onboarding: Ensuring we can navigate through pre-onboarding flow"
+name: "Onboarding: Ensuring we can navigate through pre-onboarding flow and dismissing the fire dialog"
 tags:
   - onboardingTest
 ---

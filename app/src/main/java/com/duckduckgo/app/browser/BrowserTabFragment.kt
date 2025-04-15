@@ -582,7 +582,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    private lateinit var omnibar: Omnibar
+    lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -616,6 +616,20 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+
+    private val tabSwitcherActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Handle any result data if needed
+            result.data?.let { intent ->
+                intent.extras?.let { extras ->
+                    val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
+                    if (!deletedTabIds.isNullOrEmpty()) {
+                        (activity as? BrowserActivity?)?.onTabsDeletedInTabSwitcher(deletedTabIds)
+                    }
+                }
+            }
+        }
+    }
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -1024,7 +1038,7 @@ class BrowserTabFragment :
 
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onBrowserMenuClicked()
+        viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -1060,8 +1074,8 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            // when bottom navigation bar is enabled, we always inflate the popup menu from the bottom
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
             when (settingsDataStore.omnibarPosition) {
@@ -1232,11 +1246,17 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        val intent = TabSwitcherActivity.intent(activity, tabId)
+        tabSwitcherActivityResult.launch(intent)
     }
 
     override fun onResume() {
         super.onResume()
+
+        // we need to prevent new tab initialization while clearing data, because it can mess up onboarding state after the process is restarted
+        if (swipingTabsFeature.isEnabled && (requireActivity() as? BrowserActivity)?.isDataClearingInProgress == true) {
+            return
+        }
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
         val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
@@ -2736,7 +2756,7 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
+        val webViewLayout = if (!isActiveCustomTab() && visualDesignExperimentDataStore.getOmnibarType() == FADE) {
             R.layout.include_duckduckgo_browser_experiment_webview
         } else {
             R.layout.include_duckduckgo_browser_webview

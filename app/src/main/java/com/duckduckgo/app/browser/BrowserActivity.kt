@@ -35,9 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -76,7 +74,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -85,6 +82,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -102,7 +100,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -254,6 +252,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
+    var isDataClearingInProgress: Boolean = false
+
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
@@ -335,12 +335,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         }
                     }
                 }
-            }
-        }
-
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            lifecycleScope.launch {
-                viewModel.deletableTabsFlow.flowWithLifecycle(lifecycle, RESUMED).collect()
             }
         }
     }
@@ -651,18 +645,31 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {
-        TabSwitcherSnackbar(
-            anchorView = binding.fragmentContainer,
-            message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
-            action = getString(R.string.tabClosedUndo),
-            showAction = true,
-            onAction = { viewModel.undoDeletableTabs(tabIds) },
-            onDismiss = { viewModel.purgeDeletableTabs() },
-        ).show()
+        lifecycleScope.launch {
+            // allow the tab fragment to initialize for the snackbar
+            delay(500)
+
+            val anchorView = when (settingsDataStore.omnibarPosition) {
+                TOP -> binding.fragmentContainer
+                BOTTOM -> currentTab?.omnibar?.newOmnibar ?: binding.fragmentContainer
+            }
+            TabSwitcherSnackbar(
+                anchorView = anchorView,
+                message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+                action = getString(R.string.tabClosedUndo),
+                showAction = true,
+                onAction = { viewModel.undoDeletableTabs(tabIds) },
+                onDismiss = { viewModel.purgeDeletableTabs() },
+            ).show()
+        }
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
+    }
+
+    fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
+        viewModel.onTabsDeletedInTabSwitcher(tabIds)
     }
 
     fun clearTabsAndRecreate() {
@@ -683,19 +690,20 @@ open class BrowserActivity : DuckDuckGoActivity() {
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
         )
-        dialog.clearStarted = {
-            removeObservers()
-        }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
             pixel.fire(FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
+        dialog.clearStarted = {
+            isDataClearingInProgress = true
+            removeObservers()
+        }
         dialog.show()
     }
 
     fun launchSettings() {
-        startActivity(SettingsActivity.intent(this))
+        globalActivityStarter.start(this, SettingsScreenNoParams)
     }
 
     fun launchSitePermissionsSettings() {

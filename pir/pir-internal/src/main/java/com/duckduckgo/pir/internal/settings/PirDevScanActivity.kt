@@ -52,7 +52,6 @@ import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker.Companion.T
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.db.Address
 import com.duckduckgo.pir.internal.store.db.EventType
@@ -122,19 +121,12 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private fun render(results: List<ScanResult>) {
         val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
-        val allError = results.filterIsInstance<ErrorResult>()
         val brokersWithRecords = allExtracted.filter {
             it.extractResults.isNotEmpty() && it.extractResults.any { result ->
                 result.result
             }
         }
         val brokersWithRecordsCount = brokersWithRecords.size
-
-        val brokersWithNoRecords = allExtracted.filter {
-            it.extractResults.isEmpty() || it.extractResults.none { result ->
-                result.result
-            }
-        }.size + allError.size
 
         val totalRecordCount = brokersWithRecords.sumOf {
             it.extractResults.filter { result -> result.result }.size
@@ -145,8 +137,6 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 getString(R.string.pirStatsStatusRecords, totalRecordCount)
             this.statusTotalBrokersFound.text =
                 getString(R.string.pirStatsStatusBrokerFound, brokersWithRecordsCount)
-            this.statusTotalAllClear.text =
-                getString(R.string.pirStatsStatusAllClear, brokersWithNoRecords)
             recordStringBuilder.clear()
 
             recordStringBuilder.append("\nRecords found:\n")
@@ -167,17 +157,17 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                     repository.replaceUserProfile(
                         UserProfile(
                             userName = UserName(
-                                firstName = binding.profileFirstName.text,
-                                middleName = binding.profileMiddleName.text.ifBlank {
+                                firstName = binding.profileFirstName.text.trim(),
+                                middleName = binding.profileMiddleName.text.trim().ifBlank {
                                     null
                                 },
-                                lastName = binding.profileLastName.text,
+                                lastName = binding.profileLastName.text.trim(),
                             ),
                             addresses = Address(
-                                city = binding.profileCity.text,
-                                state = binding.profileState.text,
+                                city = binding.profileCity.text.trim(),
+                                state = binding.profileState.text.trim(),
                             ),
-                            birthYear = binding.profileBirthYear.text.toInt(),
+                            birthYear = binding.profileBirthYear.text.trim().toInt(),
                         ),
                     )
                 }

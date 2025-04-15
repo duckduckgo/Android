@@ -105,8 +105,11 @@ import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
+import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -540,6 +543,11 @@ class BrowserTabViewModelTest {
     private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
 
+    private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
+    private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
+    private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -655,6 +663,8 @@ class BrowserTabViewModelTest {
             defaultVisualExperimentNavBarStateFlow,
         )
 
+        whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
+
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
@@ -723,6 +733,9 @@ class BrowserTabViewModelTest {
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
+            siteErrorHandler = mockSiteErrorHandler,
+            siteHttpErrorHandler = mockSiteHttpErrorHandler,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4917,8 +4930,29 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+    fun whenErrorHandlerKilledAndPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+        whenever(mockSiteErrorHandlerKillSwitchToggle.isEnabled()).thenReturn(false)
         testee.recordHttpErrorCode(statusCode = 404, url = "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
+            url = "example2.com",
+            httpErrorCodes = listOf(404),
+            hasBrowserError = false,
+        )
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+        val siteCaptor = argumentCaptor<Site>()
+        whenever(mockSiteHttpErrorHandler.assignErrorsAndClearCache(siteCaptor.capture())).then {
+            siteCaptor.lastValue.onHttpErrorDetected(404)
+        }
 
         updateUrl(
             originalUrl = "example.com",
@@ -6083,6 +6117,66 @@ class BrowserTabViewModelTest {
             assertEquals(cta, this.onboardingCta)
         }
         verify(mockPixel).fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_SERP_CTA))
+    }
+
+    @Test
+    fun whenRecordErrorCodeThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "some.domain"
+        val errorValue = "error value"
+
+        testee.recordErrorCode(url = errorUrl, error = errorValue)
+
+        verify(mockSiteErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordHttpErrorCodeThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "some.domain"
+        val errorValue = -1
+
+        testee.recordHttpErrorCode(url = errorUrl, statusCode = errorValue)
+
+        verify(mockSiteHttpErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordErrorCodeNotMatchingCurrentSiteThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "error.com"
+        val errorValue = "error value"
+
+        testee.recordErrorCode(url = errorUrl, error = errorValue)
+
+        verify(mockSiteErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordHttpErrorCodeNotMatchingCurrentSiteThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "error.com"
+        val errorValue = -1
+
+        testee.recordHttpErrorCode(url = errorUrl, statusCode = errorValue)
+
+        verify(mockSiteHttpErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenSiteLoadedThenAssignCachedErrors() {
+        val site = givenCurrentSite("some.domain")
+
+        verify(mockSiteErrorHandler).assignErrorsAndClearCache(site)
+        verify(mockSiteHttpErrorHandler).assignErrorsAndClearCache(site)
     }
 
     private fun aCredential(): LoginCredentials {

@@ -66,22 +66,10 @@ class BrowserNavigationBarViewModel @Inject constructor(
         visualDesignExperimentDataStore.navigationBarState,
     ) { state, isCustomTab, tabs, navigationBarState ->
         state.copy(
-            isVisible = navigationBarState.isEnabled,
+            isVisible = navigationBarState.isEnabled && !isCustomTab,
             tabsCount = tabs.size,
             shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
-        ).let { newState ->
-            if (isCustomTab) {
-                newState.copy(
-                    newTabButtonVisible = false,
-                    autofillButtonVisible = false,
-                    bookmarksButtonVisible = false,
-                    fireButtonVisible = false,
-                    tabsButtonVisible = false,
-                )
-            } else {
-                newState
-            }
-        }
+        )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     fun onFireButtonClicked() {

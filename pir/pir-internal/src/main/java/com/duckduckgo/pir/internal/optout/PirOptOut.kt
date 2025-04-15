@@ -28,7 +28,7 @@ import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJob
-import com.duckduckgo.pir.internal.common.getMaximumParallelRunners
+import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
@@ -184,11 +184,10 @@ class RealPirOptOut @Inject constructor(
             pirCssScriptLoader.getScript()
         }
 
-        val coreCount = getMaximumParallelRunners()
-        maxWebViewCount = if (brokers.size <= coreCount) {
+        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
             brokers.size
         } else {
-            coreCount
+            MAX_DETACHED_WEBVIEW_COUNT
         }
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
