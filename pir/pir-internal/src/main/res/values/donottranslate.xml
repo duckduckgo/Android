@@ -36,7 +36,6 @@
     <string name="pirStatsStatusScanned" instruction="Placeholder is an integer">Sites Scanned: %1$d</string>
     <string name="pirStatsStatusRecords" instruction="Placeholder is an integer">Total extracted profiles: %1$d</string>
     <string name="pirStatsStatusBrokerFound" instruction="Placeholder is an integer">Brokers with records: %1$d</string>
-    <string name="pirStatsStatusAllClear" instruction="Placeholder is an integer">Brokers with NO records: %1$d</string>
     <string name="pirStatsStatusError" instruction="Placeholder is an integer">Errors: %1$d</string>
     <string name="pirNotificationTitle">Pir Manual Scan</string>
     <string name="pirNotificationMessageInProgress">Manual scan is currently in progress…</string>
