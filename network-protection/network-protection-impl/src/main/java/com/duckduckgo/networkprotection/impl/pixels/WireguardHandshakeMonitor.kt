@@ -99,7 +99,7 @@ class WireguardHandshakeMonitor @Inject constructor(
             while (isActive && networkProtectionState.isEnabled()) {
                 val nowSeconds = Instant.now().epochSecond
                 val lastHandshakeEpocSeconds = wgProtocol.getStatistics().lastHandshakeEpochSeconds
-                logcat { "Handshake monitoring $lastHandshakeEpocSeconds" }
+                logcat { "Handshake monitoring $lastHandshakeEpocSeconds, attempts ${attemptsWithZeroHandshakeEpoc.get()}" }
                 if (lastHandshakeEpocSeconds > 0 || attemptsWithZeroHandshakeEpoc.compareAndSet(MAX_ATTEMPTS_WITH_NO_HS_EPOC, 0)) {
                     attemptsWithZeroHandshakeEpoc.set(0) // reset in case lastHandshakeEpocSeconds > 0
 
@@ -136,8 +136,9 @@ class WireguardHandshakeMonitor @Inject constructor(
         // WG handshakes happen every 2min, this means we'd miss 2+ handshakes
         private const val REPORT_TUNNEL_FAILURE_IN_THRESHOLD_MINUTES = 5
 
-        // WG handshakes happen every 2min, this mean 5 handshakes as we test every 1min
-        private const val MAX_ATTEMPTS_WITH_NO_HS_EPOC = 10
+        // We test every 1min, try recovery after 4min
+        // WG handshakes happen every 2min, this mean 4min without handshakes
+        private const val MAX_ATTEMPTS_WITH_NO_HS_EPOC = 4
 
         // WG handshakes happen every 2min
         private const val REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES = 2
