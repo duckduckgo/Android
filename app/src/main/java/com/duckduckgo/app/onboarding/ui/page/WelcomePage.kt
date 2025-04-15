@@ -213,7 +213,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBarText.gone()
                     binding.daxDialogCta.progressBar.gone()
                     binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.secondaryCta.gone()
 
                     val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
