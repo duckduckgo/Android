@@ -52,7 +52,7 @@ interface VpnRemoteFeatures {
     @DefaultValue(false)
     fun allowDnsBlockMalware(): Toggle
 
-    @DefaultValue(true)
+    @DefaultValue(false)
     fun localVpnControllerDns(): Toggle
 }
 
