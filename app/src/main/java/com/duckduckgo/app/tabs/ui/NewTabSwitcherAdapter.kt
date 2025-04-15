@@ -60,12 +60,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.duckduckgo.mobile.android.R as CommonR
+import java.io.File
+import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.security.MessageDigest
-import com.duckduckgo.mobile.android.R as CommonR
 
 class NewTabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,

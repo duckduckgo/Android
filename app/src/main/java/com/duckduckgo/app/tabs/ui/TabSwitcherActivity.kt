@@ -90,7 +90,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -307,7 +306,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             tabsRecycler.paddingLeft,
             tabsRecycler.paddingTop,
             tabsRecycler.paddingRight,
-            bottomPadding.toInt()
+            bottomPadding.toInt(),
         )
     }
 
