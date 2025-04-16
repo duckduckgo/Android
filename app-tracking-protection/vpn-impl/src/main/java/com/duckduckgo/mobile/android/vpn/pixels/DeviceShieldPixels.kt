@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
-import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromAll
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDetail
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
@@ -392,7 +391,11 @@ interface DeviceShieldPixels {
     fun reportPproUpsellRevokedInfoLinkClicked()
 
     /** Fires when the AppTP experiment blocklist fails to download. */
-    fun appTPBlocklistExperimentDownloadFailure(statusCode: Int)
+    fun appTPBlocklistExperimentDownloadFailure(
+        statusCode: Int,
+        experimentName: String,
+        experimentCohort: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -934,12 +937,15 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
     }
 
-    override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params.plus(mapOf("code" to statusCode.toString())))
-            }
-        }
+    override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int, experimentName: String, experimentCohort: String) {
+        firePixel(
+            DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED,
+            mapOf(
+                "code" to statusCode.toString(),
+                "experimentName" to experimentName,
+                "experimentCohort" to experimentCohort,
+            ),
+        )
     }
 
     private fun firePixel(

@@ -17,11 +17,14 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -78,7 +81,11 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
                 logcat { "[AppTP]: Rewrote TDS request URL to $newURL" }
                 chain.proceed(request.url(newURL).build()).also { response ->
                     if (!response.isSuccessful) {
-                        pixel.appTPBlocklistExperimentDownloadFailure(response.code)
+                        pixel.appTPBlocklistExperimentDownloadFailure(
+                            response.code,
+                            activeExperiment.featureName().name,
+                            activeExperiment.getCohort()?.name.toString(),
+                        )
                     }
                 }
             } ?: chain.proceed(request.build())
@@ -89,5 +96,17 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
 
     override fun getInterceptor(): Interceptor {
         return this
+    }
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelParamRemovalPlugin::class,
+)
+object MetricPixelRemovalInterceptor : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName to PixelParameter.removeAll(),
+        )
     }
 }
