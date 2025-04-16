@@ -31,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
@@ -41,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -164,6 +166,18 @@ class AppTPBlockListInterceptorApiPluginTest {
         checkEndpointIntercept("controlUrl", expectedResponseCode = 200)
         verifyNoInteractions(pixel)
     }
+
+    @Test
+    fun `when experiment request fails, sends failure pixel`() {
+         testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+         checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
+         verify(pixel).fire(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName, mapOf(
+                 "code" to "400",
+                 "experimentName" to "atpTdsNextExperimentAnotherTest",
+                 "experimentCohort" to "control",
+             )
+         )
+     }
 
     private fun getUrl(path: String): String = "$APPTP_TDS_BASE_URL$path"
 

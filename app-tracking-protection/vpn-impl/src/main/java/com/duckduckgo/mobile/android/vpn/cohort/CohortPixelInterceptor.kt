@@ -77,6 +77,7 @@ class CohortPixelInterceptor @Inject constructor(
             "m_atp_ev_cpu_usage_above_",
             "m_atp_unprotected_apps_bucket_",
             "m_atp_breakage_report",
+            "m_atp_tds_experiment_download_failed",
         )
     }
 }
