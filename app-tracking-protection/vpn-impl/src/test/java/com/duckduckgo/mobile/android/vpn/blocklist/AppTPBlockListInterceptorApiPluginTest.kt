@@ -169,15 +169,17 @@ class AppTPBlockListInterceptorApiPluginTest {
 
     @Test
     fun `when experiment request fails, sends failure pixel`() {
-         testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
-         checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
-         verify(pixel).fire(DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName, mapOf(
-                 "code" to "400",
-                 "experimentName" to "atpTdsNextExperimentAnotherTest",
-                 "experimentCohort" to "control",
-             )
-         )
-     }
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        checkEndpointIntercept("controlUrl", expectedResponseCode = 400)
+        verify(pixel).fire(
+            DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName,
+            mapOf(
+                "code" to "400",
+                "experimentName" to "atpTdsNextExperimentAnotherTest",
+                "experimentCohort" to "control",
+            ),
+        )
+    }
 
     private fun getUrl(path: String): String = "$APPTP_TDS_BASE_URL$path"
 
