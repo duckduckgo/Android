@@ -127,7 +127,6 @@
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
-        <item name="daxColorOmnibarStroke">?attr/daxColorSurface</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
@@ -154,7 +153,6 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
-        <item name="daxColorSurfaceTransparent">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/gray85</item>
         <item name="daxColorPrimaryText">@color/white84</item>
@@ -236,10 +234,6 @@
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
 
-        <!-- Browser Navigation Bar colors -->
-        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray50</item>
-        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray70</item>
-
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -260,7 +254,6 @@
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
-        <item name="daxColorSurfaceTransparent">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/white</item>
         <item name="daxColorPrimaryText">@color/black84</item>
@@ -341,10 +334,6 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
-
-        <!-- Browser Navigation Bar colors -->
-        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray70</item>
-        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray50</item>
 
     </style>
 

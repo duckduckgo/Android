@@ -17,39 +17,64 @@
 <resources>
 
     <style name="Theme.DuckDuckGo.Dark.Experiment" parent="Theme.DuckDuckGo.Dark">
-        <item name="preferredStatusBarColor">@color/warm_gray90</item>
-        <item name="preferredNavigationBarColor">@color/warm_gray90</item>
-        <item name="daxColorBackground">@color/warm_gray90</item>
-        <item name="daxColorSurface">@color/gray87</item>
-        <item name="daxColorSurfaceTransparent">@color/dark_surface_tertiary</item>
-        <item name="daxColorWindow">@color/warm_gray85</item>
+        <!-- Backgrounds -->
+        <item name="preferredStatusBarColor">@color/background_background_dark</item>
+        <item name="preferredNavigationBarColor">@color/background_background_dark</item>
+        <item name="daxColorBackground">@color/background_background_dark</item>
+        <item name="daxColorSurface">@color/background_surface_dark</item>
+        <item name="daxColorWindow">@color/background_window_dark</item>
+
+        <!-- Text -->
+        <item name="daxColorPrimaryText">@color/text_primary_dark</item>
+        <item name="daxColorSecondaryText">@color/text_secondary_dark</item>
+
+        <!-- Icons -->
+        <item name="daxColorPrimaryIcon">@color/icon_primary_dark</item>
+        <item name="daxColorIconDisabled">@color/text_primary_dark</item>
+        <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
+
+        <!-- Lines-->
+        <item name="daxColorLines">@color/lines_dark</item>
+
+        <!-- Controls -->
+        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
+        <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_dark</item>
+        <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_dark</item>
+
+        <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
-        <item name="daxColorOmnibarStroke">@color/white_12</item>
-        <item name="daxColorControlFillPrimary">@color/dark_controls_fill_primary</item>
-
-        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
-        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
-        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
 
         <item name="tabItemSelectionCircleWidth">1dp</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
-        <item name="preferredStatusBarColor">@color/warm_gray15</item>
-        <item name="preferredNavigationBarColor">@color/warm_gray15</item>
-        <item name="daxColorBackground">@color/warm_gray15</item>
-        <item name="daxColorSurfaceTransparent">@color/light_surface_tertiary</item>
-        <item name="daxColorPrimaryIcon">@color/warm_gray85_84</item>
-        <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
+        <!-- Backgrounds -->
+        <item name="preferredStatusBarColor">@color/background_background_light</item>
+        <item name="preferredNavigationBarColor">@color/background_background_light</item>
+        <item name="daxColorBackground">@color/background_background_light</item>
+        <item name="daxColorSurface">@color/background_surface_light</item>
+        <item name="daxColorWindow">@color/background_window_light</item>
+
+        <!-- Text -->
+        <item name="daxColorPrimaryText">@color/text_primary_light</item>
+        <item name="daxColorSecondaryText">@color/text_secondary_light</item>
+
+        <!-- Icons -->
+        <item name="daxColorPrimaryIcon">@color/icon_primary_light</item>
+        <item name="daxColorSecondaryIcon">@color/icon_secondary_light</item>
+
+        <!-- Lines-->
+        <item name="daxColorLines">@color/lines_light</item>
+
+        <!-- Controls -->
+        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>
+        <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_light</item>
+        <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_light</item>
+
+        <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
-        <item name="daxColorOmnibarStroke">@color/white</item>
-        <item name="daxColorControlFillPrimary">@color/light_controls_fill_primary</item>
-
-        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
-        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
-        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
 
         <item name="tabItemSelectionCircleWidth">1dp</item>
     </style>

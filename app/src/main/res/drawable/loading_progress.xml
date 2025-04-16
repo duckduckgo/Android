@@ -27,7 +27,7 @@
         <clip>
             <shape>
                 <solid
-                    android:color="?colorAccent" />
+                    android:color="?daxColorAccentBlue" />
             </shape>
         </clip>
     </item>
