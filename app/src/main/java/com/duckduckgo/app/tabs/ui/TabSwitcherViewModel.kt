@@ -552,7 +552,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onDuckChatMenuClicked(fromOverflowMenu: Boolean = true) {
+    fun onDuckChatMenuClicked() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
 
