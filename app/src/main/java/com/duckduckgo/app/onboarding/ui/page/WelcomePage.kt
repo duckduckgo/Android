@@ -264,11 +264,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     val ctaDialog3Text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaDialog3Text.html(it)
-
+                    val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                    binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
-                        binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
                         binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
