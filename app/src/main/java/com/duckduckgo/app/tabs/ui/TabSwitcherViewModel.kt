@@ -33,7 +33,6 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICK
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
@@ -568,7 +567,10 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(TAB_MANAGER_INFO_PANEL_TAPPED)
+        pixel.fire(
+            pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
+            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+        )
         command.value = ShowAnimatedTileDismissalDialog
     }
 
@@ -582,12 +584,19 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-            pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to trackerCount.toString()))
+            pixel.fire(
+                pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
+                parameters = mapOf("trackerCount" to trackerCount.toString()) +
+                    senseOfProtectionExperiment.getTabManagerPixelParams(),
+            )
         }
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+        pixel.fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
+            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+        )
     }
 
     private suspend fun getTabItems(

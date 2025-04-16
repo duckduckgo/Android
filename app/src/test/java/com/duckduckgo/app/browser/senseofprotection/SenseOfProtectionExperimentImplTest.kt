@@ -31,6 +31,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
+import org.junit.Assert.assertEquals
 
 class SenseOfProtectionExperimentImplTest {
 
@@ -142,6 +143,65 @@ class SenseOfProtectionExperimentImplTest {
         )
 
         assertFalse(testee.isEnabled(MODIFIED_CONTROL))
+    }
+
+    @Test
+    fun `when user is enrolled in new user experiment then getTabManagerPixelParams returns new user experiment params`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        val params = testee.getTabManagerPixelParams()
+
+        assertEquals(VARIANT_1.cohortName, params["cohort"])
+        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name, params["experiment"])
+    }
+
+    @Test
+    fun `when user is enrolled in existing user experiment then getTabManagerPixelParams returns existing user experiment params`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        val params = testee.getTabManagerPixelParams()
+
+        assertEquals(VARIANT_2.cohortName, params["cohort"])
+        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name, params["experiment"])
+    }
+
+    @Test
+    fun `when user is not enrolled in any experiment then getTabManagerPixelParams returns empty map`() {
+        fakeUserBrowserProperties.setDaysSinceInstalled(30)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = null,
+                cohorts = emptyList(),
+            ),
+        )
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = null,
+                cohorts = emptyList(),
+            ),
+        )
+
+        val params = testee.getTabManagerPixelParams()
+
+        assertTrue(params.isEmpty())
     }
 }
 
