@@ -75,7 +75,7 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
-    fun `when user is new and experiment is enabled for user's cohort then isEnabled returns true`() {
+    fun `when user is new and enrolUserInNewExperimentIfEligible then user is in enrolled`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
             State(
@@ -86,7 +86,9 @@ class SenseOfProtectionExperimentImplTest {
             ),
         )
 
-        assertTrue(testee.isEnabled(cohortName = MODIFIED_CONTROL))
+        testee.enrolUserInNewExperimentIfEligible()
+
+        assertTrue(testee.enrolUserInNewExperimentIfEligible())
     }
 
     @Test
@@ -101,7 +103,7 @@ class SenseOfProtectionExperimentImplTest {
             ),
         )
 
-        assertFalse(testee.isEnabled(MODIFIED_CONTROL))
+        assertFalse(testee.enrolUserInNewExperimentIfEligible())
     }
 
     @Test
@@ -116,53 +118,7 @@ class SenseOfProtectionExperimentImplTest {
             ),
         )
 
-        assertFalse(testee.isEnabled(MODIFIED_CONTROL))
-    }
-
-    @Test
-    fun `when user is existing and not enrolled in new user experiment then isEnabled returns true`() {
-        fakeUserBrowserProperties.setDaysSinceInstalled(29) // just above threshold
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = null,
-                cohorts = cohorts,
-            ),
-        )
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(MODIFIED_CONTROL.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
-        assertTrue(testee.isEnabled(MODIFIED_CONTROL))
-    }
-
-    @Test
-    fun `when user is existing and enrolled in existing user experiment but existing user experiment disabled then isEnabled returns false`() {
-        fakeUserBrowserProperties.setDaysSinceInstalled(100)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = null,
-                cohorts = cohorts,
-            ),
-        )
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
-            State(
-                remoteEnableState = false,
-                enable = false,
-                assignedCohort = State.Cohort(MODIFIED_CONTROL.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
-        assertFalse(testee.isEnabled(MODIFIED_CONTROL))
+        assertFalse(testee.enrolUserInNewExperimentIfEligible())
     }
 
     @Test
