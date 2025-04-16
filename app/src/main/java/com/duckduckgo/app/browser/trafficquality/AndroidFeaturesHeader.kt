@@ -36,8 +36,9 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
 ) : CustomHeadersPlugin {
 
     override fun getHeaders(url: String): Map<String, String> {
+        println("TAG_ANA getHeaders for $url")
         if (isFeatureEnabled() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return when (val result = customHeaderAllowedChecker.isAllowed()) {
+            val result = when (val result = customHeaderAllowedChecker.isAllowed()) {
                 is Allowed -> {
                     val headers = mutableMapOf<String, String>()
                     androidFeaturesHeaderProvider.provide(result.config)?.let { headerValue ->
@@ -53,14 +54,19 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
                     mapOf(X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER to appVersionProvider.provide(isStub = true))
                 }
             }
+            println("TAG_ANA getHeaders result: $result")
+            return result
         } else {
+            println("TAG_ANA getHeaders - feature not enabled or url not duckduckgo")
             return emptyMap()
         }
     }
 
     private fun isFeatureEnabled(): Boolean {
-        return androidBrowserConfigFeature.self().isEnabled() &&
+        val result =  androidBrowserConfigFeature.self().isEnabled() &&
             androidBrowserConfigFeature.featuresRequestHeader().isEnabled()
+        println("TAG_ANA isFeatureEnabled: $result")
+        return result
     }
 
     companion object {

@@ -57,6 +57,8 @@ class RealCustomHeadersProvider @Inject constructor(
         customHeadersPluginPoint.getPlugins().forEach {
             customHeaders.putAll(it.getHeaders(url))
         }
-        return customHeaders.toMap()
+        val result = customHeaders.toMap()
+        println("TAG_ANA getCustomHeaders: $result")
+        return result
     }
 }

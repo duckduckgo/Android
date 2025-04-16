@@ -1145,7 +1145,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
-        return url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+        val result = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+        println("TAG_ANA getUrlHeaders: $result for url: $url")
+        return result
     }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {

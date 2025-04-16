@@ -2915,7 +2915,7 @@ class BrowserTabFragment :
             )
         }
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+        WebView.setWebContentsDebuggingEnabled(true)
     }
 
     private fun screenLock(data: JsCallbackData) {

@@ -65,7 +65,7 @@ android {
         if (project.hasProperty('build-date-time')) {
             buildConfigField "long", "BUILD_DATE_MILLIS", "${System.currentTimeMillis()}"
         } else {
-            buildConfigField "long", "BUILD_DATE_MILLIS", "0"
+            buildConfigField "long", "BUILD_DATE_MILLIS", "${System.currentTimeMillis()}"
         }
 
         namespace 'com.duckduckgo.app.browser'

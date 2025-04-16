@@ -406,6 +406,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
         headers: Map<String, String>,
     ) {
+        println("TAG_ANA loadUrl: $url with headers: $headers")
         webView.loadUrl(url, headers)
     }
 
