@@ -820,7 +820,7 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorer</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Je suis déjà venu(e) ici</string>
     <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[J\'ai compris ! Je vais ignorer les autres conseils.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[N\'oubliez pas : vous pouvez supprimer tous vos onglets, votre historique et vos données de navigation en deux clics avec le Fire Button 🔥]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[N\'oubliez pas : vous pouvez supprimer tous vos onglets, votre historique et vos données de navigation en deux clics avec le <b>Fire Button</b> 🔥]]></string>
     <string name="preOnboardingDaxDialog3SecondaryButton">Afficher le tutoriel</string>
 
     <!-- Appearance settings -->
