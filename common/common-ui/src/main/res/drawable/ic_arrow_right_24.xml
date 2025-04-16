@@ -2,9 +2,8 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="@color/primary_icon_color_selector">
+    android:viewportHeight="24">
   <path
-      android:pathData="M11.293,4.707c-0.39,-0.39 -0.39,-1.024 0,-1.414 0.39,-0.39 1.024,-0.39 1.414,0l8,8c0.39,0.39 0.39,1.024 0,1.414l-8,8c-0.39,0.39 -1.024,0.39 -1.414,0 -0.39,-0.39 -0.39,-1.024 0,-1.414L17.586,13H4c-0.552,0 -1,-0.448 -1,-1s0.448,-1 1,-1h13.586l-6.293,-6.293z"
+      android:pathData="M13.196,4.031a0.75,0.75 0,0 1,1.06 -1.06l7.012,7.011a2.5,2.5 0,0 1,0 3.536l-7.012,7.012a0.75,0.75 0,0 1,-1.06 -1.06l6.969,-6.97H2.75a0.75,0.75 0,0 1,0 -1.5h17.415l-6.97,-6.969Z"
       android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>

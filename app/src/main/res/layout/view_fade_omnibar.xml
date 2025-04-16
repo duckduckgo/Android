@@ -154,7 +154,7 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
-                                android:src="@drawable/ic_arrow_left_24e"
+                                android:src="@drawable/ic_arrow_left_24"
                                 android:visibility="gone" />
 
                             <ImageView

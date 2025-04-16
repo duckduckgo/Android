@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:text="Secondary Large"
             app:daxButtonSize="large"
-            app:icon="@drawable/ic_arrow_down_24" />
+            app:icon="@drawable/ic_arrow_left_24" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/dax_button_secondary_disabled"
