@@ -38,7 +38,9 @@ interface SenseOfProtectionExperiment {
     fun enrolUserInNewExperimentIfEligible(): Boolean
     fun getTabManagerPixelParams(): Map<String, String>
     fun firePrivacyDashboardClickedPixelIfInExperiment()
+    fun isUserEnrolledInAVariantAndExperimentEnabled(): Boolean
     fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean
+    fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean
 }
 
 @ContributesBinding(
@@ -98,13 +100,18 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     override fun firePrivacyDashboardClickedPixelIfInExperiment() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (isUserEnrolledInVariantAndExperimentEnabled()) {
+            if (isUserEnrolledInAVariantAndExperimentEnabled()) {
                 senseOfProtectionPixelsPlugin.getPrivacyDashboardClickedMetric()?.fire()
             }
         }
     }
 
-    private fun isUserEnrolledInVariantAndExperimentEnabled(): Boolean {
+    override fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
+        getNewUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isNewUserExperimentEnabled(MODIFIED_CONTROL) ||
+            getExistingUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isExistingUserExperimentEnabled(MODIFIED_CONTROL)
+
+    // TODO this _might_ be able to be simplified like the isUserEnrolledInModifiedControlCohortAndExperimentEnabled function
+    override fun isUserEnrolledInAVariantAndExperimentEnabled(): Boolean {
         return when {
             isEnrolledInNewUserExperiment() -> {
                 val cohortNameString = senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name

@@ -244,7 +244,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -284,7 +283,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -479,7 +477,6 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
-    private val appPersonalityFeature: AppPersonalityFeature,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
 ) : WebViewClientListener,
     EditSavedSiteListener,
@@ -1043,7 +1040,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -4089,9 +4086,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAnimationFinished() {
         viewModelScope.launch {
-            if (appPersonalityFeature.self().isEnabled() &&
-                (appPersonalityFeature.variant2().isEnabled() || appPersonalityFeature.variant3().isEnabled())
-            ) {
+            if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
                 command.value = StartTrackersExperimentShieldPopAnimation
             }
         }
