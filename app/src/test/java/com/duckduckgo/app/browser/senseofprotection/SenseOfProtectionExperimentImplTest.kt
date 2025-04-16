@@ -22,7 +22,9 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_1
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -32,8 +34,17 @@ import org.junit.Before
 import org.junit.Test
 import java.util.Date
 import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
 class SenseOfProtectionExperimentImplTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    @Mock
+    private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
 
     private lateinit var testee: SenseOfProtectionExperimentImpl
     private lateinit var fakeUserBrowserProperties: FakeUserBrowserProperties
@@ -46,12 +57,21 @@ class SenseOfProtectionExperimentImplTest {
 
     @Before
     fun setup() {
+        MockitoAnnotations.openMocks(this)
+
         fakeUserBrowserProperties = FakeUserBrowserProperties()
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "senseOfProtection",
         ).build().create(SenseOfProtectionToggles::class.java)
-        testee = SenseOfProtectionExperimentImpl(fakeUserBrowserProperties, fakeSenseOfProtectionToggles)
+        testee = SenseOfProtectionExperimentImpl(
+            appCoroutineScope = coroutineTestRule.testScope,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            userBrowserProperties = fakeUserBrowserProperties,
+            senseOfProtectionToggles = fakeSenseOfProtectionToggles,
+            senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
+            pixel = FakePixel(),
+        )
     }
 
     @Test
@@ -205,7 +225,7 @@ class SenseOfProtectionExperimentImplTest {
     }
 }
 
-private class FakeUserBrowserProperties : UserBrowserProperties {
+class FakeUserBrowserProperties : UserBrowserProperties {
 
     private var daysSinceInstall: Long = 0
 
