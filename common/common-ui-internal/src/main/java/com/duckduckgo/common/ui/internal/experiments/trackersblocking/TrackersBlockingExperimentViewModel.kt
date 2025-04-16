@@ -21,11 +21,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +35,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class TrackersBlockingExperimentViewModel@Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val appPersonalityFeature: AppPersonalityFeature,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -57,14 +54,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant1ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(checked))
-            appPersonalityFeature.variant1().setRawStoredState(State(checked))
-
-            if (checked) {
-                visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
-                appPersonalityFeature.variant2().setRawStoredState(State(false))
-                appPersonalityFeature.variant3().setRawStoredState(State(false))
-            }
             updateCurrentState()
         }
     }
@@ -72,14 +61,6 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant2ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(checked))
-            appPersonalityFeature.variant2().setRawStoredState(State(checked))
-
-            if (checked) {
-                visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
-                appPersonalityFeature.variant1().setRawStoredState(State(false))
-                appPersonalityFeature.variant3().setRawStoredState(State(false))
-            }
             updateCurrentState()
         }
     }
@@ -87,27 +68,13 @@ class TrackersBlockingExperimentViewModel@Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onTrackersBlockingVariant3ExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            appPersonalityFeature.self().setRawStoredState(State(checked))
-            appPersonalityFeature.variant3().setRawStoredState(State(checked))
-
-            if (checked) {
-                visualDesignExperimentDataStore.setExperimentStateUserPreference(false)
-                appPersonalityFeature.variant1().setRawStoredState(State(false))
-                appPersonalityFeature.variant2().setRawStoredState(State(false))
-            }
             updateCurrentState()
         }
     }
 
     private fun updateCurrentState() {
         viewModelScope.launch {
-            viewState.update {
-                currentViewState().copy(
-                    variant1 = appPersonalityFeature.variant1().isEnabled(),
-                    variant2 = appPersonalityFeature.variant2().isEnabled(),
-                    variant3 = appPersonalityFeature.variant3().isEnabled(),
-                )
-            }
+            viewState.update { currentViewState() }
         }
     }
 }

@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelp
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -80,7 +81,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -150,7 +150,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
-    lateinit var appPersonalityFeature: AppPersonalityFeature
+    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -495,7 +495,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
+                val isExperimentEnabled = !senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
                 if (isExperimentEnabled) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()
@@ -672,7 +672,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (targetView != null) {
             // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
             val isPrivacyShieldAnimation = targetView == placeholder
-            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
+            val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
@@ -751,7 +751,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
             val shieldIconView = if (viewMode is ViewMode.Browser) {
-                val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
+                val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
                 if (isExperimentEnabled) shieldIconExperiment else shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon

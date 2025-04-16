@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,7 +35,7 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
-    private val appPersonalityFeature: AppPersonalityFeature,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -46,7 +46,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         val protectedShieldDark: Int
         val unprotectedShield: Int
         val unprotectedShieldDark: Int
-        if (appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()) {
+        if (!senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
             protectedShield = R.raw.protected_shield_experiment
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment
