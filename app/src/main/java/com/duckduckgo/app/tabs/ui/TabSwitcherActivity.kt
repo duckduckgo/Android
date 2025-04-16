@@ -327,9 +327,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     dy: Int,
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (dy.toDp() > FAB_SCROLL_THRESHOLD) {
+                    if (dy.toDp(recyclerView.context) > FAB_SCROLL_THRESHOLD) {
                         binding.mainFab.shrink()
-                    } else if (dy.toDp() < -FAB_SCROLL_THRESHOLD) {
+                    } else if (dy.toDp(recyclerView.context) < -FAB_SCROLL_THRESHOLD) {
                         binding.mainFab.extend()
                     }
                 }
