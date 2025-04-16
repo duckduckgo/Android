@@ -117,11 +117,10 @@ fun Menu.createDynamicInterface(
     findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
 
-
     val bottomPadding = if (dynamicMenu.isAIFabVisible) {
         tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewTwoFabsBottomPadding)
     } else if (dynamicMenu.isMainFabVisible) {
-        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewOneFabBottomPadding )
+        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewOneFabBottomPadding)
     } else {
         tabsRecycler.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
     }
