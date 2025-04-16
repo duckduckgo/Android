@@ -17,11 +17,17 @@
 package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
@@ -30,6 +36,7 @@ interface SenseOfProtectionExperiment {
 
     fun isEnabled(cohort: CohortName): Boolean
     fun getTabManagerPixelParams(): Map<String, String>
+    fun firePrivacyDashboardClickedPixelIfInExperiment()
 }
 
 @ContributesBinding(
@@ -38,8 +45,12 @@ interface SenseOfProtectionExperiment {
 )
 @SingleInstanceIn(AppScope::class)
 class SenseOfProtectionExperimentImpl @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
+    private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
+    private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
     override fun isEnabled(cohortName: CohortName): Boolean {
@@ -64,13 +75,47 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
                     "experiment" to getNewUserExperimentName(),
                 )
             }
+
             isEnrolledInExistingUserExperiment() -> {
                 mapOf(
                     "cohort" to (getExistingUserExperimentCohortName() ?: ""),
                     "experiment" to getExistingUserExperimentName(),
                 )
             }
+
             else -> emptyMap()
+        }
+    }
+
+    override fun firePrivacyDashboardClickedPixelIfInExperiment() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (isUserEnrolledInVariantAndExperimentEnabled()) {
+                senseOfProtectionPixelsPlugin.getPrivacyDashboardClickedMetric()?.fire()
+            }
+        }
+    }
+
+    private fun isUserEnrolledInVariantAndExperimentEnabled(): Boolean {
+        return when {
+            isEnrolledInNewUserExperiment() -> {
+                val cohortNameString = senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
+                val cohortName = cohortNameString?.let {
+                    SenseOfProtectionToggles.Cohorts.valueOf(it)
+                } ?: return false
+
+                isNewUserExperimentEnabled(cohortName) && cohortName.isVariantCohort()
+            }
+
+            isEnrolledInExistingUserExperiment() -> {
+                val cohortNameString = senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name
+                val cohortName = cohortNameString?.let {
+                    SenseOfProtectionToggles.Cohorts.valueOf(it)
+                } ?: return false
+
+                isExistingUserExperimentEnabled(cohortName) && cohortName.isVariantCohort()
+            }
+
+            else -> false
         }
     }
 
@@ -100,4 +145,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     private fun getExistingUserExperimentName(): String =
         senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name
+
+    private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
+        pixel.fire(it.pixelName, it.params)
+    }
+
+    private fun SenseOfProtectionToggles.Cohorts?.isVariantCohort(): Boolean = this != MODIFIED_CONTROL &&
+        this in setOf(SenseOfProtectionToggles.Cohorts.VARIANT_1, SenseOfProtectionToggles.Cohorts.VARIANT_2)
 }
