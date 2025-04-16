@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -1462,6 +1461,51 @@ class AutoCompleteApiTest {
                 AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenCurrentTabIsInResultsThenItIsNotShownInSwitchToTabSuggestions() = runTest {
+        val searchTerm = "example"
+
+        val tabs = listOf(
+            TabEntity(tabId = "1", position = 1, title = "example", url = "https://example.com"),
+            TabEntity(tabId = "2", position = 2, title = "other", url = "https://other.com"),
+        )
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(tabs))
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabs[0]))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("example", isNav = false),
+                AutoCompleteServiceRawResult("example.com", isNav = true),
+            ),
+        )
+        var result = testee.autoComplete(searchTerm)
+        var value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabs[1]))
+
+        result = testee.autoComplete(searchTerm)
+        value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "example.com", title = "example", url = "https://example.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )

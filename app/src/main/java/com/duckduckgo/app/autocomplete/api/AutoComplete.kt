@@ -290,7 +290,7 @@ class AutoCompleteApi @Inject constructor(
             if (autocompleteTabsEnabled) {
                 combine(
                     tabRepository.flowTabs,
-                    tabRepository.flowSelectedTab
+                    tabRepository.flowSelectedTab,
                 ) { tabs, selectedTab ->
                     rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
                 }.distinctUntilChanged()
