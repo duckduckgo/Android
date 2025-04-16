@@ -69,7 +69,7 @@ class TabItemDecorator(context: Context, experimentStore: VisualDesignExperiment
         recyclerView: RecyclerView,
         state: RecyclerView.State,
     ) {
-        val adapter = recyclerView.adapter as? TabSwitcherAdapterBase ?: return
+        val adapter = recyclerView.adapter as? TabSwitcherAdapter ?: return
         recyclerView.children.forEach { child ->
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->

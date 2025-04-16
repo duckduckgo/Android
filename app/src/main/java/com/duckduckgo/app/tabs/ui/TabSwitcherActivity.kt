@@ -162,15 +162,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter: TabSwitcherAdapterBase by lazy {
+    private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
             isVisualExperimentEnabled = visualDesignExperimentDataStore.experimentState.value.isEnabled,
-            this,
-            webViewPreviewPersister,
-            this,
-            faviconManager,
-            dispatchers,
-            trackerCountAnimator,
+            itemClickListener = this,
+            webViewPreviewPersister = webViewPreviewPersister,
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            dispatchers = dispatchers,
+            trackerCountAnimator = trackerCountAnimator,
         )
     }
 

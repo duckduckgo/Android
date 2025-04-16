@@ -30,6 +30,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -85,7 +86,7 @@ class TabSwitcherAdapter(
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider,
     private val trackerCountAnimator: TrackerCountAnimator,
-) : TabSwitcherAdapterBase() {
+) : Adapter<ViewHolder>() {
 
     private val list = mutableListOf<TabSwitcherItem>()
     private var isDragging: Boolean = false
@@ -168,7 +169,7 @@ class TabSwitcherAdapter(
     }
 
     @VisibleForTesting
-    override fun createCloseClickListener(
+    fun createCloseClickListener(
         bindingAdapterPosition: () -> Int,
         tabSwitcherListener: TabSwitcherListener,
     ): View.OnClickListener {
@@ -420,41 +421,41 @@ class TabSwitcherAdapter(
         }
     }
 
-    override fun updateData(updatedList: List<TabSwitcherItem>) {
+    fun updateData(updatedList: List<TabSwitcherItem>) {
         val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList, isDragging))
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun getTabSwitcherItem(position: Int): TabSwitcherItem? = list.getOrNull(position)
+    fun getTabSwitcherItem(position: Int): TabSwitcherItem? = list.getOrNull(position)
 
-    override fun getAdapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
+    fun getAdapterPositionForTab(tabId: String?): Int = list.indexOfFirst {
         it is Tab && it.tabEntity.tabId == tabId
     }
 
-    override fun onDraggingStarted() {
+    fun onDraggingStarted() {
         isDragging = true
         updateAnimatedTileAlpha(ANIMATED_TILE_NO_REPLACE_ALPHA)
     }
 
-    override fun onDraggingFinished() {
+    fun onDraggingFinished() {
         isDragging = false
         updateAnimatedTileAlpha(ANIMATED_TILE_DEFAULT_ALPHA)
     }
 
-    override fun onTabMoved(from: Int, to: Int) {
+    fun onTabMoved(from: Int, to: Int) {
         val swapped = list.swap(from, to)
         updateData(swapped)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onLayoutTypeChanged(layoutType: LayoutType) {
+    fun onLayoutTypeChanged(layoutType: LayoutType) {
         this.layoutType = layoutType
         notifyDataSetChanged()
     }
 
-    override fun setAnimationTileCloseClickListener(onClick: () -> Unit) {
+    fun setAnimationTileCloseClickListener(onClick: () -> Unit) {
         onAnimationTileCloseClickListener = onClick
     }
 
