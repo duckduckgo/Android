@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,6 +39,7 @@ interface SenseOfProtectionExperiment {
     fun isEnabled(cohort: CohortName): Boolean
     fun getTabManagerPixelParams(): Map<String, String>
     fun firePrivacyDashboardClickedPixelIfInExperiment()
+    fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean
 }
 
 @ContributesBinding(
@@ -76,6 +78,10 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
             isNewUserExperimentEnabled(cohortName)
         }
     }
+
+    override fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean =
+        getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
+        getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
 
     override fun getTabManagerPixelParams(): Map<String, String> {
         return when {
@@ -161,5 +167,5 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun SenseOfProtectionToggles.Cohorts?.isVariantCohort(): Boolean = this != MODIFIED_CONTROL &&
-        this in setOf(SenseOfProtectionToggles.Cohorts.VARIANT_1, SenseOfProtectionToggles.Cohorts.VARIANT_2)
+        this in setOf(SenseOfProtectionToggles.Cohorts.VARIANT_1, VARIANT_2)
 }
