@@ -35,6 +35,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
@@ -65,6 +66,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Comp
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.mobile.android.R as AndroidR
@@ -392,7 +394,13 @@ class TabSwitcherAdapter(
 
                 glide.load(cachedWebViewPreview)
                     .transition(DrawableTransitionOptions.withCrossFade())
-                    .optionalTransform(fitAndClipBottom())
+                    .optionalTransform(fitAndClipBottom()).let {
+                        if (isVisualExperimentEnabled) {
+                            it.transform(RoundedCorners(10.toPx()))
+                        } else {
+                            it
+                        }
+                    }
                     .into(tabPreview)
             }
         } else {
