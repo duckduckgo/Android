@@ -50,6 +50,7 @@
         android:contentDescription="@string/newTabMenuItem"
         app:layout_anchor="@id/spacer"
         android:layout_gravity="top|end"
+        android:visibility="gone"
         android:src="@drawable/ic_ai_chat_outline_24_solid_color" />
 
     <View
