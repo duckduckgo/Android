@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,7 +34,7 @@ private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
 interface SenseOfProtectionExperiment {
 
-    fun isEnabled(cohort: CohortName): Boolean
+    fun enrolUserInNewExperimentIfEligible(): Boolean
     fun getTabManagerPixelParams(): Map<String, String>
     fun firePrivacyDashboardClickedPixelIfInExperiment()
     fun isMemberOfVariant2Cohort(): Boolean
@@ -64,17 +63,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         }
     }
 
-    override fun isEnabled(cohortName: CohortName): Boolean {
-        return if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-            // A user might have already been enrolled in the new user experiment so we need to check they are not part of a cohort before we can
-            // enroll them into the existing user experiment
-            if (isNotEnrolledInNewUserExperiment()) {
-                isExistingUserExperimentEnabled(cohortName)
-            } else {
-                false
-            }
+    override fun enrolUserInNewExperimentIfEligible(): Boolean {
+        return if (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) {
+            isNewUserExperimentEnabled(cohortName = MODIFIED_CONTROL)
         } else {
-            isNewUserExperimentEnabled(cohortName)
+            false
         }
     }
 
