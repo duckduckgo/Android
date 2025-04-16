@@ -294,7 +294,7 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/browserPopupMenu"
                                 android:scaleType="center"
-                                android:src="@drawable/ic_ai_chat_outline_24"
+                                android:src="@drawable/ic_ai_chat_24"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
