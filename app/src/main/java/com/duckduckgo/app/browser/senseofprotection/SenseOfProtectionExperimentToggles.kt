@@ -17,13 +17,21 @@
 package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Companion.BASE_EXPERIMENT_NAME
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.ConversionWindow
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "senseOfProtection",
+    featureName = BASE_EXPERIMENT_NAME,
 )
 interface SenseOfProtectionToggles {
 
@@ -40,5 +48,37 @@ interface SenseOfProtectionToggles {
         MODIFIED_CONTROL("modifiedControl"), // without grey tracker logos from original animation
         VARIANT_1("variant1"), // Persistent Green Shield + X Trackers Blocked animation
         VARIANT_2("variant2"), // Persistent Green Shield + X Trackers Blocked animation + TabSwitcher animation
+    }
+
+    companion object {
+        internal const val BASE_EXPERIMENT_NAME = "senseOfProtection"
+    }
+}
+
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class SenseOfProtectionPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
+
+    override suspend fun getMetrics(): List<MetricsPixel> {
+        val activeToggle = inventory.activeSenseOfProtectionFlag() ?: return emptyList()
+
+        return listOf(
+            MetricsPixel(
+                metric = METRIC_PRIVACY_DASHBOARD_CLICKED,
+                value = "1",
+                toggle = activeToggle,
+                conversionWindow = (0..7).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
+            ),
+        )
+    }
+
+    companion object {
+        internal const val METRIC_PRIVACY_DASHBOARD_CLICKED = "privacyDashboardClicked"
+    }
+}
+
+suspend fun FeatureTogglesInventory.activeSenseOfProtectionFlag(): Toggle? {
+    return this.getAllTogglesForParent(BASE_EXPERIMENT_NAME).firstOrNull {
+        it.featureName().name.startsWith(BASE_EXPERIMENT_NAME) && it.isEnabled()
     }
 }
