@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
@@ -146,6 +147,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val findInPageVisible: Boolean = false,
+        val findInPageCurrentMatchPosition: Int? = null,
+        val findInPageMatchesCount: Int? = null,
     ) {
 
         val outlineVisible: Boolean = hasFocus || findInPageVisible
@@ -711,7 +714,24 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun hideFindInPage() {
         _viewState.update {
-            it.copy(findInPageVisible = false)
+            it.copy(
+                findInPageVisible = false,
+                findInPageCurrentMatchPosition = null,
+                findInPageMatchesCount = null,
+            )
+        }
+    }
+
+    fun onFindResultReceived(
+        activeMatchOrdinal: Int,
+        numberOfMatches: Int
+    ) {
+        val activePosition = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
+        _viewState.update {
+            it.copy(
+                findInPageCurrentMatchPosition = activePosition,
+                findInPageMatchesCount = numberOfMatches,
+            )
         }
     }
 }

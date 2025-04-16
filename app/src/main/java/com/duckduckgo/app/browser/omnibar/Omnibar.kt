@@ -20,8 +20,10 @@ import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
@@ -46,7 +48,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -54,7 +55,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
@@ -137,15 +137,10 @@ class Omnibar(
     }
 
     interface FindInPageListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
+        fun onFindInPageTextChanged(query: String)
         fun onPreviousSearchItemPressed()
         fun onNextSearchItemPressed()
-        fun onClosePressed()
-        fun onFindInPageTextChanged(query: String)
+        fun onClosed(editText: EditText)
     }
 
     interface TextListener {
@@ -287,21 +282,25 @@ class Omnibar(
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
-        // we could move this to the layout once the refactor is do
-        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
-            listener.onFocusChanged(hasFocus, findInPage.findInPageInput.text.toString())
-        }
+        newOmnibar.configureFindInPage(listener)
+    }
 
-        findInPage.previousSearchTermButton.setOnClickListener { listener.onPreviousSearchItemPressed() }
-        findInPage.nextSearchTermButton.setOnClickListener { listener.onNextSearchItemPressed() }
-        findInPage.closeFindInPagePanel.setOnClickListener { listener.onClosePressed() }
-        findInPage.findInPageInput.replaceTextChangedListener(
-            object : TextChangedWatcher() {
-                override fun afterTextChanged(editable: Editable) {
-                    listener.onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
-                }
-            },
-        )
+    fun openFindInPage() {
+        newOmnibar.showFindInPage()
+        findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
+            findInPage.findInPageInput.showKeyboard()
+        }
+    }
+
+    fun onFindResultReceived(
+        activeMatchOrdinal: Int,
+        numberOfMatches: Int,
+    ) {
+        newOmnibar.onFindResultReceived(activeMatchOrdinal, numberOfMatches)
+    }
+
+    fun closeFindInPage() {
+        newOmnibar.hideFindInPage()
     }
 
     fun renderLoadingViewState(viewState: LoadingViewState) {
@@ -319,32 +318,6 @@ class Omnibar(
 
     fun isPulseAnimationPlaying(): Boolean {
         return newOmnibar.isPulseAnimationPlaying()
-    }
-
-    fun hideFindInPage() {
-        if (newOmnibar.isFindInPageVisible()) {
-            binding.focusDummy.requestFocus()
-            newOmnibar.hideFindInPage()
-            findInPage.findInPageInput.hideKeyboard()
-            findInPage.findInPageInput.text.clear()
-        }
-    }
-
-    fun showFindInPageView(viewState: FindInPageViewState) {
-        if (!newOmnibar.isFindInPageVisible()) {
-            newOmnibar.showFindInPage()
-            findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                findInPage.findInPageInput.showKeyboard()
-            }
-        }
-
-        if (viewState.showNumberMatches) {
-            findInPage.findInPageMatches.text =
-                findInPage.findInPageMatches.context.getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
-            findInPage.findInPageMatches.show()
-        } else {
-            findInPage.findInPageMatches.hide()
-        }
     }
 
     fun setText(text: String) {
@@ -432,6 +405,10 @@ class Omnibar(
         } else {
             null
         }
+    }
+
+    fun onBackPressed(): Boolean {
+        return newOmnibar.onBackPressed()
     }
 }
 

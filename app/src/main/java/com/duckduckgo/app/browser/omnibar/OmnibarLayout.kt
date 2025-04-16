@@ -35,6 +35,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -43,11 +44,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -84,7 +87,9 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -655,12 +660,52 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderFindInPage(viewState: ViewState) {
         findInPage.findInPageContainer.isVisible = viewState.findInPageVisible
+        if (!viewState.findInPageVisible) {
+            findInPage.findInPageInput.text.clear()
+        }
+
+        val currentMatchPosition = viewState.findInPageCurrentMatchPosition
+        val matchesCount = viewState.findInPageMatchesCount
+        if (currentMatchPosition != null && matchesCount != null) {
+            findInPage.findInPageMatches.text =
+                findInPage.findInPageMatches.context.getString(R.string.findInPageMatches, currentMatchPosition, matchesCount)
+            findInPage.findInPageMatches.show()
+        } else {
+            findInPage.findInPageMatches.gone()
+        }
     }
 
-    fun isFindInPageVisible(): Boolean = viewModel.viewState.value.findInPageVisible
+    fun configureFindInPage(listener: FindInPageListener) {
+        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                listener.onClosed(findInPage.findInPageInput)
+            }
+        }
+
+        findInPage.previousSearchTermButton.setOnClickListener { listener.onPreviousSearchItemPressed() }
+        findInPage.nextSearchTermButton.setOnClickListener { listener.onNextSearchItemPressed() }
+        findInPage.closeFindInPagePanel.setOnClickListener {
+            hideFindInPage()
+            // listener.onClosed(findInPage.findInPageInput)
+        }
+        findInPage.findInPageInput.replaceTextChangedListener(
+            object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    listener.onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
+                }
+            },
+        )
+    }
 
     fun showFindInPage() {
         viewModel.showFindInPage()
+    }
+
+    fun onFindResultReceived(
+        activeMatchOrdinal: Int,
+        numberOfMatches: Int,
+    ) {
+        viewModel.onFindResultReceived(activeMatchOrdinal, numberOfMatches)
     }
 
     fun hideFindInPage() {
@@ -888,5 +933,14 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun onAnimationFinished() {
         omnibarTextListener?.onTrackersCountFinished()
+    }
+
+    fun onBackPressed(): Boolean {
+        if (viewModel.viewState.value.findInPageVisible) {
+            hideFindInPage()
+            return true
+        } else {
+            return false
+        }
     }
 }

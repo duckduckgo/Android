@@ -63,6 +63,7 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -141,6 +142,7 @@ import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegra
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
@@ -1169,6 +1171,8 @@ class BrowserTabFragment :
             onMenuItemClicked(findInPageMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                 viewModel.onFindInPageSelected()
+                omnibar.openFindInPage()
+                showKeyboard() // TODO move to onOpened?
             }
             onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
             onMenuItemClicked(brokenSiteMenuItem) {
@@ -1400,13 +1404,6 @@ class BrowserTabFragment :
             },
         )
 
-        viewModel.findInPageViewState.observe(
-            viewLifecycleOwner,
-            Observer {
-                it?.let { renderer.renderFindInPageState(it) }
-            },
-        )
-
         viewModel.accessibilityViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -1419,6 +1416,7 @@ class BrowserTabFragment :
         viewModel.command.observe(
             viewLifecycleOwner,
             Observer {
+                Timber.d("lp_test; processCommand: $it")
                 processCommand(it)
             },
         )
@@ -1675,6 +1673,7 @@ class BrowserTabFragment :
 
     fun submitQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
+        omnibar.closeFindInPage()
     }
 
     private fun navigate(
@@ -1683,7 +1682,7 @@ class BrowserTabFragment :
     ) {
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
-        omnibar.hideFindInPage()
+        omnibar.closeFindInPage()
         webView?.loadUrl(url, headers)
     }
 
@@ -1893,8 +1892,7 @@ class BrowserTabFragment :
             }
 
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
-            is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            is Command.DismissFindInPage -> webView?.findAllAsync("")
+            is Command.DismissFindInPage -> omnibar.closeFindInPage()
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
@@ -2645,14 +2643,9 @@ class BrowserTabFragment :
 
     private fun configureFindInPage() {
         omnibar.configureFindInPage(
-            object : Omnibar.FindInPageListener {
-                override fun onFocusChanged(
-                    hasFocus: Boolean,
-                    query: String,
-                ) {
-                    if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
-                        onFindInPageInputChanged(query)
-                    }
+            object : FindInPageListener {
+                override fun onFindInPageTextChanged(query: String) {
+                    webView?.findAllAsync(query)
                 }
 
                 override fun onPreviousSearchItemPressed() {
@@ -2663,14 +2656,12 @@ class BrowserTabFragment :
                     onFindInPageNextTermPressed()
                 }
 
-                override fun onClosePressed() {
-                    onFindInPageDismissed()
+                override fun onClosed(editText: EditText) {
+                    webView?.findAllAsync("")
+                    hideKeyboard(editText)
+                    binding.focusDummy.requestFocus()
                 }
-
-                override fun onFindInPageTextChanged(query: String) {
-                    onFindInPageInputChanged(query)
-                }
-            },
+            }
         )
     }
 
@@ -2785,20 +2776,12 @@ class BrowserTabFragment :
         binding.focusDummy.requestFocus()
     }
 
-    private fun onFindInPageDismissed() {
-        viewModel.dismissFindInView()
-    }
-
     private fun onFindInPageNextTermPressed() {
         webView?.findNext(true)
     }
 
     private fun onFindInPagePreviousTermPressed() {
         webView?.findNext(false)
-    }
-
-    private fun onFindInPageInputChanged(query: String) {
-        viewModel.userFindingInPage(query)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -3487,7 +3470,7 @@ class BrowserTabFragment :
         numberOfMatches: Int,
         isDoneCounting: Boolean,
     ) {
-        viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
+        omnibar.onFindResultReceived(activeMatchOrdinal, numberOfMatches)
     }
 
     private fun hideKeyboard() {
@@ -3586,7 +3569,7 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
-        return viewModel.onUserPressedBack(isCustomTab)
+        return omnibar.onBackPressed() || viewModel.onUserPressedBack(isCustomTab)
     }
 
     private fun resetWebView() {
@@ -3933,7 +3916,6 @@ class BrowserTabFragment :
 
         private var lastSeenOmnibarViewState: OmnibarViewState? = null
         private var lastSeenLoadingViewState: LoadingViewState? = null
-        private var lastSeenFindInPageViewState: FindInPageViewState? = null
         private var lastSeenBrowserViewState: BrowserViewState? = null
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
@@ -4155,18 +4137,6 @@ class BrowserTabFragment :
             if (viewState.refreshWebView) {
                 Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
                 refresh()
-            }
-        }
-
-        fun renderFindInPageState(viewState: FindInPageViewState) {
-            renderIfChanged(viewState, lastSeenFindInPageViewState) {
-                lastSeenFindInPageViewState = viewState
-
-                if (viewState.visible) {
-                    omnibar.showFindInPageView(viewState)
-                } else {
-                    omnibar.hideFindInPage()
-                }
             }
         }
 
