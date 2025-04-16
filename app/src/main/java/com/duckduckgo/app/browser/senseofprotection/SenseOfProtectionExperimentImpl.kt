@@ -41,6 +41,7 @@ interface SenseOfProtectionExperiment {
     fun isUserEnrolledInAVariantAndExperimentEnabled(): Boolean
     fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean
     fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean
+    fun isMemberOfVariant2Cohort(): Boolean
 }
 
 @ContributesBinding(
@@ -77,6 +78,10 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     override fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean =
         getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
         getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
+
+    override fun isMemberOfVariant2Cohort(): Boolean =
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName ||
+            senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName
 
     override fun getTabManagerPixelParams(): Map<String, String> {
         return when {
