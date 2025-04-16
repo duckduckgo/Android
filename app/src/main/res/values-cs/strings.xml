@@ -850,7 +850,7 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
     <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na Fire Button 🔥]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
     <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
 
     <!-- Appearance settings -->

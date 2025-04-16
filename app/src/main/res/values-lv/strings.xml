@@ -835,7 +835,7 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
     <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem pogai Fire Button 🔥]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
     <string name="preOnboardingDaxDialog3SecondaryButton">Parādīt pamācību</string>
 
     <!-- Appearance settings -->
