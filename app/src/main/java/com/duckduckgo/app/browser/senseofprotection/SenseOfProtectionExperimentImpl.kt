@@ -29,6 +29,7 @@ private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 interface SenseOfProtectionExperiment {
 
     fun isEnabled(cohort: CohortName): Boolean
+    fun getTabManagerPixelParams(): Map<String, String>
 }
 
 @ContributesBinding(
@@ -55,6 +56,30 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         }
     }
 
+    override fun getTabManagerPixelParams(): Map<String, String> {
+        return when {
+            isEnrolledInNewUserExperiment() -> {
+                mapOf(
+                    "cohort" to (getNewUserExperimentCohortName() ?: ""),
+                    "experiment" to getNewUserExperimentName(),
+                )
+            }
+            isEnrolledInExistingUserExperiment() -> {
+                mapOf(
+                    "cohort" to (getExistingUserExperimentCohortName() ?: ""),
+                    "experiment" to getExistingUserExperimentName(),
+                )
+            }
+            else -> emptyMap()
+        }
+    }
+
+    private fun isEnrolledInNewUserExperiment(): Boolean =
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort() != null
+
+    private fun isEnrolledInExistingUserExperiment(): Boolean =
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort() != null
+
     private fun isNotEnrolledInNewUserExperiment(): Boolean =
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort() == null
 
@@ -63,4 +88,16 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
         senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnabled(cohort = cohortName)
+
+    private fun getNewUserExperimentCohortName(): String? =
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
+
+    private fun getNewUserExperimentName(): String =
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name
+
+    private fun getExistingUserExperimentCohortName(): String? =
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name
+
+    private fun getExistingUserExperimentName(): String =
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name
 }
