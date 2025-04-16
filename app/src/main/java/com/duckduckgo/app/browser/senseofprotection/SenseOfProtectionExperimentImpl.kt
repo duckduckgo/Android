@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -52,6 +53,15 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
+
+    init {
+        // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
+        if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
+            if (isNotEnrolledInNewUserExperiment()) {
+                isExistingUserExperimentEnabled(cohortName = MODIFIED_CONTROL)
+            }
+        }
+    }
 
     override fun isEnabled(cohortName: CohortName): Boolean {
         return if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
