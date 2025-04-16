@@ -45,6 +45,7 @@
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
 
+        <item name="tabItemSelectionCircleWidth">1dp</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
@@ -74,6 +75,8 @@
         <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+        <item name="tabItemSelectionCircleWidth">1dp</item>
     </style>
 
 </resources>

@@ -20,6 +20,7 @@ import android.view.Menu
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
@@ -31,11 +32,14 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Layout
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
 import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,
     popupMenu: PopupTabsMenuBinding,
-    fab: ExtendedFloatingActionButton,
+    mainFab: ExtendedFloatingActionButton,
+    aiFab: FloatingActionButton,
+    tabsRecycler: RecyclerView,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ) {
@@ -63,16 +67,16 @@ fun Menu.createDynamicInterface(
         setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
 
-    fab.apply {
-        if (dynamicMenu.isFabVisible) {
-            when (dynamicMenu.fabType) {
+    mainFab.apply {
+        if (dynamicMenu.isMainFabVisible) {
+            when (dynamicMenu.mainFabType) {
                 FabType.NEW_TAB -> {
                     text = resources.getString(R.string.newTabMenuItem)
-                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_add_24_solid_color)
                 }
                 FabType.CLOSE_TABS -> {
                     text = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24)
+                    icon = AppCompatResources.getDrawable(context, commonR.drawable.ic_close_24_solid_color)
                 }
             }
 
@@ -81,6 +85,12 @@ fun Menu.createDynamicInterface(
         } else {
             hide()
         }
+    }
+
+    if (dynamicMenu.isAIFabVisible) {
+        aiFab.show()
+    } else {
+        aiFab.hide()
     }
 
     toolbar.navigationIcon = when (dynamicMenu.backButtonType) {
@@ -106,4 +116,19 @@ fun Menu.createDynamicInterface(
 
     findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
+
+    val bottomPadding = if (dynamicMenu.isAIFabVisible) {
+        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewTwoFabsBottomPadding)
+    } else if (dynamicMenu.isMainFabVisible) {
+        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewOneFabBottomPadding)
+    } else {
+        tabsRecycler.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+    }
+
+    tabsRecycler.setPadding(
+        tabsRecycler.paddingLeft,
+        tabsRecycler.paddingTop,
+        tabsRecycler.paddingRight,
+        bottomPadding.toInt(),
+    )
 }

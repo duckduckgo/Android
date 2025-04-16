@@ -56,6 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -97,6 +98,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
+    visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -126,10 +128,13 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-    ) { viewState, tabSwitcherItems, tabSwitcherData ->
+        visualDesignExperimentDataStore.experimentState,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, experimentState ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
+            isNewVisualDesignEnabled = experimentState.isEnabled,
+            isDuckChatEnabled = duckChat.isEnabled() && duckChat.showInBrowserMenu(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
@@ -519,7 +524,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
-        when (selectionViewState.value.dynamicInterface.fabType) {
+        when (selectionViewState.value.dynamicInterface.mainFabType) {
             FabType.NEW_TAB -> onNewTabRequested()
             FabType.CLOSE_TABS -> onCloseSelectedTabsRequested()
         }
@@ -538,6 +543,14 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
         return@withContext null
+    }
+
+    fun onDuckChatFabClicked() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+
+            duckChat.openDuckChat()
+        }
     }
 
     fun onDuckChatMenuClicked() {
@@ -612,6 +625,8 @@ class TabSwitcherViewModel @Inject constructor(
         val tabSwitcherItems: List<TabSwitcherItem> = emptyList(),
         val mode: Mode = Normal,
         val layoutType: LayoutType? = null,
+        val isNewVisualDesignEnabled: Boolean = false,
+        val isDuckChatEnabled: Boolean = false,
     ) {
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
@@ -622,7 +637,7 @@ class TabSwitcherViewModel @Inject constructor(
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabVisible = true,
-                    isDuckChatVisible = true,
+                    isDuckChatVisible = !isNewVisualDesignEnabled && isDuckChatEnabled,
                     isSelectAllVisible = false,
                     isDeselectAllVisible = false,
                     isSelectionActionsDividerVisible = false,
@@ -635,8 +650,9 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseAllTabsDividerVisible = true,
                     isCloseAllTabsVisible = true,
                     isMoreMenuItemEnabled = !isThereOnlyNewTabPage,
-                    isFabVisible = true,
-                    fabType = FabType.NEW_TAB,
+                    isMainFabVisible = true,
+                    isAIFabVisible = isNewVisualDesignEnabled && isDuckChatEnabled,
+                    mainFabType = FabType.NEW_TAB,
                     backButtonType = ARROW,
                     layoutButtonType = when (layoutType) {
                         GRID -> LayoutButtonType.LIST
@@ -668,8 +684,9 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseAllTabsDividerVisible = isSomethingSelected,
                     isCloseAllTabsVisible = false,
                     isMoreMenuItemEnabled = true,
-                    isFabVisible = isSomethingSelected,
-                    fabType = FabType.CLOSE_TABS,
+                    isMainFabVisible = isSomethingSelected,
+                    isAIFabVisible = false,
+                    mainFabType = FabType.CLOSE_TABS,
                     backButtonType = CLOSE,
                     layoutButtonType = LayoutButtonType.HIDDEN,
                 )
@@ -692,8 +709,9 @@ class TabSwitcherViewModel @Inject constructor(
             val isCloseAllTabsDividerVisible: Boolean,
             val isCloseAllTabsVisible: Boolean,
             val isMoreMenuItemEnabled: Boolean,
-            val isFabVisible: Boolean,
-            val fabType: FabType,
+            val isMainFabVisible: Boolean,
+            val isAIFabVisible: Boolean,
+            val mainFabType: FabType,
             val backButtonType: BackButtonType,
             val layoutButtonType: LayoutButtonType,
         )

@@ -56,6 +56,7 @@
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="checkboxStyle">@style/Widget.DuckDuckGo.CheckBox</item>
         <item name="extendedFloatingActionButtonStyle">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.DuckDuckGo.FloatingActionButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
         <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
@@ -129,6 +130,8 @@
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
+
+        <item name="tabItemSelectionCircleWidth">2dp</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -189,6 +192,17 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/white84</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
+
+        <!-- Fab -->
+        <item name="daxColorFabPrimaryContainer">@color/blue20</item>
+        <item name="daxColorFabPrimaryText">@color/black</item>
+        <item name="daxColorFabPrimaryIcon">@color/black</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue20</item>
+        <item name="daxColorFabSecondaryText">@color/black</item>
+        <item name="daxColorFabSecondaryIcon">@color/black</item>
+
+        <!-- Tab -->
+        <item name="daxColorTabHighlight">@color/gray50</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
@@ -279,6 +293,17 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/black60</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
+
+        <!-- Fab -->
+        <item name="daxColorFabPrimaryContainer">@color/blue50</item>
+        <item name="daxColorFabPrimaryText">@color/white</item>
+        <item name="daxColorFabPrimaryIcon">@color/white</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryText">@color/blue70</item>
+        <item name="daxColorFabSecondaryIcon">@color/blue70</item>
+
+        <!-- Tab -->
+        <item name="daxColorTabHighlight">@color/gray60</item>
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
