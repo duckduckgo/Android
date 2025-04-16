@@ -24,13 +24,11 @@
 
     <com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionView
         android:id="@+id/indonesiaNewTabSectionView"
-        android:layout_marginTop="@dimen/keyline_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionStateView
         android:id="@+id/appTrackingProtectionStateView"
-        android:layout_marginTop="@dimen/keyline_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
