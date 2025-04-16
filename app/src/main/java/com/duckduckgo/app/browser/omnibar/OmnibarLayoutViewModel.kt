@@ -57,6 +57,7 @@ import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -84,6 +85,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
     private val pixel: Pixel,
+    private val duckChat: DuckChat,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
@@ -106,6 +108,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isNavigationBarEnabled = navigationBarState.isEnabled,
+            showChat = shouldShowAIChat(),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -132,6 +135,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
         val showBrowserMenuHighlight: Boolean = false,
+        val showChat: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -191,6 +195,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
+                    showChat = shouldShowAIChat(),
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -224,6 +229,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
+                    showChat = shouldShowAIChat(),
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -302,6 +308,10 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasQueryChanged = hasQueryChanged,
             urlLoaded = urlLoaded,
         )
+    }
+
+    private fun shouldShowAIChat(): Boolean {
+        return duckChat.isEnabled() && duckChat.showInBrowserMenu()
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
@@ -496,6 +506,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                showChat = shouldShowAIChat(),
             )
         }
     }
