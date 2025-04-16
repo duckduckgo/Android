@@ -24,6 +24,14 @@ import androidx.lifecycle.liveData
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.senseofprotection.FakeUserBrowserProperties
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperimentImpl
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionPixelsPlugin
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_1
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -52,13 +60,18 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Layout
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -91,6 +104,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {
@@ -134,12 +148,21 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
 
-    private lateinit var fakeTabSwitcherDataStore: TabSwitcherPrefsDataStore
+    @Mock
+    private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
+
+    private lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
-    private val tabSwitcherAnimationFeature = FakeFeatureToggleFactory.create(TabSwitcherAnimationFeature::class.java)
+
+    private lateinit var fakeSenseOfProtectionToggles: SenseOfProtectionToggles
+    private val cohorts = listOf(
+        State.Cohort(name = MODIFIED_CONTROL.cohortName, weight = 1),
+        State.Cohort(name = VARIANT_1.cohortName, weight = 1),
+        State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+    )
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
@@ -176,6 +199,16 @@ class TabSwitcherViewModelTest {
             defaultVisualExperimentStateFlow,
         )
 
+        fakeSenseOfProtectionToggles = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = SenseOfProtectionToggles.BASE_EXPERIMENT_NAME,
+        ).build().create(SenseOfProtectionToggles::class.java)
+
+        senseOfProtectionExperiment = SenseOfProtectionExperimentImpl(
+            userBrowserProperties = FakeUserBrowserProperties(),
+            senseOfProtectionToggles = fakeSenseOfProtectionToggles,
+        )
+
         initializeMockTabEntitesData()
         initializeViewModel()
     }
@@ -194,7 +227,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             tabManagerFeatureFlags,
-            tabSwitcherAnimationFeature,
+            senseOfProtectionExperiment,
             mockWebTrackersBlockedAppRepository,
             tabSwitcherDataStore,
             faviconManager,
@@ -1207,7 +1240,14 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel then tab switcher items include animation tile and tabs`() = runTest {
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1229,7 +1269,14 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel not visible then tab switcher items contain only tabs`() = runTest {
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1250,7 +1297,6 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = false))
         whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
 
         val tab1 = TabEntity("1", position = 1)
@@ -1270,9 +1316,16 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then animated info panel is still visible`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
 
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1292,7 +1345,14 @@ class TabSwitcherViewModelTest {
     fun `when animated info panel negative button clicked then animated info panel is removed`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
 
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1309,35 +1369,114 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        initializeViewModel(FakeTabSwitcherDataStore())
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationInfoPanelVisible()
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+        verify(mockPixel).fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
+            parameters = mapOf(
+                "cohort" to VARIANT_2.cohortName,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name,
+            ),
+        )
     }
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
         initializeViewModel(FakeTabSwitcherDataStore())
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         testee.onTrackerAnimationInfoPanelClicked()
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED)
+        verify(mockPixel).fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED,
+            parameters = mapOf(
+                "cohort" to VARIANT_2.cohortName,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name,
+            ),
+        )
     }
 
     @Test
     fun `when animated info panel negative button clicked then dismiss pixel fired`() = runTest {
-        initializeViewModel(FakeTabSwitcherDataStore())
-        tabSwitcherAnimationFeature.self().setRawStoredState(State(enable = true))
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationTileNegativeButtonClicked()
 
-        verify(mockPixel).fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to "15"))
+        verify(mockPixel).fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED,
+            parameters = mapOf(
+                "trackerCount" to "15",
+                "cohort" to VARIANT_2.cohortName,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name,
+            ),
+        )
+    }
+
+    @Test
+    fun `when user is in modified control of sense of protection experiment then animated tile is not shown`() = runTest {
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = MODIFIED_CONTROL.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        initializeViewModel(FakeTabSwitcherDataStore())
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
+    }
+
+    @Test
+    fun `when user is in variant 1 of sense of protection experiment then animated tile is not shown`() = runTest {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        initializeViewModel(FakeTabSwitcherDataStore())
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
@@ -1359,10 +1498,51 @@ class TabSwitcherViewModelTest {
     }
 
     private fun TestScope.prepareSelectionMode() {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.selectionViewState.collect()
+        }
+    }
+
+    private class FakeUserBrowserProperties : UserBrowserProperties {
+
+        private var daysSinceInstall: Long = 0
+
+        fun setDaysSinceInstalled(days: Long) {
+            daysSinceInstall = days
+        }
+
+        override fun appTheme(): DuckDuckGoTheme {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun bookmarks(): Long {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun favorites(): Long {
+            TODO("Not yet implemented")
+        }
+
+        override fun daysSinceInstalled(): Long = daysSinceInstall
+
+        override suspend fun daysUsedSince(since: Date): Long {
+            TODO("Not yet implemented")
+        }
+
+        override fun defaultBrowser(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun emailEnabled(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun searchCount(): Long {
+            TODO("Not yet implemented")
+        }
+
+        override fun widgetAdded(): Boolean {
+            TODO("Not yet implemented")
         }
     }
 }
