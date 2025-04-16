@@ -88,7 +88,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/bookmarksMenuTitle"
             android:scaleType="center"
-            android:src="@drawable/ic_bookmarks_stacked_24e" />
+            android:src="@drawable/ic_bookmarks_24" />
     </FrameLayout>
 
     <Space

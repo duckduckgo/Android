@@ -117,7 +117,7 @@
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_bookmarks_stacked_24e" />
+                android:src="@drawable/ic_bookmarks_24" />
         </FrameLayout>
 
         <Space
