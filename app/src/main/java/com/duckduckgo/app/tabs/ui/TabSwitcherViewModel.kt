@@ -597,7 +597,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (senseOfProtectionExperiment.isEnabled(cohort = VARIANT_2)) {
+            return if (senseOfProtectionExperiment.isMemberOfVariant2Cohort()) {
                 if (!isAnimationTileDismissed) {
                     val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
