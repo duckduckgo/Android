@@ -24,7 +24,6 @@ import androidx.lifecycle.liveData
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.senseofprotection.FakeUserBrowserProperties
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperimentImpl
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionPixelsPlugin
@@ -37,7 +36,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -205,8 +203,12 @@ class TabSwitcherViewModelTest {
         ).build().create(SenseOfProtectionToggles::class.java)
 
         senseOfProtectionExperiment = SenseOfProtectionExperimentImpl(
+            appCoroutineScope = coroutinesTestRule.testScope,
+            dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
             userBrowserProperties = FakeUserBrowserProperties(),
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
+            senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
+            pixel = FakePixel(),
         )
 
         initializeMockTabEntitesData()
