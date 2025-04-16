@@ -850,7 +850,7 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
     <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem mygtuko „Fire Button“ 🔥 bakstelėjimais.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
     <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
 
     <!-- Appearance settings -->
