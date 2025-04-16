@@ -820,7 +820,7 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
     <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på Fire Button 🔥]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
     <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
 
     <!-- Appearance settings -->
