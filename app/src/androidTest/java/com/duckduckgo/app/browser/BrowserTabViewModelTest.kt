@@ -553,6 +553,8 @@ class BrowserTabViewModelTest {
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
     private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
+    private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -586,6 +588,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(selectedTab))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
