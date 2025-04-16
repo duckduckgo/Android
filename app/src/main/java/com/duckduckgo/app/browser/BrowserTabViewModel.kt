@@ -201,6 +201,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -483,6 +484,7 @@ class BrowserTabViewModel @Inject constructor(
     private val appPersonalityFeature: AppPersonalityFeature,
     private val userStageStore: UserStageStore,
     private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -4105,6 +4107,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun resetTrackersCount() {
         site?.resetTrackingEvents()
+    }
+
+    fun onOmnibarPrivacyShieldButtonPressed() {
+        senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
     fun openDuckChat(query: String?) {

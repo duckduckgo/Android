@@ -72,6 +72,10 @@ class SenseOfProtectionPixelsPlugin @Inject constructor(private val inventory: F
         )
     }
 
+    suspend fun getPrivacyDashboardClickedMetric(): MetricsPixel? {
+        return this.getMetrics().firstOrNull { it.metric == METRIC_PRIVACY_DASHBOARD_CLICKED }
+    }
+
     companion object {
         internal const val METRIC_PRIVACY_DASHBOARD_CLICKED = "privacyDashboardClicked"
     }
