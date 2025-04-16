@@ -20,6 +20,7 @@ import android.view.Menu
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
@@ -38,6 +39,7 @@ fun Menu.createDynamicInterface(
     popupMenu: PopupTabsMenuBinding,
     mainFab: ExtendedFloatingActionButton,
     aiFab: FloatingActionButton,
+    tabsRecycler: RecyclerView,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ) {
@@ -114,4 +116,20 @@ fun Menu.createDynamicInterface(
 
     findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
     findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
+
+
+    val bottomPadding = if (dynamicMenu.isAIFabVisible) {
+        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewTwoFabsBottomPadding)
+    } else if (dynamicMenu.isMainFabVisible) {
+        tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewOneFabBottomPadding )
+    } else {
+        tabsRecycler.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+    }
+
+    tabsRecycler.setPadding(
+        tabsRecycler.paddingLeft,
+        tabsRecycler.paddingTop,
+        tabsRecycler.paddingRight,
+        bottomPadding.toInt(),
+    )
 }

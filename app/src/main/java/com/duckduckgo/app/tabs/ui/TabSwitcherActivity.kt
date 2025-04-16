@@ -294,21 +294,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             handleFabStateUpdates()
             handleSelectionModeCancellation()
         }
-
-        val bottomPadding = if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            resources.getDimension(R.dimen.recyclerViewTwoFabsBottomPadding)
-        } else if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            resources.getDimension(R.dimen.recyclerViewOneFabBottomPadding)
-        } else {
-            resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        }
-
-        tabsRecycler.setPadding(
-            tabsRecycler.paddingLeft,
-            tabsRecycler.paddingTop,
-            tabsRecycler.paddingRight,
-            bottomPadding.toInt(),
-        )
     }
 
     private fun handleSelectionModeCancellation() {
@@ -627,7 +612,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val viewState = viewModel.selectionViewState.value
 
             val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
-            menu.createDynamicInterface(numSelectedTabs, popupBinding, binding.mainFab, binding.aiChatFab, toolbar, viewState.dynamicInterface)
+            menu.createDynamicInterface(
+                numSelectedTabs,
+                popupBinding,
+                binding.mainFab,
+                binding.aiChatFab,
+                tabsRecycler,
+                toolbar,
+                viewState.dynamicInterface,
+            )
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
             layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
