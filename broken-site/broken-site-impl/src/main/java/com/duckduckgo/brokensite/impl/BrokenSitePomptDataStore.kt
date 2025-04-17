@@ -42,6 +42,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface BrokenSitePromptDataStore {
@@ -149,7 +150,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     ): Int {
         val allDismissEvents = store.data.map { prefs ->
             prefs[DISMISS_EVENTS]?.toSet() ?: emptySet()
-        }.first()
+        }.firstOrNull() ?: emptySet()
 
         return allDismissEvents.count { dateString: String ->
             try {
