@@ -90,14 +90,15 @@ class BrowserNavigationBarViewIntegration(
         // to prevent it from being "pushed up" within the coordinator layout
         keyboardVisibilityJob = lifecycleScope.launch {
             omnibar.textInputRootView.keyboardVisibilityFlow().distinctUntilChanged().collect { keyboardVisible ->
-                if (keyboardVisible) {
-                    navigationBarView.gone()
-                } else {
-                    navigationBarView.postDelayed(
-                        { navigationBarView.show() },
-                        BrowserTabFragment.KEYBOARD_DELAY,
-                    )
-                }
+                (navigationBarView.behavior as BrowserNavigationBarView.BottomViewBehavior).setKeyboardVisible(keyboardVisible)
+                // if (keyboardVisible) {
+                //     navigationBarView.gone()
+                // } else {
+                //     navigationBarView.postDelayed(
+                //         { navigationBarView.show() },
+                //         BrowserTabFragment.KEYBOARD_DELAY,
+                //     )
+                // }
             }
         }
     }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.navigation.bar.view
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -57,8 +58,8 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
 class BrowserNavigationBarView @JvmOverloads constructor(
-    private val context: Context,
-    private val attrs: AttributeSet? = null,
+    context: Context,
+    attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
 
@@ -92,6 +93,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
+
+    private val behavior = BottomViewBehavior(context, attrs, view = this)
 
     val popupMenuAnchor: View = binding.menuButton
 
@@ -163,7 +166,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     override fun getBehavior(): Behavior<*> {
-        return BottomViewBehavior(context, attrs)
+        return behavior
     }
 
     private fun renderView(viewState: ViewState) {
@@ -201,10 +204,36 @@ class BrowserNavigationBarView @JvmOverloads constructor(
      *
      * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
      */
-    private class BottomViewBehavior(
+    class BottomViewBehavior(
         context: Context,
         attrs: AttributeSet?,
+        private val view: BrowserNavigationBarView,
     ) : Behavior<View>(context, attrs) {
+
+        private var offsetFromDependents = 0f
+        private var isKeyboardVisible = false
+        private var animator: ValueAnimator? = null
+
+        fun setKeyboardVisible(visible: Boolean) {
+            if (isKeyboardVisible != visible) {
+                isKeyboardVisible = visible
+                animator?.cancel()
+                if (visible) {
+                    // todo we also need to gone or shrink the bottom omnibar which has nav bar embedded
+                    view.translationY = view.measuredHeight.toFloat()
+                } else {
+                    val currentTranslationY = view.translationY
+                    val targetTranslationY = offsetFromDependents
+                    animator = ValueAnimator.ofFloat(currentTranslationY, targetTranslationY).also { animator ->
+                        animator.addUpdateListener {
+                            view.translationY = it.animatedValue as Float
+                        }
+                        animator.duration = 200L
+                        animator.start()
+                    }
+                }
+            }
+        }
 
         override fun layoutDependsOn(
             parent: CoordinatorLayout,
@@ -224,8 +253,13 @@ class BrowserNavigationBarView @JvmOverloads constructor(
                 val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
                 val childHeight = child.measuredHeight
                 val childOffset = childHeight * offsetPercentage
-                child.translationY = childOffset
-                return true
+                offsetFromDependents = childOffset
+                if (!isKeyboardVisible) {
+                    child.translationY = childOffset
+                    return true
+                } else {
+                    return false
+                }
             }
             return false
         }
