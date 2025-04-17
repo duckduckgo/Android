@@ -440,7 +440,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
         renderButtons(viewState)
-        renderFindInPage(viewState)
     }
 
     open fun processCommand(command: OmnibarLayoutViewModel.Command) {
@@ -651,20 +650,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             Timber.d("Omnibar: reduce not attached saving $stateChange")
             this.stateBuffer.add(stateChange)
         }
-    }
-
-    private fun renderFindInPage(viewState: ViewState) {
-        findInPage.findInPageContainer.isVisible = viewState.findInPageVisible
-    }
-
-    fun isFindInPageVisible(): Boolean = viewModel.viewState.value.findInPageVisible
-
-    fun showFindInPage() {
-        viewModel.showFindInPage()
-    }
-
-    fun hideFindInPage() {
-        viewModel.hideFindInPage()
     }
 
     private fun reduceDeferred(stateChange: StateChange) {

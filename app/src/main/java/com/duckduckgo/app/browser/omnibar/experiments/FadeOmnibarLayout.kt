@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewOutlineProvider
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -62,6 +63,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
+    }
+    private var isFindInPageVisible = false
+    private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
+        val isVisible = findInPage.findInPageContainer.isVisible
+        if (isFindInPageVisible != isVisible) {
+            isFindInPageVisible = isVisible
+            if (isVisible) {
+                onFindInPageShown()
+            } else {
+                onFindInPageHidden()
+            }
+        }
     }
 
     /**
@@ -127,9 +140,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        findInPage.findInPageContainer.viewTreeObserver.addOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         focusAnimator?.cancel()
+        findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
     }
 
     override fun render(viewState: ViewState) {
@@ -165,9 +184,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             backIcon.gone()
         }
 
-        omniBarContentContainer.isVisible = !viewState.findInPageVisible
-
-        if (viewState.outlineVisible) {
+        if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
         } else {
             animateOmnibarFocusedState(focused = false)
@@ -263,6 +280,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         animator.start()
         focusAnimator = animator
+    }
+
+    private fun onFindInPageShown() {
+        omniBarContentContainer.gone()
+        animateOmnibarFocusedState(focused = true)
+    }
+
+    private fun onFindInPageHidden() {
+        omniBarContentContainer.show()
+        if (!viewModel.viewState.value.hasFocus) {
+            animateOmnibarFocusedState(focused = false)
+        }
     }
 
     fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {

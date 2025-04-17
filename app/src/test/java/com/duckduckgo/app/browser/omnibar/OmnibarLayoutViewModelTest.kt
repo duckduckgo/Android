@@ -1072,57 +1072,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
-    @Test
-    fun `when showFindInPage and hideFindInPage called, then update the view state`() = runTest {
-        testee.showFindInPage()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.findInPageVisible)
-        }
-
-        testee.hideFindInPage()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.findInPageVisible)
-        }
-    }
-
-    @Test
-    fun `when find in page visible, then outline also visible`() = runTest {
-        testee.showFindInPage()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.outlineVisible)
-        }
-
-        testee.hideFindInPage()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.outlineVisible)
-        }
-    }
-
-    @Test
-    fun `when omnibar focused, then outline visible`() = runTest {
-        testee.onOmnibarFocusChanged(hasFocus = true, "")
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.outlineVisible)
-        }
-
-        testee.onOmnibarFocusChanged(hasFocus = false, "")
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.outlineVisible)
-        }
-    }
-
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(

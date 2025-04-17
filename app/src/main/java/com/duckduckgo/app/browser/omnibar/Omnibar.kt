@@ -61,6 +61,8 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
+import com.google.android.material.appbar.AppBarLayout.GONE
+import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
@@ -322,17 +324,17 @@ class Omnibar(
     }
 
     fun hideFindInPage() {
-        if (newOmnibar.isFindInPageVisible()) {
+        if (findInPage.findInPageContainer.visibility != GONE) {
             binding.focusDummy.requestFocus()
-            newOmnibar.hideFindInPage()
+            findInPage.findInPageContainer.gone()
             findInPage.findInPageInput.hideKeyboard()
             findInPage.findInPageInput.text.clear()
         }
     }
 
     fun showFindInPageView(viewState: FindInPageViewState) {
-        if (!newOmnibar.isFindInPageVisible()) {
-            newOmnibar.showFindInPage()
+        if (findInPage.findInPageContainer.visibility != VISIBLE) {
+            findInPage.findInPageContainer.show()
             findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
                 findInPage.findInPageInput.showKeyboard()
             }
