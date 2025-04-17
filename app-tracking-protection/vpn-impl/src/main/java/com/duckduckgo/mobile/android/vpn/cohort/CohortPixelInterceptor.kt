@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.cohort
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -77,7 +78,7 @@ class CohortPixelInterceptor @Inject constructor(
             "m_atp_ev_cpu_usage_above_",
             "m_atp_unprotected_apps_bucket_",
             "m_atp_breakage_report",
-            "m_atp_tds_experiment_download_failed",
+            ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED.pixelName,
         )
     }
 }
