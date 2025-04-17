@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
@@ -88,11 +89,14 @@ class BrowserNavigationBarViewIntegration(
         // we're hiding the navigation bar when keyboard is shown,
         // to prevent it from being "pushed up" within the coordinator layout
         keyboardVisibilityJob = lifecycleScope.launch {
-            omnibar.textInputRootView.keyboardVisibilityFlow().collect { keyboardVisible ->
+            omnibar.textInputRootView.keyboardVisibilityFlow().distinctUntilChanged().collect { keyboardVisible ->
                 if (keyboardVisible) {
                     navigationBarView.gone()
                 } else {
-                    navigationBarView.show()
+                    navigationBarView.postDelayed(
+                        { navigationBarView.show() },
+                        BrowserTabFragment.KEYBOARD_DELAY,
+                    )
                 }
             }
         }
