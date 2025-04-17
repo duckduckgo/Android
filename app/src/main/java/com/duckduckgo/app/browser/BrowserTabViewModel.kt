@@ -99,7 +99,6 @@ import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
-import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
@@ -345,38 +344,6 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
-import java.net.URI
-import java.net.URISyntaxException
-import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.any
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.contains
-import kotlin.collections.drop
-import kotlin.collections.emptyList
-import kotlin.collections.emptyMap
-import kotlin.collections.filter
-import kotlin.collections.filterNot
-import kotlin.collections.firstOrNull
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
-import kotlin.collections.iterator
-import kotlin.collections.map
-import kotlin.collections.mapOf
-import kotlin.collections.minus
-import kotlin.collections.mutableMapOf
-import kotlin.collections.mutableSetOf
-import kotlin.collections.plus
-import kotlin.collections.set
-import kotlin.collections.setOf
-import kotlin.collections.take
-import kotlin.collections.toList
-import kotlin.collections.toMutableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -402,6 +369,14 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
+import java.net.URI
+import java.net.URISyntaxException
+import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
 private const val MALICIOUS_SITE_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
@@ -506,7 +481,6 @@ class BrowserTabViewModel @Inject constructor(
     val globalLayoutState: MutableLiveData<GlobalLayoutViewState> = MutableLiveData()
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
-    val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
@@ -1128,7 +1102,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
-        findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
             forceExpand = true,
@@ -1352,11 +1325,6 @@ class BrowserTabViewModel @Inject constructor(
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
-        if (currentFindInPageViewState().visible) {
-            dismissFindInView()
-            return true
-        }
-
         if (currentBrowserViewState().sslError != NONE) {
             command.postValue(HideSSLError)
             return true
@@ -1403,7 +1371,6 @@ class BrowserTabViewModel @Inject constructor(
         )
         browserViewState.value = browserState
 
-        findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = "",
             forceExpand = true,
@@ -1560,7 +1527,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
 
-        findInPageViewState.value = FindInPageViewState(visible = false)
+        command.value = DismissFindInPage
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
@@ -2136,7 +2103,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun currentGlobalLayoutState(): GlobalLayoutViewState = globalLayoutState.value!!
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
     private fun currentBrowserViewState(): BrowserViewState = browserViewState.value!!
-    private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
     private fun currentAccessibilityViewState(): AccessibilityViewState = accessibilityViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
@@ -2526,38 +2492,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onFindInPageSelected() {
-        findInPageViewState.value = FindInPageViewState(visible = true)
-    }
-
-    fun userFindingInPage(searchTerm: String) {
-        val currentViewState = currentFindInPageViewState()
-        if (!currentViewState.visible && searchTerm.isEmpty()) {
-            return
-        }
-
-        var findInPage = currentViewState.copy(visible = true, searchTerm = searchTerm)
-        if (searchTerm.isEmpty()) {
-            findInPage = findInPage.copy(showNumberMatches = false)
-        }
-        findInPageViewState.value = findInPage
-        command.value = FindInPageCommand(searchTerm)
-    }
-
-    fun dismissFindInView() {
-        findInPageViewState.value = currentFindInPageViewState().copy(visible = false, searchTerm = "")
-        command.value = DismissFindInPage
-    }
-
-    fun onFindResultsReceived(
-        activeMatchOrdinal: Int,
-        numberOfMatches: Int,
-    ) {
-        val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
-        val currentViewState = currentFindInPageViewState()
-        findInPageViewState.value = currentViewState.copy(
-            showNumberMatches = true,
-            activeMatchIndex = activeIndex,
-            numberMatches = numberOfMatches,
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            forceExpand = true,
         )
     }
 
@@ -2608,7 +2544,6 @@ class BrowserTabViewModel @Inject constructor(
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
-        findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
         privacyShieldViewState.value = PrivacyShieldViewState()
         accessibilityViewState.value = AccessibilityViewState()
@@ -3038,7 +2973,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
         loadingViewState.value = LoadingViewState()
-        findInPageViewState.value = FindInPageViewState()
     }
 
     private fun disableUserNavigation() {

@@ -103,10 +103,9 @@ sealed class Command {
     ) : Command()
 
     class CopyLink(val url: String) : Command()
-    class FindInPageCommand(val searchTerm: String) : Command()
     class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
     class ToggleReportFeedback(val opener: DashboardOpener) : Command()
-    object DismissFindInPage : Command()
+    data object DismissFindInPage : Command()
     class ShowFileChooser(
         val filePathCallback: ValueCallback<Array<Uri>>,
         val fileChooserParams: FileChooserRequestedParams,
