@@ -45,7 +45,7 @@
             android:hint="Single line editable text"
             android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line."
             app:editable="true"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:type="single_line" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
@@ -56,7 +56,7 @@
             android:hint="Multi line editable text"
             android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text."
             app:editable="true"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:type="multi_line" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
@@ -67,7 +67,7 @@
             android:hint="Form mode editable text"
             android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text. Form mode is 3 lines minimum"
             app:editable="true"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:type="form_mode" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
@@ -78,7 +78,7 @@
             android:hint="Non-editable text full click listener with end icon"
             android:text="Non-editable text full click listener with end icon."
             app:clickable="true"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:type="single_line" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
@@ -101,7 +101,7 @@
             android:text="Non-editable text with line truncation and end icon. It has a very long text to show how it behaves when the text is too long to fit in a single line."
             app:editable="false"
             app:singleLineTextTruncated="true"
-            app:endIcon="@drawable/ic_copy" />
+            app:endIcon="@drawable/ic_copy_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext33"
@@ -168,7 +168,7 @@
             android:hint="Non-editable password with icon"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:editable="false"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:type="password" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
