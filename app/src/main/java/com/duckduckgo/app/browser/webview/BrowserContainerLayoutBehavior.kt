@@ -20,18 +20,21 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 
 /**
- * A [ScrollingViewBehavior] that additionally observes the position of [BrowserNavigationBarView], if present,
- * and applies bottom padding to the target view equal to the visible height of the navigation bar.
+ * A [ScrollingViewBehavior] that additionally observes the position of [BrowserNavigationBarView] or bottom [OmnibarLayout], if present,
+ * and applies bottom padding to the target view equal to the visible height of the bottom element.
  *
- * This prevents the navigation bar from overlapping with, for example, content found in the web view.
+ * This prevents the bottom element from overlapping with, for example, content found in the web view.
  *
- * Note: This behavior is intended for use with the top omnibar. When the bottom omnibar is used,
- * it already includes the navigation bar, so no additional coordination is required.
+ * Note: [BrowserNavigationBarView] or bottom [OmnibarLayout] will never be children of the coordinator layout at the same time, so they won't be competing for updates:
+ * - When top [OmnibarLayout] is used, [BrowserNavigationBarView] is added directly to the coordinator layout.
+ * - When bottom [OmnibarLayout] is used, it comes embedded with the [BrowserNavigationBarView].
  */
 class BrowserContainerLayoutBehavior(
     context: Context,
@@ -43,11 +46,7 @@ class BrowserContainerLayoutBehavior(
         child: View,
         dependency: View,
     ): Boolean {
-        return if (dependency is BrowserNavigationBarView) {
-            true
-        } else {
-            super.layoutDependsOn(parent, child, dependency)
-        }
+        return dependency.isBrowserNavigationBar() || dependency.isBottomOmnibar() || super.layoutDependsOn(parent, child, dependency)
     }
 
     override fun onDependentViewChanged(
@@ -55,11 +54,11 @@ class BrowserContainerLayoutBehavior(
         child: View,
         dependency: View,
     ): Boolean {
-        return if (dependency is BrowserNavigationBarView) {
-            val newBottomPadding = if (dependency.isVisible) {
-                dependency.measuredHeight - dependency.translationY.toInt()
-            } else {
+        return if (dependency.isBrowserNavigationBar() || dependency.isBottomOmnibar()) {
+            val newBottomPadding = if (dependency.isGone) {
                 0
+            } else {
+                dependency.measuredHeight - dependency.translationY.toInt()
             }
             if (child.paddingBottom != newBottomPadding) {
                 child.setPadding(
@@ -76,4 +75,7 @@ class BrowserContainerLayoutBehavior(
             super.onDependentViewChanged(parent, child, dependency)
         }
     }
+
+    private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
+    private fun View.isBottomOmnibar(): Boolean = this is OmnibarLayout && this.omnibarPosition == OmnibarPosition.BOTTOM
 }
