@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
+import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromAll
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDetail
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
@@ -946,6 +947,11 @@ class RealDeviceShieldPixels @Inject constructor(
                 "experimentCohort" to experimentCohort,
             ),
         )
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     private fun firePixel(
