@@ -62,6 +62,22 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
 
+    override fun setVisibility(visibility: Int) {
+        val isVisibilityUpdated = this.visibility != visibility
+
+        super.setVisibility(visibility)
+
+        /**
+         * This change forces all view behaviors that depend on the [BrowserNavigationBarView] to recalculate whenever the bar's visibility changes.
+         *
+         * Normally, the coordinator behavior doesn't notify dependent views when dependency changes the visibility, so we need to invoke the change manually.
+         */
+        val parent = parent
+        if (isVisibilityUpdated && parent is CoordinatorLayout) {
+            parent.dispatchDependentViewsChanged(this)
+        }
+    }
+
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
