@@ -75,7 +75,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     private val duckChatShowInAddressBar: StateFlow<Boolean> = store.data
         .map { prefs ->
-            prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] ?: true
+            prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] ?: duckChatShowInBrowserMenu.value
         }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
