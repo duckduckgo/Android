@@ -374,15 +374,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onOutlineEnabled(enabled: Boolean) {
-        Timber.d("Omnibar: onOutlineEnabled")
-        _viewState.update {
-            it.copy(
-                hasFocus = enabled,
-            )
-        }
-    }
-
     fun onClearTextButtonPressed() {
         Timber.d("Omnibar: onClearTextButtonPressed")
         firePixelBasedOnCurrentUrl(
