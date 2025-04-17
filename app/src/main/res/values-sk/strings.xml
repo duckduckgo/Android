@@ -848,6 +848,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Ruku na to!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyskúšajte to</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskočiť</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Bol/-a som tu už predtým</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Rozumiem! Preskočím ostatné rady.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Nezabudni: všetky karty, históriu a údaje o prehliadaní môžeš odstrániť dvoma ťuknutiami pomocou tlačidla <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Zobraziť návod</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>

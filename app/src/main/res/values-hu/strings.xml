@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Pacsi!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
