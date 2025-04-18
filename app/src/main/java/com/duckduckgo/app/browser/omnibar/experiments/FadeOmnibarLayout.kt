@@ -171,6 +171,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         aiChat.isVisible = viewState.showChat
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChat
+        spacer.isVisible = false
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
