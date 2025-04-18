@@ -61,6 +61,9 @@ dependencies {
 }
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
