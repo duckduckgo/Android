@@ -106,12 +106,14 @@ interface SubscriptionsManager {
     suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
     /**
-     * Launches the purchase flow for a given combination of plan id and offer id
+     * Launches the purchase flow for a given combination of plan id, offer id and front-end experiment details
      */
     suspend fun purchase(
         activity: Activity,
         planId: String,
         offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
     )
 
     /**
@@ -271,6 +273,9 @@ class RealSubscriptionsManager @Inject constructor(
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
     private var purchaseFlowStartedUsingRestoredAccount: Boolean = false
 
+    // Indicates whether the user is part of any FE experiment at the time of purchase
+    private var experimentAssigned: Experiment? = null
+
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
     }
@@ -424,9 +429,14 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): Boolean {
         var experimentName: String? = null
-        val cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
-        if (cohort != null) {
+        var cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
+        if (cohort != null) { // Android experiment
             experimentName = "privacyProFreeTrialJan25"
+        } else {
+            experimentAssigned?.let { // FE experiment details
+                cohort = it.cohort
+                experimentName = it.name
+            }
         }
         return try {
             val confirmationResponse = subscriptionsService.confirm(
@@ -807,6 +817,8 @@ class RealSubscriptionsManager @Inject constructor(
         activity: Activity,
         planId: String,
         offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
@@ -858,6 +870,12 @@ class RealSubscriptionsManager @Inject constructor(
                 if (!shouldUseAuthV2()) {
                     exchangeAuthToken(authRepository.getAuthToken()!!)
                 }
+            }
+
+            experimentAssigned = if (experimentCohort.isNullOrEmpty() || experimentName.isNullOrEmpty()) {
+                null
+            } else {
+                Experiment(experimentName, experimentCohort)
             }
 
             purchaseFlowStartedUsingRestoredAccount = restoredAccount
@@ -1119,4 +1137,9 @@ data class ValidatedTokenPair(
     val accessTokenClaims: AccessTokenClaims,
     val refreshToken: String,
     val refreshTokenClaims: RefreshTokenClaims,
+)
+
+data class Experiment(
+    val name: String,
+    val cohort: String,
 )
