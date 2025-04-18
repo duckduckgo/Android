@@ -226,8 +226,10 @@ interface SubscriptionsManager {
 
     /**
      * Signs the user out and deletes all the data from the device
+     *
+     * @param invalidateTokens if true, a request will be made to BE to invalidate refresh+access token pair.
      */
-    suspend fun signOut()
+    suspend fun signOut(invalidateTokens: Boolean = true)
 
     /**
      * Returns a [String] with the URL of the portal or null otherwise
@@ -532,9 +534,11 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun signOut() {
-        authRepository.getAccessTokenV2()?.run {
-            coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
+    override suspend fun signOut(invalidateTokens: Boolean) {
+        if (invalidateTokens) {
+            authRepository.getAccessTokenV2()?.run {
+                coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
+            }
         }
         authRepository.setAccessTokenV2(null)
         authRepository.setRefreshTokenV2(null)
@@ -792,7 +796,7 @@ class RealSubscriptionsManager @Inject constructor(
                     After the subscription expires, BE eventually deletes the account, so this is expected.
                      */
                     tokenRefreshWideEvent.onUnknownAccountError()
-                    signOut()
+                    signOut(invalidateTokens = false)
                     throw e
                 }
 
@@ -817,7 +821,7 @@ class RealSubscriptionsManager @Inject constructor(
                             loginError = storeLoginResult.javaClass.simpleName,
                         )
                         pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
-                        signOut()
+                        signOut(invalidateTokens = false)
                         throw e
                     }
 
@@ -1140,8 +1144,10 @@ class RealSubscriptionsManager @Inject constructor(
                     refreshSubscriptionData()
                 } catch (e: HttpException) {
                     when (e.code()) {
-                        400, 404 -> {} // expected if this is a first ever purchase using this account - ignore
-                        401 -> signOut() // access token was rejected even though it's not expired - can happen if the account was removed from BE
+                        // expected if this is a first ever purchase using this account - ignore
+                        400, 404 -> {}
+                        // access token was rejected even though it's not expired - can happen if the account was removed from BE
+                        401 -> signOut(invalidateTokens = false)
                         else -> {
                             subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
                             throw e
