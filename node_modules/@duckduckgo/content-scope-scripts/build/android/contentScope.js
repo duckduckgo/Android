@@ -42,6 +42,7 @@
   var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
   var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
   var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
+  var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 
   // <define:import.meta.trackerLookup>
   var define_import_meta_trackerLookup_default;
@@ -76,28 +77,28 @@
       //! THE SOFTWARE.
       (function(global, module2, define2) {
         function Alea(seed) {
-          var me = this, mash = Mash();
-          me.next = function() {
-            var t = 2091639 * me.s0 + me.c * 23283064365386963e-26;
-            me.s0 = me.s1;
-            me.s1 = me.s2;
-            return me.s2 = t - (me.c = t | 0);
+          var me2 = this, mash = Mash();
+          me2.next = function() {
+            var t = 2091639 * me2.s0 + me2.c * 23283064365386963e-26;
+            me2.s0 = me2.s1;
+            me2.s1 = me2.s2;
+            return me2.s2 = t - (me2.c = t | 0);
           };
-          me.c = 1;
-          me.s0 = mash(" ");
-          me.s1 = mash(" ");
-          me.s2 = mash(" ");
-          me.s0 -= mash(seed);
-          if (me.s0 < 0) {
-            me.s0 += 1;
+          me2.c = 1;
+          me2.s0 = mash(" ");
+          me2.s1 = mash(" ");
+          me2.s2 = mash(" ");
+          me2.s0 -= mash(seed);
+          if (me2.s0 < 0) {
+            me2.s0 += 1;
           }
-          me.s1 -= mash(seed);
-          if (me.s1 < 0) {
-            me.s1 += 1;
+          me2.s1 -= mash(seed);
+          if (me2.s1 < 0) {
+            me2.s1 += 1;
           }
-          me.s2 -= mash(seed);
-          if (me.s2 < 0) {
-            me.s2 += 1;
+          me2.s2 -= mash(seed);
+          if (me2.s2 < 0) {
+            me2.s2 += 1;
           }
           mash = null;
         }
@@ -168,26 +169,26 @@
       init_define_import_meta_trackerLookup();
       (function(global, module2, define2) {
         function XorGen(seed) {
-          var me = this, strseed = "";
-          me.x = 0;
-          me.y = 0;
-          me.z = 0;
-          me.w = 0;
-          me.next = function() {
-            var t = me.x ^ me.x << 11;
-            me.x = me.y;
-            me.y = me.z;
-            me.z = me.w;
-            return me.w ^= me.w >>> 19 ^ t ^ t >>> 8;
+          var me2 = this, strseed = "";
+          me2.x = 0;
+          me2.y = 0;
+          me2.z = 0;
+          me2.w = 0;
+          me2.next = function() {
+            var t = me2.x ^ me2.x << 11;
+            me2.x = me2.y;
+            me2.y = me2.z;
+            me2.z = me2.w;
+            return me2.w ^= me2.w >>> 19 ^ t ^ t >>> 8;
           };
           if (seed === (seed | 0)) {
-            me.x = seed;
+            me2.x = seed;
           } else {
             strseed += seed;
           }
-          for (var k = 0; k < strseed.length + 64; k++) {
-            me.x ^= strseed.charCodeAt(k) | 0;
-            me.next();
+          for (var k2 = 0; k2 < strseed.length + 64; k2++) {
+            me2.x ^= strseed.charCodeAt(k2) | 0;
+            me2.next();
           }
         }
         function copy2(f, t) {
@@ -242,31 +243,31 @@
       init_define_import_meta_trackerLookup();
       (function(global, module2, define2) {
         function XorGen(seed) {
-          var me = this, strseed = "";
-          me.next = function() {
-            var t = me.x ^ me.x >>> 2;
-            me.x = me.y;
-            me.y = me.z;
-            me.z = me.w;
-            me.w = me.v;
-            return (me.d = me.d + 362437 | 0) + (me.v = me.v ^ me.v << 4 ^ (t ^ t << 1)) | 0;
+          var me2 = this, strseed = "";
+          me2.next = function() {
+            var t = me2.x ^ me2.x >>> 2;
+            me2.x = me2.y;
+            me2.y = me2.z;
+            me2.z = me2.w;
+            me2.w = me2.v;
+            return (me2.d = me2.d + 362437 | 0) + (me2.v = me2.v ^ me2.v << 4 ^ (t ^ t << 1)) | 0;
           };
-          me.x = 0;
-          me.y = 0;
-          me.z = 0;
-          me.w = 0;
-          me.v = 0;
+          me2.x = 0;
+          me2.y = 0;
+          me2.z = 0;
+          me2.w = 0;
+          me2.v = 0;
           if (seed === (seed | 0)) {
-            me.x = seed;
+            me2.x = seed;
           } else {
             strseed += seed;
           }
-          for (var k = 0; k < strseed.length + 64; k++) {
-            me.x ^= strseed.charCodeAt(k) | 0;
-            if (k == strseed.length) {
-              me.d = me.x << 10 ^ me.x >>> 4;
+          for (var k2 = 0; k2 < strseed.length + 64; k2++) {
+            me2.x ^= strseed.charCodeAt(k2) | 0;
+            if (k2 == strseed.length) {
+              me2.d = me2.x << 10 ^ me2.x >>> 4;
             }
-            me.next();
+            me2.next();
           }
         }
         function copy2(f, t) {
@@ -323,46 +324,46 @@
       init_define_import_meta_trackerLookup();
       (function(global, module2, define2) {
         function XorGen(seed) {
-          var me = this;
-          me.next = function() {
-            var X = me.x, i = me.i, t, v, w;
-            t = X[i];
+          var me2 = this;
+          me2.next = function() {
+            var X2 = me2.x, i = me2.i, t, v2, w2;
+            t = X2[i];
             t ^= t >>> 7;
-            v = t ^ t << 24;
-            t = X[i + 1 & 7];
-            v ^= t ^ t >>> 10;
-            t = X[i + 3 & 7];
-            v ^= t ^ t >>> 3;
-            t = X[i + 4 & 7];
-            v ^= t ^ t << 7;
-            t = X[i + 7 & 7];
+            v2 = t ^ t << 24;
+            t = X2[i + 1 & 7];
+            v2 ^= t ^ t >>> 10;
+            t = X2[i + 3 & 7];
+            v2 ^= t ^ t >>> 3;
+            t = X2[i + 4 & 7];
+            v2 ^= t ^ t << 7;
+            t = X2[i + 7 & 7];
             t = t ^ t << 13;
-            v ^= t ^ t << 9;
-            X[i] = v;
-            me.i = i + 1 & 7;
-            return v;
+            v2 ^= t ^ t << 9;
+            X2[i] = v2;
+            me2.i = i + 1 & 7;
+            return v2;
           };
-          function init2(me2, seed2) {
-            var j, w, X = [];
+          function init2(me3, seed2) {
+            var j2, w2, X2 = [];
             if (seed2 === (seed2 | 0)) {
-              w = X[0] = seed2;
+              w2 = X2[0] = seed2;
             } else {
               seed2 = "" + seed2;
-              for (j = 0; j < seed2.length; ++j) {
-                X[j & 7] = X[j & 7] << 15 ^ seed2.charCodeAt(j) + X[j + 1 & 7] << 13;
+              for (j2 = 0; j2 < seed2.length; ++j2) {
+                X2[j2 & 7] = X2[j2 & 7] << 15 ^ seed2.charCodeAt(j2) + X2[j2 + 1 & 7] << 13;
               }
             }
-            while (X.length < 8) X.push(0);
-            for (j = 0; j < 8 && X[j] === 0; ++j) ;
-            if (j == 8) w = X[7] = -1;
-            else w = X[j];
-            me2.x = X;
-            me2.i = 0;
-            for (j = 256; j > 0; --j) {
-              me2.next();
+            while (X2.length < 8) X2.push(0);
+            for (j2 = 0; j2 < 8 && X2[j2] === 0; ++j2) ;
+            if (j2 == 8) w2 = X2[7] = -1;
+            else w2 = X2[j2];
+            me3.x = X2;
+            me3.i = 0;
+            for (j2 = 256; j2 > 0; --j2) {
+              me3.next();
             }
           }
-          init2(me, seed);
+          init2(me2, seed);
         }
         function copy2(f, t) {
           t.x = f.x.slice();
@@ -415,61 +416,61 @@
       init_define_import_meta_trackerLookup();
       (function(global, module2, define2) {
         function XorGen(seed) {
-          var me = this;
-          me.next = function() {
-            var w = me.w, X = me.X, i = me.i, t, v;
-            me.w = w = w + 1640531527 | 0;
-            v = X[i + 34 & 127];
-            t = X[i = i + 1 & 127];
-            v ^= v << 13;
+          var me2 = this;
+          me2.next = function() {
+            var w2 = me2.w, X2 = me2.X, i = me2.i, t, v2;
+            me2.w = w2 = w2 + 1640531527 | 0;
+            v2 = X2[i + 34 & 127];
+            t = X2[i = i + 1 & 127];
+            v2 ^= v2 << 13;
             t ^= t << 17;
-            v ^= v >>> 15;
+            v2 ^= v2 >>> 15;
             t ^= t >>> 12;
-            v = X[i] = v ^ t;
-            me.i = i;
-            return v + (w ^ w >>> 16) | 0;
+            v2 = X2[i] = v2 ^ t;
+            me2.i = i;
+            return v2 + (w2 ^ w2 >>> 16) | 0;
           };
-          function init2(me2, seed2) {
-            var t, v, i, j, w, X = [], limit = 128;
+          function init2(me3, seed2) {
+            var t, v2, i, j2, w2, X2 = [], limit = 128;
             if (seed2 === (seed2 | 0)) {
-              v = seed2;
+              v2 = seed2;
               seed2 = null;
             } else {
               seed2 = seed2 + "\0";
-              v = 0;
+              v2 = 0;
               limit = Math.max(limit, seed2.length);
             }
-            for (i = 0, j = -32; j < limit; ++j) {
-              if (seed2) v ^= seed2.charCodeAt((j + 32) % seed2.length);
-              if (j === 0) w = v;
-              v ^= v << 10;
-              v ^= v >>> 15;
-              v ^= v << 4;
-              v ^= v >>> 13;
-              if (j >= 0) {
-                w = w + 1640531527 | 0;
-                t = X[j & 127] ^= v + w;
+            for (i = 0, j2 = -32; j2 < limit; ++j2) {
+              if (seed2) v2 ^= seed2.charCodeAt((j2 + 32) % seed2.length);
+              if (j2 === 0) w2 = v2;
+              v2 ^= v2 << 10;
+              v2 ^= v2 >>> 15;
+              v2 ^= v2 << 4;
+              v2 ^= v2 >>> 13;
+              if (j2 >= 0) {
+                w2 = w2 + 1640531527 | 0;
+                t = X2[j2 & 127] ^= v2 + w2;
                 i = 0 == t ? i + 1 : 0;
               }
             }
             if (i >= 128) {
-              X[(seed2 && seed2.length || 0) & 127] = -1;
+              X2[(seed2 && seed2.length || 0) & 127] = -1;
             }
             i = 127;
-            for (j = 4 * 128; j > 0; --j) {
-              v = X[i + 34 & 127];
-              t = X[i = i + 1 & 127];
-              v ^= v << 13;
+            for (j2 = 4 * 128; j2 > 0; --j2) {
+              v2 = X2[i + 34 & 127];
+              t = X2[i = i + 1 & 127];
+              v2 ^= v2 << 13;
               t ^= t << 17;
-              v ^= v >>> 15;
+              v2 ^= v2 >>> 15;
               t ^= t >>> 12;
-              X[i] = v ^ t;
+              X2[i] = v2 ^ t;
             }
-            me2.w = w;
-            me2.X = X;
-            me2.i = i;
+            me3.w = w2;
+            me3.X = X2;
+            me3.i = i;
           }
-          init2(me, seed);
+          init2(me2, seed);
         }
         function copy2(f, t) {
           t.i = f.i;
@@ -525,31 +526,31 @@
       init_define_import_meta_trackerLookup();
       (function(global, module2, define2) {
         function XorGen(seed) {
-          var me = this, strseed = "";
-          me.next = function() {
-            var b = me.b, c = me.c, d = me.d, a = me.a;
-            b = b << 25 ^ b >>> 7 ^ c;
+          var me2 = this, strseed = "";
+          me2.next = function() {
+            var b2 = me2.b, c = me2.c, d = me2.d, a = me2.a;
+            b2 = b2 << 25 ^ b2 >>> 7 ^ c;
             c = c - d | 0;
             d = d << 24 ^ d >>> 8 ^ a;
-            a = a - b | 0;
-            me.b = b = b << 20 ^ b >>> 12 ^ c;
-            me.c = c = c - d | 0;
-            me.d = d << 16 ^ c >>> 16 ^ a;
-            return me.a = a - b | 0;
+            a = a - b2 | 0;
+            me2.b = b2 = b2 << 20 ^ b2 >>> 12 ^ c;
+            me2.c = c = c - d | 0;
+            me2.d = d << 16 ^ c >>> 16 ^ a;
+            return me2.a = a - b2 | 0;
           };
-          me.a = 0;
-          me.b = 0;
-          me.c = 2654435769 | 0;
-          me.d = 1367130551;
+          me2.a = 0;
+          me2.b = 0;
+          me2.c = 2654435769 | 0;
+          me2.d = 1367130551;
           if (seed === Math.floor(seed)) {
-            me.a = seed / 4294967296 | 0;
-            me.b = seed | 0;
+            me2.a = seed / 4294967296 | 0;
+            me2.b = seed | 0;
           } else {
             strseed += seed;
           }
-          for (var k = 0; k < strseed.length + 20; k++) {
-            me.b ^= strseed.charCodeAt(k) | 0;
-            me.next();
+          for (var k2 = 0; k2 < strseed.length + 20; k2++) {
+            me2.b ^= strseed.charCodeAt(k2) | 0;
+            me2.next();
           }
         }
         function copy2(f, t) {
@@ -644,18 +645,18 @@
           ), key);
           var arc4 = new ARC4(key);
           var prng = function() {
-            var n = arc4.g(chunks), d = startdenom, x = 0;
+            var n = arc4.g(chunks), d = startdenom, x2 = 0;
             while (n < significance) {
-              n = (n + x) * width;
+              n = (n + x2) * width;
               d *= width;
-              x = arc4.g(1);
+              x2 = arc4.g(1);
             }
             while (n >= overflow) {
               n /= 2;
               d /= 2;
-              x >>>= 1;
+              x2 >>>= 1;
             }
-            return (n + x) / d;
+            return (n + x2) / d;
           };
           prng.int32 = function() {
             return arc4.g(4) | 0;
@@ -686,7 +687,7 @@
           );
         }
         function ARC4(key) {
-          var t, keylen = key.length, me = this, i = 0, j = me.i = me.j = 0, s = me.S = [];
+          var t, keylen = key.length, me2 = this, i = 0, j2 = me2.i = me2.j = 0, s = me2.S = [];
           if (!keylen) {
             key = [keylen++];
           }
@@ -694,17 +695,17 @@
             s[i] = i++;
           }
           for (i = 0; i < width; i++) {
-            s[i] = s[j = mask & j + key[i % keylen] + (t = s[i])];
-            s[j] = t;
+            s[i] = s[j2 = mask & j2 + key[i % keylen] + (t = s[i])];
+            s[j2] = t;
           }
-          (me.g = function(count) {
-            var t2, r = 0, i2 = me.i, j2 = me.j, s2 = me.S;
+          (me2.g = function(count) {
+            var t2, r = 0, i2 = me2.i, j3 = me2.j, s2 = me2.S;
             while (count--) {
               t2 = s2[i2 = mask & i2 + 1];
-              r = r * width + s2[mask & (s2[i2] = s2[j2 = mask & j2 + t2]) + (s2[j2] = t2)];
+              r = r * width + s2[mask & (s2[i2] = s2[j3 = mask & j3 + t2]) + (s2[j3] = t2)];
             }
-            me.i = i2;
-            me.j = j2;
+            me2.i = i2;
+            me2.j = j3;
             return r;
           })(width);
         }
@@ -728,9 +729,9 @@
           return result.length ? result : typ == "string" ? obj : obj + "\0";
         }
         function mixkey(seed, key) {
-          var stringseed = seed + "", smear, j = 0;
-          while (j < stringseed.length) {
-            key[mask & j] = mask & (smear ^= key[mask & j] * 19) + stringseed.charCodeAt(j++);
+          var stringseed = seed + "", smear, j2 = 0;
+          while (j2 < stringseed.length) {
+            key[mask & j2] = mask & (smear ^= key[mask & j2] * 19) + stringseed.charCodeAt(j2++);
           }
           return tostring(key);
         }
@@ -888,8 +889,8 @@
   function getGlobal() {
     return globalObj;
   }
-  function nextRandom(v) {
-    return Math.abs(v >> 1 | (v << 62 ^ v << 61) & ~(~0 << 63) << 62);
+  function nextRandom(v2) {
+    return Math.abs(v2 >> 1 | (v2 << 62 ^ v2 << 61) & ~(~0 << 63) << 62);
   }
   var exemptionLists = {};
   function shouldExemptUrl(type, url) {
@@ -917,22 +918,30 @@
     }
     return globalThis.top !== globalThis.window;
   }
-  function getTabHostname() {
-    let framingOrigin = null;
+  function getTabUrl() {
+    let framingURLString = null;
     try {
-      framingOrigin = globalThis.top.location.href;
+      framingURLString = globalThis.top.location.href;
     } catch {
-      framingOrigin = globalThis.document.referrer;
+      framingURLString = getTopLevelOriginFromFrameAncestors() ?? globalThis.document.referrer;
     }
+    let framingURL;
+    try {
+      framingURL = new URL(framingURLString);
+    } catch {
+      framingURL = null;
+    }
+    return framingURL;
+  }
+  function getTopLevelOriginFromFrameAncestors() {
     if ("ancestorOrigins" in globalThis.location && globalThis.location.ancestorOrigins.length) {
-      framingOrigin = globalThis.location.ancestorOrigins.item(globalThis.location.ancestorOrigins.length - 1);
+      return globalThis.location.ancestorOrigins.item(globalThis.location.ancestorOrigins.length - 1);
     }
-    try {
-      framingOrigin = new URL(framingOrigin).hostname;
-    } catch {
-      framingOrigin = null;
-    }
-    return framingOrigin;
+    return null;
+  }
+  function getTabHostname() {
+    const topURLString = getTabUrl()?.hostname;
+    return topURLString || null;
   }
   function matchHostname(hostname, exceptionDomain) {
     return hostname === exceptionDomain || hostname.endsWith(`.${exceptionDomain}`);
@@ -977,7 +986,7 @@
     let item = key.charCodeAt(0);
     for (const i in key) {
       let byte = key.charCodeAt(i);
-      for (let j = 8; j >= 0; j--) {
+      for (let j2 = 8; j2 >= 0; j2--) {
         const res = callback(item, byte);
         if (res === null) {
           return;
@@ -991,7 +1000,7 @@
     return isPlatformSpecificFeature(feature) ? !args.site.enabledFeatures.includes(feature) : args.site.isBroken || args.site.allowlisted || !args.site.enabledFeatures.includes(feature);
   }
   function camelcase(dashCaseText) {
-    return dashCaseText.replace(/-(.)/g, (_, letter) => {
+    return dashCaseText.replace(/-(.)/g, (_2, letter) => {
       return letter.toUpperCase();
     });
   }
@@ -1176,7 +1185,8 @@
   function computeLimitedSiteObject() {
     const topLevelHostname = getTabHostname();
     return {
-      domain: topLevelHostname
+      domain: topLevelHostname,
+      url: getTabUrl()?.href || null
     };
   }
   function getPlatformVersion(preferences) {
@@ -1493,13 +1503,13 @@
        * @return {Number} The requested slice.
        */
       extract: function(a, bstart, blength) {
-        var x, sh = Math.floor(-bstart - blength & 31);
+        var x2, sh = Math.floor(-bstart - blength & 31);
         if ((bstart + blength - 1 ^ bstart) & -32) {
-          x = a[bstart / 32 | 0] << 32 - sh ^ a[bstart / 32 + 1 | 0] >>> sh;
+          x2 = a[bstart / 32 | 0] << 32 - sh ^ a[bstart / 32 + 1 | 0] >>> sh;
         } else {
-          x = a[bstart / 32 | 0] >>> sh;
+          x2 = a[bstart / 32 | 0] >>> sh;
         }
-        return x & (1 << blength) - 1;
+        return x2 & (1 << blength) - 1;
       },
       /**
        * Concatenate two bit arrays.
@@ -1524,12 +1534,12 @@
        * @return {Number} The length of a, in bits.
        */
       bitLength: function(a) {
-        var l = a.length, x;
+        var l = a.length, x2;
         if (l === 0) {
           return 0;
         }
-        x = a[l - 1];
-        return (l - 1) * 32 + sjcl2.bitArray.getPartial(x);
+        x2 = a[l - 1];
+        return (l - 1) * 32 + sjcl2.bitArray.getPartial(x2);
       },
       /**
        * Truncate an array.
@@ -1556,19 +1566,19 @@
        * @param {Number} [_end=0] Pass 1 if x has already been shifted to the high side.
        * @return {Number} The partial word.
        */
-      partial: function(len, x, _end) {
+      partial: function(len, x2, _end) {
         if (len === 32) {
-          return x;
+          return x2;
         }
-        return (_end ? x | 0 : x << 32 - len) + len * 1099511627776;
+        return (_end ? x2 | 0 : x2 << 32 - len) + len * 1099511627776;
       },
       /**
        * Get the number of bits used by a partial word.
        * @param {Number} x The partial word.
        * @return {Number} The number of bits used by the partial word.
        */
-      getPartial: function(x) {
-        return Math.round(x / 1099511627776) || 32;
+      getPartial: function(x2) {
+        return Math.round(x2 / 1099511627776) || 32;
       },
       /**
        * Compare two arrays for equality in a predictable amount of time.
@@ -1576,15 +1586,15 @@
        * @param {bitArray} b The second array.
        * @return {boolean} true if a == b; false otherwise.
        */
-      equal: function(a, b) {
-        if (sjcl2.bitArray.bitLength(a) !== sjcl2.bitArray.bitLength(b)) {
+      equal: function(a, b2) {
+        if (sjcl2.bitArray.bitLength(a) !== sjcl2.bitArray.bitLength(b2)) {
           return false;
         }
-        var x = 0, i;
+        var x2 = 0, i;
         for (i = 0; i < a.length; i++) {
-          x |= a[i] ^ b[i];
+          x2 |= a[i] ^ b2[i];
         }
-        return x === 0;
+        return x2 === 0;
       },
       /** Shift an array right.
        * @param {bitArray} a The array to shift.
@@ -1617,8 +1627,8 @@
       /** xor a block of 4 words together.
        * @private
        */
-      _xor4: function(x, y) {
-        return [x[0] ^ y[0], x[1] ^ y[1], x[2] ^ y[2], x[3] ^ y[3]];
+      _xor4: function(x2, y2) {
+        return [x2[0] ^ y2[0], x2[1] ^ y2[1], x2[2] ^ y2[2], x2[3] ^ y2[3]];
       },
       /** byteswap a word array inplace.
        * (does not handle partial words)
@@ -1626,10 +1636,10 @@
        * @return {sjcl.bitArray} byteswapped array
        */
       byteswapM: function(a) {
-        var i, v, m = 65280;
+        var i, v2, m = 65280;
         for (i = 0; i < a.length; ++i) {
-          v = a[i];
-          a[i] = v >>> 24 | v >>> 8 & m | (v & m) << 8 | v << 24;
+          v2 = a[i];
+          a[i] = v2 >>> 24 | v2 >>> 8 & m | (v2 & m) << 8 | v2 << 24;
         }
         return a;
       }
@@ -1725,21 +1735,21 @@
         if (typeof data === "string") {
           data = sjcl2.codec.utf8String.toBits(data);
         }
-        var i, b = this._buffer = sjcl2.bitArray.concat(this._buffer, data), ol = this._length, nl = this._length = ol + sjcl2.bitArray.bitLength(data);
+        var i, b2 = this._buffer = sjcl2.bitArray.concat(this._buffer, data), ol = this._length, nl = this._length = ol + sjcl2.bitArray.bitLength(data);
         if (nl > 9007199254740991) {
           throw new sjcl2.exception.invalid("Cannot hash more than 2^53 - 1 bits");
         }
         if (typeof Uint32Array !== "undefined") {
-          var c = new Uint32Array(b);
-          var j = 0;
+          var c = new Uint32Array(b2);
+          var j2 = 0;
           for (i = 512 + ol - (512 + ol & 511); i <= nl; i += 512) {
-            this._block(c.subarray(16 * j, 16 * (j + 1)));
-            j += 1;
+            this._block(c.subarray(16 * j2, 16 * (j2 + 1)));
+            j2 += 1;
           }
-          b.splice(0, 16 * j);
+          b2.splice(0, 16 * j2);
         } else {
           for (i = 512 + ol - (512 + ol & 511); i <= nl; i += 512) {
-            this._block(b.splice(0, 16));
+            this._block(b2.splice(0, 16));
           }
         }
         return this;
@@ -1749,15 +1759,15 @@
        * @return {bitArray} The hash value, an array of 8 big-endian words.
        */
       finalize: function() {
-        var i, b = this._buffer, h = this._h;
-        b = sjcl2.bitArray.concat(b, [sjcl2.bitArray.partial(1, 1)]);
-        for (i = b.length + 2; i & 15; i++) {
-          b.push(0);
+        var i, b2 = this._buffer, h = this._h;
+        b2 = sjcl2.bitArray.concat(b2, [sjcl2.bitArray.partial(1, 1)]);
+        for (i = b2.length + 2; i & 15; i++) {
+          b2.push(0);
         }
-        b.push(Math.floor(this._length / 4294967296));
-        b.push(this._length | 0);
-        while (b.length) {
-          this._block(b.splice(0, 16));
+        b2.push(Math.floor(this._length / 4294967296));
+        b2.push(this._length | 0);
+        while (b2.length) {
+          this._block(b2.splice(0, 16));
         }
         this.reset();
         return h;
@@ -1792,8 +1802,8 @@
        */
       _precompute: function() {
         var i = 0, prime = 2, factor, isPrime;
-        function frac(x) {
-          return (x - Math.floor(x)) * 4294967296 | 0;
+        function frac(x2) {
+          return (x2 - Math.floor(x2)) * 4294967296 | 0;
         }
         for (; i < 64; prime++) {
           isPrime = true;
@@ -1817,17 +1827,17 @@
        * @param {Uint32Array|bitArray} w one block of words.
        * @private
        */
-      _block: function(w) {
-        var i, tmp, a, b, h = this._h, k = this._key, h0 = h[0], h1 = h[1], h2 = h[2], h3 = h[3], h4 = h[4], h5 = h[5], h6 = h[6], h7 = h[7];
+      _block: function(w2) {
+        var i, tmp, a, b2, h = this._h, k2 = this._key, h0 = h[0], h1 = h[1], h2 = h[2], h3 = h[3], h4 = h[4], h5 = h[5], h6 = h[6], h7 = h[7];
         for (i = 0; i < 64; i++) {
           if (i < 16) {
-            tmp = w[i];
+            tmp = w2[i];
           } else {
-            a = w[i + 1 & 15];
-            b = w[i + 14 & 15];
-            tmp = w[i & 15] = (a >>> 7 ^ a >>> 18 ^ a >>> 3 ^ a << 25 ^ a << 14) + (b >>> 17 ^ b >>> 19 ^ b >>> 10 ^ b << 15 ^ b << 13) + w[i & 15] + w[i + 9 & 15] | 0;
+            a = w2[i + 1 & 15];
+            b2 = w2[i + 14 & 15];
+            tmp = w2[i & 15] = (a >>> 7 ^ a >>> 18 ^ a >>> 3 ^ a << 25 ^ a << 14) + (b2 >>> 17 ^ b2 >>> 19 ^ b2 >>> 10 ^ b2 << 15 ^ b2 << 13) + w2[i & 15] + w2[i + 9 & 15] | 0;
           }
-          tmp = tmp + h7 + (h4 >>> 6 ^ h4 >>> 11 ^ h4 >>> 25 ^ h4 << 26 ^ h4 << 21 ^ h4 << 7) + (h6 ^ h4 & (h5 ^ h6)) + k[i];
+          tmp = tmp + h7 + (h4 >>> 6 ^ h4 >>> 11 ^ h4 >>> 25 ^ h4 << 26 ^ h4 << 21 ^ h4 << 7) + (h6 ^ h4 & (h5 ^ h6)) + k2[i];
           h7 = h6;
           h6 = h5;
           h5 = h4;
@@ -1879,7 +1889,7 @@
       this._resultHash.update(data);
     };
     sjcl2.misc.hmac.prototype.digest = function() {
-      var w = this._resultHash.finalize(), result = new this._hash(this._baseHash[1]).update(w).finalize();
+      var w2 = this._resultHash.finalize(), result = new this._hash(this._baseHash[1]).update(w2).finalize();
       this.reset();
       return result;
     };
@@ -3131,8 +3141,8 @@
 
   // ../node_modules/immutable-json-patch/lib/esm/utils.js
   init_define_import_meta_trackerLookup();
-  function isEqual(a, b) {
-    return JSON.stringify(a) === JSON.stringify(b);
+  function isEqual(a, b2) {
+    return JSON.stringify(a) === JSON.stringify(b2);
   }
   function initial(array) {
     return array.slice(0, array.length - 1);
@@ -3405,6 +3415,729 @@
     return parseJSONPointer(fromPointer);
   }
 
+  // ../node_modules/urlpattern-polyfill/index.js
+  init_define_import_meta_trackerLookup();
+
+  // ../node_modules/urlpattern-polyfill/dist/urlpattern.js
+  init_define_import_meta_trackerLookup();
+  var R = class {
+    constructor(t, r, n, o, c, l) {
+      __publicField(this, "type", 3);
+      __publicField(this, "name", "");
+      __publicField(this, "prefix", "");
+      __publicField(this, "value", "");
+      __publicField(this, "suffix", "");
+      __publicField(this, "modifier", 3);
+      this.type = t, this.name = r, this.prefix = n, this.value = o, this.suffix = c, this.modifier = l;
+    }
+    hasCustomName() {
+      return this.name !== "" && typeof this.name != "number";
+    }
+  };
+  var be = /[$_\p{ID_Start}]/u;
+  var Pe = /[$_\u200C\u200D\p{ID_Continue}]/u;
+  var M = ".*";
+  function Re(e, t) {
+    return (t ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(e);
+  }
+  function v(e, t = false) {
+    let r = [], n = 0;
+    for (; n < e.length; ) {
+      let o = e[n], c = function(l) {
+        if (!t) throw new TypeError(l);
+        r.push({ type: "INVALID_CHAR", index: n, value: e[n++] });
+      };
+      if (o === "*") {
+        r.push({ type: "ASTERISK", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "+" || o === "?") {
+        r.push({ type: "OTHER_MODIFIER", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "\\") {
+        r.push({ type: "ESCAPED_CHAR", index: n++, value: e[n++] });
+        continue;
+      }
+      if (o === "{") {
+        r.push({ type: "OPEN", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "}") {
+        r.push({ type: "CLOSE", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === ":") {
+        let l = "", s = n + 1;
+        for (; s < e.length; ) {
+          let i = e.substr(s, 1);
+          if (s === n + 1 && be.test(i) || s !== n + 1 && Pe.test(i)) {
+            l += e[s++];
+            continue;
+          }
+          break;
+        }
+        if (!l) {
+          c(`Missing parameter name at ${n}`);
+          continue;
+        }
+        r.push({ type: "NAME", index: n, value: l }), n = s;
+        continue;
+      }
+      if (o === "(") {
+        let l = 1, s = "", i = n + 1, a = false;
+        if (e[i] === "?") {
+          c(`Pattern cannot start with "?" at ${i}`);
+          continue;
+        }
+        for (; i < e.length; ) {
+          if (!Re(e[i], false)) {
+            c(`Invalid character '${e[i]}' at ${i}.`), a = true;
+            break;
+          }
+          if (e[i] === "\\") {
+            s += e[i++] + e[i++];
+            continue;
+          }
+          if (e[i] === ")") {
+            if (l--, l === 0) {
+              i++;
+              break;
+            }
+          } else if (e[i] === "(" && (l++, e[i + 1] !== "?")) {
+            c(`Capturing groups are not allowed at ${i}`), a = true;
+            break;
+          }
+          s += e[i++];
+        }
+        if (a) continue;
+        if (l) {
+          c(`Unbalanced pattern at ${n}`);
+          continue;
+        }
+        if (!s) {
+          c(`Missing pattern at ${n}`);
+          continue;
+        }
+        r.push({ type: "REGEX", index: n, value: s }), n = i;
+        continue;
+      }
+      r.push({ type: "CHAR", index: n, value: e[n++] });
+    }
+    return r.push({ type: "END", index: n, value: "" }), r;
+  }
+  function D(e, t = {}) {
+    let r = v(e);
+    t.delimiter ??= "/#?", t.prefixes ??= "./";
+    let n = `[^${S(t.delimiter)}]+?`, o = [], c = 0, l = 0, s = "", i = /* @__PURE__ */ new Set(), a = (h) => {
+      if (l < r.length && r[l].type === h) return r[l++].value;
+    }, f = () => a("OTHER_MODIFIER") ?? a("ASTERISK"), d = (h) => {
+      let u = a(h);
+      if (u !== void 0) return u;
+      let { type: p, index: A } = r[l];
+      throw new TypeError(`Unexpected ${p} at ${A}, expected ${h}`);
+    }, T = () => {
+      let h = "", u;
+      for (; u = a("CHAR") ?? a("ESCAPED_CHAR"); ) h += u;
+      return h;
+    }, Se = (h) => h, L = t.encodePart || Se, I = "", U = (h) => {
+      I += h;
+    }, $ = () => {
+      I.length && (o.push(new R(3, "", "", L(I), "", 3)), I = "");
+    }, V = (h, u, p, A, Y) => {
+      let g = 3;
+      switch (Y) {
+        case "?":
+          g = 1;
+          break;
+        case "*":
+          g = 0;
+          break;
+        case "+":
+          g = 2;
+          break;
+      }
+      if (!u && !p && g === 3) {
+        U(h);
+        return;
+      }
+      if ($(), !u && !p) {
+        if (!h) return;
+        o.push(new R(3, "", "", L(h), "", g));
+        return;
+      }
+      let m;
+      p ? p === "*" ? m = M : m = p : m = n;
+      let O = 2;
+      m === n ? (O = 1, m = "") : m === M && (O = 0, m = "");
+      let P;
+      if (u ? P = u : p && (P = c++), i.has(P)) throw new TypeError(`Duplicate name '${P}'.`);
+      i.add(P), o.push(new R(O, P, L(h), m, L(A), g));
+    };
+    for (; l < r.length; ) {
+      let h = a("CHAR"), u = a("NAME"), p = a("REGEX");
+      if (!u && !p && (p = a("ASTERISK")), u || p) {
+        let g = h ?? "";
+        t.prefixes.indexOf(g) === -1 && (U(g), g = ""), $();
+        let m = f();
+        V(g, u, p, "", m);
+        continue;
+      }
+      let A = h ?? a("ESCAPED_CHAR");
+      if (A) {
+        U(A);
+        continue;
+      }
+      if (a("OPEN")) {
+        let g = T(), m = a("NAME"), O = a("REGEX");
+        !m && !O && (O = a("ASTERISK"));
+        let P = T();
+        d("CLOSE");
+        let xe = f();
+        V(g, m, O, P, xe);
+        continue;
+      }
+      $(), d("END");
+    }
+    return o;
+  }
+  function S(e) {
+    return e.replace(/([.+*?^${}()[\]|/\\])/g, "\\$1");
+  }
+  function X(e) {
+    return e && e.ignoreCase ? "ui" : "u";
+  }
+  function Z(e, t, r) {
+    return F(D(e, r), t, r);
+  }
+  function k(e) {
+    switch (e) {
+      case 0:
+        return "*";
+      case 1:
+        return "?";
+      case 2:
+        return "+";
+      case 3:
+        return "";
+    }
+  }
+  function F(e, t, r = {}) {
+    r.delimiter ??= "/#?", r.prefixes ??= "./", r.sensitive ??= false, r.strict ??= false, r.end ??= true, r.start ??= true, r.endsWith = "";
+    let n = r.start ? "^" : "";
+    for (let s of e) {
+      if (s.type === 3) {
+        s.modifier === 3 ? n += S(s.value) : n += `(?:${S(s.value)})${k(s.modifier)}`;
+        continue;
+      }
+      t && t.push(s.name);
+      let i = `[^${S(r.delimiter)}]+?`, a = s.value;
+      if (s.type === 1 ? a = i : s.type === 0 && (a = M), !s.prefix.length && !s.suffix.length) {
+        s.modifier === 3 || s.modifier === 1 ? n += `(${a})${k(s.modifier)}` : n += `((?:${a})${k(s.modifier)})`;
+        continue;
+      }
+      if (s.modifier === 3 || s.modifier === 1) {
+        n += `(?:${S(s.prefix)}(${a})${S(s.suffix)})`, n += k(s.modifier);
+        continue;
+      }
+      n += `(?:${S(s.prefix)}`, n += `((?:${a})(?:`, n += S(s.suffix), n += S(s.prefix), n += `(?:${a}))*)${S(s.suffix)})`, s.modifier === 0 && (n += "?");
+    }
+    let o = `[${S(r.endsWith)}]|$`, c = `[${S(r.delimiter)}]`;
+    if (r.end) return r.strict || (n += `${c}?`), r.endsWith.length ? n += `(?=${o})` : n += "$", new RegExp(n, X(r));
+    r.strict || (n += `(?:${c}(?=${o}))?`);
+    let l = false;
+    if (e.length) {
+      let s = e[e.length - 1];
+      s.type === 3 && s.modifier === 3 && (l = r.delimiter.indexOf(s) > -1);
+    }
+    return l || (n += `(?=${c}|${o})`), new RegExp(n, X(r));
+  }
+  var x = { delimiter: "", prefixes: "", sensitive: true, strict: true };
+  var B = { delimiter: ".", prefixes: "", sensitive: true, strict: true };
+  var q = { delimiter: "/", prefixes: "/", sensitive: true, strict: true };
+  function J(e, t) {
+    return e.length ? e[0] === "/" ? true : !t || e.length < 2 ? false : (e[0] == "\\" || e[0] == "{") && e[1] == "/" : false;
+  }
+  function Q(e, t) {
+    return e.startsWith(t) ? e.substring(t.length, e.length) : e;
+  }
+  function Ee(e, t) {
+    return e.endsWith(t) ? e.substr(0, e.length - t.length) : e;
+  }
+  function W(e) {
+    return !e || e.length < 2 ? false : e[0] === "[" || (e[0] === "\\" || e[0] === "{") && e[1] === "[";
+  }
+  var ee = ["ftp", "file", "http", "https", "ws", "wss"];
+  function N(e) {
+    if (!e) return true;
+    for (let t of ee) if (e.test(t)) return true;
+    return false;
+  }
+  function te(e, t) {
+    if (e = Q(e, "#"), t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.hash = e, r.hash ? r.hash.substring(1, r.hash.length) : "";
+  }
+  function re(e, t) {
+    if (e = Q(e, "?"), t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.search = e, r.search ? r.search.substring(1, r.search.length) : "";
+  }
+  function ne(e, t) {
+    return t || e === "" ? e : W(e) ? j(e) : z(e);
+  }
+  function se(e, t) {
+    if (t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.password = e, r.password;
+  }
+  function ie(e, t) {
+    if (t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.username = e, r.username;
+  }
+  function ae(e, t, r) {
+    if (r || e === "") return e;
+    if (t && !ee.includes(t)) return new URL(`${t}:${e}`).pathname;
+    let n = e[0] == "/";
+    return e = new URL(n ? e : "/-" + e, "https://example.com").pathname, n || (e = e.substring(2, e.length)), e;
+  }
+  function oe(e, t, r) {
+    return _(t) === e && (e = ""), r || e === "" ? e : K(e);
+  }
+  function ce(e, t) {
+    return e = Ee(e, ":"), t || e === "" ? e : y(e);
+  }
+  function _(e) {
+    switch (e) {
+      case "ws":
+      case "http":
+        return "80";
+      case "wws":
+      case "https":
+        return "443";
+      case "ftp":
+        return "21";
+      default:
+        return "";
+    }
+  }
+  function y(e) {
+    if (e === "") return e;
+    if (/^[-+.A-Za-z0-9]*$/.test(e)) return e.toLowerCase();
+    throw new TypeError(`Invalid protocol '${e}'.`);
+  }
+  function le(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.username = e, t.username;
+  }
+  function fe(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.password = e, t.password;
+  }
+  function z(e) {
+    if (e === "") return e;
+    if (/[\t\n\r #%/:<>?@[\]^\\|]/g.test(e)) throw new TypeError(`Invalid hostname '${e}'`);
+    let t = new URL("https://example.com");
+    return t.hostname = e, t.hostname;
+  }
+  function j(e) {
+    if (e === "") return e;
+    if (/[^0-9a-fA-F[\]:]/g.test(e)) throw new TypeError(`Invalid IPv6 hostname '${e}'`);
+    return e.toLowerCase();
+  }
+  function K(e) {
+    if (e === "" || /^[0-9]*$/.test(e) && parseInt(e) <= 65535) return e;
+    throw new TypeError(`Invalid port '${e}'.`);
+  }
+  function he(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.pathname = e[0] !== "/" ? "/-" + e : e, e[0] !== "/" ? t.pathname.substring(2, t.pathname.length) : t.pathname;
+  }
+  function ue(e) {
+    return e === "" ? e : new URL(`data:${e}`).pathname;
+  }
+  function de(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.search = e, t.search.substring(1, t.search.length);
+  }
+  function pe(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.hash = e, t.hash.substring(1, t.hash.length);
+  }
+  var _i, _n, _t, _e, _s, _l, _o, _d, _p, _g, _H_instances, r_fn, R_fn, b_fn, u_fn, m_fn, a_fn, P_fn, E_fn, S_fn, O_fn, k_fn, x_fn, h_fn, f_fn, T_fn, A_fn, y_fn, w_fn, c_fn, C_fn, _a;
+  var H = (_a = class {
+    constructor(t) {
+      __privateAdd(this, _H_instances);
+      __privateAdd(this, _i);
+      __privateAdd(this, _n, []);
+      __privateAdd(this, _t, {});
+      __privateAdd(this, _e, 0);
+      __privateAdd(this, _s, 1);
+      __privateAdd(this, _l, 0);
+      __privateAdd(this, _o, 0);
+      __privateAdd(this, _d, 0);
+      __privateAdd(this, _p, 0);
+      __privateAdd(this, _g, false);
+      __privateSet(this, _i, t);
+    }
+    get result() {
+      return __privateGet(this, _t);
+    }
+    parse() {
+      for (__privateSet(this, _n, v(__privateGet(this, _i), true)); __privateGet(this, _e) < __privateGet(this, _n).length; __privateSet(this, _e, __privateGet(this, _e) + __privateGet(this, _s))) {
+        if (__privateSet(this, _s, 1), __privateGet(this, _n)[__privateGet(this, _e)].type === "END") {
+          if (__privateGet(this, _o) === 0) {
+            __privateMethod(this, _H_instances, b_fn).call(this), __privateMethod(this, _H_instances, f_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 9, 1) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, r_fn).call(this, 7, 0);
+            continue;
+          } else if (__privateGet(this, _o) === 2) {
+            __privateMethod(this, _H_instances, u_fn).call(this, 5);
+            continue;
+          }
+          __privateMethod(this, _H_instances, r_fn).call(this, 10, 0);
+          break;
+        }
+        if (__privateGet(this, _d) > 0) if (__privateMethod(this, _H_instances, A_fn).call(this)) __privateSet(this, _d, __privateGet(this, _d) - 1);
+        else continue;
+        if (__privateMethod(this, _H_instances, T_fn).call(this)) {
+          __privateSet(this, _d, __privateGet(this, _d) + 1);
+          continue;
+        }
+        switch (__privateGet(this, _o)) {
+          case 0:
+            __privateMethod(this, _H_instances, P_fn).call(this) && __privateMethod(this, _H_instances, u_fn).call(this, 1);
+            break;
+          case 1:
+            if (__privateMethod(this, _H_instances, P_fn).call(this)) {
+              __privateMethod(this, _H_instances, C_fn).call(this);
+              let t = 7, r = 1;
+              __privateMethod(this, _H_instances, E_fn).call(this) ? (t = 2, r = 3) : __privateGet(this, _g) && (t = 2), __privateMethod(this, _H_instances, r_fn).call(this, t, r);
+            }
+            break;
+          case 2:
+            __privateMethod(this, _H_instances, S_fn).call(this) ? __privateMethod(this, _H_instances, u_fn).call(this, 3) : (__privateMethod(this, _H_instances, x_fn).call(this) || __privateMethod(this, _H_instances, h_fn).call(this) || __privateMethod(this, _H_instances, f_fn).call(this)) && __privateMethod(this, _H_instances, u_fn).call(this, 5);
+            break;
+          case 3:
+            __privateMethod(this, _H_instances, O_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 4, 1) : __privateMethod(this, _H_instances, S_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 5, 1);
+            break;
+          case 4:
+            __privateMethod(this, _H_instances, S_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 5, 1);
+            break;
+          case 5:
+            __privateMethod(this, _H_instances, y_fn).call(this) ? __privateSet(this, _p, __privateGet(this, _p) + 1) : __privateMethod(this, _H_instances, w_fn).call(this) && __privateSet(this, _p, __privateGet(this, _p) - 1), __privateMethod(this, _H_instances, k_fn).call(this) && !__privateGet(this, _p) ? __privateMethod(this, _H_instances, r_fn).call(this, 6, 1) : __privateMethod(this, _H_instances, x_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 7, 0) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 6:
+            __privateMethod(this, _H_instances, x_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 7, 0) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 7:
+            __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 8:
+            __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 9:
+            break;
+          case 10:
+            break;
+        }
+      }
+      __privateGet(this, _t).hostname !== void 0 && __privateGet(this, _t).port === void 0 && (__privateGet(this, _t).port = "");
+    }
+  }, _i = new WeakMap(), _n = new WeakMap(), _t = new WeakMap(), _e = new WeakMap(), _s = new WeakMap(), _l = new WeakMap(), _o = new WeakMap(), _d = new WeakMap(), _p = new WeakMap(), _g = new WeakMap(), _H_instances = new WeakSet(), r_fn = function(t, r) {
+    switch (__privateGet(this, _o)) {
+      case 0:
+        break;
+      case 1:
+        __privateGet(this, _t).protocol = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 2:
+        break;
+      case 3:
+        __privateGet(this, _t).username = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 4:
+        __privateGet(this, _t).password = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 5:
+        __privateGet(this, _t).hostname = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 6:
+        __privateGet(this, _t).port = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 7:
+        __privateGet(this, _t).pathname = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 8:
+        __privateGet(this, _t).search = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 9:
+        __privateGet(this, _t).hash = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 10:
+        break;
+    }
+    __privateGet(this, _o) !== 0 && t !== 10 && ([1, 2, 3, 4].includes(__privateGet(this, _o)) && [6, 7, 8, 9].includes(t) && (__privateGet(this, _t).hostname ??= ""), [1, 2, 3, 4, 5, 6].includes(__privateGet(this, _o)) && [8, 9].includes(t) && (__privateGet(this, _t).pathname ??= __privateGet(this, _g) ? "/" : ""), [1, 2, 3, 4, 5, 6, 7].includes(__privateGet(this, _o)) && t === 9 && (__privateGet(this, _t).search ??= "")), __privateMethod(this, _H_instances, R_fn).call(this, t, r);
+  }, R_fn = function(t, r) {
+    __privateSet(this, _o, t), __privateSet(this, _l, __privateGet(this, _e) + r), __privateSet(this, _e, __privateGet(this, _e) + r), __privateSet(this, _s, 0);
+  }, b_fn = function() {
+    __privateSet(this, _e, __privateGet(this, _l)), __privateSet(this, _s, 0);
+  }, u_fn = function(t) {
+    __privateMethod(this, _H_instances, b_fn).call(this), __privateSet(this, _o, t);
+  }, m_fn = function(t) {
+    return t < 0 && (t = __privateGet(this, _n).length - t), t < __privateGet(this, _n).length ? __privateGet(this, _n)[t] : __privateGet(this, _n)[__privateGet(this, _n).length - 1];
+  }, a_fn = function(t, r) {
+    let n = __privateMethod(this, _H_instances, m_fn).call(this, t);
+    return n.value === r && (n.type === "CHAR" || n.type === "ESCAPED_CHAR" || n.type === "INVALID_CHAR");
+  }, P_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, E_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e) + 1, "/") && __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e) + 2, "/");
+  }, S_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "@");
+  }, O_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, k_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, x_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "/");
+  }, h_fn = function() {
+    if (__privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "?")) return true;
+    if (__privateGet(this, _n)[__privateGet(this, _e)].value !== "?") return false;
+    let t = __privateMethod(this, _H_instances, m_fn).call(this, __privateGet(this, _e) - 1);
+    return t.type !== "NAME" && t.type !== "REGEX" && t.type !== "CLOSE" && t.type !== "ASTERISK";
+  }, f_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "#");
+  }, T_fn = function() {
+    return __privateGet(this, _n)[__privateGet(this, _e)].type == "OPEN";
+  }, A_fn = function() {
+    return __privateGet(this, _n)[__privateGet(this, _e)].type == "CLOSE";
+  }, y_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "[");
+  }, w_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "]");
+  }, c_fn = function() {
+    let t = __privateGet(this, _n)[__privateGet(this, _e)], r = __privateMethod(this, _H_instances, m_fn).call(this, __privateGet(this, _l)).index;
+    return __privateGet(this, _i).substring(r, t.index);
+  }, C_fn = function() {
+    let t = {};
+    Object.assign(t, x), t.encodePart = y;
+    let r = Z(__privateMethod(this, _H_instances, c_fn).call(this), void 0, t);
+    __privateSet(this, _g, N(r));
+  }, _a);
+  var G = ["protocol", "username", "password", "hostname", "port", "pathname", "search", "hash"];
+  var E = "*";
+  function ge(e, t) {
+    if (typeof e != "string") throw new TypeError("parameter 1 is not of type 'string'.");
+    let r = new URL(e, t);
+    return { protocol: r.protocol.substring(0, r.protocol.length - 1), username: r.username, password: r.password, hostname: r.hostname, port: r.port, pathname: r.pathname, search: r.search !== "" ? r.search.substring(1, r.search.length) : void 0, hash: r.hash !== "" ? r.hash.substring(1, r.hash.length) : void 0 };
+  }
+  function b(e, t) {
+    return t ? C(e) : e;
+  }
+  function w(e, t, r) {
+    let n;
+    if (typeof t.baseURL == "string") try {
+      n = new URL(t.baseURL), t.protocol === void 0 && (e.protocol = b(n.protocol.substring(0, n.protocol.length - 1), r)), !r && t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.username === void 0 && (e.username = b(n.username, r)), !r && t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.username === void 0 && t.password === void 0 && (e.password = b(n.password, r)), t.protocol === void 0 && t.hostname === void 0 && (e.hostname = b(n.hostname, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && (e.port = b(n.port, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && (e.pathname = b(n.pathname, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && t.search === void 0 && (e.search = b(n.search.substring(1, n.search.length), r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && t.search === void 0 && t.hash === void 0 && (e.hash = b(n.hash.substring(1, n.hash.length), r));
+    } catch {
+      throw new TypeError(`invalid baseURL '${t.baseURL}'.`);
+    }
+    if (typeof t.protocol == "string" && (e.protocol = ce(t.protocol, r)), typeof t.username == "string" && (e.username = ie(t.username, r)), typeof t.password == "string" && (e.password = se(t.password, r)), typeof t.hostname == "string" && (e.hostname = ne(t.hostname, r)), typeof t.port == "string" && (e.port = oe(t.port, e.protocol, r)), typeof t.pathname == "string") {
+      if (e.pathname = t.pathname, n && !J(e.pathname, r)) {
+        let o = n.pathname.lastIndexOf("/");
+        o >= 0 && (e.pathname = b(n.pathname.substring(0, o + 1), r) + e.pathname);
+      }
+      e.pathname = ae(e.pathname, e.protocol, r);
+    }
+    return typeof t.search == "string" && (e.search = re(t.search, r)), typeof t.hash == "string" && (e.hash = te(t.hash, r)), e;
+  }
+  function C(e) {
+    return e.replace(/([+*?:{}()\\])/g, "\\$1");
+  }
+  function Oe(e) {
+    return e.replace(/([.+*?^${}()[\]|/\\])/g, "\\$1");
+  }
+  function ke(e, t) {
+    t.delimiter ??= "/#?", t.prefixes ??= "./", t.sensitive ??= false, t.strict ??= false, t.end ??= true, t.start ??= true, t.endsWith = "";
+    let r = ".*", n = `[^${Oe(t.delimiter)}]+?`, o = /[$_\u200C\u200D\p{ID_Continue}]/u, c = "";
+    for (let l = 0; l < e.length; ++l) {
+      let s = e[l];
+      if (s.type === 3) {
+        if (s.modifier === 3) {
+          c += C(s.value);
+          continue;
+        }
+        c += `{${C(s.value)}}${k(s.modifier)}`;
+        continue;
+      }
+      let i = s.hasCustomName(), a = !!s.suffix.length || !!s.prefix.length && (s.prefix.length !== 1 || !t.prefixes.includes(s.prefix)), f = l > 0 ? e[l - 1] : null, d = l < e.length - 1 ? e[l + 1] : null;
+      if (!a && i && s.type === 1 && s.modifier === 3 && d && !d.prefix.length && !d.suffix.length) if (d.type === 3) {
+        let T = d.value.length > 0 ? d.value[0] : "";
+        a = o.test(T);
+      } else a = !d.hasCustomName();
+      if (!a && !s.prefix.length && f && f.type === 3) {
+        let T = f.value[f.value.length - 1];
+        a = t.prefixes.includes(T);
+      }
+      a && (c += "{"), c += C(s.prefix), i && (c += `:${s.name}`), s.type === 2 ? c += `(${s.value})` : s.type === 1 ? i || (c += `(${n})`) : s.type === 0 && (!i && (!f || f.type === 3 || f.modifier !== 3 || a || s.prefix !== "") ? c += "*" : c += `(${r})`), s.type === 1 && i && s.suffix.length && o.test(s.suffix[0]) && (c += "\\"), c += C(s.suffix), a && (c += "}"), s.modifier !== 3 && (c += k(s.modifier));
+    }
+    return c;
+  }
+  var _i2, _n2, _t2, _e2, _s2, _l2, _a2;
+  var me = (_a2 = class {
+    constructor(t = {}, r, n) {
+      __privateAdd(this, _i2);
+      __privateAdd(this, _n2, {});
+      __privateAdd(this, _t2, {});
+      __privateAdd(this, _e2, {});
+      __privateAdd(this, _s2, {});
+      __privateAdd(this, _l2, false);
+      try {
+        let o;
+        if (typeof r == "string" ? o = r : n = r, typeof t == "string") {
+          let i = new H(t);
+          if (i.parse(), t = i.result, o === void 0 && typeof t.protocol != "string") throw new TypeError("A base URL must be provided for a relative constructor string.");
+          t.baseURL = o;
+        } else {
+          if (!t || typeof t != "object") throw new TypeError("parameter 1 is not of type 'string' and cannot convert to dictionary.");
+          if (o) throw new TypeError("parameter 1 is not of type 'string'.");
+        }
+        typeof n > "u" && (n = { ignoreCase: false });
+        let c = { ignoreCase: n.ignoreCase === true }, l = { pathname: E, protocol: E, username: E, password: E, hostname: E, port: E, search: E, hash: E };
+        __privateSet(this, _i2, w(l, t, true)), _(__privateGet(this, _i2).protocol) === __privateGet(this, _i2).port && (__privateGet(this, _i2).port = "");
+        let s;
+        for (s of G) {
+          if (!(s in __privateGet(this, _i2))) continue;
+          let i = {}, a = __privateGet(this, _i2)[s];
+          switch (__privateGet(this, _t2)[s] = [], s) {
+            case "protocol":
+              Object.assign(i, x), i.encodePart = y;
+              break;
+            case "username":
+              Object.assign(i, x), i.encodePart = le;
+              break;
+            case "password":
+              Object.assign(i, x), i.encodePart = fe;
+              break;
+            case "hostname":
+              Object.assign(i, B), W(a) ? i.encodePart = j : i.encodePart = z;
+              break;
+            case "port":
+              Object.assign(i, x), i.encodePart = K;
+              break;
+            case "pathname":
+              N(__privateGet(this, _n2).protocol) ? (Object.assign(i, q, c), i.encodePart = he) : (Object.assign(i, x, c), i.encodePart = ue);
+              break;
+            case "search":
+              Object.assign(i, x, c), i.encodePart = de;
+              break;
+            case "hash":
+              Object.assign(i, x, c), i.encodePart = pe;
+              break;
+          }
+          try {
+            __privateGet(this, _s2)[s] = D(a, i), __privateGet(this, _n2)[s] = F(__privateGet(this, _s2)[s], __privateGet(this, _t2)[s], i), __privateGet(this, _e2)[s] = ke(__privateGet(this, _s2)[s], i), __privateSet(this, _l2, __privateGet(this, _l2) || __privateGet(this, _s2)[s].some((f) => f.type === 2));
+          } catch {
+            throw new TypeError(`invalid ${s} pattern '${__privateGet(this, _i2)[s]}'.`);
+          }
+        }
+      } catch (o) {
+        throw new TypeError(`Failed to construct 'URLPattern': ${o.message}`);
+      }
+    }
+    test(t = {}, r) {
+      let n = { pathname: "", protocol: "", username: "", password: "", hostname: "", port: "", search: "", hash: "" };
+      if (typeof t != "string" && r) throw new TypeError("parameter 1 is not of type 'string'.");
+      if (typeof t > "u") return false;
+      try {
+        typeof t == "object" ? n = w(n, t, false) : n = w(n, ge(t, r), false);
+      } catch {
+        return false;
+      }
+      let o;
+      for (o of G) if (!__privateGet(this, _n2)[o].exec(n[o])) return false;
+      return true;
+    }
+    exec(t = {}, r) {
+      let n = { pathname: "", protocol: "", username: "", password: "", hostname: "", port: "", search: "", hash: "" };
+      if (typeof t != "string" && r) throw new TypeError("parameter 1 is not of type 'string'.");
+      if (typeof t > "u") return;
+      try {
+        typeof t == "object" ? n = w(n, t, false) : n = w(n, ge(t, r), false);
+      } catch {
+        return null;
+      }
+      let o = {};
+      r ? o.inputs = [t, r] : o.inputs = [t];
+      let c;
+      for (c of G) {
+        let l = __privateGet(this, _n2)[c].exec(n[c]);
+        if (!l) return null;
+        let s = {};
+        for (let [i, a] of __privateGet(this, _t2)[c].entries()) if (typeof a == "string" || typeof a == "number") {
+          let f = l[i + 1];
+          s[a] = f;
+        }
+        o[c] = { input: n[c] ?? "", groups: s };
+      }
+      return o;
+    }
+    static compareComponent(t, r, n) {
+      let o = (i, a) => {
+        for (let f of ["type", "modifier", "prefix", "value", "suffix"]) {
+          if (i[f] < a[f]) return -1;
+          if (i[f] === a[f]) continue;
+          return 1;
+        }
+        return 0;
+      }, c = new R(3, "", "", "", "", 3), l = new R(0, "", "", "", "", 3), s = (i, a) => {
+        let f = 0;
+        for (; f < Math.min(i.length, a.length); ++f) {
+          let d = o(i[f], a[f]);
+          if (d) return d;
+        }
+        return i.length === a.length ? 0 : o(i[f] ?? c, a[f] ?? c);
+      };
+      return !__privateGet(r, _e2)[t] && !__privateGet(n, _e2)[t] ? 0 : __privateGet(r, _e2)[t] && !__privateGet(n, _e2)[t] ? s(__privateGet(r, _s2)[t], [l]) : !__privateGet(r, _e2)[t] && __privateGet(n, _e2)[t] ? s([l], __privateGet(n, _s2)[t]) : s(__privateGet(r, _s2)[t], __privateGet(n, _s2)[t]);
+    }
+    get protocol() {
+      return __privateGet(this, _e2).protocol;
+    }
+    get username() {
+      return __privateGet(this, _e2).username;
+    }
+    get password() {
+      return __privateGet(this, _e2).password;
+    }
+    get hostname() {
+      return __privateGet(this, _e2).hostname;
+    }
+    get port() {
+      return __privateGet(this, _e2).port;
+    }
+    get pathname() {
+      return __privateGet(this, _e2).pathname;
+    }
+    get search() {
+      return __privateGet(this, _e2).search;
+    }
+    get hash() {
+      return __privateGet(this, _e2).hash;
+    }
+    get hasRegExpGroups() {
+      return __privateGet(this, _l2);
+    }
+  }, _i2 = new WeakMap(), _n2 = new WeakMap(), _t2 = new WeakMap(), _e2 = new WeakMap(), _s2 = new WeakMap(), _l2 = new WeakMap(), _a2);
+
+  // ../node_modules/urlpattern-polyfill/index.js
+  if (!globalThis.URLPattern) {
+    globalThis.URLPattern = me;
+  }
+
   // src/config-feature.js
   var _bundledConfig, _args;
   var ConfigFeature = class {
@@ -3438,24 +4171,98 @@
       return __privateGet(this, _args)?.featureSettings;
     }
     /**
-     * Given a config key, interpret the value as a list of domain overrides, and return the elements that match the current page
-     * Consider using patchSettings instead as per `getFeatureSetting`.
+     * Given a config key, interpret the value as a list of conditionals objects, and return the elements that match the current page
+     * Consider in your feature using patchSettings instead as per `getFeatureSetting`.
      * @param {string} featureKeyName
      * @return {any[]}
      * @protected
      */
-    matchDomainFeatureSetting(featureKeyName) {
-      const domain = this.args?.site.domain;
-      if (!domain) return [];
-      const domains = this._getFeatureSettings()?.[featureKeyName] || [];
-      return domains.filter((rule) => {
-        if (Array.isArray(rule.domain)) {
-          return rule.domain.some((domainRule) => {
-            return matchHostname(domain, domainRule);
-          });
+    matchConditionalFeatureSetting(featureKeyName) {
+      const conditionalChanges = this._getFeatureSettings()?.[featureKeyName] || [];
+      return conditionalChanges.filter((rule) => {
+        let condition = rule.condition;
+        if (condition === void 0 && "domain" in rule) {
+          condition = this._domainToConditonBlocks(rule.domain);
         }
-        return matchHostname(domain, rule.domain);
+        return this._matchConditionalBlockOrArray(condition);
       });
+    }
+    /**
+     * Takes a list of domains and returns a list of condition blocks
+     * @param {string|string[]} domain
+     * @returns {ConditionBlock[]}
+     */
+    _domainToConditonBlocks(domain) {
+      if (Array.isArray(domain)) {
+        return domain.map((domain2) => ({ domain: domain2 }));
+      } else {
+        return [{ domain }];
+      }
+    }
+    /**
+     * Used to match conditional changes for a settings feature.
+     * @typedef {object} ConditionBlock
+     * @property {string[] | string} [domain]
+     * @property {object} [urlPattern]
+     */
+    /**
+     * Takes multiple conditional blocks and returns true if any apply.
+     * @param {ConditionBlock|ConditionBlock[]} conditionBlock
+     * @returns {boolean}
+     */
+    _matchConditionalBlockOrArray(conditionBlock) {
+      if (Array.isArray(conditionBlock)) {
+        return conditionBlock.some((block) => this._matchConditionalBlock(block));
+      }
+      return this._matchConditionalBlock(conditionBlock);
+    }
+    /**
+     * Takes a conditional block and returns true if it applies.
+     * All conditions must be met to return true.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchConditionalBlock(conditionBlock) {
+      const conditionChecks = {
+        domain: this._matchDomainConditional,
+        urlPattern: this._matchUrlPatternConditional
+      };
+      for (const key in conditionBlock) {
+        if (!conditionChecks[key]) {
+          return false;
+        } else if (!conditionChecks[key].call(this, conditionBlock)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    /**
+     * Takes a condtion block and returns true if the current url matches the urlPattern.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchUrlPatternConditional(conditionBlock) {
+      const url = this.args?.site.url;
+      if (!url) return false;
+      if (typeof conditionBlock.urlPattern === "string") {
+        return new me(conditionBlock.urlPattern, url).test(url);
+      }
+      const pattern = new me(conditionBlock.urlPattern);
+      return pattern.test(url);
+    }
+    /**
+     * Takes a condition block and returns true if the current domain matches the domain.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchDomainConditional(conditionBlock) {
+      if (!conditionBlock.domain) return false;
+      const domain = this.args?.site.domain;
+      if (!domain) return false;
+      if (Array.isArray(conditionBlock.domain)) {
+        return false;
+      }
+      return matchHostname(domain, conditionBlock.domain);
     }
     /**
      * Return the settings object for a feature
@@ -3498,40 +4305,83 @@
       return result === "enabled";
     }
     /**
-      * Return a specific setting from the feature settings
-      * If the "settings" key within the config has a "domains" key, it will be used to override the settings.
-      * This uses JSONPatch to apply the patches to settings before getting the setting value.
-      * For example.com getFeatureSettings('val') will return 1:
-      * ```json
-      *  {
-      *      "settings": {
-      *         "domains": [
-      *             {
-      *                "domain": "example.com",
-      *                "patchSettings": [
-      *                    { "op": "replace", "path": "/val", "value": 1 }
-      *                ]
-      *             }
-      *         ]
-      *      }
-      *  }
-      * ```
-      * "domain" can either be a string or an array of strings.
-    
-      * For boolean states you should consider using getFeatureSettingEnabled.
-      * @param {string} featureKeyName
-      * @param {string} [featureName]
-      * @returns {any}
-    */
+     * Return a specific setting from the feature settings
+     * If the "settings" key within the config has a "conditionalChanges" key, it will be used to override the settings.
+     * This uses JSONPatch to apply the patches to settings before getting the setting value.
+     * For example.com getFeatureSettings('val') will return 1:
+     * ```json
+     *  {
+     *      "settings": {
+     *         "conditionalChanges": [
+     *             {
+     *                "domain": "example.com",
+     *                "patchSettings": [
+     *                    { "op": "replace", "path": "/val", "value": 1 }
+     *                ]
+     *             }
+     *         ]
+     *      }
+     *  }
+     * ```
+     * "domain" can either be a string or an array of strings.
+     * Additionally we support urlPattern for more complex matching.
+     * For example.com getFeatureSettings('val') will return 1:
+     * ```json
+     * {
+     *    "settings": {
+     *       "conditionalChanges": [
+     *          {
+     *            "condition": {
+     *                "urlPattern": "https://example.com/*",
+     *            },
+     *            "patchSettings": [
+     *                { "op": "replace", "path": "/val", "value": 1 }
+     *            ]
+     *          }
+     *       ]
+     *   }
+     * }
+     * ```
+     * We also support multiple conditions:
+     * ```json
+     * {
+     *    "settings": {
+     *       "conditionalChanges": [
+     *          {
+     *            "condition": [
+     *                {
+     *                    "urlPattern": "https://example.com/*",
+     *                },
+     *                {
+     *                    "urlPattern": "https://other.com/path/something",
+     *                },
+     *            ],
+     *            "patchSettings": [
+     *                { "op": "replace", "path": "/val", "value": 1 }
+     *            ]
+     *          }
+     *       ]
+     *   }
+     * }
+     * ```
+     *
+     * For boolean states you should consider using getFeatureSettingEnabled.
+     * @param {string} featureKeyName
+     * @param {string} [featureName]
+     * @returns {any}
+     */
     getFeatureSetting(featureKeyName, featureName) {
       let result = this._getFeatureSettings(featureName);
-      if (featureKeyName === "domains") {
-        throw new Error("domains is a reserved feature setting key name");
+      if (featureKeyName in ["domains", "conditionalChanges"]) {
+        throw new Error(`${featureKeyName} is a reserved feature setting key name`);
       }
-      const domainMatch = [...this.matchDomainFeatureSetting("domains")].sort((a, b) => {
-        return a.domain.length - b.domain.length;
-      });
-      for (const match of domainMatch) {
+      let conditionalMatches = [];
+      if (result?.conditionalChanges) {
+        conditionalMatches = this.matchConditionalFeatureSetting("conditionalChanges");
+      } else {
+        conditionalMatches = this.matchConditionalFeatureSetting("domains");
+      }
+      for (const match of conditionalMatches) {
         if (match.patchSettings === void 0) {
           continue;
         }
@@ -3729,7 +4579,7 @@
         this.messaging?.notify("addDebugFlag", {
           flag: this.name
         });
-      } catch (_e) {
+      } catch (_e3) {
       }
     }
     /**
@@ -3740,17 +4590,17 @@
      * @param {import('./wrapper-utils').StrictPropertyDescriptor} descriptor - requires all descriptor options to be defined because we can't validate correctness based on TS types
      */
     defineProperty(object, propertyName, descriptor) {
-      ["value", "get", "set"].forEach((k) => {
-        const descriptorProp = descriptor[k];
+      ["value", "get", "set"].forEach((k2) => {
+        const descriptorProp = descriptor[k2];
         if (typeof descriptorProp === "function") {
           const addDebugFlag = this.addDebugFlag.bind(this);
           const wrapper = new Proxy2(descriptorProp, {
-            apply(_, thisArg, argumentsList) {
+            apply(_2, thisArg, argumentsList) {
               addDebugFlag();
               return Reflect2.apply(descriptorProp, thisArg, argumentsList);
             }
           });
-          descriptor[k] = wrapToString(wrapper, descriptorProp);
+          descriptor[k2] = wrapToString(wrapper, descriptorProp);
         }
       });
       return defineProperty(object, propertyName, descriptor);
@@ -3812,8 +4662,8 @@
         let { audioKey } = getCachedResponse(thisArg, args);
         if (!audioKey) {
           let cdSum = 0;
-          for (const k in channelData) {
-            cdSum += channelData[k];
+          for (const k2 in channelData) {
+            cdSum += channelData[k2];
           }
           if (cdSum === 0) {
             return;
@@ -3924,7 +4774,7 @@
             this.defineProperty(BatteryManager.prototype, eventProp, {
               enumerable: true,
               configurable: true,
-              set: (x) => x,
+              set: (x2) => x2,
               // noop
               get: () => {
                 return null;
@@ -3996,9 +4846,9 @@
   }
   function adjacentSame(imageData, index, width) {
     const widthPixel = width * 4;
-    const x = index % widthPixel;
+    const x2 = index % widthPixel;
     const maxLength = imageData.length;
-    if (x < widthPixel) {
+    if (x2 < widthPixel) {
       const right = index + 4;
       if (!pixelsSame(imageData, index, right)) {
         return false;
@@ -4012,7 +4862,7 @@
         return false;
       }
     }
-    if (x > 0) {
+    if (x2 > 0) {
       const left = index - 4;
       if (!pixelsSame(imageData, index, left)) {
         return false;
@@ -4813,7 +5663,7 @@
   // src/features/navigator-interface.js
   var NavigatorInterface = class extends ContentFeature {
     load(args) {
-      if (this.matchDomainFeatureSetting("privilegedDomains").length) {
+      if (this.matchConditionalFeatureSetting("privilegedDomains").length) {
         this.injectNavigatorInterface(args);
       }
     }
@@ -5049,9 +5899,9 @@
       unhideTimeouts = this.getFeatureSetting("unhideTimeouts") || unhideTimeouts;
       mediaAndFormSelectors = this.getFeatureSetting("mediaAndFormSelectors") || mediaAndFormSelectors;
       if (shouldInjectStyleTag) {
-        shouldInjectStyleTag = this.matchDomainFeatureSetting("styleTagExceptions").length === 0;
+        shouldInjectStyleTag = this.matchConditionalFeatureSetting("styleTagExceptions").length === 0;
       }
-      const activeDomainRules = this.matchDomainFeatureSetting("domains").flatMap((item) => item.rules);
+      const activeDomainRules = this.matchConditionalFeatureSetting("domains").flatMap((item) => item.rules);
       const overrideRules = activeDomainRules.filter((rule) => {
         return rule.type === "override";
       });
@@ -5097,7 +5947,7 @@
      */
     applyRules(rules) {
       const timeoutRules = extractTimeoutRules(rules);
-      const clearCacheTimer = unhideTimeouts.concat(hideTimeouts).reduce((a, b) => Math.max(a, b), 0) + 100;
+      const clearCacheTimer = unhideTimeouts.concat(hideTimeouts).reduce((a, b2) => Math.max(a, b2), 0) + 100;
       hideTimeouts.forEach((timeout) => {
         setTimeout(() => {
           hideAdNodes(timeoutRules);
@@ -6102,8 +6952,8 @@
   init_define_import_meta_trackerLookup();
   function appendImageAsBackground(parent, targetSelector, imageUrl) {
     const canceled = false;
-    fetch(imageUrl, { method: "HEAD" }).then((x) => {
-      const status = String(x.status);
+    fetch(imageUrl, { method: "HEAD" }).then((x2) => {
+      const status = String(x2.status);
       if (canceled) return console.warn("not adding image, cancelled");
       if (status.startsWith("2")) {
         if (!canceled) {
