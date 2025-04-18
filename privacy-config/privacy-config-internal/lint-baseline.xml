@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DenyListedApi"
@@ -14,23 +14,12 @@
 
     <issue
         id="SetTextI18n"
-        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
-        errorLine1="            binding.validation.text = &quot;URL is not valid or toggle is disabled. Default URL will be used&quot;"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/privacy/config/internal/PrivacyConfigInternalSettingsActivity.kt"
-            line="141"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
         message="String literal in `setText` can not be translated. Use Android resources instead."
         errorLine1="            binding.validation.text = &quot;URL is not valid or toggle is disabled. Default URL will be used&quot;"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/privacy/config/internal/PrivacyConfigInternalSettingsActivity.kt"
-            line="141"
+            line="142"
             column="40"/>
     </issue>
 
