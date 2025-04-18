@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.service
 
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.autofill.impl.service.store.AutofillFeatureRepository
+import com.duckduckgo.autofill.impl.service.store.AutofillServiceFeatureRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -30,7 +30,7 @@ interface AutofillServiceExceptions {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealAutofillServiceExceptions @Inject constructor(
-    private val repository: AutofillFeatureRepository,
+    private val repository: AutofillServiceFeatureRepository,
 ) : AutofillServiceExceptions {
 
     override fun isAnException(domain: String): Boolean {
