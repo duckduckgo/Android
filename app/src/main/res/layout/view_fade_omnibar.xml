@@ -220,14 +220,12 @@
                             style="@style/Base.V7.Widget.AppCompat.EditText"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            android:layout_marginEnd="6dp"
                             android:background="@null"
                             android:fontFamily="sans-serif"
                             android:hint="@string/omnibarInputHint"
                             android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                             android:inputType="textUri|textNoSuggestions"
                             android:maxLines="1"
-                            android:paddingStart="5dp"
                             android:selectAllOnFocus="true"
                             android:textColor="?attr/daxColorPrimaryText"
                             android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
@@ -243,6 +241,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/endIconsContainer"
                             android:layout_width="wrap_content"
+                            android:minWidth="8dp"
                             android:layout_height="match_parent"
                             android:layout_marginEnd="@dimen/keyline_0"
                             app:layout_constraintEnd_toEndOf="parent">
