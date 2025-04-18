@@ -11,6 +11,7 @@
   var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
   var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
   var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
+  var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 
   // <define:import.meta.trackerLookup>
   var define_import_meta_trackerLookup_default = { org: { cdn77: { rsc: { "1558334541": 1 } }, adsrvr: 1, ampproject: 1, "browser-update": 1, flowplayer: 1, "privacy-center": 1, webvisor: 1, framasoft: 1, "do-not-tracker": 1, trackersimulator: 1 }, io: { "1dmp": 1, "1rx": 1, "4dex": 1, adnami: 1, aidata: 1, arcspire: 1, bidr: 1, branch: 1, center: 1, cloudimg: 1, concert: 1, connectad: 1, cordial: 1, dcmn: 1, extole: 1, getblue: 1, hbrd: 1, instana: 1, karte: 1, leadsmonitor: 1, litix: 1, lytics: 1, marchex: 1, mediago: 1, mrf: 1, narrative: 1, ntv: 1, optad360: 1, oracleinfinity: 1, oribi: 1, "p-n": 1, personalizer: 1, pghub: 1, piano: 1, powr: 1, pzz: 1, searchspring: 1, segment: 1, siteimproveanalytics: 1, sspinc: 1, t13: 1, webgains: 1, wovn: 1, yellowblue: 1, zprk: 1, axept: 1, akstat: 1, clarium: 1, hotjar: 1 }, com: { "2020mustang": 1, "33across": 1, "360yield": 1, "3lift": 1, "4dsply": 1, "4strokemedia": 1, "8353e36c2a": 1, "a-mx": 1, a2z: 1, aamsitecertifier: 1, absorbingband: 1, abstractedauthority: 1, abtasty: 1, acexedge: 1, acidpigs: 1, acsbapp: 1, acuityplatform: 1, "ad-score": 1, "ad-stir": 1, adalyser: 1, adapf: 1, adara: 1, adblade: 1, addthis: 1, addtoany: 1, adelixir: 1, adentifi: 1, adextrem: 1, adgrx: 1, adhese: 1, adition: 1, adkernel: 1, adlightning: 1, adlooxtracking: 1, admanmedia: 1, admedo: 1, adnium: 1, "adnxs-simple": 1, adnxs: 1, adobedtm: 1, adotmob: 1, adpone: 1, adpushup: 1, adroll: 1, adrta: 1, "ads-twitter": 1, "ads3-adnow": 1, adsafeprotected: 1, adstanding: 1, adswizz: 1, adtdp: 1, adtechus: 1, adtelligent: 1, adthrive: 1, adtlgc: 1, adtng: 1, adultfriendfinder: 1, advangelists: 1, adventive: 1, adventori: 1, advertising: 1, aegpresents: 1, affinity: 1, affirm: 1, agilone: 1, agkn: 1, aimbase: 1, albacross: 1, alcmpn: 1, alexametrics: 1, alicdn: 1, alikeaddition: 1, aliveachiever: 1, aliyuncs: 1, alluringbucket: 1, aloofvest: 1, "amazon-adsystem": 1, amazon: 1, ambiguousafternoon: 1, amplitude: 1, "analytics-egain": 1, aniview: 1, annoyedairport: 1, annoyingclover: 1, anyclip: 1, anymind360: 1, "app-us1": 1, appboycdn: 1, appdynamics: 1, appsflyer: 1, aralego: 1, aspiringattempt: 1, aswpsdkus: 1, atemda: 1, att: 1, attentivemobile: 1, attractionbanana: 1, audioeye: 1, audrte: 1, automaticside: 1, avanser: 1, avmws: 1, aweber: 1, aweprt: 1, azure: 1, b0e8: 1, badgevolcano: 1, bagbeam: 1, ballsbanana: 1, bandborder: 1, batch: 1, bawdybalance: 1, bc0a: 1, bdstatic: 1, bedsberry: 1, beginnerpancake: 1, benchmarkemail: 1, betweendigital: 1, bfmio: 1, bidtheatre: 1, billowybelief: 1, bimbolive: 1, bing: 1, bizographics: 1, bizrate: 1, bkrtx: 1, blismedia: 1, blogherads: 1, bluecava: 1, bluekai: 1, blushingbread: 1, boatwizard: 1, boilingcredit: 1, boldchat: 1, booking: 1, borderfree: 1, bounceexchange: 1, brainlyads: 1, "brand-display": 1, brandmetrics: 1, brealtime: 1, brightfunnel: 1, brightspotcdn: 1, btloader: 1, btstatic: 1, bttrack: 1, btttag: 1, bumlam: 1, butterbulb: 1, buttonladybug: 1, buzzfeed: 1, buzzoola: 1, byside: 1, c3tag: 1, cabnnr: 1, calculatorstatement: 1, callrail: 1, calltracks: 1, capablecup: 1, "captcha-delivery": 1, carpentercomparison: 1, cartstack: 1, carvecakes: 1, casalemedia: 1, cattlecommittee: 1, cdninstagram: 1, cdnwidget: 1, channeladvisor: 1, chargecracker: 1, chartbeat: 1, chatango: 1, chaturbate: 1, cheqzone: 1, cherriescare: 1, chickensstation: 1, childlikecrowd: 1, childlikeform: 1, chocolateplatform: 1, cintnetworks: 1, circlelevel: 1, "ck-ie": 1, clcktrax: 1, cleanhaircut: 1, clearbit: 1, clearbitjs: 1, clickagy: 1, clickcease: 1, clickcertain: 1, clicktripz: 1, clientgear: 1, cloudflare: 1, cloudflareinsights: 1, cloudflarestream: 1, cobaltgroup: 1, cobrowser: 1, cognitivlabs: 1, colossusssp: 1, combativecar: 1, comm100: 1, googleapis: { commondatastorage: 1, imasdk: 1, storage: 1, fonts: 1, maps: 1, www: 1 }, "company-target": 1, condenastdigital: 1, confusedcart: 1, connatix: 1, contextweb: 1, conversionruler: 1, convertkit: 1, convertlanguage: 1, cootlogix: 1, coveo: 1, cpmstar: 1, cquotient: 1, crabbychin: 1, cratecamera: 1, crazyegg: 1, "creative-serving": 1, creativecdn: 1, criteo: 1, crowdedmass: 1, crowdriff: 1, crownpeak: 1, crsspxl: 1, ctnsnet: 1, cudasvc: 1, cuddlethehyena: 1, cumbersomecarpenter: 1, curalate: 1, curvedhoney: 1, cushiondrum: 1, cutechin: 1, cxense: 1, d28dc30335: 1, dailymotion: 1, damdoor: 1, dampdock: 1, dapperfloor: 1, "datadoghq-browser-agent": 1, decisivebase: 1, deepintent: 1, defybrick: 1, delivra: 1, demandbase: 1, detectdiscovery: 1, devilishdinner: 1, dimelochat: 1, disagreeabledrop: 1, discreetfield: 1, disqus: 1, dmpxs: 1, dockdigestion: 1, dotomi: 1, doubleverify: 1, drainpaste: 1, dramaticdirection: 1, driftt: 1, dtscdn: 1, dtscout: 1, dwin1: 1, dynamics: 1, dynamicyield: 1, dynatrace: 1, ebaystatic: 1, ecal: 1, eccmp: 1, elfsight: 1, elitrack: 1, eloqua: 1, en25: 1, encouragingthread: 1, enormousearth: 1, ensighten: 1, enviousshape: 1, eqads: 1, "ero-advertising": 1, esputnik: 1, evergage: 1, evgnet: 1, exdynsrv: 1, exelator: 1, exoclick: 1, exosrv: 1, expansioneggnog: 1, expedia: 1, expertrec: 1, exponea: 1, exponential: 1, extole: 1, ezodn: 1, ezoic: 1, ezoiccdn: 1, facebook: 1, "facil-iti": 1, fadewaves: 1, fallaciousfifth: 1, farmergoldfish: 1, "fastly-insights": 1, fearlessfaucet: 1, fiftyt: 1, financefear: 1, fitanalytics: 1, five9: 1, fixedfold: 1, fksnk: 1, flashtalking: 1, flipp: 1, flowerstreatment: 1, floweryflavor: 1, flutteringfireman: 1, "flux-cdn": 1, foresee: 1, fortunatemark: 1, fouanalytics: 1, fox: 1, fqtag: 1, frailfruit: 1, freezingbuilding: 1, fronttoad: 1, fullstory: 1, functionalfeather: 1, fuzzybasketball: 1, gammamaximum: 1, gbqofs: 1, geetest: 1, geistm: 1, geniusmonkey: 1, "geoip-js": 1, getbread: 1, getcandid: 1, getclicky: 1, getdrip: 1, getelevar: 1, getrockerbox: 1, getshogun: 1, getsitecontrol: 1, giraffepiano: 1, glassdoor: 1, gloriousbeef: 1, godpvqnszo: 1, "google-analytics": 1, google: 1, googleadservices: 1, googlehosted: 1, googleoptimize: 1, googlesyndication: 1, googletagmanager: 1, googletagservices: 1, gorgeousedge: 1, govx: 1, grainmass: 1, greasysquare: 1, greylabeldelivery: 1, groovehq: 1, growsumo: 1, gstatic: 1, "guarantee-cdn": 1, guiltlessbasketball: 1, gumgum: 1, haltingbadge: 1, hammerhearing: 1, handsomelyhealth: 1, harborcaption: 1, hawksearch: 1, amazonaws: { "us-east-2": { s3: { "hb-obv2": 1 } } }, heapanalytics: 1, hellobar: 1, hhbypdoecp: 1, hiconversion: 1, highwebmedia: 1, histats: 1, hlserve: 1, hocgeese: 1, hollowafterthought: 1, honorableland: 1, hotjar: 1, hp: 1, "hs-banner": 1, htlbid: 1, htplayground: 1, hubspot: 1, "ib-ibi": 1, "id5-sync": 1, igodigital: 1, iheart: 1, iljmp: 1, illiweb: 1, impactcdn: 1, "impactradius-event": 1, impressionmonster: 1, improvedcontactform: 1, improvedigital: 1, imrworldwide: 1, indexww: 1, infolinks: 1, infusionsoft: 1, inmobi: 1, inq: 1, "inside-graph": 1, instagram: 1, intentiq: 1, intergient: 1, investingchannel: 1, invocacdn: 1, iperceptions: 1, iplsc: 1, ipredictive: 1, iteratehq: 1, ivitrack: 1, j93557g: 1, jaavnacsdw: 1, jimstatic: 1, journity: 1, js7k: 1, jscache: 1, juiceadv: 1, juicyads: 1, justanswer: 1, justpremium: 1, jwpcdn: 1, kakao: 1, kampyle: 1, kargo: 1, kissmetrics: 1, klarnaservices: 1, klaviyo: 1, knottyswing: 1, krushmedia: 1, ktkjmp: 1, kxcdn: 1, laboredlocket: 1, ladesk: 1, ladsp: 1, laughablelizards: 1, leadsrx: 1, lendingtree: 1, levexis: 1, liadm: 1, licdn: 1, lightboxcdn: 1, lijit: 1, linkedin: 1, linksynergy: 1, "list-manage": 1, listrakbi: 1, livechatinc: 1, livejasmin: 1, localytics: 1, loggly: 1, loop11: 1, looseloaf: 1, lovelydrum: 1, lunchroomlock: 1, lwonclbench: 1, macromill: 1, maddeningpowder: 1, mailchimp: 1, mailchimpapp: 1, mailerlite: 1, "maillist-manage": 1, marinsm: 1, marketiq: 1, marketo: 1, marphezis: 1, marriedbelief: 1, materialparcel: 1, matheranalytics: 1, mathtag: 1, maxmind: 1, mczbf: 1, measlymiddle: 1, medallia: 1, meddleplant: 1, media6degrees: 1, mediacategory: 1, mediavine: 1, mediawallahscript: 1, medtargetsystem: 1, megpxs: 1, memberful: 1, memorizematch: 1, mentorsticks: 1, metaffiliation: 1, metricode: 1, metricswpsh: 1, mfadsrvr: 1, mgid: 1, micpn: 1, microadinc: 1, "minutemedia-prebid": 1, minutemediaservices: 1, mixpo: 1, mkt932: 1, mktoresp: 1, mktoweb: 1, ml314: 1, moatads: 1, mobtrakk: 1, monsido: 1, mookie1: 1, motionflowers: 1, mountain: 1, mouseflow: 1, mpeasylink: 1, mql5: 1, mrtnsvr: 1, murdoog: 1, mxpnl: 1, mybestpro: 1, myregistry: 1, nappyattack: 1, navistechnologies: 1, neodatagroup: 1, nervoussummer: 1, netmng: 1, newrelic: 1, newscgp: 1, nextdoor: 1, ninthdecimal: 1, nitropay: 1, noibu: 1, nondescriptnote: 1, nosto: 1, npttech: 1, ntvpwpush: 1, nuance: 1, nutritiousbean: 1, nxsttv: 1, omappapi: 1, omnisnippet1: 1, omnisrc: 1, omnitagjs: 1, ondemand: 1, oneall: 1, onesignal: 1, "onetag-sys": 1, "oo-syringe": 1, ooyala: 1, opecloud: 1, opentext: 1, opera: 1, opmnstr: 1, "opti-digital": 1, optimicdn: 1, optimizely: 1, optinmonster: 1, optmnstr: 1, optmstr: 1, optnmnstr: 1, optnmstr: 1, osano: 1, "otm-r": 1, outbrain: 1, overconfidentfood: 1, ownlocal: 1, pailpatch: 1, panickypancake: 1, panoramicplane: 1, parastorage: 1, pardot: 1, parsely: 1, partplanes: 1, patreon: 1, paypal: 1, pbstck: 1, pcmag: 1, peerius: 1, perfdrive: 1, perfectmarket: 1, permutive: 1, picreel: 1, pinterest: 1, pippio: 1, piwikpro: 1, pixlee: 1, placidperson: 1, pleasantpump: 1, plotrabbit: 1, pluckypocket: 1, pocketfaucet: 1, possibleboats: 1, postaffiliatepro: 1, postrelease: 1, potatoinvention: 1, powerfulcopper: 1, predictplate: 1, prepareplanes: 1, pricespider: 1, priceypies: 1, pricklydebt: 1, profusesupport: 1, proofpoint: 1, protoawe: 1, providesupport: 1, pswec: 1, psychedelicarithmetic: 1, psyma: 1, ptengine: 1, publir: 1, pubmatic: 1, pubmine: 1, pubnation: 1, qualaroo: 1, qualtrics: 1, quantcast: 1, quantserve: 1, quantummetric: 1, quietknowledge: 1, quizzicalpartner: 1, quizzicalzephyr: 1, quora: 1, r42tag: 1, radiateprose: 1, railwayreason: 1, rakuten: 1, rambunctiousflock: 1, rangeplayground: 1, "rating-widget": 1, realsrv: 1, rebelswing: 1, reconditerake: 1, reconditerespect: 1, recruitics: 1, reddit: 1, redditstatic: 1, rehabilitatereason: 1, repeatsweater: 1, reson8: 1, resonantrock: 1, resonate: 1, responsiveads: 1, restrainstorm: 1, restructureinvention: 1, retargetly: 1, revcontent: 1, rezync: 1, rfihub: 1, rhetoricalloss: 1, richaudience: 1, righteouscrayon: 1, rightfulfall: 1, riotgames: 1, riskified: 1, rkdms: 1, rlcdn: 1, rmtag: 1, rogersmedia: 1, rokt: 1, route: 1, rtbsystem: 1, rubiconproject: 1, ruralrobin: 1, "s-onetag": 1, saambaa: 1, sablesong: 1, "sail-horizon": 1, salesforceliveagent: 1, samestretch: 1, sascdn: 1, satisfycork: 1, savoryorange: 1, scarabresearch: 1, scaredsnakes: 1, scaredsong: 1, scaredstomach: 1, scarfsmash: 1, scene7: 1, scholarlyiq: 1, scintillatingsilver: 1, scorecardresearch: 1, screechingstove: 1, screenpopper: 1, scribblestring: 1, sddan: 1, seatsmoke: 1, securedvisit: 1, seedtag: 1, sefsdvc: 1, segment: 1, sekindo: 1, selectivesummer: 1, selfishsnake: 1, servebom: 1, servedbyadbutler: 1, servenobid: 1, serverbid: 1, "serving-sys": 1, shakegoldfish: 1, shamerain: 1, shapecomb: 1, shappify: 1, shareaholic: 1, sharethis: 1, sharethrough: 1, shopifyapps: 1, shopperapproved: 1, shrillspoon: 1, sibautomation: 1, sicksmash: 1, signifyd: 1, singroot: 1, site: 1, siteimprove: 1, siteimproveanalytics: 1, sitescout: 1, sixauthority: 1, skillfuldrop: 1, skimresources: 1, skisofa: 1, "sli-spark": 1, slickstream: 1, slopesoap: 1, smadex: 1, smartadserver: 1, smashquartz: 1, smashsurprise: 1, smg: 1, smilewanted: 1, smoggysnakes: 1, snapchat: 1, snapkit: 1, snigelweb: 1, socdm: 1, sojern: 1, songsterritory: 1, sonobi: 1, soundstocking: 1, spectacularstamp: 1, speedcurve: 1, sphereup: 1, spiceworks: 1, spookyexchange: 1, spookyskate: 1, spookysleet: 1, sportradarserving: 1, sportslocalmedia: 1, spotxchange: 1, springserve: 1, srvmath: 1, "ssl-images-amazon": 1, stackadapt: 1, stakingsmile: 1, statcounter: 1, steadfastseat: 1, steadfastsound: 1, steadfastsystem: 1, steelhousemedia: 1, steepsquirrel: 1, stereotypedsugar: 1, stickyadstv: 1, stiffgame: 1, stingycrush: 1, straightnest: 1, stripchat: 1, strivesquirrel: 1, strokesystem: 1, stupendoussleet: 1, stupendoussnow: 1, stupidscene: 1, sulkycook: 1, sumo: 1, sumologic: 1, sundaysky: 1, superficialeyes: 1, superficialsquare: 1, surveymonkey: 1, survicate: 1, svonm: 1, swankysquare: 1, symantec: 1, taboola: 1, tailtarget: 1, talkable: 1, tamgrt: 1, tangycover: 1, taobao: 1, tapad: 1, tapioni: 1, taptapnetworks: 1, taskanalytics: 1, tealiumiq: 1, "techlab-cdn": 1, technoratimedia: 1, techtarget: 1, tediousticket: 1, teenytinyshirt: 1, tendertest: 1, "the-ozone-project": 1, theadex: 1, themoneytizer: 1, theplatform: 1, thestar: 1, thinkitten: 1, threetruck: 1, thrtle: 1, tidaltv: 1, tidiochat: 1, tiktok: 1, tinypass: 1, tiqcdn: 1, tiresomethunder: 1, trackjs: 1, traffichaus: 1, trafficjunky: 1, trafmag: 1, travelaudience: 1, treasuredata: 1, tremorhub: 1, trendemon: 1, tribalfusion: 1, trovit: 1, trueleadid: 1, truoptik: 1, truste: 1, trustpilot: 1, trvdp: 1, tsyndicate: 1, tubemogul: 1, turn: 1, tvpixel: 1, tvsquared: 1, tweakwise: 1, twitter: 1, tynt: 1, typicalteeth: 1, u5e: 1, ubembed: 1, uidapi: 1, ultraoranges: 1, unbecominglamp: 1, unbxdapi: 1, undertone: 1, uninterestedquarter: 1, unpkg: 1, unrulymedia: 1, unwieldyhealth: 1, unwieldyplastic: 1, upsellit: 1, urbanairship: 1, usabilla: 1, usbrowserspeed: 1, usemessages: 1, userreport: 1, uservoice: 1, valuecommerce: 1, vengefulgrass: 1, vidazoo: 1, videoplayerhub: 1, vidoomy: 1, viglink: 1, visualwebsiteoptimizer: 1, vivaclix: 1, vk: 1, vlitag: 1, voicefive: 1, volatilevessel: 1, voraciousgrip: 1, voxmedia: 1, vrtcal: 1, w3counter: 1, walkme: 1, warmafterthought: 1, warmquiver: 1, webcontentassessor: 1, webengage: 1, webeyez: 1, webtraxs: 1, "webtrends-optimize": 1, webtrends: 1, wgplayer: 1, woosmap: 1, worldoftulo: 1, wpadmngr: 1, wpshsdk: 1, wpushsdk: 1, wsod: 1, "wt-safetag": 1, wysistat: 1, xg4ken: 1, xiti: 1, xlirdr: 1, xlivrdr: 1, "xnxx-cdn": 1, "y-track": 1, yahoo: 1, yandex: 1, yieldmo: 1, yieldoptimizer: 1, yimg: 1, yotpo: 1, yottaa: 1, "youtube-nocookie": 1, youtube: 1, zemanta: 1, zendesk: 1, zeotap: 1, zestycrime: 1, zonos: 1, zoominfo: 1, zopim: 1, createsend1: 1, veoxa: 1, parchedsofa: 1, sooqr: 1, adtraction: 1, addthisedge: 1, adsymptotic: 1, bootstrapcdn: 1, bugsnag: 1, dmxleo: 1, dtssrv: 1, fontawesome: 1, "hs-scripts": 1, jwpltx: 1, nereserv: 1, onaudience: 1, outbrainimg: 1, quantcount: 1, rtactivate: 1, shopifysvc: 1, stripe: 1, twimg: 1, vimeo: 1, vimeocdn: 1, wp: 1, "2znp09oa": 1, "4jnzhl0d0": 1, "6ldu6qa": 1, "82o9v830": 1, abilityscale: 1, aboardamusement: 1, aboardlevel: 1, abovechat: 1, abruptroad: 1, absentairport: 1, absorbingcorn: 1, absorbingprison: 1, abstractedamount: 1, absurdapple: 1, abundantcoin: 1, acceptableauthority: 1, accurateanimal: 1, accuratecoal: 1, achieverknee: 1, acidicstraw: 1, acridangle: 1, acridtwist: 1, actoramusement: 1, actuallysheep: 1, actuallysnake: 1, actuallything: 1, adamantsnail: 1, addictedattention: 1, adorableanger: 1, adorableattention: 1, adventurousamount: 1, afraidlanguage: 1, aftermathbrother: 1, agilebreeze: 1, agreeablearch: 1, agreeabletouch: 1, aheadday: 1, aheadgrow: 1, aheadmachine: 1, ak0gsh40: 1, alertarithmetic: 1, aliasanvil: 1, alleythecat: 1, aloofmetal: 1, alpineactor: 1, ambientdusk: 1, ambientlagoon: 1, ambiguousanger: 1, ambiguousdinosaurs: 1, ambiguousincome: 1, ambrosialsummit: 1, amethystzenith: 1, amuckafternoon: 1, amusedbucket: 1, analogwonder: 1, analyzecorona: 1, ancientact: 1, annoyingacoustics: 1, anxiousapples: 1, aquaticowl: 1, ar1nvz5: 1, archswimming: 1, aromamirror: 1, arrivegrowth: 1, artthevoid: 1, aspiringapples: 1, aspiringtoy: 1, astonishingfood: 1, astralhustle: 1, astrallullaby: 1, attendchase: 1, attractivecap: 1, audioarctic: 1, automaticturkey: 1, availablerest: 1, avalonalbum: 1, averageactivity: 1, awarealley: 1, awesomeagreement: 1, awzbijw: 1, axiomaticalley: 1, axiomaticanger: 1, azuremystique: 1, backupcat: 1, badgeboat: 1, badgerabbit: 1, baitbaseball: 1, balloonbelieve: 1, bananabarrel: 1, barbarousbase: 1, basilfish: 1, basketballbelieve: 1, baskettexture: 1, bawdybeast: 1, beamvolcano: 1, beancontrol: 1, bearmoonlodge: 1, beetleend: 1, begintrain: 1, berserkhydrant: 1, bespokesandals: 1, bestboundary: 1, bewilderedbattle: 1, bewilderedblade: 1, bhcumsc: 1, bikepaws: 1, bikesboard: 1, billowybead: 1, binspiredtees: 1, birthdaybelief: 1, blackbrake: 1, bleachbubble: 1, bleachscarecrow: 1, bleedlight: 1, blesspizzas: 1, blissfulcrescendo: 1, blissfullagoon: 1, blueeyedblow: 1, blushingbeast: 1, boatsvest: 1, boilingbeetle: 1, boostbehavior: 1, boredcrown: 1, bouncyproperty: 1, boundarybusiness: 1, boundlessargument: 1, boundlessbrake: 1, boundlessveil: 1, brainybasin: 1, brainynut: 1, branchborder: 1, brandsfive: 1, brandybison: 1, bravebone: 1, bravecalculator: 1, breadbalance: 1, breakableinsurance: 1, breakfastboat: 1, breezygrove: 1, brianwould: 1, brighttoe: 1, briskstorm: 1, broadborder: 1, broadboundary: 1, broadcastbed: 1, broaddoor: 1, brotherslocket: 1, bruisebaseball: 1, brunchforher: 1, buildingknife: 1, bulbbait: 1, burgersalt: 1, burlywhistle: 1, burnbubble: 1, bushesbag: 1, bustlingbath: 1, bustlingbook: 1, butterburst: 1, cakesdrum: 1, calculatingcircle: 1, calculatingtoothbrush: 1, callousbrake: 1, calmcactus: 1, calypsocapsule: 1, cannonchange: 1, capablecows: 1, capriciouscorn: 1, captivatingcanyon: 1, captivatingillusion: 1, captivatingpanorama: 1, captivatingperformance: 1, carefuldolls: 1, caringcast: 1, caringzinc: 1, carloforward: 1, carscannon: 1, cartkitten: 1, catalogcake: 1, catschickens: 1, causecherry: 1, cautiouscamera: 1, cautiouscherries: 1, cautiouscrate: 1, cautiouscredit: 1, cavecurtain: 1, ceciliavenus: 1, celestialeuphony: 1, celestialquasar: 1, celestialspectra: 1, chaireggnog: 1, chairscrack: 1, chairsdonkey: 1, chalkoil: 1, changeablecats: 1, channelcamp: 1, charmingplate: 1, charscroll: 1, cheerycraze: 1, chessbranch: 1, chesscolor: 1, chesscrowd: 1, childlikeexample: 1, chilledliquid: 1, chingovernment: 1, chinsnakes: 1, chipperisle: 1, chivalrouscord: 1, chubbycreature: 1, chunkycactus: 1, cicdserver: 1, cinemabonus: 1, clammychicken: 1, cloisteredcord: 1, cloisteredcurve: 1, closedcows: 1, closefriction: 1, cloudhustles: 1, cloudjumbo: 1, clovercabbage: 1, clumsycar: 1, coatfood: 1, cobaltoverture: 1, coffeesidehustle: 1, coldbalance: 1, coldcreatives: 1, colorfulafterthought: 1, colossalclouds: 1, colossalcoat: 1, colossalcry: 1, combativedetail: 1, combbit: 1, combcattle: 1, combcompetition: 1, cometquote: 1, comfortablecheese: 1, comfygoodness: 1, companyparcel: 1, comparereaction: 1, compiledoctor: 1, concernedchange: 1, concernedchickens: 1, condemnedcomb: 1, conditionchange: 1, conditioncrush: 1, confesschairs: 1, configchain: 1, connectashelf: 1, consciouschairs: 1, consciouscheese: 1, consciousdirt: 1, consumerzero: 1, controlcola: 1, controlhall: 1, convertbatch: 1, cooingcoal: 1, coordinatedbedroom: 1, coordinatedcoat: 1, copycarpenter: 1, copyrightaccesscontrols: 1, coralreverie: 1, corgibeachday: 1, cosmicsculptor: 1, cosmosjackson: 1, courageousbaby: 1, coverapparatus: 1, coverlayer: 1, cozydusk: 1, cozyhillside: 1, cozytryst: 1, crackedsafe: 1, crafthenry: 1, crashchance: 1, craterbox: 1, creatorcherry: 1, creatorpassenger: 1, creaturecabbage: 1, crimsonmeadow: 1, critictruck: 1, crookedcreature: 1, cruisetourist: 1, cryptvalue: 1, crystalboulevard: 1, crystalstatus: 1, cubchannel: 1, cubepins: 1, cuddlycake: 1, cuddlylunchroom: 1, culturedcamera: 1, culturedfeather: 1, cumbersomecar: 1, cumbersomecloud: 1, curiouschalk: 1, curioussuccess: 1, curlycannon: 1, currentcollar: 1, curtaincows: 1, curvycord: 1, curvycry: 1, cushionpig: 1, cutcurrent: 1, cyclopsdial: 1, dailydivision: 1, damagedadvice: 1, damageddistance: 1, dancemistake: 1, dandydune: 1, dandyglow: 1, dapperdiscussion: 1, datastoried: 1, daughterstone: 1, daymodern: 1, dazzlingbook: 1, deafeningdock: 1, deafeningdowntown: 1, debonairdust: 1, debonairtree: 1, debugentity: 1, decidedrum: 1, decisivedrawer: 1, decisiveducks: 1, decoycreation: 1, deerbeginner: 1, defeatedbadge: 1, defensevest: 1, degreechariot: 1, delegatediscussion: 1, delicatecascade: 1, deliciousducks: 1, deltafault: 1, deluxecrate: 1, dependenttrip: 1, desirebucket: 1, desiredirt: 1, detailedgovernment: 1, detailedkitten: 1, detectdinner: 1, detourgame: 1, deviceseal: 1, deviceworkshop: 1, dewdroplagoon: 1, difficultfog: 1, digestiondrawer: 1, dinnerquartz: 1, diplomahawaii: 1, direfuldesk: 1, discreetquarter: 1, distributionneck: 1, distributionpocket: 1, distributiontomatoes: 1, disturbedquiet: 1, divehope: 1, dk4ywix: 1, dogsonclouds: 1, dollardelta: 1, doubledefend: 1, doubtdrawer: 1, dq95d35: 1, dreamycanyon: 1, driftpizza: 1, drollwharf: 1, drydrum: 1, dustydime: 1, dustyhammer: 1, eagereden: 1, eagerflame: 1, eagerknight: 1, earthyfarm: 1, eatablesquare: 1, echochief: 1, echoinghaven: 1, effervescentcoral: 1, effervescentvista: 1, effulgentnook: 1, effulgenttempest: 1, ejyymghi: 1, elasticchange: 1, elderlybean: 1, elderlytown: 1, elephantqueue: 1, elusivebreeze: 1, elusivecascade: 1, elysiantraverse: 1, embellishedmeadow: 1, embermosaic: 1, emberwhisper: 1, eminentbubble: 1, eminentend: 1, emptyescort: 1, enchantedskyline: 1, enchantingdiscovery: 1, enchantingenchantment: 1, enchantingmystique: 1, enchantingtundra: 1, enchantingvalley: 1, encourageshock: 1, endlesstrust: 1, endurablebulb: 1, energeticexample: 1, energeticladybug: 1, engineergrape: 1, engineertrick: 1, enigmaticblossom: 1, enigmaticcanyon: 1, enigmaticvoyage: 1, enormousfoot: 1, enterdrama: 1, entertainskin: 1, enthusiastictemper: 1, enviousthread: 1, equablekettle: 1, etherealbamboo: 1, ethereallagoon: 1, etherealpinnacle: 1, etherealquasar: 1, etherealripple: 1, evanescentedge: 1, evasivejar: 1, eventexistence: 1, exampleshake: 1, excitingtub: 1, exclusivebrass: 1, executeknowledge: 1, exhibitsneeze: 1, exquisiteartisanship: 1, extractobservation: 1, extralocker: 1, extramonies: 1, exuberantedge: 1, facilitatebreakfast: 1, fadechildren: 1, fadedsnow: 1, fairfeeling: 1, fairiesbranch: 1, fairytaleflame: 1, falseframe: 1, familiarrod: 1, fancyactivity: 1, fancydune: 1, fancygrove: 1, fangfeeling: 1, fantastictone: 1, farethief: 1, farshake: 1, farsnails: 1, fastenfather: 1, fasterfineart: 1, fasterjson: 1, fatcoil: 1, faucetfoot: 1, faultycanvas: 1, fearfulfish: 1, fearfulmint: 1, fearlesstramp: 1, featherstage: 1, feeblestamp: 1, feignedfaucet: 1, fernwaycloud: 1, fertilefeeling: 1, fewjuice: 1, fewkittens: 1, finalizeforce: 1, finestpiece: 1, finitecube: 1, firecatfilms: 1, fireworkcamp: 1, firstendpoint: 1, firstfrogs: 1, firsttexture: 1, fitmessage: 1, fivesidedsquare: 1, flakyfeast: 1, flameuncle: 1, flimsycircle: 1, flimsythought: 1, flippedfunnel: 1, floodprincipal: 1, flourishingcollaboration: 1, flourishingendeavor: 1, flourishinginnovation: 1, flourishingpartnership: 1, flowersornament: 1, flowerycreature: 1, floweryfact: 1, floweryoperation: 1, foambench: 1, followborder: 1, forecasttiger: 1, foretellfifth: 1, forevergears: 1, forgetfulflowers: 1, forgetfulsnail: 1, fractalcoast: 1, framebanana: 1, franticroof: 1, frantictrail: 1, frazzleart: 1, freakyglass: 1, frequentflesh: 1, friendlycrayon: 1, friendlyfold: 1, friendwool: 1, frightenedpotato: 1, frogator: 1, frogtray: 1, frugalfiestas: 1, fumblingform: 1, functionalcrown: 1, funoverbored: 1, funoverflow: 1, furnstudio: 1, furryfork: 1, furryhorses: 1, futuristicapparatus: 1, futuristicfairies: 1, futuristicfifth: 1, futuristicframe: 1, fuzzyaudio: 1, fuzzyerror: 1, gardenovens: 1, gaudyairplane: 1, geekactive: 1, generalprose: 1, generateoffice: 1, giantsvessel: 1, giddycoat: 1, gitcrumbs: 1, givevacation: 1, gladglen: 1, gladysway: 1, glamhawk: 1, gleamingcow: 1, gleaminghaven: 1, glisteningguide: 1, glisteningsign: 1, glitteringbrook: 1, glowingmeadow: 1, gluedpixel: 1, goldfishgrowth: 1, gondolagnome: 1, goodbark: 1, gracefulmilk: 1, grandfatherguitar: 1, gravitygive: 1, gravitykick: 1, grayoranges: 1, grayreceipt: 1, greyinstrument: 1, gripcorn: 1, groovyornament: 1, grouchybrothers: 1, grouchypush: 1, grumpydime: 1, grumpydrawer: 1, guardeddirection: 1, guardedschool: 1, guessdetail: 1, guidecent: 1, guildalpha: 1, gulliblegrip: 1, gustocooking: 1, gustygrandmother: 1, habitualhumor: 1, halcyoncanyon: 1, halcyonsculpture: 1, hallowedinvention: 1, haltingdivision: 1, haltinggold: 1, handleteeth: 1, handnorth: 1, handsomehose: 1, handsomeindustry: 1, handsomelythumb: 1, handsomeyam: 1, handyfield: 1, handyfireman: 1, handyincrease: 1, haplesshydrant: 1, haplessland: 1, happysponge: 1, harborcub: 1, harmonicbamboo: 1, harmonywing: 1, hatefulrequest: 1, headydegree: 1, headyhook: 1, healflowers: 1, hearinglizards: 1, heartbreakingmind: 1, hearthorn: 1, heavydetail: 1, heavyplayground: 1, helpcollar: 1, helpflame: 1, hfc195b: 1, highfalutinbox: 1, highfalutinhoney: 1, hilariouszinc: 1, historicalbeam: 1, homelycrown: 1, honeybulb: 1, honeywhipped: 1, honorablehydrant: 1, horsenectar: 1, hospitablehall: 1, hospitablehat: 1, howdyinbox: 1, humdrumhobbies: 1, humdrumtouch: 1, hurtgrape: 1, hypnoticwound: 1, hystericalcloth: 1, hystericalfinger: 1, idolscene: 1, idyllicjazz: 1, illinvention: 1, illustriousoatmeal: 1, immensehoney: 1, imminentshake: 1, importantmeat: 1, importedincrease: 1, importedinsect: 1, importlocate: 1, impossibleexpansion: 1, impossiblemove: 1, impulsejewel: 1, impulselumber: 1, incomehippo: 1, incompetentjoke: 1, inconclusiveaction: 1, infamousstream: 1, innocentlamp: 1, innocentwax: 1, inputicicle: 1, inquisitiveice: 1, inquisitiveinvention: 1, intelligentscissors: 1, intentlens: 1, interestdust: 1, internalcondition: 1, internalsink: 1, iotapool: 1, irritatingfog: 1, itemslice: 1, ivykiosk: 1, jadeitite: 1, jaderooster: 1, jailbulb: 1, joblessdrum: 1, jollylens: 1, joyfulkeen: 1, joyoussurprise: 1, jubilantaura: 1, jubilantcanyon: 1, jubilantcascade: 1, jubilantglimmer: 1, jubilanttempest: 1, jubilantwhisper: 1, justicejudo: 1, kaputquill: 1, keenquill: 1, kindhush: 1, kitesquirrel: 1, knitstamp: 1, laboredlight: 1, lameletters: 1, lamplow: 1, largebrass: 1, lasttaco: 1, leaplunchroom: 1, leftliquid: 1, lemonpackage: 1, lemonsandjoy: 1, liftedknowledge: 1, lightenafterthought: 1, lighttalon: 1, livelumber: 1, livelylaugh: 1, livelyreward: 1, livingsleet: 1, lizardslaugh: 1, loadsurprise: 1, lonelyflavor: 1, longingtrees: 1, lorenzourban: 1, losslace: 1, loudlunch: 1, loveseashore: 1, lp3tdqle: 1, ludicrousarch: 1, lumberamount: 1, luminousboulevard: 1, luminouscatalyst: 1, luminoussculptor: 1, lumpygnome: 1, lumpylumber: 1, lustroushaven: 1, lyricshook: 1, madebyintent: 1, magicaljoin: 1, magnetairport: 1, majesticmountainrange: 1, majesticwaterscape: 1, majesticwilderness: 1, maliciousmusic: 1, managedpush: 1, mantrafox: 1, marblediscussion: 1, markahouse: 1, markedmeasure: 1, marketspiders: 1, marriedmailbox: 1, marriedvalue: 1, massivemark: 1, materialisticmoon: 1, materialmilk: 1, materialplayground: 1, meadowlullaby: 1, meatydime: 1, mediatescarf: 1, mediumshort: 1, mellowhush: 1, mellowmailbox: 1, melodiouschorus: 1, melodiouscomposition: 1, meltmilk: 1, memopilot: 1, memorizeneck: 1, meremark: 1, merequartz: 1, merryopal: 1, merryvault: 1, messagenovice: 1, messyoranges: 1, mightyspiders: 1, mimosamajor: 1, mindfulgem: 1, minorcattle: 1, minusmental: 1, minuteburst: 1, miscreantmoon: 1, mistyhorizon: 1, mittencattle: 1, mixedreading: 1, modularmental: 1, monacobeatles: 1, moorshoes: 1, motionlessbag: 1, motionlessbelief: 1, motionlessmeeting: 1, movemeal: 1, muddledaftermath: 1, muddledmemory: 1, mundanenail: 1, mundanepollution: 1, mushywaste: 1, muteknife: 1, mutemailbox: 1, mysticalagoon: 1, naivestatement: 1, nappyneck: 1, neatshade: 1, nebulacrescent: 1, nebulajubilee: 1, nebulousamusement: 1, nebulousgarden: 1, nebulousquasar: 1, nebulousripple: 1, needlessnorth: 1, needyneedle: 1, neighborlywatch: 1, niftygraphs: 1, niftyhospital: 1, niftyjelly: 1, nightwound: 1, nimbleplot: 1, nocturnalloom: 1, nocturnalmystique: 1, noiselessplough: 1, nonchalantnerve: 1, nondescriptcrowd: 1, nondescriptstocking: 1, nostalgicknot: 1, nostalgicneed: 1, notifyglass: 1, nudgeduck: 1, nullnorth: 1, numberlessring: 1, numerousnest: 1, nuttyorganization: 1, oafishchance: 1, oafishobservation: 1, obscenesidewalk: 1, observantice: 1, oldfashionedoffer: 1, omgthink: 1, omniscientfeeling: 1, onlywoofs: 1, opalquill: 1, operationchicken: 1, operationnail: 1, oppositeoperation: 1, optimallimit: 1, opulentsylvan: 1, orientedargument: 1, orionember: 1, ourblogthing: 1, outgoinggiraffe: 1, outsidevibe: 1, outstandingincome: 1, outstandingsnails: 1, overkick: 1, overratedchalk: 1, oxygenfuse: 1, pailcrime: 1, painstakingpickle: 1, paintpear: 1, paleleaf: 1, pamelarandom: 1, panickycurtain: 1, parallelbulb: 1, pardonpopular: 1, parentpicture: 1, parsimoniouspolice: 1, passivepolo: 1, pastoralroad: 1, pawsnug: 1, peacefullimit: 1, pedromister: 1, pedropanther: 1, perceivequarter: 1, perkyjade: 1, petiteumbrella: 1, philippinch: 1, photographpan: 1, piespower: 1, piquantgrove: 1, piquantmeadow: 1, piquantpigs: 1, piquantprice: 1, piquantvortex: 1, pixeledhub: 1, pizzasnut: 1, placeframe: 1, placidactivity: 1, planebasin: 1, plantdigestion: 1, playfulriver: 1, plotparent: 1, pluckyzone: 1, poeticpackage: 1, pointdigestion: 1, pointlesshour: 1, pointlesspocket: 1, pointlessprofit: 1, pointlessrifle: 1, polarismagnet: 1, polishedcrescent: 1, polishedfolly: 1, politeplanes: 1, politicalflip: 1, politicalporter: 1, popplantation: 1, possiblepencil: 1, powderjourney: 1, powerfulblends: 1, preciousplanes: 1, prefixpatriot: 1, presetrabbits: 1, previousplayground: 1, previouspotato: 1, pricklypollution: 1, pristinegale: 1, probablepartner: 1, processplantation: 1, producepickle: 1, productsurfer: 1, profitrumour: 1, promiseair: 1, proofconvert: 1, propertypotato: 1, protestcopy: 1, psychedelicchess: 1, publicsofa: 1, puffyloss: 1, puffypaste: 1, puffypull: 1, puffypurpose: 1, pulsatingmeadow: 1, pumpedpancake: 1, pumpedpurpose: 1, punyplant: 1, puppytooth: 1, purposepipe: 1, quacksquirrel: 1, quaintcan: 1, quaintlake: 1, quantumlagoon: 1, quantumshine: 1, queenskart: 1, quillkick: 1, quirkybliss: 1, quirkysugar: 1, quixoticnebula: 1, rabbitbreath: 1, rabbitrifle: 1, radiantcanopy: 1, radiantlullaby: 1, railwaygiraffe: 1, raintwig: 1, rainyhand: 1, rainyrule: 1, rangecake: 1, raresummer: 1, reactjspdf: 1, readingguilt: 1, readymoon: 1, readysnails: 1, realizedoor: 1, realizerecess: 1, rebelclover: 1, rebelhen: 1, rebelsubway: 1, receiptcent: 1, receptiveink: 1, receptivereaction: 1, recessrain: 1, reconditeprison: 1, reflectivestatement: 1, refundradar: 1, regularplants: 1, regulatesleet: 1, relationrest: 1, reloadphoto: 1, rememberdiscussion: 1, rentinfinity: 1, replaceroute: 1, resonantbrush: 1, respectrain: 1, resplendentecho: 1, retrievemint: 1, rhetoricalactivity: 1, rhetoricalveil: 1, rhymezebra: 1, rhythmrule: 1, richstring: 1, rigidrobin: 1, rigidveil: 1, rigorlab: 1, ringplant: 1, ringsrecord: 1, ritzykey: 1, ritzyrepresentative: 1, ritzyveil: 1, rockpebbles: 1, rollconnection: 1, roofrelation: 1, roseincome: 1, rottenray: 1, rusticprice: 1, ruthlessdegree: 1, ruthlessmilk: 1, sableloss: 1, sablesmile: 1, sadloaf: 1, saffronrefuge: 1, sagargift: 1, saltsacademy: 1, samesticks: 1, samplesamba: 1, scarcecard: 1, scarceshock: 1, scarcesign: 1, scarcestructure: 1, scarcesurprise: 1, scaredcomfort: 1, scaredsidewalk: 1, scaredslip: 1, scaredsnake: 1, scaredswing: 1, scarefowl: 1, scatteredheat: 1, scatteredquiver: 1, scatteredstream: 1, scenicapparel: 1, scientificshirt: 1, scintillatingscissors: 1, scissorsstatement: 1, scrapesleep: 1, scratchsofa: 1, screechingfurniture: 1, screechingstocking: 1, scribbleson: 1, scrollservice: 1, scrubswim: 1, seashoresociety: 1, secondhandfall: 1, secretivesheep: 1, secretspiders: 1, secretturtle: 1, seedscissors: 1, seemlysuggestion: 1, selfishsea: 1, sendingspire: 1, sensorsmile: 1, separatesort: 1, seraphichorizon: 1, seraphicjubilee: 1, serendipityecho: 1, serenecascade: 1, serenepebble: 1, serenesurf: 1, serioussuit: 1, serpentshampoo: 1, settleshoes: 1, shadeship: 1, shaggytank: 1, shakyseat: 1, shakysurprise: 1, shakytaste: 1, shallowblade: 1, sharkskids: 1, sheargovernor: 1, shesubscriptions: 1, shinypond: 1, shirtsidewalk: 1, shiveringspot: 1, shiverscissors: 1, shockinggrass: 1, shockingship: 1, shredquiz: 1, shydinosaurs: 1, sierrakermit: 1, signaturepod: 1, siliconslow: 1, sillyscrew: 1, simplesidewalk: 1, simulateswing: 1, sincerebuffalo: 1, sincerepelican: 1, sinceresubstance: 1, sinkbooks: 1, sixscissors: 1, sizzlingsmoke: 1, slaysweater: 1, slimyscarf: 1, slinksuggestion: 1, smallershops: 1, smashshoe: 1, smilewound: 1, smilingcattle: 1, smilingswim: 1, smilingwaves: 1, smoggysongs: 1, smoggystation: 1, snacktoken: 1, snakemineral: 1, snakeslang: 1, sneakwind: 1, sneakystew: 1, snoresmile: 1, snowmentor: 1, soggysponge: 1, soggyzoo: 1, solarislabyrinth: 1, somberscarecrow: 1, sombersea: 1, sombersquirrel: 1, sombersticks: 1, sombersurprise: 1, soothingglade: 1, sophisticatedstove: 1, sordidsmile: 1, soresidewalk: 1, soresneeze: 1, sorethunder: 1, soretrain: 1, sortsail: 1, sortsummer: 1, sowlettuce: 1, spadelocket: 1, sparkgoal: 1, sparklingshelf: 1, specialscissors: 1, spellmist: 1, spellsalsa: 1, spiffymachine: 1, spirebaboon: 1, spookystitch: 1, spoonsilk: 1, spotlessstamp: 1, spottednoise: 1, springolive: 1, springsister: 1, springsnails: 1, sproutingbag: 1, sprydelta: 1, sprysummit: 1, spuriousair: 1, spuriousbase: 1, spurioussquirrel: 1, spuriousstranger: 1, spysubstance: 1, squalidscrew: 1, squeakzinc: 1, squealingturn: 1, stakingbasket: 1, stakingshock: 1, staleshow: 1, stalesummer: 1, starkscale: 1, startingcars: 1, statshunt: 1, statuesqueship: 1, stayaction: 1, steadycopper: 1, stealsteel: 1, steepscale: 1, steepsister: 1, stepcattle: 1, stepplane: 1, stepwisevideo: 1, stereoproxy: 1, stewspiders: 1, stiffstem: 1, stimulatingsneeze: 1, stingsquirrel: 1, stingyshoe: 1, stingyspoon: 1, stockingsleet: 1, stockingsneeze: 1, stomachscience: 1, stonechin: 1, stopstomach: 1, stormyachiever: 1, stormyfold: 1, strangeclocks: 1, strangersponge: 1, strangesink: 1, streetsort: 1, stretchsister: 1, stretchsneeze: 1, stretchsquirrel: 1, stripedbat: 1, strivesidewalk: 1, sturdysnail: 1, subletyoke: 1, sublimequartz: 1, subsequentswim: 1, substantialcarpenter: 1, substantialgrade: 1, succeedscene: 1, successfulscent: 1, suddensoda: 1, sugarfriction: 1, suggestionbridge: 1, summerobject: 1, sunshinegates: 1, superchichair: 1, superficialspring: 1, superviseshoes: 1, supportwaves: 1, suspectmark: 1, swellstocking: 1, swelteringsleep: 1, swingslip: 1, swordgoose: 1, syllablesight: 1, synonymousrule: 1, synonymoussticks: 1, synthesizescarecrow: 1, tackytrains: 1, tacojournal: 1, talltouch: 1, tangibleteam: 1, tangyamount: 1, tastelesstrees: 1, tastelesstrucks: 1, tastesnake: 1, tawdryson: 1, tearfulglass: 1, techconverter: 1, tediousbear: 1, tedioustooth: 1, teenytinycellar: 1, teenytinytongue: 1, telephoneapparatus: 1, tempertrick: 1, tempttalk: 1, temptteam: 1, terriblethumb: 1, terrifictooth: 1, testadmiral: 1, texturetrick: 1, therapeuticcars: 1, thickticket: 1, thicktrucks: 1, thingsafterthought: 1, thingstaste: 1, thinkitwice: 1, thirdrespect: 1, thirstytwig: 1, thomastorch: 1, thoughtlessknot: 1, thrivingmarketplace: 1, ticketaunt: 1, ticklesign: 1, tidymitten: 1, tightpowder: 1, tinyswans: 1, tinytendency: 1, tiredthroat: 1, toolcapital: 1, toomanyalts: 1, torpidtongue: 1, trackcaddie: 1, tradetooth: 1, trafficviews: 1, tranquilamulet: 1, tranquilarchipelago: 1, tranquilcan: 1, tranquilcanyon: 1, tranquilplume: 1, tranquilside: 1, tranquilveil: 1, tranquilveranda: 1, trappush: 1, treadbun: 1, tremendousearthquake: 1, tremendousplastic: 1, tremendoustime: 1, tritebadge: 1, tritethunder: 1, tritetongue: 1, troubledtail: 1, troubleshade: 1, truckstomatoes: 1, truculentrate: 1, tumbleicicle: 1, tuneupcoffee: 1, twistloss: 1, twistsweater: 1, typicalairplane: 1, ubiquitoussea: 1, ubiquitousyard: 1, ultravalid: 1, unablehope: 1, unaccountablecreator: 1, unaccountablepie: 1, unarmedindustry: 1, unbecominghall: 1, uncoveredexpert: 1, understoodocean: 1, unequalbrake: 1, unequaltrail: 1, unknowncontrol: 1, unknowncrate: 1, unknowntray: 1, untidyquestion: 1, untidyrice: 1, unusedstone: 1, unusualtitle: 1, unwieldyimpulse: 1, uppitytime: 1, uselesslumber: 1, validmemo: 1, vanfireworks: 1, vanishmemory: 1, velvetnova: 1, velvetquasar: 1, venomousvessel: 1, venusgloria: 1, verdantanswer: 1, verdantlabyrinth: 1, verdantloom: 1, verdantsculpture: 1, verseballs: 1, vibrantcelebration: 1, vibrantgale: 1, vibranthaven: 1, vibrantpact: 1, vibrantsundown: 1, vibranttalisman: 1, vibrantvale: 1, victoriousrequest: 1, virtualvincent: 1, vividcanopy: 1, vividfrost: 1, vividmeadow: 1, vividplume: 1, voicelessvein: 1, voidgoo: 1, volatileprofit: 1, waitingnumber: 1, wantingwindow: 1, warnwing: 1, washbanana: 1, wateryvan: 1, waterywave: 1, waterywrist: 1, wearbasin: 1, websitesdude: 1, wellgroomedapparel: 1, wellgroomedhydrant: 1, wellmadefrog: 1, westpalmweb: 1, whimsicalcanyon: 1, whimsicalgrove: 1, whineattempt: 1, whirlwealth: 1, whiskyqueue: 1, whisperingcascade: 1, whisperingcrib: 1, whisperingquasar: 1, whisperingsummit: 1, whispermeeting: 1, wildcommittee: 1, wirecomic: 1, wiredforcoffee: 1, wirypaste: 1, wistfulwaste: 1, wittypopcorn: 1, wittyshack: 1, workoperation: 1, worldlever: 1, worriednumber: 1, worriedwine: 1, wretchedfloor: 1, wrongpotato: 1, wrongwound: 1, wtaccesscontrol: 1, xovq5nemr: 1, yieldingwoman: 1, zbwp6ghm: 1, zephyrcatalyst: 1, zephyrlabyrinth: 1, zestyhorizon: 1, zestyrover: 1, zestywire: 1, zipperxray: 1, zonewedgeshaft: 1 }, net: { "2mdn": 1, "2o7": 1, "3gl": 1, "a-mo": 1, acint: 1, adform: 1, adhigh: 1, admixer: 1, adobedc: 1, adspeed: 1, adverticum: 1, apicit: 1, appier: 1, akamaized: { "assets-momentum": 1 }, aticdn: 1, edgekey: { au: 1, ca: 1, ch: 1, cn: 1, "com-v1": 1, es: 1, ihg: 1, in: 1, io: 1, it: 1, jp: 1, net: 1, org: 1, com: { scene7: 1 }, "uk-v1": 1, uk: 1 }, azure: 1, azurefd: 1, bannerflow: 1, "bf-tools": 1, bidswitch: 1, bitsngo: 1, blueconic: 1, boldapps: 1, buysellads: 1, cachefly: 1, cedexis: 1, certona: 1, "confiant-integrations": 1, contentsquare: 1, criteo: 1, crwdcntrl: 1, cloudfront: { d1af033869koo7: 1, d1cr9zxt7u0sgu: 1, d1s87id6169zda: 1, d1vg5xiq7qffdj: 1, d1y068gyog18cq: 1, d214hhm15p4t1d: 1, d21gpk1vhmjuf5: 1, d2zah9y47r7bi2: 1, d38b8me95wjkbc: 1, d38xvr37kwwhcm: 1, d3fv2pqyjay52z: 1, d3i4yxtzktqr9n: 1, d3odp2r1osuwn0: 1, d5yoctgpv4cpx: 1, d6tizftlrpuof: 1, dbukjj6eu5tsf: 1, dn0qt3r0xannq: 1, dsh7ky7308k4b: 1, d2g3ekl4mwm40k: 1 }, demdex: 1, dotmetrics: 1, doubleclick: 1, durationmedia: 1, "e-planning": 1, edgecastcdn: 1, emsecure: 1, episerver: 1, esm1: 1, eulerian: 1, everestjs: 1, everesttech: 1, eyeota: 1, ezoic: 1, fastly: { global: { shared: { f2: 1 }, sni: { j: 1 } }, map: { "prisa-us-eu": 1, scribd: 1 }, ssl: { global: { "qognvtzku-x": 1 } } }, facebook: 1, fastclick: 1, fonts: 1, azureedge: { "fp-cdn": 1, sdtagging: 1 }, fuseplatform: 1, fwmrm: 1, "go-mpulse": 1, hadronid: 1, "hs-analytics": 1, hsleadflows: 1, "im-apps": 1, impervadns: 1, iocnt: 1, iprom: 1, jsdelivr: 1, "kanade-ad": 1, krxd: 1, "line-scdn": 1, listhub: 1, livecom: 1, livedoor: 1, liveperson: 1, lkqd: 1, llnwd: 1, lpsnmedia: 1, magnetmail: 1, marketo: 1, maxymiser: 1, media: 1, microad: 1, mobon: 1, monetate: 1, mxptint: 1, myfonts: 1, myvisualiq: 1, naver: 1, "nr-data": 1, ojrq: 1, omtrdc: 1, onecount: 1, openx: 1, openxcdn: 1, opta: 1, owneriq: 1, pages02: 1, pages03: 1, pages04: 1, pages05: 1, pages06: 1, pages08: 1, pingdom: 1, pmdstatic: 1, popads: 1, popcash: 1, primecaster: 1, "pro-market": 1, akamaihd: { "pxlclnmdecom-a": 1 }, rfihub: 1, sancdn: 1, "sc-static": 1, semasio: 1, sensic: 1, sexad: 1, smaato: 1, spreadshirts: 1, storygize: 1, tfaforms: 1, trackcmp: 1, trackedlink: 1, tradetracker: 1, "truste-svc": 1, uuidksinc: 1, viafoura: 1, visilabs: 1, visx: 1, w55c: 1, wdsvc: 1, witglobal: 1, yandex: 1, yastatic: 1, yieldlab: 1, zencdn: 1, zucks: 1, opencmp: 1, azurewebsites: { "app-fnsp-matomo-analytics-prod": 1 }, "ad-delivery": 1, chartbeat: 1, msecnd: 1, cloudfunctions: { "us-central1-adaptive-growth": 1 }, eviltracker: 1 }, co: { "6sc": 1, ayads: 1, getlasso: 1, idio: 1, increasingly: 1, jads: 1, nanorep: 1, nc0: 1, pcdn: 1, prmutv: 1, resetdigital: 1, t: 1, tctm: 1, zip: 1 }, gt: { ad: 1 }, ru: { adfox: 1, adriver: 1, digitaltarget: 1, mail: 1, mindbox: 1, rambler: 1, rutarget: 1, sape: 1, smi2: 1, "tns-counter": 1, top100: 1, ulogin: 1, yandex: 1, yadro: 1 }, jp: { adingo: 1, admatrix: 1, auone: 1, co: { dmm: 1, "i-mobile": 1, rakuten: 1, yahoo: 1 }, fout: 1, genieesspv: 1, "gmossp-sp": 1, gsspat: 1, gssprt: 1, ne: { hatena: 1 }, i2i: 1, "impact-ad": 1, microad: 1, nakanohito: 1, r10s: 1, "reemo-ad": 1, rtoaster: 1, shinobi: 1, "team-rec": 1, uncn: 1, yimg: 1, yjtag: 1 }, pl: { adocean: 1, gemius: 1, nsaudience: 1, onet: 1, salesmanago: 1, wp: 1 }, pro: { adpartner: 1, piwik: 1, usocial: 1 }, de: { adscale: 1, "auswaertiges-amt": 1, fiduciagad: 1, ioam: 1, itzbund: 1, vgwort: 1, werk21system: 1 }, re: { adsco: 1 }, info: { adxbid: 1, bitrix: 1, navistechnologies: 1, usergram: 1, webantenna: 1 }, tv: { affec: 1, attn: 1, iris: 1, ispot: 1, samba: 1, teads: 1, twitch: 1, videohub: 1 }, dev: { amazon: 1 }, us: { amung: 1, samplicio: 1, slgnt: 1, trkn: 1, owlsr: 1 }, media: { andbeyond: 1, nextday: 1, townsquare: 1, underdog: 1 }, link: { app: 1 }, cloud: { avct: 1, egain: 1, matomo: 1 }, delivery: { ay: 1, monu: 1 }, ly: { bit: 1 }, br: { com: { btg360: 1, clearsale: 1, jsuol: 1, shopconvert: 1, shoptarget: 1, soclminer: 1 }, org: { ivcbrasil: 1 } }, ch: { ch: 1, "da-services": 1, google: 1 }, me: { channel: 1, contentexchange: 1, grow: 1, line: 1, loopme: 1, t: 1 }, ms: { clarity: 1 }, my: { cnt: 1 }, se: { codigo: 1 }, to: { cpx: 1, tawk: 1 }, chat: { crisp: 1, gorgias: 1 }, fr: { "d-bi": 1, "open-system": 1, weborama: 1 }, uk: { co: { dailymail: 1, hsbc: 1 } }, gov: { dhs: 1 }, ai: { "e-volution": 1, hybrid: 1, m2: 1, nrich: 1, wknd: 1 }, be: { geoedge: 1 }, au: { com: { google: 1, news: 1, nine: 1, zipmoney: 1, telstra: 1 } }, stream: { ibclick: 1 }, cz: { imedia: 1, seznam: 1, trackad: 1 }, app: { infusionsoft: 1, permutive: 1, shop: 1 }, tech: { ingage: 1, primis: 1 }, eu: { kameleoon: 1, medallia: 1, media01: 1, ocdn: 1, rqtrk: 1, slgnt: 1 }, fi: { kesko: 1, simpli: 1 }, live: { lura: 1 }, services: { marketingautomation: 1 }, sg: { mediacorp: 1 }, bi: { newsroom: 1 }, fm: { pdst: 1 }, ad: { pixel: 1 }, xyz: { playground: 1 }, it: { plug: 1, repstatic: 1 }, cc: { popin: 1 }, network: { pub: 1 }, nl: { rijksoverheid: 1 }, fyi: { sda: 1 }, es: { socy: 1 }, im: { spot: 1 }, market: { spotim: 1 }, am: { tru: 1 }, no: { uio: 1, medietall: 1 }, at: { waust: 1 }, pe: { shop: 1 }, ca: { bc: { gov: 1 } }, gg: { clean: 1 }, example: { "ad-company": 1 }, site: { "ad-company": 1, "third-party": { bad: 1, broken: 1 } }, pw: { "5mcwl": 1, fvl1f: 1, h78xb: 1, i9w8p: 1, k54nw: 1, tdzvm: 1, tzwaw: 1, vq1qi: 1, zlp6s: 1 }, pub: { admiral: 1 } };
@@ -72,22 +73,30 @@
       }
     }
   }
-  function getTabHostname() {
-    let framingOrigin = null;
+  function getTabUrl() {
+    let framingURLString = null;
     try {
-      framingOrigin = globalThis.top.location.href;
+      framingURLString = globalThis.top.location.href;
     } catch {
-      framingOrigin = globalThis.document.referrer;
+      framingURLString = getTopLevelOriginFromFrameAncestors() ?? globalThis.document.referrer;
     }
+    let framingURL;
+    try {
+      framingURL = new URL(framingURLString);
+    } catch {
+      framingURL = null;
+    }
+    return framingURL;
+  }
+  function getTopLevelOriginFromFrameAncestors() {
     if ("ancestorOrigins" in globalThis.location && globalThis.location.ancestorOrigins.length) {
-      framingOrigin = globalThis.location.ancestorOrigins.item(globalThis.location.ancestorOrigins.length - 1);
+      return globalThis.location.ancestorOrigins.item(globalThis.location.ancestorOrigins.length - 1);
     }
-    try {
-      framingOrigin = new URL(framingOrigin).hostname;
-    } catch {
-      framingOrigin = null;
-    }
-    return framingOrigin;
+    return null;
+  }
+  function getTabHostname() {
+    const topURLString = getTabUrl()?.hostname;
+    return topURLString || null;
   }
   function matchHostname(hostname, exceptionDomain) {
     return hostname === exceptionDomain || hostname.endsWith(`.${exceptionDomain}`);
@@ -132,7 +141,7 @@
     return isPlatformSpecificFeature(feature) ? !args.site.enabledFeatures.includes(feature) : args.site.isBroken || args.site.allowlisted || !args.site.enabledFeatures.includes(feature);
   }
   function camelcase(dashCaseText) {
-    return dashCaseText.replace(/-(.)/g, (_, letter) => {
+    return dashCaseText.replace(/-(.)/g, (_2, letter) => {
       return letter.toUpperCase();
     });
   }
@@ -317,7 +326,8 @@
   function computeLimitedSiteObject() {
     const topLevelHostname = getTabHostname();
     return {
-      domain: topLevelHostname
+      domain: topLevelHostname,
+      url: getTabUrl()?.href || null
     };
   }
   function getPlatformVersion(preferences) {
@@ -1747,8 +1757,8 @@
   }
 
   // ../node_modules/immutable-json-patch/lib/esm/utils.js
-  function isEqual(a, b) {
-    return JSON.stringify(a) === JSON.stringify(b);
+  function isEqual(a, b2) {
+    return JSON.stringify(a) === JSON.stringify(b2);
   }
   function initial(array) {
     return array.slice(0, array.length - 1);
@@ -2020,6 +2030,725 @@
     return parseJSONPointer(fromPointer);
   }
 
+  // ../node_modules/urlpattern-polyfill/dist/urlpattern.js
+  var R = class {
+    constructor(t, r, n, o, c, l) {
+      __publicField(this, "type", 3);
+      __publicField(this, "name", "");
+      __publicField(this, "prefix", "");
+      __publicField(this, "value", "");
+      __publicField(this, "suffix", "");
+      __publicField(this, "modifier", 3);
+      this.type = t, this.name = r, this.prefix = n, this.value = o, this.suffix = c, this.modifier = l;
+    }
+    hasCustomName() {
+      return this.name !== "" && typeof this.name != "number";
+    }
+  };
+  var be = /[$_\p{ID_Start}]/u;
+  var Pe = /[$_\u200C\u200D\p{ID_Continue}]/u;
+  var M = ".*";
+  function Re(e, t) {
+    return (t ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(e);
+  }
+  function v(e, t = false) {
+    let r = [], n = 0;
+    for (; n < e.length; ) {
+      let o = e[n], c = function(l) {
+        if (!t) throw new TypeError(l);
+        r.push({ type: "INVALID_CHAR", index: n, value: e[n++] });
+      };
+      if (o === "*") {
+        r.push({ type: "ASTERISK", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "+" || o === "?") {
+        r.push({ type: "OTHER_MODIFIER", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "\\") {
+        r.push({ type: "ESCAPED_CHAR", index: n++, value: e[n++] });
+        continue;
+      }
+      if (o === "{") {
+        r.push({ type: "OPEN", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === "}") {
+        r.push({ type: "CLOSE", index: n, value: e[n++] });
+        continue;
+      }
+      if (o === ":") {
+        let l = "", s = n + 1;
+        for (; s < e.length; ) {
+          let i = e.substr(s, 1);
+          if (s === n + 1 && be.test(i) || s !== n + 1 && Pe.test(i)) {
+            l += e[s++];
+            continue;
+          }
+          break;
+        }
+        if (!l) {
+          c(`Missing parameter name at ${n}`);
+          continue;
+        }
+        r.push({ type: "NAME", index: n, value: l }), n = s;
+        continue;
+      }
+      if (o === "(") {
+        let l = 1, s = "", i = n + 1, a = false;
+        if (e[i] === "?") {
+          c(`Pattern cannot start with "?" at ${i}`);
+          continue;
+        }
+        for (; i < e.length; ) {
+          if (!Re(e[i], false)) {
+            c(`Invalid character '${e[i]}' at ${i}.`), a = true;
+            break;
+          }
+          if (e[i] === "\\") {
+            s += e[i++] + e[i++];
+            continue;
+          }
+          if (e[i] === ")") {
+            if (l--, l === 0) {
+              i++;
+              break;
+            }
+          } else if (e[i] === "(" && (l++, e[i + 1] !== "?")) {
+            c(`Capturing groups are not allowed at ${i}`), a = true;
+            break;
+          }
+          s += e[i++];
+        }
+        if (a) continue;
+        if (l) {
+          c(`Unbalanced pattern at ${n}`);
+          continue;
+        }
+        if (!s) {
+          c(`Missing pattern at ${n}`);
+          continue;
+        }
+        r.push({ type: "REGEX", index: n, value: s }), n = i;
+        continue;
+      }
+      r.push({ type: "CHAR", index: n, value: e[n++] });
+    }
+    return r.push({ type: "END", index: n, value: "" }), r;
+  }
+  function D(e, t = {}) {
+    let r = v(e);
+    t.delimiter ??= "/#?", t.prefixes ??= "./";
+    let n = `[^${S(t.delimiter)}]+?`, o = [], c = 0, l = 0, s = "", i = /* @__PURE__ */ new Set(), a = (h) => {
+      if (l < r.length && r[l].type === h) return r[l++].value;
+    }, f = () => a("OTHER_MODIFIER") ?? a("ASTERISK"), d = (h) => {
+      let u = a(h);
+      if (u !== void 0) return u;
+      let { type: p, index: A } = r[l];
+      throw new TypeError(`Unexpected ${p} at ${A}, expected ${h}`);
+    }, T = () => {
+      let h = "", u;
+      for (; u = a("CHAR") ?? a("ESCAPED_CHAR"); ) h += u;
+      return h;
+    }, Se = (h) => h, L = t.encodePart || Se, I = "", U = (h) => {
+      I += h;
+    }, $ = () => {
+      I.length && (o.push(new R(3, "", "", L(I), "", 3)), I = "");
+    }, V = (h, u, p, A, Y) => {
+      let g = 3;
+      switch (Y) {
+        case "?":
+          g = 1;
+          break;
+        case "*":
+          g = 0;
+          break;
+        case "+":
+          g = 2;
+          break;
+      }
+      if (!u && !p && g === 3) {
+        U(h);
+        return;
+      }
+      if ($(), !u && !p) {
+        if (!h) return;
+        o.push(new R(3, "", "", L(h), "", g));
+        return;
+      }
+      let m;
+      p ? p === "*" ? m = M : m = p : m = n;
+      let O = 2;
+      m === n ? (O = 1, m = "") : m === M && (O = 0, m = "");
+      let P;
+      if (u ? P = u : p && (P = c++), i.has(P)) throw new TypeError(`Duplicate name '${P}'.`);
+      i.add(P), o.push(new R(O, P, L(h), m, L(A), g));
+    };
+    for (; l < r.length; ) {
+      let h = a("CHAR"), u = a("NAME"), p = a("REGEX");
+      if (!u && !p && (p = a("ASTERISK")), u || p) {
+        let g = h ?? "";
+        t.prefixes.indexOf(g) === -1 && (U(g), g = ""), $();
+        let m = f();
+        V(g, u, p, "", m);
+        continue;
+      }
+      let A = h ?? a("ESCAPED_CHAR");
+      if (A) {
+        U(A);
+        continue;
+      }
+      if (a("OPEN")) {
+        let g = T(), m = a("NAME"), O = a("REGEX");
+        !m && !O && (O = a("ASTERISK"));
+        let P = T();
+        d("CLOSE");
+        let xe = f();
+        V(g, m, O, P, xe);
+        continue;
+      }
+      $(), d("END");
+    }
+    return o;
+  }
+  function S(e) {
+    return e.replace(/([.+*?^${}()[\]|/\\])/g, "\\$1");
+  }
+  function X(e) {
+    return e && e.ignoreCase ? "ui" : "u";
+  }
+  function Z(e, t, r) {
+    return F(D(e, r), t, r);
+  }
+  function k(e) {
+    switch (e) {
+      case 0:
+        return "*";
+      case 1:
+        return "?";
+      case 2:
+        return "+";
+      case 3:
+        return "";
+    }
+  }
+  function F(e, t, r = {}) {
+    r.delimiter ??= "/#?", r.prefixes ??= "./", r.sensitive ??= false, r.strict ??= false, r.end ??= true, r.start ??= true, r.endsWith = "";
+    let n = r.start ? "^" : "";
+    for (let s of e) {
+      if (s.type === 3) {
+        s.modifier === 3 ? n += S(s.value) : n += `(?:${S(s.value)})${k(s.modifier)}`;
+        continue;
+      }
+      t && t.push(s.name);
+      let i = `[^${S(r.delimiter)}]+?`, a = s.value;
+      if (s.type === 1 ? a = i : s.type === 0 && (a = M), !s.prefix.length && !s.suffix.length) {
+        s.modifier === 3 || s.modifier === 1 ? n += `(${a})${k(s.modifier)}` : n += `((?:${a})${k(s.modifier)})`;
+        continue;
+      }
+      if (s.modifier === 3 || s.modifier === 1) {
+        n += `(?:${S(s.prefix)}(${a})${S(s.suffix)})`, n += k(s.modifier);
+        continue;
+      }
+      n += `(?:${S(s.prefix)}`, n += `((?:${a})(?:`, n += S(s.suffix), n += S(s.prefix), n += `(?:${a}))*)${S(s.suffix)})`, s.modifier === 0 && (n += "?");
+    }
+    let o = `[${S(r.endsWith)}]|$`, c = `[${S(r.delimiter)}]`;
+    if (r.end) return r.strict || (n += `${c}?`), r.endsWith.length ? n += `(?=${o})` : n += "$", new RegExp(n, X(r));
+    r.strict || (n += `(?:${c}(?=${o}))?`);
+    let l = false;
+    if (e.length) {
+      let s = e[e.length - 1];
+      s.type === 3 && s.modifier === 3 && (l = r.delimiter.indexOf(s) > -1);
+    }
+    return l || (n += `(?=${c}|${o})`), new RegExp(n, X(r));
+  }
+  var x = { delimiter: "", prefixes: "", sensitive: true, strict: true };
+  var B = { delimiter: ".", prefixes: "", sensitive: true, strict: true };
+  var q = { delimiter: "/", prefixes: "/", sensitive: true, strict: true };
+  function J(e, t) {
+    return e.length ? e[0] === "/" ? true : !t || e.length < 2 ? false : (e[0] == "\\" || e[0] == "{") && e[1] == "/" : false;
+  }
+  function Q(e, t) {
+    return e.startsWith(t) ? e.substring(t.length, e.length) : e;
+  }
+  function Ee(e, t) {
+    return e.endsWith(t) ? e.substr(0, e.length - t.length) : e;
+  }
+  function W(e) {
+    return !e || e.length < 2 ? false : e[0] === "[" || (e[0] === "\\" || e[0] === "{") && e[1] === "[";
+  }
+  var ee = ["ftp", "file", "http", "https", "ws", "wss"];
+  function N(e) {
+    if (!e) return true;
+    for (let t of ee) if (e.test(t)) return true;
+    return false;
+  }
+  function te(e, t) {
+    if (e = Q(e, "#"), t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.hash = e, r.hash ? r.hash.substring(1, r.hash.length) : "";
+  }
+  function re(e, t) {
+    if (e = Q(e, "?"), t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.search = e, r.search ? r.search.substring(1, r.search.length) : "";
+  }
+  function ne(e, t) {
+    return t || e === "" ? e : W(e) ? j(e) : z(e);
+  }
+  function se(e, t) {
+    if (t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.password = e, r.password;
+  }
+  function ie(e, t) {
+    if (t || e === "") return e;
+    let r = new URL("https://example.com");
+    return r.username = e, r.username;
+  }
+  function ae(e, t, r) {
+    if (r || e === "") return e;
+    if (t && !ee.includes(t)) return new URL(`${t}:${e}`).pathname;
+    let n = e[0] == "/";
+    return e = new URL(n ? e : "/-" + e, "https://example.com").pathname, n || (e = e.substring(2, e.length)), e;
+  }
+  function oe(e, t, r) {
+    return _(t) === e && (e = ""), r || e === "" ? e : K(e);
+  }
+  function ce(e, t) {
+    return e = Ee(e, ":"), t || e === "" ? e : y(e);
+  }
+  function _(e) {
+    switch (e) {
+      case "ws":
+      case "http":
+        return "80";
+      case "wws":
+      case "https":
+        return "443";
+      case "ftp":
+        return "21";
+      default:
+        return "";
+    }
+  }
+  function y(e) {
+    if (e === "") return e;
+    if (/^[-+.A-Za-z0-9]*$/.test(e)) return e.toLowerCase();
+    throw new TypeError(`Invalid protocol '${e}'.`);
+  }
+  function le(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.username = e, t.username;
+  }
+  function fe(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.password = e, t.password;
+  }
+  function z(e) {
+    if (e === "") return e;
+    if (/[\t\n\r #%/:<>?@[\]^\\|]/g.test(e)) throw new TypeError(`Invalid hostname '${e}'`);
+    let t = new URL("https://example.com");
+    return t.hostname = e, t.hostname;
+  }
+  function j(e) {
+    if (e === "") return e;
+    if (/[^0-9a-fA-F[\]:]/g.test(e)) throw new TypeError(`Invalid IPv6 hostname '${e}'`);
+    return e.toLowerCase();
+  }
+  function K(e) {
+    if (e === "" || /^[0-9]*$/.test(e) && parseInt(e) <= 65535) return e;
+    throw new TypeError(`Invalid port '${e}'.`);
+  }
+  function he(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.pathname = e[0] !== "/" ? "/-" + e : e, e[0] !== "/" ? t.pathname.substring(2, t.pathname.length) : t.pathname;
+  }
+  function ue(e) {
+    return e === "" ? e : new URL(`data:${e}`).pathname;
+  }
+  function de(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.search = e, t.search.substring(1, t.search.length);
+  }
+  function pe(e) {
+    if (e === "") return e;
+    let t = new URL("https://example.com");
+    return t.hash = e, t.hash.substring(1, t.hash.length);
+  }
+  var _i, _n, _t, _e, _s, _l, _o, _d, _p, _g, _H_instances, r_fn, R_fn, b_fn, u_fn, m_fn, a_fn, P_fn, E_fn, S_fn, O_fn, k_fn, x_fn, h_fn, f_fn, T_fn, A_fn, y_fn, w_fn, c_fn, C_fn, _a;
+  var H = (_a = class {
+    constructor(t) {
+      __privateAdd(this, _H_instances);
+      __privateAdd(this, _i);
+      __privateAdd(this, _n, []);
+      __privateAdd(this, _t, {});
+      __privateAdd(this, _e, 0);
+      __privateAdd(this, _s, 1);
+      __privateAdd(this, _l, 0);
+      __privateAdd(this, _o, 0);
+      __privateAdd(this, _d, 0);
+      __privateAdd(this, _p, 0);
+      __privateAdd(this, _g, false);
+      __privateSet(this, _i, t);
+    }
+    get result() {
+      return __privateGet(this, _t);
+    }
+    parse() {
+      for (__privateSet(this, _n, v(__privateGet(this, _i), true)); __privateGet(this, _e) < __privateGet(this, _n).length; __privateSet(this, _e, __privateGet(this, _e) + __privateGet(this, _s))) {
+        if (__privateSet(this, _s, 1), __privateGet(this, _n)[__privateGet(this, _e)].type === "END") {
+          if (__privateGet(this, _o) === 0) {
+            __privateMethod(this, _H_instances, b_fn).call(this), __privateMethod(this, _H_instances, f_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 9, 1) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, r_fn).call(this, 7, 0);
+            continue;
+          } else if (__privateGet(this, _o) === 2) {
+            __privateMethod(this, _H_instances, u_fn).call(this, 5);
+            continue;
+          }
+          __privateMethod(this, _H_instances, r_fn).call(this, 10, 0);
+          break;
+        }
+        if (__privateGet(this, _d) > 0) if (__privateMethod(this, _H_instances, A_fn).call(this)) __privateSet(this, _d, __privateGet(this, _d) - 1);
+        else continue;
+        if (__privateMethod(this, _H_instances, T_fn).call(this)) {
+          __privateSet(this, _d, __privateGet(this, _d) + 1);
+          continue;
+        }
+        switch (__privateGet(this, _o)) {
+          case 0:
+            __privateMethod(this, _H_instances, P_fn).call(this) && __privateMethod(this, _H_instances, u_fn).call(this, 1);
+            break;
+          case 1:
+            if (__privateMethod(this, _H_instances, P_fn).call(this)) {
+              __privateMethod(this, _H_instances, C_fn).call(this);
+              let t = 7, r = 1;
+              __privateMethod(this, _H_instances, E_fn).call(this) ? (t = 2, r = 3) : __privateGet(this, _g) && (t = 2), __privateMethod(this, _H_instances, r_fn).call(this, t, r);
+            }
+            break;
+          case 2:
+            __privateMethod(this, _H_instances, S_fn).call(this) ? __privateMethod(this, _H_instances, u_fn).call(this, 3) : (__privateMethod(this, _H_instances, x_fn).call(this) || __privateMethod(this, _H_instances, h_fn).call(this) || __privateMethod(this, _H_instances, f_fn).call(this)) && __privateMethod(this, _H_instances, u_fn).call(this, 5);
+            break;
+          case 3:
+            __privateMethod(this, _H_instances, O_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 4, 1) : __privateMethod(this, _H_instances, S_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 5, 1);
+            break;
+          case 4:
+            __privateMethod(this, _H_instances, S_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 5, 1);
+            break;
+          case 5:
+            __privateMethod(this, _H_instances, y_fn).call(this) ? __privateSet(this, _p, __privateGet(this, _p) + 1) : __privateMethod(this, _H_instances, w_fn).call(this) && __privateSet(this, _p, __privateGet(this, _p) - 1), __privateMethod(this, _H_instances, k_fn).call(this) && !__privateGet(this, _p) ? __privateMethod(this, _H_instances, r_fn).call(this, 6, 1) : __privateMethod(this, _H_instances, x_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 7, 0) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 6:
+            __privateMethod(this, _H_instances, x_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 7, 0) : __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 7:
+            __privateMethod(this, _H_instances, h_fn).call(this) ? __privateMethod(this, _H_instances, r_fn).call(this, 8, 1) : __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 8:
+            __privateMethod(this, _H_instances, f_fn).call(this) && __privateMethod(this, _H_instances, r_fn).call(this, 9, 1);
+            break;
+          case 9:
+            break;
+          case 10:
+            break;
+        }
+      }
+      __privateGet(this, _t).hostname !== void 0 && __privateGet(this, _t).port === void 0 && (__privateGet(this, _t).port = "");
+    }
+  }, _i = new WeakMap(), _n = new WeakMap(), _t = new WeakMap(), _e = new WeakMap(), _s = new WeakMap(), _l = new WeakMap(), _o = new WeakMap(), _d = new WeakMap(), _p = new WeakMap(), _g = new WeakMap(), _H_instances = new WeakSet(), r_fn = function(t, r) {
+    switch (__privateGet(this, _o)) {
+      case 0:
+        break;
+      case 1:
+        __privateGet(this, _t).protocol = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 2:
+        break;
+      case 3:
+        __privateGet(this, _t).username = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 4:
+        __privateGet(this, _t).password = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 5:
+        __privateGet(this, _t).hostname = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 6:
+        __privateGet(this, _t).port = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 7:
+        __privateGet(this, _t).pathname = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 8:
+        __privateGet(this, _t).search = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 9:
+        __privateGet(this, _t).hash = __privateMethod(this, _H_instances, c_fn).call(this);
+        break;
+      case 10:
+        break;
+    }
+    __privateGet(this, _o) !== 0 && t !== 10 && ([1, 2, 3, 4].includes(__privateGet(this, _o)) && [6, 7, 8, 9].includes(t) && (__privateGet(this, _t).hostname ??= ""), [1, 2, 3, 4, 5, 6].includes(__privateGet(this, _o)) && [8, 9].includes(t) && (__privateGet(this, _t).pathname ??= __privateGet(this, _g) ? "/" : ""), [1, 2, 3, 4, 5, 6, 7].includes(__privateGet(this, _o)) && t === 9 && (__privateGet(this, _t).search ??= "")), __privateMethod(this, _H_instances, R_fn).call(this, t, r);
+  }, R_fn = function(t, r) {
+    __privateSet(this, _o, t), __privateSet(this, _l, __privateGet(this, _e) + r), __privateSet(this, _e, __privateGet(this, _e) + r), __privateSet(this, _s, 0);
+  }, b_fn = function() {
+    __privateSet(this, _e, __privateGet(this, _l)), __privateSet(this, _s, 0);
+  }, u_fn = function(t) {
+    __privateMethod(this, _H_instances, b_fn).call(this), __privateSet(this, _o, t);
+  }, m_fn = function(t) {
+    return t < 0 && (t = __privateGet(this, _n).length - t), t < __privateGet(this, _n).length ? __privateGet(this, _n)[t] : __privateGet(this, _n)[__privateGet(this, _n).length - 1];
+  }, a_fn = function(t, r) {
+    let n = __privateMethod(this, _H_instances, m_fn).call(this, t);
+    return n.value === r && (n.type === "CHAR" || n.type === "ESCAPED_CHAR" || n.type === "INVALID_CHAR");
+  }, P_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, E_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e) + 1, "/") && __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e) + 2, "/");
+  }, S_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "@");
+  }, O_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, k_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), ":");
+  }, x_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "/");
+  }, h_fn = function() {
+    if (__privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "?")) return true;
+    if (__privateGet(this, _n)[__privateGet(this, _e)].value !== "?") return false;
+    let t = __privateMethod(this, _H_instances, m_fn).call(this, __privateGet(this, _e) - 1);
+    return t.type !== "NAME" && t.type !== "REGEX" && t.type !== "CLOSE" && t.type !== "ASTERISK";
+  }, f_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "#");
+  }, T_fn = function() {
+    return __privateGet(this, _n)[__privateGet(this, _e)].type == "OPEN";
+  }, A_fn = function() {
+    return __privateGet(this, _n)[__privateGet(this, _e)].type == "CLOSE";
+  }, y_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "[");
+  }, w_fn = function() {
+    return __privateMethod(this, _H_instances, a_fn).call(this, __privateGet(this, _e), "]");
+  }, c_fn = function() {
+    let t = __privateGet(this, _n)[__privateGet(this, _e)], r = __privateMethod(this, _H_instances, m_fn).call(this, __privateGet(this, _l)).index;
+    return __privateGet(this, _i).substring(r, t.index);
+  }, C_fn = function() {
+    let t = {};
+    Object.assign(t, x), t.encodePart = y;
+    let r = Z(__privateMethod(this, _H_instances, c_fn).call(this), void 0, t);
+    __privateSet(this, _g, N(r));
+  }, _a);
+  var G = ["protocol", "username", "password", "hostname", "port", "pathname", "search", "hash"];
+  var E = "*";
+  function ge(e, t) {
+    if (typeof e != "string") throw new TypeError("parameter 1 is not of type 'string'.");
+    let r = new URL(e, t);
+    return { protocol: r.protocol.substring(0, r.protocol.length - 1), username: r.username, password: r.password, hostname: r.hostname, port: r.port, pathname: r.pathname, search: r.search !== "" ? r.search.substring(1, r.search.length) : void 0, hash: r.hash !== "" ? r.hash.substring(1, r.hash.length) : void 0 };
+  }
+  function b(e, t) {
+    return t ? C(e) : e;
+  }
+  function w(e, t, r) {
+    let n;
+    if (typeof t.baseURL == "string") try {
+      n = new URL(t.baseURL), t.protocol === void 0 && (e.protocol = b(n.protocol.substring(0, n.protocol.length - 1), r)), !r && t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.username === void 0 && (e.username = b(n.username, r)), !r && t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.username === void 0 && t.password === void 0 && (e.password = b(n.password, r)), t.protocol === void 0 && t.hostname === void 0 && (e.hostname = b(n.hostname, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && (e.port = b(n.port, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && (e.pathname = b(n.pathname, r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && t.search === void 0 && (e.search = b(n.search.substring(1, n.search.length), r)), t.protocol === void 0 && t.hostname === void 0 && t.port === void 0 && t.pathname === void 0 && t.search === void 0 && t.hash === void 0 && (e.hash = b(n.hash.substring(1, n.hash.length), r));
+    } catch {
+      throw new TypeError(`invalid baseURL '${t.baseURL}'.`);
+    }
+    if (typeof t.protocol == "string" && (e.protocol = ce(t.protocol, r)), typeof t.username == "string" && (e.username = ie(t.username, r)), typeof t.password == "string" && (e.password = se(t.password, r)), typeof t.hostname == "string" && (e.hostname = ne(t.hostname, r)), typeof t.port == "string" && (e.port = oe(t.port, e.protocol, r)), typeof t.pathname == "string") {
+      if (e.pathname = t.pathname, n && !J(e.pathname, r)) {
+        let o = n.pathname.lastIndexOf("/");
+        o >= 0 && (e.pathname = b(n.pathname.substring(0, o + 1), r) + e.pathname);
+      }
+      e.pathname = ae(e.pathname, e.protocol, r);
+    }
+    return typeof t.search == "string" && (e.search = re(t.search, r)), typeof t.hash == "string" && (e.hash = te(t.hash, r)), e;
+  }
+  function C(e) {
+    return e.replace(/([+*?:{}()\\])/g, "\\$1");
+  }
+  function Oe(e) {
+    return e.replace(/([.+*?^${}()[\]|/\\])/g, "\\$1");
+  }
+  function ke(e, t) {
+    t.delimiter ??= "/#?", t.prefixes ??= "./", t.sensitive ??= false, t.strict ??= false, t.end ??= true, t.start ??= true, t.endsWith = "";
+    let r = ".*", n = `[^${Oe(t.delimiter)}]+?`, o = /[$_\u200C\u200D\p{ID_Continue}]/u, c = "";
+    for (let l = 0; l < e.length; ++l) {
+      let s = e[l];
+      if (s.type === 3) {
+        if (s.modifier === 3) {
+          c += C(s.value);
+          continue;
+        }
+        c += `{${C(s.value)}}${k(s.modifier)}`;
+        continue;
+      }
+      let i = s.hasCustomName(), a = !!s.suffix.length || !!s.prefix.length && (s.prefix.length !== 1 || !t.prefixes.includes(s.prefix)), f = l > 0 ? e[l - 1] : null, d = l < e.length - 1 ? e[l + 1] : null;
+      if (!a && i && s.type === 1 && s.modifier === 3 && d && !d.prefix.length && !d.suffix.length) if (d.type === 3) {
+        let T = d.value.length > 0 ? d.value[0] : "";
+        a = o.test(T);
+      } else a = !d.hasCustomName();
+      if (!a && !s.prefix.length && f && f.type === 3) {
+        let T = f.value[f.value.length - 1];
+        a = t.prefixes.includes(T);
+      }
+      a && (c += "{"), c += C(s.prefix), i && (c += `:${s.name}`), s.type === 2 ? c += `(${s.value})` : s.type === 1 ? i || (c += `(${n})`) : s.type === 0 && (!i && (!f || f.type === 3 || f.modifier !== 3 || a || s.prefix !== "") ? c += "*" : c += `(${r})`), s.type === 1 && i && s.suffix.length && o.test(s.suffix[0]) && (c += "\\"), c += C(s.suffix), a && (c += "}"), s.modifier !== 3 && (c += k(s.modifier));
+    }
+    return c;
+  }
+  var _i2, _n2, _t2, _e2, _s2, _l2, _a2;
+  var me = (_a2 = class {
+    constructor(t = {}, r, n) {
+      __privateAdd(this, _i2);
+      __privateAdd(this, _n2, {});
+      __privateAdd(this, _t2, {});
+      __privateAdd(this, _e2, {});
+      __privateAdd(this, _s2, {});
+      __privateAdd(this, _l2, false);
+      try {
+        let o;
+        if (typeof r == "string" ? o = r : n = r, typeof t == "string") {
+          let i = new H(t);
+          if (i.parse(), t = i.result, o === void 0 && typeof t.protocol != "string") throw new TypeError("A base URL must be provided for a relative constructor string.");
+          t.baseURL = o;
+        } else {
+          if (!t || typeof t != "object") throw new TypeError("parameter 1 is not of type 'string' and cannot convert to dictionary.");
+          if (o) throw new TypeError("parameter 1 is not of type 'string'.");
+        }
+        typeof n > "u" && (n = { ignoreCase: false });
+        let c = { ignoreCase: n.ignoreCase === true }, l = { pathname: E, protocol: E, username: E, password: E, hostname: E, port: E, search: E, hash: E };
+        __privateSet(this, _i2, w(l, t, true)), _(__privateGet(this, _i2).protocol) === __privateGet(this, _i2).port && (__privateGet(this, _i2).port = "");
+        let s;
+        for (s of G) {
+          if (!(s in __privateGet(this, _i2))) continue;
+          let i = {}, a = __privateGet(this, _i2)[s];
+          switch (__privateGet(this, _t2)[s] = [], s) {
+            case "protocol":
+              Object.assign(i, x), i.encodePart = y;
+              break;
+            case "username":
+              Object.assign(i, x), i.encodePart = le;
+              break;
+            case "password":
+              Object.assign(i, x), i.encodePart = fe;
+              break;
+            case "hostname":
+              Object.assign(i, B), W(a) ? i.encodePart = j : i.encodePart = z;
+              break;
+            case "port":
+              Object.assign(i, x), i.encodePart = K;
+              break;
+            case "pathname":
+              N(__privateGet(this, _n2).protocol) ? (Object.assign(i, q, c), i.encodePart = he) : (Object.assign(i, x, c), i.encodePart = ue);
+              break;
+            case "search":
+              Object.assign(i, x, c), i.encodePart = de;
+              break;
+            case "hash":
+              Object.assign(i, x, c), i.encodePart = pe;
+              break;
+          }
+          try {
+            __privateGet(this, _s2)[s] = D(a, i), __privateGet(this, _n2)[s] = F(__privateGet(this, _s2)[s], __privateGet(this, _t2)[s], i), __privateGet(this, _e2)[s] = ke(__privateGet(this, _s2)[s], i), __privateSet(this, _l2, __privateGet(this, _l2) || __privateGet(this, _s2)[s].some((f) => f.type === 2));
+          } catch {
+            throw new TypeError(`invalid ${s} pattern '${__privateGet(this, _i2)[s]}'.`);
+          }
+        }
+      } catch (o) {
+        throw new TypeError(`Failed to construct 'URLPattern': ${o.message}`);
+      }
+    }
+    test(t = {}, r) {
+      let n = { pathname: "", protocol: "", username: "", password: "", hostname: "", port: "", search: "", hash: "" };
+      if (typeof t != "string" && r) throw new TypeError("parameter 1 is not of type 'string'.");
+      if (typeof t > "u") return false;
+      try {
+        typeof t == "object" ? n = w(n, t, false) : n = w(n, ge(t, r), false);
+      } catch {
+        return false;
+      }
+      let o;
+      for (o of G) if (!__privateGet(this, _n2)[o].exec(n[o])) return false;
+      return true;
+    }
+    exec(t = {}, r) {
+      let n = { pathname: "", protocol: "", username: "", password: "", hostname: "", port: "", search: "", hash: "" };
+      if (typeof t != "string" && r) throw new TypeError("parameter 1 is not of type 'string'.");
+      if (typeof t > "u") return;
+      try {
+        typeof t == "object" ? n = w(n, t, false) : n = w(n, ge(t, r), false);
+      } catch {
+        return null;
+      }
+      let o = {};
+      r ? o.inputs = [t, r] : o.inputs = [t];
+      let c;
+      for (c of G) {
+        let l = __privateGet(this, _n2)[c].exec(n[c]);
+        if (!l) return null;
+        let s = {};
+        for (let [i, a] of __privateGet(this, _t2)[c].entries()) if (typeof a == "string" || typeof a == "number") {
+          let f = l[i + 1];
+          s[a] = f;
+        }
+        o[c] = { input: n[c] ?? "", groups: s };
+      }
+      return o;
+    }
+    static compareComponent(t, r, n) {
+      let o = (i, a) => {
+        for (let f of ["type", "modifier", "prefix", "value", "suffix"]) {
+          if (i[f] < a[f]) return -1;
+          if (i[f] === a[f]) continue;
+          return 1;
+        }
+        return 0;
+      }, c = new R(3, "", "", "", "", 3), l = new R(0, "", "", "", "", 3), s = (i, a) => {
+        let f = 0;
+        for (; f < Math.min(i.length, a.length); ++f) {
+          let d = o(i[f], a[f]);
+          if (d) return d;
+        }
+        return i.length === a.length ? 0 : o(i[f] ?? c, a[f] ?? c);
+      };
+      return !__privateGet(r, _e2)[t] && !__privateGet(n, _e2)[t] ? 0 : __privateGet(r, _e2)[t] && !__privateGet(n, _e2)[t] ? s(__privateGet(r, _s2)[t], [l]) : !__privateGet(r, _e2)[t] && __privateGet(n, _e2)[t] ? s([l], __privateGet(n, _s2)[t]) : s(__privateGet(r, _s2)[t], __privateGet(n, _s2)[t]);
+    }
+    get protocol() {
+      return __privateGet(this, _e2).protocol;
+    }
+    get username() {
+      return __privateGet(this, _e2).username;
+    }
+    get password() {
+      return __privateGet(this, _e2).password;
+    }
+    get hostname() {
+      return __privateGet(this, _e2).hostname;
+    }
+    get port() {
+      return __privateGet(this, _e2).port;
+    }
+    get pathname() {
+      return __privateGet(this, _e2).pathname;
+    }
+    get search() {
+      return __privateGet(this, _e2).search;
+    }
+    get hash() {
+      return __privateGet(this, _e2).hash;
+    }
+    get hasRegExpGroups() {
+      return __privateGet(this, _l2);
+    }
+  }, _i2 = new WeakMap(), _n2 = new WeakMap(), _t2 = new WeakMap(), _e2 = new WeakMap(), _s2 = new WeakMap(), _l2 = new WeakMap(), _a2);
+
+  // ../node_modules/urlpattern-polyfill/index.js
+  if (!globalThis.URLPattern) {
+    globalThis.URLPattern = me;
+  }
+
   // src/config-feature.js
   var _bundledConfig, _args;
   var ConfigFeature = class {
@@ -2053,24 +2782,98 @@
       return __privateGet(this, _args)?.featureSettings;
     }
     /**
-     * Given a config key, interpret the value as a list of domain overrides, and return the elements that match the current page
-     * Consider using patchSettings instead as per `getFeatureSetting`.
+     * Given a config key, interpret the value as a list of conditionals objects, and return the elements that match the current page
+     * Consider in your feature using patchSettings instead as per `getFeatureSetting`.
      * @param {string} featureKeyName
      * @return {any[]}
      * @protected
      */
-    matchDomainFeatureSetting(featureKeyName) {
-      const domain = this.args?.site.domain;
-      if (!domain) return [];
-      const domains = this._getFeatureSettings()?.[featureKeyName] || [];
-      return domains.filter((rule) => {
-        if (Array.isArray(rule.domain)) {
-          return rule.domain.some((domainRule) => {
-            return matchHostname(domain, domainRule);
-          });
+    matchConditionalFeatureSetting(featureKeyName) {
+      const conditionalChanges = this._getFeatureSettings()?.[featureKeyName] || [];
+      return conditionalChanges.filter((rule) => {
+        let condition = rule.condition;
+        if (condition === void 0 && "domain" in rule) {
+          condition = this._domainToConditonBlocks(rule.domain);
         }
-        return matchHostname(domain, rule.domain);
+        return this._matchConditionalBlockOrArray(condition);
       });
+    }
+    /**
+     * Takes a list of domains and returns a list of condition blocks
+     * @param {string|string[]} domain
+     * @returns {ConditionBlock[]}
+     */
+    _domainToConditonBlocks(domain) {
+      if (Array.isArray(domain)) {
+        return domain.map((domain2) => ({ domain: domain2 }));
+      } else {
+        return [{ domain }];
+      }
+    }
+    /**
+     * Used to match conditional changes for a settings feature.
+     * @typedef {object} ConditionBlock
+     * @property {string[] | string} [domain]
+     * @property {object} [urlPattern]
+     */
+    /**
+     * Takes multiple conditional blocks and returns true if any apply.
+     * @param {ConditionBlock|ConditionBlock[]} conditionBlock
+     * @returns {boolean}
+     */
+    _matchConditionalBlockOrArray(conditionBlock) {
+      if (Array.isArray(conditionBlock)) {
+        return conditionBlock.some((block) => this._matchConditionalBlock(block));
+      }
+      return this._matchConditionalBlock(conditionBlock);
+    }
+    /**
+     * Takes a conditional block and returns true if it applies.
+     * All conditions must be met to return true.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchConditionalBlock(conditionBlock) {
+      const conditionChecks = {
+        domain: this._matchDomainConditional,
+        urlPattern: this._matchUrlPatternConditional
+      };
+      for (const key in conditionBlock) {
+        if (!conditionChecks[key]) {
+          return false;
+        } else if (!conditionChecks[key].call(this, conditionBlock)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    /**
+     * Takes a condtion block and returns true if the current url matches the urlPattern.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchUrlPatternConditional(conditionBlock) {
+      const url = this.args?.site.url;
+      if (!url) return false;
+      if (typeof conditionBlock.urlPattern === "string") {
+        return new me(conditionBlock.urlPattern, url).test(url);
+      }
+      const pattern = new me(conditionBlock.urlPattern);
+      return pattern.test(url);
+    }
+    /**
+     * Takes a condition block and returns true if the current domain matches the domain.
+     * @param {ConditionBlock} conditionBlock
+     * @returns {boolean}
+     */
+    _matchDomainConditional(conditionBlock) {
+      if (!conditionBlock.domain) return false;
+      const domain = this.args?.site.domain;
+      if (!domain) return false;
+      if (Array.isArray(conditionBlock.domain)) {
+        return false;
+      }
+      return matchHostname(domain, conditionBlock.domain);
     }
     /**
      * Return the settings object for a feature
@@ -2113,40 +2916,83 @@
       return result === "enabled";
     }
     /**
-      * Return a specific setting from the feature settings
-      * If the "settings" key within the config has a "domains" key, it will be used to override the settings.
-      * This uses JSONPatch to apply the patches to settings before getting the setting value.
-      * For example.com getFeatureSettings('val') will return 1:
-      * ```json
-      *  {
-      *      "settings": {
-      *         "domains": [
-      *             {
-      *                "domain": "example.com",
-      *                "patchSettings": [
-      *                    { "op": "replace", "path": "/val", "value": 1 }
-      *                ]
-      *             }
-      *         ]
-      *      }
-      *  }
-      * ```
-      * "domain" can either be a string or an array of strings.
-    
-      * For boolean states you should consider using getFeatureSettingEnabled.
-      * @param {string} featureKeyName
-      * @param {string} [featureName]
-      * @returns {any}
-    */
+     * Return a specific setting from the feature settings
+     * If the "settings" key within the config has a "conditionalChanges" key, it will be used to override the settings.
+     * This uses JSONPatch to apply the patches to settings before getting the setting value.
+     * For example.com getFeatureSettings('val') will return 1:
+     * ```json
+     *  {
+     *      "settings": {
+     *         "conditionalChanges": [
+     *             {
+     *                "domain": "example.com",
+     *                "patchSettings": [
+     *                    { "op": "replace", "path": "/val", "value": 1 }
+     *                ]
+     *             }
+     *         ]
+     *      }
+     *  }
+     * ```
+     * "domain" can either be a string or an array of strings.
+     * Additionally we support urlPattern for more complex matching.
+     * For example.com getFeatureSettings('val') will return 1:
+     * ```json
+     * {
+     *    "settings": {
+     *       "conditionalChanges": [
+     *          {
+     *            "condition": {
+     *                "urlPattern": "https://example.com/*",
+     *            },
+     *            "patchSettings": [
+     *                { "op": "replace", "path": "/val", "value": 1 }
+     *            ]
+     *          }
+     *       ]
+     *   }
+     * }
+     * ```
+     * We also support multiple conditions:
+     * ```json
+     * {
+     *    "settings": {
+     *       "conditionalChanges": [
+     *          {
+     *            "condition": [
+     *                {
+     *                    "urlPattern": "https://example.com/*",
+     *                },
+     *                {
+     *                    "urlPattern": "https://other.com/path/something",
+     *                },
+     *            ],
+     *            "patchSettings": [
+     *                { "op": "replace", "path": "/val", "value": 1 }
+     *            ]
+     *          }
+     *       ]
+     *   }
+     * }
+     * ```
+     *
+     * For boolean states you should consider using getFeatureSettingEnabled.
+     * @param {string} featureKeyName
+     * @param {string} [featureName]
+     * @returns {any}
+     */
     getFeatureSetting(featureKeyName, featureName) {
       let result = this._getFeatureSettings(featureName);
-      if (featureKeyName === "domains") {
-        throw new Error("domains is a reserved feature setting key name");
+      if (featureKeyName in ["domains", "conditionalChanges"]) {
+        throw new Error(`${featureKeyName} is a reserved feature setting key name`);
       }
-      const domainMatch = [...this.matchDomainFeatureSetting("domains")].sort((a, b) => {
-        return a.domain.length - b.domain.length;
-      });
-      for (const match of domainMatch) {
+      let conditionalMatches = [];
+      if (result?.conditionalChanges) {
+        conditionalMatches = this.matchConditionalFeatureSetting("conditionalChanges");
+      } else {
+        conditionalMatches = this.matchConditionalFeatureSetting("domains");
+      }
+      for (const match of conditionalMatches) {
         if (match.patchSettings === void 0) {
           continue;
         }
@@ -2344,7 +3190,7 @@
         this.messaging?.notify("addDebugFlag", {
           flag: this.name
         });
-      } catch (_e) {
+      } catch (_e3) {
       }
     }
     /**
@@ -2355,17 +3201,17 @@
      * @param {import('./wrapper-utils').StrictPropertyDescriptor} descriptor - requires all descriptor options to be defined because we can't validate correctness based on TS types
      */
     defineProperty(object, propertyName, descriptor) {
-      ["value", "get", "set"].forEach((k) => {
-        const descriptorProp = descriptor[k];
+      ["value", "get", "set"].forEach((k2) => {
+        const descriptorProp = descriptor[k2];
         if (typeof descriptorProp === "function") {
           const addDebugFlag = this.addDebugFlag.bind(this);
           const wrapper = new Proxy2(descriptorProp, {
-            apply(_, thisArg, argumentsList) {
+            apply(_2, thisArg, argumentsList) {
               addDebugFlag();
               return Reflect2.apply(descriptorProp, thisArg, argumentsList);
             }
           });
-          descriptor[k] = wrapToString(wrapper, descriptorProp);
+          descriptor[k2] = wrapToString(wrapper, descriptorProp);
         }
       });
       return defineProperty(object, propertyName, descriptor);
