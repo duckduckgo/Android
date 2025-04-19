@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Gerir e-mail</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Voltar às Definições</string>
+    <string name="somethingWentWrong">Ocorreu um erro</string>
+    <string name="somethingWentWrongDescription">O Google Play não conseguiu processar a tua compra. Tenta novamente mais tarde.</string>
+    <string name="youAreSet">Está tudo pronto.</string>
+    <string name="viewPlans">Ver Planos</string>
+    <string name="subscriptionNotFound">Subscrição não encontrada</string>
+    <string name="subscriptionNotFoundDescription">A tua subscrição associada a esta conta do Google Play já não está ativa.</string>
+    <string name="purchaseRestored">As tuas compras foram restauradas.</string>
+    <string name="restoreSubscriptionTitle">Adiciona a tua subscrição Privacy Pro a este dispositivo</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Adicionar através da conta do Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restaura a tua subscrição em dispositivos Android usando a tua conta do Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Restaurar Compra</string>
+    <string name="restoreSubscriptionEmailTitle">Adicionar através de e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Associa um endereço de e-mail à tua subscrição para adicionares o Privacy Pro a este dispositivo.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Comece</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Remover Subscrição</string>
+    <string name="subscriptionRemoved">A tua subscrição foi removida deste dispositivo</string>
+    <string name="removeFromDevice">Remover deste dispositivo?</string>
+    <string name="removeFromDeviceDescription">Perderás acesso à subscrição Privacy Pro neste dispositivo. Isto não irá cancelar a tua subscrição, e ela permanecerá ativa nos teus outros dispositivos.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">A tua subscrição mensal %1$s a %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">A tua subscrição anual %1$s a %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">A tua subscrição expirou a %1$s.</string>
+    <string name="monthlySubscription">Subscrição mensal</string>
+    <string name="yearlySubscription">Subscrição anual</string>
+    <string name="renews">renova</string>
+    <string name="expires">expira</string>
+    <string name="activateOnOtherDevices">Adicionar o Privacy Pro a outros dispositivos</string>
+    <string name="addToDevicePrimaryText">Adicionar ao dispositivo</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Adiciona o Privacy Pro aos teus outros dispositivos através do Google Play ou associando um endereço de e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Utiliza o e-mail acima para adicionar a tua subscrição aos teus outros dispositivos na aplicação DuckDuckGo. Acede a Definições &gt; Privacy Pro &gt; Tenho uma subscrição.</string>
+    <string name="editEmailPrimaryText">Editar e-mail</string>
+    <string name="learnMore">Saiba mais</string>
+    <string name="privacyProFaq">Precisas de ajuda com o Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Obtém respostas a perguntas frequentes ou contacta o apoio técnico do Privacy Pro a partir das nossas páginas de ajuda. A disponibilidade das funcionalidades varia consoante o país.</string>
+    <string name="subscriptionStatusSubscribed">Subscrito</string>
+    <string name="privacyPolicyAndTermsOfService">Política de Privacidade e Termos de Serviço</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Definições de Subscrição</string>
+    <string name="subscriptionSettingSubscribe">Protege a tua ligação e identidade com o Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Inclui a nossa VPN, a Personal Information Removal e a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Inclui a nossa VPN e a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Obter Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Tenho uma Subscrição</string>
+    <string name="subscriptionSettingExpired">A tua subscrição Privacy Pro expirou</string>
+    <string name="subscriptionSettingExpiredViewPlans">Ver Planos</string>
+    <string name="subscriptionSettingSectionSubscription">Subscrição</string>
+    <string name="subscriptionSettingRemoveFromDevice">Remover Deste Dispositivo</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Ajuda e Suporte</string>
+    <string name="subscriptionSettingSendFeedback">Enviar comentário</string>
+    <string name="subscriptionSettingActivating">A ativar…</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Está tudo pronto.</string>
+    <string name="purchaseCompletedText">A tua compra foi realizada com êxito.</string>
+    <string name="purchaseRecoveredText">Já tinhas uma subscrição e recuperámo-la para ti.</string>
+    <string name="purchaseErrorTitle">Ocorreu um erro</string>
+    <string name="purchaseError">Falha na ligação. Tenta novamente mais tarde.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Atualizar Plano ou Cancelar</string>
+    <string name="changePlanDescription">A tua subscrição foi adquirida na Apple App Store. Para alterares o teu plano ou as definições de faturação, acede a Definições &gt; Conta Apple &gt; Subscrições num dispositivo com sessão iniciada na mesma conta Apple utilizada para comprar a tua subscrição.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Ativa o Privacy Pro no computador para configurar a Personal Information Removal</string>
+    <string name="pirDescription">No navegador DuckDuckGo para computador, acede a <b>Definições &gt; Privacy Pro</b> e clica em <b>Tenho uma subscrição</b> para começar.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Abrir</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Enviar comentário</string>
+    <string name="feedbackActionHeader">SELECIONA UMA CATEGORIA</string>
+    <string name="feedbackActionReportIssue">Comunicar um problema</string>
+    <string name="feedbackActionGeneralFeedback">Feedback geral</string>
+    <string name="feedbackActionFeatureRequest">Pedir uma funcionalidade</string>
+
+    <string name="feedbackGeneralHeader">SELECIONA UMA CATEGORIA</string>
+    <string name="feedbackGeneralBrowser">Feedback do navegador</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">SELECIONA UMA CATEGORIA</string>
+    <string name="feedbackCategorySubscription">Subscrição e Pagamentos</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">SELECIONA UMA CATEGORIA</string>
+
+    <string name="feedbackSubCategoryVpnConnection">A VPN não consegue ligar-se</string>
+    <string name="feedbackSubCategoryVpnSlow">A ligação da VPN é demasiado lenta</string>
+    <string name="feedbackSubCategoryVpnOtherApps">A VPN causa problemas com outras aplicações ou sites</string>
+    <string name="feedbackSubCategoryVpnIot">A VPN não me deixa ligar ao dispositivo local</string>
+    <string name="feedbackSubCategoryVpnCrash">A VPN faz com que o navegador falhe ou bloqueie</string>
+    <string name="feedbackSubCategoryVpnOther">Outros</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Informações ausentes de um site específico</string>
+    <string name="feedbackSubCategoryPirNotMe">Os registos não pertencem ao utilizador</string>
+    <string name="feedbackSubCategoryPirScanStuck">A leitura para</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">A remoção para</string>
+    <string name="feedbackSubCategoryPirOther">Outros</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problema com o código de acesso</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Não é possível contactar o consultor</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">A chamada para o consultor não foi útil</string>
+    <string name="feedbackSubCategoryItrOther">Outros</string>
+
+    <string name="feedbackSubCategorySubsOtp">Palavra-passe de utilização única</string>
+    <string name="feedbackSubCategorySubsOther">Outros</string>
+
+    <string name="feedbackSubmitVpnHeader">Encontraste um problema que não é abordado no nosso <annotation type="faqs_link">centro de ajuda</annotation> ? Queremos perceber do que se trata.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Diz-nos o que se passa…</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Além dos detalhes introduzidos acima, enviamos algumas informações anónimas com o teu feedback:\n\n• Se algumas funcionalidades do navegador estão ativas\n• Diagnósticos agregados da aplicação (por exemplo, códigos de erro)\n\nAo clicar em Enviar, aceitas que a DuckDuckGo utilize as informações enviadas para melhorar a aplicação."</string>
+    <string name="feedbackSubmitVpnSubmit">Submeter</string>
+    <string name="feedbackSubmitCompletedMessage">Obrigado! Comentário enviado</string>
+    <string name="feedbackSubmitFailedMessage">Ocorreu um erro</string>
+
+    <string name="feedbackSubmitEmailByLine">Fornece um e-mail se quiseres que te contactemos sobre este problema (podemos não conseguir responder a todos os problemas):</string>
+    <string name="feedbackSubmitEmailHint">E-mail (opcional)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Envia-nos o teu feedback…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Que funcionalidade gostarias de ver?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Subscrições</string>
+    <string name="activitySubscriptionSettings">Definições de Subscrição</string>
+    <string name="activityActivateSubscription">Tenho uma Subscrição</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Enviar comentário</string>
+</resources>

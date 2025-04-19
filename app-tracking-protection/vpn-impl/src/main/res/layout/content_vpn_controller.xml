@@ -236,7 +236,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="24dp"
             android:padding="10dp"
-            android:textAlignment="center"
+            android:gravity="center"
             app:textType="secondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

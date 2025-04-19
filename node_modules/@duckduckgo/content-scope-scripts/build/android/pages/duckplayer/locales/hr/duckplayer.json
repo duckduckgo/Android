@@ -1,0 +1,58 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "YouTube videozapise uvijek otvaraj ovdje",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Drži Duck Player uključen",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Više informacija",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Otvori Postavke",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Pogledaj na YouTubeu",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>POGREŠKA:</b> Nevažeći ID videozapisa",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube ne dopušta Duck Playeru da učita ovaj videozapis.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube ne dopušta da se ovaj videozapis gleda izvan YouTubea.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Još uvijek možeš gledati ovaj videozapis na YouTubeu, ali bez dodatne privatnosti Duck Playera.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube blokira učitavanje ovog videozapisa. Ako koristiš VPN, pokušaj ga isključiti i ponovno učitati ovu stranicu.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Ako to ne uspije, i dalje možeš gledati ovaj videozapis na YouTubeu, ali bez dodatne privatnosti Duck Playera.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player pruža čisti doživljaj gledanja bez personaliziranih oglasa i sprječava da aktivnosti gledanja utječu na tvoje preporuke na YouTubeu."
+  }
+}

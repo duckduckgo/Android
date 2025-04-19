@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.db
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
@@ -39,6 +40,7 @@ class RealUserAllowListRepository @Inject constructor(
     private val userAllowListDao: UserAllowListDao,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : UserAllowListRepository {
 
     private val userAllowList = CopyOnWriteArrayList<String>()
@@ -78,9 +80,11 @@ class RealUserAllowListRepository @Inject constructor(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            all().collect { list ->
-                userAllowList.clear()
-                userAllowList.addAll(list)
+            if (isMainProcess) {
+                all().collect { list ->
+                    userAllowList.clear()
+                    userAllowList.addAll(list)
+                }
             }
         }
     }

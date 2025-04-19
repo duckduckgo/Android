@@ -136,7 +136,7 @@ class RealSavedSitesParser : SavedSitesParser {
         if (children.size > 1) {
             rootElement = Element("DL").appendChildren(children)
         }
-        return parseElement(rootElement, "", savedSitesRepository, mutableListOf(), false)
+        return parseElement(rootElement, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, mutableListOf(), false)
     }
 
     private fun parseElement(
@@ -163,12 +163,9 @@ class RealSavedSitesParser : SavedSitesParser {
                         if (isFavoritesFolder(folderName) || isBookmarksFolder(folderName)) {
                             parseElement(element, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
-                            val folderParentId = parentId.ifEmpty {
-                                SavedSitesNames.BOOKMARKS_ROOT
-                            }
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
-                                parentId = folderParentId,
+                                parentId = parentId,
                                 lastModified = DatabaseDateFormatter.iso8601(),
                                 deleted = null,
                             )

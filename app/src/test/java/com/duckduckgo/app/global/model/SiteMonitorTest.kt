@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -28,14 +29,18 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -67,15 +72,30 @@ class SiteMonitorTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
 
+    private val mockBrokenSiteContext: BrokenSiteContext = mock()
+
+    private val mockDuckPlayer: DuckPlayer = mock()
+
+    private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
+
+    @Before
+    fun setup() {
+        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+    }
+
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -85,10 +105,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -98,10 +122,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -112,10 +140,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = malformedDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -125,10 +157,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(document, testee.url)
     }
@@ -138,10 +174,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -151,10 +191,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -197,10 +241,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -243,10 +291,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -289,10 +341,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -313,10 +369,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -337,10 +397,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -372,10 +436,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -385,10 +453,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -398,10 +470,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -412,10 +488,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -458,10 +538,14 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -572,21 +656,34 @@ class SiteMonitorTest {
         assertEquals(PROTECTED, testee.privacyProtection())
     }
 
-    fun givenASiteMonitor(
+    @Test
+    fun whenUserBypassedSslCertificateThenPrivacyShieldIsUnprotected() {
+        val testee = givenASiteMonitor(url = document)
+        whenever(mockBypassedSSLCertificatesRepository.contains(document)).thenReturn(false)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
+    private fun givenASiteMonitor(
         url: String = document,
         title: String? = null,
         upgradedHttps: Boolean = false,
+        externalLaunch: Boolean = false,
     ) = SiteMonitor(
         url = url,
         title = title,
         upgradedHttps = upgradedHttps,
+        externalLaunch = externalLaunch,
         userAllowListRepository = mockAllowListRepository,
         contentBlocking = mockContentBlocking,
+        bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        brokenSiteContext = mockBrokenSiteContext,
+        duckPlayer = mockDuckPlayer,
     )
 
-    fun givenSitePrivacyData(
+    private fun givenSitePrivacyData(
         url: String = document,
         entity: Entity? = null,
         prevalence: Double? = null,

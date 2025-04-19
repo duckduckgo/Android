@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
@@ -30,7 +31,6 @@ interface BrowserTrackersAnimatorHelper {
      * Then it plays both animations, [shieldAnimationView] and [trackersAnimationView], at the same time.
      * When the animations starts, views in [omnibarViews] will fade out. When animation finishes, view in [omnibarViews] will fade in.
      *
-     * @param shouldRunPartialAnimation indicates if animation should pause, at 50% of progress, until {@link finishPartialTrackerAnimation()} is called.
      * @param shieldAnimationView holder of the privacy shield animation.
      * @param trackersAnimationView holder of the trackers animations.
      * @param omnibarViews are the views that should be hidden while the animation is running
@@ -38,10 +38,25 @@ interface BrowserTrackersAnimatorHelper {
      */
     fun startTrackersAnimation(
         context: Context,
-        shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
+        entities: List<Entity>?,
+    )
+
+    fun startExperimentVariant1Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        omnibarViews: List<View>,
+    )
+
+    fun startExperimentVariant2OrVariant3Animation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        shieldViews: List<View>,
         entities: List<Entity>?,
     )
 
@@ -56,10 +71,12 @@ interface BrowserTrackersAnimatorHelper {
     fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
+        shieldViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     )
 
     /**
@@ -80,12 +97,6 @@ interface BrowserTrackersAnimatorHelper {
      * removes [TrackersAnimatorListener]
      */
     fun removeListener()
-
-    /**
-     * Finishes a partial tracker animation.
-     * See startTrackersAnimation.shouldRunPartialAnimation for more details.
-     */
-    fun finishPartialTrackerAnimation()
 }
 
 /**

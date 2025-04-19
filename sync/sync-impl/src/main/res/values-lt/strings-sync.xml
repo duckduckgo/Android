@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet šiuo metu sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami. Pabandykite dar kartą vėliau.</string>
     <string name="sync_flows_disabled_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
     <string name="sync_paused_notification"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
+    <string name="sync_error_notification"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
+    <string name="sync_error_warning"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
+    <string name="sync_signed_out_notification"><b>Sinchronizavimas pristabdymas</b>\nSinchronizavimas buvo pristabdytas. Jei norite toliau sinchronizuoti šį įrenginį, iš naujo prisijunkite naudodami kitą įrenginį arba atkūrimo kodą.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinchronizuoti ir kurti atsarginę kopiją</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Saugiai sinchronizuokite žymes ir slaptažodžius tarp savo įrenginių.</string>
     <string name="sync_off_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „DuckDuckGo“ neturi prieigos prie šifravimo rakto.</string>
     <string name="sync_setup_single_device_title">Vieno įrenginio sąranka</string>
+    <string name="sync_setup_other_options_title">Kitos parinktys</string>
     <string name="sync_setup_single_recover_data_cta_title">Atkurti sinchronizuotus duomenis</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
     <string name="sync_enable_connecting">Jungiamasi...</string>
     <string name="sync_intro_enable_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
-    <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti...</string>
+    <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
     <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sinchronizuoti</string>
     <string name="sync_notify_me_title">Pranešimai yra išjungti</string>
     <string name="sync_notify_me_description">Gaukite pranešimą, jei „Sinchronizavimas ir atsarginės kopijos kūrimas“ susiduria su klaida.</string>
-    <string name="sync_rollout_banner_text">Sinchronizavimas ir atsarginės kopijos kūrimas atliekami palaipsniui ir gali būti dar nepasiekiami „DuckDuckGo“ kituose jūsų įrenginiuose.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nepavyko išjungti funkcijos „Sync &amp; Backup“.</string>
+    <string name="sync_edit_device_error">Nepavyko atnaujinti įrenginio pavadinimo.</string>
+    <string name="sync_remove_device_error">Nepavyko pašalinti šio įrenginio iš funkcijos „Sync &amp; Backup“.</string>
+    <string name="sync_delete_data_error">Nepavyko ištrinti duomenų serveryje.</string>
+    <string name="sync_login_authenticated_device_error">"Norėdami susieti šiuos įrenginius, viename įrenginyje išjunkite funkciją „Sync &amp; Backup“, tada kitame įrenginyje bakstelėkite „Sinchronizuoti su kitu įrenginiu“."</string>
+    <string name="sync_connect_generic_error">Nepavyko prisijungti prie serverio.</string>
+    <string name="sync_connect_login_error">Nepavyko sinchronizuoti su kitu įrenginiu.</string>
+    <string name="sync_create_account_generic_error">Nepavyko prisijungti prie serverio.</string>
+    <string name="sync_invalid_code_error">Atsiprašome, šis kodas neteisingas. Įsitikinkite, kad įvestas arba nuskaitytas teisingas kodas.</string>
+    <string name="sync_recovery_pdf_error">Nepavyko sukurti atkūrimo PDF.</string>
+    <string name="sync_dialog_error_ok">Gerai</string>
+    <string name="sync_dialog_error_title">Sync &amp; Backup</string>
+    <string name="sync_encryption_not_supported_error_title">Nepalaikomas įrenginys</string>
+    <string name="sync_encryption_not_supported_error">Funkcijai „Sync &amp; Backup“ naudojamas ištisinis šifravimas, todėl jūsų įrenginyje turi būti galima užšifruoti ir išsaugoti duomenis. Jūsų įrenginys nepalaiko šifruotos saugyklos, todėl „Sync &amp; Backup“ funkcija nepasiekiama.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Atrakinkite įrenginį, kad galėtumėte pasiekti funkciją „Sync &amp; Backup“.</string>
+    <string name="sync_biometric_prompt_title">Funkcija „Sync &amp; Backup“ užrakinta</string>
+    <string name="sync_require_device_passcode_dialog_title">Apsaugokite savo įrenginį, kad galėtumėte naudoti „Sync &amp; Backup“</string>
+    <string name="sync_require_device_passcode_dialog_body">Norint naudoti „Sync &amp; Backup“, reikalingas užrakinimo piešinys, PIN kodas arba biometriniai duomenys.</string>
+    <string name="sync_require_device_passcode_dialog_action">Eikite į „Nustatymai“</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Ištrinti serverio duomenis?</string>
+    <string name="sync_delete_server_data_dialog_content">Visi įrenginiai bus atjungti, o sinchronizuoti duomenys bus ištrinti iš serverio.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Ištrinti duomenis</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Atšaukti</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinchronizuokite slaptažodžius ir sukurkite atsargines jų kopijas</string>
+    <string name="syncPromoSubtitlePasswords">Paskyros nereikia. Galutinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų slaptažodžių, net mes.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinchronizuokite žymes ir kurkite jų atsargines kopijas</string>
+    <string name="syncPromoSubtitleBookmarks">Paskyros nereikia. Galutinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų žymių, net mes.</string>
+
+    <string name="syncPromoPrimaryButton">Nustatykite sinchronizavimą</string>
+    <string name="syncPromoSecondaryButton">Ne, dėkoju</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Atsisiųskite „DuckDuckGo“ į kitus įrenginius</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Atsisiųskite „DuckDuckGo“ į kitus įrenginius, kad sinchronizuotumėte su šiuo įrenginiu</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Atsisiųskite „DuckDuckGo“</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Norėdami atsisiųsti „DuckDuckGo“ į kompiuterį arba kitą mobilųjį įrenginį, apsilankykite:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Bendrinti atsisiuntimo nuorodą</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Perjungti į kitą sinchronizaciją?</string>
+    <string name="sync_dialog_switch_account_primary_button">Perjungti sinchronizavimą</string>
+    <string name="sync_dialog_switch_account_secondary_button">Atšaukti</string>
+    <string name="sync_dialog_switch_account_description">Šis įrenginys jau sinchronizuotas, ar tikrai norite jį sinchronizuoti su kita atsargine kopija ar įrenginiu? Perjungiant nebus pašalinti jokie duomenys, jau sinchronizuoti su šiuo įrenginiu.</string>
 </resources>

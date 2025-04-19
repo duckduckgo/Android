@@ -16,8 +16,6 @@
 
 package com.duckduckgo.user.agent.api
 
-import android.webkit.WebSettings
-
 interface UserAgentProvider {
     /**
      * Provides the user agent based on a specific URL and if the website should be displayed in desktop mode or not
@@ -26,11 +24,6 @@ interface UserAgentProvider {
      * @return a string with the user agent
      */
     fun userAgent(url: String? = null, isDesktop: Boolean = false): String
-
-    /**
-     * Sets the correct Sec-CH-UA hint header for our browser
-     */
-    fun setHintHeader(settings: WebSettings)
 }
 
 /**

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Синхронизация и резервное копирование недоступны</b>\nК сожалению, функция «Синхронизация и резервное копирование» сейчас недоступна. Повторите попытку позже.</string>
     <string name="sync_flows_disabled_new_version"><b>Синхронизация и резервное копирование недоступны</b>\nК сожалению, функция «Синхронизация и резервное копирование» больше не работает в этой версии приложения. Для продолжения обновите DuckDuckGo до последней версии.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Синхронизация и резервное копирование приостановлены</b>\nК сожалению, функция «Синхронизация и резервное копирование» сейчас недоступна. Повторите попытку позже.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Синхронизация и резервное копирование приостановлены</b>\nК сожалению, функция «Синхронизация и резервное копирование» больше не работает в этой версии приложения. Чтобы продолжить, обновите DuckDuckGo до последней версии.</string>
     <string name="sync_paused_notification"><b>Синхронизация и резервное копирование приостановлены</b>\nК сожалению, функция «Синхронизация и резервное копирование» сейчас недоступна. Повторите попытку позже.</string>
+    <string name="sync_error_notification"><b>Ошибка синхронизации</b>\nФункция «Синхронизация и резервное копирование» временно недоступна.</string>
+    <string name="sync_error_warning"><b>Ошибка синхронизации</b>\nФункция Sync &amp; Backup («Синхронизация и резервное копирование») временно недоступна.</string>
+    <string name="sync_signed_out_notification"><b>Синхронизация на паузе</b>\nСинхронизация приостановлена. Чтобы возобновить ее, выполните повторную привязку, используя другое устройство или код восстановления.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Синхронизация и резервное копирование</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Безопасная синхронизация закладок и паролей на ваших устройствах.</string>
     <string name="sync_off_hint">Ваши данные защищены сквозным шифрованием. У DuckDuckGo нет доступа к ключу шифрования.</string>
     <string name="sync_setup_single_device_title">Настройка на одном устройстве</string>
+    <string name="sync_setup_other_options_title">Другие варианты</string>
     <string name="sync_setup_single_recover_data_cta_title">Восстановить синхронизированные данные</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Синхронизация и резервное копирование устройства</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
     <string name="sync_enable_connecting">Выполняется подключение...</string>
     <string name="sync_intro_enable_title">Синхронизация и резервное копирование устройства</string>
-    <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа...</string>
+    <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
     <string name="sync_intro_enable_footer">Синхронизацию с другими устройствами можно выполнить позже.</string>
     <string name="sync_intro_enable_cta">Включить синхронизацию и копирование</string>
     <string name="sync_intro_recover_title">Восстановить синхронизированные данные</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Синхронизация</string>
     <string name="sync_notify_me_title">Уведомления отключены</string>
     <string name="sync_notify_me_description">Позволяет получать уведомления об ошибках при синхронизации и резервном копировании.</string>
-    <string name="sync_rollout_banner_text">Внедрение функции «Синхронизация и резервное копирование» в DuckDuckGo выполняется постепенно, поэтому она доступна не на всех устройствах.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Не удалось отключить синхронизацию и резервное копирование.</string>
+    <string name="sync_edit_device_error">Не удалось обновить имя устройства.</string>
+    <string name="sync_remove_device_error">Не удалось удалить устройство из списка синхронизации и резервного копирования.</string>
+    <string name="sync_delete_data_error">Не удалось удалить данные с сервера.</string>
+    <string name="sync_login_authenticated_device_error">"Чтобы привязать устройства друг к другу, отключите функцию «Синхронизация и резервное копирование» на одном из них и нажмите кнопку «Синхронизировать с другим устройством» на другом."</string>
+    <string name="sync_connect_generic_error">Не удалось подключиться к серверу.</string>
+    <string name="sync_connect_login_error">Не удалось выполнить синхронизацию с другим устройством.</string>
+    <string name="sync_create_account_generic_error">Не удалось подключиться к серверу.</string>
+    <string name="sync_invalid_code_error">К сожалению, этот код недействителен. Введите или отсканируйте правильный код.</string>
+    <string name="sync_recovery_pdf_error">Не удалось создать PDF-файл для восстановления.</string>
+    <string name="sync_dialog_error_ok">Хорошо</string>
+    <string name="sync_dialog_error_title">Синхронизация и резервное копирование</string>
+    <string name="sync_encryption_not_supported_error_title">Устройство не поддерживается</string>
+    <string name="sync_encryption_not_supported_error">При синхронизации и резервном копировании используется сквозное шифрование. Поэтому необходима возможность шифровать и хранить данные на вашем устройстве. Однако данное устройство не поддерживает хранение зашифрованной информации, и по этой причине синхронизация и резервное копирование недоступны.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Разблокируйте устройство, чтобы использовать эту функцию.</string>
+    <string name="sync_biometric_prompt_title">Синхронизация и резервное копирование заблокированы</string>
+    <string name="sync_require_device_passcode_dialog_title">Защитите устройство для работы функции Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Для работы с функцией Sync &amp; Backup требуются биометрические данные, графический ключ или ПИН-код устройства.</string>
+    <string name="sync_require_device_passcode_dialog_action">Открыть «Настройки»</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Удалить данные с сервера?</string>
+    <string name="sync_delete_server_data_dialog_content">Привязка устройств будет отключена, а синхронизированные данные — удалены с сервера.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Удалить данные</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Отменить</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Синхронизация и резервное копирование паролей</string>
+    <string name="syncPromoSubtitlePasswords">Учетная запись не требуется. Сквозное шифрование означает, что ваши пароли видны только вам. Даже у нас нет к ним доступа.</string>
+
+    <string name="syncPromoTitleBookmarks">Синхронизация и резервное копирование закладок</string>
+    <string name="syncPromoSubtitleBookmarks">Учетная запись не требуется. Сквозное шифрование означает, что ваши закладки видны только вам. Даже у нас нет к ним доступа.</string>
+
+    <string name="syncPromoPrimaryButton">Настройка синхронизации</string>
+    <string name="syncPromoSecondaryButton">Нет, спасибо</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Загрузить DuckDuckGo на другие устройства</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Для настройки синхронизации скачайте DuckDuckGo на другие устройства</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Скачать DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Чтобы скачать DuckDuckGo на компьютер или другое мобильное устройство, посетите:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Поделиться ссылкой для загрузки</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Переключиться на другую синхронизацию?</string>
+    <string name="sync_dialog_switch_account_primary_button">Переключить синхронизацию</string>
+    <string name="sync_dialog_switch_account_secondary_button">Отменить</string>
+    <string name="sync_dialog_switch_account_description">Это устройство уже синхронизировано. Действительно синхронизировать его с другой резервной копией или устройством? Переключение не приведет к удалению данных, синхронизированных с этим устройством ранее.</string>
 </resources>

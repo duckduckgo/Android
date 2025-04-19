@@ -17,8 +17,8 @@
 package com.duckduckgo.app.anr
 
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_GLOBAL
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -46,9 +46,11 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
         thread: Thread?,
         originalException: Throwable?,
     ) {
-        if (shouldRecordExceptionAndCrashApp(originalException)) {
-            recordExceptionAndAllowCrash(thread, originalException)
-            return
+        runCatching {
+            if (shouldRecordExceptionAndCrashApp(originalException)) {
+                recordExceptionAndAllowCrash(thread, originalException)
+                return
+            }
         }
     }
 
@@ -74,7 +76,7 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
                 originalException?.let {
                     crashLogger.logCrash(
                         CrashLogger.Crash(
-                            shortName = Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
+                            shortName = APPLICATION_CRASH_GLOBAL.pixelName,
                             t = it,
                         ),
                     )

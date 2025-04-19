@@ -45,6 +45,7 @@ class BadConfigException private constructor(
     enum class Location(val locationName: String) {
         TOP_LEVEL(""),
         ADDRESS("Address"),
+        ROUTE("Route"),
         ALLOWED_IPS("AllowedIPs"),
         DNS("DNS"),
         ENDPOINT("Endpoint"),

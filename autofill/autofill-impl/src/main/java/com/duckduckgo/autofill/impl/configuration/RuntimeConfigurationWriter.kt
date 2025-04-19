@@ -30,7 +30,7 @@ interface RuntimeConfigurationWriter {
         emailAvailable: Boolean,
     ): String
 
-    fun generateContentScope(): String
+    fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
@@ -38,6 +38,8 @@ interface RuntimeConfigurationWriter {
         passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
         showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
+        partialFormSaves: Boolean,
     ): String
 }
 
@@ -54,21 +56,34 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         return availableInputTypesAdapter.toJson(availableInputTypes)
     }
 
-    /*
-    * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
-    */
-    override fun generateContentScope(): String {
+    private fun generateSiteSpecificFixesJson(settingsJson: AutofillSiteSpecificFixesSettings): String {
+        if (!settingsJson.canApplySiteSpecificFixes) {
+            return ""
+        }
+
+        return """
+            "siteSpecificFixes": {
+                "state": "enabled",
+                "settings": ${settingsJson.javascriptConfigSiteSpecificFixes}
+            }
+        """.trimIndent()
+    }
+
+    override fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String {
         return """
             contentScope = {
               "features": {
                 "autofill": {
                   "state": "enabled",
-                  "exceptions": []
+                  "exceptions": [],
+                  "features": {
+                    ${generateSiteSpecificFixesJson(settingsJson)}
+                  }
                 }
               },
               "unprotectedTemporary": []
             };
-        """.trimIndent()
+        """.trim()
     }
 
     /*
@@ -86,6 +101,8 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
         showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
+        partialFormSaves: Boolean,
     ): String {
         return """
             userPreferences = {
@@ -104,7 +121,9 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "password_generation": $passwordGeneration,
                       "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon,
-                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup
+                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
+                      "unknown_username_categorization": $unknownUsernameCategorization,
+                      "partial_form_saves": $partialFormSaves
                     }
                   }
                 }

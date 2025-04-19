@@ -23,10 +23,17 @@
     <attr name="primaryText" format="string"/>
     <attr name="primaryTextColorOverlay" format="color"/>
     <attr name="primaryTextTruncated" format="boolean"/>
+    <attr name="primaryTextType">
+        <!-- Primary text color -->
+        <enum name="primary" value="0" />
+        <!-- Destructive text color -->
+        <enum name="destructive" value="1" />
+    </attr>
     <attr name="secondaryText" format="string"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
+    <attr name="trailingIconTint" format="reference|color"/>
     <attr name="showBetaPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
@@ -43,8 +50,16 @@
         <enum name="small" value="0" />
         <!-- Medium 24dp (default) -->
         <enum name="medium" value="1" />
-        <!-- Large 40dp -->
+        <!-- Large 32dp -->
         <enum name="large" value="2" />
+        <!-- Extra Large 40dp -->
+        <enum name="extra_large" value="3" />
+    </attr>
+    <attr name="trailingIconSize">
+        <!-- Small 16dp -->
+        <enum name="small" value="0" />
+        <!-- Medium 24dp (default) -->
+        <enum name="medium" value="1" />
     </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
@@ -64,6 +79,7 @@
         <attr name="leadingIconBackground"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
+        <attr name="trailingIconTint"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
     </declare-styleable>
@@ -79,9 +95,22 @@
         <attr name="leadingIconBackground"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
+        <attr name="trailingIconSize"/>
         <attr name="showBetaPill"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
+    </declare-styleable>
+
+    <!-- Grid Item-->
+    <attr name="gridItemType">
+        <enum name="favicon" value="0" />
+        <enum name="placeholder" value="1" />
+        <enum name="shortcut" value="2" />
+    </attr>
+    <declare-styleable name="DaxGridItem">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="gridItemType"/>
     </declare-styleable>
 
 </resources>

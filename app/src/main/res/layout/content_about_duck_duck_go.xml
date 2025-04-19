@@ -48,39 +48,39 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:text="@string/aboutHeader"
-            android:textAlignment="center"
+            android:gravity="center"
+            android:text="@string/aboutHeaderNewTagLine"
             app:typography="h3" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutSeparator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="..."
-            android:textAlignment="center"
-            app:textType="secondary"
-            app:typography="title"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_6"
-            tools:text="..."
-            tools:ignore="HardcodedText" />
+            android:gravity="center"
+            android:text="..."
+            app:textType="secondary"
+            app:typography="title"
+            tools:ignore="HardcodedText"
+            tools:text="..." />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/keyline_6"
-            android:paddingEnd="@dimen/keyline_6"
+            android:gravity="start"
+            android:paddingHorizontal="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_4"
-            android:text="@string/aboutDescription"
-            android:textAlignment="viewStart"
+            android:text="@string/aboutHeaderNewTagLine"
             app:textType="secondary"
             app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/keyline_2" />
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/aboutPrivacyPolicy"
@@ -94,12 +94,6 @@
             android:layout_height="wrap_content"
             app:primaryText="@string/settingsVersion"
             tools:secondaryText="123.43.5456" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/aboutProvideFeedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/leaveFeedback" />
 
     </LinearLayout>
 

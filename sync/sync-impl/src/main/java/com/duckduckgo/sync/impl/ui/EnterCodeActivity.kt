@@ -25,16 +25,21 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Loading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -93,11 +98,56 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            LoginSucess -> {
+            LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
             }
+
+            is ShowError -> {
+                showError(command)
+            }
+
+            is AskToSwitchAccount -> askUserToSwitchAccount(command)
+            SwitchAccountSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_USER_SWITCHED_ACCOUNT, true)
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
         }
+    }
+
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                    }
+                },
+            ).show()
+    }
+
+    private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
+        viewModel.onUserAskedToSwitchAccount()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_switch_account_header)
+            .setMessage(R.string.sync_dialog_switch_account_description)
+            .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
+            .setNegativeButton(R.string.sync_dialog_switch_account_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAcceptedJoiningNewAccount(it.encodedStringCode)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserCancelledJoiningNewAccount()
+                    }
+                },
+            ).show()
     }
 
     companion object {
@@ -107,6 +157,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         }
 
         private const val EXTRA_CODE_TYPE = "codeType"
+
+        const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
 
         internal fun intent(context: Context, codeType: Code): Intent {
             return Intent(context, EnterCodeActivity::class.java).apply {

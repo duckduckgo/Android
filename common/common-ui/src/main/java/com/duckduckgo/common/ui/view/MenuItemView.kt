@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewMenuItemBinding
@@ -46,6 +47,21 @@ constructor(
             0,
             R.style.Widget_DuckDuckGo_MenuItemView,
         )
+
+        val typography = if (attributes.hasValue(R.styleable.MenuItemView_typography)) {
+            DaxTextView.Typography.from(attributes.getInt(R.styleable.MenuItemView_typography, 0))
+        } else {
+            DaxTextView.Typography.Body1
+        }
+
+        binding.label.setTypography(typography)
+
+        val hasType = attributes.hasValue(R.styleable.MenuItemView_textType)
+        if (hasType) {
+            val textType = DaxTextView.TextType.from(attributes.getInt(R.styleable.MenuItemView_textType, 0))
+            binding.label.setTextColorStateList(textType)
+        }
+
         binding.label.text = attributes.getString(R.styleable.MenuItemView_primaryText) ?: ""
         binding.icon.setImageResource(
             attributes.getResourceId(

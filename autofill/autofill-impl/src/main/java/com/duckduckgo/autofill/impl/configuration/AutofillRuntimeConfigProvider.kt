@@ -17,12 +17,13 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,12 +40,14 @@ interface AutofillRuntimeConfigProvider {
 @ContributesBinding(AppScope::class)
 class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillFeature: AutofillFeature,
     private val shareableCredentials: ShareableCredentials,
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
+    private val siteSpecificFixesStore: AutofillSiteSpecificFixesStore,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -52,7 +55,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
-        val contentScope = runtimeConfigurationWriter.generateContentScope()
+        val contentScope = runtimeConfigurationWriter.generateContentScope(siteSpecificFixesStore.getConfig())
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = canInjectCredentials(url),
@@ -60,14 +63,24 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
             showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
+            unknownUsernameCategorization = canCategorizeUnknownUsername(),
+            partialFormSaves = partialFormSaves(),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
-        return rawJs
-            .replace("// INJECT contentScope HERE", contentScope)
-            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
-            .replace("// INJECT userPreferences HERE", userPreferences)
-            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
+        return StringBuilder(rawJs).apply {
+            replacePlaceholder(this, TAG_INJECT_CONTENT_SCOPE, contentScope)
+            replacePlaceholder(this, TAG_INJECT_USER_UNPROTECTED_DOMAINS, userUnprotectedDomains)
+            replacePlaceholder(this, TAG_INJECT_USER_PREFERENCES, userPreferences)
+            replacePlaceholder(this, TAG_INJECT_AVAILABLE_INPUT_TYPES, availableInputTypes)
+        }.toString()
+    }
+
+    private fun replacePlaceholder(builder: StringBuilder, placeholder: String, replacement: String) {
+        val index = builder.indexOf(placeholder)
+        if (index != -1) {
+            builder.replace(index, index + placeholder.length, replacement)
+        }
     }
 
     private suspend fun generateAvailableInputTypes(url: String?): String {
@@ -126,10 +139,25 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return !neverSavedSiteRepository.isInNeverSaveList(url)
     }
 
+    private fun canCategorizeUnknownUsername(): Boolean {
+        return autofillFeature.canCategorizeUnknownUsername().isEnabled()
+    }
+
+    private fun partialFormSaves(): Boolean {
+        return autofillFeature.partialFormSaves().isEnabled()
+    }
+
     private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {
         if (url == null) return false
         return emailProtectionInContextAvailabilityRules.permittedToShow(url)
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
+
+    companion object {
+        private const val TAG_INJECT_CONTENT_SCOPE = "// INJECT contentScope HERE"
+        private const val TAG_INJECT_USER_UNPROTECTED_DOMAINS = "// INJECT userUnprotectedDomains HERE"
+        private const val TAG_INJECT_USER_PREFERENCES = "// INJECT userPreferences HERE"
+        private const val TAG_INJECT_AVAILABLE_INPUT_TYPES = "// INJECT availableInputTypes HERE"
+    }
 }

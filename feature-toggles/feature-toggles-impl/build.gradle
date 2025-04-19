@@ -29,6 +29,9 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':feature-toggles-api')
+    implementation project(':feature-toggles-internal-api')
+    implementation project(":statistics-api")
+    implementation project(":data-store-api")
 
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -36,6 +39,8 @@ dependencies {
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation Square.okHttp3.okHttp
+    implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
@@ -43,7 +48,10 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')
+    testImplementation project(':data-store-api')
+    testImplementation project(':data-store-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "com.squareup.moshi:moshi-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation Square.retrofit2.converter.moshi
@@ -57,4 +65,7 @@ anvil {
 
 android {
   namespace 'com.duckduckgo.feature.impl'
+  lintOptions {
+      baseline file("lint-baseline.xml")
+  }
 }

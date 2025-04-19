@@ -102,6 +102,9 @@
   "rules": [
     {
       "id": 5,
+      "targetPercentile": {
+        "before": 0.5
+      },
       "attributes": {
         "locale": {
           "value": [

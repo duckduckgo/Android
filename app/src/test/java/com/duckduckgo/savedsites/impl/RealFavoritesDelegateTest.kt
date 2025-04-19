@@ -413,6 +413,7 @@ class RealFavoritesDelegateTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             displayModeSettingsRepository,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutineRule.testDispatcherProvider,
         )
     }

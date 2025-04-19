@@ -20,6 +20,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.windows.impl.WindowsDownloadLinkOrigin
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
 import kotlinx.coroutines.test.runTest
@@ -36,19 +39,21 @@ internal class WindowsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
+    private var windowsShareLinkOrigin = FakeFeatureToggleFactory.create(WindowsDownloadLinkOrigin::class.java)
 
     private lateinit var testee: WindowsViewModel
 
     @Before
     fun before() {
-        testee = WindowsViewModel(mockPixel)
+        testee = WindowsViewModel(mockPixel, windowsShareLinkOrigin)
     }
 
     @Test
     fun whenOnShareClickedThenEmitShareLinkCommand() = runTest {
+        windowsShareLinkOrigin.self().setRawStoredState(State(enable = true))
         testee.commands.test {
             testee.onShareClicked()
-            assertEquals(ShareLink, awaitItem())
+            assertEquals(ShareLink(true), awaitItem())
         }
     }
 

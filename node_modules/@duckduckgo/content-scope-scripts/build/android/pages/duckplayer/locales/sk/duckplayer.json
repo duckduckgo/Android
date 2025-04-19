@@ -1,0 +1,58 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Vždy otvárajte videá YouTube tu",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Nechajte zapnutý prehrávač Duck Player",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Otvorené informácie",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Otvoriť nastavenia",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Pozrieť na YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>CHYBA:</b> Neplatný identifikátor videa",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube nedovolí Duck Playeru načítať toto video",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube nepovoľuje, aby sa toto video pozeralo mimo YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Toto video si môžeš pozrieť aj na YouTube, ale bez dodatočného súkromia Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube blokuje načítanie tohto videa. Ak používaš sieť VPN, skús ju vypnúť a znova načítať túto stránku.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Ak to nefunguje, môžeš si toto video pozrieť aj na YouTube, ale bez dodatočnej ochrany súkromia, ktorú poskytuje Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player poskytuje čisté zobrazenie bez personalizovaných reklám a zabraňuje tomu, aby aktivita pri sledovaní ovplyvňovala vaše odporúčania v službe YouTube."
+  }
+}

@@ -32,9 +32,19 @@ interface FaviconManager {
         url: String,
     ): File?
 
+    suspend fun tryFetchFaviconForUrl(
+        url: String,
+    ): File?
+
     suspend fun persistCachedFavicon(
         tabId: String,
         url: String,
+    )
+
+    suspend fun loadToViewMaybeFromRemoteWithPlaceholder(
+        url: String,
+        view: ImageView,
+        placeholder: String? = null,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="duck_player_save">Salva</string>
+    <string name="duck_player_cancel">Annulla</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi.\n<annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Preferenze video</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi.</string>
+    <string name="duck_player_mode_always">Sempre</string>
+    <string name="duck_player_mode_never">Mai</string>
+    <string name="duck_player_mode_always_ask">Chiedi ogni volta</string>
+    <string name="duck_player_mode_dialog_title">Aprire i video di YouTube in Duck Player?</string>
+    <string name="duck_player_close_modal_content_description">Chiudi</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">YouTube ti inonda di annunci? Non con Duck Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">YouTube ti inonda di annunci? Prova Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi.</string>
+    <string name="duck_player_info_modal_button">Ho capito!</string>
+    <string name="duck_player_unavailable">Duck Player non disponibile</string>
+    <string name="duck_player_unavailable_learn_more">Ulteriori informazioni</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Apri i video di YouTube in Duck Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Apri Duck Player in una nuova scheda</string>
+</resources>

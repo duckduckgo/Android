@@ -25,7 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityFireButtonBinding
+import com.duckduckgo.app.browser.databinding.ActivityDataClearingBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
@@ -59,23 +59,26 @@ class FireButtonActivity : DuckDuckGoActivity() {
     lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel: FireButtonViewModel by bindViewModel()
-    private val binding: ActivityFireButtonBinding by viewBinding()
+    private val binding: ActivityDataClearingBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
 
         configureUiEventHandlers()
         observeViewModel()
     }
 
     private fun configureUiEventHandlers() {
-        binding.fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
-        binding.automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-        binding.automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-        binding.selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+        with(binding) {
+            fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
+            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+        }
     }
 
     private fun observeViewModel() {

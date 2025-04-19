@@ -16,7 +16,10 @@
 
 package com.duckduckgo.site.permissions.api
 
+import android.net.Uri
+import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
+import androidx.core.net.toUri
 
 /** Public interface for managing site permissions data */
 interface SitePermissionsManager {
@@ -45,7 +48,16 @@ interface SitePermissionsManager {
      * @param queriedPermission permission being queried (note: this is different from WebView permissions, check link above)
      * @return state of the permission as expected by the API: 'granted', 'prompt', or 'denied'
      */
-    fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
+    suspend fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
+
+    /**
+     * Checks if a site has been granted a specific set of permissions permanently
+     *
+     * @param url website querying the permission
+     * @param request original permission request type
+     * @return Returns true if site has that type of permission enabled
+     */
+    suspend fun hasSitePermanentPermission(url: String, request: String): Boolean
 
     data class SitePermissions(
         val autoAccept: List<String>,
@@ -60,5 +72,35 @@ interface SitePermissionsManager {
         object Granted : SitePermissionQueryResponse()
         object Prompt : SitePermissionQueryResponse()
         object Denied : SitePermissionQueryResponse()
+    }
+
+    /**
+     * Class that represents a location permission asked
+     * callback is used to interact with the site that requested the permission
+     */
+    data class LocationPermissionRequest(
+        val origin: String,
+        val callback: GeolocationPermissions.Callback,
+    ) : PermissionRequest() {
+
+        override fun getOrigin(): Uri {
+            return origin.toUri()
+        }
+
+        override fun getResources(): Array<String> {
+            return listOf(RESOURCE_LOCATION_PERMISSION).toTypedArray()
+        }
+
+        override fun grant(p0: Array<out String>?) {
+            callback.invoke(origin, true, false)
+        }
+
+        override fun deny() {
+            callback.invoke(origin, false, false)
+        }
+
+        companion object {
+            const val RESOURCE_LOCATION_PERMISSION: String = "com.duckduckgo.permissions.resource.LOCATION_PERMISSION"
+        }
     }
 }

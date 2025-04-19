@@ -55,6 +55,7 @@ class RealContentBlockingRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
 
         assertEquals(
@@ -71,6 +72,7 @@ class RealContentBlockingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(listOf())
@@ -87,6 +89,7 @@ class RealContentBlockingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockContentBlockingDao)

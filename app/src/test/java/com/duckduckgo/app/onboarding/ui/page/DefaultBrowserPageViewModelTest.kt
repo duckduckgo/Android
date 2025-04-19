@@ -34,8 +34,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
@@ -57,8 +55,7 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
     private lateinit var testee: DefaultBrowserPageViewModel
 
@@ -365,7 +362,7 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(0, testee.timesPressedJustOnce)
     }
 
-    private fun captureCommands(): ArgumentCaptor<Command> {
+    private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }

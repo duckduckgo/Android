@@ -17,6 +17,7 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,8 +44,14 @@ class SitePermissionsManagerTest {
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockPackageManager = mock<PackageManager>()
+    private val mockLocationManager = mock<LocationManager>()
 
-    private val testee = SitePermissionsManagerImpl(mockPackageManager, mockSitePermissionsRepository, coroutineRule.testDispatcherProvider)
+    private val testee = SitePermissionsManagerImpl(
+        mockPackageManager,
+        mockLocationManager,
+        mockSitePermissionsRepository,
+        coroutineRule.testDispatcherProvider,
+    )
 
     private val url = "https://domain.com/whatever"
     private val tabId = "tabId"
@@ -98,6 +105,7 @@ class SitePermissionsManagerTest {
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(false)
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
 
         val permissionRequest: PermissionRequest = mock()
         whenever(permissionRequest.origin).thenReturn(url.toUri())
@@ -167,14 +175,14 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun whenDomainGrantedThenGetPermissionsQueryResponseReturnsGranted() {
+    fun whenDomainGrantedThenGetPermissionsQueryResponseReturnsGranted() = runTest {
         whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
 
         assertEquals(SitePermissionQueryResponse.Granted, testee.getPermissionsQueryResponse(url, tabId, "camera"))
     }
 
     @Test
-    fun whenDomainAllowedToAskThenGetPermissionsQueryResponseReturnsPrompt() {
+    fun whenDomainAllowedToAskThenGetPermissionsQueryResponseReturnsPrompt() = runTest {
         whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
@@ -183,7 +191,7 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun whenDomainNotAllowedToAskThenGetPermissionsQueryResponseReturnsDenied() {
+    fun whenDomainNotAllowedToAskThenGetPermissionsQueryResponseReturnsDenied() = runTest {
         whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
@@ -192,7 +200,7 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun whenHardwareNotSupportedThenGetPermissionsQueryResponseReturnsDenied() {
+    fun whenHardwareNotSupportedThenGetPermissionsQueryResponseReturnsDenied() = runTest {
         whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(false)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
@@ -201,7 +209,7 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun whenAndroidPermissionNotSupportedThenGetPermissionsQueryResponseReturnsDenied() {
+    fun whenAndroidPermissionNotSupportedThenGetPermissionsQueryResponseReturnsDenied() = runTest {
         assertEquals(SitePermissionQueryResponse.Denied, testee.getPermissionsQueryResponse(url, tabId, "unsupported"))
     }
 }

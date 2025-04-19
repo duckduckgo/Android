@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.common.test.api.FakeChain
+import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -24,7 +25,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDate
 
 class NetpCohortPixelInterceptorTest {
     @Mock
@@ -149,6 +149,18 @@ class NetpCohortPixelInterceptorTest {
     fun whenCohortLocalDateIsNotSetThenSendExemptedFaqsPixelUrl() {
         whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
         val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_faqs_d")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
+    @Test
+    fun `when cohort local date is not set then send exempted main VPN settings pressed pixel`() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_ev_setting_pressed_c")
 
         val result = testee.intercept(FakeChain(pixelUrl))
 

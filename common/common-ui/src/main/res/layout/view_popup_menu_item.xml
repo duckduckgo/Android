@@ -14,21 +14,38 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:app="http://schemas.android.com/apk/res-auto"
-       xmlns:tools="http://schemas.android.com/tools"
-       tools:parentTag="android.widget.LinearLayout">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:paddingEnd="@dimen/keyline_4"
-            android:paddingStart="@dimen/keyline_4"
-            android:gravity="center_vertical"
-            android:minWidth="@dimen/popupMenuItemWidth"
-            android:minHeight="@dimen/popupMenuItemHeight"
-            app:typography="body1"
-            tools:text="Text label" />
-</merge>
+        android:id="@+id/label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minWidth="@dimen/popupMenuItemWidth"
+        android:minHeight="@dimen/popupMenuItemHeight"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/trailingIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:typography="body1"
+        tools:text="Text label" />
+
+    <ImageView
+        android:id="@+id/trailingIcon"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_check_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/label"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+</androidx.constraintlayout.widget.ConstraintLayout>

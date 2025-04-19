@@ -43,6 +43,9 @@ import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.coroutines.resume
@@ -58,9 +61,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.temporal.ChronoUnit
 
 @RunWith(Parameterized::class)
 @SuppressLint("NoHardcodedCoroutineDispatcher")

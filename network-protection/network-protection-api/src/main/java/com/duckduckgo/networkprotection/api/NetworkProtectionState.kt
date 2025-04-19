@@ -41,14 +41,31 @@ interface NetworkProtectionState {
     suspend fun isRunning(): Boolean
 
     /**
+     * This method will start the Network Protection feature
+     */
+    fun start()
+
+    /**
      * This method will restart the Network Protection feature by disabling it and re-enabling back again
      */
     fun restart()
 
     /**
+     * This method is the same as [restart] but it also clears the existing VPN reconfiguration, forcing a new registration
+     * process with the VPN backend
+     */
+    fun clearVPNConfigurationAndRestart()
+
+    /**
      * This method will stop the Network Protection feature by disabling it
      */
     suspend fun stop()
+
+    /**
+     * This method is the same as [stop] but it also clears the existing VPN reconfiguration, forcing a new registration
+     * process with the VPN backend
+     */
+    fun clearVPNConfigurationAndStop()
 
     /**
      * This method returns the current server location Network Protection is routing device's data through.
@@ -62,9 +79,20 @@ interface NetworkProtectionState {
      */
     fun getConnectionStateFlow(): Flow<ConnectionState>
 
+    /**
+     * This is a suspend function because the operation can take time.
+     * You DO NOT need to set any dispatcher to call this suspend function
+     *
+     * @return a list of app packages that is excluded from Network Protection
+     */
+    suspend fun getExcludedApps(): List<String>
+
     enum class ConnectionState {
         CONNECTED,
         CONNECTING,
         DISCONNECTED,
+        ;
+
+        fun isConnected(): Boolean = this == CONNECTED
     }
 }

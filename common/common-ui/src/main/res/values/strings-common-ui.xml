@@ -16,7 +16,25 @@
 
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Notify me</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Add</string>
+    <string name="dialogEditTitle">Edit</string>
+    <string name="dialogSaveAction">Save</string>
+    <string name="dialogConfirmTitle">Confirm</string>
+    <string name="dialogSave">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
+    <string name="removeAll">Remove All</string>
+    <string name="undo">Undo</string>
+    <string name="cancel">Cancel</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Always On</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

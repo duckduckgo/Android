@@ -20,6 +20,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Message
 import android.view.View
@@ -27,6 +28,7 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.core.graphics.get
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -34,6 +36,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -114,14 +117,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(20) // Value should come from the webView instance
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
-        testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).navigationStateChanged(any())
+        verify(mockWebViewClientListener).progressChanged(eq(20), any()) // Value should come from the webView instance
     }
 
     @UiThreadTest
@@ -130,8 +126,7 @@ class BrowserChromeClientTest {
         val mockWebView: WebView = mock()
         whenever(mockWebView.progress).thenReturn(0)
         testee.onProgressChanged(mockWebView, 10)
-        verify(mockWebViewClientListener, never()).navigationStateChanged(any())
-        verify(mockWebViewClientListener, never()).progressChanged(any())
+        verify(mockWebViewClientListener, never()).progressChanged(any(), any())
     }
 
     @UiThreadTest
@@ -241,6 +236,15 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockRequest)
 
         verify(mockWebViewClientListener, never()).onSitePermissionRequested(mockRequest, permissions)
+    }
+
+    @Test
+    fun whenGetDefaultVideoPosterThenReturnTransparentPixel() = runTest {
+        val bitmap = testee.defaultVideoPoster
+
+        assertEquals(1, bitmap.width)
+        assertEquals(1, bitmap.height)
+        assertEquals(Color.TRANSPARENT, bitmap[0, 0])
     }
 
     private val mockMsg = Message().apply {

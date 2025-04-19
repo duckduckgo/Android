@@ -33,6 +33,7 @@ class RealFingerprintingScreenSizeRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : FingerprintingScreenSizeRepository {
 
     private val fingerprintingScreenSizeDao: FingerprintingScreenSizeDao = database.fingerprintingScreenSizeDao()
@@ -40,7 +41,9 @@ class RealFingerprintingScreenSizeRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

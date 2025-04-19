@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Manage Email</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Back to Settings</string>
+    <string name="somethingWentWrong">Something went wrong</string>
+    <string name="somethingWentWrongDescription">Google Play was unable to process your purchase. Please try again later.</string>
+    <string name="youAreSet">You\'re all set.</string>
+    <string name="viewPlans">View Plans</string>
+    <string name="subscriptionNotFound">Subscription Not Found</string>
+    <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
+    <string name="purchaseRestored">Your purchases have been restored.</string>
+    <string name="restoreSubscriptionTitle">Add your Privacy Pro subscription to this device</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Add via Google Play Account</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restore your subscription on Android devices using your Google Play account.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Restore Purchase</string>
+    <string name="restoreSubscriptionEmailTitle">Add via Email</string>
+    <string name="restoreSubscriptionEmailDescription">Link an email address to your subscription to add Privacy Pro to this device.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Get Started</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Remove Subscription</string>
+    <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
+    <string name="removeFromDevice">Remove from this device?</string>
+    <string name="removeFromDeviceDescription">You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your monthly subscription %1$s on %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your yearly subscription %1$s on %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Your subscription expired on %1$s.</string>
+    <string name="monthlySubscription">Monthly Subscription</string>
+    <string name="yearlySubscription">Yearly Subscription</string>
+    <string name="renews">renews</string>
+    <string name="expires">expires</string>
+    <string name="activateOnOtherDevices">Add Privacy Pro to Other Devices</string>
+    <string name="addToDevicePrimaryText">Add to Device</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Add Privacy Pro to your other devices via Google Play or by linking an email address.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Use the email above to add your subscription on your other devices in the DuckDuckGo app. Go to Settings > Privacy Pro > I Have a Subscription.</string>
+    <string name="editEmailPrimaryText">Edit Email</string>
+    <string name="learnMore">Learn More</string>
+    <string name="privacyProFaq">Need help with Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
+    <string name="subscriptionStatusSubscribed">Subscribed</string>
+    <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Subscription Settings</string>
+    <string name="subscriptionSettingSubscribe">Protect your connection and identity with Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Includes our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Includes our VPN and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Get Privacy Pro</string>
+    <string name="subscriptionSettingRestore">I Have a Subscription</string>
+    <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
+    <string name="subscriptionSettingExpiredViewPlans">View Plans</string>
+    <string name="subscriptionSettingSectionSubscription">Subscription</string>
+    <string name="subscriptionSettingRemoveFromDevice">Remove From This Device</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
+    <string name="subscriptionSettingSendFeedback">Send Feedback</string>
+    <string name="subscriptionSettingActivating">Activating</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">You\'re all set.</string>
+    <string name="purchaseCompletedText">Your purchase was successful.</string>
+    <string name="purchaseRecoveredText">You already had a subscription and we\'ve recovered that for you.</string>
+    <string name="purchaseErrorTitle">Something went wrong</string>
+    <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Update Plan or Cancel</string>
+    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
+    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Open</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Send Feedback</string>
+    <string name="feedbackActionHeader">SELECT A CATEGORY</string>
+    <string name="feedbackActionReportIssue">Report a problem</string>
+    <string name="feedbackActionGeneralFeedback">General feedback</string>
+    <string name="feedbackActionFeatureRequest">Request a feature</string>
+
+    <string name="feedbackGeneralHeader">SELECT A CATEGORY</string>
+    <string name="feedbackGeneralBrowser">Browser Feedback</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">SELECT A CATEGORY</string>
+    <string name="feedbackCategorySubscription">Subscription and Payments</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">SELECT A CATEGORY</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN fails to connect</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN connection is too slow</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN causes issues with other apps or websites</string>
+    <string name="feedbackSubCategoryVpnIot">VPN won’t let me connect to local device</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN causes browser to crash or freeze</string>
+    <string name="feedbackSubCategoryVpnOther">Other</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Info not on specific site</string>
+    <string name="feedbackSubCategoryPirNotMe">Records do not belong to the user</string>
+    <string name="feedbackSubCategoryPirScanStuck">Scan stuck</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Removal stuck</string>
+    <string name="feedbackSubCategoryPirOther">Other</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Issue with access code</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Can\'t contact advisor</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Call to advisor unhelpful</string>
+    <string name="feedbackSubCategoryItrOther">Other</string>
+
+    <string name="feedbackSubCategorySubsOtp">One time password</string>
+    <string name="feedbackSubCategorySubsOther">Other</string>
+
+    <string name="feedbackSubmitVpnHeader">Found an issue not covered in our <annotation type="faqs_link">help center</annotation> ? We definitely want to know about it.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Tell us what’s going on…</string>
+    <string name="feedbackSubmitVpnDisclaimer">In addition to details entered above, we send some anonymized info with your feedback:\n\n• Whether some browser features are active\n• Aggregate app diagnostics (e.g., error codes)\n\nBy clicking "Submit" you agree that DuckDuckGo may use information submitted to improve the app.</string>
+    <string name="feedbackSubmitVpnSubmit">Submit</string>
+    <string name="feedbackSubmitCompletedMessage">Thank You! Feedback submitted.</string>
+    <string name="feedbackSubmitFailedMessage">Something went wrong</string>
+
+    <string name="feedbackSubmitEmailByLine">Provide an email if you\'d like us to contact you about this issue (we may not be able to respond to all issues):</string>
+    <string name="feedbackSubmitEmailHint">Email (optional)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Please give us your feedback…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">What feature would you like to see?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Subscriptions</string>
+    <string name="activitySubscriptionSettings">Subscription Settings</string>
+    <string name="activityActivateSubscription">I Have a Subscription</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Send Feedback</string>
+</resources>

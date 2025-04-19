@@ -27,11 +27,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.lastValue
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 
 class AddWidgetInstructionsViewModelTest {
@@ -49,8 +47,7 @@ class AddWidgetInstructionsViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
     @Before
     fun before() {

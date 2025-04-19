@@ -95,7 +95,6 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     override fun setHttpAuthUsernamePassword(
         webView: WebView,
         host: String,
@@ -103,25 +102,15 @@ class RealWebViewHttpAuthStore @Inject constructor(
         username: String,
         password: String,
     ) {
-        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabaseProvider.get().setHttpAuthUsernamePassword(host, realm, username, password)
-        } else {
-            webView.setHttpAuthUsernamePassword(host, realm, username, password)
-        }
+        webViewDatabaseProvider.get().setHttpAuthUsernamePassword(host, realm, username, password)
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     override fun getHttpAuthUsernamePassword(
         webView: WebView,
         host: String,
         realm: String,
     ): WebViewHttpAuthCredentials? {
-        val credentials = if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabaseProvider.get().getHttpAuthUsernamePassword(host, realm)
-        } else {
-            @Suppress("DEPRECATION")
-            webView.getHttpAuthUsernamePassword(host, realm)
-        } ?: return null
+        val credentials = webViewDatabaseProvider.get().getHttpAuthUsernamePassword(host, realm) ?: return null
 
         return WebViewHttpAuthCredentials(username = credentials[0], password = credentials[1])
     }

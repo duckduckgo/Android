@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
 
     <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сохранять</string>
-    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил ваш пароль?</string>
+    <string name="saveLoginDialogTitle">Сохранить пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
     <string name="useSavedLoginDialogTitle">Использовать сохраненный пароль?</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автозаполнение паролей недоступно: ваша версия Android WebView устарела или утратила совместимость.</string>
+
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
 
     <string name="autofillDeleteLoginDialogCancel">Отменить</string>
     <string name="autofillDeleteLoginDialogDelete">Удалить</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Выйти из настройки</string>
 
     <string name="autofillManagementScreenTitle">Пароли</string>
+    <string name="autofillManagementScreenTitleNew">Пароли и автозаполнение</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
     <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Пароли надежно защищены и хранятся на вашем устройстве</string>
-    <string name="saveLoginDialogSubtitle">Пароли надежно защищены и хранятся на вашем устройстве.</string>
+    <string name="credentialManagementAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Безопасность менеджера паролей</string>
+    <string name="saveLoginDialogSubtitle">Вы можете сохранить этот пароль на устройстве под надежной защитой функции «Пароли и автозаполнение» от DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
     <string name="credentialManagementEditLoginTitleHint">Название</string>
-    <string name="autofillDeleteLoginDialogTitle">Вы точно хотите удалить этот пароль?</string>
     <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Продолжить сохранять пароли?</string>
@@ -133,6 +140,137 @@
     <string name="managementDisabledModeSubtitle">Для защиты паролей требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="credentialManagementEditTitle">Редактирование пароля</string>
 
-    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nПревышен лимит по количеству логинов. Удалите некоторые из них, чтобы возобновить синхронизацию.\n\n<annotation type="manage_logins">Управление логинами</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей приостановлена</b>\nВы превысили лимит синхронизации паролей. Удалите несколько из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет.</string>
+    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nДостигнуто максимальное количество паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей на паузе</b>\nДостигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизация на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Синхронизация паролей на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Больше не спрашивать на этом сайте</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Нет, спасибо</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Сбросить список исключений</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Сбросить список исключений?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Сбросить</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отменить</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Удалить все пароли</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">Удален %1$d пароль</item>
+        <item quantity="few">Удалено %1$d пароля</item>
+        <item quantity="many">Удалено %1$d паролей</item>
+        <item quantity="other">Удалено паролей: %1$d</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Чтобы подтвердить удаление, выполните авторизацию</string>
+    <string name="autofill_title_text_for_delete_all">Удалить все пароли</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Синхронизировать ваш пароль от сайта %1$s не удалось, так как содержимое одного из полей превышает ограничение по числу символов.</item>
+        <item quantity="few">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="many">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="other">Синхронизировать ваш пароль от %1$s и других сайтов (%2$d) не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление паролями</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ваш пароль будет удален с этого устройства.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ваш пароль будет удален с этого устройства.</item>
+        <item quantity="few">Ваши пароли будут удалены с этого устройства.</item>
+        <item quantity="many">Ваши пароли будут удалены с этого устройства.</item>
+        <item quantity="other">Ваши пароли будут удалены с этого устройства.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Пароль будет удален со всех синхронизированных устройств.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Пароль будет удален со всех синхронизированных устройств.</item>
+        <item quantity="few">Пароли будут удалены со всех синхронизированных устройств.</item>
+        <item quantity="many">Пароли будут удалены со всех синхронизированных устройств.</item>
+        <item quantity="other">Пароли будут удалены со всех синхронизированных устройств.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Вы точно хотите удалить этот пароль?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Вы точно хотите удалить %1$d пароль?</item>
+        <item quantity="few">Вы точно хотите удалить %1$d пароля?</item>
+        <item quantity="many">Вы точно хотите удалить %1$d паролей?</item>
+        <item quantity="other">Вы точно хотите удалить пароли (%1$d)?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</item>
+        <item quantity="few">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+        <item quantity="many">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+        <item quantity="other">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">В DuckDuckGo можно импортировать сохраненные пароли из другого браузера.</string>
+
+    <string name="autofillManagementImportPasswords">Импорт паролей</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Как импортировать пароли</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Браузер DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Браузер DuckDuckGo для настольных компьютеров — это конфиденциальный поиск плюс блокировка трекеров. Скачивайте по ссылке.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизировать с компьютером</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Импорт из настольного браузера:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Запустите DuckDuckGo на Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Откройте раздел «<b>Настройки</b> > <b>Пароли</b>»]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Выберите вариант «<b>Импортировать пароли...</b>» и следуйте дальнейшим инструкциям.]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">По окончании импортирования на компьютер вы сможете настроить синхронизацию на данном устройстве.</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компьютере откройте ссылку:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Сообщить о сбое автозаполнения</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Анонимный отчет о сбое в работе функции автозаполнения на этом сайте. Ни в коем случае не включает пароли.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Сообщить о сбое в работе автозаполнения на %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Отчеты о сбоях отправляются в DuckDuckGo анонимно, то есть без указания вашего имени пользователя, пароля и другой информации, по которой можно установить вашу личность.\n\nВ отчет входит только адрес сайта и состояние некоторых настроек автозаполнения.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Отправить жалобу</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Отменить</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Спасибо! Ваш отчет поможет нам улучшить DuckDuckGo для всех.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Основные преимущества</string>
+    <string name="onboardingSaveDialogFeature1Title">Удобный вход</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Не нужно запоминать учетные данные.</string>
+    <string name="onboardingSaveDialogFeature2Title">Безопасное хранение</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Пароли в зашифрованном виде хранятся на устройстве под защитой ПИН-кодом или графическим ключом Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Синхронизация между устройствами</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Сквозное шифрование и удобная настройка на ваше усмотрение.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Хранение паролей можно отключить в любой момент.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Открыть Настройки</string>
+
+    <string name="newTabPageShortcutPasswords">Пароли</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импорт паролей из Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из Google: %1$d</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из CSV: %1$d</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Импортировать пароли из Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Импортировать пароли из Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизировать пароли с DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизировать пароли с DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Открыть пароли Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортировать из настольного браузера</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Импорт в DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Импортирование завершено</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Понятно</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Не удалось импортировать пароли</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Пропущено (дубликаты и недействительные): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Импортировано паролей: <b>%1$d</b>]]></string>
+
 </resources>

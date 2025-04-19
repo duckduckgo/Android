@@ -21,6 +21,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -64,6 +65,14 @@ class FeedbackActivity :
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackPressed()
+                }
+            },
+        )
     }
 
     private fun configureObservers() {
@@ -151,10 +160,6 @@ class FeedbackActivity :
             this.applyTransition(forwardDirection)
             replace(R.id.fragmentContainer, fragment, fragment.tag)
         }
-    }
-
-    override fun onBackPressed() {
-        viewModel.onBackPressed()
     }
 
     /**
@@ -272,13 +277,13 @@ private fun FeedbackActivity.animateFinish(feedbackSubmitted: Boolean) {
     setResult(resultCode)
 
     finish()
-    overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+    overridePendingTransition(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
 }
 
 private fun FragmentTransaction.applyTransition(forwardDirection: Boolean) {
     if (forwardDirection) {
-        setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_right, com.duckduckgo.mobile.android.R.anim.slide_to_left)
     } else {
-        setCustomAnimations(R.anim.slide_from_left, R.anim.slide_to_right)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
     }
 }

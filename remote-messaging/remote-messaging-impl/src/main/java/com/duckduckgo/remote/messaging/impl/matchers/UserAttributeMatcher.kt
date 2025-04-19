@@ -24,7 +24,7 @@ import com.duckduckgo.remote.messaging.impl.models.*
 class UserAttributeMatcher(
     private val userBrowserProperties: UserBrowserProperties,
 ) : AttributeMatcherPlugin {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
             is AppTheme -> {
                 matchingAttribute.matches(userBrowserProperties.appTheme().toString())
@@ -53,12 +53,6 @@ class UserAttributeMatcher(
             }
             is WidgetAdded -> {
                 matchingAttribute.matches(userBrowserProperties.widgetAdded())
-            }
-            is AppTpOnboarded -> {
-                matchingAttribute.matches(userBrowserProperties.appTpOnboarded())
-            }
-            is NetPOnboarded -> {
-                matchingAttribute.matches(userBrowserProperties.networkProtectionOnboarded())
             }
             else -> return null
         }

@@ -18,7 +18,8 @@ package com.duckduckgo.downloads.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.downloads.api.DownloadFailReason
+import com.duckduckgo.downloads.api.DownloadFailReason.ConnectionRefused
+import com.duckduckgo.downloads.api.DownloadFailReason.Other
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
@@ -27,10 +28,11 @@ import javax.inject.Inject
 import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.random.Random
+import logcat.asLog
+import logcat.logcat
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.sink
-import timber.log.Timber
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
@@ -53,7 +55,7 @@ class UrlFileDownloader @Inject constructor(
         val downloadId = Random.nextLong()
         urlFileDownloadCallManager.add(downloadId, call)
 
-        Timber.d("Starting download $fileName / $url")
+        logcat { "Starting download $fileName / $url" }
         downloadCallback.onStart(
             DownloadItem(
                 downloadId = downloadId,
@@ -78,26 +80,26 @@ class UrlFileDownloader @Inject constructor(
                         downloadCallback.onSuccess(downloadId, file.length(), file, pendingFileDownload.mimeType)
                     } else {
                         if (call.isCanceled) {
-                            Timber.v("Download $fileName cancelled")
+                            logcat { "Download $fileName cancelled" }
                             downloadCallback.onCancel(downloadId)
                         } else {
-                            Timber.v("Download $fileName failed")
-                            downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.Other)
+                            logcat { "Download $fileName failed" }
+                            downloadCallback.onError(url = url, downloadId = downloadId, reason = Other)
                         }
                         // clean up
                         directory.getOrCreate(fileName).delete()
                     }
                 }
             } else {
-                Timber.w("Failed to download $fileName / ${response.errorBody()?.string()}")
-                downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+                logcat { "Failed to download $fileName / ${response.errorBody()?.string()}" }
+                downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
             }
         }.onFailure {
-            Timber.w(it, "Failed to download $fileName")
+            logcat { "Failed to download $fileName: ${it.asLog()}" }
             if (call.isCanceled) {
                 downloadCallback.onCancel(downloadId)
             } else {
-                downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+                downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
             }
             // clean up
             directory.getOrCreate(fileName).delete()
@@ -111,7 +113,7 @@ class UrlFileDownloader @Inject constructor(
         body: ResponseBody,
         downloadCallback: DownloadCallback,
     ): Boolean {
-        Timber.d("Writing streaming response body to disk $fileName")
+        logcat { "Writing streaming response body to disk $fileName" }
 
         // ensure content length never 0
         val contentLength = if (body.contentLength() > 0) body.contentLength() else -1
@@ -134,7 +136,7 @@ class UrlFileDownloader @Inject constructor(
             }
             true
         } catch (t: Throwable) {
-            Timber.e(t, "Failed to write to disk $fileName")
+            logcat { "Failed to write to disk $fileName: ${t.asLog()}" }
             false
         } finally {
             source.close()

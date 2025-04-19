@@ -26,6 +26,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -63,7 +66,7 @@ class DialogsFragment : Fragment() {
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
                             }
 
                             override fun onNegativeButtonClicked() {
@@ -99,9 +102,8 @@ class DialogsFragment : Fragment() {
                 RadioListAlertDialogBuilder(requireContext())
                     .setTitle(R.string.text_dialog_title)
                     .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
-                    .setDestructiveButtons(true)
+                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
                     .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
                     .addEventListener(
                         object : RadioListAlertDialogBuilder.EventListener() {
@@ -141,9 +143,29 @@ class DialogsFragment : Fragment() {
                 TextAlertDialogBuilder(requireContext())
                     .setTitle(R.string.text_dialog_title)
                     .setMessage(R.string.text_dialog_message)
-                    .setDestructiveButtons(true)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.findViewById<Button>(R.id.textAlertSingleDialogButton)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive, GHOST)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -197,6 +219,34 @@ class DialogsFragment : Fragment() {
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
                                 Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.findViewById<Button>(R.id.textAlertDialogCheckbox)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setCheckBoxText(R.string.text_dialog_checkbox)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            var isChecked: Boolean = false
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked, Checked $isChecked ", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked, Checked $isChecked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onCheckedChanged(checked: Boolean) {
+                                isChecked = checked
                             }
                         },
                     )

@@ -19,6 +19,7 @@ package com.duckduckgo.gradle
 import com.duckduckgo.gradle.ModuleType.ApiPureKotlin
 import com.duckduckgo.gradle.ModuleType.Companion.destinationDirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Impl
+import com.duckduckgo.gradle.ModuleType.Internal
 import java.io.File
 
 class IntermoduleDependencyManager {
@@ -26,8 +27,41 @@ class IntermoduleDependencyManager {
     fun wireUpIntermoduleDependencies(newFeatureDestination: File) {
         val apiModule = File(newFeatureDestination, "${newFeatureDestination.name}-${ApiPureKotlin.destinationDirectorySuffix()}")
         val implModule = File(newFeatureDestination, "${newFeatureDestination.name}-${Impl.destinationDirectorySuffix()}")
+        val internalModule = File(newFeatureDestination, "${newFeatureDestination.name}-${Internal.destinationDirectorySuffix()}")
 
         wireUpImplModule(apiModule, implModule, newFeatureDestination)
+        wireUpInternalModule(apiModule, implModule, internalModule, newFeatureDestination)
+    }
+
+    private fun wireUpInternalModule(
+        apiModule: File,
+        implModule: File,
+        internalModule: File,
+        newFeatureDestination: File
+    ) {
+        if (internalModule.exists()) {
+            println("Wiring up module: ${internalModule.name}")
+            val gradleModifier = BuildGradleModifier(File(internalModule, BUILD_GRADLE))
+
+            // it was creating before
+            if (!gradleModifier.lineExists(PLACEHOLDER_API_DEPENDENCY)) {
+                println("[skip] ${internalModule.name} already existed")
+                return
+            }
+
+            // delete placeholder
+            gradleModifier.removeDependency(PLACEHOLDER_API_DEPENDENCY)
+
+            // conditionally insert dependencies
+            val modules = mutableListOf<String>()
+            if (apiModule.exists()) {
+                modules.add(ApiPureKotlin.destinationDirectorySuffix())
+            }
+            if (implModule.exists()) {
+                modules.add(Impl.destinationDirectorySuffix())
+            }
+            gradleModifier.insertDependencies(newFeatureDestination.name, modules)
+        }
     }
 
     private fun wireUpImplModule(
@@ -38,6 +72,12 @@ class IntermoduleDependencyManager {
         if (implModule.exists()) {
             println("Wiring up module: ${implModule.name}")
             val gradleModifier = BuildGradleModifier(File(implModule, BUILD_GRADLE))
+
+            // it was creating before
+            if (!gradleModifier.lineExists(PLACEHOLDER_API_DEPENDENCY)) {
+                println("[skip] ${implModule.name} already existed")
+                return
+            }
 
             // delete placeholder
             gradleModifier.removeDependency(PLACEHOLDER_API_DEPENDENCY)
@@ -58,7 +98,7 @@ class IntermoduleDependencyManager {
     ) {
         println("Wiring up app module to include feature: name=[$featureName], type=[${moduleType.javaClass.simpleName}]")
         val gradleModifier = BuildGradleModifier(buildGradleFile)
-        gradleModifier.insertDependencies(featureName, listOf(moduleType.destinationDirectorySuffix()))
+        gradleModifier.insertDependencies(featureName, listOf(moduleType.destinationDirectorySuffix()), isInternal = moduleType == Internal)
     }
 
     companion object {

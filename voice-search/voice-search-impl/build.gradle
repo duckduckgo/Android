@@ -35,9 +35,10 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':voice-search-api')
     implementation project(path: ':voice-search-store')
+    implementation project(path: ':remote-messaging-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -57,6 +58,7 @@ dependencies {
     implementation AndroidX.room.ktx
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

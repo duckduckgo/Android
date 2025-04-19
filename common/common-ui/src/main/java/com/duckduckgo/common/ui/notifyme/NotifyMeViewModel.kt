@@ -21,17 +21,17 @@ import android.os.Build
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.CheckPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
 import com.duckduckgo.common.ui.store.notifyme.NotifyMeDataStore
+import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -45,7 +45,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class NotifyMeViewModel(
+@ContributesViewModel(ViewScope::class)
+class NotifyMeViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val notifyMeDataStore: NotifyMeDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -58,7 +59,6 @@ class NotifyMeViewModel(
         object UpdateNotificationsState : Command()
         object UpdateNotificationsStateOnAndroid13Plus : Command()
         object OpenSettingsOnAndroid8Plus : Command()
-        object OpenSettings : Command()
         object CheckPermissionRationale : Command()
         object ShowPermissionRationale : Command()
         object DismissComponent : Command()
@@ -130,11 +130,7 @@ class NotifyMeViewModel(
     }
 
     private fun openSettings() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            sendCommand(OpenSettingsOnAndroid8Plus)
-        } else {
-            sendCommand(OpenSettings)
-        }
+        sendCommand(OpenSettingsOnAndroid8Plus)
     }
 
     private fun isDismissed(): Boolean {
@@ -148,24 +144,6 @@ class NotifyMeViewModel(
     private fun sendCommand(newCommand: Command) {
         viewModelScope.launch {
             command.send(newCommand)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val appBuildConfig: AppBuildConfig,
-        private val notifyMeDataStore: NotifyMeDataStore,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(NotifyMeViewModel::class.java) -> NotifyMeViewModel(
-                        appBuildConfig,
-                        notifyMeDataStore,
-                    )
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
         }
     }
 }

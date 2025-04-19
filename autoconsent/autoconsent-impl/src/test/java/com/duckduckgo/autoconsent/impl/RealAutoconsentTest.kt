@@ -19,10 +19,11 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.Toggle
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -38,21 +39,24 @@ class RealAutoconsentTest {
     private val settingsRepository = FakeSettingsRepository()
     private val unprotected = FakeUnprotected(listOf("unprotected.com"))
     private val userAllowlist = FakeUserAllowlist(listOf("userallowed.com"))
-    private val mockAutoconsentRepository: AutoconsentRepository = mock()
-    private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockAutoconsentExceptionsRepository: AutoconsentExceptionsRepository = mock()
+    private val mockAutoconsentFeature: AutoconsentFeature = mock()
+    private val mockToggle: Toggle = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
     lateinit var autoconsent: RealAutoconsent
 
     @Before
     fun setup() {
-        whenever(mockFeatureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)).thenReturn(true)
-        whenever(mockAutoconsentRepository.exceptions).thenReturn(listOf(FeatureException("exception.com", "reason")))
+        whenever(mockAutoconsentFeature.self()).thenReturn(mockToggle)
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockAutoconsentExceptionsRepository.exceptions)
+            .thenReturn(CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException("exception.com", "reason")) })
         autoconsent = RealAutoconsent(
             pluginPoint,
             settingsRepository,
-            mockAutoconsentRepository,
-            mockFeatureToggle,
+            mockAutoconsentExceptionsRepository,
+            mockAutoconsentFeature,
             userAllowlist,
             unprotected,
         )
@@ -180,7 +184,7 @@ class RealAutoconsentTest {
     @Test
     fun whenInjectAutoconsentIfFeatureIsDisabledThenDoNothing() {
         givenSettingsRepositoryAllowsInjection()
-        whenever(mockFeatureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)).thenReturn(false)
+        whenever(mockToggle.isEnabled()).thenReturn(false)
 
         autoconsent.injectAutoconsent(webView, URL)
 

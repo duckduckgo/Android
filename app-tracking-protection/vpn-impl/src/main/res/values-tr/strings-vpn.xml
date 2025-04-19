@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Engellenen izleyicilerden haberdar olun</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Bildirim çekmecenizde engellenen izleme girişimleri hakkında güncellemeler alın.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Kullandığınız VPN yüzünden App Tracking Protection\'ı kullanamıyor musunuz? Uyumlu tek VPN olan DuckDuckGo VPN\'e geçin. <annotation type="ppro_upsell_link">Daha fazla bilgi edinin</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection Devre Dışı Bırakıldı</b>\nKullandığınız VPN App Tracking Protection\'ı devre dışı mı bıraktı? Yeniden etkinleştirmek için yukarıdaki düğmeyi kullanın.\n\nApp Tracking Protection ile çalışan tek VPN olan DuckDuckGo VPN\'i edinin. <annotation type="ppro_upsell_link">Daha fazla bilgi edinin</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Gizliliğinizi bir üst seviyeye taşıyın</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo, App Tracking Protection ile uyumlu olan tek VPN\'i sunuyor. Ücretli bir Privacy Pro aboneliğiyle etkinleştirebilirsiniz.</string>
+    <string name="apptp_PproUpsellBannerAction">Daha Fazla Bilgi</string>
+
 </resources>

@@ -28,6 +28,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -77,5 +78,6 @@ private fun Placeholder.drawable(): Int {
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
+        PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
     }
 }

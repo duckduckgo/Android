@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.deviceauth
 
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +53,39 @@ class AutofillTimeBasedAuthorizationGracePeriodTest {
         timeProvider.reset()
         testee.invalidate()
         assertTrue(testee.isAuthRequired())
+    }
+
+    @Test
+    fun whenLastSuccessfulAuthWasBeforeGracePeriodButWithinExtendedAuthTimeThenAuthNotRequired() {
+        recordAuthorizationInDistantPast()
+        timeProvider.reset()
+        testee.requestExtendedGracePeriod()
+        assertFalse(testee.isAuthRequired())
+    }
+
+    @Test
+    fun whenNoPreviousAuthButWithinExtendedAuthTimeThenAuthNotRequired() {
+        testee.requestExtendedGracePeriod()
+        assertFalse(testee.isAuthRequired())
+    }
+
+    @Test
+    fun whenExtendedAuthTimeRequestedButTooLongAgoThenAuthRequired() {
+        configureExtendedAuthRequestedInDistantPast()
+        timeProvider.reset()
+        assertTrue(testee.isAuthRequired())
+    }
+
+    @Test
+    fun whenExtendedAuthTimeRequestedAndThenRemovedThenAuthRequired() {
+        testee.requestExtendedGracePeriod()
+        testee.removeRequestForExtendedGracePeriod()
+        assertTrue(testee.isAuthRequired())
+    }
+
+    private fun configureExtendedAuthRequestedInDistantPast() {
+        whenever(timeProvider.currentTimeMillis()).thenReturn(0)
+        testee.requestExtendedGracePeriod()
     }
 
     private fun recordAuthorizationInDistantPast() {

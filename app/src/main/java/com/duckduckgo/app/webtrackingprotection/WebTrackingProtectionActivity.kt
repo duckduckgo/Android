@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.webtrackingprotection
 
+import android.R.attr.text
 import android.app.ActivityOptions
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
@@ -35,9 +37,11 @@ import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -53,9 +57,16 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
 
+    // TODO eligible for extraction and use in AutoConsent as well when removing old settings
     private val clickableSpan = object : ClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.onLearnMoreSelected()
+        }
+
+        override fun updateDrawState(ds: TextPaint) {
+            super.updateDrawState(ds)
+            ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
+            ds.isUnderlineText = false
         }
     }
 
@@ -76,11 +87,14 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlGPCText = getString(R.string.webTrackingProtectionDescription).html(this)
+        val htmlGPCText = getString(
+            R.string.webTrackingProtectionDescriptionNew,
+        ).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
             gpcSpannableString.apply {
+                insert(getSpanStart(it), "\n")
                 setSpan(
                     clickableSpan,
                     gpcSpannableString.getSpanStart(it),

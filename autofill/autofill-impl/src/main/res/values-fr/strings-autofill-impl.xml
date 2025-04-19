@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
 
     <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre mot de passe ?</string>
+    <string name="saveLoginDialogTitle">Enregistrer votre mot de passe ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
     <string name="useSavedLoginDialogTitle">Utiliser un mot de passe enregistré ?</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">La saisie automatique des mots de passe n\'est pas disponible car votre version d\'Android WebView est obsolète ou incompatible.</string>
+
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annuler</string>
     <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
     <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
@@ -101,7 +107,7 @@
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquer les traqueurs d\'e-mails et masquer l\'adresse</string>
 
     <string name="autofillDisableAutofillPromptMessage">Cette fonction peut être désactivée à tout moment dans Paramètres.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Encore des économies</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuer à les sauvegarder</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Désactiver</string>
 
     <string name="autofillEmailProtectionInContextSignUpDialogTitle">Masquez votre adresse e-mail et bloquez les traqueurs</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Quitter la configuration</string>
 
     <string name="autofillManagementScreenTitle">Mots de passe</string>
+    <string name="autofillManagementScreenTitleNew">Mots de passe et saisie automatique</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aucun mot de passe n\'a été enregistré</string>
     <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les mots de passe</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil</string>
-    <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil.</string>
+    <string name="credentialManagementAutofillSubtitle">Les mots de passe sont cryptés. Personne d\'autre que vous ne peut les voir, pas même nous. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Sécurité du gestionnaire de mots de passe</string>
+    <string name="saveLoginDialogSubtitle">Stockez votre mot de passe en toute sécurité sur votre appareil avec DuckDuckGo, Mots de passe et saisie automatique.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
-    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer ce mot de passe ?</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière modification : %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer vos mots de passe ?</string>
@@ -133,6 +140,125 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos mots de passe.</string>
     <string name="credentialManagementEditTitle">Modifier le mot de passe</string>
 
-    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nLimite d\'identifiants dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les identifiants</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez dépassé la limite de synchronisation des mots de passe. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe.</string>
+    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronisation suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Ne jamais demander pour ce site</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Non merci</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Réinitialiser les sites exclus</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Réinitialiser les sites exclus ?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Réinitialiser</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuler</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Supprimer tous les mots de passe</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d mot de passe supprimé</item>
+        <item quantity="other">%1$d mots de passe supprimés</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Authentifiez-vous pour confirmer que vous souhaitez supprimer tous les mots de passe</string>
+    <string name="autofill_title_text_for_delete_all">Supprimer tous les mots de passe</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Votre mot de passe pour %1$s ne peut pas être synchronisé car l\'un de ses champs dépasse la limite de caractères.</item>
+        <item quantity="other">Vos mots de passe pour %1$s et %2$d autres sites ne peuvent pas être synchronisés car certains de leurs champs dépassent la limite de caractères.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gérer les mots de passe</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Votre mot de passe sera supprimé de cet appareil.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Votre mot de passe sera supprimé de cet appareil.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de cet appareil.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Votre mot de passe sera supprimé de tous les appareils synchronisés.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Votre mot de passe sera supprimé de tous les appareils synchronisés.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de tous les appareils synchronisés.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Voulez-vous vraiment supprimer ce mot de passe ?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
+        <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</item>
+        <item quantity="other">Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Vous pouvez importer les mots de passe enregistrés d\'un autre navigateur dans DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importer les mots de passe</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Comment importer des mots de passe</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importez les mots de passe dans la version de bureau du navigateur DuckDuckGo, puis synchronisez-les sur tous les appareils.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Télécharger le navigateur de bureau</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lien copié</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Procurez-vous le navigateur DuckDuckGo pour Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Faites une recherche privée et bloquez les traqueurs avec le navigateur de bureau DuckDuckGo. Cliquez sur ce lien sur votre ordinateur pour le télécharger dès aujourd\'hui.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronisation avec le navigateur de bureau</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer depuis le navigateur de bureau :</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ouvrez DuckDuckGo sur Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Allez dans <b>Paramètres</b> > <b>Mots de passe</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Sélectionnez <b>Importer les mots de passe</b>… et suivez les étapes pour l\'importation]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Une fois l\'importation effectuée sur votre ordinateur, vous pouvez configurer la synchronisation sur cet appareil</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obtenir l\'application de bureau</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Procurez-vous DuckDuckGo pour Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Sur votre ordinateur, accédez à :</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partager le lien de téléchargement</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Signaler un problème de saisie automatique</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">La saisie automatique du signalement ne fonctionne pas sur ce site. Les mots de passe ne sont jamais partagés.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">La saisie automatique du signalement ne fonctionne pas sur %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Anonymes, les signalements envoyés à DuckDuckGo n\'incluent ni votre nom d\'utilisateur, ni votre mot de passe, ni aucune autre information personnellement identifiable.\n\nLe signalement inclut seulement l\'URL du site et l\'état de certains paramètres de saisie automatique.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Envoyer un rapport</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Annuler</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Merci ! Votre signalement nous aidera à améliorer DuckDuckGo pour tous.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Principales caractéristiques</string>
+    <string name="onboardingSaveDialogFeature1Title">Des connexions fluides</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Inutile de mémoriser les informations de connexion.</string>
+    <string name="onboardingSaveDialogFeature2Title">Stockage sécurisé</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Les mots de passe sont cryptés, stockés sur l\'appareil et verrouillés à l\'aide de votre schéma Android ou de votre code PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronisation entre les appareils</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Crypté de bout en bout et facile à configurer quand vous le décidez.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Vous pouvez désactiver l\'enregistrement des mots de passe à tout moment.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Ouvrir les paramètres</string>
+
+    <string name="newTabPageShortcutPasswords">Mots de passe</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importer des mots de passe Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d mots de passe importés depuis Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d mots de passe importés depuis le fichier CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importer des mots de passe depuis Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importer des mots de passe depuis Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchroniser les mots de passe DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchroniser les mots de passe DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importez vos mots de passe Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Ouvrir les mots de passe Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Choisir un fichier CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer depuis le navigateur de bureau</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importer dans DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importation terminée</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">J\'ai compris</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Échec de l\'importation des mots de passe</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorés (doublons ou non valides) : <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Mots de passe importés : <b>%1$d</b>]]></string>
+
 </resources>

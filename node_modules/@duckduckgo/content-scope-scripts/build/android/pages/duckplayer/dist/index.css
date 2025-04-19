@@ -1,0 +1,1105 @@
+/* pages/duckplayer/app/base.css */
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+html[data-reduced-motion=true] *:not([data-allow-animation]) {
+  animation: none !important;
+  transition: none !important;
+}
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+button {
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}
+ul {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* pages/duckplayer/app/index.css */
+html:has(body[data-display=app]) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body[data-display=app] {
+  color: rgba(242, 242, 242, 1);
+  background: #000;
+  height: 100vh;
+  overflow: hidden;
+  padding: 16px;
+}
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  body[data-display=app] {
+    padding: 8px;
+  }
+}
+
+/* shared/components/Fallback/Fallback.module.css */
+.Fallback_fallback {
+  height: 100%;
+  width: 100%;
+}
+
+/* pages/duckplayer/app/components/Components.module.css */
+.Components_main {
+  background-color: #000;
+  color: white;
+  max-width: 3840px;
+  margin: 0 auto;
+  padding: 2rem 8px;
+  position: relative;
+  z-index: 1;
+}
+.Components_tube {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+/* pages/duckplayer/app/components/PlayerContainer.module.css */
+.PlayerContainer_container {
+  border-radius: 14px;
+}
+.PlayerContainer_inset {
+  padding: 8px;
+  border-radius: var(--outer-radius);
+  background: rgba(0, 0, 0, 0.3);
+  transition: background 1s;
+}
+[data-focus-mode=on] .PlayerContainer_inset {
+  background: none;
+}
+.PlayerContainer_internals {
+  display: grid;
+  overflow: hidden;
+}
+.PlayerContainer_insetInternals {
+  gap: 8px;
+}
+
+/* pages/duckplayer/app/components/Button.module.css */
+.Button_button {
+  border: none;
+  outline: none;
+  display: flex;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0 20px;
+  flex-shrink: 0;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--inner-radius);
+  color: rgba(255, 255, 255, 1);
+  text-decoration: none;
+}
+[data-layout=mobile] .Button_button {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+.Button_button:hover,
+.Button_button:focus-visible {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+}
+.Button_fill {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.Button_desktop {
+  height: 32px;
+  line-height: 32px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.Button_desktop .Button_icon {
+  width: 16px;
+  height: 16px;
+}
+.Button_iconOnly {
+  width: 44px;
+  padding: 0 8px;
+  position: relative;
+}
+.Button_iconOnly .Button_icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.Button_icon {
+}
+.Button_icon img {
+  display: block;
+  width: 100%;
+}
+.Button_desktop.Button_iconOnly {
+  width: 32px;
+}
+.Button_highlight {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  background: rgba(255, 255, 255, 0.2);
+}
+.Button_highlight .Button_icon img {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  transform: scale(1.1);
+}
+
+/* pages/duckplayer/app/components/FloatingBar.module.css */
+.FloatingBar_floatingBar {
+  display: flex;
+  gap: 8px;
+}
+.FloatingBar_inset {
+  border-radius: var(--outer-radius);
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.FloatingBar_topBar {
+  display: grid;
+  justify-content: center;
+  width: 100%;
+}
+
+/* pages/duckplayer/app/components/SwitchBarMobile.module.css */
+.SwitchBarMobile_switchBar {
+  display: grid;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  padding-inline: 16px;
+  height: 100%;
+  line-height: 1.1;
+}
+.SwitchBarMobile_stateExiting {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+}
+.SwitchBarMobile_stateHidden {
+  display: none;
+}
+.SwitchBarMobile_labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+.SwitchBarMobile_label {
+  pointer-events: none;
+}
+.SwitchBarMobile_checkbox {
+}
+.SwitchBarMobile_text {
+  font-weight: bold;
+  font-size: 14px;
+}
+.SwitchBarMobile_placeholder {
+  height: 44px;
+  position: relative;
+  width: 100%;
+}
+.SwitchBarMobile_placeholder > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* pages/duckplayer/app/components/Switch.module.css */
+.Switch_switch {
+  margin: 0;
+  padding: 0;
+  width: 52px;
+  height: 32px;
+  border: 0;
+  box-shadow: none;
+  background: rgba(136, 136, 136, 0.5);
+  border-radius: 32px;
+  position: relative;
+  transition: all .3s;
+}
+.Switch_switch:active .Switch_thumb {
+  scale: 1.15;
+}
+.Switch_thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 100%;
+  background: white;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  pointer-events: none;
+  transition: .2s left ease-in-out;
+}
+.Switch_switch[aria-checked=true] .Switch_thumb {
+  left: calc(100% - 32px + 4px);
+}
+.Switch_switch[aria-checked=true] {
+  background: rgba(57, 105, 239, 1);
+}
+.Switch_ios {
+  width: 51px;
+  height: 31px;
+}
+.Switch_ios .Switch_thumb {
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.Switch_ios:active .Switch_thumb {
+  scale: 1;
+}
+.Switch_ios[aria-checked=true] .Switch_thumb {
+  left: calc(100% - 32px + 3px);
+}
+
+/* pages/duckplayer/app/components/InfoBar.module.css */
+.InfoBar_infoBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.InfoBar_container {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+  z-index: 1;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+.InfoBar_dax {
+  padding: 2px;
+}
+.InfoBar_img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+.InfoBar_text {
+  margin-left: 5px;
+  margin-right: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.InfoBar_info {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+.InfoBar_info:focus-visible {
+  outline: none;
+}
+.InfoBar_info:focus-visible[aria-expanded=true] {
+  outline: 1px solid white;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.InfoBar_info img {
+  display: block;
+  width: 100%;
+}
+.InfoBar_lhs {
+  display: flex;
+  align-items: center;
+}
+.InfoBar_rhs {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.InfoBar_switch {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.InfoBar_controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* pages/duckplayer/app/components/SwitchBarDesktop.module.css */
+.SwitchBarDesktop_switchBarDesktop {
+  display: flex;
+  align-items: center;
+}
+.SwitchBarDesktop_stateCompleted {
+  display: none;
+}
+.SwitchBarDesktop_stateExiting {
+  transition: all .5s ease-in-out;
+  transition-delay: 2s;
+  opacity: 0;
+  visibility: hidden;
+}
+.SwitchBarDesktop_label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.SwitchBarDesktop_stateExiting .SwitchBarDesktop_label {
+  animation: SwitchBarDesktop_slide-out .5s forwards;
+  animation-delay: 2s;
+}
+@keyframes SwitchBarDesktop_slide-out {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+.SwitchBarDesktop_checkbox {
+  display: block;
+}
+.SwitchBarDesktop_stateExiting .SwitchBarDesktop_input {
+  pointer-events: none;
+}
+.SwitchBarDesktop_input {
+  display: block;
+}
+.SwitchBarDesktop_input:focus-visible {
+  outline: 1px solid white;
+  outline-offset: 2px;
+}
+.SwitchBarDesktop_input[disabled] {
+}
+.SwitchBarDesktop_text {
+  line-height: 1;
+}
+.SwitchBarDesktop_text:hover {
+  cursor: pointer;
+}
+
+/* pages/duckplayer/app/components/Tooltip.module.css */
+.Tooltip_tooltip {
+  position: absolute;
+  background:
+    linear-gradient(
+      0deg,
+      rgba(48, 48, 48, 0.35),
+      rgba(48, 48, 48, 0.35)),
+    rgba(33, 33, 33, 0.55);
+  background-blend-mode: normal, luminosity;
+  box-shadow: inset 0px 0px 1px #ffffff;
+  filter: drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
+  -webkit-backdrop-filter: blur(76px);
+  backdrop-filter: blur(76px);
+  border-radius: 10px;
+  width: 300px;
+  font-weight: normal;
+  padding: 12px;
+  left: -162px;
+  top: 32px;
+  color: white;
+  display: none;
+  z-index: 1;
+}
+.Tooltip_tooltip[aria-hidden=false] {
+  display: block;
+}
+.Tooltip_tooltip::after {
+  content: "";
+  width: 15px;
+  height: 15px;
+  border: 1px solid #5f5f5f;
+  display: block;
+  position: absolute;
+  top: -8px;
+  border-right: none;
+  border-bottom: none;
+  transform: rotate(45deg);
+  background: #1d1d1d;
+  left: 162px;
+}
+.Tooltip_top {
+  top: -100px;
+  z-index: 50;
+}
+.Tooltip_top::after {
+  top: calc(100% - 7px);
+  transform: rotate(225deg);
+}
+.Tooltip_bottom {
+}
+.Tooltip_tooltip.Tooltip_visible {
+  display: block;
+}
+
+/* pages/duckplayer/app/components/FocusMode.module.css */
+[data-focus-mode=on] .FocusMode_fade {
+  opacity: 0;
+  visibility: hidden;
+}
+[data-focus-mode=on] .FocusMode_slide {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%);
+}
+.FocusMode_hideInFocus {
+  opacity: 1;
+  visibility: visible;
+  top: 0;
+  transition: all .3s;
+}
+
+/* pages/duckplayer/app/components/Wordmark.module.css */
+.Wordmark_wordmark {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 8px;
+}
+.Wordmark_logo {
+  width: 32px;
+  height: 32px;
+}
+.Wordmark_img {
+  display: block;
+  width: 100%;
+}
+.Wordmark_text {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+/* pages/duckplayer/app/components/Wordmark-mobile.module.css */
+.Wordmark_mobile_logo {
+  height: 44px;
+  display: grid;
+  width: 100%;
+  align-items: center;
+  grid-column-gap: 8px;
+  grid-template-columns: max-content max-content;
+}
+@media screen and (max-width: 767px) {
+  .Wordmark_mobile_logo {
+    height: 100px;
+  }
+  [data-youtube-error=true] .Wordmark_mobile_logo {
+    height: 44px;
+  }
+}
+.Wordmark_mobile_logoSvg img {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+.Wordmark_mobile_text {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* pages/duckplayer/app/components/Player.module.css */
+.Player_root.Player_desktop {
+  z-index: 1;
+  position: relative;
+  overflow: hidden;
+  height: var(--frame-height);
+}
+.Player_root.Player_mobile {
+  aspect-ratio: 16/9;
+  border-radius: var(--inner-radius);
+  overflow: hidden;
+  height: auto;
+}
+.Player_root.Player_desktop {
+  height: var(--frame-height);
+}
+.Player_player {
+  font-size: 0;
+}
+.Player_iframe.Player_mobile {
+  height: 100%;
+  width: 100%;
+}
+.Player_iframe.Player_desktop {
+  height: var(--frame-height);
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+.Player_desktop {
+  border-top-left-radius: var(--outer-radius);
+  border-top-right-radius: var(--outer-radius);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.Player_error {
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  background: #2f2f2f;
+}
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  .Player_root.Player_mobile {
+    max-height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+  }
+  .Player_iframe.Player_mobile {
+    overflow: hidden;
+    border-radius: 0;
+  }
+  .Player_error {
+    overflow: hidden;
+    border-radius: 0;
+  }
+}
+
+/* pages/duckplayer/app/components/YouTubeError.module.css */
+.YouTubeError_error {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  display: grid;
+  height: 100%;
+  justify-items: center;
+}
+.YouTubeError_error.YouTubeError_desktop {
+  height: var(--frame-height);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+.YouTubeError_error.YouTubeError_mobile {
+  border-radius: var(--inner-radius);
+  height: 100%;
+  overflow: auto;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+@media screen and (min-width: 600px) and (min-height: 600px) {
+  .YouTubeError_error.YouTubeError_mobile {
+    aspect-ratio: 16 / 9;
+  }
+}
+.YouTubeError_desktop {
+  border-top-left-radius: var(--outer-radius);
+  border-top-right-radius: var(--outer-radius);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.YouTubeError_container {
+  column-gap: 24px;
+  display: flex;
+  flex-flow: row;
+  margin: 0;
+  max-width: 680px;
+  padding: 0 40px;
+  row-gap: 4px;
+}
+.YouTubeError_mobile .YouTubeError_container {
+  flex-flow: column;
+  padding: 0 24px;
+}
+@media screen and (min-height: 320px) {
+  .YouTubeError_mobile .YouTubeError_container {
+    margin: 16px 0;
+  }
+}
+@media screen and (min-width: 375px) and (min-height: 400px) {
+  .YouTubeError_mobile .YouTubeError_container {
+    margin: 36px 0;
+  }
+}
+.YouTubeError_content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0;
+}
+@media screen and (min-width: 600px) {
+  .YouTubeError_content {
+    margin: 24px 0;
+  }
+}
+.YouTubeError_icon {
+  align-self: center;
+  display: flex;
+  justify-content: center;
+}
+.YouTubeError_icon::before {
+  content: " ";
+  display: block;
+  background: url('data:image/svg+xml,<svg fill="none" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">%0A  <path fill="red" d="M47.5 70.802c1.945 0 3.484-1.588 3.841-3.5C53.076 58.022 61.218 51 71 51h4.96c2.225 0 4.04-1.774 4.04-4 0-.026-.007-9.022-1.338-14.004a8.02 8.02 0 0 0-5.659-5.658C68.014 26 48 26 48 26s-20.015 0-25.004 1.338a8.01 8.01 0 0 0-5.658 5.658C16 37.986 16 48.401 16 48.401s0 10.416 1.338 15.405a8.01 8.01 0 0 0 5.658 5.658c4.99 1.338 24.504 1.338 24.504 1.338"/>%0A  <path fill="%23fff" d="m41.594 58 16.627-9.598-16.627-9.599z"/>%0A  <path fill="%23EB102D" d="M87 71c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16"/>%0A  <path fill="%23fff" d="M73 77.8a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-2.039-4.4c-.706 0-1.334-.49-1.412-1.12l-.942-8.75c-.079-.7.55-1.33 1.412-1.33h1.962c.785 0 1.492.63 1.413 1.33l-.942 8.75c-.157.63-.784 1.12-1.49 1.12Z"/>%0A  <path fill="%23CCC" d="M92.501 59c.298 0 .595.12.823.354.454.468.454 1.23 0 1.698l-2.333 2.4a1.145 1.145 0 0 1-1.65 0 1.227 1.227 0 0 1 0-1.698l2.333-2.4c.227-.234.524-.354.822-.354zm-1.166 10.798h3.499c.641 0 1.166.54 1.166 1.2s-.525 1.2-1.166 1.2h-3.499c-.641 0-1.166-.54-1.166-1.2s.525-1.2 1.166-1.2m-1.982 8.754c.227-.234.525-.354.822-.354h.006c.297 0 .595.12.822.354l2.332 2.4c.455.467.455 1.23 0 1.697a1.145 1.145 0 0 1-1.65 0l-2.332-2.4a1.227 1.227 0 0 1 0-1.697"/>%0A</svg>%0A') no-repeat;
+  height: 48px;
+  width: 48px;
+}
+@media screen and (max-width: 320px) {
+  .YouTubeError_icon {
+    display: none;
+  }
+}
+@media screen and (min-width: 600px) and (min-height: 600px) {
+  .YouTubeError_icon {
+    justify-content: start;
+  }
+  .YouTubeError_icon::before {
+    background-image: url('data:image/svg+xml,<svg fill="none" viewBox="0 0 128 96" xmlns="http://www.w3.org/2000/svg">%0A  <path fill="%23888" d="M16.912 31.049a1.495 1.495 0 0 1 2.114-2.114l1.932 1.932 1.932-1.932a1.495 1.495 0 0 1 2.114 2.114l-1.932 1.932 1.932 1.932a1.495 1.495 0 0 1-2.114 2.114l-1.932-1.933-1.932 1.933a1.494 1.494 0 1 1-2.114-2.114l1.932-1.932zM.582 52.91a1.495 1.495 0 0 1 2.113-2.115l1.292 1.292 1.291-1.292a1.495 1.495 0 1 1 2.114 2.114L6.1 54.2l1.292 1.292a1.495 1.495 0 1 1-2.113 2.114l-1.292-1.292-1.292 1.292a1.495 1.495 0 1 1-2.114-2.114l1.292-1.291zm104.972-15.452a1.496 1.496 0 0 1 2.114-2.114l1.291 1.292 1.292-1.292a1.495 1.495 0 0 1 2.114 2.114l-1.292 1.291 1.292 1.292a1.494 1.494 0 1 1-2.114 2.114l-1.292-1.292-1.291 1.292a1.495 1.495 0 0 1-2.114-2.114l1.292-1.292zM124.5 54c-.825 0-1.5-.675-1.5-1.5s.675-1.5 1.5-1.5 1.5.675 1.5 1.5-.675 1.5-1.5 1.5M24 67c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2" opacity=".2"/>%0A  <path fill="red" d="M63.5 70.802c1.945 0 3.484-1.588 3.841-3.5C69.076 58.022 77.218 51 87 51h4.96c2.225 0 4.04-1.774 4.04-4 0-.026-.007-9.022-1.338-14.004a8.02 8.02 0 0 0-5.659-5.658C84.014 26 64 26 64 26s-20.014 0-25.004 1.338a8.01 8.01 0 0 0-5.658 5.658C32 37.986 32 48.401 32 48.401s0 10.416 1.338 15.405a8.01 8.01 0 0 0 5.658 5.658c4.99 1.338 24.504 1.338 24.504 1.338"/>%0A  <path fill="%23fff" d="m57.594 58 16.627-9.598-16.627-9.599z"/>%0A  <path fill="%23EB102D" d="M103 71c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16"/>%0A  <path fill="%23fff" d="M89 77.8a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-2.039-4.4c-.706 0-1.334-.49-1.412-1.12l-.942-8.75c-.079-.7.55-1.33 1.412-1.33h1.962c.785 0 1.492.63 1.413 1.33l-.942 8.75c-.157.63-.784 1.12-1.49 1.12Z"/>%0A  <path fill="%23CCC" d="M108.501 59c.298 0 .595.12.823.354.454.468.454 1.23 0 1.698l-2.333 2.4a1.145 1.145 0 0 1-1.65 0 1.226 1.226 0 0 1 0-1.698l2.332-2.4c.228-.234.525-.354.823-.354zm-1.166 10.798h3.499c.641 0 1.166.54 1.166 1.2s-.525 1.2-1.166 1.2h-3.499c-.641 0-1.166-.54-1.166-1.2s.525-1.2 1.166-1.2m-1.982 8.754c.227-.234.525-.354.822-.354h.006c.297 0 .595.12.822.354l2.333 2.4c.454.467.454 1.23 0 1.697a1.146 1.146 0 0 1-1.651 0l-2.332-2.4a1.226 1.226 0 0 1 0-1.697"/>%0A</svg>%0A');
+    height: 96px;
+    width: 128px;
+  }
+}
+.YouTubeError_heading {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: calc(24 / 20);
+  margin: 0;
+}
+.YouTubeError_messages {
+  color: #ccc;
+  font-size: 16px;
+  line-height: calc(24 / 16);
+}
+div.YouTubeError_messages {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+div.YouTubeError_messages p {
+  margin: 0;
+}
+p.YouTubeError_messages {
+  margin: 0;
+}
+ul.YouTubeError_messages li {
+  list-style: disc;
+  margin-left: 24px;
+}
+
+/* pages/duckplayer/app/components/MobileApp.module.css */
+body[data-display=app] {
+  padding: 8px;
+}
+html[data-focus-mode=on]:root .MobileApp_main {
+  --bg-color: transparent;
+}
+.MobileApp_hideInFocus {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .3s, visibility .3s;
+}
+html[data-focus-mode=on] .MobileApp_hideInFocus {
+  opacity: 0;
+  visibility: hidden;
+}
+@keyframes MobileApp_fadeout {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: visible;
+  }
+}
+.MobileApp_filler {
+  display: none;
+}
+.MobileApp_main {
+  --bg-color: #222;
+  --logo-spacing: 185px;
+  --gutter-width: 8px;
+  --outer-radius: 16px;
+  --inner-radius: 12px;
+  --logo-width: 157px;
+  --inner-padding: 8px;
+  --mobile-buttons-padding: 8px;
+  position: relative;
+  max-width: 100vh;
+  margin: 0 auto;
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto;
+  --row-1: 0;
+  --row-2: auto;
+  --row-3: max-content;
+  --row-4: max-content;
+  --row-5: 16px;
+  --row-6: max-content;
+  --row-7: auto;
+  grid-template-rows: var(--row-1) var(--row-2) var(--row-3) var(--row-4) var(--row-5) var(--row-6) var(--row-7);
+  grid-template-areas: "logo" "gap1" "embed" "buttons" "button-gap" "switch" "gap2";
+}
+body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
+  --row-1: 0;
+  --row-2: auto;
+  --row-3: max-content;
+  --row-4: max-content;
+  --row-5: 0;
+  --row-6: 0;
+  --row-7: auto;
+}
+body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
+  background: transparent;
+}
+.MobileApp_embed {
+  background: var(--bg-color);
+  grid-area: embed;
+  padding: calc(var(--inner-padding) / 2);
+  padding-bottom: 0;
+  border-top-left-radius: var(--outer-radius);
+  border-top-right-radius: var(--outer-radius);
+  transition: background-color .3s;
+}
+html[data-focus-mode=on] .MobileApp_embed {
+  transition: none;
+}
+.MobileApp_logo {
+  justify-self: center;
+  grid-area: logo;
+}
+.MobileApp_buttons {
+  grid-area: buttons;
+  padding: var(--inner-padding);
+  background: var(--bg-color);
+  border-bottom-left-radius: var(--outer-radius);
+  border-bottom-right-radius: var(--outer-radius);
+}
+.MobileApp_switch {
+  grid-area: switch;
+  height: 44px;
+}
+.MobileApp_detachedControls {
+  grid-area: detached;
+  display: flex;
+  flex-flow: column;
+  gap: 8px;
+  padding: 8px;
+  background: #2f2f2f;
+  border-radius: 12px;
+}
+@media screen and (min-width: 425px) and (max-height: 600px) {
+  .MobileApp_main {
+    grid-template-rows: max-content auto max-content max-content 12px max-content auto;
+  }
+}
+@media screen and (min-width: 768px) and (min-height: 600px) {
+  .MobileApp_logo {
+    justify-self: unset;
+    background: var(--bg-color);
+    border-bottom-left-radius: var(--outer-radius);
+    display: grid;
+    align-items: center;
+    padding-left: 12px;
+  }
+  .MobileApp_buttons {
+    border-bottom-left-radius: unset;
+  }
+  .MobileApp_main {
+    grid-template-columns: auto minmax(384px, max-content);
+    grid-template-rows: max-content max-content 12px max-content;
+    grid-template-areas: "embed embed" "logo buttons" "button-gap button-gap" "switch switch";
+    align-content: center;
+    max-width: calc(100vh * 1.3);
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
+    grid-template-rows: max-content max-content 0 0;
+  }
+}
+@media screen and (min-width: 900px) and (min-height: 660px) {
+  .MobileApp_logo {
+    justify-self: unset;
+    padding-right: 34px;
+  }
+  .MobileApp_switch {
+    background: var(--bg-color);
+    border-radius: unset;
+    display: grid;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    height: 100%;
+  }
+  .MobileApp_buttons {
+    padding-left: 8px;
+  }
+  .MobileApp_main {
+    grid-template-columns: max-content auto minmax(384px, max-content);
+    grid-template-rows: max-content max-content;
+    grid-template-areas: "embed embed embed" "logo switch buttons";
+    align-content: center;
+    max-width: calc(100vh * 1.3);
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
+    background: var(--bg-color);
+  }
+}
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  :root {
+    --body-padding: 4px;
+    --max-width: calc(100vw - var(--body-padding) * 2);
+  }
+  body[data-display=app] {
+    padding: 0;
+  }
+  .MobileApp_main {
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    grid-template-areas: "embed";
+    max-width: none;
+  }
+  .MobileApp_embed {
+    padding: 0;
+    border-radius: 0;
+    width: 100%;
+    background-color: transparent;
+  }
+  .MobileApp_filler {
+    display: none;
+  }
+  .MobileApp_logo {
+    display: none;
+  }
+  .MobileApp_buttons {
+    display: none;
+  }
+  .MobileApp_switch {
+    display: none;
+  }
+}
+@media screen and (min-width: 1100px) {
+  .MobileApp_switch {
+    justify-content: end;
+  }
+}
+@media screen and (max-width: 599px) {
+  .MobileApp_main[data-youtube-error=true] {
+    --bg-color: transparent;
+    --inner-padding: 4px;
+    grid-template-areas: "logo" "gap3" "embed" "gap4" "switch" "buttons";
+    grid-template-rows: max-content 16px auto 12px max-content max-content;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_embed {
+    background: #2f2f2f;
+    border-radius: var(--outer-radius);
+    padding: 4px;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_switch {
+    background: #2f2f2f;
+    padding: 8px 8px 0 8px;
+    height: 60px;
+    max-height: 60px;
+    border-top-left-radius: var(--outer-radius);
+    border-top-right-radius: var(--outer-radius);
+    transition: all 0.3s;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
+    background: #2f2f2f;
+    padding: 8px;
+    transition: all 0.3s;
+  }
+  .MobileApp_main[data-youtube-error=true]:has([data-state=completed]) .MobileApp_buttons {
+    border-radius: var(--outer-radius);
+  }
+  .MobileApp_main[data-youtube-error=true]:has([data-state=completed]) .MobileApp_switch {
+    background: transparent;
+    max-height: 0;
+  }
+}
+@media screen and (max-width: 599px) and (max-height: 599px) {
+  .MobileApp_main[data-youtube-error=true] {
+    max-width: unset;
+    grid-template-rows: 0 0 auto 12px 0 max-content;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_logo,
+  .MobileApp_main[data-youtube-error=true] .MobileApp_switch {
+    display: none;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
+    border-radius: var(--outer-radius);
+  }
+}
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  .MobileApp_main[data-youtube-error=true] {
+    grid-template-areas: "embed" "buttons" "gap5";
+    grid-template-rows: auto max-content 8px;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
+    border-radius: var(--outer-radius);
+    display: block;
+  }
+}
+@media screen and (max-height: 320px) {
+  .MobileApp_main[data-youtube-error=true] .MobileApp_embed {
+    overflow-y: auto;
+  }
+  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
+    bottom: 0;
+    position: sticky;
+  }
+}
+
+/* pages/duckplayer/app/components/MobileButtons.module.css */
+.MobileButtons_buttons {
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  grid-column-gap: 8px;
+}
+
+/* pages/duckplayer/app/components/DesktopApp.module.css */
+:root {
+  --video-width: 80vw;
+  --outer-radius: 16px;
+  --inner-radius: 8px;
+}
+@media screen and (max-width: 1080px) {
+  :root {
+    --video-width: 85vw;
+  }
+}
+@media screen and (max-width: 740px) {
+  :root {
+    --video-width: 90vw;
+  }
+}
+:root [data-layout=desktop] {
+  --frame-height: min( calc(var(--video-width) * calc(9 / 16)), 80vh ) ;
+}
+:root [data-layout=mobile][data-orientation=portrait] {
+  --video-width: calc(100vw - 32px) ;
+}
+:root [data-layout=mobile][data-orientation=landscape] {
+  --video-width: calc(calc(100vw - 32px) * 0.6) ;
+}
+@media screen and (max-width: 700px) {
+  :root [data-layout=mobile][data-orientation=landscape] {
+    --video-width: calc(calc(100vw - 32px) * 0.5) ;
+  }
+}
+:root [data-layout=mobile] {
+  --frame-height: min( calc(var(--video-width) * calc(9 / 16)), calc(100vh - 32px) ) ;
+}
+.DesktopApp_app {
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  max-width: 3840px;
+  color: rgba(255, 255, 255, 0.85);
+}
+.DesktopApp_portrait {
+  height: 100%;
+  display: grid;
+  align-self: center;
+  grid-template-areas: "header" "main";
+  grid-template-rows: max-content 1fr;
+}
+.DesktopApp_landscape {
+  height: 100%;
+  display: grid;
+  align-self: center;
+  align-items: center;
+  align-content: center;
+}
+.DesktopApp_wrapper {
+}
+.DesktopApp_portrait .DesktopApp_wrapper {
+  grid-area: main;
+  display: grid;
+  grid-template-areas: "main" "controls";
+  grid-template-rows: auto max-content;
+}
+.DesktopApp_landscape .DesktopApp_wrapper {
+  display: grid;
+  grid-template-columns: 60% 1fr;
+  grid-column-gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--outer-radius);
+  padding: 8px;
+}
+@media screen and (max-width: 700px) {
+  .DesktopApp_landscape .DesktopApp_wrapper {
+    grid-template-columns: 50% 1fr;
+  }
+}
+.DesktopApp_desktop {
+  height: 100%;
+  width: var(--video-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.DesktopApp_rhs {
+  display: grid;
+  height: 100%;
+  grid-template-areas: "header" "controls" "switch";
+  grid-template-rows: max-content max-content auto;
+  grid-template-columns: 1fr;
+  grid-row-gap: 12px;
+}
+.DesktopApp_rhs:has([data-state=completed] [aria-checked=true]) {
+  align-content: center;
+}
+.DesktopApp_header {
+  grid-area: header;
+  padding-top: 48px;
+}
+@media screen and (max-height: 500px) {
+  .DesktopApp_header {
+    padding-top: 32px;
+  }
+}
+.DesktopApp_main {
+  align-self: center;
+}
+.DesktopApp_controls {
+  grid-area: controls;
+}
+.DesktopApp_switch {
+  grid-area: switch;
+}
+.DesktopApp_landscape .DesktopApp_header {
+  padding-top: 8px;
+}
+.DesktopApp_landscape .DesktopApp_switch {
+  align-self: end;
+}

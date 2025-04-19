@@ -178,8 +178,8 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
         val isDesktopMode = site?.isDesktopMode ?: false
-        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()}," +
-            "${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
+        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
+            "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {
             return "{$defaultParameters}"
         }
@@ -188,6 +188,7 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
     private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
+    private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 

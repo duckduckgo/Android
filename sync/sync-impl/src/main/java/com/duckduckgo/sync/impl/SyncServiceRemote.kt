@@ -60,6 +60,13 @@ interface SyncApi {
         deviceId: String,
     ): Result<String>
 
+    fun getEncryptedMessage(keyId: String): Result<String>
+
+    fun sendEncryptedMessage(
+        keyId: String,
+        encryptedSecrets: String,
+    ): Result<Boolean>
+
     fun deleteAccount(token: String): Result<Boolean>
 
     fun getDevices(token: String): Result<List<Device>>
@@ -192,6 +199,42 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
+    override fun getEncryptedMessage(keyId: String): Result<String> {
+        Timber.v("Sync-exchange: Looking for exchange for keyId: $keyId")
+        val response = runCatching {
+            val request = syncService.getEncryptedMessage(keyId)
+            request.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val sealed = response.body()?.encryptedMessage.takeUnless { it.isNullOrEmpty() }
+                ?: return@onSuccess Result.Error(reason = "InvitationFlow: empty body")
+            Result.Success(sealed)
+        }
+    }
+
+    override fun sendEncryptedMessage(
+        keyId: String,
+        encryptedSecrets: String,
+    ): Result<Boolean> {
+        val response = runCatching {
+            val shareRecoveryKeyRequest = EncryptedMessage(
+                keyId = keyId,
+                encryptedMessage = encryptedSecrets,
+            )
+            val sendSecretCall = syncService.sendEncryptedMessage(shareRecoveryKeyRequest)
+            sendSecretCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
     override fun deleteAccount(token: String): Result<Boolean> {
         val response = runCatching {
             val deleteAccountCall = syncService.deleteAccount("Bearer $token")
@@ -247,6 +290,7 @@ class SyncServiceRemote @Inject constructor(
         updates: JSONObject,
     ): Result<JSONObject> {
         Timber.i("Sync-service: patch request $updates")
+
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()

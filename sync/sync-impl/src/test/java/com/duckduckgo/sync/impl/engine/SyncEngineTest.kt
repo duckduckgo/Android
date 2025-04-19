@@ -29,16 +29,20 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -56,13 +60,25 @@ internal class SyncEngineTest {
     private val syncStateRepository: SyncStateRepository = mock()
     private val syncPixels: SyncPixels = mock()
     private val syncStore: SyncStore = mock()
+    private val syncOperationErrorRecorder: SyncOperationErrorRecorder = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, syncStore, providerPlugins, persisterPlugins)
+        syncEngine = RealSyncEngine(
+            syncApiClient,
+            syncScheduler,
+            syncStateRepository,
+            syncPixels,
+            syncStore,
+            syncOperationErrorRecorder,
+            providerPlugins,
+            persisterPlugins,
+            lifecyclePlugins,
+        )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
     }
@@ -428,19 +444,6 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenPersistingChangesAndOrphansPresentThenPixelIsSent() {
-        givenLocalChanges()
-        givenGetSuccess()
-        givenPatchSuccess()
-
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(true)))
-
-        syncEngine.triggerSync(FEATURE_READ)
-
-        verify(syncPixels).fireOrphanPresentPixel(any())
-    }
-
-    @Test
     fun whenPatchNewDataFailsBecauseCountLimitThenNotifyFeature() {
         givenLocalChanges()
         givenPatchLimitError()
@@ -476,9 +479,50 @@ internal class SyncEngineTest {
         verify(persisterPluginMock, times(0)).onError(any())
     }
 
+    @Test
+    fun whenSyncTriggeredDailyPixelIsSent() {
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
+        verify(syncPixels).fireDailyPixel()
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithTimestampConflictThenStateIsUpdatedAndPixelIsFired() {
+        givenLocalChangesWithTimestampConflict()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
+        verify(syncPixels).fireDailyPixel()
+        verify(syncOperationErrorRecorder).record(BOOKMARKS.field, TIMESTAMP_CONFLICT)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithOrphansThenStateIsUpdatedAndPixelIsFired() {
+        givenLocalChangesWithOrphansPresent()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
+        verify(syncPixels).fireDailyPixel()
+        verify(syncOperationErrorRecorder).record(BOOKMARKS.field, ORPHANS_PRESENT)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
-        val fakeProviderPlugin = FakeSyncableDataProvider(SyncChangesRequest.empty())
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
     }
@@ -487,10 +531,30 @@ internal class SyncEngineTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakePersisterPlugin = FakeSyncableDataPersister()
-        val fakeProviderPlugin = FakeSyncableDataProvider(localChanges)
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
-            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
+    }
+
+    private fun givenLocalChangesWithTimestampConflict() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
+            .thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
+    }
+
+    private fun givenLocalChangesWithOrphansPresent() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
+            .thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
     private fun givenFirstSyncLocalChanges() {
@@ -500,9 +564,9 @@ internal class SyncEngineTest {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins())
-            .thenReturn(listOf(FakeSyncableDataProvider(firstSyncLocalChanges)))
-            .thenReturn(listOf(FakeSyncableDataProvider(localChanges)))
-            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = firstSyncLocalChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = localChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
     private fun givenGetError() {
@@ -521,7 +585,7 @@ internal class SyncEngineTest {
 
     private fun givenPatchError() {
         whenever(syncApiClient.patch(any())).thenReturn(
-            Result.Error(400, "patch failed"),
+            Result.Error(TOO_MANY_REQUESTS_1.code, "patch failed"),
         )
     }
 

@@ -17,13 +17,16 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.fingerprintprotection.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -37,9 +40,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation JakeWharton.timber
 
@@ -61,4 +61,6 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

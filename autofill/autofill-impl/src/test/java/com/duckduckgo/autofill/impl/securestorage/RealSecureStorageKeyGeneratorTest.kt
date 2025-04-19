@@ -51,11 +51,7 @@ class RealSecureStorageKeyGeneratorTest {
         whenever(derivedKeySecretFactory.getKey(any())).thenReturn(key)
         whenever(legacyDerivedKeySecretFactory.getKey(any())).thenReturn(key)
 
-        testee = RealSecureStorageKeyGenerator(
-            appBuildConfig,
-            { derivedKeySecretFactory },
-            { legacyDerivedKeySecretFactory },
-        )
+        testee = RealSecureStorageKeyGenerator { derivedKeySecretFactory }
     }
 
     @Test
@@ -76,16 +72,6 @@ class RealSecureStorageKeyGeneratorTest {
         val result = testee.generateKeyFromPassword("password", randomBytes)
 
         verify(derivedKeySecretFactory).getKey(any())
-        assertEquals("AES", result.algorithm)
-    }
-
-    @Test
-    fun whenKeyIsGeneratedFromPasswordForSDK25MaterialThenUseLegacyDerivedKeySecretFactoryAndAlgorithmShouldBeAES() {
-        whenever(appBuildConfig.sdkInt).thenReturn(25)
-
-        val result = testee.generateKeyFromPassword("password", randomBytes)
-
-        verify(legacyDerivedKeySecretFactory).getKey(any())
         assertEquals("AES", result.algorithm)
     }
 

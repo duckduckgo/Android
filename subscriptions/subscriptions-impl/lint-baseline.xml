@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="50"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="56"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="62"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="68"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="82"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            line="89"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="30"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="39"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="48"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="57"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="66"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="84"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
+            line="93"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
+            line="199"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
+            line="227"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
+            line="248"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return appBuildConfig.sdkInt >= Build.VERSION_CODES.R"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionsWebViewActivity.kt"
+            line="379"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;320dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_information_remover.xml"
+            line="19"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="                android:screenOrientation=&quot;portrait&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="25"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="                android:screenOrientation=&quot;portrait&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="31"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="                android:screenOrientation=&quot;portrait&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="38"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="                android:screenOrientation=&quot;portrait&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="45"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="                android:screenOrientation=&quot;portrait&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="52"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (878 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M27.759,12.885L28.891,10.927C29.59,9.704 31.15,9.291 32.373,9.991C33.597,10.69 34.009,12.249 33.31,13.472L22.396,32.363H30.29C32.848,32.363 34.282,35.369 33.17,37.452H10.029C8.617,37.452 7.484,36.32 7.484,34.907C7.484,33.495 8.617,32.363 10.029,32.363H16.517L24.823,17.968L22.229,13.465C21.53,12.242 21.942,10.697 23.166,9.984C24.389,9.284 25.934,9.697 26.647,10.92L27.759,12.885ZM17.943,40.074L15.496,44.318C14.797,45.541 13.238,45.954 12.014,45.255C10.791,44.555 10.378,42.996 11.078,41.773L12.895,38.627C14.951,37.991 16.622,38.48 17.943,40.074ZM39.015,32.377H45.636C47.048,32.377 48.18,33.509 48.18,34.921C48.18,36.334 47.048,37.466 45.636,37.466H41.958L44.44,41.773C45.139,42.996 44.727,44.541 43.503,45.255C42.28,45.954 40.735,45.541 40.021,44.318C35.841,37.068 32.702,31.642 30.618,28.028C28.486,24.351 30.01,20.659 31.513,19.408C33.184,22.274 35.68,26.602 39.015,32.377Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_apple_logo.xml"
+            line="41"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1613 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;m251.26,88.6 l3.09,0.8c0.57,0.11 1.14,0.69 1.26,1.26l0.8,3.09c0.23,0.8 0.91,1.26 1.6,1.26 0.8,0 1.49,-0.57 1.6,-1.26l0.8,-3.09c0.11,-0.57 0.69,-1.14 1.26,-1.26l3.09,-0.8c0.8,-0.23 1.26,-0.91 1.26,-1.6 0,-0.8 -0.57,-1.49 -1.26,-1.6l-3.09,-0.8c-0.57,-0.11 -1.14,-0.69 -1.26,-1.26l-0.8,-3.09c-0.23,-0.8 -0.91,-1.26 -1.6,-1.26 -0.8,0 -1.49,0.57 -1.6,1.26l-0.8,3.09c-0.11,0.57 -0.69,1.14 -1.26,1.26l-3.09,0.8c-0.8,0.23 -1.26,0.91 -1.26,1.6 0,0.8 0.57,1.49 1.26,1.6ZM280,137c-1.65,0 -3,1.35 -3,3s1.35,3 3,3 3,-1.35 3,-3 -1.35,-3 -3,-3ZM33.65,162.6l4.05,1.05c0.75,0.15 1.5,0.9 1.65,1.65l1.05,4.05c0.3,1.05 1.2,1.65 2.1,1.65 1.05,0 1.95,-0.75 2.1,-1.65l1.05,-4.05c0.15,-0.75 0.9,-1.5 1.65,-1.65l4.05,-1.05c1.05,-0.3 1.65,-1.2 1.65,-2.1 0,-1.05 -0.75,-1.95 -1.65,-2.1l-4.05,-1.05c-0.75,-0.15 -1.5,-0.9 -1.65,-1.65l-1.05,-4.05c-0.3,-1.05 -1.2,-1.65 -2.1,-1.65 -1.05,0 -1.95,0.75 -2.1,1.65l-1.05,4.05c-0.15,0.75 -0.9,1.5 -1.65,1.65l-4.05,1.05c-1.05,0.3 -1.65,1.2 -1.65,2.1 0,1.05 0.75,1.95 1.65,2.1ZM4.94,108.2l2.31,0.6c0.43,0.09 0.86,0.51 0.94,0.94l0.6,2.31c0.17,0.6 0.69,0.94 1.2,0.94 0.6,0 1.11,-0.43 1.2,-0.94l0.6,-2.31c0.09,-0.43 0.51,-0.86 0.94,-0.94l2.31,-0.6c0.6,-0.17 0.94,-0.69 0.94,-1.2 0,-0.6 -0.43,-1.11 -0.94,-1.2l-2.31,-0.6c-0.43,-0.09 -0.86,-0.51 -0.94,-0.94l-0.6,-2.31c-0.17,-0.6 -0.69,-0.94 -1.2,-0.94 -0.6,0 -1.11,0.43 -1.2,0.94l-0.6,2.31c-0.09,0.43 -0.51,0.86 -0.94,0.94l-2.31,0.6c-0.6,0.17 -0.94,0.69 -0.94,1.2 0,0.6 0.43,1.11 0.94,1.2ZM316,113c-1.65,0 -3,1.35 -3,3s1.35,3 3,3 3,-1.35 3,-3 -1.35,-3 -3,-3ZM48.5,67a2.51,2.51 0,0 0,-2.5 2.5c0,1.38 1.13,2.5 2.5,2.5s2.5,-1.13 2.5,-2.5 -1.13,-2.5 -2.5,-2.5Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_information_remover.xml"
+            line="24"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1107 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M60.67,74.67L60.67,74.67C60.48,74.56 60.29,74.46 60.09,74.35C53.24,70.65 46.7,67.12 42.67,60.7C38.94,54.74 36.89,46.01 37,31.23C37.01,30.49 37.33,29.87 37.93,29.39C38.58,28.87 39.39,28.66 40.05,28.75C44.3,29.32 47.83,29.16 51.03,28.07C54.23,26.97 57.08,24.95 59.97,21.85C61.03,20.71 62.93,20.72 63.98,21.86C66.91,25.05 69.8,27.07 73.04,28.14C76.24,29.19 79.75,29.31 83.95,28.74C84.61,28.65 85.42,28.86 86.07,29.38C86.67,29.86 86.99,30.49 87,31.23C87.11,46.01 85.06,54.74 81.33,60.7C77.3,67.12 70.76,70.65 63.91,74.35C63.71,74.46 63.52,74.56 63.33,74.67L63.33,74.67C62.51,75.11 61.49,75.11 60.67,74.67ZM65.71,79.06C63.4,80.31 60.6,80.31 58.29,79.07C57.99,78.9 57.68,78.73 57.37,78.57C50.79,75.02 43.18,70.92 38.43,63.35C33.95,56.2 31.88,46.32 32.01,31.19C32.04,26.42 36.51,23.22 40.72,23.79C44.49,24.3 47.18,24.09 49.41,23.33C51.63,22.58 53.81,21.13 56.31,18.44C59.35,15.18 64.64,15.18 67.66,18.47C70.19,21.22 72.39,22.66 74.61,23.39C76.84,24.13 79.52,24.3 83.27,23.79C87.48,23.22 91.96,26.42 92,31.19C92.12,46.32 90.05,56.2 85.57,63.35C80.82,70.92 73.21,75.02 66.63,78.57C66.32,78.73 66.01,78.9 65.71,79.06Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_privacy_pro_settings_hero.xml"
+            line="53"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (981 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M30.688,16C30.688,24.112 24.112,30.688 16,30.688C7.888,30.688 1.313,24.112 1.313,16C1.313,7.888 7.888,1.313 16,1.313C24.112,1.313 30.688,7.888 30.688,16ZM12.572,28.996C12.166,27.743 11.032,24.109 9.912,19.516C9.875,19.363 9.837,19.211 9.8,19.059L9.799,19.056C8.443,13.517 7.335,8.993 13.406,7.571C13.462,7.558 13.489,7.492 13.452,7.448C12.755,6.622 11.451,6.351 9.801,6.92C9.733,6.944 9.674,6.876 9.716,6.818C10.04,6.372 10.672,6.029 10.984,5.878C11.049,5.847 11.045,5.753 10.976,5.732C10.772,5.668 10.425,5.57 10.034,5.507C9.941,5.492 9.933,5.333 10.026,5.321C12.365,5.006 14.807,5.708 16.033,7.252C16.044,7.267 16.061,7.277 16.079,7.281C20.567,8.245 20.889,15.34 20.372,15.663C20.27,15.726 19.943,15.69 19.512,15.642C17.766,15.446 14.308,15.059 17.162,20.378C17.19,20.431 17.153,20.5 17.094,20.51C15.49,20.759 17.532,25.768 19.047,29.091C25,27.71 29.438,22.373 29.438,16C29.438,8.579 23.421,2.563 16,2.563C8.579,2.563 2.563,8.579 2.563,16C2.563,22.237 6.811,27.481 12.572,28.996Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_subs_toolbar_logo.xml"
+            line="15"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="Custom view ``OneLineListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
+        errorLine1="        binding.subscriptionSetting.setOnTouchListener(null)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
+            line="105"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="Custom view ``CheckListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
+        errorLine1="        binding.subscriptionBuy.setOnTouchListener(null)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
+            line="107"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="Custom view ``DaxTextView`` has `setOnTouchListener` called on it but does not override `performClick`"
+        errorLine1="        binding.subscriptionGet.setOnTouchListener(null)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
+            line="109"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="Custom view ``OneLineListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
+        errorLine1="        binding.subscriptionRestore.setOnTouchListener(null)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
+            line="110"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_subscription_settings.xml"
+            line="40"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_subscription_settings.xml"
+            line="65"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_subscription_settings.xml"
+            line="91"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;@dimen/keyline_2&quot;` to better support right-to-left layouts"
+        errorLine1="                android:layout_marginLeft=&quot;@dimen/keyline_2&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_restore_subscription.xml"
+            line="87"
+            column="17"/>
+    </issue>
+
+</issues>

@@ -37,12 +37,18 @@ class AppRemoteMessagingRepository(
     private val messageMapper: MessageMapper,
 ) : RemoteMessagingRepository {
 
+    override fun getMessageById(id: String): RemoteMessage? {
+        return remoteMessagesDao.messagesById(id)?.let {
+            messageMapper.fromMessage(it.message)
+        }
+    }
+
     override fun activeMessage(message: RemoteMessage?) {
         if (message == null) {
-            remoteMessagesDao.deleteActiveMessages()
+            remoteMessagesDao.updateActiveMessageStateAndDeleteNeverShownMessages()
         } else {
             val stringMessage = messageMapper.toString(message)
-            remoteMessagesDao.newMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
+            remoteMessagesDao.addOrUpdateActiveMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
         }
     }
 
@@ -51,6 +57,20 @@ class AppRemoteMessagingRepository(
     override fun markAsShown(remoteMessage: RemoteMessage) {
         val message = remoteMessagesDao.messagesById(remoteMessage.id) ?: return
         remoteMessagesDao.insert(message.copy(shown = true))
+    }
+
+    override fun message(): RemoteMessage? {
+        val message = remoteMessagesDao.message()
+        if (message == null || message.message.isEmpty()) return null
+
+        val remoteMessage = messageMapper.fromMessage(message.message) ?: return null
+        RemoteMessage(
+            id = message.id,
+            content = remoteMessage.content,
+            emptyList(),
+            emptyList(),
+        )
+        return remoteMessage
     }
 
     override fun messageFlow(): Flow<RemoteMessage?> {

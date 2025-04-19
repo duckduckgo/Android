@@ -20,9 +20,10 @@ import android.annotation.SuppressLint
 import android.os.Build
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.Type.DESKTOP
-import com.duckduckgo.sync.impl.Type.MOBILE
-import com.duckduckgo.sync.impl.Type.UNKNOWN
+import com.duckduckgo.sync.api.DeviceSyncState.Type
+import com.duckduckgo.sync.api.DeviceSyncState.Type.DESKTOP
+import com.duckduckgo.sync.api.DeviceSyncState.Type.MOBILE
+import com.duckduckgo.sync.api.DeviceSyncState.Type.UNKNOWN
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -93,11 +94,4 @@ fun Type.asDrawableRes(): Int {
         UNKNOWN -> R.drawable.ic_device_mobile_24
         DESKTOP -> R.drawable.ic_device_desktop_24
     }
-}
-
-enum class Type {
-    MOBILE,
-    UNKNOWN,
-    DESKTOP,
-    ;
 }

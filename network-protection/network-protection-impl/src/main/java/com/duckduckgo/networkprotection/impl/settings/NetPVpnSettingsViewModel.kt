@@ -29,7 +29,8 @@ import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.DisplayablePreferredLocationProvider
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.snooze.VpnDisableOnCall
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -43,14 +44,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetPVpnSettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val displayablePreferredLocationProvider: DisplayablePreferredLocationProvider,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val networkProtectionState: NetworkProtectionState,
+    private val vpnDisableOnCall: VpnDisableOnCall,
+    private val networkProtectionPixels: NetworkProtectionPixels,
     @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -66,11 +69,13 @@ class NetPVpnSettingsViewModel @Inject constructor(
         replay = 1,
         onBufferOverflow = DROP_OLDEST,
     )
+
     internal fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
     internal data class ViewState(
-        val preferredLocation: String? = null,
         val excludeLocalNetworks: Boolean = false,
+        val pauseDuringWifiCalls: Boolean = false,
+        val vpnNotifications: Boolean = false,
     )
 
     init {
@@ -83,12 +88,22 @@ class NetPVpnSettingsViewModel @Inject constructor(
         return _recommendedSettingsState.distinctUntilChanged()
     }
 
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        networkProtectionPixels.reportVpnSettingsShown()
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             val excludeLocalRoutes = netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()
-            val location = displayablePreferredLocationProvider.getDisplayablePreferredLocation()
-            _viewState.emit(_viewState.value.copy(preferredLocation = location, excludeLocalNetworks = excludeLocalRoutes))
+            _viewState.emit(
+                _viewState.value.copy(
+                    excludeLocalNetworks = excludeLocalRoutes,
+                    pauseDuringWifiCalls = vpnDisableOnCall.isEnabled(),
+                    vpnNotifications = netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled(),
+                ),
+            )
         }
     }
 
@@ -113,10 +128,25 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal fun onExcludeLocalRoutes(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val oldValue = _viewState.value.excludeLocalNetworks
-            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(enable = enabled))
+            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(enable = enabled))
             _viewState.emit(_viewState.value.copy(excludeLocalNetworks = enabled))
             shouldRestartVpn.set(enabled != oldValue)
         }
+    }
+
+    internal fun onEnablePauseDuringWifiCalls() {
+        networkProtectionPixels.reportEnabledPauseDuringCalls()
+        vpnDisableOnCall.enable()
+    }
+
+    internal fun onDisablePauseDuringWifiCalls() {
+        networkProtectionPixels.reportDisabledPauseDuringCalls()
+        vpnDisableOnCall.disable()
+    }
+
+    fun onVPNotificationsToggled(checked: Boolean) {
+        logcat { "VPN alert notification settings set to $checked" }
+        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(enable = checked))
     }
 
     data class RecommendedSettings(val isIgnoringBatteryOptimizations: Boolean)

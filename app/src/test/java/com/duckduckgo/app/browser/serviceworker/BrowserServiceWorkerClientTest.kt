@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.serviceworker
 
 import android.webkit.WebResourceRequest
+import androidx.core.net.toUri
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -50,7 +51,7 @@ class BrowserServiceWorkerClientTest {
 
         testee.shouldInterceptRequest(webResourceRequest)
 
-        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
+        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com".toUri())
     }
 
     @Test
@@ -60,7 +61,7 @@ class BrowserServiceWorkerClientTest {
 
         testee.shouldInterceptRequest(webResourceRequest)
 
-        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
+        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com".toUri())
     }
 
     @Test

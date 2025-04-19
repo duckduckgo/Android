@@ -33,7 +33,7 @@ interface SitePermissionsAllowedDao {
     fun getAllSitesPermissionsAllowedAsFlow(): Flow<List<SitePermissionAllowedEntity>>
 
     @Query("select * from site_permission_allowed where domain = :domain and tabId = :tabId and permissionAllowed = :permissionAllowed")
-    fun getSitePermissionAllowed(domain: String, tabId: String, permissionAllowed: String): SitePermissionAllowedEntity?
+    suspend fun getSitePermissionAllowed(domain: String, tabId: String, permissionAllowed: String): SitePermissionAllowedEntity?
 
     @Delete
     fun delete(sitePermissionsEntity: SitePermissionAllowedEntity): Int

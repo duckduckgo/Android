@@ -21,6 +21,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.content.IntentCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -42,7 +43,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val fireAnimationSerializable = intent.getSerializableExtra(FIRE_ANIMATION_EXTRA)
+        val fireAnimationSerializable = IntentCompat.getSerializableExtra(intent, FIRE_ANIMATION_EXTRA, FireAnimation::class.java)
 
         if (fireAnimationSerializable == null) finish()
 

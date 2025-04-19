@@ -22,12 +22,12 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncConnectActivity
 
-internal class ConnectFlowContract : ActivityResultContract<Void?, Boolean>() {
+internal class ConnectFlowContract : ActivityResultContract<ConnectFlowContractInput, Boolean>() {
     override fun createIntent(
         context: Context,
-        input: Void?,
+        input: ConnectFlowContractInput,
     ): Intent {
-        return SyncConnectActivity.intent(context)
+        return SyncConnectActivity.intent(context, input.launchSource)
     }
 
     override fun parseResult(
@@ -37,3 +37,5 @@ internal class ConnectFlowContract : ActivityResultContract<Void?, Boolean>() {
         return resultCode == Activity.RESULT_OK
     }
 }
+
+internal data class ConnectFlowContractInput(val launchSource: String? = null)

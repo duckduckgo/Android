@@ -19,6 +19,7 @@ package com.duckduckgo.voice.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
@@ -66,7 +67,8 @@ object VoiceSearchModule {
         database: VoiceSearchDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): VoiceSearchFeatureRepository {
-        return RealVoiceSearchFeatureRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealVoiceSearchFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

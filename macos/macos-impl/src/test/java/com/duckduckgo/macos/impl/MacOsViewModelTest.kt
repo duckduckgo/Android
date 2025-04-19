@@ -20,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
@@ -39,18 +41,21 @@ class MacOsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
+    private var macOsDownloadLinkOrigin = FakeFeatureToggleFactory.create(MacOsDownloadLinkOrigin::class.java)
+
     private lateinit var testee: MacOsViewModel
 
     @Before
     fun before() {
-        testee = MacOsViewModel(mockPixel)
+        testee = MacOsViewModel(mockPixel, macOsDownloadLinkOrigin)
     }
 
     @Test
     fun whenOnShareClickedAndInviteCodeExistsThenEmitCommandShareInviteCodeWithCorrectCode() = runTest {
+        macOsDownloadLinkOrigin.self().setRawStoredState(State(enable = true))
         testee.commands.test {
             testee.onShareClicked()
-            assertEquals(ShareLink, awaitItem())
+            assertEquals(ShareLink(true), awaitItem())
         }
     }
 

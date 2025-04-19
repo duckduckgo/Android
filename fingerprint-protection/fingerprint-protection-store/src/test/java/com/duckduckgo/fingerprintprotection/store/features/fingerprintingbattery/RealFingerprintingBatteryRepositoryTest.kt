@@ -51,6 +51,7 @@ class RealFingerprintingBatteryRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingBatteryDao).get()
@@ -66,6 +67,7 @@ class RealFingerprintingBatteryRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingBatteryDao).get()
@@ -80,6 +82,7 @@ class RealFingerprintingBatteryRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(fingerprintingBatteryEntity)

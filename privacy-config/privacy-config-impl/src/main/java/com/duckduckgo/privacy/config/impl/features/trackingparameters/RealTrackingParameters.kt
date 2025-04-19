@@ -18,8 +18,9 @@ package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.replaceQueryParameters
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
@@ -61,32 +62,66 @@ class RealTrackingParameters @Inject constructor(
         if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName.value)) return null
         if (isAnException(initiatingUrl, url)) return null
 
-        val trackingParameters = trackingParametersRepository.parameters
+        val parsedUri = Uri.parse(url)
 
-        val uri = Uri.parse(url)
+        // In some instances, particularly with ads, the query may represent a different URL (without encoding),
+        // making it difficult to detect accurately.
+        val query = parsedUri.query
+        val queryUri = query?.toUri()
 
-        try {
-            val queryParameters = uri.queryParameterNames
-
-            if (queryParameters.isEmpty()) {
-                return null
-            }
-            val preservedParameters = getPreservedParameters(queryParameters, trackingParameters)
-            if (preservedParameters.size == queryParameters.size) {
-                return null
-            }
-            val cleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
-
-            lastCleanedUrl = cleanedUrl
-
-            return cleanedUrl
-        } catch (exception: UnsupportedOperationException) {
-            Timber.e("Tracking Parameter Removal: ${exception.message}")
-            return null
+        return if (queryUri?.isValid() == true) {
+            cleanQueryUriParameters(url, query, queryUri)
+        } else {
+            cleanParsedUriParameters(parsedUri)
         }
     }
 
-    private fun getPreservedParameters(
+    private fun cleanParsedUriParameters(uri: Uri): String? {
+        return cleanUri(uri) { cleanedUrl ->
+            cleanedUrl
+        }
+    }
+
+    private fun cleanQueryUriParameters(url: String, query: String, queryUri: Uri): String? {
+        return cleanUri(queryUri) { interimCleanedUrl ->
+            url.replace(query, interimCleanedUrl)
+        }
+    }
+
+    private fun cleanUri(uri: Uri, buildCleanedUrl: (String) -> String): String? {
+        val trackingParameters = trackingParametersRepository.parameters
+
+        return try {
+            val preservedParameters = getPreservedParameters(uri, trackingParameters) ?: return null
+            val interimCleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
+            val cleanedUrl = buildCleanedUrl(interimCleanedUrl)
+
+            lastCleanedUrl = cleanedUrl
+            cleanedUrl
+        } catch (exception: UnsupportedOperationException) {
+            Timber.e("Tracking Parameter Removal: ${exception.message}")
+            null
+        }
+    }
+
+    private fun getPreservedParameters(uri: Uri, trackingParameters: List<String>): List<String>? {
+        val queryParameters = uri.queryParameterNames
+        if (queryParameters.isEmpty()) {
+            return null
+        }
+        val preservedParameters = filterNonTrackingParameters(queryParameters, trackingParameters)
+        return if (preservedParameters.size == queryParameters.size) {
+            null
+        } else {
+            preservedParameters
+        }
+    }
+
+    private fun Uri?.isValid(): Boolean {
+        return this?.isAbsolute == true && this.isHierarchical
+    }
+
+    private fun filterNonTrackingParameters(
         queryParameters: MutableSet<String>,
         trackingParameters: List<String>,
     ) =

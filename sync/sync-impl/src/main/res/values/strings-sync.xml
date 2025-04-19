@@ -16,7 +16,7 @@
 
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
     <string name="sync_flows_disabled_new_version"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
@@ -25,14 +25,18 @@
     <string name="sync_disabled_authenticated_user"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
     <string name="sync_paused_notification"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
+    <string name="sync_error_notification"><b>Sync Error</b>\nSync &amp; Backup is temporarily unavailable.</string>
+    <string name="sync_error_warning"><b>Sync Error</b>\nSync &amp; Backup is temporarily unavailable.</string>
+    <string name="sync_signed_out_notification"><b>Sync is Paused</b>\nSync has been paused. If you want to continue syncing this device, reconnect using another device or your recovery code.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="sync_setup_begin_syncing">Begin Syncing</string>
-    <string name="sync_setup_with_another_device_cta_title">Sync with Another Device</string>
+    <string name="sync_setup_with_another_device_cta_title">Sync With Another Device</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
     <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
     <string name="sync_setup_single_device_title">Single-Device Setup</string>
+    <string name="sync_setup_other_options_title">Other Options</string>
     <string name="sync_setup_single_recover_data_cta_title">Recover Synced Data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sync and Back Up This Device</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
     <string name="sync_enable_connecting">Connecting…</string>
     <string name="sync_intro_enable_title">Sync and Back Up This Device</string>
-    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.…</string>
+    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.</string>
     <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
     <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
     <string name="sync_intro_recover_title">Recover Synced Data</string>
@@ -61,7 +65,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync with Another Device.\"</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync With Another Device.\"</string>
     <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
     <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.</string>
@@ -83,7 +87,7 @@
     <string name="sync_code_box_description">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
 
     <!-- Device synced screen -->
-    <string name="sync_connected_device_title">Your Data is Synced!</string>
+    <string name="sync_connected_device_title">Your data is synced!</string>
     <string name="sync_connected_device_primary_button">Done</string>
 
     <string name="show_qr_screen_title">Show QR Code</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sync</string>
     <string name="sync_notify_me_title">Notifications are disabled</string>
     <string name="sync_notify_me_description">Get notified in the event Sync &amp; Backup encounters an error.</string>
-    <string name="sync_rollout_banner_text">Sync &amp; Backup is rolling out gradually and may not be available yet within DuckDuckGo on your other devices</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Unable to turn Sync &amp; Backup off.</string>
+    <string name="sync_edit_device_error">Unable to update the device name.</string>
+    <string name="sync_remove_device_error">Unable to remove this device from Sync &amp; Backup.</string>
+    <string name="sync_delete_data_error">Unable to delete data on the server.</string>
+    <string name="sync_login_authenticated_device_error">To pair these devices, turn off Sync &amp; Backup on one device then tap "Sync with Another Device" on the other device.</string>
+    <string name="sync_connect_generic_error">Unable to connect to the server.</string>
+    <string name="sync_connect_login_error">Unable to Sync with another device.</string>
+    <string name="sync_create_account_generic_error">Unable to connect to the server.</string>
+    <string name="sync_invalid_code_error">Sorry, this code is invalid. Please make sure the correct code was entered or scanned.</string>
+    <string name="sync_recovery_pdf_error">Unable to create the recovery PDF.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sync &amp; Backup</string>
+    <string name="sync_encryption_not_supported_error_title">Device not supported</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup is end-to-end encrypted, and needs to be able to encrypt and store data on your device. Because your device does not support encrypted storage, Sync &amp; Backup is unavailable.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Unlock device to access Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup Locked</string>
+    <string name="sync_require_device_passcode_dialog_title">Secure your device to use Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">A device lock pattern, PIN, or biometrics is required to use Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Go to Settings</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Delete server data?</string>
+    <string name="sync_delete_server_data_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Delete Data</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Cancel</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sync &amp; Back Up Your Passwords</string>
+    <string name="syncPromoSubtitlePasswords">No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.</string>
+
+    <string name="syncPromoTitleBookmarks">Sync &amp; Back Up Your Bookmarks</string>
+    <string name="syncPromoSubtitleBookmarks">No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us.</string>
+
+    <string name="syncPromoPrimaryButton">Set Up Sync</string>
+    <string name="syncPromoSecondaryButton">No Thanks</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Get DuckDuckGo on Other Devices</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Get DuckDuckGo on other devices to sync with this one</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Get DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">To download DuckDuckGo on desktop or another mobile device, visit:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Share Download Link</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copied</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Switch to a different Sync?</string>
+    <string name="sync_dialog_switch_account_primary_button">Switch Sync</string>
+    <string name="sync_dialog_switch_account_secondary_button">Cancel</string>
+    <string name="sync_dialog_switch_account_description">This device is already synced, are you sure you want to sync it with a different back up or device? Switching won\'t remove any data already synced to this device.</string>
 </resources>

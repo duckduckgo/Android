@@ -34,6 +34,7 @@ import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
@@ -41,6 +42,8 @@ import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -53,8 +56,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesRepositoryTest {
@@ -80,9 +81,17 @@ class SavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDisplayModeSettings,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutineRule.testDispatcherProvider,
         )
-        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesDelegate, coroutineRule.testDispatcherProvider)
+        val relationsReconciler = MissingEntitiesRelationReconciler(savedSitesEntitiesDao)
+        repository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            relationsReconciler,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @After

@@ -38,7 +38,7 @@ interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-        lastModified: String,
+        clientModifiedSince: String,
     ): SyncMergeResult
 }
 
@@ -55,9 +55,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-        lastModified: String,
+        clientModifiedSince: String,
     ): SyncMergeResult {
         var orphans = false
+        var timestampConflict = false
 
         val processIds: MutableList<String> = mutableListOf(SavedSitesNames.BOOKMARKS_ROOT)
         val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
@@ -80,27 +81,39 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         // check all children, the ones that are not in allFolders don't have a parent
         val foldersWithoutParent = allFolderIds.filterNot { allChildren.contains(it) }
         foldersWithoutParent.forEach { folderId ->
-            if (savedSitesRepository.getFolder(folderId) != null) {
+            val folder = savedSitesRepository.getFolder(folderId)
+            if (folder != null) {
                 processIds.add(folderId)
             }
-            processFolder(folderId, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.entries, lastModified, processIds, conflictResolution)
+            if (folder != null && folder.modifiedAfter(clientModifiedSince) && conflictResolution != DEDUPLICATION) {
+                Timber.d("Sync-Bookmarks: Timestamp conflict found for folder $folderId")
+                timestampConflict = true
+            } else {
+                processFolder(folderId, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.entries, clientModifiedSince, processIds, conflictResolution)
+            }
         }
 
         // 2. All bookmarks without a parent in the payload
         val allBookmarkIds = bookmarks.entries.filter { it.isBookmark() }.map { it.id }
         val bookmarksWithoutParent = allBookmarkIds.filterNot { allChildren.contains(it) }
         bookmarksWithoutParent.forEach { bookmarkId ->
-            if (savedSitesRepository.getSavedSite(bookmarkId) != null) {
+            val savedSite = savedSitesRepository.getSavedSite(bookmarkId)
+            if (savedSite != null) {
                 processIds.add(bookmarkId)
             }
-            processChild(
-                conflictResolution,
-                bookmarkId,
-                processIds,
-                bookmarks.entries,
-                SavedSitesNames.BOOKMARKS_ROOT,
-                lastModified,
-            )
+            if (savedSite != null && savedSite.modifiedAfter(clientModifiedSince) && conflictResolution != DEDUPLICATION) {
+                Timber.d("Sync-Bookmarks: Timestamp conflict found for bookmark $bookmarkId, skipping entry")
+                timestampConflict = true
+            } else {
+                processChild(
+                    conflictResolution,
+                    bookmarkId,
+                    processIds,
+                    bookmarks.entries,
+                    SavedSitesNames.BOOKMARKS_ROOT,
+                    clientModifiedSince,
+                )
+            }
         }
 
         // 3. All objects deleted in the root
@@ -142,7 +155,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             orphans = true
         }
 
-        return SyncMergeResult.Success(orphans = orphans)
+        return SyncMergeResult.Success(orphans = orphans, timestampConflict = timestampConflict)
     }
 
     private fun processFolder(

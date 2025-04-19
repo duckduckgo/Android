@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -39,6 +40,10 @@ interface TabRepository {
     val flowDeletableTabs: Flow<List<TabEntity>>
 
     val liveSelectedTab: LiveData<TabEntity>
+
+    val flowSelectedTab: Flow<TabEntity?>
+
+    val tabSwitcherData: Flow<TabSwitcherData>
 
     /**
      * @return tabId of new record
@@ -66,6 +71,10 @@ interface TabRepository {
         site: Site?,
     )
 
+    suspend fun updateTabPosition(from: Int, to: Int)
+
+    suspend fun updateTabLastAccess(tabId: String)
+
     /**
      * @return record if it exists, otherwise a new one
      */
@@ -75,18 +84,30 @@ interface TabRepository {
 
     suspend fun markDeletable(tab: TabEntity)
 
+    suspend fun markDeletable(tabIds: List<String>)
+
     suspend fun undoDeletable(tab: TabEntity)
+
+    suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean = false)
+
+    suspend fun deleteTabs(tabIds: List<String>)
 
     /**
      * Deletes from the DB all tabs that are marked as "deletable"
      */
     suspend fun purgeDeletableTabs()
 
+    suspend fun getDeletableTabIds(): List<String>
+
     suspend fun deleteTabAndSelectSource(tabId: String)
 
     suspend fun deleteAll()
 
+    suspend fun getSelectedTab(): TabEntity?
+
     suspend fun select(tabId: String)
+
+    suspend fun getTab(tabId: String): TabEntity?
 
     fun updateTabPreviewImage(
         tabId: String,
@@ -99,4 +120,23 @@ interface TabRepository {
     )
 
     suspend fun selectByUrlOrNewTab(url: String)
+
+    suspend fun getTabId(url: String): String?
+
+    suspend fun setIsUserNew(isUserNew: Boolean)
+
+    suspend fun setTabLayoutType(layoutType: LayoutType)
+
+    suspend fun getTabs(): List<TabEntity>
+
+    fun getOpenTabCount(): Int
+
+    /**
+     * Returns the number of tabs, given a range of days within which the tab was last accessed.
+     *
+     * @param accessOlderThan the minimum number of days (exclusive) since the tab was last accessed
+     * @param accessNotMoreThan the maximum number of days (inclusive) since the tab was last accessed (optional)
+     * @return the number of tabs that are inactive
+     */
+    fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
 }

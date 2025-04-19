@@ -27,6 +27,9 @@
     <string name="tab_title_component_messaging" translatable="false">Messaging</string>
     <string name="tab_title_component_list_items" translatable="false">List items</string>
     <string name="tab_title_component_others" translatable="false">Others</string>
+    <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
+    <string name="ads_demo_header_title" translatable="false">Android Design System</string>
+
 
     <!--Components-->
     <string name="text_headline" translatable="false">Headline</string>
@@ -46,6 +49,10 @@
     <string name="text_dialog_positive" translatable="false">Keep using</string>
     <string name="text_dialog_negative" translatable="false">Negative</string>
     <string name="text_dialog_option" translatable="false">Option</string>
+    <string name="text_dialog_checkbox" translatable="false">Remember my choice</string>
+    <string name="dax_one_line_list_item_html_primary_text"><![CDATA[Item with <b>HTML tags</b> and <b>truncated</b> text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.]]></string>
+    <string name="dax_list_item_html_primary_text"><![CDATA[<b>Two Line</b> Item]]></string>
+    <string name="dax_list_item_html_secondary_text"><![CDATA[With HTML tags in <b>primary</b> and <b>secondary</b> text]]></string>
 
     <!-- Defaults Searchbar -->
     <string name="searchbar_cleartextaction_content_description_default" translatable="false">Collapse</string>

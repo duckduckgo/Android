@@ -31,6 +31,7 @@ class VpnPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             VPN_PIXEL_PREFIX to PixelParameter.removeAtb(),
             "m_atp_unprotected_apps_bucket_" to PixelParameter.removeAll(),
             "m_vpn_ev_moto_g_fix_" to PixelParameter.removeAll(),
+            ATP_PPRO_UPSELL_PREFIX to PixelParameter.removeAtb(),
         )
     }
 
@@ -38,5 +39,6 @@ class VpnPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
         private const val ATP_PIXEL_PREFIX = "m_atp_"
         private const val NETP_PIXEL_PREFIX = "m_netp_"
         private const val VPN_PIXEL_PREFIX = "m_vpn_"
+        private const val ATP_PPRO_UPSELL_PREFIX = "m_atp_ppro-upsell"
     }
 }

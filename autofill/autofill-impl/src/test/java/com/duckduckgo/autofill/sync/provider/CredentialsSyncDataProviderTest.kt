@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
@@ -27,10 +28,11 @@ import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
-import com.duckduckgo.autofill.sync.FakeSecureStorage
+import com.duckduckgo.autofill.sync.SyncFakeSecureStorage
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.api.engine.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -50,10 +52,17 @@ internal class CredentialsSyncDataProviderTest {
     val coroutineRule = CoroutineTestRule()
 
     private val db = inMemoryAutofillDatabase()
-    private val secureStorage = FakeSecureStorage()
+    private val secureStorage = SyncFakeSecureStorage()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
     private val credentialsSyncStore = FakeCredentialsSyncStore()
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeFeatureToggleFactory.create(CredentialsSyncLocalValidationFeature::class.java),
+        FakePasswordStoreEventPlugin(),
+    )
     private val appBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.flavor).thenReturn(BuildFlavor.PLAY)
     }

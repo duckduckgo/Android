@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\'%1$s\' wil je DRM-software openen</string>
+    <string name="drmSiteDialogSubtitle">Digital Rights Management-software is nodig om beveiligde mediacontent af te spelen, maar biedt ook toegang tot apparaatherkenners. Geef alleen toestemming aan sites die je vertrouwt met deze gegevens. Je kunt de machtigingen op elk moment beheren in de instellingen. <annotation type="drm_learn_more_link">Meer informatie</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Altijd</string>
+    <string name="drmSiteDialogAllowOnce">Alleen voor deze sessie</string>
+    <string name="drmSiteDialogDenyAlways">Altijd weigeren</string>
+    <string name="drmSiteDialogDenyOnce">Weigeren voor deze sessie</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\'%1$s\' wil toegang tot je locatie</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Mijn keuze onthouden</string>
+    <string name="preciseLocationDDGDialogSubtitle">We gebruiken je anonieme locatie alleen om betere resultaten bij je in de buurt aan te bieden. De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
+    <string name="preciseLocationSiteDialogSubtitle">De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">DuckDuckGo toestaan om toegang tot de locatie op dit apparaat te vragen</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Sites kunnen je locatie alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">DuckDuckGo toestaan om toegang tot locatie te vragen</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Sitetoestemmingen</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Je kunt de toegangsrechten voor microfoon en camera die je aan individuele sites hebt verleend, beheren in Instellingen.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Je kunt de toegangsrechten voor microfoon die je aan individuele sites hebt verleend, beheren in Instellingen.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Je kunt de toegangsrechten voor camera die je aan individuele sites hebt verleend, beheren in Instellingen.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\'%1$s\' wil toegang tot de camera en microfoon</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\'%1$s\' wil toegang tot de microfoon</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\'%1$s\' wil toegang tot de camera</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites kunnen je camera en microfoon alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Open Instellingen</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Annuleren</string>
+
+    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen toegang vragen tot de software, je camera, je microfoon of DRM (Digital Rights Management) op je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>
+    <string name="sitePermissionsSettingsLocation">Locatie</string>
+    <string name="sitePermissionsSettingsCamera">Camera</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfoon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Sites beheren</string>
+    <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Toestemmingen verwijderd voor alle sites</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Toestemmingen voor \'%1$s\' </string>
+    <string name="permissionsPerWebsiteAskSetting">Elke keer vragen</string>
+    <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
+    <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Uitgeschakeld voor alle sites</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Toestemming voor %1$s voor %2$s</string>
+
 </resources>

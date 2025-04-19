@@ -24,11 +24,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.recursiveEnable
@@ -49,7 +50,7 @@ abstract class DaxListItem(
     internal abstract val leadingIconContainer: View
     internal abstract val trailingIcon: ImageView
     internal abstract val trailingIconContainer: View
-    internal abstract val trailingSwitch: SwitchView
+    internal abstract val trailingSwitch: DaxSwitch
     internal abstract val betaPill: ImageView?
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
@@ -59,8 +60,23 @@ abstract class DaxListItem(
         itemContainer.setOnClickListener { onClick() }
     }
 
+    /** Sets the item long click listener */
+    fun setLongClickListener(onClick: () -> Unit) {
+        itemContainer.setOnLongClickListener {
+            onClick()
+            true
+        }
+    }
+
+    /** Sets the item click listener */
+    fun removeLongClickListener() {
+        itemContainer.setOnLongClickListener {
+            false
+        }
+    }
+
     /** Sets the primary text title */
-    fun setPrimaryText(title: String?) {
+    fun setPrimaryText(title: CharSequence?) {
         primaryText.text = title
     }
 
@@ -85,7 +101,7 @@ abstract class DaxListItem(
     }
 
     /** Sets the secondary text title */
-    fun setSecondaryText(title: String?) {
+    fun setSecondaryText(title: CharSequence?) {
         secondaryText?.text = title
     }
 
@@ -134,10 +150,34 @@ abstract class DaxListItem(
     }
 
     /** Sets the leading icon background image type */
-    fun setLeadingIconSize(imageSize: LeadingIconSize) {
-        val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+    fun setLeadingIconSize(imageSize: IconSize) {
+        val size = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         leadingIcon.layoutParams.width = size
         leadingIcon.layoutParams.height = size
+    }
+
+    /** Sets the leading icon size and the background type
+     * The need to be set together because the size of the leading background container
+     * depends on the size of the image
+     */
+
+    fun setLeadingIconSize(
+        imageSize: IconSize,
+        type: ImageBackground,
+    ) {
+        val iconSize = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
+        val backgroundSize = if (type == ImageBackground.None) {
+            iconSize
+        } else {
+            resources.getDimensionPixelSize(R.dimen.listItemImageContainerSize)
+        }
+
+        leadingIcon.layoutParams.width = iconSize
+        leadingIcon.layoutParams.height = iconSize
+
+        leadingIconContainer.setBackgroundResource(ImageBackground.background(type))
+        leadingIconContainer.layoutParams.width = backgroundSize
+        leadingIconContainer.layoutParams.height = backgroundSize
     }
 
     /** Returns the binding of the leading icon */
@@ -158,6 +198,10 @@ abstract class DaxListItem(
     /** Sets the trailing image content description */
     fun setTrailingIconContentDescription(description: String) {
         trailingIcon.contentDescription = description
+    }
+
+    fun setTrailingIconTint(@ColorInt color: Int) {
+        trailingIcon.imageTintList = ColorStateList.valueOf(color)
     }
 
     /** Sets the item overflow menu click listener */
@@ -190,6 +234,13 @@ abstract class DaxListItem(
     fun showTrailingIcon() {
         trailingIconContainer.show()
         trailingSwitch.gone()
+    }
+
+    /** Sets the trailing icon size */
+    fun setTrailingIconSize(imageSize: IconSize) {
+        val size = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
+        trailingIcon.layoutParams.width = size
+        trailingIcon.layoutParams.height = size
     }
 
     /** Hides all trailing items */
@@ -266,28 +317,31 @@ abstract class DaxListItem(
         }
     }
 
-    enum class LeadingIconSize {
+    enum class IconSize {
         Small,
         Medium,
         Large,
+        ExtraLarge,
         ;
 
         companion object {
-            fun from(size: Int): LeadingIconSize {
+            fun from(size: Int): IconSize {
                 // same order as attrs-lists.xml
                 return when (size) {
                     0 -> Small
                     1 -> Medium
                     2 -> Large
+                    3 -> ExtraLarge
                     else -> Medium
                 }
             }
 
-            fun dimension(size: LeadingIconSize): Int {
+            fun dimension(size: IconSize): Int {
                 return when (size) {
                     Small -> R.dimen.listItemImageSmallSize
                     Medium -> R.dimen.listItemImageMediumSize
                     Large -> R.dimen.listItemImageLargeSize
+                    ExtraLarge -> R.dimen.listItemImageExtraLargeSize
                 }
             }
         }

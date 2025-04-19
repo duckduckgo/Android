@@ -7,6 +7,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.sync.crypto'
+
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }
 
 dependencies {

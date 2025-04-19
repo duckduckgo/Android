@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.ModifiedSince
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -38,6 +39,8 @@ class SettingsSyncDataProvider @Inject constructor(
     val settingsSyncStore: SettingsSyncStore,
     val syncCrypto: SyncCrypto,
 ) : SyncableDataProvider {
+
+    override fun getType(): SyncableType = SETTINGS
     override fun getChanges(): SyncChangesRequest {
         val syncableSettings = syncableSettings.getPlugins()
         if (settingsSyncStore.serverModifiedSince == "0") {

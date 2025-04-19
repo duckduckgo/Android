@@ -34,8 +34,8 @@ interface NetPInternalFeatureToggles {
     fun excludeSystemApps(): Toggle
 
     @Toggle.DefaultValue(defaultValue = false)
-    fun cloudflareDnsFallback(): Toggle
+    fun enablePcapRecording(): Toggle
 
     @Toggle.DefaultValue(defaultValue = false)
-    fun enablePcapRecording(): Toggle
+    fun useVpnStagingEnvironment(): Toggle
 }

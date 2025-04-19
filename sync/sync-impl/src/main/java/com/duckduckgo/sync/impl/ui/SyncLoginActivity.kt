@@ -24,15 +24,19 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -43,8 +47,8 @@ class SyncLoginActivity : DuckDuckGoActivity() {
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
+    ) { result ->
+        if (result != EnterCodeContractOutput.Error) {
             viewModel.onLoginSuccess()
         }
     }
@@ -79,7 +83,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             ReadTextCode -> {
-                enterCodeLauncher.launch(Code.RECOVERY_CODE)
+                enterCodeLauncher.launch(RECOVERY_CODE)
             }
             Error -> {
                 setResult(RESULT_CANCELED)
@@ -89,6 +93,8 @@ class SyncLoginActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
+
+            is ShowError -> showError(it)
         }
     }
 
@@ -99,6 +105,20 @@ class SyncLoginActivity : DuckDuckGoActivity() {
                 viewModel.onReadTextCodeClicked()
             }
         }
+    }
+
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     companion object {

@@ -19,13 +19,27 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.httpauth.db.clearFormDataCompat
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface WebDataManager {
     suspend fun clearData(
@@ -36,12 +50,20 @@ interface WebDataManager {
     fun clearWebViewSessions()
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class WebViewDataManager @Inject constructor(
     private val context: Context,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val webLocalStorageManager: WebLocalStorageManager,
+    private val crashLogger: CrashLogger,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -54,7 +76,7 @@ class WebViewDataManager @Inject constructor(
         clearFormData(webView)
         clearAuthentication(webView)
         clearExternalCookies()
-        clearWebViewDirectories(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
+        clearWebViewDirectories()
     }
 
     private fun clearWebViewCache(webView: WebView) {
@@ -65,26 +87,56 @@ class WebViewDataManager @Inject constructor(
         webView.clearHistory()
     }
 
-    private fun clearWebStorage(webStorage: WebStorage) {
-        webStorage.deleteAllData()
+    private suspend fun clearWebStorage(webStorage: WebStorage) {
+        suspendCoroutine { continuation ->
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage()
+                    continuation.resume(Unit)
+                }.onFailure { e ->
+                    Timber.e(e, "WebDataManager: Could not selectively clear web storage")
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    // fallback, if we crash we delete everything
+                    webStorage.deleteAllData()
+                    continuation.resume(Unit)
+                }
+            } else {
+                webStorage.deleteAllData()
+                continuation.resume(Unit)
+            }
+        }
+    }
+
+    private fun sendCrashPixel(e: Throwable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = e))
+        }
     }
 
     private fun clearFormData(webView: WebView) {
-        webView.clearFormDataCompat()
+        webView.clearFormData()
     }
 
     /**
-     * Deletes web view directory content. The Cookies file is kept as we clear cookies separately to avoid a crash and maintain ddg cookies.
-     * Cookies may appear in files:
-     *   app_webview/Cookies
-     *   app_webview/Default/Cookies
+     * Deletes web view directory content except the following directories
+     *  app_webview/Cookies
+     *  app_webview/Default/Cookies
+     *  app_webview/Default/Local Storage
+     *
+     *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
-    private suspend fun clearWebViewDirectories(exclusions: List<String>) {
+    private suspend fun clearWebViewDirectories() {
         val dataDir = context.applicationInfo.dataDir
-        fileDeleter.deleteContents(File(dataDir, WEBVIEW_DATA_DIRECTORY_NAME), exclusions)
+        fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
-        fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
+        if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
+        } else {
+            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))
+        }
     }
 
     private suspend fun clearAuthentication(webView: WebView) {
@@ -98,16 +150,5 @@ class WebViewDataManager @Inject constructor(
 
     override fun clearWebViewSessions() {
         webViewSessionStorage.deleteAllSessions()
-    }
-
-    companion object {
-        private const val WEBVIEW_DATA_DIRECTORY_NAME = "app_webview"
-        private const val WEBVIEW_DEFAULT_DIRECTORY_NAME = "app_webview/Default"
-        private const val DATABASES_DIRECTORY_NAME = "databases"
-
-        private val WEBVIEW_FILES_EXCLUDED_FROM_DELETION = listOf(
-            "Default",
-            "Cookies",
-        )
     }
 }

@@ -32,6 +32,7 @@ import javax.inject.Inject
 
 interface CredentialsSyncNotificationBuilder {
     fun buildRateLimitNotification(context: Context): Notification
+    fun buildInvalidRequestNotification(context: Context): Notification
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,6 +45,17 @@ class AppCredentialsSyncNotificationBuilder @Inject constructor(
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.credentials_notification_rate_limit))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .build()
+    }
+
+    override fun buildInvalidRequestNotification(context: Context): Notification {
+        return NotificationCompat.Builder(context, SYNC_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setContentIntent(getPendingIntent(context))
+            .setCustomContentView(RemoteViews(context.packageName, R.layout.credentials_notification_invalid_request))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .build()

@@ -18,9 +18,9 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.PositionKey
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
@@ -30,7 +30,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
-@PositionKey(100)
+@PriorityKey(100)
 class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return SectionHeaderListItem(context).apply {
@@ -40,7 +40,7 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PositionKey(500)
+@PriorityKey(500)
 class ProSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return ProSettingView(context)
@@ -48,7 +48,7 @@ class ProSettings @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PositionKey(300)
+@PriorityKey(300)
 class PIRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return PirSettingView(context)
@@ -56,7 +56,7 @@ class PIRSettings @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PositionKey(400)
+@PriorityKey(400)
 class ITRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return ItrSettingView(context)

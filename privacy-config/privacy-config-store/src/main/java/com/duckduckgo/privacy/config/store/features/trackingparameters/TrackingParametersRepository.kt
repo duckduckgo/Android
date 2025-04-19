@@ -33,6 +33,7 @@ class RealTrackingParametersRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : TrackingParametersRepository {
 
     private val trackingParametersDao: TrackingParametersDao = database.trackingParametersDao()
@@ -42,7 +43,9 @@ class RealTrackingParametersRepository(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

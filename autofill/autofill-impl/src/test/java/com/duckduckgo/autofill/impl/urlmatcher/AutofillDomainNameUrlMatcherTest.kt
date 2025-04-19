@@ -256,6 +256,11 @@ class AutofillDomainNameUrlMatcherTest {
     }
 
     @Test
+    fun whenCleanRawUrlWithEmptyStringThenEmptyStringReturned() {
+        assertEquals("", testee.cleanRawUrl(""))
+    }
+
+    @Test
     fun whenCleanRawUrlThenReturnOnlySchemeAndDomain() {
         assertEquals("www.foo.com", testee.cleanRawUrl("https://www.foo.com/path/to/foo?key=value"))
         assertEquals("www.fuu.foo.com", testee.cleanRawUrl("https://www.fuu.foo.com/path/to/foo?key=value"))

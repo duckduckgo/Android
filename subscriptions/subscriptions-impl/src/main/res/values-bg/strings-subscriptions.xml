@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Отмени</string>
+    <string name="ok">ОК</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Управление на имейл</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Назад към Настройки</string>
+    <string name="somethingWentWrong">Възникна някаква грешка</string>
+    <string name="somethingWentWrongDescription">Google Play не успя да обработи Вашата покупка. Моля, опитайте отново по-късно.</string>
+    <string name="youAreSet">Всичко е готово.</string>
+    <string name="viewPlans">Преглед на плановете</string>
+    <string name="subscriptionNotFound">Не е намерен абонамент</string>
+    <string name="subscriptionNotFoundDescription">Абонаментът, свързан с този акаунт в Google Play, вече не е активен.</string>
+    <string name="purchaseRestored">Вашите покупки са възстановени.</string>
+    <string name="restoreSubscriptionTitle">Добавяне на абонамент за Privacy Pro към това устройство</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Добавяне чрез акаунт в Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Възстановете абонамента си за устройства с Android, като използвате профила си в Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Възстановяване на покупката</string>
+    <string name="restoreSubscriptionEmailTitle">Добавяне чрез имейл</string>
+    <string name="restoreSubscriptionEmailDescription">Свържете имейл адрес с абонамента си, за да добавите Privacy Pro към това устройство.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Първи стъпки</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Премахване на абонамент</string>
+    <string name="subscriptionRemoved">Абонаментът е премахнат от това устройство</string>
+    <string name="removeFromDevice">Премахване от това устройство?</string>
+    <string name="removeFromDeviceDescription">Вече няма да имате достъп до абонамента си за Privacy Pro на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Месечният абонамент %1$s на %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Годишният абонамент %1$s на %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Абонаментът е изтекъл на %1$s.</string>
+    <string name="monthlySubscription">Месечен абонамент</string>
+    <string name="yearlySubscription">Годишен абонамент</string>
+    <string name="renews">се подновява</string>
+    <string name="expires">изтича</string>
+    <string name="activateOnOtherDevices">Добавяне на Privacy Pro към други устройства</string>
+    <string name="addToDevicePrimaryText">Добавяне към устройството</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Добавете Privacy Pro към други устройства чрез Google Play или чрез свързване с имейл адрес.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Използвайте имейла по-горе, за да добавите абонамента си на други устройства в приложението DuckDuckGo. Отидете в Настройки &gt; Privacy Pro &gt; Имам абонамент.</string>
+    <string name="editEmailPrimaryText">Редактиране на имейл</string>
+    <string name="learnMore">Научете повече</string>
+    <string name="privacyProFaq">Имате нужда от помощ с Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Вижте отговори на често задавани въпроси или се свържете с поддръжката на Privacy Pro от нашите страници за помощ. Предлаганите функции се различават в различните държави.</string>
+    <string name="subscriptionStatusSubscribed">Активен абонамент</string>
+    <string name="privacyPolicyAndTermsOfService">Политика за поверителност и Условия на услугата</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Настройки на абонамент</string>
+    <string name="subscriptionSettingSubscribe">Защитете връзката и самоличността си с Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Включва нашите функции VPN, Personal Information Removal и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Включва нашите функции VPN и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Вземете Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Имам абонамент</string>
+    <string name="subscriptionSettingExpired">Абонамент ви за Privacy Pro е изтекъл</string>
+    <string name="subscriptionSettingExpiredViewPlans">Преглед на плановете</string>
+    <string name="subscriptionSettingSectionSubscription">Абонамент</string>
+    <string name="subscriptionSettingRemoveFromDevice">Премахване от това устройство</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
+    <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
+    <string name="subscriptionSettingActivating">Активиране</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Всичко е готово.</string>
+    <string name="purchaseCompletedText">Покупката е успешна.</string>
+    <string name="purchaseRecoveredText">Вече сте направили абонамент и ние го възстановихме.</string>
+    <string name="purchaseErrorTitle">Възникна някаква грешка</string>
+    <string name="purchaseError">Имаме проблеми със свързването. Моля, опитайте отново по-късно.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Актуализиране или отмяна на плана</string>
+    <string name="changePlanDescription">Вашият абонамент е закупен през Apple App Store. За да промените плана или настройките за фактуриране, отидете на Настройки &gt; Apple Account &gt; Абонаменти на устройство, вписано със същия Apple Account, използван за закупуване на абонамента ви.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Активирайте Privacy Pro на настолен компютър, за да настроите Personal Information Removal</string>
+    <string name="pirDescription">В браузъра DuckDuckGo за настолен компютър отворете <b>Настройки &gt; Privacy Pro</b> и изберете <b>Имам абонамент</b>, за да започнете.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Отваряне</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Изпратете отзив</string>
+    <string name="feedbackActionHeader">ИЗБЕРЕТЕ КАТЕГОРИЯ</string>
+    <string name="feedbackActionReportIssue">Докладване на проблем</string>
+    <string name="feedbackActionGeneralFeedback">Отзив с обща информация</string>
+    <string name="feedbackActionFeatureRequest">Заявка за функция</string>
+
+    <string name="feedbackGeneralHeader">ИЗБЕРЕТЕ КАТЕГОРИЯ</string>
+    <string name="feedbackGeneralBrowser">Отзив за браузъра</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">ИЗБЕРЕТЕ КАТЕГОРИЯ</string>
+    <string name="feedbackCategorySubscription">Абонамент и плащания</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">ИЗБЕРЕТЕ КАТЕГОРИЯ</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN не може да се свърже</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN връзката е прекалено бавна</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN предизвиква проблеми с други приложения или уебсайтове</string>
+    <string name="feedbackSubCategoryVpnIot">VPN не ми позволява да се свържа с локално устройство</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN причинява срив или замръзване на браузъра</string>
+    <string name="feedbackSubCategoryVpnOther">Други</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Информацията не е за конкретния сайт</string>
+    <string name="feedbackSubCategoryPirNotMe">Записите не принадлежат на потребителя</string>
+    <string name="feedbackSubCategoryPirScanStuck">Сканирането блокира</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Премахването блокира</string>
+    <string name="feedbackSubCategoryPirOther">Други</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Проблем с кода за достъп</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Не мога да се свържа с консултант</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Разговорът с консултанта не беше полезен</string>
+    <string name="feedbackSubCategoryItrOther">Други</string>
+
+    <string name="feedbackSubCategorySubsOtp">Еднократна парола</string>
+    <string name="feedbackSubCategorySubsOther">Други</string>
+
+    <string name="feedbackSubmitVpnHeader">Попаднахте на проблем, който не е разгледан в нашия <annotation type="faqs_link">помощен център</annotation>? Определено искаме да научим за него.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Кажете ни какъв е проблемът...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Освен въведените по-горе данни заедно с Вашия отзив изпращаме някои анонимизирани данни:\n\n• Дали някои функции на браузъра са активни\n• Обобщена диагностика на приложението (напр. кодове за грешки)\n\nС натискането на бутона Подаване приемате, че DuckDuckGo може да използва подадената информация за подобряване на приложението."</string>
+    <string name="feedbackSubmitVpnSubmit">Изпрати</string>
+    <string name="feedbackSubmitCompletedMessage">Благодарим ви! Отзивът ви е изпратен.</string>
+    <string name="feedbackSubmitFailedMessage">Възникна някаква грешка</string>
+
+    <string name="feedbackSubmitEmailByLine">Посочете имейл, ако искате да се свържем с Вас относно този проблем (може да не успеем да изпратим отговор за всички проблеми):</string>
+    <string name="feedbackSubmitEmailHint">Имейл (по избор)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Моля, споделете своето мнение…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Каква функция бихте искали да въведем?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Абонаменти</string>
+    <string name="activitySubscriptionSettings">Настройки на абонамент</string>
+    <string name="activityActivateSubscription">Имам абонамент</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Изпратете отзив</string>
+</resources>

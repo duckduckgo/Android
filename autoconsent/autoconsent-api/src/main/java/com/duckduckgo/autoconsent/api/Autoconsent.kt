@@ -42,6 +42,11 @@ interface Autoconsent {
     fun isSettingEnabled(): Boolean
 
     /**
+     * @return `true` if autoconsent is enabled in remote config and enabled by the user, `false` otherwise.
+     */
+    fun isAutoconsentEnabled(): Boolean
+
+    /**
      * This method sends and opt out message to autoconsent on the given [WebView] instance to set the opt out mode.
      */
     fun setAutoconsentOptOut(webView: WebView)

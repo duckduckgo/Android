@@ -33,7 +33,7 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:background="@drawable/background_tracker_badge"
-        android:textAlignment="center"
+        android:gravity="center"
         app:typography="h5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -42,7 +42,7 @@
         android:layout_height="@dimen/keyline_5"
         android:background="@drawable/background_radius_text"
         android:minWidth="@dimen/keyline_5"
-        android:textAlignment="center"
+        android:gravity="center"
         app:typography="h5" />
 
 </FrameLayout>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Vazgeç</string>
+    <string name="ok">Tamam</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">E-postayı Yönet</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Ayarlara Geri Dön</string>
+    <string name="somethingWentWrong">Bir hata oluştu</string>
+    <string name="somethingWentWrongDescription">Google Play satın alma işleminizi gerçekleştiremedi. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="youAreSet">Her şey hazır.</string>
+    <string name="viewPlans">Planları Görüntüle</string>
+    <string name="subscriptionNotFound">Abonelik Bulunamadı</string>
+    <string name="subscriptionNotFoundDescription">Bu Google Play hesabıyla ilişkili abonelik artık aktif değil.</string>
+    <string name="purchaseRestored">Satın aldıklarınız geri yüklendi.</string>
+    <string name="restoreSubscriptionTitle">Privacy Pro aboneliğinizi bu cihaza ekleyin</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Google Play Hesabı üzerinden ekleyin</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Google Play hesabınızı kullanarak Android cihazlarda aboneliğinizi geri yükleyin.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Satın Almayı Geri Yükle</string>
+    <string name="restoreSubscriptionEmailTitle">E-posta ile ekleyin</string>
+    <string name="restoreSubscriptionEmailDescription">Privacy Pro\'yu bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Başlayın</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Aboneliği Kaldır</string>
+    <string name="subscriptionRemoved">Aboneliğiniz bu cihazdan kaldırıldı</string>
+    <string name="removeFromDevice">Bu cihazdan kaldırılsın mı?</string>
+    <string name="removeFromDeviceDescription">Privacy Pro aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu, aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Aylık aboneliğiniz %2$s tarihinde %1$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Yıllık aboneliğiniz %2$s tarihinde %1$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Aboneliğiniz %1$s tarihinde sona erdi.</string>
+    <string name="monthlySubscription">Aylık Abonelik</string>
+    <string name="yearlySubscription">Yıllık Abonelik</string>
+    <string name="renews">yenilenecek</string>
+    <string name="expires">sona erecek</string>
+    <string name="activateOnOtherDevices">Privacy Pro\'yu Diğer Cihazlara Ekleyin</string>
+    <string name="addToDevicePrimaryText">Cihaza Ekle</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Privacy Pro\'yu diğer cihazlarınıza Google Play üzerinden veya bir e-posta adresi bağlayarak ekleyin.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Privacy Pro &gt; Aboneliğim Var\'a gidin.</string>
+    <string name="editEmailPrimaryText">E-postayı Düzenle</string>
+    <string name="learnMore">Daha Fazla Bilgi</string>
+    <string name="privacyProFaq">Privacy Pro ile ilgili yardıma mı ihtiyacınız var?</string>
+    <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
+    <string name="subscriptionStatusSubscribed">Abone olundu</string>
+    <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Abonelik Ayarları</string>
+    <string name="subscriptionSettingSubscribe">Privacy Pro ile bağlantınızı ve kimliğinizi koruyun</string>
+    <string name="subscriptionSettingSubscribeSubtitle">VPN, Personal Information Removal ve Identity Theft Restoration\'ı içerir.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
+    <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
+    <string name="subscriptionSettingRestore">Aboneliğim Var</string>
+    <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
+    <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>
+    <string name="subscriptionSettingSectionSubscription">Abonelik</string>
+    <string name="subscriptionSettingRemoveFromDevice">Bu Cihazdan Kaldır</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
+    <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
+    <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Her şey hazır.</string>
+    <string name="purchaseCompletedText">Satın alma işlemi başarılı oldu.</string>
+    <string name="purchaseRecoveredText">Zaten bir aboneliğiniz vardı ve bunu sizin için kurtardık.</string>
+    <string name="purchaseErrorTitle">Bir hata oluştu</string>
+    <string name="purchaseError">Bağlanmakta sorun yaşıyoruz. Lütfen daha sonra tekrar deneyin.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Planı Güncelle veya İptal Et</string>
+    <string name="changePlanDescription">Aboneliğiniz Apple App Store üzerinden satın alınmış. Planınızı veya faturalandırma ayarlarınızı değiştirmek için lütfen aboneliğinizi satın alırken kullandığınız Apple Hesabı ile giriş yapmış bir cihazdan Ayarlar &gt; Apple Hesabı &gt; Abonelikler bölümüne gidin.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde Privacy Pro\'yu etkinleştirin</string>
+    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; Privacy Pro</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Aç</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Geri Bildirim gönder</string>
+    <string name="feedbackActionHeader">BİR KATEGORİ SEÇİN</string>
+    <string name="feedbackActionReportIssue">Sorun bildir</string>
+    <string name="feedbackActionGeneralFeedback">Genel geri bildirim</string>
+    <string name="feedbackActionFeatureRequest">Bir özellik isteyin</string>
+
+    <string name="feedbackGeneralHeader">BİR KATEGORİ SEÇİN</string>
+    <string name="feedbackGeneralBrowser">Tarayıcı Geri Bildirimi</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">BİR KATEGORİ SEÇİN</string>
+    <string name="feedbackCategorySubscription">Abonelik ve Ödemeler</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">BİR KATEGORİ SEÇİN</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN bağlanamıyor</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN bağlantısı çok yavaş</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN, diğer uygulamalar veya web sitelerinde sorunlara yol açıyor</string>
+    <string name="feedbackSubCategoryVpnIot">VPN yerel cihaza bağlanmama izin vermiyor</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN tarayıcının çökmesine veya donmasına sebep oluyor</string>
+    <string name="feedbackSubCategoryVpnOther">Diğer</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Belirli bir sitede bulunmayan bilgiler</string>
+    <string name="feedbackSubCategoryPirNotMe">Kayıtlar kullanıcıya ait değil</string>
+    <string name="feedbackSubCategoryPirScanStuck">Tarama takıldı</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Çıkarma işlemi sıkıştı</string>
+    <string name="feedbackSubCategoryPirOther">Diğer</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Erişim koduyla ilgili sorun</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Danışmanla iletişime geçilemiyor</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Danışmanı aramak yardımcı olmuyor</string>
+    <string name="feedbackSubCategoryItrOther">Diğer</string>
+
+    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre</string>
+    <string name="feedbackSubCategorySubsOther">Diğer</string>
+
+    <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Yukarıda girilen ayrıntılara ek olarak, geri bildiriminizle birlikte bazı anonimleştirilmiş bilgiler gönderiyoruz:\n\n• Bazı tarayıcı özelliklerinin etkin olup olmadığı\n• Toplu uygulama tanılama (ör. hata kodları)\n\nGönder'e tıklayarak, DuckDuckGo'nun uygulamayı geliştirmek için gönderilen bilgileri kullanabileceğini kabul ediyorsunuz."</string>
+    <string name="feedbackSubmitVpnSubmit">Gönder</string>
+    <string name="feedbackSubmitCompletedMessage">Teşekkür Ederiz! Geri bildirim gönderildi.</string>
+    <string name="feedbackSubmitFailedMessage">Bir hata oluştu</string>
+
+    <string name="feedbackSubmitEmailByLine">Bu sorunla ilgili olarak sizinle iletişime geçmemizi istiyorsanız bir e-posta adresi sağlayın (tüm sorunlara yanıt veremeyebiliriz):</string>
+    <string name="feedbackSubmitEmailHint">E-posta (isteğe bağlı)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Lütfen bize geri bildirimlerinizi iletin…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Hangi özelliği görmek istersiniz?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonelikler</string>
+    <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
+    <string name="activityActivateSubscription">Aboneliğim Var</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Geri Bildirim gönder</string>
+</resources>

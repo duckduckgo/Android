@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -37,15 +38,20 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERROR
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Duration
+import java.time.OffsetDateTime
 import javax.inject.Inject
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
@@ -55,8 +61,10 @@ class RealSyncEngine @Inject constructor(
     private val syncStateRepository: SyncStateRepository,
     private val syncPixels: SyncPixels,
     private val syncStore: SyncStore,
+    private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
@@ -118,6 +126,7 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Engine: sync is not in progress, starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
+            syncPixels.fireDailySuccessRatePixel()
             syncPixels.fireDailyPixel()
 
             Timber.i("Sync-Engine: getChanges - performSync")
@@ -183,7 +192,6 @@ class RealSyncEngine @Inject constructor(
     ) {
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
                 val featureError = result.featureError() ?: return
                 persisterPlugins.getPlugins().forEach {
                     it.onError(SyncErrorResponse(changes.type, featureError))
@@ -203,7 +211,6 @@ class RealSyncEngine @Inject constructor(
     ) {
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
@@ -213,9 +220,14 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun getChanges(): List<SyncChangesRequest> {
-        return providerPlugins.getPlugins().map {
+        return providerPlugins.getPlugins().mapNotNull {
             Timber.d("Sync-Engine: asking for changes in ${it.javaClass}")
-            it.getChanges()
+            kotlin.runCatching {
+                it.getChanges()
+            }.getOrElse { error ->
+                syncOperationErrorRecorder.record(it.getType().field, DATA_PROVIDER_ERROR)
+                null
+            }
         }
     }
 
@@ -224,15 +236,24 @@ class RealSyncEngine @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ) {
         persisterPlugins.getPlugins().map {
-            when (val result = it.onSuccess(remoteChanges, conflictResolution)) {
-                is SyncMergeResult.Success -> {
-                    if (result.orphans) {
-                        syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
+            kotlin.runCatching {
+                when (val result = it.onSuccess(remoteChanges, conflictResolution)) {
+                    is SyncMergeResult.Success -> {
+                        if (result.orphans) {
+                            Timber.d("Sync - Orphans present in this sync operation for feature ${remoteChanges.type.field}")
+                            syncOperationErrorRecorder.record(remoteChanges.type.field, ORPHANS_PRESENT)
+                        }
+                        if (result.timestampConflict) {
+                            Timber.d("Sync - Timestamp conflict present in this sync operation for feature ${remoteChanges.type.field}")
+                            syncOperationErrorRecorder.record(remoteChanges.type.field, TIMESTAMP_CONFLICT)
+                        }
+                    }
+                    is SyncMergeResult.Error -> {
+                        Timber.d("Sync - Error while persisting data $result")
                     }
                 }
-                is SyncMergeResult.Error -> {
-                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString(), result)
-                }
+            }.getOrElse { error ->
+                syncOperationErrorRecorder.record(remoteChanges.type.field, DATA_PERSISTER_ERROR)
             }
         }
     }
@@ -242,11 +263,17 @@ class RealSyncEngine @Inject constructor(
         persisterPlugins.getPlugins().map {
             it.onSyncEnabled()
         }
+        lifecyclePlugins.getPlugins().forEach {
+            it.onSyncEnabled()
+        }
     }
 
     override fun onSyncDisabled() {
         syncStateRepository.clearAll()
         persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
+        }
+        lifecyclePlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
     }
@@ -255,6 +282,7 @@ class RealSyncEngine @Inject constructor(
         return when (code) {
             API_CODE.COUNT_LIMIT.code -> COLLECTION_LIMIT_REACHED
             API_CODE.CONTENT_TOO_LARGE.code -> COLLECTION_LIMIT_REACHED
+            API_CODE.VALIDATION_ERROR.code -> INVALID_REQUEST
             else -> null
         }
     }

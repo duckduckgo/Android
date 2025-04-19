@@ -22,7 +22,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    version = 4,
+    version = 5,
     entities = [
         WebsiteLoginCredentialsEntity::class,
         NeverSavedSiteEntity::class,
@@ -52,6 +52,11 @@ val ALL_MIGRATIONS = arrayOf(
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("CREATE TABLE IF NOT EXISTS `never_saved_sites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `domain` TEXT)")
             db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_never_saved_sites_domain` ON `never_saved_sites` (`domain`)")
+        }
+    },
+    object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `lastUsedInMillis` INTEGER")
         }
     },
 )

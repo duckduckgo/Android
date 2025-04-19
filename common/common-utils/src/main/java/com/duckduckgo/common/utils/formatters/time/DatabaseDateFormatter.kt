@@ -16,13 +16,13 @@
 
 package com.duckduckgo.common.utils.formatters.time
 
-import org.threeten.bp.Duration
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class DatabaseDateFormatter {
 
@@ -69,6 +69,15 @@ class DatabaseDateFormatter {
             val startTime = LocalDateTime.parse(start, FORMATTER_SECONDS)
             val endTime = LocalDateTime.parse(end, FORMATTER_SECONDS)
             return Duration.between(startTime, endTime)
+        }
+
+        fun getUtcIsoLocalDate(minusDays: Long = 0): String {
+            // returns YYYY-MM-dd
+            return if (minusDays > 0) {
+                LocalDate.now().minusDays(minusDays)
+            } else {
+                LocalDate.now()
+            }.format(DateTimeFormatter.ISO_LOCAL_DATE)
         }
     }
 }

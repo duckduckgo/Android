@@ -1,0 +1,58 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "YouTube videolarını her zaman burada aç",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Duck Player'ı açık tut",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Bilgileri Aç",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Ayarları Aç",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Youtube'da İzle",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>HATA:</b> Geçersiz video kimliği",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube, Duck Player'ın bu videoyu yüklemesine izin vermiyor",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube, bu videonun YouTube dışında izlenmesine izin vermiyor.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Bu videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube bu videonun yüklenmesini engelliyor. VPN kullanıyorsanız, VPN'i kapatıp bu sayfayı yeniden yüklemeyi deneyin.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Bu işe yaramazsa, videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player, kişiselleştirilmiş reklamlar olmadan temiz bir görüntüleme deneyimi sağlar ve görüntüleme etkinliğinin YouTube önerilerinizi etkilemesini önler."
+  }
+}

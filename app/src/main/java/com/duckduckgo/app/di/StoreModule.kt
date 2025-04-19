@@ -24,8 +24,8 @@ import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
-import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
@@ -51,7 +51,7 @@ abstract class StoreModule {
     abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
 
     @Binds
-    abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
+    abstract fun bindOnboardingStore(onboardingStore: OnboardingStoreImpl): OnboardingStore
 
     @Binds
     abstract fun bindTabRepository(tabRepository: TabDataRepository): TabRepository

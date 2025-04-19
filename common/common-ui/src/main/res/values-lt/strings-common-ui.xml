@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Informuoti</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Papildyti</string>
+    <string name="dialogEditTitle">Redaguoti</string>
+    <string name="dialogSaveAction">Išsaugoti</string>
+    <string name="dialogConfirmTitle">Patvirtinti</string>
+    <string name="dialogSave">Išsaugoti</string>
+    <string name="delete">Trinti</string>
+    <string name="edit">Redaguoti</string>
+    <string name="remove">Pašalinti</string>
+    <string name="removeAll">Pašalinti visus</string>
+    <string name="undo">Anuliuoti</string>
+    <string name="cancel">Atšaukti</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Visada įjungta</string>
+    <string name="on">Įjungti</string>
+    <string name="off">Išjungti</string>
 </resources>

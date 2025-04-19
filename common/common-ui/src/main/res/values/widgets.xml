@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources tools:ignore="InvalidColorAttribute" xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget"/>
     <style name="ThemeOverlay"/>
@@ -77,7 +77,12 @@
     </style>
 
     <style name="Widget.DuckDuckGo.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:background">@drawable/popup_menu_bg</item>
+        <item name="android:textColor">?daxColorPrimaryText</item>
+        <item name="android:itemBackground">?attr/selectableItemBackground</item>
+        <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+        <item name="popupMenuBackground">@drawable/popup_menu_bg</item>
+        <item name="textAppearanceLargePopupMenu">?attr/textAppearanceBody1</item>
+        <item name="textAppearanceSmallPopupMenu">?attr/textAppearanceBody1</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopupMenuItem" parent="Typography.DuckDuckGo.Body1">
@@ -175,6 +180,14 @@
         <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/button_ghost_alt_text_color_selector</item>
+        <item name="backgroundTint">@color/button_ghost_alt_container_selector</item>
+        <item name="rippleColor">@color/button_ghost_alt_ripple_selector</item>
+        <item name="iconTint">@color/button_ghost_alt_text_color_selector</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.IconButton">
         <item name="android:background">@drawable/background_icon_button</item>
         <item name="android:padding">@dimen/keyline_5</item>
@@ -185,6 +198,39 @@
         <item name="buttonTint">@color/radio_button_tint</item>
         <item name="android:padding">@dimen/keyline_3</item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+        <item name="buttonTint">@color/radio_button_tint</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:paddingStart">@dimen/keyline_2</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="backgroundTint">?attr/daxColorFabPrimaryContainer</item>
+        <item name="iconTint">?attr/daxColorFabPrimaryIcon</item>
+        <item name="android:textColor">?attr/daxColorFabPrimaryText</item>
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay</item>
+        <item name="android:height">@dimen/fabHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/keyline_4</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">?attr/daxColorFabSecondaryContainer</item>
+        <item name="tint">?attr/daxColorFabSecondaryIcon</item>
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.FloatingActionButton.Overlay</item>
+        <item name="fabSize">mini</item>
+        <item name="elevation">9dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.FloatingActionButton.Overlay">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/keyline_3</item>
     </style>
 
     <!-- List Items -->
@@ -199,7 +245,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/twoLineItemHeight</item>
     </style>
-
 
     <!-- SearchBarView -->
     <style name="Widget.DuckDuckGo.SearchBarView">
@@ -220,7 +265,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/background_message_cta</item>
         <item name="android:elevation">4dp</item>
-        <item name="android:layout_margin">@dimen/keyline_4</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
         <item name="android:paddingBottom">@dimen/keyline_4</item>
     </style>
 
@@ -286,7 +334,6 @@
 
     <style name="Widget.DuckDuckGo.DialogFullScreen">
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <!-- Dax Dialog -->
@@ -330,6 +377,7 @@
         <item name="hintTextColor">@color/text_input_hint_color_selector</item>
         <item name="android:textColorHint">@color/text_input_hint_color_selector</item>
         <item name="android:theme">@style/Widget.DuckDuckGo.TextInputCursor</item>
+        <item name="errorIconDrawable">@null</item>
     </style>
 
     <style name="Widget.DuckDuckGo.TextInputText">
@@ -374,13 +422,10 @@
     </style>
 
     <!-- Switches -->
-    <style name="Widget.DuckDuckGo.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.Switch" >
+    <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <!-- Slider -->
@@ -415,6 +460,29 @@
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Card">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_message_cta</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
+        <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">@dimen/keyline_4</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.GridCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/selectable_rounded_surface_ripple</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
     <!-- Expandable Menu Item Items -->
     <style name="Widget.DuckDuckGo.DaxExpandableItem">
         <item name="android:layout_width">match_parent</item>
@@ -427,6 +495,9 @@
     <style name="Widget.DuckDuckGo.FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.FireDialogStyle</item>
     </style>
 

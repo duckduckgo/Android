@@ -22,11 +22,6 @@ import android.net.ConnectivityManager
 import androidx.room.Room
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.Vpn
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
-import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.*
@@ -86,25 +81,6 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun providesResources(context: Context): Resources {
         return context.resources
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideVpnFeaturesRegistry(
-        context: Context,
-        sharedPreferencesProvider: VpnSharedPreferencesProvider,
-        dispatcherProvider: DispatcherProvider,
-    ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context, dispatcherProvider), sharedPreferencesProvider, dispatcherProvider)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideVpnServiceWrapper(
-        context: Context,
-        dispatcherProvider: DispatcherProvider,
-    ): Vpn {
-        return VpnServiceWrapper(context, dispatcherProvider)
     }
 
     @Provides

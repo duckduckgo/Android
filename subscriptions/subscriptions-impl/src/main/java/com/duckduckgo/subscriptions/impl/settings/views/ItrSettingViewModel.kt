@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,34 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.subscriptions.api.Product.ITR
+import com.duckduckgo.subscriptions.api.Product.ROW_ITR
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
+import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class ItrSettingViewModel(
+@ContributesViewModel(ViewScope::class)
+class ItrSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -48,48 +56,79 @@ class ItrSettingViewModel(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val hasSubscription: Boolean = false)
+    data class ViewState(val itrState: ItrState = ItrState.Hidden) {
+
+        sealed class ItrState {
+
+            data object Hidden : ItrState()
+            data object Enabled : ItrState()
+            data object Disabled : ItrState()
+        }
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     fun onItr() {
+        pixelSender.reportAppSettingsIdtrClick()
         sendCommand(OpenItr)
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptions.getEntitlementStatus(ITR_PRODUCT_NAME).also {
-                if (it.isSuccess) {
-                    _viewState.emit(viewState.value.copy(hasSubscription = it.getOrDefault(NotFound) == Found))
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+
+        subscriptions.getEntitlementStatus()
+            .map { entitledProducts ->
+                entitledProducts.any { product -> product == ITR || product == ROW_ITR }
+            }
+            .onEach { hasValidEntitlement ->
+                val subscriptionStatus = subscriptions.getSubscriptionStatus()
+
+                val itrState = getItrState(hasValidEntitlement, subscriptionStatus)
+
+                _viewState.update { it.copy(itrState = itrState) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun getItrState(
+        hasValidEntitlement: Boolean,
+        subscriptionStatus: SubscriptionStatus,
+    ): ItrState {
+        return when (subscriptionStatus) {
+            SubscriptionStatus.UNKNOWN -> ItrState.Hidden
+
+            SubscriptionStatus.INACTIVE,
+            SubscriptionStatus.EXPIRED,
+            SubscriptionStatus.WAITING,
+            -> {
+                if (isItrAvailable()) {
+                    ItrState.Disabled
+                } else {
+                    ItrState.Hidden
+                }
+            }
+
+            SubscriptionStatus.AUTO_RENEWABLE,
+            SubscriptionStatus.NOT_AUTO_RENEWABLE,
+            SubscriptionStatus.GRACE_PERIOD,
+            -> {
+                if (hasValidEntitlement) {
+                    ItrState.Enabled
+                } else {
+                    ItrState.Hidden
                 }
             }
         }
+    }
+
+    private suspend fun isItrAvailable(): Boolean {
+        return subscriptions.getAvailableProducts().any { feature -> feature == ITR || feature == ROW_ITR }
     }
 
     private fun sendCommand(newCommand: Command) {
         viewModelScope.launch {
             command.send(newCommand)
         }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val subscriptions: Subscriptions,
-        private val dispatcherProvider: DispatcherProvider,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptions, dispatcherProvider)
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
-        }
-    }
-
-    companion object {
-        private const val ITR_PRODUCT_NAME = "Identity Theft Restoration"
     }
 }

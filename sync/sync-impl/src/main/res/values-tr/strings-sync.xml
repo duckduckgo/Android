@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="sync_flows_disabled_new_version"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, ancak Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
     <string name="sync_paused_notification"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="sync_error_notification"><b>Senkronizasyon Hatası</b>\nSync &amp; Backup geçici olarak kullanılamıyor.</string>
+    <string name="sync_error_warning"><b>Senkronizasyon Hatası</b>\nSync &amp; Backup geçici olarak kullanılamıyor.</string>
+    <string name="sync_signed_out_notification"><b>Senkronizasyonu Duraklatıldı</b>\nSenkronizasyon duraklatıldı. Bu cihazın senkronizasyonuna devam etmek istiyorsanız, başka bir cihaz veya kurtarma kodunuzu kullanarak yeniden bağlanın.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Senkronizasyon ve Yedekleme</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Yer imlerini ve parolaları cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
     <string name="sync_off_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifreleme anahtarına erişimi yoktur.</string>
     <string name="sync_setup_single_device_title">Tek Cihaz Kurulumu</string>
+    <string name="sync_setup_other_options_title">Diğer Seçenekler</string>
     <string name="sync_setup_single_recover_data_cta_title">Senkronize Edilen Verileri Kurtar</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Bu Cihazı Senkronize Et ve Yedekle</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Senkronize edilmiş yer imleri için simgeleri otomatik olarak indirin.</string>
     <string name="sync_enable_connecting">Bağlantı kuruluyor...</string>
     <string name="sync_intro_enable_title">Bu Cihazı Senkronize Et ve Yedekle</string>
-    <string name="sync_intro_enable_content">Bu, DuckDuckGo\'nun güvenli sunucusunda yer işaretlerinizin ve parolalarınızın diğer cihazlarınızla senkronize edilebilen şifreli bir yedeğini oluşturur. \n\n Şifreleme anahtarı yalnızca cihazınızda saklanır, DuckDuckGo buna erişemez....</string>
+    <string name="sync_intro_enable_content">Bu, DuckDuckGo\'nun güvenli sunucusunda yer işaretlerinizin ve parolalarınızın diğer cihazlarınızla senkronize edilebilen şifreli bir yedeğini oluşturur. \n\n Şifreleme anahtarı sadece cihazınızda saklanır, DuckDuckGo buna erişemez.</string>
     <string name="sync_intro_enable_footer">Daha sonra diğer cihazlarınızla senkronize edebilirsiniz.</string>
     <string name="sync_intro_enable_cta">Senkronizasyon ve Yedekleme\'yi açın</string>
     <string name="sync_intro_recover_title">Senkronize Edilen Verileri Kurtar</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Senkronizasyon</string>
     <string name="sync_notify_me_title">Bildirimler devre dışı bırakıldı</string>
     <string name="sync_notify_me_description">Senkronizasyon ve Yedekleme\'nin bir hatayla karşılaşması durumunda bildirim alın.</string>
-    <string name="sync_rollout_banner_text">Senkronizasyon ve Yedekleme kademeli olarak kullanıma sunulmaktadır ve diğer cihazlarınızda DuckDuckGo\'da henüz mevcut olmayabilir</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Senkronizasyon ve Yedekleme kapatılamıyor.</string>
+    <string name="sync_edit_device_error">Cihaz adı güncellenemiyor.</string>
+    <string name="sync_remove_device_error">Bu cihaz Senkronizasyon ve Yedekleme\'den kaldırılamıyor.</string>
+    <string name="sync_delete_data_error">Sunucudaki veriler silinemiyor.</string>
+    <string name="sync_login_authenticated_device_error">"Bu cihazları eşleştirmek için bir cihazda Senkronizasyon ve Yedeklemeyi kapattıktan sonra diğer cihazda \"Başka bir Cihazla Senkronizasyon\" ögesine dokunun."</string>
+    <string name="sync_connect_generic_error">Sunucuya bağlanılamıyor.</string>
+    <string name="sync_connect_login_error">Başka bir cihazla senkronize edilemiyor.</string>
+    <string name="sync_create_account_generic_error">Sunucuya bağlanılamıyor.</string>
+    <string name="sync_invalid_code_error">Üzgünüz, bu kod geçersiz. Lütfen doğru kodun girildiğinden veya tarandığından emin olun.</string>
+    <string name="sync_recovery_pdf_error">Kurtarma PDF\'i oluşturulamıyor.</string>
+    <string name="sync_dialog_error_ok">Tamam</string>
+    <string name="sync_dialog_error_title">Senkronizasyon ve Yedekleme</string>
+    <string name="sync_encryption_not_supported_error_title">Cihaz desteklenmiyor</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup uçtan uca şifrelenir ve cihazınızdaki verileri şifreleyip saklayabilmesi gerekir. Cihazınız şifrelenmiş depolamayı desteklemediği için Sync &amp; Backup kullanılamaz.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Sync &amp; Backup\'a erişmek için cihazın kilidini açın.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup Kilitli</string>
+    <string name="sync_require_device_passcode_dialog_title">Sync &amp; Backup\'ı kullanmak için cihazınızı güvenli hale getirin</string>
+    <string name="sync_require_device_passcode_dialog_body">Sync &amp; Backup\'ı kullanmak için cihaz kilit deseni, PIN veya biyometrik bilgi gerekir.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ayarlar\'a gidin</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Sunucu Verileri Silinsin mi?</string>
+    <string name="sync_delete_server_data_dialog_content">Tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Verileri Sil</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Vazgeç</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Şifrelerinizi Senkronize Edin ve Yedekleyin</string>
+    <string name="syncPromoSubtitlePasswords">Hesaba gerek yoktur. Uçtan uca şifreleme, şifrelerinizi sizden başka hiç kimsenin, hatta bizim bile göremeyeceğimiz anlamına gelir.</string>
+
+    <string name="syncPromoTitleBookmarks">Yer İşaretlerinizi Senkronize Edin ve Yedekleyin</string>
+    <string name="syncPromoSubtitleBookmarks">Hesaba gerek yok. Uçtan uca şifreleme, yer işaretlerinizi sizden başka hiç kimsenin, hatta bizim bile göremeyeceğimiz anlamına gelir.</string>
+
+    <string name="syncPromoPrimaryButton">Senkronizasyonu Ayarla</string>
+    <string name="syncPromoSecondaryButton">Hayır Teşekkürler</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">DuckDuckGo\'yu Diğer Cihazlarda Edinin</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Bu cihazla senkronize etmek için DuckDuckGo\'yu diğer cihazlara yükleyin</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">DuckDuckGo\'yu edinin</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">DuckDuckGo\'yu masaüstüne veya başka bir mobil cihaza indirmek için şu adresi ziyaret edin:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">İndirme Bağlantısını Paylaş</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Farklı bir Senkronizasyona mı geçmek istiyorsunuz?</string>
+    <string name="sync_dialog_switch_account_primary_button">Senkronizasyonu Değiştir</string>
+    <string name="sync_dialog_switch_account_secondary_button">Vazgeç</string>
+    <string name="sync_dialog_switch_account_description">Bu cihaz zaten senkronize edilmiş. Farklı bir yedekleme veya cihazla senkronize etmek istediğinden emin misin? Senkronizasyonu değiştirmek, bu cihazla önceden senkronize edilmiş verileri kaldırmayacaktır.</string>
 </resources>

@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.R
@@ -37,22 +36,25 @@ class VpnEnabledNotificationBuilder {
 
     companion object {
 
-        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.mobile.android.vpn.notification.ongoing"
+        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.mobile.android.vpn.notification.ongoing.v2"
         private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME = "App Tracking Protection Status"
         private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION = "Ongoing state of App Tracking Protection"
 
         private fun registerOngoingNotificationChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel =
-                    NotificationChannel(
-                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
-                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
-                        IMPORTANCE_LOW,
-                    )
-                channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
-                val notificationManager = NotificationManagerCompat.from(context)
-                notificationManager.createNotificationChannel(channel)
-            }
+            val channel =
+                NotificationChannel(
+                    VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
+                    VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
+                    IMPORTANCE_LOW,
+                )
+            channel.setShowBadge(false)
+            channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationManager.createNotificationChannel(channel)
+            /**
+             * We needed to create a new channel to fix: https://app.asana.com/0/488551667048375/1206484244032061/f
+             */
+            notificationManager.deleteNotificationChannel("com.duckduckgo.mobile.android.vpn.notification.ongoing")
         }
 
         fun buildVpnEnabledNotification(
@@ -61,14 +63,11 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setContentTitle(context.getString(R.string.atp_name))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnEnabledNotificationContent.title))
                 .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
@@ -82,21 +81,26 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnNotification.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.text))
+                .setContentTitle(vpnNotification.title)
                 .setContentIntent(vpnNotification.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)
                 .addNotificationActions(context, vpnNotification.notificationActions)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setDeleteIntentIfValid(vpnNotification.deleteIntent)
                 .build()
+        }
+
+        private fun NotificationCompat.Builder.setDeleteIntentIfValid(deleteIntent: PendingIntent?): NotificationCompat.Builder {
+            if (deleteIntent != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                this.setDeleteIntent(deleteIntent)
+            }
+            return this
         }
 
         private fun NotificationCompat.Builder.addNotificationActions(

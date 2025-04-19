@@ -27,6 +27,9 @@ interface AutofillPrefsStore {
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
+    val autofillStateSetByUser: Boolean
+    var timestampUserLastPromptedToDisableAutofill: Long?
+    var domainTargetDatasetVersion: Long
 
     /**
      * Returns if Autofill was enabled by default.
@@ -35,6 +38,12 @@ interface AutofillPrefsStore {
      * which is separate from its current state.
      */
     fun wasDefaultStateEnabled(): Boolean
+
+    /**
+     * Resets all values to their default state
+     * Only for internal use
+     */
+    fun resetAllValues()
 }
 
 class RealAutofillPrefsStore(
@@ -71,6 +80,27 @@ class RealAutofillPrefsStore(
         get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
         set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
 
+    override val autofillStateSetByUser: Boolean
+        get() = autofillStateSetByUser()
+
+    override var timestampUserLastPromptedToDisableAutofill: Long?
+        get() {
+            val timestamp = prefs.getLong(TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL, -1)
+            if (timestamp == -1L) {
+                return null
+            }
+            return timestamp
+        }
+        set(value) = prefs.edit { putLong(TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL, value ?: -1) }
+
+    override var domainTargetDatasetVersion: Long
+        get() = prefs.getLong(DOMAIN_TARGET_DATASET_VERSION, 0L)
+        set(value) {
+            prefs.edit {
+                putLong(DOMAIN_TARGET_DATASET_VERSION, value)
+            }
+        }
+
     /**
      * Returns if Autofill was enabled by default. Note, this is not necessarily the same as the current state of Autofill.
      */
@@ -106,12 +136,23 @@ class RealAutofillPrefsStore(
         get() = prefs.getBoolean(MONITOR_AUTOFILL_DECLINES, true)
         set(value) = prefs.edit { putBoolean(MONITOR_AUTOFILL_DECLINES, value) }
 
+    override fun resetAllValues() {
+        prefs.edit {
+            remove(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN)
+            remove(AUTOFILL_DECLINE_COUNT)
+            remove(MONITOR_AUTOFILL_DECLINES)
+            remove(ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED)
+        }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
+        const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
         const val ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED = "original_autofill_default_state_enabled"
+        const val DOMAIN_TARGET_DATASET_VERSION = "domain_target_dataset_version"
     }
 }

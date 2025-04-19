@@ -18,7 +18,6 @@ package com.duckduckgo.networkprotection.impl.exclusion
 
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

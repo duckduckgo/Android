@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ chce otvoriť tvoj softvér DRM</string>
+    <string name="drmSiteDialogSubtitle">Softvér Digital Rights Management je potrebný na prehrávanie chráneného mediálneho obsahu, no poskytuje aj prístup k identifikátorom zariadenia. Povolenie pre tieto údaje povoľte iba stránkam, ktorým dôverujete. Povolenia môžete kedykoľvek spravovať v Nastaveniach. <annotation type="drm_learn_more_link">Zistiť viac</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Vždy</string>
+    <string name="drmSiteDialogAllowOnce">Iba pre túto reláciu</string>
+    <string name="drmSiteDialogDenyAlways">Vždy odmietnuť</string>
+    <string name="drmSiteDialogDenyOnce">Odmietnuť pre túto reláciu</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ chce získať prístup k tvojej polohe</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Zapamätať si moju voľbu</string>
+    <string name="preciseLocationDDGDialogSubtitle">Používame vašu anonymnú polohu len na to, aby sme vám mohli ponúknuť lepšie výsledky, ktoré sú bližšie k vám. Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k polohe v tomto zariadení</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Lokality môžu používať tvoju polohu len vtedy, ak povolíš aplikácii DuckDuckGo žiadať o prístup k nej.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Povoliť aplikácii DuckDuckGo žiadať o prístup k polohe</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Povolenia na prístup k mikrofónu a kamere, ktoré si udelil/-a jednotlivým webovým stránkam, môžeš spravovať v Nastaveniach.</string>
+    <string name="sitePermissionsMicDialogSubtitle">V Nastaveniach môžeš spravovať povolenia na prístup k mikrofónu, ktoré si udelil/-a jednotlivým webovým stránkam.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Povolenia na prístup ku kamere, ktoré si udelil/-a jednotlivým webovým stránkam, môžeš spravovať v Nastaveniach.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" chce získať prístup k fotoaparátu a mikrofónu</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\"chce získať prístup k mikrofónu</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" chce mať prístup k fotoaparátu</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Lokality môžu používať váš fotoaparát a mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otvoriť nastavenia</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Zrušiť</string>
+
+    <string name="sitePermissionsSettingsDescription">Stránky, ktoré navštívite, môžu požiadať o prístup k polohe vášho zariadenia, fotoaparátu, mikrofónu alebo softvéru DRM (Digital Rights Management). Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>
+    <string name="sitePermissionsSettingsLocation">Poloha</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofón</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa lokalít</string>
+    <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Povolenia boli odstránené pre všetky lokality</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Povolenia pre „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Vždy sa opýtať</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
+    <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázané pre všetky lokality</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s povolenie pre %2$s</string>
+
 </resources>

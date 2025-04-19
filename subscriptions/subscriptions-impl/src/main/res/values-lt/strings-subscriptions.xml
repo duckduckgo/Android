@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Atšaukti</string>
+    <string name="ok">Gerai</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Tvarkyti el. paštą</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Grįžti į nustatymus</string>
+    <string name="somethingWentWrong">Įvyko klaida</string>
+    <string name="somethingWentWrongDescription">„Google Play“ nepavyko apdoroti pirkinio. Bandykite dar kartą vėliau.</string>
+    <string name="youAreSet">Viskas paruošta.</string>
+    <string name="viewPlans">Peržiūrėti planus</string>
+    <string name="subscriptionNotFound">Prenumeratos nerasta</string>
+    <string name="subscriptionNotFoundDescription">Su šia „Google Play“ paskyra susijusi prenumerata nebėra aktyvi.</string>
+    <string name="purchaseRestored">Jūsų pirkiniai atkurti.</string>
+    <string name="restoreSubscriptionTitle">Pridėkite savo „Privacy Pro“ prenumeratą prie šio įrenginio</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Pridėti per „Google Play“ paskyrą</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Atkurkite savo prenumeratą „Android“ įrenginiuose naudodami „Google Play“ paskyrą.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Atkurti pirkimą</string>
+    <string name="restoreSubscriptionEmailTitle">Pridėti per el. paštą</string>
+    <string name="restoreSubscriptionEmailDescription">Susiekite el. pašto adresą su prenumerata, kad prie šio įrenginio pridėtumėte \"Privacy Pro\".</string>
+    <string name="restoreSubscriptionEmailGetStarted">Pradėti</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Pašalinti prenumeratą</string>
+    <string name="subscriptionRemoved">Jūsų prenumerata buvo pašalinta iš šio įrenginio</string>
+    <string name="removeFromDevice">Pašalinti iš šio įrenginio?</string>
+    <string name="removeFromDeviceDescription">Šiame prietaise nebegalėsite naudotis „Privacy Pro“ prenumerata. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Jūsų mėnesio prenumerata %1$s %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Jūsų metinė prenumerata %1$s %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Jūsų prenumerata baigėsi %1$s.</string>
+    <string name="monthlySubscription">Mėnesinė prenumerata</string>
+    <string name="yearlySubscription">Metinė prenumerata</string>
+    <string name="renews">atsinaujina</string>
+    <string name="expires">baigiasi</string>
+    <string name="activateOnOtherDevices">Pridėti „Privacy Pro“ prie kitų įrenginių</string>
+    <string name="addToDevicePrimaryText">Pridėti prie įrenginio</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pridėkite „Privacy Pro“ į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į „Settings“ (Nustatymai) &gt; „Privacy Pro“ &gt; „I have a Subscription“ (Turiu prenumeratą).</string>
+    <string name="editEmailPrimaryText">Redaguoti el. pašto adresą</string>
+    <string name="learnMore">Sužinoti daugiau</string>
+    <string name="privacyProFaq">Reikia pagalbos su „Privacy Pro“?</string>
+    <string name="privacyProFaqSecondary">Gaukite atsakymus į dažniausiai užduodamus klausimus arba susisiekite su „Privacy Pro“ palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
+    <string name="subscriptionStatusSubscribed">Prenumeruota</string>
+    <string name="privacyPolicyAndTermsOfService">Privatumo politika ir paslaugų teikimo sąlygos</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Prenumeratos nustatymai</string>
+    <string name="subscriptionSettingSubscribe">Apsaugokite savo ryšį ir tapatybę su „Privacy Pro“.</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Apima mūsų VPN, Asmens duomenų pašalinimą ir Tapatybės vagystės atkūrimą.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Apima mūsų VPN ir Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Gaukite „Privacy Pro“</string>
+    <string name="subscriptionSettingRestore">Turiu prenumeratą</string>
+    <string name="subscriptionSettingExpired">Jūsų „Privacy Pro“ prenumerata baigėsi</string>
+    <string name="subscriptionSettingExpiredViewPlans">Peržiūrėti planus</string>
+    <string name="subscriptionSettingSectionSubscription">Prenumerata</string>
+    <string name="subscriptionSettingRemoveFromDevice">Pašalinti iš šio įrenginio</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Pagalba ir palaikymas</string>
+    <string name="subscriptionSettingSendFeedback">Siųsti atsiliepimą</string>
+    <string name="subscriptionSettingActivating">Aktyvavimas</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Viskas paruošta.</string>
+    <string name="purchaseCompletedText">Jūsų pirkinys buvo sėkmingas.</string>
+    <string name="purchaseRecoveredText">Jau turėjai prenumeratą ir mes ją tau atkūrėme.</string>
+    <string name="purchaseErrorTitle">Įvyko klaida</string>
+    <string name="purchaseError">Mums kyla problemų prijungiant. Bandykite dar kartą vėliau.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Atnaujinkite planą arba atšaukite</string>
+    <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Aktyvuokite „Privacy Pro“ darbalaukyje, kad nustatytumėte Asmeninės informacijos pašalinimą.</string>
+    <string name="pirDescription">„DuckDuckGo“ naršyklėje, skirtoje darbalaukiui, eikite į <b>Nustatymai &gt; „Privacy Pro“</b> ir spustelėkite <b>Turiu prenumeratą</b>, kad pradėtumėte.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Atviras</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Siųsti atsiliepimą</string>
+    <string name="feedbackActionHeader">PASIRINKITE KATEGORIJĄ</string>
+    <string name="feedbackActionReportIssue">Praneškite apie problemą</string>
+    <string name="feedbackActionGeneralFeedback">Bendro pobūdžio atsiliepimai</string>
+    <string name="feedbackActionFeatureRequest">Prašykite funkcijos</string>
+
+    <string name="feedbackGeneralHeader">PASIRINKITE KATEGORIJĄ</string>
+    <string name="feedbackGeneralBrowser">Naršyklės atsiliepimai</string>
+    <string name="feedbackGeneralPpro">„Privacy Pro“</string>
+
+    <string name="feedbackCategoryHeader">PASIRINKITE KATEGORIJĄ</string>
+    <string name="feedbackCategorySubscription">Prenumerata ir mokėjimai</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">PASIRINKITE KATEGORIJĄ</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN nepavyksta prisijungti</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN ryšys yra per lėtas</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN sukelia problemų su kitomis programėlėmis ar svetainėmis</string>
+    <string name="feedbackSubCategoryVpnIot">VPN neleidžia prisijungti prie vietinio įrenginio</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN sukelia naršyklės strigimą arba nustoja veikti</string>
+    <string name="feedbackSubCategoryVpnOther">Kiti</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Informacija nėra konkrečioje svetainėje</string>
+    <string name="feedbackSubCategoryPirNotMe">Įrašai nepriklauso naudotojui</string>
+    <string name="feedbackSubCategoryPirScanStuck">Nuskaitymas užstrigo</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Pašalinimas užstrigo</string>
+    <string name="feedbackSubCategoryPirOther">Kiti</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problema su prieigos kodu</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Nepavyksta susisiekti su konsultantu</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Skambutis konsultantui buvo nenaudingas</string>
+    <string name="feedbackSubCategoryItrOther">Kiti</string>
+
+    <string name="feedbackSubCategorySubsOtp">Vienkartinis slaptažodis</string>
+    <string name="feedbackSubCategorySubsOther">Kiti</string>
+
+    <string name="feedbackSubmitVpnHeader">Ar radote problemą, kurios nėra mūsų <annotation type="faqs_link">pagalbos centre</annotation> ? Mes tikrai norime apie tai sužinoti.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Praneškite, kas vyksta...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Be pirmiau įvestos informacijos, kartu su jūsų atsiliepimais siunčiame anoniminę informaciją:\n\n• Ar kai kurios naršyklės funkcijos yra aktyvios\n• Apibendrinta programėlės diagnostika (pvz., klaidų kodai)\n\nSpausdami „Pateikti“ sutinkate, kad „DuckDuckGo“ gali naudoti pateiktą informaciją programėlei tobulinti."</string>
+    <string name="feedbackSubmitVpnSubmit">Pateikti</string>
+    <string name="feedbackSubmitCompletedMessage">Dėkojame! Atsiliepimas pateiktas.</string>
+    <string name="feedbackSubmitFailedMessage">Įvyko klaida</string>
+
+    <string name="feedbackSubmitEmailByLine">Pateikite el. paštą, jei norėtumėte, kad susisiektume su jumis dėl šios problemos (galbūt negalėsime atsakyti į visas problemas):</string>
+    <string name="feedbackSubmitEmailHint">El. paštas (neprivaloma)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Pateikite mums savo atsiliepimą...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Kokią funkciją norėtumėte pamatyti?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Prenumeratos</string>
+    <string name="activitySubscriptionSettings">Prenumeratos nustatymai</string>
+    <string name="activityActivateSubscription">Turiu prenumeratą</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Siųsti atsiliepimą</string>
+</resources>

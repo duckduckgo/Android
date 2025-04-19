@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">La privacy, semplificata</string>
+    <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Protezione. Privacy.  Serenità.</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
     <string name="open">Apri</string>
@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossibile aprire la schermata delle impostazioni predefinite dell\'app</string>
-    <string name="settingsDefaultBrowserEnabled">Imposta come Browser predefinito</string>
+    <string name="setAsDefaultBrowser">Imposta come Browser predefinito</string>
     <string name="defaultBrowserMaybeLater">Forse più tardi</string>
-    <string name="defaultBrowserLetsDoIt">Imposta come Browser predefinito</string>
     <string name="defaultBrowserDescriptionNoDefault">Apri i collegamenti con la massima tranquillità, ogni volta.</string>
     <string name="defaultBrowserInstructions">Seleziona DuckDuckGo e clicca su <font color="#678fff">Sempre</font>.</string>
 
@@ -64,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy attivata per %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy disattivata per %1$s</string>
     <string name="undoSnackbarAction">Annulla</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sistema di tracciamento bloccato</item>
+        <item quantity="other">Sistemi di tracciamento bloccati</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Scarica immagine</string>
@@ -85,7 +89,10 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifica query prima di iniziare la ricerca</string>
-    <string name="settingsAutocompleteEnabled">Mostra suggerimenti di completamento automatico</string>
+    <string name="autocompleteRemoveItemTitle">Rimuovere il suggerimento di ricerca?</string>
+    <string name="autocompleteRemoveItemCancel">Annulla</string>
+    <string name="autocompleteRemoveItemRemove">Rimuovi</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Passa alla scheda · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Apri l\'app esterna</string>
@@ -108,6 +115,13 @@
     <string name="tabClosed">Scheda chiusa</string>
     <string name="tabClosedUndo">Annulla</string>
     <string name="downloadsMenuItemTitle">Download</string>
+    <string name="tabSwitcherListViewMenu">Vista elenco</string>
+    <string name="tabSwitcherGridViewMenu">Vista a griglia</string>
+
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sistemi di tracciamento bloccati &lt;/b&gt; negli ultimi 7 giorni</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sistemi di tracciamento bloccati &lt;/b&gt;</string>
+    <string name="inTheLast7Days">negli ultimi 7 giorni</string>
 
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
@@ -118,16 +132,15 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Impostazioni</string>
     <string name="settingsMenuItemTitle">Impostazioni</string>
-    <string name="settingsHeadingPrivacy">Privacy</string>
+    <string name="settingsHeadingProtections">Protezioni</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
-    <string name="settingsHeadingCustomize">Personalizza</string>
     <string name="settingsHeadingAbout">Informazioni</string>
     <string name="settingsAboutDuckduckgo">Informazioni su DuckDuckGo</string>
     <string name="settingsVersion">Versione</string>
     <string name="leaveFeedback">Condividi feedback</string>
+    <string name="leaveFeedbackNew">Invia feedback</string>
     <string name="settingsEmailProtectionTitle">Protezione email</string>
-    <string name="settingsEmailProtectionSubtitle">Blocca i sistemi di tracciamento delle email e nascondi il tuo indirizzo</string>
-    <string name="settingsHeadingMore">Ulteriori informazioni su DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps">Passaggi successivi</string>
     <string name="settingsLightTheme">Chiaro</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Scuro</string>
@@ -142,40 +155,47 @@
     <string name="settingsSubtitleNotificationsDisabled">Disattivato</string>
     <string name="settingsSubtitleNotificationsEnabled">Attivato</string>
     <string name="settingsDefaultBrowserTitle">Browser predefinito</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo è il tuo browser predefinito</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Imposta DuckDuckGo come browser predefinito</string>
     <string name="settingsPrivateSearchTitle">Ricerca privata</string>
-    <string name="settingsPrivateSearchDescription">Abilitato per impostazione predefinita</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generale</string>
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
-    <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
-    <string name="settingsHeadingSettings">Impostazioni</string>
+    <string name="settingsHeadingMainSettings">Altre impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
-    <string name="settingsFireButton">Fire Button</string>
+    <string name="settingsDataClearing">Cancellazione dati</string>
+    <string name="settingsAddWidget">Aggiungi widget alla schermata iniziale</string>
+    <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
+    <string name="settingsEnableVoiceSearch">Attiva la ricerca vocale privata</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo su altre piattaforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Ricerca privata</string>
-    <string name="privateSearchTitle">Private Search è abilitato</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato.</string>
-    <string name="privateSearchHeadingSearchSettings">Impostazioni di ricerca</string>
-    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Altre impostazioni di ricerca</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizza la lingua di ricerca, la regione e altro ancora</string>
     <string name="privateSearchMoreSearchSettingsTitle">Altre impostazioni di ricerca</string>
+    <string name="privateSearchAutocompleteToggle">Suggerimenti di ricerca</string>
+    <string name="privateSearchAutocompleteHint">Visualizza i suggerimenti di ricerca mentre digiti, inclusi i tuoi segnalibri. Tutte le ricerche sono private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Siti visitati di recente</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostra i siti visitati di recente nei suggerimenti di ricerca. Questi siti sono privati, vengono memorizzati solo sul tuo dispositivo e possono essere rimossi con il Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">I suggerimenti di completamento automatico ora includono i siti visitati di recente. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">La stessa privacy.\nSuggerimenti di ricerca migliori!</string>
+    <string name="openAutoCompleteSettings">Apri Impostazioni</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generale</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
-    <string name="webTrackingProtectionTitle">La protezione dal tracciamento Web è abilitata</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
+    <string name="webTrackingProtectionTitle">Protezione dal tracciamento web</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protezione pop-up dei cookie</string>
-    <string name="cookiePopupProtectionDescription">Elimina questi pop-up e riduci al minimo i cookie</string>
-    <string name="cookiePopupProtectionEnabled">Attivato</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Cancellazione dati</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Autorizzazioni</string>
@@ -186,7 +206,7 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
 
-    <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
+    <string name="settingsAutomaticallyClearData">Cancellazione automatica dei dati…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nessuno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Schede</string>
@@ -203,66 +223,17 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
-    <string name="aboutHeader">Dax the Duck ti dà il benvenuto!</string>
-    <string name="aboutDescription">Fondata nel 2008, DuckDuckGo è un\'azienda indipendente che tutela la privacy online per tutti coloro che sono stanchi di essere tracciati online e vogliono una soluzione semplice. Siamo la dimostrazione che si può garantire una vera protezione della privacy online senza compromessi.\n\nIl browser DuckDuckGo è ricco di funzioni essenziali come i segnalibri, le schede, le password e molto altro ancora, oltre a <annotation type="privacy_protection_link">numerose e potenti protezioni della privacy</annotation> che normalmente non vengono offerte dai browser più comuni. Stiamo parlando di uno straordinario set completo per la protezione della privacy, che aiuta a proteggere le attività online, dalla ricerca alla navigazione, alle e-mail e molto altro ancora.\n\nCon le nostre protezioni della privacy non è necessario conoscere particolari tecnici o dover affrontare configurazioni complesse. È sufficiente scegliere il browser DuckDuckGo su tutti i dispositivi personali per avere automaticamente garantita la privacy.\n\nPer saperne di più su come funzionano le protezioni della privacy di DuckDuckGo, è possibile consultare le nostre <annotation type="learn_more_link">pagine di aiuto</annotation></string>
+    <string name="aboutActivityTitleNew">Informazioni</string>
+    <string name="aboutHeaderNewTagLine">Protezione. Privacy.  Serenità.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo è la società indipendente di protezione online per chiunque voglia riprendere il controllo dei propri dati personali.\n\nDuckDuckGo ritiene che il modo migliore per proteggere le informazioni personali da hacker, truffatori e aziende che violano la privacy sia impedire del tutto che vengano raccolte. Ecco perché milioni di persone <annotation type="chart_comparison">scelgono DuckDuckGo invece di Chrome e altri browser</annotation> per cercare e navigare online. Il nostro motore di ricerca integrato è come Google, ma non tiene mai traccia delle ricerche. E le nostre misure di protezione per la navigazione, come il blocco dei sistemi di tracciamento degli annunci e dei cookie, aiutano a impedire ad altre aziende di raccogliere i dati. Inoltre, il nostro browser è gratuito: guadagniamo con gli <annotation type="privacy_respecting_ads">annunci di ricerca che rispettano la privacy</annotation>, non sfruttando i dati.\n\nInoltre, offriamo anche <annotation type="ppro_help_page">Privacy Pro</annotation>, un servizio di abbonamento tre in uno, integrato nel nostro browser. Gli abbonati a Privacy Pro ottengono una protezione della privacy maggiore con una <annotation type="vpn_help_page">VPN</annotation> veloce e semplice che aiuta a proteggere l\'attività online, un servizio che trova e rimuove le informazioni personali dai siti di ricerca persone e un servizio che ripristina l\'identità in caso di furto.\n\nRiprendi il controllo delle informazioni personali con il browser progettato per la protezione dei dati, non per la loro raccolta.</string>
     <string name="no_suggestions">Nessun suggerimento</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Segnala sito danneggiato</string>
-    <string name="brokenSiteHeading">Segnala sito danneggiato</string>
-    <string name="brokenSiteSubmitted">Grazie! Il feedback è stato inviato.</string>
-    <string name="brokenSitesCategoriesTitle">Descrivi cosa è successo</string>
-    <string name="brokenSitesCategoriesHint">Descrivi cosa è successo</string>
-    <string name="brokenSiteSubmitButton">Invia il rapporto</string>
-    <string name="brokenSiteDescription">L\'invio di una segnalazione anonima su un sito non funzionante ci aiuta a migliorare l\'app.</string>
-
-    <string name="brokenSiteCategoryBlocked">Sito bloccato o non caricato</string>
-    <string name="brokenSiteCategoryLayout">Layout del sito interrotto</string>
-    <string name="brokenSiteCategoryEmptySpaces">Il sito contiene grandi spazi vuoti</string>
-    <string name="brokenSiteCategoryShopping">Non riesco a pagare, effettuare il check-out o fare acquisti</string>
-    <string name="brokenSiteCategoryPaywall">Il sito mi ha chiesto di disabilitare il blocco degli annunci</string>
-    <string name="brokenSiteCategoryComments">Commenti, recensioni o chat non sono stati caricati</string>
-    <string name="brokenSiteCategoryVideos">Il video non è stato riprodotto o caricato</string>
-    <string name="brokenSiteCategoryLogin">Impossibile accedere/registrarsi</string>
-    <string name="brokenSiteCategoryOther">Qualcos\'altro</string>
-    <string name="brokenSiteDescriptionTextInputHint">Condividi maggiori dettagli (facoltativo)</string>
-    <string name="brokenSiteDescriptionCaption">Cos\'è successo? Cosa sarebbe dovuto succedere? Disattivare le protezioni è stato utile?</string>
 
     <string name="brokenSiteProtectionsOn">Le protezioni sono <b>ATTIVE</b> per questo sito</string>
     <string name="brokenSiteProtectionsOff">Le protezioni sono <b>DISATTIVATE</b> per questo sito</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Disattivare le protezioni potrebbe essere utile.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Abbiamo temporaneamente disabilitato le Protezioni della Privacy perché sembra che stiano interrompendo il funzionamento del sito.</string>
-
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Segnalibri</string>
-    <string name="bookmarksActivityTitle">Segnalibri</string>
-    <string name="noBookmarks">Non è ancora stato aggiunto nessun segnalibro</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Ulteriori opzioni per il segnalibro %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; eliminato</string>
-    <string name="exportBookmarksMenu">Esporta</string>
-    <string name="exportBookmarksEmpty">Non hai alcun segnalibro, quindi non verrà esportato nulla</string>
-    <string name="exportBookmarksError">Impossibile esportare i segnalibri, si è verificato un errore</string>
-    <string name="exportBookmarksSuccess">Tutti i segnalibri sono stati esportati correttamente</string>
-    <string name="importBookmarksMenu">Importa</string>
-    <string name="importBookmarksFileTitle">Seleziona un file di segnalibri da importare</string>
-    <string name="importBookmarksError">Impossibile importare i segnalibri, si è verificato un errore</string>
-    <string name="importBookmarksEmpty">Il file non contiene nessun segnalibro da importare</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d segnalibri sono stati importati correttamente</string>
-    <string name="savedSiteDialogTitleHint">Titolo</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Modifica</string>
-    <string name="bookmarksSectionTitle">Segnalibri</string>
-    <string name="favoritesSectionTitle">Preferiti</string>
-    <string name="bookmarksEmptyHint">Non è ancora stato aggiunto nessun segnalibro</string>
-    <string name="favoritesEmptyHint">Non è stato ancora aggiunto alcun preferito</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Conferma</string>
-    <string name="dialogSave">Salva</string>
-    <string name="delete">Cancella</string>
-    <string name="edit">Modifica</string>
-    <string name="remove">Rimuovi</string>
-    <string name="removeAll">Elimina tutto</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Cerca con DuckDuckGo</string>
@@ -276,8 +247,6 @@
     <string name="widgetConfigurationAddWidgetOption">Aggiungi widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Non è stato ancora aggiunto alcun preferito</string>
     <string name="searchWidgetEmtpyFavoritesCta">Aggiungi preferito</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visita i tuoi siti preferiti in un batter d\'occhio!<br/><br/>Vai su un sito che ti piace. Poi tocca l\'icona \"⋯\" e seleziona Aggiungi ai Preferiti.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Visita i tuoi siti preferiti in un batter d\'occhio! Vai su un sito che ti piace. Poi tocca il pulsante del menu del browser e seleziona Aggiungi ai Preferiti.</string>
     <string name="widgetConfigurationActivityTitle">Configurazione widget</string>
     <string name="favoritesWidgetLabel">Preferiti</string>
     <string name="searchWidgetLabel">Ricerca</string>
@@ -437,7 +406,7 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Da questo dispositivo</string>
     <string name="systemSearchAppNotFound">Impossibile trovare l\'applicazione</string>
-    <string name="systemSearchOnboardingText">Grazie per aver scelto DuckDuckGo!\nOra, quando usi il nostro motore di ricerca o la nostra app, le tue ricerche sono protette.</string>
+    <string name="systemSearchOnboardingThanks">Grazie per aver scelto DuckDuckGo!\nUsare il nostro browser aiuta a proteggersi da hacker, truffatori e aziende affamate di dati.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Inoltre, l\'app DuckDuckGo:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blocca i sistemi di tracciamento non sicuri.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Forza la crittografia sui siti web.</string>
@@ -447,14 +416,8 @@
     <string name="systemSearchOnboardingButtonOk">Ho capito</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Nascondi</string>
-    <string name="daxDialogPhew">Accidenti!</string>
-    <string name="daxDialogNext">Successivo</string>
     <string name="daxDialogHighFive">Batti cinque!</string>
     <string name="daxDialogGotIt">Fatto</string>
-    <string name="hideTipsTitle">Nascondere i suggerimenti rimanenti?</string>
-    <string name="hideTipsText">Ce ne sono solo alcuni e abbiamo cercato di renderli informativi.</string>
-    <string name="hideTipsButton">Nascondi suggerimenti per sempre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Ora stai bloccando i sistemi di tracciamento sul web 🎉<br/><br/>Posso anche bloccare i sistemi di tracciamento nascosti nelle altre tue app, anche quando non usi il telefono.]]></string>
@@ -465,40 +428,11 @@
     <string name="onboardingWelcomeTitle">"DuckDuckGo ti dà il benvenuto!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet può essere un po\' inquietante.<br/><br/>Non preoccuparti! Cercare e navigare privatamente è più facile di quanto pensi.]]></string>
     <string name="onboardingLetsDoItButton">Facciamolo!</string>
-    <string name="daxIntroCtaText"><![CDATA[Poi, prova a visitare uno dei tuoi siti preferiti! <br/><br/>Bloccherò i sistemi di tracciamento in modo che non possano spiarti. Aggiornerò anche la sicurezza della tua connessione, se possibile. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Ben fatto!<br/><br/>Ricorda: quando navighi con me, gli annunci inquietanti non possono seguirti. 👍]]></string>
-    <string name="daxSerpCtaText">Le tue ricerche su DuckDuckGo sono anonime. Sempre. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-        <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-        <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Mentre clicchi e scrolli, io bloccherò i fastidiosi tracker. <br/><br/>Continua pure a navigare in tranquillità!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attenzione! Non posso impedire a %1$s di visualizzare la tua attività su %2$s &lt;br/&gt;&lt;br/&gt;Tuttavia, se navighi con me posso ridurre ciò che %3$s sa in generale su di te bloccando i suoi sistemi di tracciamento su molti altri siti.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Avviso! Dal momento che %1$s appartiene a %2$s, non posso impedirgli di visualizzare la tua attività qui.&lt;br/&gt;&lt;br/&gt;Comunque, se navighi con me potrò ridurre la quantità di informazioni che %3$s conosce in generale su di te, bloccando i suoi tracker su molti altri siti.</string>
 
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Cosa ti fa decidere di usare DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Continua</string>
-    <string name="onboardingFeatureOptionsSkip">Salta questo passaggio</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Ricerca privata</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blocco dei tracker</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Impronta digitale ridotta</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Caricamento pagine rapido</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Meno annunci</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Dati eliminabili con un clic</string>
-
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Salva in Download</string>
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Salva %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Conserva entrambi</string>
     <string name="downloadConfirmationReplaceOldFileText">Sostituisci</string>
@@ -588,8 +522,8 @@
     <string name="preciseLocationSystemDialogDeny">Forse più tardi</string>
     <string name="preciseLocationSystemDialogNeverAllow">Non chiedere più per questo sito</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Consenti a %1$s di accedere alla tua posizione?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Usiamo la tua posizione anonima solo per offrirti risultati migliori, più vicini a te. Puoi sempre cambiare idea in seguito.</string>
     <string name="preciseLocationSiteDialogSubtitle">Puoi gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti in Impostazioni.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Usiamo la tua posizione anonima solo per offrirti risultati migliori, più vicini a te. Puoi gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti in Impostazioni.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Sempre</string>
     <string name="preciseLocationSiteDialogAllowOnce">Solo per questa sessione</string>
     <string name="preciseLocationSiteDialogDenyAlways">Nega sempre</string>
@@ -644,27 +578,6 @@
     <string name="emailNotSupported">Dispositivo non supportato</string>
     <string name="emailNotSupportedExplanation">Protezione email consente di creare indirizzi e-mail privati che rimuovono i sistemi di tracciamento delle e-mail. Dobbiamo crittografare e archiviare questi indirizzi che crei localmente sul tuo dispositivo. Poiché il tuo dispositivo non supporta l\'archiviazione crittografata, Protezione email non è disponibile.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Modifica segnalibro</string>
-    <string name="favoriteDialogTitleEdit">Modifica preferito</string>
-    <string name="locationLabel">Posizione</string>
-    <string name="folderLocationTitle">Seleziona la posizione</string>
-    <string name="addFolder">Aggiungi cartella</string>
-    <string name="editFolder">Modifica cartella</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Eliminare la cartella e i relativi contenuti?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Eliminare "</string>
-    <string name="bookmarkFolderEmpty">Vuoto</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s e %3$d elemento?</item>
-        <item quantity="other">%1$s%2$s e %3$d elementi?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d elemento</item>
-        <item quantity="other">%1$d elementi</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accessibilità</string>
     <string name="accessibilityActivityTitle">Accessibilità</string>
@@ -680,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Aggiungi %1$s widget alla schermata iniziale</string>
-    <string name="settingsAddHomeScreenWidget">Widget della schermata iniziale</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Naviga in privato con la nostra app per Mac</string>
-    <string name="macos_settings_title">App Mac DuckDuckGo</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
@@ -695,7 +605,7 @@
     <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
     <string name="downloadsFileNotFoundErrorMessage">Il file non esiste più</string>
     <string name="downloadsItemMenuShare">Condividi</string>
-    <string name="downloadsItemMenuDelete">Cancella</string>
+    <string name="downloadsItemMenuDelete">Elimina</string>
     <string name="downloadsItemMenuCancel">Annulla</string>
     <string name="downloadsActivityMenuDeleteAll">Elimina tutto</string>
     <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s eliminato</string>
@@ -720,55 +630,90 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">No, me ne occupo io</string>
 
-    <string name="autoconsentSetting">Gestione dei popup dei cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup nascosto</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookie gestiti</string>
-
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Autorizzazioni del sito</string>
-    <string name="sitePermissionsSettingsDescription">I siti che visiti potrebbero richiedere l\'accesso al software di localizzazione, videocamera, microfono o DRM (Digital Rights Management) del tuo dispositivo. Non potranno accedervi finché non darai il consenso esplicito.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Consenti a tutti i siti di richiedere:</string>
-    <string name="sitePermissionsSettingsLocation">Posizione</string>
-    <string name="sitePermissionsSettingsCamera">Fotocamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Microfono</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Gestisci siti</string>
-    <string name="sitePermissionsSettingsEmptyText">Non esistono ancora siti</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorizzazioni rimosse per tutti i siti</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorizzazioni per \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Chiedi</string>
-    <string name="permissionsPerWebsiteDenySetting">Rifiuta</string>
-    <string name="permissionsPerWebsiteAllowSetting">Consenti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">\"Chiedi\" disattivato per tutti i siti</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorizzazione %1$s per %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Scopri quando i download sono pronti</string>
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">App Windows DuckDuckGo</string>
-    <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
-    <string name="windows_settings_description_ready">Download disponibile</string>
-    <string name="windows_settings_description_list">Sei sulla lista.</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trascina verso il basso dall\'alto e tocca il pulsante Indietro per uscire dall\'intero schermo</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Chiudere tutte le schede?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Vuoi davvero chiudere tutte le schede?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annulla</string>
     <string name="closeAppTabsConfirmationDialogClose">Chiudi</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Eliminare questo segnalibro?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">L\'operazione eliminerà il tuo segnalibro per &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Eliminare questo preferito?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Questo eliminerà il tuo preferito per &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Eliminare questa cartella dei segnalibri?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Questa operazione eliminerà la tua cartella dei segnalibri &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Annulla</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Cancella</string>
+    <string name="selectTabsMenuItem">Seleziona schede</string>
+    <string name="selectAllTabsMenuItem">Seleziona tutto</string>
+    <string name="deselectAllTabsMenuItem">Deseleziona tutto</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d selezionata</string>
+    <string name="tabSelectedIndicator">Indicatore selezionato dalla scheda</string>
+    <string name="tabNotSelectedIndicator">Indicatore non selezionato dalla scheda</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d link da DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Condividi link</item>
+        <item quantity="other">Condividi %1$d link</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Aggiungere la scheda selezionata ai preferiti?</item>
+        <item quantity="other">Aggiungere %1$d schede ai preferiti?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Preferito aggiunto</item>
+        <item quantity="other">%1$d preferiti aggiunti</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Aggiungi ai segnalibri</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Aggiungi la scheda ai preferiti</item>
+        <item quantity="other">Aggiungi %1$d schede ai preferiti</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">I segnalibri già presenti non saranno duplicati.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Chiudere la scheda?</item>
+        <item quantity="other">Chiudere tutte le %1$d schede?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Chiudere l\'altra scheda?</item>
+        <item quantity="other">Chiudere %1$d altre schede?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Chiudere la scheda?</item>
+        <item quantity="other">Chiudere %1$d schede?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vuoi davvero chiudere questa scheda?</item>
+        <item quantity="other">Vuoi davvero chiudere tutte le schede?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vuoi davvero chiudere questa scheda?</item>
+        <item quantity="other">Vuoi davvero chiudere queste schede?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Chiudi scheda</item>
+        <item quantity="other">Chiudi schede</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Chiudi scheda</item>
+        <item quantity="other">Chiudi %1$d schede</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Chiudi altre schede</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Scheda chiusa</item>
+        <item quantity="other">%1$d schede chiuse</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">%1$d scheda privata</item>
+        <item quantity="other">%1$d schede private</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Aggiungi l\'opzione di ricerca vocale alla barra degli indirizzi. L\'audio non viene memorizzato né condiviso, nemmeno con DuckDuckGo.</string>
@@ -785,25 +730,141 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annulla</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Password</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Password e compilazione automatica</string>
     <string name="autofillLoginSavedSnackbarMessage">Password salvata</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password aggiornata</string>
 
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Cerca segnalibri</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Eliminare %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Eliminare segnalibro %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Segnalibro aggiunto in %1$s</string>
-    <string name="addToFavorites">Aggiungi ai Preferiti</string>
-    <string name="editBookmark">Modifica segnalibro</string>
-    <string name="importBookmarksDescription">Se i segnalibri vengono salvati in un altro browser,\nè possibile importarli in DuckDuckGo.</string>
-    <string name="importBookmarks">Importa segnalibri</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nessun risultato per \"%1$s\"</string>
-    <string name="removeFromFavorites">Rimuovi dai preferiti</string>
-    <string name="addToFavoritesMenu">Aggiungi ai Preferiti</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Vuoi davvero eliminare questa cartella e %1$d elemento?</item>
-        <item quantity="other">Vuoi davvero eliminare questa cartella e %1$d elementi?</item>
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Apri in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Esecuzione in DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Attenzione: questo sito potrebbe non essere sicuro</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Il certificato di questo sito non è valido. Potresti collegarti a un server che finge di essere %1$s e che potrebbe mettere a rischio le tue informazioni riservate.</string>
+    <string name="sslErrorLeaveCTA">Esci da questo sito</string>
+    <string name="sslErrorAdvancedCTA">Avanzate</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo ti avverte quando un sito web ha un certificato non valido.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accetta il rischio e visita il sito</u>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s è scaduto. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s non corrisponde a *.%2$s. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Il certificato di sicurezza di %1$s non è considerato attendibile dal sistema operativo del tuo dispositivo. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+
+    <!-- Extended Onboarding-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Ciao.<br/><br/>Vuoi navigare in Internet con più privacy?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Facciamolo!</string>
+    <string name="preOnboardingDaxDialog2Title">Protezioni della privacy attivate!</string>
+    <string name="preOnboardingDaxDialog2Button">Scegli il tuo browser</string>
+    <string name="preOnboardingComparisonChartItem1">Cerca privatamente per impostazione predefinita</string>
+    <string name="preOnboardingComparisonChartItem2">Blocca i sistemi di tracciamento di terze parti</string>
+    <string name="preOnboardingComparisonChartItem3">Blocca i popup dei cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blocca gli annunci di tracciamento</string>
+    <string name="preOnboardingComparisonChartItem5">Cancella i dati di navigazione con un solo pulsante</string>
+    <string name="preOnboardingDaxDialog3Title">Fantastico! Duck ti dà il benvenuto!</string>
+    <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>
+    <string name="onboardingSearchDaxDialogTitle">Prova una ricerca!</string>
+    <string name="onboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre anonime.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">come si dice \"anatra\" in inglese</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">come si dice \"anatra\" in spagnolo</string>
+    <string name="onboardingSearchQueryOption1">come si dice anatra in inglese</string>
+    <string name="onboardingSearchQueryOption1English">come si dice anatra in spagnolo</string>
+    <string name="onboardingSearchDaxDialogOption2">cast di avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast delle papere potenti</string>
+    <string name="onboardingSearchDaxDialogOption3">meteo locale</string>
+    <string name="onboardingSearchDaxDialogOption4">Sorprendimi!</string>
+    <string name="onboardingSearchQueryOption4">ricette per la cena</string>
+    <string name="onboardingSearchQueryOption4US">ricette di biscotti con gocce di cioccolato</string>
+    <string name="onboardingSitesDaxDialogTitle">Prova a visitare un sito!</string>
+    <string name="onboardingSitesDaxDialogDescription">Bloccherò i sistemi di tracciamento in modo che non possano spiarti.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Sorprendimi!</string>
+    <string name="onboardingSerpDaxDialogDescription">È DuckDuckGo Search. Veloce, privata e con meno annunci.</string>
+    <string name="onboardingSerpDaxDialogButton">Ho capito!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">In seguito, prova a visitare un sito!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
+        <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Eliminare il tuo segnalibro per &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. L\'ho bloccato!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
+        <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Ho capito!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <b>Fire Button</b>.<br/><br/>Provalo! 🔥]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Ben fatto!"</string>
+    <string name="onboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Fatto!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, prima che me ne dimentichi...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ha anche una <b>VPN</b> integrata!<br/><br/>Attivala con un <b>abbonamento Privacy Pro a pagamento.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Ulteriori informazioni</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Salta</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Ciao.<br/><br/>Vuoi un browser più veloce che ti garantisca protezione?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Protezioni attivate!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blocca i sistemi di tracciamento di terze parti</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blocca le richieste di cookie e i popup</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blocca gli annunci mirati</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Cancella rapidamente i dati di navigazione</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Quale colore mi sta meglio?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Scegli l\'icona della tua app:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Successivo</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Dove devo mettere la barra degli indirizzi?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">In alto (impostazione predefinita)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Facile da vedere</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Successivo</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Parte inferiore</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Facile da raggiungere</string>
+    <string name="highlightsOnboardingSearchQueryOption4">anatroccoli</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre private.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Questo è <b>DuckDuckGo Search!</b> Privato. Veloce. Meno annunci.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Batti cinque!</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
+
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
+    <string name="settingsAddressBarPositionTop">Inizio</string>
+    <string name="settingsAddressBarPositionBottom">Parte inferiore</string>
+
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Mostra all\'avvio dell\'app</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Ultima scheda aperta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Pagina Nuova scheda</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Pagina specifica</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Grazie. Il tuo rapporto aiuta a rendere DuckDuckGo migliore per tutti.</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nuova AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Lascia che DuckDuckGo protegga meglio ciò che fai online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Imposta DuckDuckGo come browser predefinito in modo che apra tutti i link dei siti.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Non adesso</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocca i sistemi di tracciamento per proteggere la navigazione</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">La cancellazione delle schede e dei dati comporterà l\'eliminazione della cronologia del blocco dei sistemi di tracciamento e azzererà questo numero.\n\nNascondi questo banner se preferisci non vederlo nella vista delle schede.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Nascondi banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Attenzione: questo sito potrebbe essere un rischio per la sicurezza</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe distribuire malware progettato per compromettere il tuo dispositivo o rubare le tue informazioni personali.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Questo sito web potrebbe imitare un sito legittimo per ingannarti e indurti a rivelare informazioni personali, come password o numeri di carta di credito.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Esci da questo sito</string>
+    <string name="maliciousSiteAdvancedCTA">Avanzate</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Se ritieni che questo sito web sia sicuro, puoi <a href=\"\">segnalare un errore</a>. Puoi comunque visitare il sito web a tuo rischio e pericolo.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accetta il rischio e visita il sito</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Segnala un sito erroneamente contrassegnato come dannoso</string>
+    <string name="maliciousSiteLearnMoreTitle">Ulteriori informazioni</string>
+    <string name="maliciousSiteSettingTitle">Avvisi di sicurezza del sito</string>
+    <string name="maliciousSiteToggleHint">Avvisami sui siti contrassegnati per phishing o malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Disabilitando questa funzione, si mettono a rischio le proprie informazioni.</string>
+
 </resources>

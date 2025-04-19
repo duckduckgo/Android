@@ -87,7 +87,7 @@ class UriUtilsFilenameExtractorTest {
 
     @Test
     fun whenUrlContainsAmbiguousFilenameButContainsPathSegmentsWhichLookLikeAFilenameAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
-        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("jpg", "image/jpeg")
 
         val url = "https://foo.example.com/path/dotted.path/b/b1/realFilename"
         val mimeType = "image/jpeg"
@@ -210,7 +210,7 @@ class UriUtilsFilenameExtractorTest {
 
     @Test
     fun whenUrlIsEmptyStringAndMimeTypeProvidedThenDefaultNameAndFiletypeFromMimeReturned() {
-        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("jpg", "image/jpeg")
 
         val url = ""
         val mimeType = "image/jpeg"

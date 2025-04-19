@@ -17,6 +17,7 @@
 package com.duckduckgo.site.permissions.impl.drmblock
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
@@ -41,13 +42,16 @@ class RealDrmBlockRepository @Inject constructor(
     val drmBlockDao: DrmBlockDao,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : DrmBlockRepository {
 
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

@@ -15,96 +15,147 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:context="com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity">
 
     <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar"/>
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <ScrollView
-            android:fillViewport="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <ImageView
-                    android:id="@+id/headerImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    app:srcCompat="@drawable/ic_sync_desktop"
-                    tools:ignore="ContentDescription" />
+                android:id="@+id/headerImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_5"
+                app:srcCompat="@drawable/ic_privacy_pro_add_device"
+                tools:ignore="ContentDescription" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/title"
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:layout_marginBottom="@dimen/keyline_6"
+                android:gravity="center"
+                android:text="@string/restoreSubscriptionTitle"
+                app:typography="h1"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+                android:id="@+id/restoreSubscriptionEmailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingVertical="@dimen/keyline_1">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/restoreSubscriptionEmailTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"
-                    android:textAlignment="center"
-                    app:typography="h1"
-                    android:text="@string/restoreSubscriptionTitle"
-                    tools:ignore="HardcodedText"/>
+                    app:leadingIcon="@drawable/ic_email_16"
+                    app:leadingIconBackground="circular"
+                    app:primaryText="@string/restoreSubscriptionEmailTitle"
+                    app:secondaryText="@string/restoreSubscriptionEmailDescription" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/description"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/keyline_5"
-                    android:textAlignment="center"
-                    app:typography="body1"
-                    app:textType="secondary"
-                    android:text="@string/restoreSubscriptionDescription"
-                    tools:ignore="HardcodedText"/>
+                    android:orientation="horizontal">
 
-            <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
+                    <!-- Adding a space and margins to align the text with the LineListItem above -->
+                    <Space
+                        android:layout_width="@dimen/listItemImageContainerSize"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/keyline_4" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/restoreSubscriptionEmailText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/keyline_4"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:paddingTop="@dimen/twoLineItemVerticalPadding"
+                        android:paddingBottom="@dimen/twoLineItemVerticalPadding"
+                        android:text="@string/restoreSubscriptionEmailGetStarted"
+                        app:textType="primary"
+                        app:typography="body1" />
+
+                </LinearLayout>
+
+            </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+                android:id="@+id/restoreSubscriptionGooglePlayLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingVertical="@dimen/keyline_1">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/restoreSubscriptionGooglePlayTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_5"
-                    android:background="@drawable/background_expandable_menu"
-                    android:orientation="vertical">
+                    app:leadingIcon="@drawable/ic_platform_playstore_16"
+                    app:leadingIconBackground="circular"
+                    app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
+                    app:secondaryText="@string/restoreSubscriptionGooglePlayDescription" />
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/googlePlay"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Adding a space and margins to align the text with the LineListItem above -->
+                    <Space
+                        android:layout_width="@dimen/listItemImageContainerSize"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/keyline_4" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/restoreSubscriptionGooglePlayText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
-                        app:leadingIcon="@drawable/ic_google_play"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
-                        app:primaryButtonText="@string/restoreSubscriptionGooglePlayButton"/>
+                        android:layout_marginStart="@dimen/keyline_4"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:paddingTop="@dimen/twoLineItemVerticalPadding"
+                        android:paddingBottom="@dimen/twoLineItemVerticalPadding"
+                        android:text="@string/restoreSubscriptionGooglePlayGetStarted"
+                        app:textType="primary"
+                        app:typography="body1" />
 
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
-
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/restoreSubscriptionEmailTitle"
-                        app:leadingIcon="@drawable/ic_email_16"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/restoreSubscriptionEmailDescription"
-                        app:primaryButtonText="@string/restoreSubscriptionEmailButton"/>
-
-            </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
+                </LinearLayout>
+            </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

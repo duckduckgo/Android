@@ -36,23 +36,25 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.notifyme.NotifyMeView.Orientation.Center
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.CheckPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Factory
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
@@ -60,9 +62,6 @@ import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -75,14 +74,16 @@ class NotifyMeView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private lateinit var sharedPrefsKeyForDismiss: String
 
     private var onNotifyMeButtonClicked: () -> Unit = {}
     private var onNotifyMeCloseButtonClicked: () -> Unit = {}
 
-    private var coroutineScope: CoroutineScope? = null
     private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var visibilityChangedListener: OnVisibilityChangedListener? = null
 
@@ -91,6 +92,9 @@ class NotifyMeView @JvmOverloads constructor(
     private val viewModel: NotifyMeViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NotifyMeViewModel::class.java]
     }
+
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
 
     init {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
@@ -116,18 +120,17 @@ class NotifyMeView @JvmOverloads constructor(
 
         addViewTreeObserverOnGlobalLayoutListener()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         viewModel.init(sharedPrefsKeyForDismiss)
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
 
@@ -139,10 +142,10 @@ class NotifyMeView @JvmOverloads constructor(
 
         removeViewTreeObserverOnGlobalLayoutListener()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
 
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
     }
 
     fun setOnVisibilityChange(visibilityChangedListener: OnVisibilityChangedListener) {
@@ -204,7 +207,6 @@ class NotifyMeView @JvmOverloads constructor(
         when (command) {
             is UpdateNotificationsState -> updateNotificationsState()
             is UpdateNotificationsStateOnAndroid13Plus -> updateNotificationsPermissionsOnAndroid13Plus()
-            is OpenSettings -> openSettings()
             is OpenSettingsOnAndroid8Plus -> openSettingsOnAndroid8Plus()
             is DismissComponent -> hideMe()
             is CheckPermissionRationale -> checkPermissionRationale()
@@ -222,14 +224,6 @@ class NotifyMeView @JvmOverloads constructor(
         val granted =
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         viewModel.updateNotificationsPermissions(granted)
-    }
-
-    private fun openSettings() {
-        val settingsIntent = Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
-            .putExtra(ANDROID_M_APP_PACKAGE, context.packageName)
-            .putExtra(ANDROID_M_APP_UID, context.applicationInfo.uid)
-
-        startActivity(context, settingsIntent, null)
     }
 
     @SuppressLint("InlinedApi")

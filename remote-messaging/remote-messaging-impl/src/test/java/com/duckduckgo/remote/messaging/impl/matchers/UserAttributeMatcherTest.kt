@@ -480,42 +480,6 @@ class UserAttributeMatcherTest {
         assertEquals(false, result)
     }
 
-    @Test
-    fun whenAppTPOnboardedNotMatchThenReturnFail() = runTest {
-        givenBrowserProperties(appTpOnboarded = false)
-        assertEquals(false, testee.evaluate(AppTpOnboarded(true)))
-
-        givenBrowserProperties(appTpOnboarded = true)
-        assertEquals(false, testee.evaluate(AppTpOnboarded(false)))
-    }
-
-    @Test
-    fun whenAppTPOnboardedMatchThenReturnMatch() = runTest {
-        givenBrowserProperties(appTpOnboarded = true)
-        assertEquals(true, testee.evaluate(AppTpOnboarded(true)))
-
-        givenBrowserProperties(appTpOnboarded = false)
-        assertEquals(true, testee.evaluate(AppTpOnboarded(false)))
-    }
-
-    @Test
-    fun whenNetPOnboardedNotMatchThenReturnFail() = runTest {
-        givenBrowserProperties(netpOnboarded = false)
-        assertEquals(false, testee.evaluate(NetPOnboarded(true)))
-
-        givenBrowserProperties(netpOnboarded = true)
-        assertEquals(false, testee.evaluate(NetPOnboarded(false)))
-    }
-
-    @Test
-    fun whenNetPOnboardedMatchThenReturnMatch() = runTest {
-        givenBrowserProperties(netpOnboarded = true)
-        assertEquals(true, testee.evaluate(NetPOnboarded(true)))
-
-        givenBrowserProperties(netpOnboarded = false)
-        assertEquals(true, testee.evaluate(NetPOnboarded(false)))
-    }
-
     private suspend fun givenBrowserProperties(
         appTheme: DuckDuckGoTheme = DuckDuckGoTheme.SYSTEM_DEFAULT,
         bookmarks: Long = 8L,
@@ -526,8 +490,6 @@ class UserAttributeMatcherTest {
         emailEnabled: Boolean = true,
         searchCount: Long = 8L,
         widgetAdded: Boolean = true,
-        appTpOnboarded: Boolean = false,
-        netpOnboarded: Boolean = false,
     ) {
         whenever(userBrowserProperties.appTheme()).thenReturn(appTheme)
         whenever(userBrowserProperties.bookmarks()).thenReturn(bookmarks)
@@ -538,7 +500,5 @@ class UserAttributeMatcherTest {
         whenever(userBrowserProperties.favorites()).thenReturn(favorites)
         whenever(userBrowserProperties.searchCount()).thenReturn(searchCount)
         whenever(userBrowserProperties.widgetAdded()).thenReturn(widgetAdded)
-        whenever(userBrowserProperties.appTpOnboarded()).thenReturn(appTpOnboarded)
-        whenever(userBrowserProperties.networkProtectionOnboarded()).thenReturn(netpOnboarded)
     }
 }

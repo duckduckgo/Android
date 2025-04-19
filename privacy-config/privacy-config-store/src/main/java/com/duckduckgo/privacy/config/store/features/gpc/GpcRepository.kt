@@ -49,6 +49,7 @@ class RealGpcRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : GpcRepository {
 
     private val gpcExceptionsDao: GpcExceptionsDao = database.gpcExceptionsDao()
@@ -59,7 +60,11 @@ class RealGpcRepository(
     override var gpcContentScopeConfig: String = emptyJson
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(

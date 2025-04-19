@@ -193,23 +193,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    fun bannerState(): BannerState {
-        return if (vpnStore.getAndSetOnboardingSession()) {
-            BannerState.OnboardingBanner
-        } else {
-            BannerState.NextSessionBanner
-        }
-    }
-
-    sealed class BannerState {
-        object OnboardingBanner : BannerState()
-        object NextSessionBanner : BannerState()
-    }
-
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
         val runningState: VpnState,
-        val bannerState: BannerState,
     )
 
     internal data class TrackerCountInfo(

@@ -1,0 +1,84 @@
+appId: com.duckduckgo.mobile.android
+name: "Custom Tabs navigation"
+tags:
+  - customTabsTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - assertVisible:
+          text: ".*Ready for a faster browser that keeps you protected?.*"
+      - tapOn: "let's do it!"
+      - assertVisible:
+          text: "Protections activated!"
+      - tapOn: "choose your browser"
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+      - assertVisible:
+          text: ".*where should I put your address bar?.*"
+      - tapOn: "next"
+      - assertVisible:
+          text: ".*Try a search!.*"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "settings"
+      - scrollUntilVisible:
+          element:
+            text: "developer settings"
+          direction: DOWN
+      - tapOn:
+          text: "developer settings"
+      - scrollUntilVisible:
+          element:
+            text: "custom tabs"
+          direction: DOWN
+      - tapOn:
+          text: "custom tabs"
+      - tapOn:
+          text: "add your url here"
+      - inputText: "https://www.search-company.site"
+      - tapOn:
+          text: "load custom tab"
+      - assertNotVisible:
+          id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - assertNotVisible:
+          id: "com.duckduckgo.mobile.android:id/tabsMenu"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabCloseIcon"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabShieldIcon"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabTitle"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/customTabDomain"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "running in duckduckgo"
+      - action: back
+      - tapOn:
+          text: "[Ad 1] SERP Ad (heuristic)"
+      - action: back
+      - tapOn:
+          text: "[Ad 1] SERP Ad (heuristic)"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/backMenuItem"
+      - assertVisible:
+          text: "Search engine"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
+      - assertVisible:
+          text: "Publisher site"

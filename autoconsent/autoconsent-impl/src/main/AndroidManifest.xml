@@ -16,7 +16,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.autoconsent.impl">
-    <application android:supportsRtl="true">
+    <application>
         <activity
             android:name=".ui.AutoconsentSettingsActivity"
             android:exported="false"

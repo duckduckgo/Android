@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Upozornite ma</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Pridať</string>
+    <string name="dialogEditTitle">Upraviť</string>
+    <string name="dialogSaveAction">Uložiť</string>
+    <string name="dialogConfirmTitle">Potvrdiť</string>
+    <string name="dialogSave">Uložiť</string>
+    <string name="delete">Vymazať</string>
+    <string name="edit">Upraviť</string>
+    <string name="remove">Odstrániť</string>
+    <string name="removeAll">Odstrániť všetky</string>
+    <string name="undo">Zrušiť zmenu</string>
+    <string name="cancel">Zrušiť</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Vždy zapnuté</string>
+    <string name="on">Zapnuté</string>
+    <string name="off">Vypnuté</string>
 </resources>

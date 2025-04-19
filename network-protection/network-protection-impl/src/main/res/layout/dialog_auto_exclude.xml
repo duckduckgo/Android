@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_background"
+    android:orientation="vertical"
+    android:padding="@dimen/keyline_5">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/autoExcludePromptTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/netpAutoExcludePromptTitle"
+        app:textType="primary"
+        app:typography="h2" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/autoExcludePromptMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/keyline_2"
+        android:text="@string/netpAutoExcludePromptMessage"
+        app:textType="secondary"
+        app:typography="body1" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/autoExcludePromptItemsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <CheckBox
+        android:id="@+id/autoExcludeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:checked="true"
+        android:text="@string/netpAutoExcludePromptOptionEnable"
+        android:layout_marginBottom="@dimen/keyline_3"/>
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/autoExcludePromptAddAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:daxButtonSize="large"
+        android:text="@string/netpAutoExcludePromptActionAdd" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+        android:id="@+id/autoExcludePromptCancelAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/netpAutoExcludePromptActionCancel" />
+</LinearLayout>

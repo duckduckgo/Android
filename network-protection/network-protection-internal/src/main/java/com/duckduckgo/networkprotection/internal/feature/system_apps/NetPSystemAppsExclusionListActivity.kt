@@ -29,20 +29,14 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 import com.duckduckgo.networkprotection.internal.network.NetPInternalExclusionListProvider
-import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import logcat.logcat
 
-@WrongScope(
-    comment = "VpnScope to access dependencies in there",
-    correctScope = ActivityScope::class,
-)
-@InjectWith(VpnScope::class)
+@InjectWith(ActivityScope::class)
 class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.SystemAppListener {
 
     @Inject

@@ -17,14 +17,22 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class QueryParamReferrerParserTest {
 
-    private val testee: QueryParamReferrerParser = QueryParamReferrerParser()
+    private val originAttributeHandler: ReferrerOriginAttributeHandler = mock()
+
+    private val testee: QueryParamReferrerParser = QueryParamReferrerParser(
+        originAttributeHandler = originAttributeHandler,
+    )
 
     @Test
     fun whenReferrerDoesNotContainTargetThenNoReferrerFound() {
@@ -73,20 +81,26 @@ class QueryParamReferrerParserTest {
     }
 
     @Test
+    fun whenReferrerContainsTargetAndUtmCampaignThenReferrerFound() {
+        val result = testee.parse("key1=foo&key2=bar&key3=DDGRAAB&origin=funnel_playstore_whatever")
+        verifyCampaignReferrerFound("AB", result)
+    }
+
+    @Test
     fun whenReferrerContainsTargetWithDifferentCaseThenNoReferrerFound() {
         verifyReferrerNotFound(testee.parse("ddgraAB"))
     }
 
     @Test
-    fun whenReferrerContainsEuAuctionDataThenEuActionReferrerFound() {
-        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
-        assertTrue(result is EuAuctionReferrerFound)
+    fun whenReferrerContainsEuAuctionSearchChoiceDataThenEuActionReferrerFound() {
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_SEARCH_CHOICE_AUCTION_VALUE")
+        assertTrue(result is EuAuctionSearchChoiceReferrerFound)
     }
 
     @Test
-    fun whenReferrerContainsBothEuAuctionAndCampaignReferrerDataThenEuActionReferrerFound() {
-        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
-        assertTrue(result is EuAuctionReferrerFound)
+    fun whenReferrerContainsBothEuAuctionSearchChoiceAndCampaignReferrerDataThenEuActionReferrerFound() {
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_SEARCH_CHOICE_AUCTION_VALUE")
+        assertTrue(result is EuAuctionSearchChoiceReferrerFound)
     }
 
     @Test
@@ -99,6 +113,31 @@ class QueryParamReferrerParserTest {
     fun whenReferrerContainsInstallationSourceKeyAndNoEuAuctionValueButHasCampaignReferrerDataThenCampaignReferrerFound() {
         val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=bar")
         verifyCampaignReferrerFound("AB", result)
+    }
+
+    @Test
+    fun whenReferrerContainsEuAuctionBrowserChoiceDataThenEuActionReferrerFound() {
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE")
+        assertTrue(result is EuAuctionBrowserChoiceReferrerFound)
+    }
+
+    @Test
+    fun whenReferrerDoesNotContainEuAuctionDataThenUtmCampaignProcessorCalled() {
+        testee.parse("origin=funnel_playstore_whatever")
+        verify(originAttributeHandler).process(any())
+    }
+
+    @Test
+    fun whenReferrerDoesContainEuAuctionDataThenUtmCampaignProcessorStillCalled() {
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE")
+        verify(originAttributeHandler).process(any())
+        assertTrue(result is EuAuctionBrowserChoiceReferrerFound)
+    }
+
+    @Test
+    fun whenReferrerContainsBothEuAuctionBrowserChoiceAndCampaignReferrerDataThenEuActionReferrerFound() {
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE")
+        assertTrue(result is EuAuctionBrowserChoiceReferrerFound)
     }
 
     private fun verifyCampaignReferrerFound(
@@ -116,6 +155,7 @@ class QueryParamReferrerParserTest {
 
     companion object {
         private const val INSTALLATION_SOURCE_KEY = "utm_source"
-        private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_SOURCE_EU_SEARCH_CHOICE_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE = "eea-browser-choice"
     }
 }

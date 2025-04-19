@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.models.*
@@ -33,6 +34,7 @@ import java.io.BufferedReader
 import java.util.Locale.US
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -52,7 +54,7 @@ class RemoteMessagingConfigJsonMapperTest {
     fun whenValidJsonParsedThenMessagesMappedIntoRemoteConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
@@ -119,31 +121,37 @@ class RemoteMessagingConfigJsonMapperTest {
     fun whenValidJsonParsedThenRulesMappedIntoRemoteConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
         assertEquals(3, config.rules.size)
 
-        assertEquals(21, config.rules[5]?.size)
+        val rule5Attributes = config.rules.find { it.id == 5 }?.attributes
+        assertEquals(0.5f, config.rules.find { it.id == 5 }?.targetPercentile?.before)
+        assertEquals(21, rule5Attributes?.size)
         val localeMA = Locale(listOf("en-US", "en-GB"), fallback = true)
-        assertEquals(localeMA, config.rules[5]?.first())
-        assertTrue(config.rules[5]?.get(1) is Api)
+        assertEquals(localeMA, rule5Attributes?.first())
+        assertTrue(rule5Attributes?.get(1) is Api)
 
+        val rule6Attributes = config.rules.find { it.id == 6 }?.attributes
+        assertNull(config.rules.find { it.id == 6 }?.targetPercentile)
         val locale2MA = Locale(listOf("en-GB"), fallback = null)
-        assertEquals(locale2MA, config.rules[6]?.first())
-        assertEquals(1, config.rules[6]?.size)
+        assertEquals(locale2MA, rule6Attributes?.first())
+        assertEquals(1, rule6Attributes?.size)
 
+        val rule7Attributes = config.rules.find { it.id == 7 }?.attributes
         val defaultBrowserMA = DefaultBrowser(value = true, fallback = null)
-        assertEquals(defaultBrowserMA, config.rules[7]?.first())
-        assertEquals(1, config.rules[7]?.size)
+        assertNull(config.rules.find { it.id == 7 }?.targetPercentile)
+        assertEquals(defaultBrowserMA, rule7Attributes?.first())
+        assertEquals(1, rule7Attributes?.size)
     }
 
     @Test
     fun whenJsonMessagesHaveUnknownTypesThenMessagesNotMappedIntoConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
@@ -154,24 +162,24 @@ class RemoteMessagingConfigJsonMapperTest {
     fun whenJsonMessagesHaveUnknownTypesThenRulesMappedIntoConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
         assertEquals(2, config.rules.size)
 
         val unknown = Unknown(fallback = true)
-        assertEquals(unknown, config.rules[6]!![0])
+        assertEquals(unknown, config.rules.find { it.id == 6 }?.attributes?.get(0))
 
         val defaultBrowser = DefaultBrowser(value = true, fallback = null)
-        assertEquals(defaultBrowser, config.rules[7]!![0])
+        assertEquals(defaultBrowser, config.rules.find { it.id == 7 }?.attributes?.get(0))
     }
 
     @Test
     fun whenJsonMessagesMalformedOrMissingInformationThenMessagesNotParsedIntoConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
@@ -192,26 +200,26 @@ class RemoteMessagingConfigJsonMapperTest {
     fun whenJsonMatchingAttributesMalformedThenParsedAsUnknownIntoConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
         assertEquals(2, config.rules.size)
-        assertEquals(3, config.rules[6]?.size)
+        assertEquals(3, config.rules.find { it.id == 6 }?.attributes?.size)
 
         val matchingAttr = listOf(Locale(), Unknown(fallback = true), WebView(fallback = false))
-        assertEquals(matchingAttr, config.rules[6])
+        assertEquals(matchingAttr, config.rules.find { it.id == 6 }?.attributes)
     }
 
     @Test
     fun whenUnknownMatchingAttributeDoesNotProvideFallbackThenFallbackIsNull() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
 
         val config = testee.map(result)
 
-        assertEquals(Unknown(null), config.rules[7]?.first())
+        assertEquals(Unknown(null), config.rules.find { it.id == 7 }?.attributes?.first())
     }
 
     private fun getConfigFromJson(resourceName: String): JsonRemoteMessagingConfig {

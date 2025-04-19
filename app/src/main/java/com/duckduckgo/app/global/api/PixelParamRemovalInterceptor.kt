@@ -17,9 +17,11 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
@@ -28,6 +30,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import okhttp3.Interceptor
@@ -75,8 +78,29 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
-            StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
+            WebViewPixelName.WEB_PAGE_PAINTED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN.pixelName to PixelParameter.removeAtb(),
+            HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY.pixelName to PixelParameter.removeAtb(),
+            HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY.pixelName to PixelParameter.removeAtb(),
+            HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName to PixelParameter.removeAtb(),
+            SitePermissionsPixelName.PERMISSION_DIALOG_CLICK.pixelName to PixelParameter.removeAtb(),
+            SitePermissionsPixelName.PERMISSION_DIALOG_IMPRESSION.pixelName to PixelParameter.removeAtb(),
+            SITE_NOT_WORKING_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SITE_NOT_WORKING_WEBSITE_BROKEN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.APP_VERSION_AT_SEARCH_TIME.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SETTINGS_SYNC_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

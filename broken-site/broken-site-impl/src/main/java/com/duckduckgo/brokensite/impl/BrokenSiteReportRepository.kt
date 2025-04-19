@@ -16,32 +16,58 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.sha256
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 interface BrokenSiteReportRepository {
     suspend fun getLastSentDay(hostname: String): String?
     fun setLastSentDay(hostname: String)
 
     fun cleanupOldEntries()
+
+    suspend fun setMaxDismissStreak(maxDismissStreak: Int)
+    suspend fun getMaxDismissStreak(): Int
+
+    suspend fun setDismissStreakResetDays(days: Int)
+    suspend fun getDismissStreakResetDays(): Int
+
+    suspend fun setCoolDownDays(days: Long)
+    suspend fun getCoolDownDays(): Long
+
+    suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
+
+    suspend fun setNextShownDate(nextShownDate: LocalDateTime?)
+    suspend fun getNextShownDate(): LocalDateTime?
+
+    suspend fun addDismissal(dismissal: LocalDateTime)
+    suspend fun clearAllDismissals()
+    suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
+
+    fun resetRefreshCount()
+    fun addRefresh(url: Uri, localDateTime: LocalDateTime)
+    fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 }
 
-class RealBrokenSiteReportRepository constructor(
+class RealBrokenSiteReportRepository(
     private val database: BrokenSiteDatabase,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val brokenSitePromptDataStore: BrokenSitePromptDataStore,
+    private val brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
 ) : BrokenSiteReportRepository {
 
     override suspend fun getLastSentDay(hostname: String): String? {
@@ -71,7 +97,71 @@ class RealBrokenSiteReportRepository constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             val expiryTime = getUTCDate30DaysAgo()
             database.brokenSiteDao().deleteAllExpiredReports(expiryTime)
+            brokenSitePromptDataStore.deleteAllExpiredDismissals(expiryTime, ZoneId.systemDefault())
         }
+    }
+
+    override suspend fun setMaxDismissStreak(maxDismissStreak: Int) {
+        brokenSitePromptDataStore.setMaxDismissStreak(maxDismissStreak)
+    }
+
+    override suspend fun getMaxDismissStreak(): Int =
+        brokenSitePromptDataStore.getMaxDismissStreak()
+
+    override suspend fun setDismissStreakResetDays(days: Int) {
+        brokenSitePromptDataStore.setDismissStreakResetDays(days)
+    }
+
+    override suspend fun getDismissStreakResetDays(): Int =
+        brokenSitePromptDataStore.getDismissStreakResetDays()
+
+    override suspend fun setCoolDownDays(days: Long) {
+        brokenSitePromptDataStore.setCoolDownDays(days)
+    }
+
+    override suspend fun getCoolDownDays(): Long =
+        brokenSitePromptDataStore.getCoolDownDays()
+
+    override suspend fun setBrokenSitePromptRCSettings(
+        maxDismissStreak: Int,
+        dismissStreakResetDays: Int,
+        coolDownDays: Int,
+    ) {
+        setMaxDismissStreak(maxDismissStreak)
+        setDismissStreakResetDays(dismissStreakResetDays)
+        setCoolDownDays(coolDownDays.toLong())
+    }
+
+    override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
+        brokenSitePromptDataStore.setNextShownDate(nextShownDate)
+    }
+
+    override suspend fun getNextShownDate(): LocalDateTime? {
+        return brokenSitePromptDataStore.getNextShownDate()
+    }
+
+    override suspend fun addDismissal(dismissal: LocalDateTime) {
+        brokenSitePromptDataStore.addDismissal(dismissal)
+    }
+
+    override suspend fun clearAllDismissals() {
+        brokenSitePromptDataStore.clearAllDismissals()
+    }
+
+    override suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
+        return brokenSitePromptDataStore.getDismissalCountBetween(t1, t2)
+    }
+
+    override fun resetRefreshCount() {
+        brokenSitePromptInMemoryStore.resetRefreshCount()
+    }
+
+    override fun addRefresh(url: Uri, localDateTime: LocalDateTime) {
+        brokenSitePromptInMemoryStore.addRefresh(url, localDateTime)
+    }
+
+    override fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
+        return brokenSitePromptInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)
     }
 
     private fun convertToShortDate(dateString: String): String {

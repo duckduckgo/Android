@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Odustani</string>
+    <string name="ok">U redu</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Upravljaj e-poštom</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Povratak na postavke</string>
+    <string name="somethingWentWrong">Nešto nije bilo kako treba</string>
+    <string name="somethingWentWrongDescription">Google Play nije mogao obraditi tvoju kupnju. Pokušaj ponovno nešto kasnije.</string>
+    <string name="youAreSet">Sve je spremno.</string>
+    <string name="viewPlans">Pregledaj planove</string>
+    <string name="subscriptionNotFound">Pretplata nije pronađena</string>
+    <string name="subscriptionNotFoundDescription">Tvoja pretplata povezana s ovim Google Play računom više nije aktivna.</string>
+    <string name="purchaseRestored">Tvoje kupnje su vraćene.</string>
+    <string name="restoreSubscriptionTitle">Dodaj svoju pretplatu na Privacy Pro na ovaj uređaj</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Dodaj putem Google Play računa</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Obnovi svoju pretplatu na Android uređajima koristeći svoj Google Play račun.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Vrati kupnju</string>
+    <string name="restoreSubscriptionEmailTitle">Dodaj putem e-pošte</string>
+    <string name="restoreSubscriptionEmailDescription">Poveži adresu e-pošte s pretplatom kako bi dodao Privacy Pro na ovaj uređaj.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Započnite</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Ukloni pretplatu</string>
+    <string name="subscriptionRemoved">Tvoja pretplata je uklonjena s ovog uređaja</string>
+    <string name="removeFromDevice">Ukloni s ovog uređaja?</string>
+    <string name="removeFromDeviceDescription">Više nećeš moći pristupiti svojoj pretplati na Privacy Pro na ovom uređaju. Ovo neće otkazati tvoju pretplatu i ostat će aktivna na tvojim drugim uređajima.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoja mjesečna pretplata %1$s na %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoja godišnja pretplata %1$s na %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tvoja pretplata je istekla %1$s.</string>
+    <string name="monthlySubscription">Mjesečna pretplata</string>
+    <string name="yearlySubscription">Godišnja pretplata</string>
+    <string name="renews">obnavlja se</string>
+    <string name="expires">istječe</string>
+    <string name="activateOnOtherDevices">Dodaj Privacy Pro na druge uređaje</string>
+    <string name="addToDevicePrimaryText">Dodaj na uređaj</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Dodaj Privacy Pro na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Privacy Pro &gt; Imam pretplatu.</string>
+    <string name="editEmailPrimaryText">Uredi e-poštu</string>
+    <string name="learnMore">Saznajte više</string>
+    <string name="privacyProFaq">Trebaš pomoć s Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku Privacy Pro putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
+    <string name="subscriptionStatusSubscribed">Pretplaćen</string>
+    <string name="privacyPolicyAndTermsOfService">Pravila privatnosti i Uvjeti pružanja usluge</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Postavke pretplate</string>
+    <string name="subscriptionSettingSubscribe">Zaštiti svoju vezu i identitet uz Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Uključuje naš VPN, Personal Information Removal i Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Uključuje naš VPN i Identity Theft Restoration (oporavak od krađe identiteta).</string>
+    <string name="subscriptionSettingGet">Nabavi Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Imam pretplatu</string>
+    <string name="subscriptionSettingExpired">Tvoja pretplata na Privacy Pro je istekla</string>
+    <string name="subscriptionSettingExpiredViewPlans">Pregledaj planove</string>
+    <string name="subscriptionSettingSectionSubscription">Pretplata</string>
+    <string name="subscriptionSettingRemoveFromDevice">Ukloni s ovog uređaja</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Pomoć i podrška</string>
+    <string name="subscriptionSettingSendFeedback">Pošalji povratnu informaciju</string>
+    <string name="subscriptionSettingActivating">Aktiviranje u tijeku...</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Sve je spremno.</string>
+    <string name="purchaseCompletedText">Tvoja kupnja je bila uspješna.</string>
+    <string name="purchaseRecoveredText">Već si imao pretplatu i mi smo je aktivno vratili.</string>
+    <string name="purchaseErrorTitle">Nešto nije bilo kako treba</string>
+    <string name="purchaseError">Imamo problema s povezivanjem. Pokušaj ponovno nešto kasnije.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Ažuriraj plan ili odustani</string>
+    <string name="changePlanDescription">Tvoja pretplata kupljena je putem Apple App Storea. Za promjenu postavki plana ili naplate, idi na Postavke &gt; Apple račun &gt; Pretplate na uređaju prijavljenom na isti Apple račun koji je korišten za kupnju pretplate.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Aktiviraj Privacy Pro na radnoj površini kako bi postavio Personal Information Removal</string>
+    <string name="pirDescription">U pregledniku DuckDuckGo za stolna računala idi na <b>Postavke &gt; Privacy Pro</b> i klikni <b>Imam pretplatu</b> za početak.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Otvori</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Pošalji povratnu informaciju</string>
+    <string name="feedbackActionHeader">ODABERI KATEGORIJU</string>
+    <string name="feedbackActionReportIssue">Prijavi problem</string>
+    <string name="feedbackActionGeneralFeedback">Općenite povratne informacije</string>
+    <string name="feedbackActionFeatureRequest">Zatraži opciju</string>
+
+    <string name="feedbackGeneralHeader">ODABERI KATEGORIJU</string>
+    <string name="feedbackGeneralBrowser">Povratne informacije preglednika</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">ODABERI KATEGORIJU</string>
+    <string name="feedbackCategorySubscription">Pretplata i plaćanja</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">ODABERI KATEGORIJU</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN se ne može povezati</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN veza je prespora</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN uzrokuje probleme s drugim aplikacijama ili web-mjestima</string>
+    <string name="feedbackSubCategoryVpnIot">VPN mi ne dopušta povezivanje s lokalnim uređajem</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN uzrokuje rušenje ili zamrzavanje preglednika</string>
+    <string name="feedbackSubCategoryVpnOther">Ostalo</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Informacije nisu na određenom web-mjestu</string>
+    <string name="feedbackSubCategoryPirNotMe">Zapisi ne pripadaju korisniku</string>
+    <string name="feedbackSubCategoryPirScanStuck">Skeniranje je zapelo</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Uklanjanje je zapelo</string>
+    <string name="feedbackSubCategoryPirOther">Ostalo</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problem s pristupnim kodom</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Kontaktiranje savjetnika nije uspjelo</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Poziv savjetniku nije bio od pomoći</string>
+    <string name="feedbackSubCategoryItrOther">Ostalo</string>
+
+    <string name="feedbackSubCategorySubsOtp">Jednokratna lozinka</string>
+    <string name="feedbackSubCategorySubsOther">Ostalo</string>
+
+    <string name="feedbackSubmitVpnHeader">Pronašao si problem koji nije pokriven u našem <annotation type="faqs_link">centru za pomoć</annotation> ? Definitivno želimo znati više o tome.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Reci nam što se događa...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Osim gore unesenih pojedinosti, šaljemo neke anonimizirane podatke s tvojim povratnim informacijama:\n\n • Jesu li neke značajke preglednika aktivne\n • Objedinjena dijagnostika aplikacije (npr. kodovi pogrešaka)\n\nKlikom \"Pošalji\" slažeš se da DuckDuckGo može koristiti poslane podatke za poboljšanje aplikacije."</string>
+    <string name="feedbackSubmitVpnSubmit">Pošalji</string>
+    <string name="feedbackSubmitCompletedMessage">Hvala! Povratne informacije su poslane.</string>
+    <string name="feedbackSubmitFailedMessage">Nešto nije bilo kako treba</string>
+
+    <string name="feedbackSubmitEmailByLine">Navedi adresu e-pošte ako želiš da te kontaktiramo u vezi s tim problemom (možda nećemo moći reagirati na sve probleme):</string>
+    <string name="feedbackSubmitEmailHint">Adresa e-pošte (neobavezno)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Pruži nam svoje povratne informacije…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Koju bi značajku želio vidjeti?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Pretplate</string>
+    <string name="activitySubscriptionSettings">Postavke pretplate</string>
+    <string name="activityActivateSubscription">Imam pretplatu</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
+</resources>

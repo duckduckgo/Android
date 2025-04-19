@@ -47,6 +47,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
     }
 
@@ -58,6 +59,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(ampLinkExceptionEntity.toFeatureException(), testee.exceptions.first())
@@ -71,6 +73,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         testee.updateAll(listOf(), listOf(), listOf())
@@ -86,6 +89,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.ampLinkFormats.size)

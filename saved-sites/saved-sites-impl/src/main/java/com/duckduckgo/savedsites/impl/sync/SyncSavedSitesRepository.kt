@@ -157,6 +157,12 @@ interface SyncSavedSitesRepository {
     fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>)
 
     /**
+     * Discards the request metadata.
+     * Client might need to call this method when sync engine didn't send changes to the server (e.g: first sync).
+     */
+    fun discardRequestMetadata()
+
+    /**
      * Stores the BE children state for each folder after receiving it
      * @param entities list of entities received in the BE response
      */
@@ -185,4 +191,14 @@ interface SyncSavedSitesRepository {
      * they are available for the next sync operation
      */
     fun setLocalEntitiesForNextSync(startTimestamp: String)
+
+    /**
+     * Returns the list of [SavedSite] that are marked as Invalid
+     */
+    fun getInvalidSavedSites(): List<SavedSite>
+
+    /**
+     * Marks as Invalid a list of [SavedSite] with the given ids
+     */
+    fun markSavedSitesAsInvalid(ids: List<String>)
 }

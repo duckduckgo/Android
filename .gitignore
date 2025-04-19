@@ -43,15 +43,15 @@ captures/
 *.iml
 .idea/
 .idea/workspace.xml
+!.idea/icon.svg
 
 # Keystore files
 *.jks
 
 # Fastlane
 fastlane/report.xml
-
-# Bitrise configuration
-bitrise.yml
+.bundle/
+vendor/
 
 # NDK files
 **/.cxx
@@ -95,5 +95,6 @@ report
 !/node_modules/@duckduckgo/content-scope-scripts/build/
 /node_modules/@duckduckgo/content-scope-scripts/build/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/
-/node_modules/@duckduckgo/content-scope-scripts/build/android/*
-!/node_modules/@duckduckgo/content-scope-scripts/build/android/contentScope.js
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/
+/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/*
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/

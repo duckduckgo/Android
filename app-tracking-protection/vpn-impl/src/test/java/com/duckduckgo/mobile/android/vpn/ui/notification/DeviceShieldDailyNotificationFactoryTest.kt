@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
+import java.time.LocalDateTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -35,7 +36,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.threeten.bp.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldDailyNotificationFactoryTest {
@@ -250,5 +250,5 @@ class DeviceShieldDailyNotificationFactoryTest {
 }
 
 private fun DeviceShieldNotification.assertTitleEquals(expected: String) {
-    assertEquals("Given notification titles do not match", expected, this.title.toString())
+    assertEquals("Given notification titles do not match", expected, this.text.toString())
 }

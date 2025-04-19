@@ -54,7 +54,7 @@ class SyncDailyReportingWorker(
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
-                syncPixels.fireDailyPixel()
+                syncPixels.fireDailySuccessRatePixel()
             }
             return@withContext Result.success()
         }

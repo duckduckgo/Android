@@ -19,18 +19,20 @@ package com.duckduckgo.networkprotection.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Qualifier
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 interface NetworkProtectionPixels {
     /**
@@ -191,49 +193,7 @@ interface NetworkProtectionPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun reportWhatIsAVpnScreenShown()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
     fun reportFaqsShown()
-
-    /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen is shown
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsShown()
-
-    /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen are accepted
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsAccepted()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun waitlistNotificationShown()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun waitlistNotificationCancelled()
-
-    /**
-     * This fun will fire daily -> fire only once a day no matter how many times we call this fun
-     *
-     * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
-     */
-    fun waitlistBetaIsEnabled()
 
     /**
      * This fun will fire one pixel
@@ -298,19 +258,64 @@ interface NetworkProtectionPixels {
      */
     fun reportTunnelFailureRecovered()
     fun reportVpnSnoozedCanceled()
+
+    fun reportFailureRecoveryStarted()
+    fun reportFailureRecoveryFailed()
+    fun reportFailureRecoveryCompletedWithServerHealthy()
+    fun reportFailureRecoveryCompletedWithServerUnhealthy()
+    fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
+
+    fun reportAccessRevokedDialogShown()
+    fun reportPrivacyProPromotionDialogShown()
+    fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+
+    fun reportVpnEnabledFromQuickSettingsTile()
+    fun reportVpnDisabledFromQuickSettingsTile()
+
+    fun reportVpnScreenShown()
+
+    fun reportVpnSettingsShown()
+
+    fun reportEnabledPauseDuringCalls()
+
+    fun reportDisabledPauseDuringCalls()
+
+    fun reportExcludeSystemAppsEnabledForCategory(category: String)
+    fun reportExcludeSystemAppsDisabledForCategory(category: String)
+
+    fun reportServerMigrationAttempt()
+    fun reportServerMigrationAttemptSuccess()
+    fun reportServerMigrationAttemptFailed()
+
+    fun reportCustomDnsSet()
+
+    fun reportDefaultDnsSet()
+
+    fun reportExcludePromptShown()
+    fun reportExcludePromptExcludeAppClicked()
+    fun reportExcludePromptDisableVpnClicked()
+    fun reportExcludePromptDontAskAgainClicked()
+
+    fun reportAutoExcludePromptShownInVPNScreen()
+    fun reportAutoExcludePromptShownInExclusionList()
+    fun reportAutoExcludePromptExcludeApps()
+    fun reportAutoExcludePromptNoAction()
+    fun reportAutoExcludePromptEnable()
+    fun reportAutoExcludeEnableViaExclusionList()
+    fun reportAutoExcludeDisableViaExclusionList()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val cohortStore: NetpCohortStore,
     private val etTimestamp: ETTimestamp,
 ) : NetworkProtectionPixels {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             NETP_PIXELS_PREF_FILE,
             multiprocess = true,
             migrate = false,
@@ -333,8 +338,22 @@ class RealNetworkProtectionPixel @Inject constructor(
     }
 
     override fun reportEnabled() {
-        tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
-        tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
+        fun LocalDate?.asWeeklyCohortDate(): String {
+            val baseDate = LocalDate.of(2023, 1, 1)
+            return this?.let { cohortLocalDate ->
+                // do we need to coalesce
+                // I know cohortLocalDate is in ET timezone and we're comparing with LocalDate.now() but the error should be ok
+                val weeksSinceCohortAssigned = ChronoUnit.WEEKS.between(cohortLocalDate, LocalDate.now())
+                return@let if (weeksSinceCohortAssigned > WEEKS_TO_COALESCE_COHORT) {
+                    // coalesce to no cohort
+                    ""
+                } else {
+                    "week-${ChronoUnit.WEEKS.between(baseDate, cohortLocalDate) + 1}"
+                }
+            } ?: ""
+        }
+        tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate.asWeeklyCohortDate()))
+        tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate.asWeeklyCohortDate()))
     }
 
     override fun reportEnabledOnSearch() {
@@ -438,38 +457,9 @@ class RealNetworkProtectionPixel @Inject constructor(
         firePixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT)
     }
 
-    override fun reportWhatIsAVpnScreenShown() {
-        tryToFireDailyPixel(NETP_INFO_VPN_SHOWN_DAILY)
-        firePixel(NETP_INFO_VPN_SHOWN)
-    }
-
     override fun reportFaqsShown() {
         tryToFireDailyPixel(NETP_FAQS_SHOWN_DAILY)
         firePixel(NETP_FAQS_SHOWN)
-    }
-
-    override fun reportTermsShown() {
-        tryToFireDailyPixel(NETP_TERMS_SHOWN_DAILY)
-        firePixel(NETP_TERMS_SHOWN)
-    }
-
-    override fun reportTermsAccepted() {
-        tryToFireDailyPixel(NETP_TERMS_ACCEPTED_DAILY)
-        firePixel(NETP_TERMS_ACCEPTED)
-    }
-
-    override fun waitlistNotificationShown() {
-        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_SHOWN_DAILY)
-        firePixel(NETP_WAITLIST_NOTIFICATION_SHOWN)
-    }
-
-    override fun waitlistNotificationCancelled() {
-        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_CANCELLED_DAILY)
-        firePixel(NETP_WAITLIST_NOTIFICATION_CANCELLED)
-    }
-
-    override fun waitlistBetaIsEnabled() {
-        tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
     }
 
     override fun reportGeoswitchingScreenShown() {
@@ -523,6 +513,166 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnSnoozedCanceled() {
         tryToFireDailyPixel(VPN_SNOOZE_CANCELED_DAILY)
         firePixel(VPN_SNOOZE_CANCELED)
+    }
+
+    override fun reportFailureRecoveryStarted() {
+        firePixel(NETP_FAILURE_RECOVERY_STARTED)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_STARTED_DAILY)
+    }
+
+    override fun reportFailureRecoveryFailed() {
+        firePixel(NETP_FAILURE_RECOVERY_FAILED)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_FAILED_DAILY)
+    }
+
+    override fun reportFailureRecoveryCompletedWithServerHealthy() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_DAILY)
+    }
+
+    override fun reportFailureRecoveryCompletedWithServerUnhealthy() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY)
+    }
+
+    override fun reportFailureRecoveryCompletedWithDifferentTunnelAddress() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY)
+    }
+
+    override fun reportAccessRevokedDialogShown() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportPrivacyProPromotionDialogShown() {
+        firePixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
+        firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
+        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
+    }
+
+    override fun reportVpnEnabledFromQuickSettingsTile() {
+        firePixel(NETP_ENABLE_FROM_SETTINGS_TILE)
+        tryToFireUniquePixel(NETP_ENABLE_FROM_SETTINGS_TILE_UNIQUE)
+        tryToFireDailyPixel(NETP_ENABLE_FROM_SETTINGS_TILE_DAILY)
+    }
+
+    override fun reportVpnDisabledFromQuickSettingsTile() {
+        firePixel(NETP_DISABLE_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(NETP_DISABLE_FROM_SETTINGS_TILE_DAILY)
+    }
+
+    override fun reportVpnScreenShown() {
+        firePixel(NETP_VPN_SCREEN_SHOWN)
+        tryToFireDailyPixel(NETP_VPN_SCREEN_SHOWN_DAILY)
+    }
+
+    override fun reportVpnSettingsShown() {
+        firePixel(NETP_VPN_SETTINGS_SHOWN)
+        tryToFireDailyPixel(NETP_VPN_SETTINGS_SHOWN_DAILY)
+    }
+
+    override fun reportEnabledPauseDuringCalls() {
+        firePixel(NETP_PAUSE_ON_CALL_ENABLED)
+        tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
+    }
+
+    override fun reportDisabledPauseDuringCalls() {
+        firePixel(NETP_PAUSE_ON_CALL_DISABLED)
+        tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
+    }
+
+    override fun reportExcludeSystemAppsEnabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportExcludeSystemAppsDisabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportServerMigrationAttempt() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptSuccess() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptFailed() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY)
+    }
+
+    override fun reportCustomDnsSet() {
+        firePixel(NETP_UPDATE_CUSTOM_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_CUSTOM_DNS_DAILY)
+    }
+
+    override fun reportDefaultDnsSet() {
+        firePixel(NETP_UPDATE_DEFAULT_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_DEFAULT_DNS_DAILY)
+    }
+
+    override fun reportExcludePromptShown() {
+        firePixel(NETP_EXCLUDE_PROMPT_SHOWN)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_SHOWN_DAILY)
+    }
+
+    override fun reportExcludePromptExcludeAppClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED_DAILY)
+    }
+
+    override fun reportExcludePromptDisableVpnClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED_DAILY)
+    }
+
+    override fun reportExcludePromptDontAskAgainClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_DONT_ASK_AGAIN_CLICKED)
+    }
+
+    override fun reportAutoExcludePromptShownInVPNScreen() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_VPN_SCREEN)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_VPN_SCREEN_DAILY)
+    }
+
+    override fun reportAutoExcludePromptShownInExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_EXCLUSION_SCREEN)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_EXCLUSION_SCREEN_DAILY)
+    }
+
+    override fun reportAutoExcludePromptExcludeApps() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_EXCLUDE_APPS)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_EXCLUDE_APPS_DAILY)
+    }
+
+    override fun reportAutoExcludePromptNoAction() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_NO_ACTION)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_NO_ACTION_DAILY)
+    }
+
+    override fun reportAutoExcludePromptEnable() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_ENABLED)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_ENABLED_DAILY)
+    }
+
+    override fun reportAutoExcludeEnableViaExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_ENABLED_VIA_EXCLUSION_LIST)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_ENABLED_VIA_EXCLUSION_LIST_DAILY)
+    }
+
+    override fun reportAutoExcludeDisableViaExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST_DAILY)
     }
 
     private fun firePixel(
@@ -605,6 +755,7 @@ class RealNetworkProtectionPixel @Inject constructor(
     companion object {
         private const val NETP_PIXELS_PREF_FILE = "com.duckduckgo.networkprotection.pixels.v1"
         private const val TIMESTAMP_ET_PARAM = "ts"
+        private const val WEEKS_TO_COALESCE_COHORT = 6
     }
 }
 

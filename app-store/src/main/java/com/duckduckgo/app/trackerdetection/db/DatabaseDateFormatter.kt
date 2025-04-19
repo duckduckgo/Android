@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.db
 
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 internal class DatabaseDateFormatter {
 

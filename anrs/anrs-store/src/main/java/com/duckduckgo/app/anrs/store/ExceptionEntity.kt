@@ -29,4 +29,5 @@ data class ExceptionEntity(
     val version: String,
     val timestamp: String,
     val webView: String,
+    val customTab: Boolean,
 )

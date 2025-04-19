@@ -35,9 +35,9 @@ class DataUriParserTest {
 
     @Before
     fun setup() {
-        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
-        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("png", "image/png")
-        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("txt", "text/plain")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("jpg", "image/jpeg")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("png", "image/png")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("txt", "text/plain")
         testee = DataUriParser()
     }
 
@@ -141,5 +141,23 @@ class DataUriParserTest {
     fun whenMimeTypeIsImageJpegThenSuffixIsJpg() {
         val parsed = testee.generate("data:image/jpeg;base64,RUJQVlA4WAo") as ParsedDataUri
         assertEquals("jpg", parsed.filename.fileType)
+    }
+
+    @Test
+    fun whenMimeTypeIsApplicationOctetStreamAndDataIsBase64AndIsPdfThenSuffixIsPdf() {
+        val parsed = testee.generate("data:application/octet-stream;base64,JVBERi0xLjMKJeL") as ParsedDataUri
+        assertEquals("pdf", parsed.filename.fileType)
+    }
+
+    @Test
+    fun whenMimeTypeParametersArePresentThenStripParametersAndParseDataUri() {
+        val parsed = testee.generate("data:text/plain;charset=utf-8;base64,77u/VGhpcyBjb252ZXJz") as ParsedDataUri
+        assertEquals("txt", parsed.filename.fileType)
+    }
+
+    @Test
+    fun whenFileNameProvidedThenParseDataUriWithProvidedFileName() {
+        val parseResult = testee.generate("data:text/plain;base64,77u/VGhpcyBjb252ZXJz", fileName = "file_name") as ParsedDataUri
+        assertEquals("file_name.txt", parseResult.filename.toString())
     }
 }

@@ -20,8 +20,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
+import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind
 import com.squareup.anvil.annotations.ContributesTo
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.ToJson
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -42,6 +45,17 @@ object JsonModule {
                     .withSubtype(Blocked::class.java, "blocked")
                     .withSubtype(Allowed::class.java, "allowed"),
             )
+            .add(ScreenKindJsonAdapter())
             .build()
     }
+}
+
+class ScreenKindJsonAdapter {
+    @FromJson
+    fun fromJson(value: String): ScreenKind? =
+        ScreenKind.entries.find { it.value == value }
+
+    @ToJson
+    fun toJson(screen: ScreenKind?): String? =
+        screen?.value
 }

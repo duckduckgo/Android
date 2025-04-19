@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Tühista</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Halda e-posti</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Tagasi seadete juurde</string>
+    <string name="somethingWentWrong">Midagi läks valesti</string>
+    <string name="somethingWentWrongDescription">Google Play ei suutnud su ostu töödelda. Proovi hiljem uuesti.</string>
+    <string name="youAreSet">Kõik on valmis.</string>
+    <string name="viewPlans">Kuva plaane</string>
+    <string name="subscriptionNotFound">Tellimust ei leitud</string>
+    <string name="subscriptionNotFoundDescription">Selle Google Play kontoga seotud tellimus ei ole enam aktiivne.</string>
+    <string name="purchaseRestored">Sinu ostud on taastatud.</string>
+    <string name="restoreSubscriptionTitle">Lisa sellele seadmele oma Privacy Pro tellimus</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Lisa Google Play konto kaudu</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Taastage oma tellimus Android-seadmetes, kasutades oma Google Play kontot.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Taasta ost</string>
+    <string name="restoreSubscriptionEmailTitle">Lisa e-posti kaudu</string>
+    <string name="restoreSubscriptionEmailDescription">Lisage e-posti aadress oma tellimusele, et lisada Privacy Pro sellele seadmele.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Alustage</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Eemalda tellimus</string>
+    <string name="subscriptionRemoved">Sinu tellimus on sellest seadmest eemaldatud</string>
+    <string name="removeFromDevice">Kas soovid sellest seadmest eemaldada?</string>
+    <string name="removeFromDeviceDescription">Sa ei pääse enam oma Privacy Pro tellimusele selles seadmes ligi. See ei tühista su tellimust ja see jääb teistel seadmetel aktiivseks.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Sinu igakuine tellimus %1$s kuupäeval %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Sinu aastane tellimus %1$s kuupäeval %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Sinu tellimus aegus kuupäeval %1$s.</string>
+    <string name="monthlySubscription">Igakuine tellimus</string>
+    <string name="yearlySubscription">Aastane tellimus</string>
+    <string name="renews">uueneb</string>
+    <string name="expires">aegub</string>
+    <string name="activateOnOtherDevices">Lisa Privacy Pro teistele seadmetele</string>
+    <string name="addToDevicePrimaryText">Lisa seadmele</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisage Privacy Pro oma teistesse seadmetesse Google Play kaudu või e-posti aadressi linkimise teel.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Kasutage ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Avage jaotis Seaded &gt; Privacy Pro &gt; Mul on tellimus.</string>
+    <string name="editEmailPrimaryText">Muuda e-posti</string>
+    <string name="learnMore">Loe edasi</string>
+    <string name="privacyProFaq">Kas vajad abi Privacy Pro\'ga?</string>
+    <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
+    <string name="subscriptionStatusSubscribed">Tellitud</string>
+    <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Tellimuse seaded</string>
+    <string name="subscriptionSettingSubscribe">Kaitse oma ühendust ja identiteeti rakendusega Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Sisaldab meie VPN-i, rakendusi Personal Information Removal ja Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Sisaldab meie VPN-i ja teenust Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Mul on tellimus</string>
+    <string name="subscriptionSettingExpired">Sinu Privacy Pro tellimus on aegunud</string>
+    <string name="subscriptionSettingExpiredViewPlans">Kuva plaane</string>
+    <string name="subscriptionSettingSectionSubscription">Püsitellimus</string>
+    <string name="subscriptionSettingRemoveFromDevice">Eemalda sellest seadmest</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
+    <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
+    <string name="subscriptionSettingActivating">Aktiveerimine</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Kõik on valmis.</string>
+    <string name="purchaseCompletedText">Sinu ost oli edukas.</string>
+    <string name="purchaseRecoveredText">Sul oli juba tellimus ja oleme selle sinu jaoks taastanud.</string>
+    <string name="purchaseErrorTitle">Midagi läks valesti</string>
+    <string name="purchaseError">Meil on probleeme ühenduse loomisega. Proovi hiljem uuesti.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Uuenda plaani või loobu</string>
+    <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveerige töölaual Privacy Pro</string>
+    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisesse <b>Seaded &gt; Privacy Pro</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Avatud</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Saada tagasisidet</string>
+    <string name="feedbackActionHeader">VALI KATEGOORIA</string>
+    <string name="feedbackActionReportIssue">Teata probleemist</string>
+    <string name="feedbackActionGeneralFeedback">Üldine tagasiside</string>
+    <string name="feedbackActionFeatureRequest">Funktsiooni taotlemine</string>
+
+    <string name="feedbackGeneralHeader">VALI KATEGOORIA</string>
+    <string name="feedbackGeneralBrowser">Brauseri tagasiside</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">VALI KATEGOORIA</string>
+    <string name="feedbackCategorySubscription">Tellimused ja maksed</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">VALI KATEGOORIA</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN ei suuda ühendust luua</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN-ühendus on liiga aeglane</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN tekitab probleeme teiste rakenduste või veebisaitidega</string>
+    <string name="feedbackSubCategoryVpnIot">VPN ei lase mul kohaliku seadmega ühendada</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN põhjustab veebilehitseja kokkujooksmise või hangumise</string>
+    <string name="feedbackSubCategoryVpnOther">Muu</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Teave pole konkreetsel saidil</string>
+    <string name="feedbackSubCategoryPirNotMe">Kirjed ei kuulu kasutajale</string>
+    <string name="feedbackSubCategoryPirScanStuck">Skannimine on takerdunud</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Eemaldamine on takerdunud</string>
+    <string name="feedbackSubCategoryPirOther">Muu</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Probleem pääsukoodiga</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Ei saa kontakteeruda nõustajaga</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Nõustajale helistamine ei aita</string>
+    <string name="feedbackSubCategoryItrOther">Muu</string>
+
+    <string name="feedbackSubCategorySubsOtp">Ühekordne parool</string>
+    <string name="feedbackSubCategorySubsOther">Muu</string>
+
+    <string name="feedbackSubmitVpnHeader">Kas leidsid probleemi, mida meie <annotation type="faqs_link">abikeskuses</annotation> ei käsitleta? Me tahame sellest kindlasti teada saada.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Ütle meile, mis toimub...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Lisaks eespool sisestatud andmetele saadame koos sinu tagasisidega ka mõned anonüümsed andmed:\n\n• Kas mõned brauseri funktsioonid on aktiivsed\n• Rakenduse koonddiagnostika (nt veakoodid)\n\nVajutades nuppu Saada, nõustud, et DuckDuckGo võib kasutada esitatud teavet rakenduse täiustamiseks."</string>
+    <string name="feedbackSubmitVpnSubmit">Esita</string>
+    <string name="feedbackSubmitCompletedMessage">Aitäh! Tagasiside on esitatud.</string>
+    <string name="feedbackSubmitFailedMessage">Midagi läks valesti</string>
+
+    <string name="feedbackSubmitEmailByLine">Anna oma e-posti aadress, kui soovid, et võtaksime sinuga selle probleemi osas ühendust (me ei pruugi kõigile probleemidele vastata):</string>
+    <string name="feedbackSubmitEmailHint">E-post (valikuline)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Millist funktsiooni soovid näha?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Tellimused</string>
+    <string name="activitySubscriptionSettings">Tellimuse seaded</string>
+    <string name="activityActivateSubscription">Mul on tellimus</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Saada tagasisidet</string>
+</resources>

@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.R
 
 class DaxButtonSecondary @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet,
+    attrs: AttributeSet?,
     defStyleAttr: Int = R.attr.daxButtonSecondary,
 ) : DaxButton(
     ctx,

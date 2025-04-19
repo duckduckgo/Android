@@ -16,17 +16,12 @@
 
 package com.duckduckgo.settings.impl
 
-import com.duckduckgo.di.DaggerMap
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.multibindings.Multibinds
 
-@Module
-@ContributesTo(ActivityScope::class)
-abstract class SettingsProModule {
-    // we use multibinds as the list of plugins can be empty
-    @Multibinds
-    abstract fun provideProSettingsPlugins(): DaggerMap<Int, ProSettingsPlugin>
-}
+@ContributesPluginPoint(
+    scope = ActivityScope::class,
+    boundType = ProSettingsPlugin::class,
+)
+private interface ProSettingsPluginTrigger

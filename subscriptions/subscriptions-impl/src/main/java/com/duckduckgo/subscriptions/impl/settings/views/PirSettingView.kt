@@ -16,31 +16,33 @@
 
 package com.duckduckgo.subscriptions.impl.settings.views
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import android.widget.Toast
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,12 +55,13 @@ class PirSettingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private var coroutineScope: CoroutineScope? = null
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val binding: ViewPirSettingsBinding by viewBinding()
 
@@ -67,49 +70,56 @@ class PirSettingView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
+    private val conflatedStateJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
-
-        binding.pirSettings.setClickListener {
-            viewModel.onPir()
-        }
-
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         job += viewModel.commands()
             .onEach { processCommands(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { renderView(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         job.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
     }
 
     private fun renderView(viewState: ViewState) {
-        if (viewState.hasSubscription) {
-            binding.pirSettings.show()
-        } else {
-            binding.pirSettings.gone()
+        with(binding.pirSettings) {
+            when (viewState.pirState) {
+                is Enabled -> {
+                    isVisible = true
+                    setStatus(isOn = true)
+                    setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
+                    isClickable = true
+                    binding.pirSettings.setClickListener { viewModel.onPir() }
+                }
+                is Disabled -> {
+                    isVisible = true
+                    isClickable = false
+                    setStatus(isOn = false)
+                    binding.pirSettings.setClickListener(null)
+                    setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
+                }
+                Hidden -> isGone = true
+            }
         }
     }
 
     private fun processCommands(command: Command) {
         when (command) {
             is OpenPir -> {
-                Toast.makeText(context, "Open PIR", Toast.LENGTH_SHORT).show()
+                globalActivityStarter.start(context, PirScreenWithEmptyParams)
             }
         }
     }

@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">INFORMĒT MANI</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Pievienot</string>
+    <string name="dialogEditTitle">Rediģēt</string>
+    <string name="dialogSaveAction">Saglabāt</string>
+    <string name="dialogConfirmTitle">Apstiprināt</string>
+    <string name="dialogSave">Saglabāt</string>
+    <string name="delete">Dzēst</string>
+    <string name="edit">Rediģēt</string>
+    <string name="remove">Noņemt</string>
+    <string name="removeAll">Noņemt visu</string>
+    <string name="undo">Atsaukt</string>
+    <string name="cancel">Atcelt</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Vienmēr ieslēgts</string>
+    <string name="on">Ieslēgts</string>
+    <string name="off">Izslēgts</string>
 </resources>

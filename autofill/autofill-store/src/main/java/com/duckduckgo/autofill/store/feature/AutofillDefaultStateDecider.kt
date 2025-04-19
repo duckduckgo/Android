@@ -41,7 +41,7 @@ class RealAutofillDefaultStateDecider(
             return false
         }
 
-        if (userBrowserProperties.daysSinceInstalled() > 0L) {
+        if (userBrowserProperties.daysSinceInstalled() > 0L && !autofillFeature.onForExistingUsers().isEnabled()) {
             return false
         }
 

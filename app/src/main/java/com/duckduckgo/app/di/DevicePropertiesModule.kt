@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.store.AndroidAppProperties
 import com.duckduckgo.app.global.store.AndroidUserBrowserProperties
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -29,10 +28,9 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -69,8 +67,6 @@ object DevicePropertiesModule {
         emailManager: EmailManager,
         searchCountDao: SearchCountDao,
         appDaysUsedRepository: AppDaysUsedRepository,
-        appTrackingProtection: AppTrackingProtection,
-        networkProtectionState: NetworkProtectionState,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
@@ -80,8 +76,6 @@ object DevicePropertiesModule {
             emailManager,
             searchCountDao,
             appDaysUsedRepository,
-            appTrackingProtection,
-            networkProtectionState,
         )
     }
 }

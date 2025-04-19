@@ -49,6 +49,7 @@ class ElementHidingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockElementHidingDao).get()
@@ -64,6 +65,7 @@ class ElementHidingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockElementHidingDao).get()
@@ -78,6 +80,7 @@ class ElementHidingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(elementHidingEntity)

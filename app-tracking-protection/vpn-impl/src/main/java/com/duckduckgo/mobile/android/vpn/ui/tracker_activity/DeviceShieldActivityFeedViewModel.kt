@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedIt
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerDescriptionFeed
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import java.lang.Integer.min
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -48,7 +49,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import logcat.logcat
-import org.threeten.bp.LocalDateTime
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synkronisering og sikkerhedskopiering ikke tilgængelige</b>\nBeklager, men synkronisering og sikkerhedskopiering er ikke tilgængelige i øjeblikket. Prøv igen senere.</string>
     <string name="sync_flows_disabled_new_version"><b>Synkronisering og sikkerhedskopiering ikke tilgængelige</b>\nBeklager, men synkronisering og sikkerhedskopiering er ikke længere tilgængelige i denne app-version. Opdater DuckDuckGo til den nyeste version for at fortsætte.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synkronisering og sikkerhedskopiering sat på pause</b>\nBeklager, men synkronisering og sikkerhedskopiering er ikke tilgængelige i øjeblikket. Prøv igen senere.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synkronisering og sikkerhedskopiering sat på pause</b>\nBeklager, men synkronisering og sikkerhedskopiering er ikke længere tilgængelige i denne app-version. Opdater DuckDuckGo til den nyeste version for at fortsætte.</string>
     <string name="sync_paused_notification"><b>Synkronisering og sikkerhedskopiering sat på pause</b>\nSynkronisering og sikkerhedskopiering er desværre ikke tilgængelige i øjeblikket. Prøv igen senere.</string>
+    <string name="sync_error_notification"><b>Synkroniseringsfejl</b>\nSync &amp; Backup er midlertidigt utilgængelig.</string>
+    <string name="sync_error_warning"><b>Synkroniseringsfejl</b>\nSync &amp; Backup er midlertidigt utilgængelig.</string>
+    <string name="sync_signed_out_notification"><b>Synkronisering sat på pause</b>\nSynkroniseringen er blevet sat på pause. Hvis du vil fortsætte med at synkronisere denne enhed, skal du oprette forbindelse igen ved hjælp af en anden enhed eller din gendannelseskode.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synkronisering og sikkerhedskopiering</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synkroniser sikkert bogmærker og adgangskoder mellem dine enheder.</string>
     <string name="sync_off_hint">Dine data er fuldt krypterede, og DuckDuckGo har ikke adgang til krypteringsnøglen.</string>
     <string name="sync_setup_single_device_title">Opsætning af en enkelt enhed</string>
+    <string name="sync_setup_other_options_title">Andre muligheder</string>
     <string name="sync_setup_single_recover_data_cta_title">Gendan synkroniserede data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synkroniser og sikkerhedskopier denne enhed</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Download automatisk ikoner for dine synkroniserede bogmærker.</string>
     <string name="sync_enable_connecting">Forbinder ...</string>
     <string name="sync_intro_enable_title">Synkroniser og sikkerhedskopier denne enhed</string>
-    <string name="sync_intro_enable_content">Dette opretter en krypteret sikkerhedskopi af dine bogmærker og adgangskoder på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheder.\n\n Krypteringsnøglen gemmes kun på din enhed, DuckDuckGo har ikke adgang til den ...</string>
+    <string name="sync_intro_enable_content">Dette opretter en krypteret sikkerhedskopi af dine bogmærker og adgangskoder på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheder.\n\n Krypteringsnøglen gemmes kun på din enhed, DuckDuckGo har ikke adgang til den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisere med dine andre enheder senere.</string>
     <string name="sync_intro_enable_cta">Slå synkronisering og sikkerhedskopiering til</string>
     <string name="sync_intro_recover_title">Gendan synkroniserede data</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Synkronisering</string>
     <string name="sync_notify_me_title">Notifikationer er deaktiveret</string>
     <string name="sync_notify_me_description">Få besked, hvis synkronisering og sikkerhedskopiering støder på en fejl.</string>
-    <string name="sync_rollout_banner_text">Synkronisering og sikkerhedskopiering udrulles gradvist og er muligvis endnu ikke tilgængelig i DuckDuckGo på dine andre enheder</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Synkronisering og sikkerhedskopiering kunne ikke slås fra.</string>
+    <string name="sync_edit_device_error">Enhedens navn kunne ikke opdateres.</string>
+    <string name="sync_remove_device_error">Denne enhed kunne ikke fjernes fra synkronisering og sikkerhedskopiering.</string>
+    <string name="sync_delete_data_error">Kan ikke slette data på serveren.</string>
+    <string name="sync_login_authenticated_device_error">"For at parre disse enheder skal du slå Sync &amp; Backup fra på den ene enhed og derefter trykke på \"Synkroniser med en anden enhed\" på den anden enhed."</string>
+    <string name="sync_connect_generic_error">Kan ikke oprette forbindelse til serveren.</string>
+    <string name="sync_connect_login_error">Kan ikke synkronisere med en anden enhed.</string>
+    <string name="sync_create_account_generic_error">Kan ikke oprette forbindelse til serveren.</string>
+    <string name="sync_invalid_code_error">Beklager, denne kode er ugyldig. Sørg for, at den korrekte kode er indtastet eller scannet.</string>
+    <string name="sync_recovery_pdf_error">Kan ikke oprette gendannelses-PDF.</string>
+    <string name="sync_dialog_error_ok">Okay</string>
+    <string name="sync_dialog_error_title">Synkronisering og sikkerhedskopiering</string>
+    <string name="sync_encryption_not_supported_error_title">Enheden understøttes ikke</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup er end-to-end-krypteret og skal kunne kryptere og gemme data på din enhed. Da din enhed ikke understøtter krypteret lagring, er Sync &amp; Backup ikke tilgængelig.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Lås enheden op for at få adgang til Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup låst</string>
+    <string name="sync_require_device_passcode_dialog_title">Beskyt din enhed for at bruge synkronisering og sikkerhedskopiering</string>
+    <string name="sync_require_device_passcode_dialog_body">Der kræves et låsemønster, en pinkode eller biometri for at bruge Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Gå til Indstillinger</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Slet serverdata?</string>
+    <string name="sync_delete_server_data_dialog_content">Alle enheder vil blive afbrudt, og dine synkroniserede data vil blive slettet fra serveren.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Slet data</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Annuller</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synkroniser og sikkerhedskopier dine adgangskoder</string>
+    <string name="syncPromoSubtitlePasswords">En konto er ikke nødvendig. End-to-end-krypteret betyder, at ingen andre end dig kan se dine adgangskoder, ikke engang os.</string>
+
+    <string name="syncPromoTitleBookmarks">Synkroniser og sikkerhedskopier dine bogmærker</string>
+    <string name="syncPromoSubtitleBookmarks">En konto er ikke nødvendig. End-to-end-krypteret betyder, at ingen andre end dig kan se dine bogmærker, ikke engang os.</string>
+
+    <string name="syncPromoPrimaryButton">Opsætning af synkronisering</string>
+    <string name="syncPromoSecondaryButton">Nej tak</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Få DuckDuckGo på andre enheder</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Få DuckDuckGo på andre enheder for at synkronisere med denne</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hent DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">For at downloade DuckDuckGo på en computer eller en anden mobilenhed, skal du gå til:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Del downloadlink</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopieret</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Skift til en anden synkronisering?</string>
+    <string name="sync_dialog_switch_account_primary_button">Skift synkronisering</string>
+    <string name="sync_dialog_switch_account_secondary_button">Annuller</string>
+    <string name="sync_dialog_switch_account_description">Denne enhed er allerede synkroniseret. Er du sikker på, at du vil synkronisere den med en anden sikkerhedskopi eller enhed? Et skifte fjerner ikke data, der allerede er synkroniseret til denne enhed.</string>
 </resources>

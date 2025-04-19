@@ -51,6 +51,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(requestFiltererExceptionEntity.toFeatureException(), testee.exceptions.first())
@@ -65,6 +66,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(DEFAULT_WINDOW_IN_MS, testee.settings.windowInMs)
@@ -78,6 +80,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         testee.updateAll(listOf(), policy)
@@ -93,6 +96,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(WINDOW_IN_MS, testee.settings.windowInMs)

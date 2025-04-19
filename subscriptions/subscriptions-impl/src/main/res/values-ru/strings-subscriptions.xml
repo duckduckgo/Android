@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Отменить</string>
+    <string name="ok">Хорошо</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Управление электронной почтой</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Назад к настройкам</string>
+    <string name="somethingWentWrong">Что-то пошло не так</string>
+    <string name="somethingWentWrongDescription">Сервису Google Play не удалось обработать вашу покупку. Повторите попытку позже.</string>
+    <string name="youAreSet">Всё готово!</string>
+    <string name="viewPlans">Просмотреть тарифы</string>
+    <string name="subscriptionNotFound">Подписка не найдена</string>
+    <string name="subscriptionNotFoundDescription">Подписка, закрепленная за этой учетной записью Google Play, утратила активный статус.</string>
+    <string name="purchaseRestored">Ваши покупки восстановлены.</string>
+    <string name="restoreSubscriptionTitle">Добавьте подписку Privacy Pro на это устройство</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Добавление через Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Чтобы восстановить подписку на устройствах Android, используйте учетную запись Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Восстановить покупку</string>
+    <string name="restoreSubscriptionEmailTitle">Добавление через электронную почту</string>
+    <string name="restoreSubscriptionEmailDescription">Чтобы добавить подписку Privacy Pro на это устройство, привяжите к ней адрес электронной почты.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Приступим!</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Удалить подписку</string>
+    <string name="subscriptionRemoved">Ваша подписка удалена с этого устройства</string>
+    <string name="removeFromDevice">Удалить с этого устройства?</string>
+    <string name="removeFromDeviceDescription">Вы утратите доступ к возможностям тарифа Privacy Pro на этом устройстве. Сама же подписка не отменяется и по-прежнему будет работать на других устройствах.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Ваша ежемесячная подписка %1$s %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Ваша годовая подписка %1$s %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Срок действия вашей подписки истек %1$s.</string>
+    <string name="monthlySubscription">Ежемесячная подписка</string>
+    <string name="yearlySubscription">Годовая подписка</string>
+    <string name="renews">продлится</string>
+    <string name="expires">завершится</string>
+    <string name="activateOnOtherDevices">Добавление подписки Privacy Pro на другие устройства</string>
+    <string name="addToDevicePrimaryText">Добавление на устройство</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Подписку Privacy Pro можно добавить на другие устройства с помощью учетной записи Google Play или адреса электронной почты.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Чтобы добавить подписку на других устройствах, используйте указанный выше адрес электронной почты. Откройте в приложении DuckDuckGo раздел «Настройки &gt; Privacy Pro &gt; У меня уже есть подписка».</string>
+    <string name="editEmailPrimaryText">Изменить адрес почты</string>
+    <string name="learnMore">Узнать больше</string>
+    <string name="privacyProFaq">Нужна помощь с Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">На страницах справки вы найдете ответы на распространенные вопросы, а также контакты поддержки Privacy Pro. Доступность функций зависит от страны.</string>
+    <string name="subscriptionStatusSubscribed">Подписка оформлена</string>
+    <string name="privacyPolicyAndTermsOfService">Политика конфиденциальности и условия обслуживания</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Настройки подписки</string>
+    <string name="subscriptionSettingSubscribe">Тариф Privacy Pro для защиты соединения и личных данных</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Включает услуги: VPN, Personal Information Removal (удаление личной информации) и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Включает услуги: VPN и и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
+    <string name="subscriptionSettingGet">Перейти на Privacy Pro</string>
+    <string name="subscriptionSettingRestore">У меня уже есть подписка</string>
+    <string name="subscriptionSettingExpired">Срок действия вашей подписки Privacy Pro истек</string>
+    <string name="subscriptionSettingExpiredViewPlans">Просмотреть тарифы</string>
+    <string name="subscriptionSettingSectionSubscription">По подписке</string>
+    <string name="subscriptionSettingRemoveFromDevice">Удалить с этого устройства</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
+    <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
+    <string name="subscriptionSettingActivating">Выполняется активация</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Все готово!</string>
+    <string name="purchaseCompletedText">Ваша покупка оформлена.</string>
+    <string name="purchaseRecoveredText">У вас уже была подписка, и теперь мы ее восстановили.</string>
+    <string name="purchaseErrorTitle">Что-то пошло не так</string>
+    <string name="purchaseError">Возникли проблемы с подключением. Повторите попытку позже.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Изменить или отменить подписку</string>
+    <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Чтобы включить функцию Personal Information Removal, активируйте подписку Privacy Pro на настольном компьютере</string>
+    <string name="pirDescription">Запустите браузер DuckDuckGo на настольном компьютере, откройте раздел «<b>Настройки &gt; Privacy Pro</b>» и нажмите на ссылку «<b>У меня уже есть подписка</b>».</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Открыть</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Отправить отзыв</string>
+    <string name="feedbackActionHeader">ВЫБЕРИТЕ КАТЕГОРИЮ</string>
+    <string name="feedbackActionReportIssue">Отчет о проблеме</string>
+    <string name="feedbackActionGeneralFeedback">Общий комментарий</string>
+    <string name="feedbackActionFeatureRequest">Запрос функции</string>
+
+    <string name="feedbackGeneralHeader">ВЫБЕРИТЕ КАТЕГОРИЮ</string>
+    <string name="feedbackGeneralBrowser">Отзыв о браузере</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">ВЫБЕРИТЕ КАТЕГОРИЮ</string>
+    <string name="feedbackCategorySubscription">Подписки и платежи</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">ВЫБЕРИТЕ КАТЕГОРИЮ</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN не подключается</string>
+    <string name="feedbackSubCategoryVpnSlow">Слишком медленное соединение по VPN</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN вызывает проблемы с другими приложениями или сайтами</string>
+    <string name="feedbackSubCategoryVpnIot">VPN не дает подключиться к локальному устройству</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN приводит к сбою или зависанию браузера</string>
+    <string name="feedbackSubCategoryVpnOther">Дополнительные настройки</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Информация не найдена на конкретном сайте</string>
+    <string name="feedbackSubCategoryPirNotMe">Данные принадлежат другому лицу</string>
+    <string name="feedbackSubCategoryPirScanStuck">Поиск застопорился</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Процесс удаления застопорился</string>
+    <string name="feedbackSubCategoryPirOther">Дополнительные настройки</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Проблема с кодом доступа</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Невозможно связаться с консультантом</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Мало толку от звонка консультанту</string>
+    <string name="feedbackSubCategoryItrOther">Дополнительные настройки</string>
+
+    <string name="feedbackSubCategorySubsOtp">Одноразовый пароль</string>
+    <string name="feedbackSubCategorySubsOther">Дополнительные настройки</string>
+
+    <string name="feedbackSubmitVpnHeader">Столкнулись с проблемой, которая не затронута в нашем <annotation type="faqs_link">справочном центре</annotation>? Мы просто обязаны о ней знать.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Сообщите нам, что происходит...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Помимо указанных выше данных, вместе с отзывом отправляется следующая обезличенная информация:\n\n• сведения о том, были ли активированы те или иные функции браузера;\n• обобщенные результаты диагностики приложений (например, коды ошибок).\n\nНажимая кнопку «Отправить», вы разрешаете DuckDuckGo использовать отправленную информацию для улучшения работы приложения."</string>
+    <string name="feedbackSubmitVpnSubmit">Подтвердить</string>
+    <string name="feedbackSubmitCompletedMessage">Спасибо! Ваш отзыв отправлен.</string>
+    <string name="feedbackSubmitFailedMessage">Что-то пошло не так</string>
+
+    <string name="feedbackSubmitEmailByLine">Укажите адрес эл. почты, если вы хотите, чтобы мы связались с вами по этому вопросу (мы отвечаем не во всех случаях):</string>
+    <string name="feedbackSubmitEmailHint">Электронная почта (необязательно)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Какую функцию вы хотели бы увидеть?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Подписки</string>
+    <string name="activitySubscriptionSettings">Настройки подписки</string>
+    <string name="activityActivateSubscription">У меня уже есть подписка</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Отправить отзыв</string>
+</resources>

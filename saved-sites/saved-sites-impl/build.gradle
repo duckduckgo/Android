@@ -18,14 +18,16 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':saved-sites-api')
@@ -33,11 +35,14 @@ dependencies {
     implementation project(path: ':sync-settings-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')
-    api project(path: ':saved-sites-store')
+    implementation project(path: ':new-tab-page-api')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':saved-sites-store')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
+    implementation AndroidX.dataStore.preferences
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation AndroidX.appCompat
@@ -50,17 +55,22 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.logcat:logcat:_"
+
+    // ViewModel and LiveData
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
+    implementation AndroidX.lifecycle.liveDataKtx
 
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     // Testing dependencies
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation AndroidX.core
     testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -76,6 +86,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -91,5 +102,8 @@ android {
         }
     }
     namespace 'com.duckduckgo.saved.sites.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

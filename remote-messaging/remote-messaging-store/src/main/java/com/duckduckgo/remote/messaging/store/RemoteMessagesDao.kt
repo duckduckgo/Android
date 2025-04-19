@@ -40,14 +40,45 @@ abstract class RemoteMessagesDao {
     abstract fun updateState(id: String, newState: Status)
 
     @Query("select * from remote_message where status = \"SCHEDULED\"")
+    abstract fun message(): RemoteMessageEntity?
+
+    @Query("select * from remote_message where status = \"SCHEDULED\"")
     abstract fun messagesFlow(): Flow<RemoteMessageEntity?>
 
-    @Query("DELETE FROM remote_message WHERE status = \"SCHEDULED\"")
-    abstract fun deleteActiveMessages()
+    @Query("DELETE FROM remote_message WHERE status = \"DONE\" AND shown = 0")
+    abstract fun deleteDoneMessagesNotShown()
+
+    @Query("update remote_message set status = \"DONE\" where status = \"SCHEDULED\"")
+    abstract fun markAsDonePreviousMessages()
 
     @Transaction
-    open fun newMessage(messageEntity: RemoteMessageEntity) {
-        deleteActiveMessages()
-        insert(messageEntity)
+    open fun updateActiveMessageStateAndDeleteNeverShownMessages() {
+        markAsDonePreviousMessages()
+        deleteDoneMessagesNotShown()
     }
+
+    @Transaction
+    open fun addOrUpdateActiveMessage(remoteMessageEntity: RemoteMessageEntity) {
+        if (activeMessage()?.id == remoteMessageEntity.id) {
+            // update the message content if it's the same message
+            updateMessageContent(remoteMessageEntity.id, remoteMessageEntity.message, remoteMessageEntity.status)
+        } else {
+            // new active message, move scheduled messages to done
+            markAsDonePreviousMessages()
+            val messagesById = messagesById(remoteMessageEntity.id)
+            if (messagesById == null) {
+                insert(remoteMessageEntity)
+            } else {
+                updateMessageContent(remoteMessageEntity.id, remoteMessageEntity.message, remoteMessageEntity.status)
+            }
+        }
+        // delete any done messages that were not shown
+        deleteDoneMessagesNotShown()
+    }
+
+    @Query("select * from remote_message where status = \"SCHEDULED\" LIMIT 1")
+    abstract fun activeMessage(): RemoteMessageEntity?
+
+    @Query("update remote_message set message = :content, status = :newState where id = :id AND status != \"DISMISSED\"")
+    abstract fun updateMessageContent(id: String, content: String, newState: Status)
 }

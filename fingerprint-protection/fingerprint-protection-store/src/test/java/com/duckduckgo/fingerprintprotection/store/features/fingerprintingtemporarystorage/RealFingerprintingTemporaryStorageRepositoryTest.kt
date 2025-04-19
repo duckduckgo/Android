@@ -51,6 +51,7 @@ class RealFingerprintingTemporaryStorageRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingTemporaryStorageDao).get()
@@ -66,6 +67,7 @@ class RealFingerprintingTemporaryStorageRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingTemporaryStorageDao).get()
@@ -80,6 +82,7 @@ class RealFingerprintingTemporaryStorageRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(fingerprintingTemporaryStorageEntity)

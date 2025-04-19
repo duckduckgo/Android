@@ -317,7 +317,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
     }
 
     data class DeviceShieldNotification(
-        val title: SpannableStringBuilder = SpannableStringBuilder(),
+        val text: SpannableStringBuilder = SpannableStringBuilder(),
         val silent: Boolean = false,
         val hidden: Boolean = false,
         val notificationVariant: Int = -1, // default no variant
@@ -325,7 +325,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
         companion object {
             fun from(content: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent): DeviceShieldNotification {
                 return DeviceShieldNotification(
-                    title = SpannableStringBuilder(content.title),
+                    text = SpannableStringBuilder(content.text),
                 )
             }
         }

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Zrušiť</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Spravovať e-mail</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Späť na nastavenia</string>
+    <string name="somethingWentWrong">Vyskytla sa chyba</string>
+    <string name="somethingWentWrongDescription">Google Play nemohol spracovať tvoj nákup. Prosím, skús to neskôr znova.</string>
+    <string name="youAreSet">Všetko je pripravené.</string>
+    <string name="viewPlans">Zobraziť plány</string>
+    <string name="subscriptionNotFound">Predplatné nebolo nájdené</string>
+    <string name="subscriptionNotFoundDescription">Predplatné spojené s týmto účtom Google Play už nie je aktívne.</string>
+    <string name="purchaseRestored">Tvoje nákupy boli obnovené.</string>
+    <string name="restoreSubscriptionTitle">Pridaj si do tohto zariadenia predplatné Privacy Pro</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Pridať prostredníctvom účtu Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Obnov svoje predplatné na zariadeniach so systémom Android pomocou svojho účtu Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Obnoviť nákup</string>
+    <string name="restoreSubscriptionEmailTitle">Pridať cez e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Ak chceš pridať Privacy Pro do tohto zariadenia, prepoj e-mailovú adresu so svojím predplatným.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Začnite</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Zrušiť predplatné</string>
+    <string name="subscriptionRemoved">Tvoje predplatné bolo z tohto zariadenia odstránené</string>
+    <string name="removeFromDevice">Odstrániť z tohto zariadenia?</string>
+    <string name="removeFromDeviceDescription">Na tomto zariadení už nebudeš mať prístup k predplatnému služby Privacy Pro. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoje mesačné predplatné %1$s dňa %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoje ročné predplatné %1$s na %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Platnosť tvojho predplatného vypršala dňa %1$s.</string>
+    <string name="monthlySubscription">Mesačné predplatné</string>
+    <string name="yearlySubscription">Ročné predplatné</string>
+    <string name="renews">obnovuje</string>
+    <string name="expires">platnosť sa končí</string>
+    <string name="activateOnOtherDevices">Pridaj Privacy Pro do iných zariadení</string>
+    <string name="addToDevicePrimaryText">Pridať do zariadenia</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pridaj Privacy Pro do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Použi vyššie uvedený e-mail na pridanie predplatného v iných zariadeniach v aplikácii DuckDuckGo. Prejdi do ponuky Nastavenia &gt; Privacy Pro &gt; Mám predplatné.</string>
+    <string name="editEmailPrimaryText">Upraviť e-mail</string>
+    <string name="learnMore">Zistite viac</string>
+    <string name="privacyProFaq">Potrebuješ pomoc s aplikáciou Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Získaj odpovede na často kladené otázky alebo kontaktuj podporu programu Privacy Pro na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
+    <string name="subscriptionStatusSubscribed">Prihlásený/-á</string>
+    <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobných údajov a podmienky služby</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Nastavenia predplatného</string>
+    <string name="subscriptionSettingSubscribe">Chráň si pripojenie a totožnosť pomocou Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Zahŕňa naše služby VPN, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Zahŕňa našu VPN a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Mám predplatné</string>
+    <string name="subscriptionSettingExpired">Vaše predplatné Privacy Pro vypršalo</string>
+    <string name="subscriptionSettingExpiredViewPlans">Zobraziť plány</string>
+    <string name="subscriptionSettingSectionSubscription">Predplatné</string>
+    <string name="subscriptionSettingRemoveFromDevice">Odstrániť z tohto zariadenia</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Pomoc a podpora</string>
+    <string name="subscriptionSettingSendFeedback">Odoslať spätnú väzbu</string>
+    <string name="subscriptionSettingActivating">Aktivácia</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Máš všetko pripravené.</string>
+    <string name="purchaseCompletedText">Tvoj nákup bol úspešný.</string>
+    <string name="purchaseRecoveredText">Už si mal/-a predplatné a my sme ho pre teba obnovili.</string>
+    <string name="purchaseErrorTitle">Vyskytla sa chyba</string>
+    <string name="purchaseError">Máme problémy s pripojením. Prosím, skús to neskôr znova.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Aktualizovať plán alebo zrušiť</string>
+    <string name="changePlanDescription">Tvoje predplatné bolo zakúpené prostredníctvom obchodu Apple App Store. Ak chceš zmeniť svoje nastavenia plánu alebo fakturácie, prejdi do časti Nastavenia &gt; Apple účet &gt; Predplatné na zariadení prihlásenom do rovnakého Apple účtu, ktorý bol použitý na zakúpenie predplatného.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Aktivuj si Privacy Pro na pracovnej ploche a nastav si Personal Information Removal</string>
+    <string name="pirDescription">Začni tak, že v prehliadači DuckDuckGo pre PC prejdeš na <b>Nastavenia &gt; Privacy Pro</b> a klikneš na <b>Mám predplatné</b>.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Otvorené</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Odoslať spätnú väzbu</string>
+    <string name="feedbackActionHeader">VYBERTE KATEGÓRIU</string>
+    <string name="feedbackActionReportIssue">Nahlásiť problém</string>
+    <string name="feedbackActionGeneralFeedback">Všeobecná spätná väzba</string>
+    <string name="feedbackActionFeatureRequest">Požiadaj o funkciu</string>
+
+    <string name="feedbackGeneralHeader">VYBERTE KATEGÓRIU</string>
+    <string name="feedbackGeneralBrowser">Spätná väzba prehliadača</string>
+    <string name="feedbackGeneralPpro">Ochrana osobných údajov Pro</string>
+
+    <string name="feedbackCategoryHeader">VYBERTE KATEGÓRIU</string>
+    <string name="feedbackCategorySubscription">Predplatné a platby</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">VYBERTE KATEGÓRIU</string>
+
+    <string name="feedbackSubCategoryVpnConnection">Nedarí sa pripojiť k VPN.</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN pripojenie je príliš pomalé</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN spôsobuje problémy s inými aplikáciami alebo webovými stránkami.</string>
+    <string name="feedbackSubCategoryVpnIot">VPN mi nedovolí pripojiť sa k lokálnemu zariadeniu</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN spôsobuje zlyhanie alebo zamrznutie prehliadača</string>
+    <string name="feedbackSubCategoryVpnOther">Iné</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Na konkrétnej stránke nie sú informácie</string>
+    <string name="feedbackSubCategoryPirNotMe">Záznamy nepatria užívateľovi</string>
+    <string name="feedbackSubCategoryPirScanStuck">Skenovanie je zaseknuté</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Odstránenie je zaseknuté</string>
+    <string name="feedbackSubCategoryPirOther">Iné</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problém s prístupovým kódom</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Nemôžem sa spojiť s poradcom</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefonát poradcovi nebol nápomocný</string>
+    <string name="feedbackSubCategoryItrOther">Iné</string>
+
+    <string name="feedbackSubCategorySubsOtp">Jednorazové heslo</string>
+    <string name="feedbackSubCategorySubsOther">Iné</string>
+
+    <string name="feedbackSubmitVpnHeader">Našiel/našla si problém, ktorý nepokrýva naše <annotation type="faqs_link">centrum pomoci</annotation> ? Určite o tom chceme vedieť.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Povedz nám, čo sa deje...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Okrem vyššie uvedených údajov posielame spolu s tvojou spätnou väzbou aj niektoré anonymizované informácie:\n\n- Či sú niektoré funkcie prehliadača aktívne\n- Súhrnná diagnostika aplikácie (napr. kódy chýb)\n\nKliknutím na tlačidlo Odoslať súhlasíš s tým, že DuckDuckGo môže použiť odoslané informácie na zlepšenie aplikácie."</string>
+    <string name="feedbackSubmitVpnSubmit">Odoslať</string>
+    <string name="feedbackSubmitCompletedMessage">Ďakujeme! Spätná väzba bola odoslaná</string>
+    <string name="feedbackSubmitFailedMessage">Vyskytla sa chyba</string>
+
+    <string name="feedbackSubmitEmailByLine">Uveď e-mail, ak chceš, aby sme ťa v súvislosti s týmto problémom kontaktovali (nemusíme byť schopní odpovedať na všetky problémy):</string>
+    <string name="feedbackSubmitEmailHint">E-mail (nepovinné)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Prosím, daj nám svoju spätnú väzbu...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Akú funkciu by si chcel/-a?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Predplatné</string>
+    <string name="activitySubscriptionSettings">Nastavenia predplatného</string>
+    <string name="activityActivateSubscription">Mám predplatné</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Odoslať spätnú väzbu</string>
+</resources>

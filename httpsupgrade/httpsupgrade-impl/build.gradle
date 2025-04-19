@@ -31,7 +31,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':common-utils')
     implementation project(':di')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':httpsupgrade-api')
     implementation project(':httpsupgrade-store')
 
@@ -55,6 +55,8 @@ dependencies {
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -72,6 +74,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }
 

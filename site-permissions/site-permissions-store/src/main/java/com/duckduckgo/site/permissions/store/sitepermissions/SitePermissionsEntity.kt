@@ -26,6 +26,7 @@ data class SitePermissionsEntity(
     val askCameraSetting: String = ASK_EVERY_TIME.name,
     val askMicSetting: String = ASK_EVERY_TIME.name,
     val askDrmSetting: String = ASK_EVERY_TIME.name,
+    val askLocationSetting: String = ASK_EVERY_TIME.name,
 )
 
 enum class SitePermissionAskSettingType {

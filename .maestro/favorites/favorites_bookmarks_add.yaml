@@ -1,0 +1,35 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Can add favorite from bookmark screen"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+      # Navigate to bookmarks screen
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "bookmarks"
+      # Add favorite from bookmarks screen
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/trailingIcon"
+          index: 0
+      - tapOn:
+          text: "add to favorites"
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/favoriteStar"

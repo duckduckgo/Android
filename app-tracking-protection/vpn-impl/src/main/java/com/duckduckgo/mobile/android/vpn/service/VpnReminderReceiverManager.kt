@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.Manifest.permission
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -50,18 +53,20 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
             logcat { "Vpn is already running, nothing to show" }
         } else {
             logcat { "Vpn is not running, showing reminder notification" }
-            val notification = vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.getContent()?.let { content ->
-                val actualContent = if (wasReminderNotificationShown()) {
-                    content.copy(true)
-                } else {
-                    notificationWasShown()
-                    content.copy(false)
+            if (ActivityCompat.checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                val notification = vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.getContent()?.let { content ->
+                    val actualContent = if (wasReminderNotificationShown()) {
+                        content.copy(true)
+                    } else {
+                        notificationWasShown()
+                        content.copy(false)
+                    }
+                    vpnReminderNotificationBuilder.buildReminderNotification(actualContent)
                 }
-                vpnReminderNotificationBuilder.buildReminderNotification(actualContent)
-            }
-            if (notification != null) {
-                deviceShieldPixels.didShowReminderNotification()
-                notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+                if (notification != null) {
+                    deviceShieldPixels.didShowReminderNotification()
+                    notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+                }
             }
         }
     }

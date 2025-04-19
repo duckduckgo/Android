@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Försök igen</string>
     <string name="notificationDownloadComplete">Nedladdning klar.</string>
     <string name="notificationDownloadFailed">Det gick inte att ladda ner.</string>
+
+    <string name="downloadConfirmationContinue">Spara till Nerladdningar</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Från: %1$s</string>
 </resources>

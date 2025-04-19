@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -39,7 +40,7 @@ class TrackerDataDevReceiver(
     private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
     init {
-        context.registerReceiver(this, IntentFilter(intentAction))
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(

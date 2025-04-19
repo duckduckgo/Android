@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:textAlignment="center"
+        android:gravity="center"
         app:typography="h5"
         android:padding="@dimen/keyline_2"
         android:background="@color/daxColorBlurLight"

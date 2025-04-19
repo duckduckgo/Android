@@ -26,6 +26,7 @@ import android.os.Build
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -46,7 +47,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
 ) : DefaultBrowserDetector, BrowserFeatureStateReporterPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
+        // previously was ensuring that device was >= Build.VERSION_CODES.N. Returning true here to minimize further changes.
+        return true
     }
 
     override fun isDefaultBrowser(): Boolean {
@@ -65,8 +67,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return resolutionInfo?.activityInfo?.packageName
     }
 
-    override fun featureState(): Pair<Boolean, String> {
-        return Pair(isDefaultBrowser(), PixelParameter.DEFAULT_BROWSER)
+    override fun featureStateParams(): Map<String, String> {
+        return mapOf(PixelParameter.DEFAULT_BROWSER to isDefaultBrowser().toBinaryString())
     }
 
     @Suppress("NewApi") // we use appBuildConfig

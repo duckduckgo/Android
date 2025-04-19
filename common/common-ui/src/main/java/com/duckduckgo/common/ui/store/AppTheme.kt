@@ -25,7 +25,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface AppTheme {
-    fun getAppTheme(): DuckDuckGoTheme
     fun isLightModeEnabled(): Boolean
 }
 
@@ -36,14 +35,12 @@ class BrowserAppTheme @Inject constructor(
     private val themeDataStore: ThemingDataStore,
 ) : AppTheme {
 
-    override fun getAppTheme(): DuckDuckGoTheme {
-        return getAppTheme()
-    }
-
     override fun isLightModeEnabled(): Boolean {
         return when (themeDataStore.theme) {
             DuckDuckGoTheme.LIGHT -> true
+            DuckDuckGoTheme.EXPERIMENT_LIGHT -> true
             DuckDuckGoTheme.DARK -> false
+            DuckDuckGoTheme.EXPERIMENT_DARK -> false
             DuckDuckGoTheme.SYSTEM_DEFAULT -> {
                 !isNightMode(context)
             }

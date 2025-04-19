@@ -39,6 +39,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DISABLE_DAILY("m_atp_ev_disabled_d"),
 
     ATP_ENABLE_UNIQUE("m_atp_ev_enabled_u"),
+    ATP_ENABLE_MONTHLY("m_atp_ev_enabled_monthly"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE("m_atp_ev_enabled_reminder_notification_u"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY("m_atp_ev_enabled_reminder_notification_d"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION("m_atp_ev_enabled_reminder_notification_c"),
@@ -103,6 +104,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_tun_error_d"),
     ATP_ESTABLISH_TUN_INTERFACE_ERROR("m_atp_ev_establish_tun_error_c"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_null_tun_error_d"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR("m_atp_ev_establish_null_tun_error_c"),
 
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
@@ -125,6 +128,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY("m_atp_imp_tracker_activity_report_issues_d"),
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
+    ATP_APP_BREAKAGE_REPORT_DAILY("m_atp_breakage_report_d"),
     ATP_APP_BREAKAGE_REPORT_UNIQUE("m_atp_breakage_report_u"),
     ATP_APP_CPU_MONITOR_REPORT("m_atp_ev_cpu_usage_above_%d"),
 
@@ -220,5 +224,37 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     VPN_SNOOZE_ENDED_DAILY("m_vpn_ev_snooze_ended_d", enqueue = true),
 
     VPN_MOTO_G_FIX_DAILY("m_vpn_ev_moto_g_fix_d", enqueue = true),
+    VPN_START_ATTEMPT("m_vpn_ev_start_attempt_c", enqueue = true),
+    VPN_START_ATTEMPT_SUCCESS("m_vpn_ev_start_attempt_success_c", enqueue = true),
+    VPN_START_ATTEMPT_FAILURE("m_vpn_ev_start_attempt_failure_c", enqueue = true),
+
+    NEW_TAB_SECTION_TOGGLED_OFF("m_new_tab_page_customize_section_off_appTP"),
+    NEW_TAB_SECTION_TOGGLED_ON("m_new_tab_page_customize_section_on_appTP"),
+
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN("m_atp_ppro-upsell_banner-apptp-enabled_show_c"),
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_DAILY("m_atp_ppro-upsell_banner-apptp-enabled_show_d"),
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_UNIQUE("m_atp_ppro-upsell_banner-apptp-enabled_show_u"),
+
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_DISMISSED("m_atp_ppro-upsell_banner-apptp-enabled_dismissed_c"),
+
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED("m_atp_ppro-upsell_banner-apptp-enabled_link_clicked_c"),
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_DAILY("m_atp_ppro-upsell_banner-apptp-enabled_link_clicked_d"),
+    APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_UNIQUE("m_atp_ppro-upsell_banner-apptp-enabled_link_clicked_u"),
+
+    APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN("m_atp_ppro-upsell_info-apptp-disabled_show_c"),
+    APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_DAILY("m_atp_ppro-upsell_info-apptp-disabled_show_d"),
+    APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_UNIQUE("m_atp_ppro-upsell_info-apptp-disabled_show_u"),
+
+    APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED("m_atp_ppro-upsell_info-apptp-disabled_link_clicked_c"),
+    APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_DAILY("m_atp_ppro-upsell_info-apptp-disabled_link_clicked_d"),
+    APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_UNIQUE("m_atp_ppro-upsell_info-apptp-disabled_link_clicked_u"),
+
+    APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN("m_atp_ppro-upsell_info-apptp-revoked_show_c"),
+    APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_DAILY("m_atp_ppro-upsell_info-apptp-revoked_show_d"),
+    APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_UNIQUE("m_atp_ppro-upsell_info-apptp-revoked_show_u"),
+
+    APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_c"),
+    APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_d"),
+    APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_u"),
     ;
 }

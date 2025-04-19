@@ -29,12 +29,12 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.faviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
@@ -59,6 +59,7 @@ class DuckDuckGoFaviconManagerTest {
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
     private val mockFaviconDownloader: FaviconDownloader = mock()
     private val mockAutofillStore: AutofillStore = mock()
+    private val mockFaviconFetchingStore: FaviconsFetchingStore = mock()
     private val mockFile: File = File("test")
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -73,15 +74,11 @@ class DuckDuckGoFaviconManagerTest {
             faviconPersister = mockFaviconPersister,
             savedSitesDao = mockSavedSitesDao,
             fireproofWebsiteRepository = FireproofWebsiteRepositoryImpl(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
-            locationPermissionsRepository = LocationPermissionsRepositoryImpl(
-                mockLocationPermissionsDao,
-                mock(),
-                coroutineRule.testDispatcherProvider,
-            ),
             savedSitesRepository = mockSavedSitesRepository,
             faviconDownloader = mockFaviconDownloader,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             autofillStore = mockAutofillStore,
+            faviconsFetchingStore = mockFaviconFetchingStore,
             context = context,
         )
     }

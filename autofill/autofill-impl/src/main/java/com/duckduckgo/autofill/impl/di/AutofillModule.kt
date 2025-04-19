@@ -20,9 +20,11 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
@@ -35,6 +37,7 @@ import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
+import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
@@ -43,8 +46,11 @@ import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as E
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
+import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
+import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -112,8 +118,9 @@ class AutofillModule {
         database: AutofillDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AutofillFeatureRepository {
-        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -122,8 +129,9 @@ class AutofillModule {
         database: EmailProtectionInContextDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): EmailProtectionInContextFeatureRepository {
-        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @Provides
@@ -133,6 +141,34 @@ class AutofillModule {
     ): CredentialsSyncMetadataDao {
         return database.credentialsSyncDao()
     }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesAutofillEngagementDb(
+        context: Context,
+    ): AutofillEngagementDatabase {
+        return Room.databaseBuilder(context, AutofillEngagementDatabase::class.java, "autofill_engagement.db")
+            .addMigrations(*AutofillEngagementDatabase.ALL_MIGRATIONS)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesDomainTargetAppsDatabase(
+        context: Context,
+    ): DomainTargetAppsDatabase {
+        return Room.databaseBuilder(context, DomainTargetAppsDatabase::class.java, "autofill_domain_target_apps.db")
+            .addMigrations(*DomainTargetAppsDatabase.ALL_MIGRATIONS)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesDomainTargetAppsDao(
+        database: DomainTargetAppsDatabase,
+    ): DomainTargetAppDao {
+        return database.domainTargetAppDao()
+    }
 }
 
 /**
@@ -140,3 +176,6 @@ class AutofillModule {
  */
 @ContributesPluginPoint(scope = AppScope::class, boundType = AutofillFragmentResultsPlugin::class)
 interface UnusedAutofillResultPlugin
+
+@ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
+private interface PasswordsScreenPromotionPluginPoint

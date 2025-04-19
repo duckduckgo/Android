@@ -21,7 +21,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.impl.PrivacyConfigUpdateListener
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
@@ -53,7 +52,6 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
     private lateinit var privacyConfigPersister: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
-    private val mockPrivacyConfigUpdateListener: PrivacyConfigUpdateListener = mock()
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var referenceTestUtilities: ReferenceTestUtilities
@@ -123,7 +121,6 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
             db,
-            mockPrivacyConfigUpdateListener,
             InMemorySharedPreferences(),
         )
         privacyConfigPersister.persistPrivacyConfig(

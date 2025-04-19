@@ -1,0 +1,58 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "YouTube-Videos immer hier öffnen",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Duck Player aktiviert lassen",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Info öffnen",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Einstellungen öffnen",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Auf YouTube ansehen",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>FEHLER:</b> Ungültige Video-ID",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube lässt den Duck Player dieses Video nicht laden",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube erlaubt nicht, dass dieses Video außerhalb von YouTube angesehen wird.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Du kannst dieses Video auf YouTube ansehen, aber ohne die zusätzliche Privatsphäre des Duck Players.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube blockiert das Laden dieses Videos. Falls du ein VPN benutzt, deaktiviere es und lade diese Seite neu.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Falls das nicht funktioniert, kannst du das Video dennoch auf YouTube ansehen, jedoch ohne die zusätzliche Privatsphäre des Duck Players.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "tooltipInfo" : {
+    "title" : "Mit Duck Player kannst du dir ungestört und ohne personalisierte Werbung Inhalte ansehen. Er verhindert, dass das, was du dir ansiehst, deine YouTube-Empfehlungen beeinflussen."
+  }
+}

@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo pre Windows má všetko, čo potrebujete na prehľadávanie s väčšou mierou súkromia — súkromné vyhľadávanie, blokovanie sledovania, vynútené šifrovanie, blokovanie automaticky zobrazených okien so súbormi cookie a ďalšie špičkové prvky ochrany.\n\nV počítači so systémom Windows prejdite na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Zdieľať odkaz</string>
-    <string name="windows_share_text">Ste pripravení začať v systéme Windows prehliadať s ochranou súkromia?\n\nNa stiahnutie navštívte v počítači so systémom Windows túto URL adresu:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Ste pripravení začať súkromne prehliadať v systéme Windows?\n\nNavštívte túto adresu URL v počítači so systémom Windows a stiahnite si:\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Hľadáte verziu pre Mac?</string>
 </resources>

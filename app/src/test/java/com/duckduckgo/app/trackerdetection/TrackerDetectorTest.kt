@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.privacy.db.UserAllowListDao
@@ -34,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -81,7 +84,7 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 "http://thirdparty.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -91,7 +94,30 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 "http://thirdparty.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenTwoClientsWithSameNameAddedThenClientIsReplacedAndCountIsStillOne2() {
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertEquals(1, trackerDetector.clientCount)
+        assertNotNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://thirdparty.com/update.js"),
+                "http://example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
+
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertEquals(1, trackerDetector.clientCount)
+        assertNotNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://thirdparty.com/update.js"),
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -112,7 +138,28 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenThereAreNoClientsAndIsThirdPartyThenEvaluateReturnsNonTrackingEvent2() {
+        trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.ALLOWED,
+            type = TrackerType.OTHER,
+        )
+
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -122,6 +169,7 @@ class TrackerDetectorTest {
     fun whenThereAreNoClientsAndIsThirdPartyFromSameEntityThenEvaluateReturnsSameEntityNonTrackingEvent() {
         val entity = TdsEntity("example", "example", 0.0)
         whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
         trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -135,7 +183,31 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenThereAreNoClientsAndIsThirdPartyFromSameEntityThenEvaluateReturnsSameEntityNonTrackingEvent2() {
+        val entity = TdsEntity("example", "example", 0.0)
+        whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
+        trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = entity,
+            surrogateId = null,
+            status = TrackerStatus.SAME_ENTITY_ALLOWED,
+            type = TrackerType.OTHER,
+        )
+
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -145,6 +217,7 @@ class TrackerDetectorTest {
     fun whenThereAreClientsAndIsThirdPartyButIgnoredThenEvaluateReturnsNonTrackingEvent() {
         val entity = TdsEntity("example", "example", 0.0)
         whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
         trackerDetector.addClient(matchingClientTrackerIgnored(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -158,7 +231,31 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenThereAreClientsAndIsThirdPartyButIgnoredThenEvaluateReturnsNonTrackingEvent2() {
+        val entity = TdsEntity("example", "example", 0.0)
+        whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
+        trackerDetector.addClient(matchingClientTrackerIgnored(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = entity,
+            surrogateId = null,
+            status = TrackerStatus.SAME_ENTITY_ALLOWED,
+            type = TrackerType.OTHER,
+        )
+
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -180,7 +277,29 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsNotUserAllowListedAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent2() {
+        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -202,7 +321,29 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsUserAllowListedAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
+        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.USER_ALLOWED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -223,7 +364,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsNotUserAllowListedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent2() {
+        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -244,7 +406,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsUserAllowListedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
+        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.USER_ALLOWED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -265,7 +448,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsInContentBlockingExceptionsListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
+        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.ALLOWED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -286,7 +490,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenSiteIsNotUserAllowListedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate2() {
+        whenever(mockUserAllowListDao.contains("example.com")).thenReturn(false)
+        trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = "testId",
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -307,7 +532,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenRequestIsInAllowlistAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
+        whenever(mockTrackerAllowlist.isAnException(anyString(), anyString())).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
+            type = TrackerType.OTHER,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -328,7 +574,28 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenRequestIsInAdClickAllowListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent2() {
+        whenever(mockAdClickManager.isExemption(anyString(), anyString())).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.AD_ALLOWED,
+            type = TrackerType.AD,
+        )
+        val actual = trackerDetector.evaluate(
+            Uri.parse("http://thirdparty.com/update.js"),
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -337,7 +604,19 @@ class TrackerDetectorTest {
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", requestHeaders = mapOf()))
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com".toUri(), requestHeaders = mapOf()))
+    }
+
+    @Test
+    fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull2() {
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://example.com/update.js"),
+                "http://example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
     }
 
     @Test
@@ -346,7 +625,19 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 "http://mobile.example.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull2() {
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://mobile.example.com/update.js"),
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -358,7 +649,19 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 "http://example.com/update.js",
-                "http://mobile.example.com/index.com",
+                "http://mobile.example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull2() {
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://example.com/update.js"),
+                "http://mobile.example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -367,14 +670,17 @@ class TrackerDetectorTest {
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(any<Uri>(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
     private fun alwaysMatchingClientWithSurrogate(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap()))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap()))
+            .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        whenever(client.matches(any<Uri>(), any<Uri>(), anyMap()))
             .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
         return client
     }
@@ -382,14 +688,14 @@ class TrackerDetectorTest {
     private fun nonMatchingClientNoTracker(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         return client
     }
 
     private fun matchingClientTrackerIgnored(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = true))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
     companion object {

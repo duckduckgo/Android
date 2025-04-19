@@ -6,7 +6,6 @@
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application>
         <activity
@@ -18,11 +17,6 @@
             android:name=".feature.system_apps.NetPSystemAppsExclusionListActivity"
             android:process=":vpn"
             android:label="@string/netpSystemAppsExclusionList"
-            android:exported="false" />
-        <activity
-            android:name=".feature.NetPEnvironmentSettingActivity"
-            android:process=":vpn"
-            android:label="@string/netpEnvironmentSetting"
             android:exported="false" />
     </application>
 

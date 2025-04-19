@@ -19,8 +19,8 @@ package com.duckduckgo.autofill.impl
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -41,7 +41,7 @@ class AutofillGlobalCapabilityCheckerImplSecureStorageAvailableTest(
 
     private val autofillFeature: AutofillFeature = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val autofill: Autofill = mock()
 
@@ -101,11 +101,12 @@ class AutofillGlobalCapabilityCheckerImplSecureStorageAvailableTest(
     }
 
     private fun configureDeviceAuthValid(isValid: Boolean) {
+        whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(isValid)
     }
 
-    private fun configureDeviceCapableOfAutofill(isCapable: Boolean) {
-        whenever(autofillStore.autofillAvailable).thenReturn(isCapable)
+    private suspend fun configureDeviceCapableOfAutofill(isCapable: Boolean) {
+        whenever(autofillStore.autofillAvailable()).thenReturn(isCapable)
     }
 
     data class TestCase(

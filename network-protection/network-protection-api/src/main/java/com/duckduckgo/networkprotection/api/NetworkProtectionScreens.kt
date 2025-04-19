@@ -30,11 +30,6 @@ sealed class NetworkProtectionScreens {
     data class NetworkProtectionManagementScreenAndEnable(val enable: Boolean) : ActivityParams
 
     /**
-     * Use this model to launch the NetPWaitlist screen
-     */
-    object NetPWaitlistInvitedScreenNoParams : ActivityParams
-
-    /**
      * Use this model to launch the NetP app exclusion list screen
      */
     object NetPAppExclusionListNoParams : ActivityParams

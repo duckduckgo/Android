@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.view.expand.daxExpandableMenuItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -142,6 +143,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
+    class PopupMenuItemComponentViewHolder(
+        parent: ViewGroup,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_popup_menu_item))
+
     class HeaderSectionComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
@@ -179,6 +184,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithExtraLargeImage).apply {
+                setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Extra Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
@@ -209,6 +224,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+            }
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLongTextTruncated).apply {
+                setPrimaryText(context.getString(R.string.dax_one_line_list_item_html_primary_text).html(context))
             }
         }
     }
@@ -241,6 +259,12 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithLargeImageAndTrailingIcon).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithExtraLargeImageAndTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Extra Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
@@ -283,6 +307,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithSwitchDisabledChecked).apply {
                 quietlySetIsChecked(true, null)
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithHTMLTags).apply {
+                setPrimaryText(context.getString(R.string.dax_list_item_html_primary_text).html(context))
+                setSecondaryText(context.getString(R.string.dax_list_item_html_secondary_text).html(context))
             }
         }
     }
@@ -360,6 +389,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class SettingsListItemComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_settings))
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -377,12 +409,14 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
+                Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
                 Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
                 Component.EXPANDABLE_LAYOUT -> ExpandableComponentViewHolder(parent)
+                Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

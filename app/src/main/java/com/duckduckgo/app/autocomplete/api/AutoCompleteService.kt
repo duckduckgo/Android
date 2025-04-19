@@ -19,7 +19,6 @@ package com.duckduckgo.app.autocomplete.api
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.di.scopes.AppScope
-import io.reactivex.Observable
 import java.util.*
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -28,11 +27,11 @@ import retrofit2.http.Query
 interface AutoCompleteService {
 
     @GET("${AppUrl.Url.API}/ac/")
-    fun autoComplete(
+    suspend fun autoComplete(
         @Query("q") query: String,
         @Query("kl") languageCode: String = Locale.getDefault().language,
         @Query("is_nav") nav: String = "1",
-    ): Observable<List<AutoCompleteServiceRawResult>>
+    ): List<AutoCompleteServiceRawResult>
 }
 
 data class AutoCompleteServiceRawResult(

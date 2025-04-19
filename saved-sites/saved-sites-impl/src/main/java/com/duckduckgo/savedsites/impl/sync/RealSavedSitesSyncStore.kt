@@ -36,6 +36,7 @@ interface SavedSitesSyncStore {
     var startTimeStamp: String
     var clientModifiedSince: String
     var isSyncPaused: Boolean
+    var syncPausedReason: String
     fun isSyncPausedFlow(): Flow<Boolean>
 }
 
@@ -68,6 +69,12 @@ class RealSavedSitesSyncStore @Inject constructor(
             preferences.edit(true) { putBoolean(KEY_CLIENT_LIMIT_EXCEEDED, value) }
             emitNewValue()
         }
+    override var syncPausedReason: String
+        get() = preferences.getString(KEY_CLIENT_SYNC_PAUSED_REASON, "") ?: ""
+        set(value) {
+            preferences.edit(true) { putString(KEY_CLIENT_SYNC_PAUSED_REASON, value) }
+            emitNewValue()
+        }
 
     override fun isSyncPausedFlow(): Flow<Boolean> = syncPausedSharedFlow
 
@@ -86,5 +93,6 @@ class RealSavedSitesSyncStore @Inject constructor(
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
         private const val KEY_CLIENT_MODIFIED_SINCE = "KEY_CLIENT_MODIFIED_SINCE"
         private const val KEY_CLIENT_LIMIT_EXCEEDED = "KEY_CLIENT_LIMIT_EXCEEDED"
+        private const val KEY_CLIENT_SYNC_PAUSED_REASON = "KEY_CLIENT_SYNC_PAUSED_REASON"
     }
 }

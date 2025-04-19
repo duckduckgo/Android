@@ -16,8 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary

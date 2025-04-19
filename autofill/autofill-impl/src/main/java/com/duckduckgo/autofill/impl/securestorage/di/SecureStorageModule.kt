@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.securestorage.di
 
 import android.content.Context
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
-import com.duckduckgo.autofill.impl.securestorage.LegacyDerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.store.RealSecureStorageKeyRepository
@@ -46,8 +45,4 @@ object SecureStorageKeyModule {
     @Provides
     @Named("DerivedKeySecretFactoryFor26Up")
     fun provideDerivedKeySecretFactoryFor26Up(): DerivedKeySecretFactory = RealDerivedKeySecretFactory()
-
-    @Provides
-    @Named("DerivedKeySecretFactoryForLegacy")
-    fun provideDerivedKeySecretFactoryForLegacy(): DerivedKeySecretFactory = LegacyDerivedKeySecretFactory()
 }

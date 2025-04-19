@@ -27,18 +27,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Execute Gradle build
         run: ./gradlew dokkaHtmlMultiModule
@@ -52,9 +52,9 @@ jobs:
         uses: actions/configure-pages@v3
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4

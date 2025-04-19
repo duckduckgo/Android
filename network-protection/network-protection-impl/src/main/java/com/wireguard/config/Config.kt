@@ -18,7 +18,7 @@ import java.util.*
  *
  * Instances of this class are immutable.
  */
-class Config private constructor(builder: Builder) {
+class Config private constructor(val builder: Builder) {
     /**
      * Returns the interface section of the configuration.
      *
@@ -55,7 +55,7 @@ class Config private constructor(builder: Builder) {
      * @return a concise single-line identifier for the `Config`
      */
     override fun toString(): String {
-        return "(Config " + `interface` + " (" + peers.size + " peers))"
+        return toWgQuickString()
     }
 
     /**

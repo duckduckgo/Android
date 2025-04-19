@@ -1,0 +1,23 @@
+# Test Definition: https://app.asana.com/0/1205017362573508/1205044961533553/f
+# Test Definition: https://app.asana.com/0/1205017362573508/1205044961533551/f
+# This test also runs the create account test, so we don't need to run both
+appId: com.duckduckgo.mobile.android
+name: "Sync Critical Path test: Users can recover an account / Device can be added to an account"
+tags:
+  - syncCriticalPathTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: create_account.yaml
+- tapOn: "Sync With Another Device"
+- runFlow:
+    when:
+      visible: "Don't allow"
+    commands:
+      - tapOn: "Don't allow"
+- tapOn: "Can't Scan? Share Text Code"
+- tapOn: "Navigate up"
+- tapOn: "Turn Off Sync & Backup…"
+- tapOn: "Turn Off"
+- runFlow: ../sync_flows/steps/action_recover_account.yaml

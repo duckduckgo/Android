@@ -2,10 +2,13 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
-import com.wireguard.config.InetAddresses
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
+import com.wireguard.config.Config
+import com.wireguard.crypto.KeyPair
+import java.io.BufferedReader
+import java.io.StringReader
 import java.lang.reflect.Field
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -20,6 +23,9 @@ import org.mockito.kotlin.*
 class WgTunnelTest {
 
     private val wgServerApi: WgServerApi = mock()
+    private val netPDefaultConfigProvider: NetPDefaultConfigProvider = object : NetPDefaultConfigProvider {}
+    private lateinit var wgTunnelStore: WgTunnelStore
+    private val keys = KeyPair()
     private val serverData = WgServerApi.WgServerData(
         serverName = "name",
         publicKey = "public key",
@@ -28,45 +34,88 @@ class WgTunnelTest {
         location = "Furadouro",
         gateway = "10.1.1.1",
     )
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = ${serverData.address}
+        DNS = ${serverData.gateway}
+        MTU = 1280
+        PrivateKey = ${keys.privateKey.toBase64()}
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0, ::/0
+        Endpoint = ${serverData.publicEndpoint}
+        Name = ${serverData.serverName}
+        Location = ${serverData.location}
+        PublicKey = ${keys.publicKey.toBase64()}
+    """.trimIndent()
+
     private lateinit var wgTunnel: WgTunnel
 
     @Before
     fun setup() {
-        val networkProtectionPrefs = RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider())
-        val networkProtectionRepository = RealNetworkProtectionRepository(networkProtectionPrefs)
-        val deviceKeys = RealDeviceKeys(networkProtectionRepository, WgKeyPairGenerator())
         setFinalStatic(VERSION::class.java.getField("SDK_INT"), 29)
 
         runBlocking {
-            whenever(wgServerApi.registerPublicKey(eq(deviceKeys.publicKey)))
-                .thenReturn(serverData.copy(publicKey = deviceKeys.publicKey))
+            whenever(wgServerApi.registerPublicKey(eq(keys.publicKey.toBase64()), isNull()))
+                .thenReturn(serverData.copy(publicKey = keys.publicKey.toBase64()))
         }
-
-        wgTunnel = RealWgTunnel(deviceKeys, wgServerApi)
+        wgTunnelStore = WgTunnelStore(FakeSharedPreferencesProvider())
+        wgTunnel = RealWgTunnel(wgServerApi, netPDefaultConfigProvider, wgTunnelStore)
     }
 
     @Test
     fun establishThenReturnWgTunnelData() = runTest {
-        val actual = wgTunnel.establish().getOrThrow().copy(userSpaceConfig = "")
-        val expected = WgTunnel.WgTunnelData(
-            serverName = serverData.serverName,
-            userSpaceConfig = "",
-            serverLocation = serverData.location,
-            serverIP = serverData.publicEndpoint.substringBefore(":"),
-            gateway = serverData.gateway,
-            tunnelAddress = mapOf(
-                InetAddresses.parse(serverData.address.substringBefore("/")) to serverData.address.substringAfter("/").toInt(),
-            ),
-        )
+        val actual = wgTunnel.createWgConfig(keys).getOrThrow()
+        val expected = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
 
         assertEquals(expected, actual)
     }
 
     @Test
     fun establishErrorThenLogError() = runTest {
-        whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
 
-        assertNull(wgTunnel.establish().getOrNull())
+        assertNull(wgTunnel.createWgConfig(keys).getOrNull())
+    }
+
+    @Test
+    fun withNoKeysEstablishErrorThenLogError() = runTest {
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
+
+        assertNull(wgTunnel.createWgConfig().getOrNull())
+    }
+
+    @Test
+    fun whenTunnelIsMarkedAsUnhealthyAndCreateWgConfigThenUpdateStateToFailureRecovery() = runTest {
+        whenever(wgServerApi.registerPublicKey(any(), eq(FailureRecovery(currentServer = "name")))).thenReturn(serverData)
+        wgTunnelStore.wireguardConfig = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
+
+        wgTunnel.markTunnelUnhealthy()
+        assertNull(wgTunnel.createWgConfig(KeyPair()).getOrNull())
+
+        verify(wgServerApi).registerPublicKey(any(), eq(FailureRecovery(currentServer = "name")))
+    }
+
+    @Test
+    fun whenTunnelIsMarkAsUnhealthyAndCreateAndSetWgConfigThenResetTunnelHealth() = runTest {
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
+
+        wgTunnel.markTunnelUnhealthy()
+        assertNull(wgTunnel.createAndSetWgConfig(KeyPair()).getOrNull())
+
+        verify(wgServerApi).registerPublicKey(any(), isNull())
+    }
+
+    @Test
+    fun whenTunnelIsMarkedAsUnhealthyTheHealthyAndCreateWgConfigThenResetTunnelHealth() = runTest {
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
+
+        wgTunnel.markTunnelUnhealthy()
+        wgTunnel.markTunnelHealthy()
+        assertNull(wgTunnel.createWgConfig(KeyPair()).getOrNull())
+
+        verify(wgServerApi).registerPublicKey(any(), isNull())
     }
 
     @Throws(Exception::class)

@@ -22,15 +22,20 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
+import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor.Listener
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -41,7 +46,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
-import org.threeten.bp.Instant
 
 @ContributesMultibinding(VpnScope::class)
 class WireguardHandshakeMonitor @Inject constructor(
@@ -50,10 +54,21 @@ class WireguardHandshakeMonitor @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
     private val currentNetworkState: CurrentNetworkState,
+    private val listeners: PluginPoint<Listener>,
 ) : VpnServiceCallbacks {
+
+    interface Listener {
+        suspend fun onTunnelFailure(
+            coroutineScope: CoroutineScope,
+            lastHandshakeEpocSeconds: Long,
+        )
+
+        suspend fun onTunnelFailureRecovered(coroutineScope: CoroutineScope)
+    }
 
     private val job = ConflatedJob()
     private val failureReported = AtomicBoolean(false)
+    private val attemptsWithZeroHandshakeEpoc = AtomicInteger(0)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch {
@@ -77,13 +92,17 @@ class WireguardHandshakeMonitor @Inject constructor(
 
     private suspend fun startHandShakeMonitoring() = withContext(dispatcherProvider.io()) {
         if (networkProtectionState.isEnabled()) {
-            failureReported.set(false)
+            // failureReported.set(false)
             currentNetworkState.start()
+            attemptsWithZeroHandshakeEpoc.set(0)
 
             while (isActive && networkProtectionState.isEnabled()) {
                 val nowSeconds = Instant.now().epochSecond
                 val lastHandshakeEpocSeconds = wgProtocol.getStatistics().lastHandshakeEpochSeconds
-                if (lastHandshakeEpocSeconds > 0) {
+                logcat { "Handshake monitoring $lastHandshakeEpocSeconds, attempts ${attemptsWithZeroHandshakeEpoc.get()}" }
+                if (lastHandshakeEpocSeconds > 0 || attemptsWithZeroHandshakeEpoc.compareAndSet(MAX_ATTEMPTS_WITH_NO_HS_EPOC, 0)) {
+                    attemptsWithZeroHandshakeEpoc.set(0) // reset in case lastHandshakeEpocSeconds > 0
+
                     val diff = nowSeconds - lastHandshakeEpocSeconds
                     if (diff.seconds.inWholeMinutes > REPORT_TUNNEL_FAILURE_IN_THRESHOLD_MINUTES && currentNetworkState.isConnected()) {
                         logcat(WARN) { "Last handshake was more than 5 minutes ago" }
@@ -93,12 +112,20 @@ class WireguardHandshakeMonitor @Inject constructor(
                         } else {
                             logcat { "Last handshake was already reported, skipping" }
                         }
+                        listeners.getPlugins().forEach {
+                            it.onTunnelFailure(this, lastHandshakeEpocSeconds)
+                        }
                     } else if (diff.seconds.inWholeMinutes <= REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES) {
                         if (failureReported.getAndSet(false)) {
                             logcat(WARN) { "Recovered from tunnel failure" }
                             pixels.reportTunnelFailureRecovered()
+                            listeners.getPlugins().forEach {
+                                it.onTunnelFailureRecovered(this)
+                            }
                         }
                     }
+                } else {
+                    attemptsWithZeroHandshakeEpoc.incrementAndGet()
                 }
                 delay(1.minutes.inWholeMilliseconds)
             }
@@ -108,6 +135,10 @@ class WireguardHandshakeMonitor @Inject constructor(
     companion object {
         // WG handshakes happen every 2min, this means we'd miss 2+ handshakes
         private const val REPORT_TUNNEL_FAILURE_IN_THRESHOLD_MINUTES = 5
+
+        // We test every 1min, try recovery after 4min
+        // WG handshakes happen every 2min, this mean 4min without handshakes
+        private const val MAX_ATTEMPTS_WITH_NO_HS_EPOC = 4
 
         // WG handshakes happen every 2min
         private const val REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES = 2
@@ -163,7 +194,15 @@ open class CurrentNetworkState @Inject constructor(
             connectivityManager.unregisterNetworkCallback(cellularNetworkCallback)
         }
     }
+
     internal fun isConnected(): Boolean {
         return isWifiAvailable.get() || isCellAvailable.get()
     }
 }
+
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = Listener::class,
+)
+@Suppress("unused")
+interface WireguardHandshakeListenerPluginPoint

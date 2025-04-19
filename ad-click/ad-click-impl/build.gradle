@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -26,20 +27,26 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     namespace 'com.duckduckgo.adclick.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
+    implementation project(path: ':browser-api')
     implementation project(path: ':ad-click-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':ad-click-store')
 
     implementation AndroidX.core.ktx
 
@@ -61,6 +68,7 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
     // Dagger
@@ -73,9 +81,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation JakeWharton.timber
 
@@ -91,4 +96,6 @@ dependencies {
     testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

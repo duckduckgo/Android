@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -38,14 +38,14 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
-            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
+            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery) || UriString.isDuckUri(searchQuery)
         }
 
         if (isUrl == true) {
             return convertUri(searchQuery)
         }
 
-        if (URLUtil.isDataUrl(searchQuery)) {
+        if (URLUtil.isDataUrl(searchQuery) || URLUtil.isAssetUrl(searchQuery)) {
             return searchQuery
         }
 

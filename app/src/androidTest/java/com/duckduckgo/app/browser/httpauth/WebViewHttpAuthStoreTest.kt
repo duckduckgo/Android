@@ -97,50 +97,19 @@ class WebViewHttpAuthStoreTest {
     }
 
     @Test
-    @Suppress("DEPRECATION")
-    fun whenSetHttpAuthUsernamePasswordApiBelow26ThenInsertHttpAuthEntity() {
-        for (i in android.os.Build.VERSION_CODES.M..android.os.Build.VERSION_CODES.N_MR1) {
-            whenever(appBuildConfig.sdkInt).thenReturn(i)
-            webViewHttpAuthStore.setHttpAuthUsernamePassword(
-                webView = webView,
-                host = "host",
-                realm = "realm",
-                username = "name",
-                password = "pass",
-            )
-        }
-        val times = (android.os.Build.VERSION_CODES.M..android.os.Build.VERSION_CODES.N_MR1).toList().size
-        verify(webView, times(times)).setHttpAuthUsernamePassword("host", "realm", "name", "pass")
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    @SdkSuppress(maxSdkVersion = android.os.Build.VERSION_CODES.N_MR1)
-    fun whenGetHttpAuthUsernamePasswordApiBelow26ThenReturnWebViewHttpAuthCredentials() {
-        for (i in android.os.Build.VERSION_CODES.M..android.os.Build.VERSION_CODES.N_MR1) {
-            whenever(appBuildConfig.sdkInt).thenReturn(i)
-            whenever(webView.getHttpAuthUsernamePassword("host", "realm"))
-                .thenReturn(arrayOf("name", "pass"))
-            val credentials = webViewHttpAuthStore.getHttpAuthUsernamePassword(webView, "host", "realm")
-
-            assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
-        }
-    }
-
-    @Test
     fun whenCleanHttpAuthDatabaseThenCleanDatabaseCalled() = runTest {
         webViewHttpAuthStore.cleanHttpAuthDatabase()
         verify(mockDatabaseCleaner).cleanDatabase(databaseLocator.getDatabasePath())
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.LOLLIPOP, maxSdkVersion = android.os.Build.VERSION_CODES.O_MR1)
-    fun whenAppCreatedAndApiBetween21And27ThenJournalModeChangedToDelete() = runTest {
-        for (i in android.os.Build.VERSION_CODES.LOLLIPOP..android.os.Build.VERSION_CODES.O_MR1) {
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O, maxSdkVersion = android.os.Build.VERSION_CODES.O_MR1)
+    fun whenAppCreatedAndApiBetween26And27ThenJournalModeChangedToDelete() = runTest {
+        for (i in android.os.Build.VERSION_CODES.O..android.os.Build.VERSION_CODES.O_MR1) {
             whenever(appBuildConfig.sdkInt).thenReturn(i)
             webViewHttpAuthStore.onCreate(mockOwner)
         }
-        val times = (android.os.Build.VERSION_CODES.LOLLIPOP..android.os.Build.VERSION_CODES.O_MR1).toList().size
+        val times = (android.os.Build.VERSION_CODES.O..android.os.Build.VERSION_CODES.O_MR1).toList().size
         verify(mockDatabaseCleaner, times(times)).changeJournalModeToDelete(databaseLocator.getDatabasePath())
     }
 

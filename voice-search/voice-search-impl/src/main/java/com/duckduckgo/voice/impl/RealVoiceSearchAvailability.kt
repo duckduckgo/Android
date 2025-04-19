@@ -18,6 +18,7 @@ package com.duckduckgo.voice.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
@@ -30,9 +31,9 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val voiceSearchFeature: VoiceSearchFeature,
     private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
     private val voiceSearchRepository: VoiceSearchRepository,
+    private val languageSupportChecker: LanguageSupportChecker,
 ) : VoiceSearchAvailability {
     companion object {
-        private const val LANGUAGE_TAG_ENG_US = "en-US"
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
@@ -41,6 +42,7 @@ class RealVoiceSearchAvailability @Inject constructor(
             voiceSearchFeature.self().isEnabled() &&
                 hasValidVersion(sdkInt) &&
                 isOnDeviceSpeechRecognitionSupported &&
+                languageSupportChecker.isLanguageSupported() &&
                 hasValidLocale(languageTag) &&
                 voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
@@ -52,7 +54,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         sdkInt >= minVersion
     } ?: true
 
-    private fun hasValidLocale(localeLanguageTag: String) = localeLanguageTag == LANGUAGE_TAG_ENG_US
+    private fun hasValidLocale(localeLanguageTag: String) = voiceSearchFeatureRepository.localeExceptions.none { it.name == localeLanguageTag }
 
     override fun shouldShowVoiceSearch(
         hasFocus: Boolean,

@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="h5"
-        android:textAlignment="center"
+        android:gravity="center"
         tools:ignore="InvalidColorAttribute" />
 
     <FrameLayout

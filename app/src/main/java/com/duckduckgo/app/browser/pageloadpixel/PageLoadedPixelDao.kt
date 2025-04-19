@@ -31,7 +31,7 @@ abstract class PageLoadedPixelDao {
     abstract fun all(): List<PageLoadedPixelEntity>
 
     @Delete
-    abstract fun delete(exceptionEntity: PageLoadedPixelEntity)
+    abstract fun delete(pageLoadedPixelEntity: PageLoadedPixelEntity)
 
     @Query("DELETE FROM page_loaded_pixel_entity")
     abstract fun deleteAll()

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Ακύρωση</string>
+    <string name="ok">Εντάξει</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Διαχείριση Email</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Επιστροφή στις Ρυθμίσεις</string>
+    <string name="somethingWentWrong">Κάτι πήγε λάθος</string>
+    <string name="somethingWentWrongDescription">Το Google Play δεν μπόρεσε να επεξεργαστεί την αγορά σας. Ξαναδοκιμάστε αργότερα.</string>
+    <string name="youAreSet">Είστε πανέτοιμοι.</string>
+    <string name="viewPlans">Προβολή προγραμμάτων</string>
+    <string name="subscriptionNotFound">Η συνδρομή δεν βρέθηκε</string>
+    <string name="subscriptionNotFoundDescription">Η συνδρομή που συνδέεται με αυτόν τον λογαριασμό Google Play δεν είναι πλέον ενεργή.</string>
+    <string name="purchaseRestored">Οι αγορές σας έχουν αποκατασταθεί.</string>
+    <string name="restoreSubscriptionTitle">Προσθέστε τη συνδρομή σας Privacy Pro σε αυτήν τη συσκευή</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Προσθήκη μέσω λογαριασμού Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Κάντε επαναφορά της συνδρομή σας σε συσκευές Android χρησιμοποιώντας τον λογαριασμό σας στο Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Επαναφορά αγοράς</string>
+    <string name="restoreSubscriptionEmailTitle">Προσθήκη μέσω email</string>
+    <string name="restoreSubscriptionEmailDescription">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να προσθέσετε το Privacy Pro σε αυτήν τη συσκευή.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Ξεκινήστε</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Αφαίρεση συνδρομής</string>
+    <string name="subscriptionRemoved">Η συνδρομή σας έχει αφαιρεθεί από αυτήν τη συσκευή</string>
+    <string name="removeFromDevice">Αφαίρεση από αυτήν τη συσκευή;</string>
+    <string name="removeFromDeviceDescription">Δεν θα μπορείτε πλέον να έχετε πρόσβαση στη συνδρομή Privacy Pro σε αυτήν τη συσκευή. Αυτό δεν θα ακυρώσει τη συνδρομή σας και θα παραμείνει ενεργή στις υπόλοιπες συσκευές σας.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Η μηνιαία συνδρομή σας %1$s στις %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Η ετήσια συνδρομή σας %1$s στις %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Η συνδρομή σας έληξε %1$s.</string>
+    <string name="monthlySubscription">Μηνιαία συνδρομή</string>
+    <string name="yearlySubscription">Ετήσια συνδρομή</string>
+    <string name="renews">ανανεώνεται</string>
+    <string name="expires">λήγει</string>
+    <string name="activateOnOtherDevices">Προσθήκη Privacy Pro σε άλλες συσκευές</string>
+    <string name="addToDevicePrimaryText">Προσθήκη σε συσκευή</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Προσθέστε το Privacy Pro στις άλλες συσκευές σας μέσω του Google Play ή συνδέοντας μια διεύθυνση email.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Privacy Pro &gt; Έχω συνδρομή.</string>
+    <string name="editEmailPrimaryText">Επεξεργασία email</string>
+    <string name="learnMore">Μάθετε περισσότερα</string>
+    <string name="privacyProFaq">Χρειάζεστε βοήθεια με το Privacy Pro;</string>
+    <string name="privacyProFaqSecondary">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη του Privacy Pro από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
+    <string name="subscriptionStatusSubscribed">Έχει γίνει εγγραφή</string>
+    <string name="privacyPolicyAndTermsOfService">Πολιτική απορρήτου και Όροι χρήσης υπηρεσιών</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Ρυθμίσεις συνδρομής</string>
+    <string name="subscriptionSettingSubscribe">Προστατέψτε τη σύνδεση και την ταυτότητά σας με το Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Περιλαμβάνει το VPN μας και τα Personal Information Removal και Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Περιλαμβάνει το VPN μας και τo Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Απόκτησε το Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Έχω συνδρομή</string>
+    <string name="subscriptionSettingExpired">Η συνδρομή σας στο Privacy Pro έληξε</string>
+    <string name="subscriptionSettingExpiredViewPlans">Προβολή προγραμμάτων</string>
+    <string name="subscriptionSettingSectionSubscription">Συνδρομή</string>
+    <string name="subscriptionSettingRemoveFromDevice">Αφαίρεση από αυτήν τη συσκευή</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Βοήθεια και υποστήριξη</string>
+    <string name="subscriptionSettingSendFeedback">Αποστολή σχολίου</string>
+    <string name="subscriptionSettingActivating">Ενεργοποίηση</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Είστε πανέτοιμοι.</string>
+    <string name="purchaseCompletedText">Η αγορά σας ήταν επιτυχής.</string>
+    <string name="purchaseRecoveredText">Είχατε ήδη μια συνδρομή και την ανακτήσαμε για εσάς.</string>
+    <string name="purchaseErrorTitle">Κάτι πήγε λάθος</string>
+    <string name="purchaseError">Αντιμετωπίζουμε κάποιο πρόβλημα σύνδεσης. Ξαναδοκιμάστε αργότερα.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Ενημέρωση προγράμματος ή ακύρωση</string>
+    <string name="changePlanDescription">Η συνδρομή σας αγοράστηκε μέσω του Apple Play Store. Για να αλλάξετε το πρόγραμμα ή τις ρυθμίσεις χρέωσης, μεταβείτε στις επιλογές Ρυθμίσεις &gt; Λογαριασμός Apple &gt; Συνδρομές, σε μια συσκευή που έχει συνδεθεί με τον ίδιο Λογαριασμό Apple που χρησιμοποιήθηκε για την αγορά της συνδρομής σας.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Ενεργοποιήστε το Privacy Pro στην επιφάνεια εργασίας για να ρυθμίσετε το Personal Information Removal</string>
+    <string name="pirDescription">Στο πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές, μεταβείτε στις επιλογές <b>Ρυθμίσεις &gt; Privacy Pro</b> και κάντε κλικ στην επιλογή <b>Έχω συνδρομή</b> για να ξεκινήσετε.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Άνοιγμα</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Αποστολή σχολίου</string>
+    <string name="feedbackActionHeader">ΕΠΙΛΕΞΤΕ ΚΑΤΗΓΟΡΙΑ</string>
+    <string name="feedbackActionReportIssue">Αναφέρετε ένα πρόβλημα</string>
+    <string name="feedbackActionGeneralFeedback">Γενικά σχόλια</string>
+    <string name="feedbackActionFeatureRequest">Αιτηθείτε μια λειτουργία</string>
+
+    <string name="feedbackGeneralHeader">ΕΠΙΛΕΞΤΕ ΚΑΤΗΓΟΡΙΑ</string>
+    <string name="feedbackGeneralBrowser">Σχόλια για το πρόγραμμα περιήγησης</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">ΕΠΙΛΕΞΤΕ ΚΑΤΗΓΟΡΙΑ</string>
+    <string name="feedbackCategorySubscription">Συνδρομές και πληρωμές</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">ΕΠΙΛΕΞΤΕ ΚΑΤΗΓΟΡΙΑ</string>
+
+    <string name="feedbackSubCategoryVpnConnection">Το VPN δεν μπορεί να συνδεθεί</string>
+    <string name="feedbackSubCategoryVpnSlow">Η σύνδεση του VPN είναι πολύ αργή</string>
+    <string name="feedbackSubCategoryVpnOtherApps">Το VPN προκαλεί προβλήματα με άλλες εφαρμογές ή ιστότοπους</string>
+    <string name="feedbackSubCategoryVpnIot">Το VPN δεν με αφήνει να συνδεθώ σε μια τοπική συσκευή</string>
+    <string name="feedbackSubCategoryVpnCrash">Το VPN προκαλεί σφάλματα ή παγώνει το πρόγραμμα περιήγησης</string>
+    <string name="feedbackSubCategoryVpnOther">Άλλα</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Πληροφορίες όχι σε συγκεκριμένο ιστότοπο</string>
+    <string name="feedbackSubCategoryPirNotMe">Οι εγγραφές δεν ανήκουν στον χρήστη</string>
+    <string name="feedbackSubCategoryPirScanStuck">Η σάρωση κόλλησε</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Η αφαίρεση κόλλησε</string>
+    <string name="feedbackSubCategoryPirOther">Άλλα</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Πρόβλημα με τον κωδικό πρόσβασης</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Δεν μπορώ να επικοινωνήσω με έναν σύμβουλο</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Η κλήση στον σύμβουλο δεν βοήθησε</string>
+    <string name="feedbackSubCategoryItrOther">Άλλα</string>
+
+    <string name="feedbackSubCategorySubsOtp">Κωδικός πρόσβασης μίας χρήσης</string>
+    <string name="feedbackSubCategorySubsOther">Άλλα</string>
+
+    <string name="feedbackSubmitVpnHeader">Βρήκατε ένα πρόβλημα που δεν καλύπτεται στο <annotation type="faqs_link">κέντρο βοήθειας</annotation>; Θέλουμε σίγουρα να μάθουμε γι\' αυτό.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Πείτε μας τι συμβαίνει...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Εκτός από τις λεπτομέρειες που καταχωρήθηκαν παραπάνω, στέλνουμε κάποιες ανώνυμες πληροφορίες με τα σχόλιά σας:\n\n• Εάν κάποιες λειτουργίες του προγράμματος περιήγησης είναι ενεργές\n• Συγκεντρωτικά διαγνωστικά της εφαρμογής (π.χ. κωδικοί σφάλματος)\n\nΚάνοντας κλικ στην επιλογή Υποβολή, συμφωνείτε ότι το DuckDuckGo μπορεί να χρησιμοποιήσει τις πληροφορίες που υποβάλλονται για βελτίωση της εφαρμογής."</string>
+    <string name="feedbackSubmitVpnSubmit">Υποβολή</string>
+    <string name="feedbackSubmitCompletedMessage">Σας ευχαριστούμε! Το σχόλιο υποβλήθηκε.</string>
+    <string name="feedbackSubmitFailedMessage">Κάτι πήγε λάθος</string>
+
+    <string name="feedbackSubmitEmailByLine">Παρέχετε ένα email αν θέλετε να επικοινωνήσουμε μαζί σας για το θέμα αυτό (ίσως δεν είμαστε σε θέση να απαντήσουμε σε όλα τα θέματα):</string>
+    <string name="feedbackSubmitEmailHint">Email (προαιρετικό)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Στείλτε μας τα σχόλιά σας...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Ποιες λειτουργίες θα θέλατε να δείτε;</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Συνδρομές</string>
+    <string name="activitySubscriptionSettings">Ρυθμίσεις συνδρομής</string>
+    <string name="activityActivateSubscription">Έχω συνδρομή</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Αποστολή σχολίου</string>
+</resources>

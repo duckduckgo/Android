@@ -33,6 +33,12 @@
             android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
+        <activity android:name=".promotion.SyncGetOnOtherPlatformsActivity"
+            android:parentActivityName=".ui.SyncActivity"
+            android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
+            android:exported="false"
+            />
+
         <activity
             android:name=".ui.setup.SetupAccountActivity"
             android:exported="false"
@@ -46,6 +52,14 @@
             android:label="@string/login_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:parentActivityName=".ui.setup.SetupAccountActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.SyncWithAnotherDeviceActivity"
+            android:exported="false"
+            android:label="@string/login_screen_title"
+            android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:parentActivityName=".ui.SyncActivity"
             android:screenOrientation="portrait"/>
 
         <activity
@@ -65,11 +79,11 @@
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
-            android:name=".ui.ShowCodeActivity"
+            android:name=".ui.DeviceUnsupportedActivity"
             android:exported="false"
-            android:label="@string/show_code_screen_title"
+            android:label="@string/sync_screen_title"
             android:screenOrientation="portrait"
-            android:parentActivityName=".ui.SyncActivity"/>
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

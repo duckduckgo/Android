@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/errorLayout"
+    android:background="?attr/daxColorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="150dp"
+        android:paddingBottom="50dp" >
+
+        <ImageView
+            android:id="@+id/sslAlertImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_shield_alert_128"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sslErrorTitle"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:breakStrategy="balanced"
+            android:gravity="center"
+            android:text="@string/sslErrorTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslAlertImage"
+            app:typography="h2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sslErrorHeadline"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:gravity="center"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorTitle"
+            app:typography="body1"
+            tools:text="@string/sslErrorHeadline" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sslErrorLeaveSiteCTA"
+            android:layout_width="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_6"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:text="@string/sslErrorLeaveCTA"
+            app:daxButtonSize="large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorHeadline"/>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/sslErrorAdvancedCTA"
+            android:layout_width="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:text="@string/sslErrorAdvancedCTA"
+            app:daxButtonSize="large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorLeaveSiteCTA" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/sslErrorAdvancedGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="sslErrorAdvancedDivider, sslErrorExpandedHeadline, sslErrorExpandedMessage, sslErrorAcceptCta"  />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/sslErrorAdvancedDivider"
+            app:defaultPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorAdvancedCTA"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sslErrorExpandedHeadline"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorAdvancedDivider"
+            app:typography="body2"
+            android:text="@string/sslErrorExpandedHeadline" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sslErrorExpandedMessage"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedHeadline"
+            app:typography="body2"
+            tools:text="@string/sslErrorExpiredMessage" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sslErrorAcceptCta"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedMessage"
+            app:typography="body2"
+            tools:text="@string/sslErrorExpandedCTA" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

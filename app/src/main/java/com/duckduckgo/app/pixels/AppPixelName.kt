@@ -20,6 +20,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH("ml"),
+    PROCESS_CREATED_MAIN("m_process_created_main"),
+    PROCESS_CREATED_VPN("m_process_created_vpn"),
+
+    APP_LAUNCH_VERIFIED_INSTALL("m_app_launched_on_verified_play_store_install"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
@@ -31,11 +35,23 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_REPORT("epbf"),
     BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
+    PROTECTION_TOGGLE_BROKEN_SITE_REPORT("m_protection-toggled-off-breakage-report"),
 
+    PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
+    PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
+    PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
+    PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
+    PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),
+    ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
+    ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
-    ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
+    ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
+    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
+
+    // Temporary Pixel
+    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -59,7 +75,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FAVORITES_WIDGETS_DARK(pixelName = "m_sfw_dk"),
     FAVORITES_WIDGETS_SYSTEM(pixelName = "m_sfw_sd"),
 
-    FAVORITES_ONBOARDING_CTA_SHOWN("m_fo_s"),
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
@@ -69,7 +84,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
     APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH(pixelName = "m_sfbw_l"),
     APP_FAVORITES_ITEM_WIDGET_LAUNCH(pixelName = "m_sfiw_l"),
-    APP_EMPTY_VIEW_WIDGET_LAUNCH(pixelName = "m_sfew_l"),
     APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
     APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
     APP_THIRD_PARTY_LAUNCH(pixelName = "m_third_party_launch"),
@@ -106,6 +120,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED("ms_add_home_screen_widget_clicked"),
     SETTINGS_DEFAULT_BROWSER_PRESSED("ms_default_browser_pressed"),
     SETTINGS_PRIVATE_SEARCH_PRESSED("ms_private_search_setting_pressed"),
+    SETTINGS_GENERAL_PRESSED("ms_settings_general_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
@@ -113,11 +128,15 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
+    SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
+    SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
+    SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM("ms_address_bar_position_setting_selected_bottom"),
+    SETTINGS_NEXT_STEPS_ADDRESS_BAR("m_settings_next_steps_set_address_bar"),
+    SETTINGS_NEXT_STEPS_VOICE_SEARCH("m_settings_next_steps_enable_voice_search"),
     SETTINGS_MAC_APP_PRESSED("ms_mac_app_setting_pressed"),
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),
     SETTINGS_APPTP_PRESSED("ms_apptp_setting_pressed"),
-    SETTINGS_NETP_PRESSED("ms_netp_setting_pressed"),
     SETTINGS_GPC_PRESSED("ms_gpc_pressed"),
     SETTINGS_FIREPROOF_WEBSITES_PRESSED("ms_fireproof_websites_pressed"),
     SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED("ms_automatically_clear_what_pressed"),
@@ -127,10 +146,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED("ms_about_ddg_privacy_policy_pressed"),
     SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED("ms_about_ddg_version_easter_egg_pressed"),
     SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED("ms_about_ddg_share_feedback_pressed"),
-    SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED("ms_about_ddg_netp_unlock_pressed"),
     SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED("ms_private_search_more_search_settings_pressed"),
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
+    SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -142,6 +161,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     NOTIFICATION_CANCELLED("mnot_c"),
     NOTIFICATIONS_ENABLED("mnot_e"),
     NOTIFICATIONS_DISABLED("mnot_d"),
+    NOTIFICATION_RUNTIME_PERMISSION_SHOWN("m_notification_runtime_permission_shown"),
 
     AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
     AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),
@@ -176,8 +196,40 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-    AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
+    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
+    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
+    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
+
+    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
+    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
+
+    AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION("m_autocomplete_click_switch_to_tab"),
+
+    AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
+    AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
+
+    AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF("m_settings_general_autocomplete_off"),
+    AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON("m_settings_general_autocomplete_on"),
+
+    AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
+    AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
+
+    AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF("m_settings_general_recent_sites_off"),
+    AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON("m_settings_general_recent_sites_on"),
+
+    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
+    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
+
+    AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_autocomplete_displayed_bookmark"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_autocomplete_displayed_favorite"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_SWITCH_TO_TAB("m_autocomplete_displayed_switch_to_tab"),
+
+    AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
+    AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
     SERP_REQUERY("rq_%s"),
 
@@ -186,8 +238,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_POPUP_OPENED("m_nav_pm_o"),
     MENU_ACTION_FIRE_PRESSED("m_nav_f_p"),
     MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
-    MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p"),
-    MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p"),
+    MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP("m_new_tab_open_from_serp"),
+    MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE("m_new_tab_open_from_website"),
+    MENU_ACTION_BOOKMARKS_PRESSED("m_navigation_menu_bookmarks"),
     MENU_ACTION_NAVIGATE_FORWARD_PRESSED("m_nav_nf_p"),
     MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
     MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
@@ -204,6 +257,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
+    MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
@@ -227,19 +281,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),
 
-    PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE("m_pc_syd_e"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_LATER("m_pc_syd_l"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_NEVER("m_pc_syd_n"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE("m_pc_s_l_e"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE("m_pc_s_l_d"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS("m_pc_sd_aa"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
-
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
-    FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
 
@@ -251,10 +294,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_EMAIL_OVERRIDE_PIXEL("m_sync_duck_address_override"),
 
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
-    EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
+    ENCRYPTION_UNABLE_TO_DECRYPT_SECURE_EMAIL_DATA("m_unable_to_decrypt_secure_email_data"),
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
     ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e"),
 
@@ -265,4 +306,128 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
     REMOTE_MESSAGE_ACTION_CLICKED("m_remote_message_action_clicked"),
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
+
+    PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
+
+    SSL_CERTIFICATE_WARNING_CLOSE_PRESSED("m_certificate_warning_leave_clicked"),
+    SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED("m_certificate_warning_advanced_clicked"),
+    SSL_CERTIFICATE_WARNING_PROCEED_PRESSED("m_certificate_warning_proceed_clicked"),
+    SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN("m_certificate_warning_displayed_wrong_host"),
+    SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN("m_certificate_warning_displayed_expired"),
+    SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
+    SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
+
+    FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
+    FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
+
+    ADDRESS_BAR_NEW_TAB_PAGE_CLICKED("m_addressbar_click_ntp"),
+    ADDRESS_BAR_WEBSITE_CLICKED("m_addressbar_click_website"),
+    ADDRESS_BAR_SERP_CLICKED("m_addressbar_click_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_ntp"),
+    ADDRESS_BAR_WEBSITE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_website"),
+    ADDRESS_BAR_SERP_ENTRY_CLEARED("m_addressbar_focus_clear_entry_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED("m_addressbar_focus_cancel_ntp"),
+    ADDRESS_BAR_WEBSITE_CANCELLED("m_addressbar_focus_cancel_website"),
+    ADDRESS_BAR_SERP_CANCELLED("m_addressbar_focus_cancel_serp"),
+
+    KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
+    KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
+    KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
+
+    TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
+    TAB_MANAGER_CLICKED_DAILY("m_tab_manager_clicked_daily"),
+    TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
+    TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
+    TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
+    TAB_MANAGER_CLOSE_TAB_SWIPED("m_tab_manager_close_tab_swipe"),
+    TAB_MANAGER_NEW_TAB_LONG_PRESSED("m_tab_manager_long_press_new_tab"),
+    TAB_MANAGER_UP_BUTTON_PRESSED("m_tab_manager_exit_back_arrow"),
+    TAB_MANAGER_BACK_BUTTON_PRESSED("m_tab_manager_exit_other"),
+    TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"),
+    TAB_MANAGER_SELECT_MODE_MENU_PRESSED("m_tab_manager_select_mode_menu_clicked"),
+    TAB_MANAGER_MENU_NEW_TAB_PRESSED("m_tab_manager_menu_new_tab"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED("m_tab_manager_menu_close_all_tabs"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED_DAILY("m_tab_manager_menu_close_all_tabs_daily"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY("m_tab_manager_menu_close_all_tabs_confirm_daily"),
+    TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
+    TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
+    TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
+    TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED("m_tab_manager_grid_view_button_clicked"),
+    TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED("m_tab_manager_list_view_button_clicked"),
+    TAB_MANAGER_OPENED_FROM_SERP("m_tab_manager_open_from_serp"),
+    TAB_MANAGER_OPENED_FROM_SITE("m_tab_manager_open_from_website"),
+    TAB_MANAGER_OPENED_FROM_NEW_TAB("m_tab_manager_open_from_newtabpage"),
+    TAB_MANAGER_CLOSE_TABS("m_tab_manager_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_DAILY("m_tab_manager_close_tabs_daily"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED("m_tab_manager_confirm_close_tabs"),
+    TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY("m_tab_manager_confirm_close_tabs_daily"),
+    TAB_MANAGER_MENU_SELECT_TABS("m_tab_manager_menu_select_tabs"),
+    TAB_MANAGER_MENU_SELECT_TABS_DAILY("m_tab_manager_menu_select_tabs_daily"),
+    TAB_MANAGER_TAB_SELECTED("m_tab_manager_tab_selected"),
+    TAB_MANAGER_TAB_DESELECTED("m_tab_manager_tab_deselected"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL("m_tab_manager_select_mode_menu_select_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY("m_tab_manager_select_mode_menu_select_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL("m_tab_manager_select_mode_menu_deselect_all"),
+    TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY("m_tab_manager_select_mode_menu_deselect_all_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS("m_tab_manager_select_mode_menu_share_links"),
+    TAB_MANAGER_SELECT_MODE_MENU_SHARE_LINKS_DAILY("m_tab_manager_select_mode_menu_share_links_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS("m_tab_manager_select_mode_menu_bookmark_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_BOOKMARK_TABS_DAILY("m_tab_manager_select_mode_menu_bookmark_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS("m_tab_manager_select_mode_menu_close_other_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_tabs_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS("m_tab_manager_select_mode_menu_close_tabs"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_daily"),
+
+    SWIPE_TABS_USED("m_swipe_tabs_used"),
+    SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
+
+    DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
+
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION("duckplayer_youtube-signin-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION("duckplayer_youtube-age-restricted-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION("duckplayer_youtube-no-embed-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION("duckplayer_youtube-unknown-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE("duckplayer_youtube-signin-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE("duckplayer_youtube-age-restricted-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE("duckplayer_youtube-no-embed-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE("duckplayer_youtube-unknown-error_daily-unique"),
+
+    MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED("m_malicious-site-protection_feature-toggled"),
+    MALICIOUS_SITE_PROTECTION_VISIT_SITE("m_malicious-site-protection_visit-site"),
+    MALICIOUS_SITE_PROTECTION_ERROR_SHOWN("m_malicious-site-protection_error-page-shown"),
+
+    ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
+
+    REFERRAL_INSTALL_UTM_CAMPAIGN("m_android_install"),
+
+    REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
+    RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload-three-times-within-20-seconds"),
+
+    SITE_NOT_WORKING_WEBSITE_BROKEN("m_site-not-working_website-is-broken"),
+    SITE_NOT_WORKING_SHOWN("m_site-not-working_shown"),
+
+    URI_LOADED("m_uri_loaded"),
+
+    ERROR_PAGE_SHOWN("m_errorpageshown"),
+
+    APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
+
+    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
+
+    SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
+    SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
+    SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
+    SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
+
+    MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
+
+    TAB_MANAGER_INFO_PANEL_IMPRESSIONS("m_tab_manager_info_panel_impressions"),
+    TAB_MANAGER_INFO_PANEL_DISMISSED("m_tab_manager_info_panel_dismissed"),
+    TAB_MANAGER_INFO_PANEL_TAPPED("m_tab_manager_info_panel_tapped"),
 }

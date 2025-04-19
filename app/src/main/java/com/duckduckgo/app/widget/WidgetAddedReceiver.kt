@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.widget.AppWidgetManagerAddWidgetLauncher.Companion.ACTION_ADD_WIDGET
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -46,7 +47,7 @@ class WidgetAddedReceiver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        context.registerReceiver(this, IntentFilter(ACTION_ADD_WIDGET))
+        context.registerNotExportedReceiver(this, IntentFilter(ACTION_ADD_WIDGET))
     }
 
     override fun onDestroy(owner: LifecycleOwner) {

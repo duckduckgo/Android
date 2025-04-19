@@ -30,13 +30,16 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
@@ -45,8 +48,9 @@ class NetworkProtectionStateImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val cohortStore: NetpCohortStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val netPExclusionListRepository: NetPExclusionListRepository,
 ) : NetworkProtectionState {
     override suspend fun isOnboarded(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext cohortStore.cohortLocalDate != null
@@ -60,9 +64,22 @@ class NetworkProtectionStateImpl @Inject constructor(
         return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
     }
 
+    override fun start() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+        }
+    }
+
     override fun restart() {
         coroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+        }
+    }
+
+    override fun clearVPNConfigurationAndRestart() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            wgTunnelConfig.clearWgConfig()
+            restart()
         }
     }
 
@@ -70,8 +87,15 @@ class NetworkProtectionStateImpl @Inject constructor(
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
     }
 
+    override fun clearVPNConfigurationAndStop() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            wgTunnelConfig.clearWgConfig()
+            stop()
+        }
+    }
+
     override fun serverLocation(): String? {
-        return networkProtectionRepository.serverDetails?.location
+        return runBlocking { wgTunnelConfig.getWgConfig() }?.asServerDetails()?.location
     }
 
     override fun getConnectionStateFlow(): Flow<ConnectionState> {
@@ -82,5 +106,9 @@ class NetworkProtectionStateImpl @Inject constructor(
                 else -> DISCONNECTED
             }
         }
+    }
+
+    override suspend fun getExcludedApps(): List<String> = withContext(dispatcherProvider.io()) {
+        netPExclusionListRepository.getExcludedAppPackages()
     }
 }

@@ -1,0 +1,50 @@
+appId: com.duckduckgo.mobile.android
+tags:
+  - adClickTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - inputText: "https://www.search-company.site/#ad-id-3"
+      - pressKey: Enter
+
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/fireIconMenu"
+      - tapOn:
+          text: "Cancel"
+      - assertVisible:
+          id: "ad-id-3"
+      - tapOn:
+          id: "ad-id-3"
+      - assertVisible:
+          text: "Publisher site"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+      - assertVisible:
+          text: "View Tracker Companies"
+      - tapOn:
+          text: "View Tracker Companies"
+      - assertVisible:
+          text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
+      - assertVisible:
+          text: "About our Web Tracking Protections"
+      - assertVisible:
+          text: ".*Ad Company"
+      - assertVisible:
+          text: "convert.ad-company.site"
+      - assertVisible:
+          text: "ad-company.site"
+      - action: back
+      - assertVisible:
+          text: "View Non-Tracker Companies"
+      - tapOn:
+          text: "View Non-Tracker Companies"
+      - assertVisible:
+          text: "We did not identify any requests from third-party domains."
+      - assertVisible:
+          text: "About our Web Tracking Protections"

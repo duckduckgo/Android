@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -32,17 +32,13 @@ class NetworkProtectionRetentionPixelSender @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : RefreshRetentionAtbPlugin {
+) : AtbLifecyclePlugin {
 
-    override fun onSearchRetentionAtbRefreshed() {
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (networkProtectionState.isEnabled()) {
                 networkProtectionPixels.reportEnabledOnSearch()
             }
         }
-    }
-
-    override fun onAppRetentionAtbRefreshed() {
-        // noop
     }
 }

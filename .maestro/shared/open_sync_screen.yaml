@@ -1,8 +1,6 @@
 appId: com.duckduckgo.mobile.android
 ---
 - tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn: "Settings"
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/item_container"
-      index: 8
+- tapOn: "Sync & Backup"

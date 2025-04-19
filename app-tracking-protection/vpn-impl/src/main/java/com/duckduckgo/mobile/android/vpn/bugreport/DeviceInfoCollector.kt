@@ -44,6 +44,7 @@ class DeviceInfoCollector @Inject constructor(
             put("buildFlavor", appBuildConfig.flavor.toString())
             put("os", appBuildConfig.sdkInt)
             put("batteryOptimizations", (!isIgnoringBatteryOptimizations.get()).toString())
+            put("man", appBuildConfig.manufacturer)
         }
     }
 }

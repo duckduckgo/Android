@@ -80,19 +80,40 @@
                 app:primaryText="@string/devSettingsClearSavedSites"
                 app:secondaryText="@string/devSettingsClearSavedSitesSubtitle" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/customTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenCustomTabs"
+                app:secondaryText="@string/devSettingsScreenCustomTabsSubtitle"
+                />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/notifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenNotificationsTitle"
+                app:secondaryText="@string/devSettingsScreenNotificationsSubtitle" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenTabs"
+                app:secondaryText="@string/devSettingsScreenTabsSubtitle" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/showTabSwitcherAnimatedTile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsShowTabSwitcherAnimatedTile"
+                app:secondaryText="@string/devSettingsShowTabSwitcherAnimatedSubtitle" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenPrivacySection" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/nextTdsEnabled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/devSettingsScreenTdsVersionSubtitle"
-                app:secondaryText="@string/devSettingsScreenTdsVersion"
-                app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overridePrivacyRemoteConfigUrl"

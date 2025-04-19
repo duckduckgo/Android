@@ -2,24 +2,19 @@ appId: com.duckduckgo.mobile.android
 tags:
     - privacyTest
 ---
-- launchApp:
-    clearState: true
-- runFlow: ../shared/onboarding.yaml
-- inputText: "https://privacy-test-pages.site/privacy-protections/query-parameters/"
-- pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
-- tapOn:
-    text: "HIDE"
-- assertVisible:
-    text: "HIDE TIPS FOREVER"
-- tapOn:
-    text: "HIDE TIPS FOREVER"
-- assertVisible:
-    text: "Link with utm_source and 1 standard parameter"
-- tapOn:
-    text: "Link with utm_source and 1 standard parameter"
-- assertNotVisible:
-    text: "utm_source=something&q=other"
-- assertVisible:
-    text: "q=other"
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                clearState: true
+            - runFlow: ../shared/skip_all_onboarding.yaml
+            - inputText: "https://privacy-test-pages.site/privacy-protections/query-parameters/"
+            - pressKey: Enter
+            - assertVisible:
+                text: "Link with utm_source and 1 standard parameter"
+            - tapOn:
+                text: "Link with utm_source and 1 standard parameter"
+            - assertNotVisible:
+                text: "utm_source=something&q=other"
+            - assertVisible:
+                text: "q=other"

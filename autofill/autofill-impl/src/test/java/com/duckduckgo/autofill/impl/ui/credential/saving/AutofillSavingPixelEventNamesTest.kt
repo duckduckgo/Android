@@ -17,6 +17,11 @@
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
@@ -25,6 +30,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSW
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogAccepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogDismissed
+import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogExclude
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogShown
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.saveType
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.PasswordOnly
@@ -37,32 +43,60 @@ class AutofillSavingPixelEventNamesTest {
 
     @Test
     fun whenSavingAcceptedWithUsernameAndPasswordThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogAccepted(UsernameAndPassword), AUTOFILL_SAVE_LOGIN_PROMPT_SAVED)
+        assertEquals(pixelNameDialogAccepted(UsernameAndPassword, onboardingMode = false), AUTOFILL_SAVE_LOGIN_PROMPT_SAVED)
     }
 
     @Test
     fun whenSavingAcceptedWithPasswordOnlyThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogAccepted(PasswordOnly), AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED)
+        assertEquals(pixelNameDialogAccepted(PasswordOnly, onboardingMode = false), AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED)
     }
 
     @Test
     fun whenDialogShownWithUsernameAndPasswordThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogShown(UsernameAndPassword), AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN)
+        assertEquals(pixelNameDialogShown(UsernameAndPassword, onboardingMode = false), AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN)
     }
 
     @Test
     fun whenDialogShownWithPasswordOnlyThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogShown(PasswordOnly), AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN)
+        assertEquals(pixelNameDialogShown(PasswordOnly, onboardingMode = false), AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN)
     }
 
     @Test
     fun whenDialogDismissedWithUsernameAndPasswordThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogDismissed(UsernameAndPassword), AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED)
+        assertEquals(pixelNameDialogDismissed(UsernameAndPassword, onboardingMode = false), AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED)
     }
 
     @Test
     fun whenDialogDismissedWithPasswordOnlyThenCorrectPixelUsed() {
-        assertEquals(pixelNameDialogDismissed(PasswordOnly), AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED)
+        assertEquals(pixelNameDialogDismissed(PasswordOnly, onboardingMode = false), AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED)
+    }
+
+    @Test
+    fun whenNeverForThisSiteClickedThenCorrectPixelUsed() {
+        assertEquals(
+            pixelNameDialogExclude(UsernameAndPassword, onboardingMode = false),
+            AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG,
+        )
+    }
+
+    @Test
+    fun whenSavingAcceptedInOnboardingDialogThenCorrectPixelUsed() {
+        assertEquals(pixelNameDialogAccepted(UsernameAndPassword, onboardingMode = true), AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED)
+    }
+
+    @Test
+    fun whenDialogShownInOnboardingDialogThenCorrectPixelUsed() {
+        assertEquals(pixelNameDialogShown(UsernameAndPassword, onboardingMode = true), AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN)
+    }
+
+    @Test
+    fun whenDialogDismissedInOnboardingDialogThenCorrectPixelUsed() {
+        assertEquals(pixelNameDialogDismissed(UsernameAndPassword, onboardingMode = true), AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED)
+    }
+
+    @Test
+    fun whenNeverForThisSiteClickedInOnboardingDialogThenCorrectPixelUsed() {
+        assertEquals(pixelNameDialogExclude(UsernameAndPassword, onboardingMode = true), AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE)
     }
 
     @Test
@@ -83,7 +117,10 @@ class AutofillSavingPixelEventNamesTest {
         assertEquals(loginCredentials.saveType(), PasswordOnly)
     }
 
-    private fun loginCredentials(username: String? = null, password: String? = null): LoginCredentials {
+    private fun loginCredentials(
+        username: String? = null,
+        password: String? = null,
+    ): LoginCredentials {
         return LoginCredentials(id = 0, domain = "example.com", username = username, password = password)
     }
 }

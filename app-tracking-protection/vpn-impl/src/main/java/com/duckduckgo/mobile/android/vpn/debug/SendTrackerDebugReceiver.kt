@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -31,12 +32,12 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.threeten.bp.LocalDateTime
 
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:
@@ -66,7 +67,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         }
 
         logcat { "Debug receiver SendTrackerDebugReceiver registered" }
-        context.registerReceiver(this, IntentFilter(INTENT_ACTION))
+        context.registerNotExportedReceiver(this, IntentFilter(INTENT_ACTION))
     }
 
     private fun unregister() {

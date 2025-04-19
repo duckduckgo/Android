@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,95 +18,173 @@ package com.duckduckgo.app.onboarding.ui.page
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.di.scopes.FragmentScope
+import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @SuppressLint("StaticFieldLeak")
-class WelcomePageViewModel(
-    private val appInstallStore: AppInstallStore,
+@ContributesViewModel(FragmentScope::class)
+class WelcomePageViewModel @Inject constructor(
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val appInstallStore: AppInstallStore,
+    private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
-    fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
-        return when (event) {
-            WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
-            WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
-            WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
-        }
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private var defaultAddressBarPosition: Boolean = true
+
+    sealed interface Command {
+        data object ShowInitialDialog : Command
+        data object ShowComparisonChart : Command
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command
+        data object ShowAddressBarPositionDialog : Command
+        data object Finish : Command
+        data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
+        data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
     }
 
-    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
-        if (defaultRoleBrowserDialog.shouldShowDialog()) {
-            val intent = defaultRoleBrowserDialog.createIntent(context)
-            if (intent != null) {
-                emit(WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            } else {
-                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                emit(WelcomePageView.State.Finish)
+    fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
+        when (currentDialog) {
+            INITIAL -> {
+                viewModelScope.launch {
+                    _commands.send(ShowComparisonChart)
+                }
             }
-        } else {
-            emit(WelcomePageView.State.Finish)
+
+            COMPARISON_CHART -> {
+                viewModelScope.launch {
+                    val isDDGDefaultBrowser =
+                        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                            val intent = defaultRoleBrowserDialog.createIntent(context)
+                            if (intent != null) {
+                                _commands.send(ShowDefaultBrowserDialog(intent))
+                            } else {
+                                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                                _commands.send(ShowAddressBarPositionDialog)
+                            }
+                            false
+                        } else {
+                            _commands.send(Finish)
+                            true
+                        }
+                    pixel.fire(
+                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                        mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
+                    )
+                }
+            }
+
+            ADDRESS_BAR_POSITION -> {
+                if (!defaultAddressBarPosition) {
+                    settingsDataStore.omnibarPosition = OmnibarPosition.BOTTOM
+                    pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                }
+                viewModelScope.launch {
+                    _commands.send(Finish)
+                }
+            }
         }
     }
 
-    private fun onDefaultBrowserSet(): Flow<WelcomePageView.State> = flow {
+    fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
-
         appInstallStore.defaultBrowser = true
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
-        pixel.fire(
-            AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-            ),
-        )
-
-        emit(WelcomePageView.State.Finish)
+        viewModelScope.launch {
+            _commands.send(ShowAddressBarPositionDialog)
+        }
     }
 
-    private fun onDefaultBrowserNotSet(): Flow<WelcomePageView.State> = flow {
+    fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
-
         appInstallStore.defaultBrowser = false
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
-        pixel.fire(
-            AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-            ),
-        )
-
-        emit(WelcomePageView.State.Finish)
+        viewModelScope.launch {
+            _commands.send(ShowAddressBarPositionDialog)
+        }
     }
-}
 
-@Suppress("UNCHECKED_CAST")
-class WelcomePageViewModelFactory(
-    private val appInstallStore: AppInstallStore,
-    private val context: Context,
-    private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-) : ViewModelProvider.NewInstanceFactory() {
+    fun notificationRuntimePermissionRequested() {
+        pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+    }
 
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return with(modelClass) {
-            when {
-                isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
-                    appInstallStore,
-                    context,
-                    pixel,
-                    defaultRoleBrowserDialog,
-                )
-                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-            }
-        } as T
+    fun notificationRuntimePermissionGranted() {
+        pixel.fire(
+            AppPixelName.NOTIFICATIONS_ENABLED,
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
+        when (onboardingDialogType) {
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+        }
+    }
+
+    fun setBackgroundResource(lightModeEnabled: Boolean) {
+        val backgroundRes = if (lightModeEnabled) {
+            R.drawable.onboarding_background_bitmap_light
+        } else {
+            R.drawable.onboarding_background_bitmap_dark
+        }
+        viewModelScope.launch {
+            _commands.send(SetBackgroundResource(backgroundRes))
+        }
+    }
+
+    fun onAddressBarPositionOptionSelected(defaultOption: Boolean) {
+        defaultAddressBarPosition = defaultOption
+        viewModelScope.launch {
+            _commands.send(SetAddressBarPositionOptions(defaultOption))
+        }
+    }
+
+    fun loadDaxDialog() {
+        viewModelScope.launch {
+            _commands.send(ShowInitialDialog)
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -25,23 +27,31 @@ class PageLoadedHandlerTest {
     private val deviceInfo: DeviceInfo = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
+    private val autoconsent: Autoconsent = mock()
+
     private val testee = RealPageLoadedHandler(
         deviceInfo,
         webViewVersionProvider,
         pageLoadedPixelDao,
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
+        autoconsent,
+        object : OptimizeTrackerEvaluationRCWrapper {
+            override val enabled: Boolean
+                get() = true
+        },
     )
 
     @Before
     fun before() {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
+        whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
     }
 
     @Test
     fun whenInvokingWithValidUrlThenPixelIsAdded() {
-        testee.invoke(VALID_URL, 0L, 10L)
+        testee.onPageLoaded(VALID_URL, "title", 0L, 10L)
         val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
         verify(pageLoadedPixelDao).add(argumentCaptor.capture())
         Assert.assertEquals(10L, argumentCaptor.firstValue.elapsedTime)
@@ -49,7 +59,7 @@ class PageLoadedHandlerTest {
 
     @Test
     fun whenInvokingWithInvalidUrlThenPixelIsAdded() {
-        testee.invoke(INVALID_URL, 0L, 10L)
+        testee.onPageLoaded(INVALID_URL, "title", 0L, 10L)
         verify(pageLoadedPixelDao, never()).add(any())
     }
 }

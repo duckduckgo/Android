@@ -38,10 +38,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Qualifier
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
 interface PrivacyConfigPersister {
@@ -63,7 +63,6 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
     private val database: PrivacyConfigDatabase,
-    private val listener: PrivacyConfigUpdateListener,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
@@ -115,13 +114,12 @@ class RealPrivacyConfigPersister @Inject constructor(
                 // Then feature flags
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
-                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
+                        for (featurePlugin in privacyFeaturePluginPoint.getPlugins().filter { feature.key == it.featureName }) {
                             featurePlugin.store(feature.key, jsonObject.toString())
                         }
                     }
                 }
             }
-            listener.privacyConfigUpdated()
         }
     }
 
@@ -142,7 +140,10 @@ class RealPrivacyConfigPersister @Inject constructor(
 
 @VisibleForTesting
 fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
-    return this.getPlugins().sumOf { it.featureName.hashCode() }
+    return this.getPlugins().sumOf {
+        // use the hash() of the feature or featureName for backwards compat
+        it.hash()?.hashCode() ?: it.featureName.hashCode()
+    }
 }
 
 @Retention(AnnotationRetention.BINARY)

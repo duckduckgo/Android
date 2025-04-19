@@ -58,10 +58,11 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
 
     companion object {
         private const val KEY_PARAM_SOURCE = "source"
+        private const val KEY_PARAM_ERROR = "error"
         private const val SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES = 3
     }
 
-    private lateinit var _source: Source
+    private var _source: Source? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -77,7 +78,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     if (data.isNotEmpty()) {
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
-                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
                         )
                         voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
@@ -86,6 +87,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     }
                 } else {
                     if (code == VOICE_SEARCH_ERROR) {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                            parameters = mapOf(KEY_PARAM_ERROR to data),
+                        )
                         activity.window?.decorView?.rootView?.let {
                             val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
                             snackbar.view.translationY =
@@ -127,7 +132,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         }
         pixel.fire(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
-            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
         )
         activityResultLauncherWrapper.launch(LaunchVoiceSearch)
     }

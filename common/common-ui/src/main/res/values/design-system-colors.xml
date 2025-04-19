@@ -34,6 +34,7 @@
         daxColorSecondaryText - Secondary text color
         daxColorSecondaryText - Secondary text color inverted
         daxColorPrimaryIcon - Primary color for icons
+        daxColorSecondaryIcon - Secondary color for icons
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
@@ -53,6 +54,7 @@
     <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorTertiaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
+    <attr name="daxColorSecondaryIcon" format="color"/>
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
@@ -62,28 +64,53 @@
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
+    <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
+    <attr name="daxColorToolbar" format="color"/>
+    <attr name="daxColorBrowserOverlay" format="color"/>
+
+    <!-- Visual Design Specific Colors -->
+    <attr name="daxColorControlFillPrimary" format="color"/>
+    <attr name="daxColorControlFillSecondary" format="color"/>
+    <attr name="daxColorControlFillTertiary" format="color"/>
+
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
     <attr name="daxColorButtonSecondaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonGhostAltContainerPressed" format="color"/>
     <attr name="daxColorButtonDestructiveContainer" format="color"/>
     <attr name="daxColorButtonDestructiveContainerPressed" format="color"/>
     <attr name="daxColorButtonDestructiveGhostContainer" format="color"/>
     <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
+
+    <attr name="daxColorFabPrimaryContainer" format="color"/>
+    <attr name="daxColorFabPrimaryText" format="color"/>
+    <attr name="daxColorFabPrimaryIcon" format="color"/>
+    <attr name="daxColorFabSecondaryContainer" format="color"/>
+    <attr name="daxColorFabSecondaryText" format="color"/>
+    <attr name="daxColorFabSecondaryIcon" format="color"/>
+
+    <attr name="daxColorTabHighlight" format="color"/>
 
     <attr name="daxColorButtonPrimaryText" format="color"/>
     <attr name="daxColorButtonPrimaryTextPressed" format="color"/>
     <attr name="daxColorButtonSecondaryText" format="color"/>
     <attr name="daxColorButtonSecondaryTextPressed" format="color"/>
     <attr name="daxColorButtonDestructiveGhostText" format="color"/>
+    <attr name="daxColorButtonGhostAltText" format="color"/>
+    <attr name="daxColorButtonGhostAltTextPressed" format="color"/>
     <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
@@ -93,6 +120,7 @@
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="alertGreen">#21C000</color>
     <color name="alertRedOnLightDefault">#EB102D</color>
     <color name="alertRedOnLightDefault_18">#2EEB102D</color>
     <color name="alertRedOnLightPressed">#C10D25</color>
@@ -114,12 +142,16 @@
     <color name="red70">#9A3216</color>
 
     <color name="purple50">#5132A9</color>
+    <color name="purple40">#A276FF</color>
 
     <color name="yellow50_14">#24FFCC33</color>
     <color name="yellow50">#FFCC33</color>
     <color name="yellow10">#FFF0C2</color>
 
+    <color name="green0">#D3FFCC</color>
     <color name="green50">#4CBA3C</color>
+    <color name="green70">#288419</color>
+    <color name="green80">#1A690D</color>
 
     <color name="gray100">#111111</color>
     <color name="gray95">#494949</color>
@@ -133,22 +165,28 @@
     <color name="gray40">#CCCCCC</color>
     <color name="gray40_40">#66CCCCCC</color>
     <color name="gray40_50">#80CCCCCC</color>
+    <color name="gray36">#5C000000</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
+    <color name="gray15">#F0F1F2</color>
     <color name="gray0">#FAFAFA</color>
 
     <color name="blue0">#CCDAFF</color>
     <color name="blue0_50">#80CCDAFF</color>
+    <color name="blue10">#803969FF</color>
     <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
+    <color name="blue30_20">#337295F6</color>
     <color name="blue50">#3969EF</color>
+    <color name="blue50_20">#333969EF</color>
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
+    <color name="black50">#80000000</color>
     <color name="black48">#7A000000</color>
     <color name="black40">#66000000</color>
     <color name="black36">#5C000000</color>
@@ -172,6 +210,10 @@
     <color name="white9">#17FFFFFF</color>
     <color name="white6">#0FFFFFFF</color>
     <color name="white">#FFFFFF</color>
+    <color name="white_60">#F2F5F9</color>
+
+    <color name="pink100">#9232E2</color>
+    <color name="pink90">#A060D9</color>
 
     <color name="magenta">#A64FD1</color>
     <color name="purple">#D4A1EE</color>
@@ -186,19 +228,7 @@
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
     <!-- Legacy Raw -->
-    <color name="whiteFour">#f1f1f1</color>
-    <color name="whiteFive">#fafafa</color>
-    <color name="almostBlackDark">#222222</color>
-    <color name="almostBlack">#333333</color>
-    <color name="newBlack">#111111</color>
-    <color name="grayishBrown">#494949</color>
-    <color name="grayishTwo">#939393</color>
-    <color name="paleBrownishGray">#d0d0d0</color>
-    <color name="brownishGrayTwo">#666666</color>
-    <color name="cornflowerBlue">#678fff</color>
-    <color name="cornflowerDark">#5078e9</color>
     <color name="translucentDark">#b000</color>
-    <color name="light_blue">#F2F5F9</color>
 
     <color name="ic_launcher_red_background">#DE5833</color>
     <color name="ic_launcher_white_background">#FFFFFF</color>

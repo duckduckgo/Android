@@ -1,5 +1,313 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                onResult(Error(String.format(&quot;(%d) %s&quot;, errorCode, errString)))"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
+            line="103"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
+            line="126"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
+            line="126"
+            column="95"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        remoteFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/reporting/AutofillBreakageReportCanShowRulesImplTest.kt"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        remoteFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/reporting/AutofillBreakageReportCanShowRulesImplTest.kt"
+            line="55"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.manufacturer == &quot;samsung&quot; &amp;&amp; (appBuildConfig.sdkInt == VERSION_CODES.S || appBuildConfig.sdkInt == VERSION_CODES.S_V2)) {"
+        errorLine2="                                                                                  ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/AutofillClipboardInteractor.kt"
+            line="55"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.manufacturer == &quot;samsung&quot; &amp;&amp; (appBuildConfig.sdkInt == VERSION_CODES.S || appBuildConfig.sdkInt == VERSION_CODES.S_V2)) {"
+        errorLine2="                                                                                                                              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/AutofillClipboardInteractor.kt"
+            line="55"
+            column="127"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return appBuildConfig.sdkInt &lt;= VERSION_CODES.S_V2"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/AutofillClipboardInteractor.kt"
+            line="60"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementDisabledMode.kt"
+            line="74"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementDisabledMode.kt"
+            line="78"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
+            line="62"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
+            line="64"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        get() = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/pixel/AutofillPixelSender.kt"
+            line="58"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            surveysFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/ui/credential/management/survey/AutofillSurveyImplTest.kt"
+            line="52"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/survey/AutofillSurveyStore.kt"
+            line="46"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.manufacturer == &quot;samsung&quot; &amp;&amp; (appBuildConfig.sdkInt == VERSION_CODES.S || appBuildConfig.sdkInt == VERSION_CODES.S_V2)) {"
+        errorLine2="                                                                                  ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
+            line="146"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.manufacturer == &quot;samsung&quot; &amp;&amp; (appBuildConfig.sdkInt == VERSION_CODES.S || appBuildConfig.sdkInt == VERSION_CODES.S_V2)) {"
+        errorLine2="                                                                                                                              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
+            line="146"
+            column="127"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return appBuildConfig.sdkInt &lt;= VERSION_CODES.S_V2"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
+            line="151"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/sync/CredentialsSyncStore.kt"
+            line="97"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/DeviceAuthenticator.kt"
+            line="93"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/DeviceAuthenticator.kt"
+            line="93"
+            column="95"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/email/incontext/store/EmailProtectionInContextDataStore.kt"
+            line="45"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.onByDefault().setRawStoredState(State(enable = onByDefaultNewUsers))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
+            line="77"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.onForExistingUsers().setRawStoredState(State(enable = onByDefaultExistingUsers))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
+            line="78"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/configuration/RealAutofillRuntimeConfigProviderTest.kt"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        whenever(this.getSharedPreferences(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt())).thenReturn(preferences)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/RealCredentialsSyncStoreTest.kt"
+            line="39"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextAvailabilityRulesTest.kt"
+            line="52"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextAvailabilityRulesTest.kt"
+            line="86"
+            column="9"/>
+    </issue>
 
     <issue
         id="VectorRaster"
@@ -13,47 +321,1664 @@
     </issue>
 
     <issue
-        id="NotifyDataSetChanged"
-        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
-        errorLine1="                    notifyDataSetChanged()"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsSnackbarConfirmation&quot; instruction=&quot;Placeholder is a number representing how many passwords were deleted&quot;>"
+        errorLine2="    ^">
         <location
-            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/selecting/CredentialsPickerRecyclerAdapter.kt"
-            line="73"
-            column="21"/>
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="156"
+            column="5"/>
     </issue>
 
     <issue
-        id="UseCompoundDrawables"
-        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsSnackbarConfirmation&quot; instruction=&quot;Placeholder is a number representing how many passwords were deleted&quot;>"
+        errorLine2="    ^">
         <location
-            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="45"
-            column="6"/>
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="156"
+            column="5"/>
     </issue>
 
     <issue
-        id="UseCompoundDrawables"
-        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsSnackbarConfirmation&quot; instruction=&quot;Placeholder is a number representing how many passwords were deleted&quot;>"
+        errorLine2="    ^">
         <location
-            file="src/main/res/layout/content_autofill_select_credentials_tooltip.xml"
-            line="29"
-            column="6"/>
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="156"
+            column="5"/>
     </issue>
 
     <issue
-        id="UseCompoundDrawables"
-        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsSnackbarConfirmation&quot; instruction=&quot;Placeholder is a number representing how many passwords were deleted&quot;>"
+        errorLine2="    ^">
         <location
-            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
-            line="29"
-            column="6"/>
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="156"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;syncCredentialInvalidItemsWarning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="165"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;syncCredentialInvalidItemsWarning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="165"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;syncCredentialInvalidItemsWarning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="165"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;syncCredentialInvalidItemsWarning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="165"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="172"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="172"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="172"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="172"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="178"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="178"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="178"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="178"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural&quot; tools:ignore=&quot;ImpliedQuantity&quot; instruction=&quot;Placeholder is a number representing how many passwords will be deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural&quot; tools:ignore=&quot;ImpliedQuantity&quot; instruction=&quot;Placeholder is a number representing how many passwords will be deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural&quot; tools:ignore=&quot;ImpliedQuantity&quot; instruction=&quot;Placeholder is a number representing how many passwords will be deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural&quot; tools:ignore=&quot;ImpliedQuantity&quot; instruction=&quot;Placeholder is a number representing how many passwords will be deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllSecondInstructionPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="190"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllSecondInstructionPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="190"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllSecondInstructionPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="190"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllSecondInstructionPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="190"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;Autentica&quot; is a common misspelling; did you mean &quot;Autêntica&quot;?"
+        errorLine1="    &lt;string name=&quot;autofill_auth_text_for_delete_all&quot;>Autentica para confirmar que pretendes eliminar todas as palavras-passe&lt;/string>"
+        errorLine2="                                                     ^">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="161"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="68"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptMessage&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptMessage&quot; translatable=&quot;false&quot;>We want to make using passwords in DuckDuckGo better.&lt;/string>"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementSurveyPromptAcceptButtonText&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptAcceptButtonText&quot; translatable=&quot;false&quot;>Take Survey&lt;/string>"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="70"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;credentialManagementDuckAddressLabel&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressLabel&quot; translatable=&quot;false&quot;>Duck Address&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="85"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="214"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="220"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="220"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;autofillManagementImportPasswordsGetDesktopAppUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/browser&lt;/string>"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="226"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsSnackbarConfirmation&quot; instruction=&quot;Placeholder is a number representing how many passwords were deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="156"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;syncCredentialInvalidItemsWarning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="167"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="176"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural&quot; tools:ignore=&quot;ImpliedQuantity&quot; instruction=&quot;Placeholder is a number representing how many passwords will be deleted&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="192"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;credentialManagementDeleteAllSecondInstructionPlural&quot; tools:ignore=&quot;ImpliedQuantity&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="200"
+            column="5"/>
     </issue>
 
     <issue
@@ -63,7 +1988,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/drawable/ic_autofill_keychain.xml"
-            line="24"
+            line="22"
             column="25"/>
     </issue>
 
@@ -74,7 +1999,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/drawable/ic_autofill_keychain.xml"
-            line="27"
+            line="25"
             column="25"/>
     </issue>
 
@@ -85,8 +2010,41 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/drawable/ic_autofill_keychain.xml"
-            line="30"
+            line="28"
             column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (949 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M89.49,65.46C86.64,63.99 83.15,65.06 81.52,67.97L81.51,67.98C80.97,68.94 80.71,69.98 80.68,71.02C80.66,71.57 80.33,72.05 79.82,72.19L77.79,72.74C77.43,72.84 77.08,72.58 77.05,72.19C76.86,70.12 77.26,67.97 78.35,66.03C81.01,61.27 86.77,59.59 91.38,62.16C91.59,62.27 91.84,62.2 91.96,61.99L92.75,60.57C92.95,60.23 93.44,60.3 93.54,60.69L94.92,66.21C94.98,66.45 94.84,66.7 94.61,66.76L89.34,68.2C88.97,68.3 88.66,67.88 88.86,67.54L89.67,66.09C89.79,65.87 89.72,65.58 89.49,65.46ZM84.02,76.62C86.99,78.09 90.62,77.02 92.31,74.11L92.32,74.1C92.88,73.14 93.15,72.1 93.18,71.06C93.2,70.51 93.55,70.03 94.07,69.89L96.18,69.34C96.55,69.24 96.91,69.5 96.95,69.89C97.15,71.96 96.73,74.11 95.6,76.05C92.83,80.81 86.85,82.49 82.07,79.92C81.85,79.81 81.59,79.88 81.46,80.09L80.64,81.51C80.44,81.85 79.92,81.78 79.82,81.39L78.39,75.87C78.33,75.63 78.47,75.38 78.71,75.32L84.18,73.88C84.57,73.78 84.89,74.2 84.69,74.54L83.85,75.98C83.72,76.21 83.8,76.5 84.02,76.62Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/sync_desktop_new_128.xml"
+            line="82"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/gray0` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_autofill_management_device_unsupported.xml"
+            line="20"
+            column="5"/>
     </issue>
 
     <issue
@@ -107,7 +2065,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
-            line="21"
+            line="22"
             column="5"/>
     </issue>
 
@@ -123,14 +2081,278 @@
     </issue>
 
     <issue
-        id="UnusedResources"
-        message="The resource `R.string.credentialManagementEditButtonDelete` appears to be unused"
-        errorLine1="    &lt;string name=&quot;credentialManagementEditButtonDelete&quot;>Delete&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/values/strings-autofill-impl.xml"
-            line="56"
-            column="13"/>
+            file="src/main/res/layout/item_row_autofill_credentials_management_screen.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Активиране...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktiverer ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktivieren ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Ενεργοποίηση...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktivacija...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktyvinama...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Se activează...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Активация...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktivuje sa...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktiviranje ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Aktiverar...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressActivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from deactivated to active&quot;>Etkinleştiriliyor...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="95"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Деактивиране...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktiverer ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktivieren ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Απενεργοποίηση...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktivacija...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktyvinama...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Se dezactivează...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Деактивация...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktivuje sa...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Deaktiviranje ...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Inaktiverar...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;credentialManagementDuckAddressDeactivatingLabel&quot; instruction=&quot;This is text shown briefly while changing the status of their &amp;apos;Duck Address&amp;apos;, going from active to deactivated&quot;>Devre dışı bırakılıyor...&lt;/string>"
+        errorLine2="                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="98"
+            column="204"/>
     </issue>
 
     <issue
@@ -140,11 +2362,11 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/menu/autofill_list_mode_menu.xml"
-            line="25"
+            line="26"
             column="9"/>
         <location
             file="src/main/res/menu/autofill_list_mode_menu.xml"
-            line="31"
+            line="33"
             column="9"/>
     </issue>
 
@@ -162,12 +2384,12 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="39"
-            column="6"/>
+            file="src/main/res/layout/content_autofill_generate_password_dialog.xml"
+            line="25"
+            column="10"/>
     </issue>
 
     <issue
@@ -177,7 +2399,7 @@
         errorLine2="         ~~~~~~~~~">
         <location
             file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="56"
+            line="25"
             column="10"/>
     </issue>
 
@@ -188,18 +2410,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/content_autofill_select_credentials_tooltip.xml"
-            line="23"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
-            line="23"
+            line="22"
             column="6"/>
     </issue>
 
@@ -210,36 +2421,84 @@
         errorLine2="         ~~~~~~~~~">
         <location
             file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
-            line="40"
+            line="25"
             column="10"/>
     </issue>
 
     <issue
-        id="RtlEnabled"
-        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
         <location
-            file="src/main/AndroidManifest.xml"/>
+            file="src/main/res/layout/dialog_email_protection_choose_email.xml"
+            line="27"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_email_protection_in_context_sign_up.xml"
+            line="24"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="        &lt;TextView"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="29"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="        &lt;TextView"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="36"
+            column="10"/>
     </issue>
 
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="            android:background=&quot;#F00&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="27"
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:textColor=&quot;@color/gray100&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="34"
             column="13"/>
     </issue>
 
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="            android:background=&quot;#F00&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        errorLine1="            android:textColor=&quot;@color/gray100&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="35"
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="41"
             column="13"/>
     </issue>
 

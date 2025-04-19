@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.WebView
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
@@ -31,21 +32,26 @@ class PrivacyDashboardRenderer(
     private val webView: WebView,
     private val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
     private val moshi: Moshi,
-    private val onBrokenSiteClicked: () -> Unit,
-    private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+    private val onPrivacyProtectionsClicked: (String) -> Unit,
     private val onUrlClicked: (String) -> Unit,
     private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
+    private val onSubmitBrokenSiteReport: (String) -> Unit,
+    private val onGetToggleReportOptions: () -> Unit,
+    private val onSendToggleReport: () -> Unit,
+    private val onRejectToggleReport: () -> Unit,
+    private val onSeeWhatIsSent: () -> Unit,
+    private val onShowNativeFeedback: () -> Unit,
+    private val onReportBrokenSiteShown: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
 
-    fun loadDashboard(webView: WebView) {
+    fun loadDashboard(webView: WebView, initialScreen: InitialScreen, toggleOpener: DashboardOpener) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
-                onBrokenSiteClicked = { onBrokenSiteClicked() },
-                onPrivacyProtectionsClicked = { newValue ->
-                    onPrivacyProtectionsClicked(newValue)
+                onPrivacyProtectionsClicked = { payload ->
+                    onPrivacyProtectionsClicked(payload)
                 },
                 onUrlClicked = {
                     onUrlClicked(it)
@@ -54,10 +60,17 @@ class PrivacyDashboardRenderer(
                     onOpenSettings(it)
                 },
                 onClose = { onClose() },
+                onSubmitBrokenSiteReport = onSubmitBrokenSiteReport,
+                onGetToggleReportOptions = onGetToggleReportOptions,
+                onSendToggleReport = onSendToggleReport,
+                onRejectToggleReport = onRejectToggleReport,
+                onSeeWhatIsSent = onSeeWhatIsSent,
+                onShowNativeFeedback = onShowNativeFeedback,
+                onReportBrokenSiteShown = onReportBrokenSiteShown,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android.html")
+        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}&opener=${toggleOpener.value}")
     }
 
     fun render(viewState: ViewState) {
@@ -73,6 +86,9 @@ class PrivacyDashboardRenderer(
         val cookiePromptManagementStatusAdapter = moshi.adapter(CookiePromptManagementState::class.java)
         val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
         webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
+
+        val maliciousStateJson = """{"kind": ${viewState.maliciousSiteStatus?.let { "\"$it\"" } ?: "null"}}"""
+        webView.evaluateJavascript("javascript:onChangeMaliciousSiteStatus($maliciousStateJson);", null)
 
         // remote feature settings
         val remoteFeatureSettingsAdapter = moshi.adapter(RemoteFeatureSettingsViewState::class.java)
@@ -101,5 +117,11 @@ class PrivacyDashboardRenderer(
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
 
         lastSeenPrivacyDashboardViewState = viewState
+    }
+
+    enum class InitialScreen(val value: String) {
+        PRIMARY("primaryScreen"),
+        BREAKAGE_FORM("breakageForm"),
+        TOGGLE_REPORT("toggleReport"),
     }
 }

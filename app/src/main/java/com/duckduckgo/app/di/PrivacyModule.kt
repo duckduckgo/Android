@@ -32,8 +32,6 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
@@ -41,11 +39,14 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -75,14 +76,16 @@ object PrivacyModule {
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
-        geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
         deviceSyncState: DeviceSyncState,
         savedSitesRepository: SavedSitesRepository,
+        privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
+        navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
+        webTrackingRepository: WebTrackersBlockedRepository,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -92,14 +95,16 @@ object PrivacyModule {
             settingsDataStore,
             cookieManager,
             appCacheClearer,
-            geoLocationPermissions,
             thirdPartyCookieManager,
             adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
             deviceSyncState,
             savedSitesRepository,
+            privacyProtectionsPopupDataClearer,
+            navigationHistory,
             dispatcherProvider,
+            webTrackingRepository,
         )
     }
 
@@ -122,17 +127,6 @@ object PrivacyModule {
         fileDeleter: FileDeleter,
     ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun geoLocationPermissions(
-        context: Context,
-        locationPermissionsRepository: LocationPermissionsRepository,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider,
-    ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 
     @Provides

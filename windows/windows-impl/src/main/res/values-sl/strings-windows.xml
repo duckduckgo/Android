@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo za sistem Windows ima vse, kar potrebujete za zasebnejše brskanje – zasebno iskanje, blokiranje sledenja, prisilno šifriranje in blokiranje pojavnih oken s piškotki ter še več najboljših zaščit v svojem razredu.\n\nV računalniku s sistemom Windows pojdite na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Daj povezavo v skupno rabo</string>
-    <string name="windows_share_text">Ste pripravljeni začeti zasebno brskati v sistemu Windows?\n\nZa prenos v računalniku s sistemom Windows obiščite ta naslov URL:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Ste pripravljeni začeti brskati zasebno v sistemu Windows?\n\nZa prenos obiščite ta URL v računalniku z operacijskim sistemom Windows:\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Iščete različico za računalnike Mac?</string>
 </resources>

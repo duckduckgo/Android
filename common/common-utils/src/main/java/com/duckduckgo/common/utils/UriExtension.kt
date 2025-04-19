@@ -56,6 +56,9 @@ val Uri.isHttps: Boolean
 val Uri.toHttps: Uri
     get() = buildUpon().scheme(UrlScheme.https).build()
 
+val Uri.isHttpOrHttps: Boolean
+    get() = isHttp || isHttps
+
 val Uri.hasIpHost: Boolean
     get() {
         return baseHost?.matches(IP_REGEX) ?: false
@@ -185,6 +188,8 @@ fun Uri.getEncodedQueryParameters(key: String?): List<String> {
 fun String.extractDomain(): String? {
     return if (this.startsWith("http")) {
         this.toUri().domain()
+    } else if (this.startsWith("duck")) {
+        this.toUri().buildUpon().path("").toString()
     } else {
         "https://$this".extractDomain()
     }

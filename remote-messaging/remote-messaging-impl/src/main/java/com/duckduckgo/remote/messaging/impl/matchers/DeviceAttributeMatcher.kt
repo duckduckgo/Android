@@ -26,7 +26,7 @@ class DeviceAttributeMatcher(
     private val appBuildConfig: AppBuildConfig,
     private val appProperties: AppProperties,
 ) : AttributeMatcherPlugin {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
             is Api -> {
                 matchingAttribute.matches(appBuildConfig.sdkInt)

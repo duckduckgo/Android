@@ -34,13 +34,18 @@ class RealHttpsRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : HttpsRepository {
 
     private val httpsDao: HttpsDao = database.httpsDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(exceptions: List<HttpsExceptionEntity>) {

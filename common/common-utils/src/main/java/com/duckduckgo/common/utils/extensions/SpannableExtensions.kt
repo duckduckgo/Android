@@ -31,7 +31,7 @@ fun String.applyBoldSpanTo(textToStyle: List<String>): SpannableStringBuilder {
     return spannable
 }
 
-fun String.applyBoldSpanTo(textToStyle: String): SpannableStringBuilder {
+fun String.applyBoldSpanTo(textToStyle: String = this): SpannableStringBuilder {
     val spannable = SpannableStringBuilder(this)
     val index = this.indexOf(textToStyle)
     spannable.setSpan(StyleSpan(Typeface.BOLD), index, index + textToStyle.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)

@@ -421,4 +421,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Pidä silmällä estettyjä seurantaohjelmia</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Saat päivityksiä estetyistä seurantayrityksistä ilmoituslaatikkoosi.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Etkö pysty käyttämään App Tracking Protectionia VPN:n takia? Vaihda DuckDuckGo VPN:ään – ainoaan yhteensopivaan VPN:ään. <annotation type="ppro_upsell_link">Lue lisää</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection poistettu käytöstä</b>\nPoistiko VPN:si App Tracking Protectionin käytöstä? Ota se uudelleen käyttöön yllä olevalla valitsimella.\n\nHanki DuckDuckGo VPN – ainoa VPN, joka toimii App Tracking Protectionin kanssa. <annotation type="ppro_upsell_link">Lue lisää</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Vie tietosuojasi uudelle tasolle</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGolla on ainoa VPN, joka on yhteensopiva App Tracking Protectionin kanssa. Aktivoi maksullisella Privacy Pro -tilauksella.</string>
+    <string name="apptp_PproUpsellBannerAction">Lue lisää</string>
+
 </resources>

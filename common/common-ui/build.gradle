@@ -42,10 +42,12 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':app-build-config-api')
+    implementation "androidx.datastore:datastore-preferences:_"
 
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+    implementation AndroidX.core.splashscreen
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
     // just to get the dagger annotations

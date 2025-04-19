@@ -27,6 +27,7 @@ data class CookiesFeature(
 
 data class Settings(
     val firstPartyCookiePolicy: FirstPartyCookiePolicy,
+    val thirdPartyCookieNames: List<String>,
 )
 
 data class FirstPartyCookiePolicy(

@@ -20,8 +20,10 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -124,6 +126,17 @@ class SetupAccountViewModelTest {
             testee.onRecoveryCodePrompt()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
+        }
+    }
+
+    @Test
+    fun whenClickedToGetAppOnOtherPlatformsClickedInDisabledStateThenEmitCommand() = runTest {
+        testee.onGetAppOnOtherDevicesClicked()
+        testee.commands().test {
+            awaitItem().also {
+                assertEquals("activating", (it as LaunchSyncGetOnOtherPlatforms).source)
+            }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

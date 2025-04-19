@@ -21,16 +21,17 @@
     <string name="netpDevSettingHeaderPCAPDelete">Delete PCAP file</string>
     <string name="netpDevSettingHeaderPCAPShare">Share PCAP file</string>
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
-    <string name="netpEnvironmentSetting">Change NetP Environment</string>
+    <string name="netpStagingEnvironment">VPN staging environment</string>
+    <string name="netpStagingEndpoint">VPN Staging endpoint</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
-    <string name="netpSnoozeWhileCalling">Snooze VPN while calling</string>
-    <string name="netpSnoozeWhileCallingByline">Detects when the phone is making a call and temporarily snoozes the VPN.</string>
-    <string name="netpGrantPhonePermissionByline">Please grant PHONE permission.</string>
-    <string name="netpGrantPhonePermissionAction">Grant Permission</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
     <string name="netpDevSettingConnectionQuality">Connection Quality</string>
-    <string name="netpDnsCloudflareFallback">Set DNS 1.1.1.1 fallback</string>
     <string name="netpPcapRecording">Enable PCAP recording</string>
     <string name="netpForceRekey">Force Rekey</string>
+    <string name="netpEgressFailure">Simulate egress failure</string>
+    <string name="netpUnsafeWifiDetectionPrimary">Unsafe Wi-Fi detection</string>
+    <string name="netpUnsafeWifiDetectionByline">Get notified when connected to unsafe Wi-Fi without a VPN.</string>
+    <string name="netpBlockMalwarePrimary">Block Malware</string>
+    <string name="netpBlockMalwareByline">The Default DuckDuckGo DNS will block malware when enabled.</string>
 </resources>

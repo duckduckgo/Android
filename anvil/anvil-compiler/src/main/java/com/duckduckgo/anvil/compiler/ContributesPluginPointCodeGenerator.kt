@@ -77,8 +77,15 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                     .primaryConstructor(
                         PropertySpec
                             .builder(
-                                "plugins",
+                                "setPlugins",
                                 ClassName("com.duckduckgo.di", "DaggerSet").parameterizedBy(pluginClassName),
+                            )
+                            .addModifiers(KModifier.PRIVATE)
+                            .build(),
+                        PropertySpec
+                            .builder(
+                                "mapPlugins",
+                                ClassName("com.duckduckgo.di", "DaggerMap").parameterizedBy(Int::class.asClassName(), pluginClassName),
                             )
                             .addModifiers(KModifier.PRIVATE)
                             .build(),
@@ -93,7 +100,17 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                             .delegate(
                                 CodeBlock.builder()
                                     .beginControlFlow("lazy")
-                                    .add("plugins.toList().sortedBy { it.javaClass.name }")
+                                    .add(
+                                        """
+                                            mapPlugins.entries
+                                            .sortedWith(compareBy({ it.key }, { it.value.javaClass.name }))
+                                            .map { it.value }
+                                            .toMutableList()
+                                            .apply {
+                                                addAll(setPlugins.toList().sortedBy { it.javaClass.name })                                            
+                                            }
+                                        """.trimIndent(),
+                                    )
                                     .endControlFlow()
                                     .build(),
                             )
@@ -135,10 +152,17 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                     )
                     .addModifiers(KModifier.ABSTRACT)
                     .addFunction(
-                        FunSpec.builder("bindEmpty${vmClass.shortName}_PluginPoint")
+                        FunSpec.builder("bindSetEmpty${vmClass.shortName}_PluginPoint")
                             .addAnnotation(AnnotationSpec.builder(Multibinds::class).build())
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(daggerSetFqName.asClassName(module).parameterizedBy(pluginClassName))
+                            .build(),
+                    )
+                    .addFunction(
+                        FunSpec.builder("bindMapEmpty${vmClass.shortName}_PluginPoint")
+                            .addAnnotation(AnnotationSpec.builder(Multibinds::class).build())
+                            .addModifiers(KModifier.ABSTRACT)
+                            .returns(daggerMapFqName.asClassName(module).parameterizedBy(Int::class.asClassName(), pluginClassName))
                             .build(),
                     )
                     .addFunction(
@@ -163,6 +187,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
         private val pluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.PluginPoint")
         private val kotlinCollectionFqName = FqName("kotlin.collections.Collection")
         private val daggerSetFqName = FqName("com.duckduckgo.di.DaggerSet")
+        private val daggerMapFqName = FqName("com.duckduckgo.di.DaggerMap")
     }
 
     private fun TypeSpec.Builder.primaryConstructor(vararg properties: PropertySpec): TypeSpec.Builder {

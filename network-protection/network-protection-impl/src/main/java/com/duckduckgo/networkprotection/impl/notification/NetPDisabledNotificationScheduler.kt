@@ -22,12 +22,12 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -44,7 +44,6 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val netPRemoteFeature: NetPRemoteFeature,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
@@ -79,7 +78,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
 
     private suspend fun shouldShowImmediateNotification(): Boolean {
         // When VPN is stopped and if AppTP has been enabled AND user has been onboarded, then we show the disabled notif
-        return isNetPEnabled.get() && networkProtectionState.isOnboarded() && netPRemoteFeature.waitlistBetaActive().isEnabled()
+        return isNetPEnabled.get() && networkProtectionState.isOnboarded()
     }
 
     private suspend fun onVPNManuallyStopped(snoozedTriggerAtMillis: Long) {
@@ -93,7 +92,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
-            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState && netPRemoteFeature.waitlistBetaActive().isEnabled()) {
+            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
                 if (!reconfiguredNetPState) {
                     logcat { "VPN has been reconfigured, showing disabled notification for NetP" }
                     showDisabledNotification()
@@ -108,7 +107,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             if (triggerAtMillis != 0L) {
                 if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-                notificationManager.notify(
+                notificationManager.checkPermissionAndNotify(
+                    context,
                     NETP_REMINDER_NOTIFICATION_ID,
                     netPDisabledNotificationBuilder.buildSnoozeNotification(context, triggerAtMillis),
                 )
@@ -122,10 +122,13 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Showing disabled notification for NetP" }
             if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-            notificationManager.notify(
-                NETP_REMINDER_NOTIFICATION_ID,
-                netPDisabledNotificationBuilder.buildDisabledNotification(context),
-            )
+            netPDisabledNotificationBuilder.buildDisabledNotification(context)?.let { notification ->
+                notificationManager.checkPermissionAndNotify(
+                    context,
+                    NETP_REMINDER_NOTIFICATION_ID,
+                    notification,
+                )
+            }
         }
     }
 
@@ -141,7 +144,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Showing disabled by vpn notification for NetP" }
             if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-            notificationManager.notify(
+            notificationManager.checkPermissionAndNotify(
+                context,
                 NETP_REMINDER_NOTIFICATION_ID,
                 netPDisabledNotificationBuilder.buildDisabledByVpnNotification(context),
             )

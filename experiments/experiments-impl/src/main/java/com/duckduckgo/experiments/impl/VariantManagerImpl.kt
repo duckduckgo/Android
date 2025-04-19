@@ -21,9 +21,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.Locale
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -33,6 +32,7 @@ class VariantManagerImpl @Inject constructor(
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
+    private val experimentFiltersManager: ExperimentFiltersManager,
 ) : VariantManager {
 
     override fun defaultVariantKey(): String {
@@ -47,11 +47,9 @@ class VariantManagerImpl @Inject constructor(
         experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun saveVariants(variants: List<VariantConfig>) {
-        experimentVariantRepository.saveVariants(variants)
-        Timber.d("Variants update ${experimentVariantRepository.getActiveVariants()}")
-
-        val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
+    override fun updateVariants(variants: List<VariantConfig>) {
+        val activeVariants = variants.toVariants()
+        Timber.d("Variants update $variants")
         val currentVariantKey = experimentVariantRepository.getUserVariant()
 
         updateUserVariant(activeVariants, currentVariantKey)
@@ -86,30 +84,18 @@ class VariantManagerImpl @Inject constructor(
         Timber.i("Variant $currentVariantKey is still in use, no need to update")
     }
 
-    private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
+    private fun List<VariantConfig>.toVariants(): List<Variant> {
         val activeVariants: MutableList<Variant> = mutableListOf()
-        activeVariantEntities.map { entity ->
+        this.map { entity ->
             activeVariants.add(
                 Variant(
-                    key = entity.key,
+                    key = entity.variantKey,
                     weight = entity.weight ?: 0.0,
-                    filterBy = addFilters(entity),
+                    filterBy = experimentFiltersManager.computeFilters(entity),
                 ),
             )
         }
         return activeVariants
-    }
-
-    private fun addFilters(entity: ExperimentVariantEntity): (AppBuildConfig) -> Boolean {
-        if (entity.key == "sc" || entity.key == "se") {
-            return { isSerpRegionToggleCountry() }
-        }
-        if (entity.localeFilter.isEmpty()) {
-            return { noFilter() }
-        }
-
-        val userLocale = Locale.getDefault()
-        return { entity.localeFilter.contains(userLocale.toString()) }
     }
 
     private fun matchesReferrerVariant(key: String): Boolean {
@@ -123,7 +109,7 @@ class VariantManagerImpl @Inject constructor(
         if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
             newVariant = DEFAULT_VARIANT
         }
-        Timber.i("Current variant is null; allocating new one $newVariant")
+        Timber.i("Current variant is null; allocating new one ${newVariant.key}")
         experimentVariantRepository.updateVariant(newVariant.key)
         return newVariant
     }
@@ -140,34 +126,18 @@ class VariantManagerImpl @Inject constructor(
 
     companion object {
 
-        const val RESERVED_EU_AUCTION_VARIANT = "ml"
+        /**
+         * Since March 7th 2024 there are two choice screens on Android
+         * Once for Search choice (existing since 2021) and Browser Choice (new since 2024)
+         * We want to be able to measure installs and retention from both screens separately
+         * https://app.asana.com/0/0/1206729008769473/f
+         */
+        const val RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT = "ml"
+        const val RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT = "mm"
 
         // this will be returned when there are no other active experiments
-        private val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
-
-        private const val REINSTALL_VARIANT = "ru"
-
-        private val serpRegionToggleTargetCountries = listOf(
-            "AU",
-            "AT",
-            "DK",
-            "FI",
-            "FR",
-            "DE",
-            "IT",
-            "IE",
-            "NZ",
-            "NO",
-            "ES",
-            "SE",
-            "GB",
-        )
+        val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
 
         private fun noFilter(): Boolean = true
-
-        private fun isSerpRegionToggleCountry(): Boolean {
-            val locale = Locale.getDefault()
-            return serpRegionToggleTargetCountries.contains(locale.country)
-        }
     }
 }

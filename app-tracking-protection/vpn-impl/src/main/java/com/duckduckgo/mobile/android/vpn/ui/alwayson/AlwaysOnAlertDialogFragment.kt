@@ -25,6 +25,7 @@ import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.extensions.getSerializable
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ContentVpnAlwaysOnAlertBinding
@@ -41,7 +42,7 @@ private enum class FragmentType {
 }
 
 @InjectWith(FragmentScope::class)
-class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragment() {
+class AlwaysOnAlertDialogFragment : BottomSheetDialogFragment() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
@@ -56,8 +57,13 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
         return ContentVpnAlwaysOnAlertBinding.inflate(inflater, container, false).apply {
+            fragmentType = requireArguments().getSerializable<FragmentType>(ARGUMENT_FRAGMENT_TYPE) ?: FragmentType.ALWAYS_ON
             configureViews(this)
         }.root
     }
@@ -143,16 +149,22 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
     }
 
     companion object {
+        private const val ARGUMENT_FRAGMENT_TYPE = "fragmentType"
         fun newAlwaysOnDialog(listener: Listener): AlwaysOnAlertDialogFragment {
             return AlwaysOnAlertDialogFragment().apply {
                 this.listener = listener
-                this.fragmentType = FragmentType.ALWAYS_ON
+                arguments = Bundle().also {
+                    it.putSerializable(ARGUMENT_FRAGMENT_TYPE, FragmentType.ALWAYS_ON)
+                }
             }
         }
+
         fun newAlwaysOnLockdownDialog(listener: Listener): AlwaysOnAlertDialogFragment {
             return AlwaysOnAlertDialogFragment().apply {
                 this.listener = listener
-                this.fragmentType = FragmentType.ALWAYS_ON_LOCKDOWN
+                arguments = Bundle().also {
+                    it.putSerializable(ARGUMENT_FRAGMENT_TYPE, FragmentType.ALWAYS_ON_LOCKDOWN)
+                }
             }
         }
     }

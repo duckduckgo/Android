@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -40,6 +40,9 @@ android {
             includeAndroidResources = true
         }
     }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -50,9 +53,6 @@ dependencies {
     implementation project(path: ':app-build-config-api')
 
     implementation AndroidX.core.ktx
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation "com.squareup.logcat:logcat:_"
 
@@ -79,4 +79,6 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
 
     androidTestUtil AndroidX.test.orchestrator
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

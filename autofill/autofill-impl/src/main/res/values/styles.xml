@@ -66,4 +66,25 @@
         <item name="layout_constraintGuide_percent">0.9</item>
     </style>
 
+    <style name="AutofillImportNumberedInstructionBullet">
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="typography">h3</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/autofill_import_instruction_bullet</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="AutofillImportNumberedInstructionText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="typography">body1</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="textType">secondary</item>
+
+    </style>
+
+
 </resources>

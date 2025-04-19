@@ -25,12 +25,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,15 +53,19 @@ class SyncRemoteFeatureToggleTest {
     private val notificationManager = NotificationManagerCompat.from(context)
     private val sharedPrefsProvider = TestSharedPrefsProvider(context)
     private val store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope(), coroutinesTestRule.testDispatcherProvider)
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java, appVersionProvider = { appBuildConfig.versionCode })
 
     private lateinit var testee: SyncRemoteFeatureToggle
+
+    @Before
+    fun setup() {
+        syncFeature.self().setRawStoredState(State(enable = true))
+    }
 
     @Test
     fun whenFeatureDisabledThenInternalBuildShowSyncTrue() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            sync = false
-        }
+        syncFeature.self().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.showSync())
@@ -69,9 +74,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenFeatureDisabledThenShowSyncIsFalse() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            sync = false
-        }
+        syncFeature.self().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.showSync())
@@ -79,9 +82,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenShowSyncDisabledThenAllFeaturesDisabled() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            showSync = false
-        }
+        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -91,9 +92,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowDataSyncingFalseThenAllowDataSyncingFalse() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowDataSyncing = false
-        }
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -102,10 +101,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowDataSyncEnabledButNotForThisVersionThenAllowDataSyncingOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowDataSyncing = true
-            minSupportedVersion = 2
-        }
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -114,9 +110,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowDataSyncingFalseThenSetupFlowsAndCreateAccountDisabled() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowDataSyncing = false
-        }
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -125,9 +119,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowSetupFlowsFalseThenAllowDataSyncingEnabled() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowSetupFlows = false
-        }
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.allowDataSyncing())
@@ -136,10 +128,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowSetupFlowsEnabledButNotForThisVersionThenAllowSetupFlowsOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowSetupFlows = true
-            minSupportedVersion = 2
-        }
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -148,9 +137,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowSetupFlowsFalseThenSetupFlowsAndCreateAccountDisabled() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowSetupFlows = false
-        }
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -159,9 +146,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowCreateAccountFalseThenAllowCreateAccountFalse() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowCreateAccount = false
-        }
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowCreateAccount())
@@ -170,10 +155,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowCreateAccountTrueButNotForThisVersionThenAllowCreateAccountOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowCreateAccount = true
-            minSupportedVersion = 2
-        }
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowCreateAccount())
@@ -182,9 +164,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowCreateAccountFalseThenDataSyncingAndSetupFlowsEnabled() {
-        val syncFeature = TestSyncFeature(appBuildConfig).apply {
-            allowCreateAccount = false
-        }
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.allowDataSyncing())
@@ -202,39 +182,6 @@ class SyncRemoteFeatureToggleTest {
             appCoroutineScope = coroutinesTestRule.testScope,
             coroutineDispatcher = coroutinesTestRule.testDispatcherProvider,
         )
-    }
-}
-
-class TestSyncFeature(private val appBuildConfig: AppBuildConfig) : SyncFeature {
-    var sync: Boolean = true
-    var showSync: Boolean = true
-    var allowDataSyncing: Boolean = true
-    var allowSetupFlows: Boolean = true
-    var allowCreateAccount: Boolean = true
-    var minSupportedVersion: Int = 0
-    override fun self(): TestToggle = TestToggle(sync, minSupportedVersion, appBuildConfig.versionCode)
-
-    override fun level0ShowSync(): TestToggle = TestToggle(showSync, minSupportedVersion, appBuildConfig.versionCode)
-
-    override fun level1AllowDataSyncing(): TestToggle = TestToggle(allowDataSyncing, minSupportedVersion, appBuildConfig.versionCode)
-
-    override fun level2AllowSetupFlows(): TestToggle = TestToggle(allowSetupFlows, minSupportedVersion, appBuildConfig.versionCode)
-
-    override fun level3AllowCreateAccount(): TestToggle = TestToggle(allowCreateAccount, minSupportedVersion, appBuildConfig.versionCode)
-}
-
-open class TestToggle(
-    private val enabled: Boolean,
-    private val minSupportedVersion: Int = 0,
-    private val versionCode: Int = 0,
-) : Toggle {
-    override fun getRawStoredState(): Toggle.State? = State(
-        remoteEnableState = enabled,
-        minSupportedVersion = minSupportedVersion,
-    )
-    override fun setEnabled(state: Toggle.State) {}
-    override fun isEnabled(): Boolean {
-        return enabled && versionCode >= minSupportedVersion
     }
 }
 

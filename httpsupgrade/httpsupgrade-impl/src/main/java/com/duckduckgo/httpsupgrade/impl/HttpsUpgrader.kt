@@ -99,11 +99,8 @@ class HttpsUpgraderImpl @Inject constructor(
     override fun reloadData() {
         logcat { "Reload Https upgrader data" }
         bloomReloadLock.lock()
-        try {
-            bloomFilter = bloomFactory.create()
-        } finally {
-            bloomReloadLock.unlock()
-        }
+        bloomFilter = runCatching { bloomFactory.create() }.getOrNull()
+        bloomReloadLock.unlock()
     }
 
     private fun waitForAnyReloadsToComplete() {

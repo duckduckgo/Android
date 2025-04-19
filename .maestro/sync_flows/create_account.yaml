@@ -1,0 +1,21 @@
+# Test Definition: https://app.asana.com/0/1205017362573508/1205017364481021
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Users can create a sync account"
+tags:
+  - syncCriticalPathTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/pre_onboarding.yaml
+- runFlow: ../shared/open_sync_screen.yaml
+- tapOn: "Sync and Back Up This Device"
+- tapOn: "Turn on Sync & Backup"
+- extendedWaitUntil:
+    visible:
+      id: "com.duckduckgo.mobile.android:id/footer_next_button"
+      enabled: true
+    timeout: 5000
+- tapOn: "Next"
+- tapOn: "Done"
+- assertVisible: "Synced Devices"

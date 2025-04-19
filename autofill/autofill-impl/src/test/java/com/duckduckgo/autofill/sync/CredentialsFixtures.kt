@@ -48,6 +48,15 @@ object CredentialsFixtures {
         notes = "My Amazon account",
     )
 
+    val invalidCredentials = LoginCredentials(
+        id = 4L,
+        domain = "www.invalid.com",
+        username = "invalidUS",
+        password = "invalidPW",
+        domainTitle = String(CharArray(3000) { 'a' + (it % 26) }),
+        notes = "My Invalid account",
+    )
+
     fun LoginCredentials.toLoginCredentialEntryResponse(): CredentialsSyncEntryResponse =
         CredentialsSyncEntryResponse(
             id = id.toString(),
@@ -68,6 +77,7 @@ object CredentialsFixtures {
             domainTitle = details.domainTitle,
             notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis,
+            lastUsedMillis = details.lastUsedInMillis,
         )
     }
     fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginDetailsWithCredentials {
@@ -78,6 +88,7 @@ object CredentialsFixtures {
                 id = id,
                 domainTitle = domainTitle,
                 lastUpdatedMillis = lastUpdatedMillis,
+                lastUsedInMillis = lastUsedMillis,
             ),
             password = password,
             notes = notes,

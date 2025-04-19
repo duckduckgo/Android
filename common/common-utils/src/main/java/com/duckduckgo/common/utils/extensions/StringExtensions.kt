@@ -19,22 +19,18 @@ package com.duckduckgo.common.utils.extensions
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import java.util.*
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 fun String.capitalizeFirstLetter() = this.replaceFirstChar {
     if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
 }
 
-@Suppress("deprecation")
 fun String.html(context: Context): Spanned {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT, { htmlDrawable(context, it.toInt()) }, null)
-    }
-    return Html.fromHtml(this, { htmlDrawable(context, it.toInt()) }, null)
+    return Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT, { htmlDrawable(context, it.toInt()) }, null)
 }
 
 private fun htmlDrawable(
@@ -49,6 +45,7 @@ private fun htmlDrawable(
 private const val HTTPS_PREFIX = "https://"
 private const val WWW_PREFIX = "www."
 private const val WWW_SUFFIX = "/"
+private val publicSuffixDatabase = PublicSuffixDatabase()
 
 fun String.websiteFromGeoLocationsApiOrigin(): String {
     val uri = Uri.parse(this)
@@ -60,4 +57,33 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 
 fun String.asLocationPermissionOrigin(): String {
     return HTTPS_PREFIX + this + WWW_SUFFIX
+}
+
+fun String.toTldPlusOne(): String? {
+    return runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(this) }.getOrNull()
+}
+
+/**
+ * Compares the current semantic version string with the target semantic version string.
+ *
+ * The version strings can have an arbitrary number of parts separated by dots (e.g. "x.y.z").
+ * Each part is expected to be an integer.
+ * If any part of the version string is not a valid integer, the function returns null.
+ *
+ * @param targetVersion The version string to compare against.
+ * @return 1 if the current version is greater, -1 if it is smaller, 0 if they are equal or null if the format is invalid.
+ */
+fun String.compareSemanticVersion(targetVersion: String): Int? {
+    val versionParts = this.split(".")
+    val targetParts = targetVersion.split(".")
+
+    val maxLength = maxOf(versionParts.size, targetParts.size)
+
+    for (i in 0 until maxLength) {
+        val versionPart = versionParts.getOrElse(i) { "0" }.toIntOrNull() ?: return null
+        val targetPart = targetParts.getOrElse(i) { "0" }.toIntOrNull() ?: return null
+
+        if (versionPart != targetPart) return versionPart.compareTo(targetPart)
+    }
+    return 0
 }

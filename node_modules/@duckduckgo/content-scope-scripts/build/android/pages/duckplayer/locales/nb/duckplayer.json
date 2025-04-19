@@ -1,0 +1,58 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Åpne alltid YouTube-videoer her",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "La Duck Player være på",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Åpne informasjon",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Åpne innstillingene",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Se på YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>FEIL:</b> Ugyldig video-ID",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube lar ikke Duck Player laste denne videoen",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube tillater ikke visning av denne videoen utenfor YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Du kan fremdeles se videoen på YouTube, men uten det ekstra personvernet som Duck Player tilbyr.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube blokkerer denne videoen fra å lastes. Hvis du bruker en VPN, kan du prøve å slå den av og laste denne siden på nytt.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Hvis ikke det virker, kan du fremdeles se videoen på YouTube, bare uten det ekstra personvernet som Duck Player tilbyr.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player tilbyr en ren seeropplevelse uten tilpassede annonser og forhindrer at seeraktiviteten din påvirker YouTube-anbefalingene dine."
+  }
+}

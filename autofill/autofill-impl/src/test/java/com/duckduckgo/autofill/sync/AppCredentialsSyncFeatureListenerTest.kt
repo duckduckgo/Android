@@ -24,7 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.sync.api.engine.FeatureSyncError
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
@@ -68,6 +68,7 @@ class AppCredentialsSyncFeatureListenerTest {
         testee.onSuccess(validChanges)
 
         assertFalse(credentialsSyncStore.isSyncPaused)
+        assertTrue(credentialsSyncStore.syncPausedReason.isEmpty())
     }
 
     @Test
@@ -84,18 +85,20 @@ class AppCredentialsSyncFeatureListenerTest {
     fun whenSyncPausedAndOnErrorThenSyncPaused() {
         credentialsSyncStore.isSyncPaused = true
 
-        testee.onError(FeatureSyncError.COLLECTION_LIMIT_REACHED)
+        testee.onError(COLLECTION_LIMIT_REACHED)
 
         assertTrue(credentialsSyncStore.isSyncPaused)
+        assertEquals(COLLECTION_LIMIT_REACHED.name, credentialsSyncStore.syncPausedReason)
     }
 
     @Test
     fun whenSyncActiveAndOnErrorThenSyncPaused() {
         credentialsSyncStore.isSyncPaused = false
 
-        testee.onError(FeatureSyncError.COLLECTION_LIMIT_REACHED)
+        testee.onError(COLLECTION_LIMIT_REACHED)
 
         assertTrue(credentialsSyncStore.isSyncPaused)
+        assertEquals(COLLECTION_LIMIT_REACHED.name, credentialsSyncStore.syncPausedReason)
     }
 
     @Test
@@ -105,5 +108,6 @@ class AppCredentialsSyncFeatureListenerTest {
         testee.onSyncDisabled()
 
         assertFalse(credentialsSyncStore.isSyncPaused)
+        assertTrue(credentialsSyncStore.syncPausedReason.isEmpty())
     }
 }

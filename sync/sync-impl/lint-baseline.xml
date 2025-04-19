@@ -1,4 +1,1716 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.2" type="baseline" client="cli" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                onResult(Error(String.format(&quot;(%d) %s&quot;, errorCode, errString)))"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/AuthLauncher.kt"
+            line="81"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/syncSetupOtherPlatforms, defined or included multiple times in layout/activity_sync.xml: [layout/activity_sync.xml => layout/view_sync_enabled.xml defines @+id/syncSetupOtherPlatforms, layout/activity_sync.xml => layout/view_sync_disabled.xml defines @+id/syncSetupOtherPlatforms]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/activity_sync.xml"
+            line="45"
+            column="13"
+            message="Duplicate id @+id/syncSetupOtherPlatforms, defined or included multiple times in layout/activity_sync.xml: [layout/activity_sync.xml => layout/view_sync_enabled.xml defines @+id/syncSetupOtherPlatforms, layout/activity_sync.xml => layout/view_sync_disabled.xml defines @+id/syncSetupOtherPlatforms]"/>
+        <location
+            file="src/main/res/layout/view_sync_enabled.xml"
+            line="80"
+            column="9"
+            message="Defined here, included via layout/activity_sync.xml => layout/view_sync_enabled.xml defines @+id/syncSetupOtherPlatforms"/>
+        <location
+            file="src/main/res/layout/view_sync_disabled.xml"
+            line="77"
+            column="9"
+            message="Defined here, included via layout/activity_sync.xml => layout/view_sync_disabled.xml defines @+id/syncSetupOtherPlatforms"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/AppSyncAccountRepositoryTest.kt"
+            line="100"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/AuthLauncher.kt"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/AuthLauncher.kt"
+            line="104"
+            column="95"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/DeviceAuthenticator.kt"
+            line="92"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
+        errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/DeviceAuthenticator.kt"
+            line="92"
+            column="95"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/DeviceAuthenticator.kt"
+            line="125"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/auth/DeviceAuthenticator.kt"
+            line="129"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
+            line="63"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
+            line="137"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ShareAction.kt"
+            line="52"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        return appBuildConfig.sdkInt >= Build.VERSION_CODES.R"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/StoragePermissionRequest.kt"
+            line="84"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/favicons/SyncFaviconsFetchingStore.kt"
+            line="28"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        val rawStoredState = toggle.getRawStoredState()"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/SyncFeatureToggle.kt"
+            line="115"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/internal/SyncInternalEnvDataStore.kt"
+            line="35"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncPromotionFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
+            line="76"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncPromotionFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
+            line="88"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncPromotionFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
+            line="140"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncPromotionFeature.bookmarks().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
+            line="141"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncPromotionFeature.passwords().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/promotion/SyncPromotionsImplTest.kt"
+            line="142"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="62"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="68"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="77"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="85"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="95"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="104"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="113"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="122"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="131"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="140"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="149"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = true, minSupportedVersion = 2))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="158"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="167"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="190"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="194"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
+            line="62"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
+            line="135"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;302dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/frame.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;249dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_dax_stacked.xml"
+            line="18"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="26"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="33"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="46"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="55"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="63"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="71"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="78"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="85"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="90"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1427 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;m105.63,38.2 l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54A0.84,0.84 0,0 1,109 35c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54a0.84,0.84 0,0 1,-0.8 0.63c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63l-1.54,-0.4A0.84,0.84 0,0 1,105 39c0,-0.4 0.29,-0.74 0.63,-0.8ZM15.94,31.8 L18.26,31.2c0.43,-0.09 0.86,-0.51 0.94,-0.94l0.6,-2.31c0.17,-0.6 0.69,-0.94 1.2,-0.94 0.6,0 1.11,0.43 1.2,0.94l0.6,2.31c0.09,0.43 0.51,0.86 0.94,0.94l2.31,0.6c0.6,0.17 0.94,0.69 0.94,1.2 0,0.6 -0.43,1.11 -0.94,1.2l-2.31,0.6c-0.43,0.09 -0.86,0.51 -0.94,0.94l-0.6,2.31c-0.17,0.6 -0.69,0.94 -1.2,0.94 -0.6,0 -1.11,-0.43 -1.2,-0.94l-0.6,-2.31c-0.09,-0.43 -0.51,-0.86 -0.94,-0.94l-2.31,-0.6c-0.6,-0.17 -0.94,-0.69 -0.94,-1.2 0,-0.6 0.43,-1.11 0.94,-1.2ZM0.63,53.2l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54A0.84,0.84 0,0 1,4 50c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54A0.84,0.84 0,0 1,4 58c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63L0.63,54.8A0.84,0.84 0,0 1,0 54c0,-0.4 0.29,-0.74 0.63,-0.8ZM126.5,52c-0.82,0 -1.5,-0.68 -1.5,-1.5s0.68,-1.5 1.5,-1.5 1.5,0.68 1.5,1.5 -0.68,1.5 -1.5,1.5ZM23,70c-1.1,0 -2,-0.9 -2,-2s0.9,-2 2,-2 2,0.9 2,2 -0.9,2 -2,2Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/device_not_supported_android_128.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1481 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M227,181.34C226.54,181.34 226.15,181.51 225.82,181.84C225.51,182.17 225.35,182.55 225.35,183C225.35,183.46 225.51,183.86 225.83,184.18C226.15,184.5 226.54,184.67 227,184.67C227.45,184.67 227.84,184.5 228.16,184.18C228.49,183.85 228.65,183.46 228.65,183C228.65,182.55 228.49,182.17 228.17,181.84C227.84,181.51 227.45,181.34 227,181.34ZM229,183C229,183.57 228.8,184.05 228.4,184.44C228.01,184.81 227.54,185 227,185C226.44,185 225.96,184.81 225.58,184.42C225.19,184.04 225,183.56 225,183C225,182.42 225.21,181.93 225.62,181.54C226.01,181.18 226.47,181 227,181C227.55,181 228.02,181.2 228.41,181.59C228.8,181.98 229,182.45 229,183ZM227.36,182.59C227.36,182.46 227.3,182.38 227.18,182.33C227.1,182.3 226.99,182.29 226.85,182.29H226.7V182.93H226.93C227.07,182.93 227.17,182.9 227.25,182.85C227.32,182.79 227.36,182.71 227.36,182.59ZM226.12,184.11V181.9C226.26,181.9 226.47,181.9 226.74,181.9C227.01,181.9 227.17,181.9 227.2,181.9C227.37,181.91 227.52,181.95 227.63,182.01C227.83,182.12 227.93,182.3 227.93,182.54C227.93,182.73 227.88,182.87 227.77,182.95C227.67,183.03 227.54,183.08 227.39,183.1C227.53,183.13 227.63,183.17 227.71,183.23C227.84,183.33 227.9,183.5 227.9,183.72V183.92C227.9,183.94 227.9,183.96 227.9,183.99C227.91,184.01 227.91,184.03 227.92,184.05L227.94,184.11H227.38C227.37,184.04 227.35,183.94 227.35,183.81C227.35,183.67 227.33,183.58 227.32,183.54C227.29,183.46 227.23,183.4 227.15,183.37C227.11,183.35 227.04,183.34 226.95,183.34L226.83,183.33H226.7V184.11H226.12Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_dax_stacked.xml"
+            line="103"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (3704 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M22,12C22,17.525 17.525,22 12,22C6.475,22 2,17.525 2,12C2,6.475 6.475,2 12,2C17.525,2 22,6.475 22,12ZM20.75,12C20.75,16.833 16.833,20.75 12,20.75C7.168,20.75 3.25,16.833 3.25,12C3.25,7.168 7.168,3.25 12,3.25C16.833,3.25 20.75,7.168 20.75,12ZM19.813,12C19.813,15.754 17.165,18.889 13.635,19.641C13.539,19.427 13.444,19.21 13.365,19.026C13.098,19.109 12.719,19.148 12.447,19.157C12.24,19.157 12.073,19.148 11.985,19.026C11.456,19.478 10.387,20.081 10.173,19.94C9.765,19.677 9.381,17.656 9.687,17.233C9.755,17.136 9.881,17.087 10.037,17.073C9.891,17.671 10.231,19.148 10.421,19.298C10.605,19.444 11.928,18.657 11.87,18.472C11.753,18.084 11.753,17.734 11.768,17.515C11.821,17.442 11.985,17.33 12.097,17.282C12.087,17.335 12.083,17.394 12.087,17.462C12.087,17.69 12.116,18.084 12.175,18.254C12.253,18.463 12.335,18.599 12.705,18.594C13.079,18.589 13.681,18.506 13.774,18.341C13.866,18.176 13.744,17.505 13.667,17.292L13.623,17.19C13.618,17.18 13.613,17.17 13.608,17.165H13.738C13.933,17.209 14.099,17.292 14.148,18.187C14.148,18.367 15.406,18.71 15.634,18.613C15.654,18.604 15.664,18.594 15.668,18.584C15.775,18.035 15.712,16.67 15.226,16.091C15.129,15.975 14.133,16.606 13.535,17.053C13.409,16.917 13.186,16.84 12.763,16.908C12.723,16.913 12.687,16.921 12.652,16.928C12.627,16.933 12.602,16.938 12.578,16.942C12.369,16.261 12.248,15.664 12.296,15.275C11.83,15.027 11.519,14.741 11.46,14.629C11.358,14.444 11.529,14.357 11.616,14.405C11.621,14.41 11.631,14.415 11.645,14.42C12.136,14.687 12.923,14.979 13.992,15.032C14.118,15.037 14.25,15.042 14.381,15.042C16.106,15.027 17.112,14.357 16.937,14.021C16.854,13.866 16.496,13.905 15.96,13.965C15.36,14.032 14.536,14.123 13.628,13.992C12.355,13.808 12.228,13.224 12.389,12.977C12.633,12.601 13.093,12.622 13.75,12.65C14.097,12.666 14.499,12.683 14.954,12.646C16.271,12.539 17.019,12.17 17.432,11.699C17.651,11.451 17.748,11.184 17.666,11.023C17.588,10.882 17.369,10.829 16.747,11.067C16.315,11.232 15.664,11.446 14.794,11.548C14.944,10.581 14.493,7.078 12.019,6.548C12.01,6.543 12,6.538 11.99,6.529C11.237,5.567 9.706,5.129 8.249,5.324C8.239,5.324 8.234,5.328 8.229,5.333C8.186,5.353 8.186,5.435 8.234,5.455C8.399,5.513 8.594,5.601 8.739,5.732C8.531,5.844 8.224,6.028 8.054,6.266C8.045,6.276 8.045,6.286 8.045,6.295C8.045,6.325 8.069,6.349 8.103,6.344C8.812,6.203 9.536,6.271 9.964,6.66C9.993,6.684 9.979,6.728 9.94,6.738C6.237,7.743 6.971,10.965 7.957,14.915C8.457,16.918 8.842,18.354 9.092,19.253C6.217,18.1 4.188,15.287 4.188,12C4.188,7.685 7.685,4.188 12,4.188C16.315,4.188 19.813,7.685 19.813,12ZM14.05,8.652L14.032,8.644C13.904,8.587 13.745,8.516 13.472,8.511C13.186,8.506 13.006,8.579 12.889,8.642C12.85,8.662 12.792,8.623 12.811,8.584C12.908,8.429 13.122,8.307 13.472,8.307C13.822,8.307 13.987,8.448 14.099,8.599C14.123,8.628 14.084,8.667 14.05,8.652ZM14.313,10.197C14.313,10.494 14.07,10.737 13.769,10.737C13.467,10.737 13.224,10.494 13.224,10.197C13.224,9.901 13.467,9.658 13.769,9.658C14.07,9.658 14.313,9.896 14.313,10.197ZM9.541,9.94C9.891,9.94 10.173,10.222 10.173,10.571C10.173,10.921 9.891,11.203 9.541,11.203C9.191,11.203 8.91,10.921 8.91,10.571C8.905,10.222 9.191,9.94 9.541,9.94ZM8.88,8.783C8.54,8.924 8.433,9.08 8.365,9.182C8.341,9.221 8.249,9.216 8.249,9.172C8.249,8.978 8.428,8.681 8.807,8.54C9.235,8.38 9.561,8.526 9.706,8.647C9.74,8.672 9.711,8.715 9.672,8.706C9.488,8.662 9.22,8.642 8.88,8.783ZM14.153,10.017C14.153,10.095 14.089,10.158 14.012,10.158C13.934,10.158 13.871,10.095 13.871,10.017C13.871,9.94 13.934,9.877 14.012,9.877C14.089,9.877 14.153,9.94 14.153,10.017ZM9.988,10.358C9.988,10.45 9.915,10.523 9.823,10.523C9.731,10.523 9.658,10.45 9.658,10.358C9.658,10.265 9.731,10.192 9.823,10.192C9.915,10.192 9.988,10.265 9.988,10.358Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_duckduckgo_silhouette_onlight_24.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1247 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M21.794,16.542C21.609,15.68 21.324,14.835 20.947,14.038C20.467,13.027 19.854,12.095 19.113,11.257C18.586,10.668 17.985,10.138 17.334,9.691C17.337,9.688 17.339,9.684 17.34,9.681C17.342,9.677 17.343,9.674 17.346,9.671C17.88,8.625 18.43,7.589 18.968,6.546C19.094,6.312 19.125,6.018 19.059,5.763C18.996,5.515 18.855,5.287 18.635,5.148C18.434,5.014 18.162,4.959 17.927,5.034C17.687,5.101 17.482,5.283 17.371,5.506C16.811,6.591 16.309,7.711 15.682,8.76C14.532,8.246 13.267,7.99 12.009,7.99C10.743,7.99 9.52,8.273 8.354,8.753C7.855,7.64 7.23,6.589 6.672,5.506C6.425,5.048 5.857,4.847 5.407,5.148C5.019,5.404 4.873,5.904 4.995,6.343C5.053,6.559 5.184,6.758 5.286,6.954C5.757,7.859 6.232,8.762 6.696,9.671L6.702,9.677C5.545,10.487 4.571,11.519 3.809,12.708C3.06,13.878 2.526,15.184 2.23,16.542LnannanL2.23,16.542C2.057,17.312 2.688,18 3.477,18H20.525C21.339,18 21.968,17.338 21.794,16.542LnannanL21.794,16.542ZM17.219,14.908C17.619,14.611 17.679,13.923 17.346,13.376C17.02,12.823 16.427,12.62 16.027,12.917C15.628,13.214 15.567,13.903 15.9,14.45C16.227,15.003 16.82,15.205 17.219,14.908ZM8.027,12.924C8.427,13.221 8.481,13.903 8.154,14.456C7.821,15.003 7.234,15.212 6.835,14.915C6.436,14.618 6.381,13.937 6.708,13.383C7.035,12.83 7.628,12.627 8.027,12.924Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_platform_android_24.xml"
+            line="7"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1948 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M16.547,6.956C16.542,6.947 16.55,6.936 16.56,6.938C17.007,7.006 17.476,7.159 18.008,7.439C18.311,7.598 18.593,7.813 18.863,8.082C19.114,8.333 19.388,8.882 19.112,9.105C18.896,9.281 18.658,9.5 18.376,9.807C18.095,10.114 17.878,10.487 17.662,10.969C17.445,11.452 17.359,12 17.359,12.636C17.359,13.382 17.489,13.996 17.748,14.522C18.008,15.048 18.311,15.443 18.658,15.772C19.004,16.101 19.307,16.32 19.567,16.452C19.851,16.596 19.949,16.864 19.841,17.163C19.781,17.326 19.718,17.498 19.675,17.614C19.459,18.206 19.134,18.82 18.658,19.522C18.246,20.136 17.792,20.684 17.315,21.211C16.839,21.737 16.254,21.978 15.605,21.978C15.15,21.978 14.782,21.913 14.501,21.781C14.219,21.649 13.916,21.518 13.613,21.386C13.31,21.255 12.899,21.189 12.379,21.189C11.859,21.189 11.47,21.255 11.123,21.386C10.777,21.518 10.474,21.649 10.17,21.803C9.867,21.956 9.521,22 9.11,22C8.482,22 7.94,21.759 7.486,21.255C7.031,20.75 6.533,20.158 6.057,19.478C5.494,18.645 4.996,17.658 4.606,16.474C4.217,15.29 4,14.083 4,12.877C4,11.583 4.238,10.509 4.714,9.61C5.191,8.711 5.819,8.075 6.576,7.614C7.334,7.154 8.114,6.934 8.936,6.934C9.369,6.934 9.781,7 10.149,7.154C10.517,7.307 10.885,7.439 11.231,7.592C11.578,7.746 11.859,7.812 12.141,7.812C12.422,7.812 12.704,7.724 13.05,7.57C13.396,7.417 13.786,7.263 14.219,7.11C14.652,6.956 15.107,6.891 15.605,6.891C15.796,6.891 16.092,6.912 16.533,6.975C16.543,6.976 16.551,6.966 16.547,6.956ZM13.646,6.2C13.638,6.207 13.63,6.213 13.621,6.218C13.128,6.476 12.656,6.605 12.206,6.605C12.163,6.605 12.121,6.605 12.078,6.603C12,6.598 11.949,6.527 11.924,6.452C11.903,6.386 11.924,6.32 11.924,6.233C11.924,5.728 12.033,5.224 12.249,4.741C12.465,4.259 12.725,3.864 13.007,3.535C13.353,3.097 13.808,2.746 14.349,2.461C14.744,2.253 15.128,2.115 15.492,2.047C15.716,2.005 15.93,2.166 15.93,2.395C15.93,2.899 15.843,3.404 15.648,3.886C15.453,4.369 15.193,4.807 14.89,5.18C14.569,5.571 14.162,5.919 13.67,6.182C13.661,6.186 13.653,6.192 13.646,6.2Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_platform_apple_24.xml"
+            line="23"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (2042 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M70,59.5H68.75C66.4,59.5 64.5,57.6 64.5,55.25V50.75C64.5,48.4 66.4,46.5 68.75,46.5H70.14C70.05,46.99 70,47.49 70,48V49H68.75C67.78,49 67,49.78 67,50.75V55.25C67,56.22 67.78,57 68.75,57H70V59.5ZM70,55C69.45,55 69,54.55 69,54V52C69,51.45 69.45,51 70,51V55ZM73.17,41.62C73.36,41.29 73.71,41.05 74.11,41.01C73.78,41.19 73.47,41.4 73.17,41.62ZM75,40.58V38.25C75,37.56 75.56,37 76.25,37C76.94,37 77.5,37.56 77.5,38.25V40.02C76.62,40.07 75.78,40.27 75,40.58ZM52.75,59.5C50.4,59.5 48.5,57.6 48.5,55.25V50.75C48.5,48.4 50.4,46.5 52.75,46.5H57.25C59.6,46.5 61.5,48.4 61.5,50.75V55.25C61.5,57.6 59.6,59.5 57.25,59.5H52.75ZM51,55.25C51,56.22 51.78,57 52.75,57H57.25C58.22,57 59,56.22 59,55.25V50.75C59,49.78 58.22,49 57.25,49H52.75C51.78,49 51,49.78 51,50.75V55.25ZM54,55C53.45,55 53,54.55 53,54V52C53,51.45 53.45,51 54,51H56C56.55,51 57,51.45 57,52V54C57,54.55 56.55,55 56,55H54ZM54,39C53.45,39 53,38.55 53,38V36C53,35.45 53.45,35 54,35H56C56.55,35 57,35.45 57,36V38C57,38.55 56.55,39 56,39H54ZM52.75,43.5C50.4,43.5 48.5,41.6 48.5,39.25V34.75C48.5,32.4 50.4,30.5 52.75,30.5H57.25C59.6,30.5 61.5,32.4 61.5,34.75V39.25C61.5,41.6 59.6,43.5 57.25,43.5H52.75ZM51,39.25C51,40.22 51.78,41 52.75,41H57.25C58.22,41 59,40.22 59,39.25V34.75C59,33.78 58.22,33 57.25,33H52.75C51.78,33 51,33.78 51,34.75V39.25ZM65.75,37C66.44,37 67,36.44 67,35.75V33.25H67.75C68.44,33.25 69,32.69 69,32C69,31.31 68.44,30.75 67.75,30.75H65.75C65.06,30.75 64.5,31.31 64.5,32V35.75C64.5,36.44 65.06,37 65.75,37ZM72.25,33.25C71.56,33.25 71,32.69 71,32C71,31.31 71.56,30.75 72.25,30.75H76.25C76.94,30.75 77.5,31.31 77.5,32V33.75C77.5,34.44 76.94,35 76.25,35C75.56,35 75,34.44 75,33.75V33.25H72.25ZM66,43.25C65.96,43.25 65.92,43.25 65.88,43.24C65.83,43.25 65.79,43.25 65.75,43.25C65.06,43.25 64.5,42.69 64.5,42V40.25C64.5,39.56 65.06,39 65.75,39C66.44,39 67,39.56 67,40.25V40.75H69.75C70.44,40.75 71,41.31 71,42C71,42.69 70.44,43.25 69.75,43.25H66ZM69,37.75C69,38.44 69.56,39 70.25,39H71.75C72.44,39 73,38.44 73,37.75V36.25C73,35.56 72.44,35 71.75,35H70.25C69.56,35 69,35.56 69,36.25V37.75Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_sync_recover_128.xml"
+            line="48"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (3396 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M98,65C98,69.42 94.42,73 90,73C85.58,73 82,69.42 82,65C82,60.58 85.58,57 90,57C94.42,57 98,60.58 98,65ZM96,65C96,67.24 94.77,69.19 92.96,70.22C93.03,69.76 92.97,68.72 92.6,68.27C92.52,68.18 91.72,68.69 91.24,69.04C91.14,68.93 90.96,68.87 90.63,68.93C90.59,68.93 90.57,68.94 90.54,68.94C90.52,68.95 90.5,68.95 90.48,68.95C90.31,68.41 90.21,67.93 90.25,67.62C89.88,67.42 89.63,67.19 89.58,67.1C89.5,66.96 89.64,66.89 89.71,66.92C89.71,66.93 89.72,66.93 89.73,66.94C90.12,67.15 90.75,67.38 91.61,67.43C91.71,67.43 91.82,67.43 91.92,67.43C93.3,67.42 94.11,66.89 93.96,66.62C93.9,66.49 93.61,66.52 93.18,66.57H93.18C92.7,66.63 92.04,66.7 91.32,66.59C90.3,66.45 90.2,65.98 90.33,65.78C90.52,65.48 90.89,65.5 91.42,65.52C91.69,65.53 92.01,65.55 92.38,65.52C93.43,65.43 94.03,65.14 94.36,64.76C94.54,64.56 94.61,64.35 94.55,64.22C94.49,64.11 94.31,64.06 93.81,64.25C93.47,64.39 92.95,64.56 92.25,64.64C92.37,63.87 92.01,61.06 90.03,60.64C90.02,60.63 90.02,60.63 90.01,60.62C89.46,59.92 88.39,59.57 87.32,59.63C88.13,59.23 89.04,59 90,59C93.31,59 96,61.69 96,65ZM91.73,69.95C91.73,70.07 92.49,70.3 92.81,70.3C92.31,70.57 91.78,70.76 91.22,70.88C91.18,70.79 91.14,70.7 91.11,70.62C90.89,70.69 90.59,70.72 90.37,70.73C90.21,70.73 90.07,70.72 90,70.62C89.87,70.74 89.69,70.86 89.5,70.98C89.2,71.17 88.89,71.33 88.7,71.36C88.63,71.37 88.58,71.37 88.55,71.35C88.44,71.28 88.33,71.04 88.24,70.74L88.24,70.74C88.08,70.18 88.01,69.41 88.17,69.19C88.22,69.11 88.32,69.07 88.45,69.06C88.33,69.54 88.6,70.72 88.75,70.84C88.9,70.96 89.96,70.33 89.91,70.18C89.82,69.87 89.82,69.59 89.83,69.41C89.87,69.35 90,69.26 90.09,69.23C90.09,69.27 90.08,69.32 90.09,69.37C90.09,69.55 90.11,69.87 90.16,70C90.22,70.17 90.28,70.28 90.58,70.28C90.88,70.27 91.36,70.21 91.43,70.07C91.51,69.94 91.41,69.4 91.35,69.23L91.31,69.15C91.31,69.14 91.31,69.14 91.3,69.13H91.41C91.56,69.17 91.69,69.23 91.73,69.95ZM84,65C84,67.46 85.48,69.58 87.61,70.5C87.41,69.8 87.14,68.76 86.78,67.33C85.99,64.17 85.41,61.59 88.37,60.79C88.4,60.78 88.41,60.75 88.39,60.73C88.04,60.42 87.47,60.36 86.9,60.48C86.87,60.48 86.85,60.46 86.85,60.44C86.85,60.43 86.85,60.42 86.86,60.41C87,60.22 87.24,60.07 87.41,59.99C87.3,59.89 87.17,59.82 87.04,59.78C85.23,60.81 84,62.76 84,65ZM97,65C97,68.87 93.87,72 90,72C86.13,72 83,68.87 83,65C83,61.13 86.13,58 90,58C93.87,58 97,61.13 97,65ZM91.66,62.32L91.64,62.32C91.54,62.27 91.41,62.21 91.19,62.21C90.96,62.21 90.82,62.26 90.73,62.31C90.7,62.33 90.65,62.3 90.66,62.27C90.74,62.14 90.91,62.05 91.19,62.05C91.47,62.05 91.61,62.16 91.69,62.28C91.71,62.3 91.68,62.33 91.66,62.32ZM91.87,63.56C91.87,63.8 91.67,63.99 91.43,63.99C91.19,63.99 91,63.8 91,63.56C91,63.32 91.19,63.13 91.43,63.13C91.67,63.13 91.87,63.32 91.87,63.56ZM88.05,63.35C88.33,63.35 88.55,63.58 88.55,63.86C88.55,64.14 88.33,64.36 88.05,64.36C87.77,64.36 87.54,64.14 87.54,63.86C87.54,63.58 87.77,63.35 88.05,63.35ZM87.52,62.43C87.25,62.54 87.16,62.66 87.11,62.75C87.09,62.78 87.01,62.77 87.01,62.74C87.01,62.58 87.16,62.35 87.46,62.23C87.8,62.1 88.06,62.22 88.18,62.32C88.21,62.34 88.18,62.37 88.15,62.36C88.01,62.33 87.79,62.31 87.52,62.43ZM91.74,63.41C91.74,63.48 91.69,63.53 91.62,63.53C91.56,63.53 91.51,63.48 91.51,63.41C91.51,63.35 91.56,63.3 91.62,63.3C91.69,63.3 91.74,63.35 91.74,63.41ZM88.41,63.69C88.41,63.76 88.35,63.82 88.27,63.82C88.2,63.82 88.14,63.76 88.14,63.69C88.14,63.61 88.2,63.55 88.27,63.55C88.35,63.55 88.41,63.61 88.41,63.69Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_sync_server_128.xml"
+            line="53"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (2628 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M73.6,41.32C74.2,40.92 74.86,40.6 75.56,40.38C74.71,39.62 73.83,38.9 72.93,38.2C72.98,37.97 73,37.74 73,37.5C73,36.1 72.18,34.9 71,34.33C70.99,33.57 70.96,32.8 70.91,32.05C71.6,32.02 72.3,32 73,32C80.39,32 87.37,33.7 93.59,36.74C93.63,36.23 93.55,35.7 93.33,35.17C93.18,34.85 93.03,34.52 92.88,34.2C86.8,31.5 80.08,30 73,30C72.25,30 71.5,30.02 70.75,30.05C70.26,25.18 69.06,20.51 67.25,16.16C66.51,16.09 65.76,16.04 65.01,16.02C66.96,20.42 68.25,25.19 68.76,30.18C66.14,30.41 63.59,30.84 61.11,31.45C57.54,30.03 53.77,29.02 49.85,28.47C49.63,27.76 49.19,27.15 48.61,26.71C50.48,23.24 52.78,20.04 55.43,17.16C54.14,17.52 52.89,17.95 51.68,18.46C49.81,20.81 48.14,23.33 46.72,26.01C46.65,26 46.57,26 46.5,26C45.1,26 43.9,26.82 43.34,28C43.22,28 43.11,28 43,28C41.61,28 40.24,28.06 38.88,28.17C38.33,28.87 37.8,29.59 37.31,30.34C39.17,30.12 41.07,30 43,30L43.04,30C43.15,30.77 43.51,31.46 44.03,31.98C42.92,34.99 42.09,38.14 41.59,41.39C38.02,44.38 34.88,47.86 32.28,51.74L32.21,51.67C32.33,52.76 32.51,53.83 32.74,54.89C35.74,57.51 39.06,59.77 42.64,61.61C43.83,66.09 45.63,70.31 47.96,74.19C47.56,74.45 47.16,74.71 46.75,74.96C47.38,75.36 48.03,75.74 48.68,76.1C48.8,76.03 48.91,75.96 49.02,75.88C49.16,76.09 49.3,76.3 49.44,76.5C50.61,77.1 51.83,77.63 53.08,78.09C52.23,77.01 51.42,75.89 50.67,74.74C53.22,72.9 55.59,70.81 57.74,68.52C58.25,68.83 58.86,69 59.5,69C60.92,69 62.14,68.16 62.69,66.95C63.45,66.98 64.22,67 65,67C66.69,67 68.36,66.91 70,66.75V64.74C68.36,64.91 66.69,65 65,65C64.32,65 63.63,64.99 62.96,64.96C62.85,64.27 62.55,63.65 62.1,63.16C66.66,56.69 69.69,49.06 70.66,40.8C71.16,40.63 71.6,40.35 71.97,39.98C72.52,40.42 73.06,40.86 73.6,41.32ZM46.5,33C48.09,33 49.43,31.94 49.86,30.5C52.6,30.9 55.27,31.54 57.84,32.39C52.8,34.03 48.13,36.46 43.95,39.53C44.42,37.27 45.04,35.07 45.82,32.93C46.04,32.98 46.27,33 46.5,33ZM41.22,44.38C38.39,46.97 35.88,49.91 33.76,53.12C36.29,55.37 39.06,57.34 42.02,59.01C41.35,55.78 41,52.43 41,49C41,47.44 41.07,45.9 41.22,44.38ZM60.96,33.56C54.47,35.27 48.53,38.34 43.45,42.45C43.15,44.59 43,46.78 43,49C43,52.87 43.47,56.63 44.35,60.23C48.07,62.05 52.06,63.4 56.25,64.19C56.77,62.9 58.03,62 59.5,62C59.81,62 60.11,62.04 60.39,62.12C64.74,55.97 67.65,48.73 68.63,40.89C67.12,40.51 66,39.13 66,37.5C66,37.02 66.1,36.57 66.27,36.15C64.56,35.18 62.79,34.31 60.96,33.56ZM45.05,62.77C48.53,64.32 52.22,65.48 56.07,66.19C56.13,66.5 56.23,66.79 56.37,67.06C54.31,69.26 52.05,71.27 49.61,73.04C47.7,69.84 46.16,66.4 45.05,62.77ZM67.56,34.59C66.47,33.96 65.36,33.37 64.22,32.82C65.76,32.53 67.33,32.31 68.92,32.17C68.95,32.79 68.98,33.41 68.99,34.04C68.47,34.11 67.98,34.31 67.56,34.59Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_sync_server_128.xml"
+            line="66"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="DisableBaselineAlignment"
+        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="     ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_recovery_code.xml"
+            line="142"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_create_account.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_device_connected.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_intro_sync.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_recovery_code.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_windows_edit_device_menu.xml"
+            line="22"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_windows_remove_device_menu.xml"
+            line="22"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/background_rounded_surface` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/background_rounded_surface&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_blurred_cta.xml"
+            line="22"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Připojování...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Forbinder ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Verbinden ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Σύνδεση...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Conectando...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Ühendamine ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Povezivanje u tijeku...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Jungiamasi...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Er wordt verbinding gemaakt ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Łączenie...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Выполняется подключение...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Pripája sa...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Povezovanje ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_enable_connecting&quot;>Bağlantı kuruluyor...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-sync.xml"
+            line="50"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Vypnutí a mazání dat serveru...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Slå fra og slet serverdata ...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Desactivar y eliminar datos del servidor...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Disattiva ed elimina i dati del server...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Servergegevens uitschakelen en verwijderen ...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Wyłącz i usuń dane serwera...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Oprește și șterge datele de pe server...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Отключить и удалить данные с сервера...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Vypnúť a zmazať údaje servera...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_delete_account_item&quot;>Izklopi in izbriši podatke strežnika ...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-sync.xml"
+            line="104"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Slå synkronisering og sikkerhedskopiering fra ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Απενεργοποίηση Συγχρονισμού και δημιουργία αντιγράφων ασφάλειας...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Desactivar sincronización y copia de seguridad...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Išjungti sinchronizavimą ir atsarginės kopijos kūrimą...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>\&apos;Synchronisatie en back-up\&apos; uitschakelen ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Dezactivează Sincronizare și backup...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Отключить синхронизацию и резервное копирование...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Vypnúť Synchronizáciu a zálohovanie...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Izklopi sinhronizacijo in varnostno kopiranje ...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_disable_sync_item&quot;>Senkronizasyon ve Yedeklemeyi Kapat...&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-sync.xml"
+            line="105"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Sdílet s...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Del med ...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Κοινή χρήση με...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Jaa...&lt;/string>"
+        errorLine2="                                    ~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Podijeli s...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Dalintis su...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Delen met...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Partilhar com...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Distribuie către...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;sync_share_title&quot;>Zdieľať s...&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="115"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                connectedBinding.deviceName.text = &quot;${device.deviceName} ${if (device.thisDevice) &quot;(This Device)&quot; else &quot;&quot;}&quot;"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/ui/SyncInternalSettingsActivity.kt"
+            line="176"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Create account&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Create account&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="207"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Signed in&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Signed in&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="215"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Read QR code&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Read QR code&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="225"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Show QR code&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Show QR code&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="232"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Connect (read QR)&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Connect (read QR)&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="239"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Connect (show QR)&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Connect (show QR)&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="246"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Logout&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Logout&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="261"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;DeleteAccount&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;DeleteAccount&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="268"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Reset&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Reset&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_internal_sync_settings.xml"
+            line="275"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Logout&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Logout&quot;/>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/item_connected_device.xml"
+            line="42"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        <location
+            file="src/main/AndroidManifest.xml"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="156"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="181"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="218"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="242"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="266"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="290"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="327"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="360"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="400"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="IgnoreWithoutReason"
+        message="Test is ignored without giving any explanation"
+        errorLine1="    @Ignore"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/engine/SyncEngineTest.kt"
+            line="414"
+            column="5"/>
+    </issue>
 
 </issues>

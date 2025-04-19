@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Konfigurer i Innstillinger</b></string>
 
     <string name="saveLoginDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke lagre</string>
-    <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre passordet ditt?</string>
+    <string name="saveLoginDialogTitle">Vil du lagre passordet ditt?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke et lagret passord?</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofyll for passord er ikke tilgjengelig fordi din versjon av Android WebView er utdatert eller inkompatibel.</string>
+
     <string name="autofillManagementSearchClearDescription">Tøm søkefeltet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for «%1$s»</string>
 
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Slett</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Brukernavnet er kopiert</string>
     <string name="autofillManagementPasswordCopied">Passordet er kopiert</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avslutt oppsett</string>
 
     <string name="autofillManagementScreenTitle">Passord</string>
+    <string name="autofillManagementScreenTitleNew">Passord og autofyll</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen passord er lagret ennå</string>
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll ut passord automatisk</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passord lagres på enheten din på en sikker måte</string>
-    <string name="saveLoginDialogSubtitle">Passord lagres på enheten din på en sikker måte.</string>
+    <string name="credentialManagementAutofillSubtitle">Passord krypteres. Ingen andre enn du kan se dem, ikke engang vi. <annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Passordbehandlingssikkerhet</string>
+    <string name="saveLoginDialogSubtitle">Lagre passordet ditt trygt på enheten med DuckDuckGos passord og autofyll.</string>
     <string name="autofillManagementAddLogin">Legg til passord</string>
     <string name="credentialManagementEditLoginTitleHint">Tittel</string>
-    <string name="autofillDeleteLoginDialogTitle">Er du sikker på at du vil slette dette passordet?</string>
     <string name="autofillManagementDeletedConfirmation">Passordet er slettet</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Sist oppdatert %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vil du fortsette å lagre passord?</string>
@@ -133,6 +140,125 @@
     <string name="managementDisabledModeSubtitle">Det kreves et låsemønster, en PIN-kode eller biometri for å beskytte passordene dine.</string>
     <string name="credentialManagementEditTitle">Rediger passordet</string>
 
-    <string name="credentials_limit_warning"><b>Synkronisering er satt på pause</b>\nGrensen for pålogginger er overskredet. Slett noen for å gjenoppta synkroniseringen.\n\n<annotation type="manage_logins">Administrer pålogginger</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nDu har overskredet grensen for passordsynkronisering. Prøv å slette noen passord. Inntil dette er løst, blir ikke passordene sikkerhetskopiert.</string>
+    <string name="credentials_limit_warning"><b>Synkronisering satt på pause</b>\nDu har nådd maksimalt antall passord. Slett noen for å gjenoppta synkronisering.\n\n<annotation type="manage_logins">Administrer passord</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nDu har nådd maksimalt antall passord. Slett noen passord for å gjenoppta synkronisering.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronisering satt på pause</b>\nNoen passord er formatert feil eller for lange og ble ikke synkronisert.\n\n<annotation type="manage_logins">Administrer passord</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nNoen passord er formatert feil eller for lange og ble ikke synkronisert.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Aldri spør for dette nettstedet</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Nei takk</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Hvis du tilbakestiller ekskluderte nettsteder, blir du bedt om å lagre passordet ditt neste gang du logger på disse nettstedene.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Tilbakestill ekskluderte nettsteder</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Vil du tilbakestille ekskluderte nettsteder?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Tilbakestill</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Slett alle passord</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d passord er slettet</item>
+        <item quantity="other">%1$d passord er slettet</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Godkjenn for å bekrefte at du vil slette alle passord</string>
+    <string name="autofill_title_text_for_delete_all">Slett alle passord</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Passordet for %1$s kan ikke synkroniseres fordi ett av feltene overskrider tegngrensen.</item>
+        <item quantity="other">Passordene for %1$s og %2$d andre nettsteder kan ikke synkroniseres fordi noen av feltene overskrider tegngrensen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Administrer passord</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Passordet ditt blir slettet fra denne enheten.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Passordet ditt blir slettet fra denne enheten.</item>
+        <item quantity="other">Passordene dine blir slettet fra denne enheten.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Passordet ditt blir slettet fra alle synkroniserte enheter.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Passordet ditt blir slettet fra alle synkroniserte enheter.</item>
+        <item quantity="other">Passordene dine blir slettet fra alle synkroniserte enheter.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Er du sikker på at du vil slette dette passordet?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Er du sikker på at du vil slette %1$d passord?</item>
+        <item quantity="other">Er du sikker på at du vil slette %1$d passord?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Sørg for at du fortsatt har tilgang til kontoen din.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sørg for at du fortsatt har tilgang til kontoen din.</item>
+        <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Du kan importere lagrede passord fra en annen nettleser til DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importer passord</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Slik importerer du passord</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importer passord i datamaskinversjonen av DuckDuckGo-nettleseren, og så kan du synkronisere mellom enheter.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Skaff deg nettleseren for datamaskin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lenken er kopiert</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Skaff deg DuckDuckGo-nettleseren for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Søk privat og blokker sporere med DuckDuckGo-nettleseren for datamaskin. Gå til denne lenken på datamaskinen for å laste ned i dag.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkroniser med datamaskinen</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer fra datamaskinnettleseren:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Åpne DuckDuckGo på Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå til <b>Innstillinger</b> > <b>Passord</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Velg <b>Importer passord</b> … og følg instruksjonene for å importere]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Når de er importert til datamaskinen, kan du sette opp synkronisering på denne enheten</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsappen</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Skaff deg DuckDuckGo for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På datamaskinen går du til:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del nedlastingslenke</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Rapporter et problem med Autofyll</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Rapporter anonymt at autofyll ikke fungerer på dette nettstedet. Passord deles aldri.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Rapportere at autofyll ikke fungerer på %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Rapporter som sendes til DuckDuckGo er anonyme og inneholder ikke ditt brukernavn, passord eller annen personlig identifiserbar informasjon.\n\nRapporten inneholder bare nettadressen til nettstedet og statusen til noen innstillinger for autofyll.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Send rapport</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Avbryt</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Takk! Rapporten din vil hjelpe oss med å gjøre DuckDuckGo bedre for alle.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Viktige funksjoner</string>
+    <string name="onboardingSaveDialogFeature1Title">Sømløse pålogginger</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Du trenger ikke å huske påloggingsinformasjon.</string>
+    <string name="onboardingSaveDialogFeature2Title">Sikker lagring</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passord er kryptert, lagres på enheten og låses med Android-mønsteret ditt eller PIN-koden din.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synkroniser mellom enheter</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Ende-til-ende-kryptert og lett å konfigurere når du er klar.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Du kan slå av passordlagring når som helst.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Åpne innstillinger</string>
+
+    <string name="newTabPageShortcutPasswords">Passord</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importer Google-passord</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d passord importert fra Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d passord importert fra CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importer passord fra Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importer passord fra Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkroniser DuckDuckGo-passord</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkroniser DuckDuckGo-passord</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importer Google-passordene dine</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be deg om å logge inn eller skrive inn passordet ditt for å bekrefte.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Åpne Google Passord</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Velg en CSV-fil</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer fra skrivebordsnettleseren</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importer til DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import fullført</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Den er grei</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Import av passord mislyktes</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Hoppet over (duplikat eller ugyldig): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passord importert: <b>%1$d</b>]]></string>
+
 </resources>

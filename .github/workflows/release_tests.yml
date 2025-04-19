@@ -1,0 +1,108 @@
+name: Run Release Tests in Maestro
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-release-tests:
+    name: Run Release tests of tag version in Maestro
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ github.event.inputs.app-version }}
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Create folder
+        if: always()
+        run: mkdir apk
+
+      - name: Decode keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Assemble release APK
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+
+      - name: Notify Mattermost of Maestro tests
+        id: send-mm-tests-started
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: Starting to run Release tests for version ${{ github.event.inputs.app-version }} successfully created. See https://app.asana.com/0/1184843898389381/1205105962934096
+          action: 'send-mattermost-message'
+
+      - name: Release tests flows
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        timeout-minutes: 120
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: releaseTest_${{ github.sha }}
+          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/release.apk
+          android-api-level: 30
+          workspace: .maestro
+          include-tags: releaseTest
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Tag Android Release (Robin)
+          asana-task-description: Run Release Tests in Maestro has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
+
+      - name: Notify Mattermost when workflow failed
+        if: ${{ failure() }}
+        id: send-mm-message-error
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          asana-task-description: Run Release Tests in Maestro has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'send-mattermost-message'

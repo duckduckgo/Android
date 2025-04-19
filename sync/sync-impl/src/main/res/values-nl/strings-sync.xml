@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
     <string name="sync_flows_disabled_new_version"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
     <string name="sync_paused_notification"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="sync_error_notification"><b>Synchronisatiefout</b>\n\'Synchronisatie en back-up\' is tijdelijk niet beschikbaar.</string>
+    <string name="sync_error_warning"><b>Synchronisatiefout</b>\n\'Sync &amp; Backup\' is tijdelijk niet beschikbaar.</string>
+    <string name="sync_signed_out_notification"><b>Synchronisatie is onderbroken</b>\nSynchronisatie is onderbroken. Als je dit apparaat wilt blijven synchroniseren, maak dan opnieuw verbinding met een ander apparaat of met je herstelcode.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronisatie en back-up</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synchroniseer bladwijzers en wachtwoorden veilig tussen je apparaten.</string>
     <string name="sync_off_hint">Je gegevens zijn volledig versleuteld en DuckDuckGo heeft geen toegang tot de versleutelingscode.</string>
     <string name="sync_setup_single_device_title">Configuratie van één apparaat</string>
+    <string name="sync_setup_other_options_title">Andere opties</string>
     <string name="sync_setup_single_recover_data_cta_title">Gesynchroniseerde gegevens herstellen</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Dit apparaat synchroniseren en back-up maken</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Download automatisch pictogrammen voor gesynchroniseerde bladwijzers.</string>
     <string name="sync_enable_connecting">Er wordt verbinding gemaakt ...</string>
     <string name="sync_intro_enable_title">Dit apparaat synchroniseren en back-up maken</string>
-    <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe ...</string>
+    <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
     <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
     <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
     <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Synchroniseren</string>
     <string name="sync_notify_me_title">Meldingen zijn uitgeschakeld</string>
     <string name="sync_notify_me_description">Ontvang een melding als \'Synchronisatie en back-up\' op een fout stuit.</string>
-    <string name="sync_rollout_banner_text">\'Synchronisatie en back-up\' wordt geleidelijk uitgerold en is mogelijk nog niet beschikbaar in DuckDuckGo op je andere apparaten</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">\'Synchronisatie en back-up\' kan niet worden uitgeschakeld.</string>
+    <string name="sync_edit_device_error">De naam van het apparaat kan niet worden bijgewerkt.</string>
+    <string name="sync_remove_device_error">Het apparaat kan niet worden verwijderd uit \'Synchronisatie en back-up\'.</string>
+    <string name="sync_delete_data_error">Kan gegevens niet verwijderen op de server.</string>
+    <string name="sync_login_authenticated_device_error">"Schakel 'Synchronisatie en back-up' uit op één apparaat en tik op 'Synchroniseren met een ander apparaat' op het andere apparaat om de apparaten te koppelen."</string>
+    <string name="sync_connect_generic_error">Er kan geen verbinding worden gemaakt met de server.</string>
+    <string name="sync_connect_login_error">Er kan niet worden gesynchroniseerd met een ander apparaat.</string>
+    <string name="sync_create_account_generic_error">Er kan geen verbinding worden gemaakt met de server.</string>
+    <string name="sync_invalid_code_error">Sorry, deze code is ongeldig. Zorg ervoor dat de juiste code is ingevoerd of gescand.</string>
+    <string name="sync_recovery_pdf_error">Het PDF-bestand voor herstel kan niet worden gemaakt.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronisatie en back-up</string>
+    <string name="sync_encryption_not_supported_error_title">Apparaat wordt niet ondersteund</string>
+    <string name="sync_encryption_not_supported_error">\'Sync &amp; Backup\' is end-to-end versleuteld en moet gegevens op je apparaat kunnen versleutelen en opslaan. \'Sync &amp; Backup\' is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Ontgrendel het apparaat om toegang te krijgen tot \'Synchronisatie en back-up\'.</string>
+    <string name="sync_biometric_prompt_title">\'Synchronisatie en back-up\' vergrendeld</string>
+    <string name="sync_require_device_passcode_dialog_title">Beveilig je apparaat om \'Synchronisatie en back-up\' te gebruiken</string>
+    <string name="sync_require_device_passcode_dialog_body">Er is een apparaatwachtwoord vereist om \'Synchronisatie  en back-up\' te kunnen gebruiken.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ga naar Instellingen</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Wil je de servergegevens verwijderen?</string>
+    <string name="sync_delete_server_data_dialog_content">De verbinding met alle apparaten wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Gegevens verwijderen</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Annuleren</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synchroniseer en maak een back-up van je wachtwoorden</string>
+    <string name="syncPromoSubtitlePasswords">Geen account nodig. Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet.</string>
+
+    <string name="syncPromoTitleBookmarks">Synchroniseer en back-up je bladwijzers</string>
+    <string name="syncPromoSubtitleBookmarks">Geen account nodig. End-to-end versleuteling betekent dat niemand anders dan jij je bladwijzers kan zien, zelfs wij niet.</string>
+
+    <string name="syncPromoPrimaryButton">Synchronisatie instellen</string>
+    <string name="syncPromoSecondaryButton">Nee, bedankt</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">DuckDuckGo downloaden op andere apparaten</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Download DuckDuckGo op andere apparaten om met dit apparaat te synchroniseren</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Download DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Om DuckDuckGo te downloaden op een desktop of een ander mobiel apparaat, ga naar:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Downloadlink delen</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link gekopieerd</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Overschakelen naar een andere synchronisatie?</string>
+    <string name="sync_dialog_switch_account_primary_button">Schakelen tussen synchronisatie</string>
+    <string name="sync_dialog_switch_account_secondary_button">Annuleren</string>
+    <string name="sync_dialog_switch_account_description">Dit apparaat is al gesynchroniseerd, weet je zeker dat je het met een andere back-up of een ander apparaat wilt synchroniseren? Als je overschakelt, worden er geen gegevens verwijderd die al met dit apparaat zijn gesynchroniseerd.</string>
 </resources>

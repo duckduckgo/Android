@@ -51,6 +51,19 @@
         app:primaryText="Item with Small Leading Image " />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithSmallImageAndBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="small"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Small Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithMediumImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +71,20 @@
         app:leadingIconSize="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImageAndBg"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Medium Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithMediumImageAndBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="medium"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImage"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Medium Leading Image " />
 
@@ -70,9 +96,47 @@
         app:leadingIconSize="large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImageAndBg"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Large Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLargeImageAndBG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="large"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Large Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithExtraLargeImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="extra_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImageAndBG"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Extra Large Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithExtraLargeImageAndBG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="extra_large"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithExtraLargeImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Extra Large Leading Image " />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"
@@ -81,9 +145,21 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithExtraLargeImageAndBG"
         app:primaryText="Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithTrailingIconTinted"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
+        app:primaryText="Item With Trailing Icon Tinted"
+        app:trailingIconTint="?attr/daxColorSecondaryIcon"
+        app:trailingIcon="@drawable/ic_open_in_16" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
@@ -92,7 +168,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIconTinted"
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"
@@ -152,7 +228,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemDisabled"
         app:primaryText="Item with custom text color"
-        app:primaryTextColorOverlay="@color/red_text_color_selector" />
+        app:primaryTextColorOverlay="@color/destructive_text_color_selector" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongText"
@@ -162,7 +238,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemCustomTextColor"
-        app:primaryText="Item with custom text color asdasda sd asda sdasda s"/>
+        app:primaryText="Item with long primary text that expands to more lines as primaryTextTruncated is disabled by default"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongTextTruncated"
@@ -172,7 +248,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongText"
-        app:primaryText="Item with custom text color asdasda sd asda sdasda s"
         app:primaryTextTruncated="true"/>
 
 

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)"
+        errorLine2="                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/AppSiteViewStateMapperTest.kt"
+            line="39"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)"
+        errorLine2="                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="79"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="119"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="131"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="238"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="295"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
+            line="311"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.sdkInt &lt; VERSION_CODES.Q) return null"
+        errorLine2="                                    ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ui/PublicKeyInfoMapper.kt"
+            line="39"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)"
+        errorLine2="                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PublicKeyInfoMapperTest.kt"
+            line="39"
+            column="42"/>
+    </issue>
+
+</issues>

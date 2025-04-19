@@ -17,11 +17,14 @@
 package com.duckduckgo.common.utils.extensions
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 /**
  * Deep links to the application App Info settings
@@ -39,12 +42,15 @@ fun AppCompatActivity.launchApplicationInfoSettings(): Boolean {
 }
 
 @SuppressLint("InlinedApi")
-fun AppCompatActivity.launchAlwaysOnSystemSettings(sdkInt: Int) {
-    val intent = if (sdkInt >= Build.VERSION_CODES.N) {
-        Intent(Settings.ACTION_VPN_SETTINGS)
-    } else {
-        Intent("android.net.vpn.SETTINGS")
-    }
+fun AppCompatActivity.launchAlwaysOnSystemSettings() {
+    val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    startActivity(intent)
+}
+
+@SuppressLint("InlinedApi")
+fun AppCompatActivity.launchSettings() {
+    val intent = Intent(Settings.ACTION_SETTINGS)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     startActivity(intent)
 }
@@ -68,4 +74,25 @@ fun AppCompatActivity.launchIgnoreBatteryOptimizationSettings(): Boolean {
     }
 
     return true
+}
+
+@SuppressLint("InlinedApi")
+fun AppCompatActivity.launchAutofillProviderSystemSettings(): Boolean {
+    val intent = Intent().apply {
+        action = Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE
+        data = Uri.parse("package:$packageName")
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    runCatching { startActivity(intent) }.onFailure { return false }
+
+    return true
+}
+
+fun Activity.showKeyboard(editText: EditText) {
+    editText.requestFocus()
+    WindowInsetsControllerCompat(window, editText).show(WindowInsetsCompat.Type.ime())
+}
+
+fun Activity.hideKeyboard(editText: EditText) {
+    WindowInsetsControllerCompat(window, editText).hide(WindowInsetsCompat.Type.ime())
 }

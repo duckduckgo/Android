@@ -18,10 +18,19 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.store.*
-import org.threeten.bp.*
+import java.time.*
 
 fun Entity.mapToBookmark(relationId: String): SavedSite.Bookmark =
     SavedSite.Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified, deleted = this.deletedFlag())
+
+fun Entity.mapToSavedSite(): SavedSite =
+    SavedSite.Bookmark(
+        id = this.entityId,
+        title = this.title,
+        url = this.url.orEmpty(),
+        lastModified = this.lastModified,
+        deleted = this.deletedFlag(),
+    )
 
 fun Entity.mapToFavorite(index: Int = 0): SavedSite.Favorite =
     SavedSite.Favorite(

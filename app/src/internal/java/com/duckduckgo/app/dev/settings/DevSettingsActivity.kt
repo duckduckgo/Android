@@ -34,8 +34,18 @@ import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.SendTdsIntent
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ShowSavedSitesClearedConfirmation
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
+import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
+import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
+import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -55,10 +65,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private val binding: ActivityDevSettingsBinding by viewBinding()
 
     private val viewModel: DevSettingsViewModel by bindViewModel()
-
-    private val nextTdsToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onNextTdsToggled(isChecked)
-    }
 
     private val startupTraceToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onStartupTraceToggled(isChecked)
@@ -88,7 +94,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
-            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))
+            webContentDebuggingFeature.webContentDebugging().setRawStoredState(Toggle.State(enable = isChecked))
         }
         binding.triggerAnr.setOnClickListener {
             Handler(Looper.getMainLooper()).post {
@@ -100,6 +106,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
+        binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
+        binding.tabs.setOnClickListener { viewModel.tabsClicked() }
+        binding.showTabSwitcherAnimatedTile.setOnClickListener { viewModel.showAnimatedTileClicked() }
     }
 
     private fun observeViewModel() {
@@ -107,7 +117,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState ->
                 viewState.let {
-                    binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
                     binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
@@ -122,13 +131,16 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun processCommand(it: Command?) {
+    private fun processCommand(it: Command) {
         when (it) {
-            is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.OpenUASelector -> showUASelector()
-            is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
-            is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
-            else -> TODO()
+            is SendTdsIntent -> sendTdsIntent()
+            is OpenUASelector -> showUASelector()
+            is ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
+            is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is CustomTabs -> showCustomTabs()
+            Notifications -> showNotifications()
+            Tabs -> showTabs()
+            is Command.Toast -> showToast(it.message)
         }
     }
 
@@ -148,11 +160,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         val popup = PopupMenu(layoutInflater, layout.popup_window_user_agent_override)
         val view = popup.contentView
         popup.apply {
-            onMenuItemClicked(view.findViewById(R.id.noAppId)) { viewModel.onUserAgentSelected(UAOverride.NO_APP_ID) }
-            onMenuItemClicked(view.findViewById(R.id.noVersion)) { viewModel.onUserAgentSelected(UAOverride.NO_VERSION) }
-            onMenuItemClicked(view.findViewById(R.id.chrome)) { viewModel.onUserAgentSelected(UAOverride.CHROME) }
             onMenuItemClicked(view.findViewById(R.id.firefox)) { viewModel.onUserAgentSelected(UAOverride.FIREFOX) }
-            onMenuItemClicked(view.findViewById(R.id.duckDuckGo)) { viewModel.onUserAgentSelected(UAOverride.DDG) }
+            onMenuItemClicked(view.findViewById(R.id.defaultUA)) { viewModel.onUserAgentSelected(UAOverride.DEFAULT) }
             onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
         popup.show(binding.root, binding.overrideUserAgentSelector)
@@ -165,6 +174,23 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showChangePrivacyUrl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showCustomTabs() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(CustomTabsInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showNotifications() {
+        startActivity(NotificationsActivity.intent(this))
+    }
+
+    private fun showTabs() {
+        startActivity(DevTabsActivity.intent(this))
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
@@ -61,7 +62,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     protected fun daggerInject() {
-        AndroidInjection.inject(this)
+        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -97,6 +98,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
                 }
             }
             DARK -> true
+            EXPERIMENT_DARK -> true
             else -> false
         }
     }

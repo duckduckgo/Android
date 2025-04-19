@@ -34,13 +34,18 @@ class RealContentBlockingRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : ContentBlockingRepository {
 
     private val contentBlockingDao: ContentBlockingDao = database.contentBlockingDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(exceptions: List<ContentBlockingExceptionEntity>) {

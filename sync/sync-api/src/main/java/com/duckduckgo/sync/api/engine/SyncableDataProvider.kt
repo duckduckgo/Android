@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.api.engine
 
 interface SyncableDataProvider {
+    fun getType(): SyncableType
 
     /**
      * Used by the SyncClient to get all the updates from each syncable feature

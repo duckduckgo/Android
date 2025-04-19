@@ -40,6 +40,7 @@ class CredentialsSyncDataProvider @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
 ) : SyncableDataProvider {
+    override fun getType(): SyncableType = CREDENTIALS
 
     override fun getChanges(): SyncChangesRequest {
         if (appBuildConfig.isInternalBuild()) checkMainThread()

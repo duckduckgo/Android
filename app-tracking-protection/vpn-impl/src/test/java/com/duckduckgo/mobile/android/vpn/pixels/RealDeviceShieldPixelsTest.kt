@@ -16,9 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
+import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 import org.junit.Before
 import org.junit.Test
@@ -27,13 +32,13 @@ import org.mockito.kotlin.*
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
+    private val prefs = InMemorySharedPreferences()
 
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Before
     fun setup() {
-        val prefs = InMemorySharedPreferences()
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true)),
         ).thenReturn(prefs)
@@ -60,13 +65,46 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenReportEnableThenFireUniqueAndDailyPixel() {
+    fun whenReportEnableThenFireUniqueAndMonthlyAndDailyPixel() {
         deviceShieldPixels.reportEnabled()
         deviceShieldPixels.reportEnabled()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UNIQUE)
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_DAILY.pixelName)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_MONTHLY.pixelName)
         verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenReportExactly28DaysApartThenDoNotFireMonthlyPixel() {
+        val pixelName = DeviceShieldPixelNames.ATP_ENABLE_MONTHLY.pixelName
+
+        deviceShieldPixels.reportEnabled()
+
+        val pastDate = Instant.now()
+            .minus(28, ChronoUnit.DAYS)
+            .atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        prefs.edit(true) { putString("${pixelName}_timestamp", pastDate) }
+
+        deviceShieldPixels.reportEnabled()
+
+        verify(pixel).fire(pixelName)
+    }
+
+    @Test
+    fun whenReportEnableMoreThan28DaysApartReportMonthlyPixel() {
+        val pixelName = DeviceShieldPixelNames.ATP_ENABLE_MONTHLY.pixelName
+
+        deviceShieldPixels.reportEnabled()
+
+        val pastDate = Instant.now()
+            .minus(29, ChronoUnit.DAYS)
+            .atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        prefs.edit(true) { putString("${pixelName}_timestamp", pastDate) }
+
+        deviceShieldPixels.reportEnabled()
+
+        verify(pixel, times(2)).fire(pixelName)
     }
 
     @Test
@@ -252,6 +290,7 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_START_ERROR_DAILY.pixelName)
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_START_ERROR.pixelName)
+        verify(pixel, times(2)).enqueueFire(DeviceShieldPixelNames.VPN_START_ATTEMPT_FAILURE.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 

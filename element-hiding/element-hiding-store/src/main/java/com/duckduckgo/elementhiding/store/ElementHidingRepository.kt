@@ -31,6 +31,7 @@ class RealElementHidingRepository constructor(
     val database: ElementHidingDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : ElementHidingRepository {
 
     private val elementHidingDao: ElementHidingDao = database.elementHidingDao()
@@ -38,7 +39,9 @@ class RealElementHidingRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

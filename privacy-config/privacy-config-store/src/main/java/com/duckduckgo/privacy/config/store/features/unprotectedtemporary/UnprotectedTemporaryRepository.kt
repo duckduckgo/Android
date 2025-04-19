@@ -34,6 +34,7 @@ class RealUnprotectedTemporaryRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : UnprotectedTemporaryRepository {
 
     private val unprotectedTemporaryDao: UnprotectedTemporaryDao =
@@ -41,7 +42,11 @@ class RealUnprotectedTemporaryRepository(
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(exceptions: List<UnprotectedTemporaryEntity>) {

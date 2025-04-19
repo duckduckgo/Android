@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -38,15 +40,21 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Listener
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.facebook.shimmer.ShimmerFrameLayout
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetPAppExclusionListNoParams::class)
@@ -70,11 +78,6 @@ class NetpAppExclusionListActivity :
 
     private lateinit var adapter: AppExclusionListAdapter
 
-    private val isNetpEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
-        }
-    }
     private val binding: ActivityNetpAppExclusionBinding by viewBinding()
     private val viewModel: NetpAppExclusionListViewModel by bindViewModel()
     private val shimmerLayout: ShimmerFrameLayout by lazy { binding.netpAppExclusionListSkeleton }
@@ -105,8 +108,7 @@ class NetpAppExclusionListActivity :
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val restoreDefault = menu.findItem(R.id.netp_exclusion_menu_restore)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
-        restoreDefault?.isVisible = isNetpEnabled
-        restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
+        restoreDefault?.setVisible(viewModel.canRestoreDefaults())
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -127,7 +129,11 @@ class NetpAppExclusionListActivity :
         }
     }
 
-    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+    override fun onAppProtectionDisabled(
+        appName: String,
+        packageName: String,
+        report: Boolean,
+    ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
@@ -148,6 +154,7 @@ class NetpAppExclusionListActivity :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
         }
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
@@ -168,18 +175,22 @@ class NetpAppExclusionListActivity :
                 override fun onFilterClick(anchorView: View) {
                     showFilterPopupMenu(anchorView)
                 }
+
+                override fun onSystemAppCategoryStateChanged(
+                    category: NetpExclusionListSystemAppCategory,
+                    enabled: Boolean,
+                    position: Int,
+                ) {
+                    viewModel.onSystemAppCategoryStateChanged(category, enabled)
+                }
+
+                override fun onHeaderToggleClicked(enabled: Boolean) {
+                    viewModel.onAutoExcludeToggled(enabled)
+                }
             },
         )
 
-        val recyclerView = binding.netpAppExclusionListRecycler
-
-        if (isNetpEnabled) {
-            recyclerView.alpha = 1.0f
-        } else {
-            recyclerView.alpha = 0.45f
-        }
-
-        recyclerView.adapter = adapter
+        binding.netpAppExclusionListRecycler.adapter = adapter
     }
 
     private fun showFilterPopupMenu(anchor: View) {
@@ -199,26 +210,81 @@ class NetpAppExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState, isNetpEnabled)
+        adapter.update(viewState)
         shimmerLayout.gone()
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.RestartVpn -> restartVpn()
+            is Command.RestartVpn -> {
+                restartVpn()
+            }
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.forApp,
             )
+
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
+            is Command.ShowUnifiedPproAppFeedback -> globalActivityStarter.start(
+                this,
+                PrivacyProAppFeedbackScreenWithParams(
+                    appName = command.appName,
+                    appPackageName = command.appPackageName,
+                ),
+            )
+
+            is Command.ShowUnifiedPproFeedback -> globalActivityStarter.start(
+                this,
+                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
+            )
+
+            is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
+
+            is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
             else -> { /* noop */
             }
         }
     }
 
+    private fun showAutoExcludePrompt(apps: List<VpnIncompatibleApp>) {
+        dismissPromotionDialog()
+
+        VpnAutoExcludePromptFragment.instance(apps, EXCLUSION_LIST_SCREEN).also {
+            it.addListener(
+                object : Listener {
+                    override fun onAutoExcludeEnabled() {
+                        viewModel.forceRefresh()
+                    }
+                },
+            )
+            it.show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+        }
+    }
+
+    private fun dismissPromotionDialog() {
+        (supportFragmentManager.findFragmentByTag(TAG_PROMOTION_DIALOG) as? DialogFragment)?.dismiss()
+    }
+
+    private fun showSystemAppsWarning(category: NetpExclusionListSystemAppCategory) {
+        TextAlertDialogBuilder(this@NetpAppExclusionListActivity)
+            .setTitle(R.string.netpExclusionListWarningTitle)
+            .setMessage(R.string.netpExclusionListWarningMessage)
+            .setPositiveButton(R.string.netpExclusionListWarningActionPositive)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onSystemAppCategoryStateChanged(category, false)
+                    }
+                },
+            )
+            .show()
+    }
+
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            }
         }
     }
 
@@ -236,5 +302,7 @@ class NetpAppExclusionListActivity :
             PROTECTED_ONLY,
             UNPROTECTED_ONLY,
         }
+
+        private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
     }
 }

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinhronizacija in varnostno kopiranje nista na voljo</b>\nSinhronizacija in varnostno kopiranje žal trenutno nista na voljo. Poskusite znova pozneje.</string>
     <string name="sync_flows_disabled_new_version"><b>Sinhronizacija in varnostno kopiranje nista na voljo</b>\nSinhronizacija in varnostno kopiranje v tej različici aplikacije žal nista več na voljo. Če želite nadaljevati, DuckDuckGo posodobite na najnovejšo različico.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal trenutno nista na voljo. Poskusite znova pozneje.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal nista več na voljo v tej različici aplikacije. Če želite nadaljevati, DuckDuckGo posodobite na najnovejšo različico.</string>
     <string name="sync_paused_notification"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal trenutno nista na voljo. Poskusite znova pozneje.</string>
+    <string name="sync_error_notification"><b>Napaka pri sinhronizaciji</b>\nSinhronizacija in varnostno kopiranje začasno nista na voljo.</string>
+    <string name="sync_error_warning"><b>Napaka pri sinhronizaciji</b>\nSinhronizacija in varnostno kopiranje začasno nista na voljo.</string>
+    <string name="sync_signed_out_notification"><b>Sinhronizacija je začasno zaustavljena</b>\nSinhronizacija je bila začasno zaustavljena. Če želite še naprej sinhronizirati to napravo, znova vzpostavite povezavo z uporabo druge naprave ali obnovitvene kode.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinhronizacija in varnostno kopiranje</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Varno sinhronizirajte zaznamke in gesla med napravami.</string>
     <string name="sync_off_hint">Vaši podatki so celovito šifrirani in DuckDuckGo nima dostopa do šifrirnega ključa.</string>
     <string name="sync_setup_single_device_title">Nastavitev ene naprave</string>
+    <string name="sync_setup_other_options_title">Druge možnosti</string>
     <string name="sync_setup_single_recover_data_cta_title">Obnovitev sinhroniziranih podatkov</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sinhronizirajte in varnostno kopirajte to napravo</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
     <string name="sync_enable_connecting">Povezovanje ...</string>
     <string name="sync_intro_enable_title">Sinhronizirajte in varnostno kopirajte to napravo</string>
-    <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo do njega nima dostopa.</string>
+    <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_footer">Pozneje lahko sinhronizirate z drugimi napravami.</string>
     <string name="sync_intro_enable_cta">Vklopite sinhronizacijo in varnostno kopiranje</string>
     <string name="sync_intro_recover_title">Obnovitev sinhroniziranih podatkov</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sinhronizacija</string>
     <string name="sync_notify_me_title">Obvestila so onemogočena</string>
     <string name="sync_notify_me_description">Prejmite obvestilo, če pride do napake pri sinhronizaciji in varnostnem kopiranju.</string>
-    <string name="sync_rollout_banner_text">Sinhronizacijo in varnostno kopiranje uvajamo postopoma in morda še ni na voljo v DuckDuckGo v vaših drugih napravah.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Sinhronizacije in varnostnega kopiranja ni bilo mogoče izklopiti.</string>
+    <string name="sync_edit_device_error">Imena naprave ni bilo mogoče posodobiti.</string>
+    <string name="sync_remove_device_error">Te naprave ni bilo mogoče odstraniti iz sinhronizacije in varnostnega kopiranja.</string>
+    <string name="sync_delete_data_error">Podatkov na strežniku ni bilo mogoče izbrisati.</string>
+    <string name="sync_login_authenticated_device_error">"Če želite seznaniti ti napravi, izklopite možnost »Sinhronizacija in varnostno kopiranje« v eni napravi in nato v drugi napravi tapnite »Sinhronizacija z drugo napravo«."</string>
+    <string name="sync_connect_generic_error">Ni bilo mogoče vzpostaviti povezave s strežnikom.</string>
+    <string name="sync_connect_login_error">Ni bilo mogoče sinhronizirati z drugo napravo.</string>
+    <string name="sync_create_account_generic_error">Ni bilo mogoče vzpostaviti povezave s strežnikom.</string>
+    <string name="sync_invalid_code_error">Oprostite, ta koda je neveljavna. Prepričajte se, da je bila vnesena ali optično prebrana pravilna koda.</string>
+    <string name="sync_recovery_pdf_error">PDF-ja za obnovitev ni bilo mogoče ustvariti.</string>
+    <string name="sync_dialog_error_ok">V redu</string>
+    <string name="sync_dialog_error_title">Sinhronizacija in varnostno kopiranje</string>
+    <string name="sync_encryption_not_supported_error_title">Naprava ni podprta</string>
+    <string name="sync_encryption_not_supported_error">Sinhronizacija in varnostno kopiranje je šifrirano v celoti, zato mora šifrirati in shranjevati podatke v vaši napravi. Ker vaša naprava ne podpira šifriranega shranjevanja, funkcija Sinhronizacija in varnostno kopiranje ni na voljo.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Odklenite napravo za dostop do sinhronizacije in varnostnega kopiranja.</string>
+    <string name="sync_biometric_prompt_title">Sinhronizacija in varnostno kopiranje je zaklenjeno</string>
+    <string name="sync_require_device_passcode_dialog_title">Za uporabo funkcije Sync &amp; Backup (Sinhronizacija in varnostno kopiranje) zavarujte svojo napravo</string>
+    <string name="sync_require_device_passcode_dialog_body">Za uporabo funkcije Sync &amp; Backup (Sinhronizacija in varnostno kopiranje) je zahtevan vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
+    <string name="sync_require_device_passcode_dialog_action">Odprite Nastavitve</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Želite izbrisati podatke strežnika?</string>
+    <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinhronizirajte in varnostno kopirajte svoja gesla</string>
+    <string name="syncPromoSubtitlePasswords">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših gesel.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinhronizirajte in varnostno kopirajte svoje zaznamke</string>
+    <string name="syncPromoSubtitleBookmarks">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših zaznamkov.</string>
+
+    <string name="syncPromoPrimaryButton">Nastavitev sinhronizacije</string>
+    <string name="syncPromoSecondaryButton">Ne, hvala</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Prenesite DuckDuckGo v drugih napravah</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Prenesite DuckDuckGo v drugih napravah in ga sinhronizirajte s tem brskalnikom</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Prenos brskalnika DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Če želite prenesti DuckDuckGo v namiznem računalniku ali drugi mobilni napravi, obiščite:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Deli povezavo za prenos</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Povezava je kopirana</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Želite preklopiti na drugo sinhronizacijo?</string>
+    <string name="sync_dialog_switch_account_primary_button">Preklop sinhronizacije</string>
+    <string name="sync_dialog_switch_account_secondary_button">Prekliči</string>
+    <string name="sync_dialog_switch_account_description">Ta naprava je že sinhronizirana, ste prepričani, da jo želite sinhronizirati z drugo varnostno kopijo ali napravo? Preklop ne bo odstranil nobenih podatkov, ki so že sinhronizirani s to napravo.</string>
 </resources>

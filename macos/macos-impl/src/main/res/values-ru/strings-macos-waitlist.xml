@@ -23,7 +23,7 @@
     <string name="macos_share_title">Поделиться ссылкой</string>
     <string name="macos_description_text">Приложение DuckDuckGo для Mac — это высокая скорость, функциональность и беспрецедентная конфиденциальность.\n\nПерейдите на компьютере Mac по ссылке:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Конфиденциальность в Интернете на Mac? Не проблема!\n\nЗагрузите наше приложение по ссылке:\nhttps://duckduckgo.com/mac</string>
+    <string name="macos_share_text">Конфиденциальность в интернете на Mac? Не проблема!\n\nЗагрузите наше приложение по ссылке:\nhttps://duckduckgo.com/mac?origin=funnel_browser_android_settings</string>
 
     <string name="macos_waitlist_windows_link">Ищете версию для Windows?</string>
     <string name="macos_waitlist_footer">Чтобы записаться в список ожидания, не нужно делиться личной информацией. Временная метка, хранящаяся только на вашем устройстве, позволит определить, когда подойдет ваша очередь. Об этом мы сообщим вам дополнительно.</string>

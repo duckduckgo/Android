@@ -255,6 +255,21 @@
             "rules": [],
             "default": "ignore"
         },
+        "bad.etld-plus-two.site": {
+            "domain": "bad.etld-plus-two.site",
+            "owner": {
+                "name": "Test Site for Tracker Blocking With eTLD+2",
+                "displayName": "Bad Third Party Site eTLD+2",
+                "privacyPolicy": "",
+                "url": "http://bad.etld-plus-two.site"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block",
+            "rules": []
+        },
         "tracker.test": {
             "domain": "tracker.test",
             "owner": {
@@ -819,6 +834,13 @@
             "prevalence": 0.1,
             "displayName": "Test Site for Tracker Blocking"
         },
+        "Test Site for Tracker Blocking With eTLD+2": {
+            "domains": [
+                "bad.etld-plus-two.site"
+            ],
+            "prevalence": 0.1,
+            "displayName": "Bad Third Party Site eTLD+2"
+        },
         "Tests for formatting": {
             "domains": [
                 "format.test"
@@ -876,6 +898,7 @@
         "bad.third-party.site": "Test Site for Tracker Blocking",
         "sometimes-bad.third-party.site": "Test Site for Tracker Blocking",
         "broken.third-party.site": "Test Site for Tracker Blocking",
+        "bad.etld-plus-two.site": "Test Site for Tracker Blocking With eTLD+2",
         "format.test": "Tests for formatting",
         "third-party.site": "Test Site for Tracker Blocking",
         "tracker.test": "Test Site for Tracker Blocking",

@@ -20,7 +20,6 @@ import androidx.room.Room
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.privacy.config.impl.PrivacyConfigUpdateListener
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
@@ -50,7 +49,6 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
 
     lateinit var testee: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    private val mockPrivacyConfigUpdateListener: PrivacyConfigUpdateListener = mock()
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var referenceTestUtilities: ReferenceTestUtilities
@@ -88,7 +86,6 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
             db,
-            mockPrivacyConfigUpdateListener,
             InMemorySharedPreferences(),
         )
     }

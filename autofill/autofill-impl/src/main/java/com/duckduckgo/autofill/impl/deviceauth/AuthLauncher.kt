@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
@@ -37,12 +36,14 @@ import timber.log.Timber
 
 interface AuthLauncher {
     fun launch(
+        @StringRes featureTitleText: Int,
         @StringRes featureAuthText: Int,
         fragment: Fragment,
         onResult: (AuthResult) -> Unit,
     )
 
     fun launch(
+        @StringRes featureTitleText: Int,
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
@@ -55,12 +56,9 @@ class RealAuthLauncher @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod,
 ) : AuthLauncher {
-    private val biometricPromptInfoBuilder by lazy {
-        BiometricPrompt.PromptInfo.Builder()
-            .setTitle(context.getString(R.string.biometric_prompt_title))
-    }
 
     override fun launch(
+        @StringRes featureTitleText: Int,
         @StringRes featureAuthText: Int,
         fragment: Fragment,
         onResult: (AuthResult) -> Unit,
@@ -71,10 +69,11 @@ class RealAuthLauncher @Inject constructor(
             getCallBack(onResult),
         )
 
-        prompt.authenticate(getPromptInfo(featureAuthText))
+        prompt.authenticate(getPromptInfo(titleText = featureTitleText, featureAuthText = featureAuthText))
     }
 
     override fun launch(
+        @StringRes featureTitleText: Int,
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
@@ -85,7 +84,7 @@ class RealAuthLauncher @Inject constructor(
             getCallBack(onResult),
         )
 
-        prompt.authenticate(getPromptInfo(featureAuthText))
+        prompt.authenticate(getPromptInfo(titleText = featureTitleText, featureAuthText = featureAuthText))
     }
 
     private fun getCallBack(
@@ -118,7 +117,10 @@ class RealAuthLauncher @Inject constructor(
         }
     }
 
-    private fun getPromptInfo(featureAuthText: Int): BiometricPrompt.PromptInfo {
+    private fun getPromptInfo(titleText: Int, featureAuthText: Int): BiometricPrompt.PromptInfo {
+        val biometricPromptInfoBuilder = BiometricPrompt.PromptInfo.Builder()
+        biometricPromptInfoBuilder.setTitle(context.getString(titleText))
+
         // https://developer.android.com/reference/kotlin/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setallowedauthenticators
         // BIOMETRIC_STRONG | DEVICE_CREDENTIAL is unsupported on API 28-29. Setting an unsupported value on an affected Android version will result in an error when calling build().
         return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q && appBuildConfig.sdkInt != Build.VERSION_CODES.P) {

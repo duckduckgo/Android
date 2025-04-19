@@ -16,13 +16,13 @@
 
 package com.duckduckgo.common.utils.formatters.time
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.temporal.ChronoUnit
 
 class DatabaseDateFormatterTest {
 
@@ -47,6 +47,7 @@ class DatabaseDateFormatterTest {
     @Test
     fun whenIso8601isParsedThenDateIsCorrect() {
         val now = OffsetDateTime.now(ZoneOffset.UTC)
+            .truncatedTo(ChronoUnit.MILLIS) // SystemClock returns time with higher precision on JVM
         val format = DatabaseDateFormatter.iso8601(now)
         val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)

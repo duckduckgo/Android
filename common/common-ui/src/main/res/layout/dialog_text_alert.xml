@@ -16,86 +16,82 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.DuckDuckGo.Dialog.Content"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    style="@style/Widget.DuckDuckGo.Dialog.Content">
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/textAlertDialogImage"
-        android:layout_width="@dimen/dialogImageSize"
-        android:layout_height="@dimen/dialogImageSize"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/textAlertDialogTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+    <ScrollView
+        android:layout_weight="0"
+        android:id="@+id/textAlertDialogScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"
-        app:textType="primary" app:typography="h2"/>
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/textAlertDialogMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"
-        app:textType="secondary"
-        app:typography="body1"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/textAlertDialogPositiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+            <ImageView
+                android:id="@+id/textAlertDialogImage"
+                android:layout_gravity="center"
+                android:layout_width="@dimen/dialogImageSize"
+                android:layout_height="@dimen/dialogImageSize"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_globe_gray_16dp" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
-        android:id="@+id/textAlertDialogPositiveDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/textAlertDialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"
+                tools:text="Dialog title"
+                app:textType="primary"
+                app:typography="h2" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/textAlertDialogMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                tools:text="This is the dialog message and it's really larhhe"
+                app:textType="secondary"
+                app:typography="body1" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveDestructiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+            <CheckBox
+                android:id="@+id/textAlertDialogCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:visibility="gone"
+                tools:text="Remember me"
+                tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:id="@+id/textAlertDialogButtonContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:gravity="end"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textAlertDialogScroll" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+</LinearLayout>

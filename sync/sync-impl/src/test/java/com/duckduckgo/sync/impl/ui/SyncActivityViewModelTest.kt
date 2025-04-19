@@ -23,7 +23,6 @@ import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
-import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.api.SyncState.OFF
@@ -31,18 +30,21 @@ import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -72,12 +74,13 @@ class SyncActivityViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
     private val syncEngine: SyncEngine = mock()
     private val syncFeatureToggle: SyncFeatureToggle = mock()
+    private val syncPixels: SyncPixels = mock()
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -86,16 +89,18 @@ class SyncActivityViewModelTest {
     @Before
     fun before() {
         testee = SyncActivityViewModel(
-            qrEncoder = qrEncoder,
             syncAccountRepository = syncAccountRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             syncStateMonitor = syncStateMonitor,
             syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
             syncFeatureToggle = syncFeatureToggle,
+            syncPixels = syncPixels,
+            deviceAuthenticator = deviceAuthenticator,
         )
-
+        whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
+        whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
     }
 
     @Test
@@ -128,7 +133,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.loginQRCode != null)
+            assertTrue(viewState.showAccount)
 
             verify(syncEngine).triggerSync(FEATURE_READ)
             cancelAndIgnoreRemainingEvents()
@@ -151,6 +156,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onSyncWithAnotherDevice()
 
         testee.commands().test {
@@ -160,7 +166,19 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSyncWithAnotherDeviceWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onSyncWithAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onAddAnotherDevice()
 
         testee.commands().test {
@@ -170,7 +188,19 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenScanAnotherDeviceQRCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onAddAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onSyncThisDevice()
             awaitItem().assertCommandType(IntroCreateAccount::class)
@@ -179,11 +209,33 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSyncThisDeviceWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onRecoverYourSyncedData()
 
         testee.commands().test {
             awaitItem().assertCommandType(IntroRecoverSyncData::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onRecoverYourSyncedData()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -398,7 +450,8 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -408,24 +461,26 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenUserClicksOnSaveRecoveryCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        testee.commands().test {
+            testee.onSaveRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is RequestSetupAuthentication)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(TestSyncFixtures.pdfFile())
 
         testee.commands().test {
             testee.generateRecoveryCode(mock())
             val command = awaitItem()
             assertTrue(command is RecoveryCodePDFSuccess)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnShowTextCodeClickedThenEmitCommandShowTextCode() = runTest {
-        testee.onShowTextCodeClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.ShowTextCode::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -542,6 +597,38 @@ class SyncActivityViewModelTest {
         }
     }
 
+    @Test
+    fun whenSyncNotSupportedThenEmitCommandShowDeviceUnsupported() = runTest {
+        whenever(syncAccountRepository.isSyncSupported()).thenReturn(false)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.ShowDeviceUnsupported::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenClickedToGetAppOnOtherPlatformsClickedInEnabledStateThenEmitCommand() = runTest {
+        testee.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+        testee.commands().test {
+            awaitItem().also {
+                assertEquals("activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenClickedToGetAppOnOtherPlatformsClickedInDisabledStateThenEmitCommand() = runTest {
+        testee.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+        testee.commands().test {
+            awaitItem().also {
+                assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {
         assertTrue(format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }
@@ -549,9 +636,12 @@ class SyncActivityViewModelTest {
     private fun givenAuthenticatedUser() {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
-        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(qrBitmap())
+    }
+
+    private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(hasDeviceAuthentication)
     }
 }

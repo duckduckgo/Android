@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
@@ -48,7 +47,6 @@ class SavedSitesSyncPersisterTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val repository: SavedSitesRepository = mock()
     private val store: SavedSitesSyncStore = mock()
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
@@ -60,7 +58,6 @@ class SavedSitesSyncPersisterTest {
     @Before
     fun setup() {
         syncPersister = SavedSitesSyncPersister(
-            repository,
             store,
             syncSavedSitesRepository,
             persisterAlgorithm,

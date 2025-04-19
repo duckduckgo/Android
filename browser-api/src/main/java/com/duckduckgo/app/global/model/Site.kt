@@ -24,6 +24,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.domain
 
@@ -46,6 +47,8 @@ interface Site {
     var hasHttpResources: Boolean
     var upgradedHttps: Boolean
     var userAllowList: Boolean
+    var sslError: Boolean
+    var isExternalLaunch: Boolean
 
     val entity: Entity?
     var certificate: SslCertificate?
@@ -66,6 +69,7 @@ interface Site {
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun privacyProtection(): PrivacyShield
+    fun resetTrackingEvents()
 
     var urlParametersRemoved: Boolean
     var consentManaged: Boolean
@@ -73,16 +77,35 @@ interface Site {
     var consentSelfTestFailed: Boolean
     var consentCosmeticHide: Boolean?
     var isDesktopMode: Boolean
+    var nextUrl: String
+
+    val realBrokenSiteContext: BrokenSiteContext
+
+    var maliciousSiteStatus: MaliciousSiteStatus?
+
+    var previousNumberOfBlockedTrackers: Int?
+}
+
+enum class MaliciousSiteStatus {
+    PHISHING, MALWARE
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents
+    .asSequence()
     .filter { it.status == TrackerStatus.BLOCKED }
     .mapNotNull { it.entity }
     .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }
+    .toList()
+    .also { previousNumberOfBlockedTrackers = it.size }
 
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
+}
+
+fun Site.domainMatchesUrl(matchingUrl: Uri): Boolean {
+    // TODO (cbarreiro) can we get rid of baseHost for the Uri as well?
+    return uri?.baseHost == matchingUrl.host
 }
 
 val Site.domain get() = uri?.domain()

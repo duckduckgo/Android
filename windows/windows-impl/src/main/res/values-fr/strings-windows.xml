@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo pour Windows a tout ce dont vous avez besoin pour naviguer en toute confidentialité : recherche privée, blocage des traqueurs, cryptage forcé et blocage des fenêtres contextuelles (cookies), sans oublier d\'autres protections de choix à venir.\n\nSur votre ordinateur Windows, accédez à :</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partager le lien</string>
-    <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application :\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application :\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Vous cherchez la version Mac ?</string>
 </resources>

@@ -37,10 +37,11 @@
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="${appIconRound}"
-        android:supportsRtl="true"
+        android:dataExtractionRules="@xml/backup_rules_android_12_upwards"
+        android:fullBackupContent="@xml/backup_rules_android_11_and_older"
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -221,16 +222,21 @@
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:exported="false"
-            android:label="@string/appName"
-            android:theme="@style/Theme.DuckDuckGo.Light" />
+            android:label="@string/appName" />
 
         <activity
-            android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
-            android:exported="true"
-            android:label="@string/appDescription"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:name="com.duckduckgo.app.browser.customtabs.CustomTabActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:exported="false"
+            android:persistableMode="persistNever"
+            android:excludeFromRecents="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:resizeableActivity="true" />
+
+        <activity
+            android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+            android:exported="true">
 
             <!-- Allows app to become default browser -->
             <intent-filter>
@@ -241,6 +247,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
             <!-- Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them -->
@@ -252,6 +259,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
 
                 <data android:mimeType="text/html" />
                 <data android:mimeType="text/plain" />
@@ -274,9 +282,18 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
         </activity>
+
+        <activity
+            android:name=".BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
+            android:exported="true"
+            android:label="@string/appDescription"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
@@ -314,12 +331,6 @@
             android:label="@string/feedbackActivityTitle"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
-            android:exported="false"
-            android:label="@string/brokenSiteHeading"
-            android:windowSoftInputMode="adjustResize"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false"
@@ -337,24 +348,10 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:exported="false"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"
-            android:exported="false"
-            android:label="@string/settingsSitePermissions"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity"
-            android:exported="false"
-            android:parentActivityName="com.duckduckgo.app.sitepermissions.SitePermissionsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"
@@ -402,6 +399,16 @@
             android:label="@string/privateSearchActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.generalsettings.GeneralSettingsActivity"
+            android:exported="false"
+            android:label="@string/generalSettingsActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchActivity"
+            android:exported="false"
+            android:label="@string/showOnAppLaunchOptionTitle"
+            android:parentActivityName="com.duckduckgo.app.generalsettings.GeneralSettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"
             android:exported="false"
             android:label="@string/webTrackingProtectionActivityTitle"
@@ -430,13 +437,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
-            android:exported="false"
-            android:label="@string/folderLocationTitle"
-            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
-
         <activity
             android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
             android:exported="false"
@@ -450,11 +450,6 @@
             android:parentActivityName=".BrowserActivity" />
 
         <service
-            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service
             android:name="com.duckduckgo.widget.FavoritesWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
@@ -463,6 +458,15 @@
             android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.support.customtabs.action.CustomTabsService" />
+            </intent-filter>
+        </service>
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 

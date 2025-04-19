@@ -38,6 +38,7 @@ class DeviceShieldMostRecentActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         finish()
     }
 

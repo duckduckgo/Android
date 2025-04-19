@@ -24,10 +24,8 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -36,42 +34,40 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class AboutDuckDuckGoViewModel @Inject constructor(
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val appBuildConfig: AppBuildConfig,
-    private val variantManager: VariantManager,
     private val pixel: Pixel,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel() {
 
     data class ViewState(
-        val networkProtectionWaitlistState: NetPWaitlistState = NotUnlocked,
         val version: String = "",
     )
 
     sealed class Command {
-        object LaunchBrowserWithLearnMoreUrl : Command()
-        object LaunchBrowserWithPrivacyProtectionsUrl : Command()
-        object LaunchWebViewWithPrivacyPolicyUrl : Command()
-        object ShowNetPUnlockedSnackbar : Command()
-        object LaunchNetPWaitlist : Command()
-        object LaunchFeedback : Command()
+        data object LaunchBrowserWithLearnMoreUrl : Command()
+        data object LaunchBrowserWithPrivacyProtectionsUrl : Command()
+        data object LaunchWebViewWithPrivacyPolicyUrl : Command()
+        data object LaunchFeedback : Command()
+        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchWebViewWithComparisonChartUrl : Command()
+        data object LaunchWebViewWithPPROUrl : Command()
+        data object LaunchWebViewWithVPNUrl : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private var netPEasterEggCounter = 0
+    private var easterEggCounter = 0
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val variantKey = variantManager.getVariantKey()
-
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
-                    version = obtainVersion(variantKey),
+                    version = obtainVersion(),
                 ),
             )
         }
@@ -79,6 +75,18 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    fun onComparisonChartLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithComparisonChartUrl) }
+    }
+
+    fun onPProHelpPageLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithPPROUrl) }
+    }
+
+    fun onVPNHelpPageLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithVPNUrl) }
     }
 
     fun onLearnMoreLinkClicked() {
@@ -96,42 +104,40 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onVersionClicked() {
-        if (viewState.value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
-            netPEasterEggCounter++
-            if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
-                viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
-                resetNetPEasterEggCounter()
-                pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
-            }
+        easterEggCounter++
+        if (easterEggCounter >= MAX_EASTER_EGG_COUNT) {
+            Timber.v("Easter egg triggered")
+            resetEasterEggCounter()
+            pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
         }
     }
 
     fun onProvideFeedbackClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFeedback) }
+        viewModelScope.launch {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(Command.LaunchPproUnifiedFeedback)
+            } else {
+                command.send(Command.LaunchFeedback)
+            }
+        }
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
-    fun onNetPUnlockedActionClicked() {
-        viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
-        pixel.fire(SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
-    }
-
-    fun resetNetPEasterEggCounter() {
-        netPEasterEggCounter = 0
+    fun resetEasterEggCounter() {
+        easterEggCounter = 0
     }
 
     // This is used for testing only to check the `netPEasterEggCounter` is reset without
     // exposing it.
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    internal fun hasResetNetPEasterEggCounter() = netPEasterEggCounter == 0
+    internal fun hasResetEasterEggCounter() = easterEggCounter == 0
 
     private fun currentViewState(): ViewState {
         return viewState.value
     }
 
-    private fun obtainVersion(variantKey: String?): String {
-        val formattedVariantKey = if (variantKey.isNullOrBlank()) " " else " $variantKey "
-        return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
+    private fun obtainVersion(): String {
+        return "${appBuildConfig.versionName} (${appBuildConfig.versionCode})"
     }
 
     companion object {

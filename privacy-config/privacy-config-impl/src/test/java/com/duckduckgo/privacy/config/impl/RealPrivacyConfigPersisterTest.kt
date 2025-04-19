@@ -56,7 +56,6 @@ class RealPrivacyConfigPersisterTest {
 
     lateinit var testee: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    private val mockPrivacyConfigUpdateListener: PrivacyConfigUpdateListener = mock()
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var privacyRepository: PrivacyConfigRepository
@@ -84,7 +83,6 @@ class RealPrivacyConfigPersisterTest {
                 unprotectedTemporaryRepository,
                 privacyRepository,
                 db,
-                mockPrivacyConfigUpdateListener,
                 sharedPreferences,
             )
     }
@@ -105,12 +103,21 @@ class RealPrivacyConfigPersisterTest {
                 db,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
     }
 
     @Test
-    fun whenPluginPointSignatureThenReturnUniqueSignature() {
-        assertEquals(pluginPoint.signature(), pluginPoint.signature())
+    fun whenHashIsNullSignatureReturnsFeatureName() {
+        val expected = pluginPoint.getPlugins().sumOf { it.featureName.hashCode() }
+        assertEquals(expected, pluginPoint.signature())
+    }
+
+    @Test
+    fun whenHashIsNotNullSignatureReturnsHash() {
+        val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(HashedFakePrivacyFeaturePlugin()))
+        val expected = pluginPoint.getPlugins().sumOf { it.hash().hashCode() }
+        assertEquals(expected, pluginPoint.signature())
     }
 
     @Test
@@ -144,6 +151,28 @@ class RealPrivacyConfigPersisterTest {
 
             val plugin = pluginPoint.getPlugins().first() as FakePrivacyFeaturePlugin
             assertEquals(1, plugin.count)
+        }
+
+    @Test
+    fun whenPersistPrivacyConfigAndMultiplePluginMatchesFeatureNameThenCallThemAll() =
+        runTest {
+            val differentPluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin(), FakePrivacyFeaturePlugin()))
+            // override
+            val testee =
+                RealPrivacyConfigPersister(
+                    differentPluginPoint,
+                    variantManagerPlugin,
+                    mockTogglesRepository,
+                    unprotectedTemporaryRepository,
+                    privacyRepository,
+                    db,
+                    sharedPreferences,
+                )
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            for (plugin in differentPluginPoint.getPlugins()) {
+                assertEquals(1, (plugin as FakePrivacyFeaturePlugin).count)
+            }
         }
 
     @Test
@@ -230,7 +259,7 @@ class RealPrivacyConfigPersisterTest {
         }
     }
 
-    class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
+    private class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
         override fun store(
@@ -243,6 +272,22 @@ class RealPrivacyConfigPersisterTest {
 
         override val featureName: String =
             PrivacyFeatureName.GpcFeatureName.value
+    }
+
+    private class HashedFakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
+        var count = 0
+
+        override fun store(
+            featureName: String,
+            jsonString: String,
+        ): Boolean {
+            count++
+            return true
+        }
+
+        override val featureName: String = "HashedFakePrivacyFeaturePlugin"
+
+        override fun hash() = "HashedFakePrivacyFeaturePluginHash"
     }
 
     class FakePrivacyVariantManagerPlugin : PrivacyFeaturePlugin {
@@ -265,8 +310,12 @@ class RealPrivacyConfigPersisterTest {
         }
     }
 
-    class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
-        override fun onPrivacyConfigDownloaded() {}
+    internal class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
+        internal var downloadCallCount = 0
+
+        override fun onPrivacyConfigDownloaded() {
+            downloadCallCount++
+        }
     }
 
     companion object {

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
     <string name="sync_flows_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sincronização &amp; Cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
     <string name="sync_paused_notification"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+    <string name="sync_error_notification"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
+    <string name="sync_error_warning"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
+    <string name="sync_signed_out_notification"><b>A sincronização está em pausa</b>\nA sincronização foi colocada em pausa. Se quiseres continuar a sincronizar este dispositivo, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sincronização e cópia de segurança</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sincroniza os marcadores e palavras-passe entre os teus dispositivos em segurança.</string>
     <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de encriptação.</string>
     <string name="sync_setup_single_device_title">Configuração de dispositivo único</string>
+    <string name="sync_setup_other_options_title">Outras opções</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperar dados sincronizados</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Transferir automaticamente ícones para marcadores sincronizados.</string>
     <string name="sync_enable_connecting">A ligar…</string>
     <string name="sync_intro_enable_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
-    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.…</string>
+    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.</string>
     <string name="sync_intro_enable_footer">Podes sincronizar com outros dispositivos mais tarde.</string>
     <string name="sync_intro_enable_cta">Ativar a sincronização e cópia de segurança</string>
     <string name="sync_intro_recover_title">Recuperar dados sincronizados</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sincronizar</string>
     <string name="sync_notify_me_title">As notificações estão desativadas</string>
     <string name="sync_notify_me_description">Recebe uma notificação se a sincronização e a cópia de segurança encontrarem um erro.</string>
-    <string name="sync_rollout_banner_text">A sincronização e cópia de segurança estão a ser disponibilizadas gradualmente e podem ainda não estar disponíveis no DuckDuckGo nos teus outros dispositivos</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Não foi possível desativar a Sincronização e cópia de segurança.</string>
+    <string name="sync_edit_device_error">Não foi possível atualizar o nome do dispositivo.</string>
+    <string name="sync_remove_device_error">Não foi possível remover este dispositivo da sincronização e cópia de segurança.</string>
+    <string name="sync_delete_data_error">Não foi possível eliminar os dados no servidor.</string>
+    <string name="sync_login_authenticated_device_error">"Para emparelhar estes dispositivos, desativa o Sync &amp; Backup num dispositivo e, em seguida, toca em Sincronizar com outro dispositivo no outro dispositivo."</string>
+    <string name="sync_connect_generic_error">Não foi possível ligar ao servidor.</string>
+    <string name="sync_connect_login_error">Não foi possível sincronizar com outro dispositivo.</string>
+    <string name="sync_create_account_generic_error">Não foi possível ligar ao servidor.</string>
+    <string name="sync_invalid_code_error">Este código é inválido. Confirma que introduziste ou leste o código correto.</string>
+    <string name="sync_recovery_pdf_error">Não foi possível criar o PDF de recuperação.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sincronização e cópia de segurança</string>
+    <string name="sync_encryption_not_supported_error_title">Dispositivo não suportado</string>
+    <string name="sync_encryption_not_supported_error">O Sync &amp; Backup é encriptado ponto a ponto e tem de poder encriptar e armazenar dados no teu dispositivo. Como o teu dispositivo não é compatível com armazenamento encriptado, o Sync &amp; Backup não está disponível.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Desbloqueia o dispositivo para acederes ao Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup bloqueado</string>
+    <string name="sync_require_device_passcode_dialog_title">Protege o teu dispositivo para usares o Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">É necessário um padrão de bloqueio do dispositivo, um PIN ou dados biométricos para usar o Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Aceder às Definições</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Eliminar dados do servidor?</string>
+    <string name="sync_delete_server_data_dialog_content">Todos os dispositivos serão desconectados e os dados sincronizados serão eliminados do servidor.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Eliminar dados</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Cancelar</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincroniza e faz uma cópia de segurança das tuas palavras-passe</string>
+    <string name="syncPromoSubtitlePasswords">Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincroniza e faz uma cópia de segurança dos teus favoritos</string>
+    <string name="syncPromoSubtitleBookmarks">Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver os teus favoritos, nem mesmo nós.</string>
+
+    <string name="syncPromoPrimaryButton">Configurar sincronização</string>
+    <string name="syncPromoSecondaryButton">Não, obrigado</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Instalar DuckDuckGo noutros dispositivos</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Instala o DuckDuckGo noutros dispositivos para sincronizar com este</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Instala o DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Para transferires o DuckDuckGo num computador ou noutro dispositivo móvel, visita:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Partilhar link de transferência</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiado</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Mudar para uma sincronização diferente?</string>
+    <string name="sync_dialog_switch_account_primary_button">Mudar sincronização</string>
+    <string name="sync_dialog_switch_account_secondary_button">Cancelar</string>
+    <string name="sync_dialog_switch_account_description">Este dispositivo já está sincronizado, tens a certeza de que queres sincronizá-lo com uma cópia de segurança ou um dispositivo diferente? A mudança não vai remover nenhum dado já sincronizado com este dispositivo.</string>
 </resources>

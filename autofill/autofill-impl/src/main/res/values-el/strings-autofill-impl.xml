@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Προσαρμογή στις Ρυθμίσεις</b></string>
 
     <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
+    <string name="saveLoginDialogTitle">Αποθήκευση του κωδικού πρόσβασής σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Η αυτόματη συμπλήρωση κωδικών πρόσβασης δεν είναι διαθέσιμη καθώς η έκδοση του Android WebView είναι παλιά ή μη συμβατή.</string>
+
     <string name="autofillManagementSearchClearDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Δεν υπάρχουν αποτελέσματα για «%1$s»</string>
 
     <string name="autofillDeleteLoginDialogCancel">Ακύρωση</string>
     <string name="autofillDeleteLoginDialogDelete">Διαγραφή</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Έξοδος από την εγκατάσταση</string>
 
     <string name="autofillManagementScreenTitle">Κωδικοί πρόσβασης</string>
+    <string name="autofillManagementScreenTitleNew">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
-    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
+    <string name="credentialManagementAutofillSubtitle">Οι κωδικοί πρόσβασης είναι κρυπτογραφημένοι. Κανείς άλλος εκτός από εσάς δεν μπορεί να τους βλέπει, ούτε καν εμείς. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Ασφάλεια Διαχειριστή κωδικών πρόσβασης</string>
+    <string name="saveLoginDialogSubtitle">Αποθηκεύστε με ασφάλεια τον κωδικό πρόσβασής σας στη συσκευή με τη λειτουργία DuckDuckGo κωδικοί πρόσβασης και αυτόματη συμπλήρωση.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
-    <string name="autofillDeleteLoginDialogTitle">Θέλετε σίγουρα να διαγράψετε αυτόν τον κωδικό πρόσβασης;</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε κωδικούς πρόσβασης;</string>
@@ -133,6 +140,125 @@
     <string name="managementDisabledModeSubtitle">Για προστασία των κωδικών πρόσβασής σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="credentialManagementEditTitle">Επεξεργασία κωδικού πρόσβασης</string>
 
-    <string name="credentials_limit_warning"><b>Ο Συγχρονισμός τέθηκε σε παύση</b>\nΥπέρβαση του ορίου συνδέσεων. Διαγραφή ορισμένων για συνέχιση του συγχρονισμού.\n\n<annotation type="manage_logins">Διαχείριση συνδέσεων</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Ο Συγχρονισμός κωδικών πρόσβασης τέθηκε σε παύση</b>\nΈχετε υπερβεί το όριο συγχρονισμού κωδικών πρόσβασης. Προσπαθήστε να διαγράψετε κάποιους κωδικούς πρόσβασης. Μέχρι να επιλυθεί το πρόβλημα αυτό, δεν θα δημιουργηθούν αντίγραφα ασφάλειας για τους κωδικούς πρόσβασής σας.</string>
+    <string name="credentials_limit_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό κωδικών πρόσβασης. Διαγράψτε ορισμένους για να συνεχίσετε τον συγχρονισμό.\n\n<annotation type="manage_logins">Διαχείριση κωδικών πρόσβασης</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Ο συγχρονισμός κωδικών πρόσβασης έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό κωδικών πρόσβασης. Διαγράψτε ορισμένους κωδικούς πρόσβασης για να συνεχίσετε τον συγχρονισμό.</string>
+    <string name="credentials_invalid_request_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΟρισμένοι κωδικοί πρόσβασης δεν έχουν μορφοποιηθεί σωστά ή είναι πολύ μεγάλοι και δεν συγχρονίστηκαν.\n\n<annotation type="manage_logins">Διαχείριση κωδικών πρόσβασης</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Ο συγχρονισμός κωδικών πρόσβασης έχει τεθεί σε παύση</b>\nΟρισμένοι κωδικοί πρόσβασης δεν έχουν μορφοποιηθεί σωστά ή είναι πολύ μεγάλοι και δεν συγχρονίστηκαν.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Μην ζητάτε ποτέ αυτόν τον ιστότοπο</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Όχι, ευχαριστώ</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Εάν κάνετε επαναφορά των αποκλεισμένων ιστότοπων, θα σας ζητηθεί να αποθηκεύσετε τον κωδικό πρόσβασής σας την επόμενη φορά που θα συνδεθείτε σε οποιονδήποτε από τους ιστότοπους αυτούς.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Επαναφορά αποκλεισμένων ιστότοπων</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Επαναφορά αποκλεισμένων ιστότοπων;</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Επαναφορά</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Ακύρωση</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Διαγραφή όλων των κωδικών πρόσβασης</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d κωδικός πρόσβασης διαγράφηκε</item>
+        <item quantity="other">%1$d κωδικοί πρόσβασης διαγράφηκαν</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Επαληθεύστε την ταυτότητά σας για να επιβεβαιώσετε ότι θέλετε να διαγράψετε όλους τους κωδικούς πρόσβασης</string>
+    <string name="autofill_title_text_for_delete_all">Διαγραφή όλων των κωδικών πρόσβασης</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Ο κωδικός πρόσβασής σας για τον %1$s δεν μπορεί να συγχρονιστεί επειδή ορισμένα από τα πεδία του υπερβαίνουν το όριο χαρακτήρων.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας για τον %1$s και %2$d ακόμα ιστότοπους δεν μπορούν να συγχρονιστούν επειδή ορισμένα από τα πεδία τους υπερβαίνουν το όριο χαρακτήρων.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Διαχείριση κωδικών πρόσβασης</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ο κωδικός πρόσβασής σας θα διαγραφεί από αυτήν τη συσκευή.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ο κωδικός πρόσβασής σας θα διαγραφεί από αυτήν τη συσκευή.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας θα διαγραφούν από αυτήν τη συσκευή.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας θα διαγραφούν από όλες τις συγχρονισμένες συσκευές.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Θέλετε σίγουρα να διαγράψετε αυτόν τον κωδικό πρόσβασης;</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+        <item quantity="other">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</item>
+        <item quantity="other">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Μπορείτε να εισαγάγετε αποθηκευμένους κωδικούς πρόσβασης από άλλο πρόγραμμα περιήγησης στο DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Εισαγωγή κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Τρόπος εισαγωγής κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Εισαγάγετε κωδικούς πρόσβασης στην έκδοση του προγράμματος περιήγησης DuckDuckGo για υπολογιστές και έπειτα συγχρονίστε τους σε όλες τις συσκευές.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ο σύνδεσμος αντιγράφηκε</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Αποκτήστε το πρόγραμμα περιήγησης DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Αναζητήστε ιδιωτικά και αποκλείστε εφαρμογές παρακολούθησης με το πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές. Επισκεφτείτε αυτόν τον σύνδεσμο στον υπολογιστή σας για να πραγματοποιήσετε λήψη σήμερα.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Συγχρονισμός με υπολογιστή</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Εισαγωγή από το πρόγραμμα περιήγησης για υπολογιστές:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ανοίξτε το DuckDuckGo σε Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Μεταβείτε στις <b>Ρυθμίσεις</b> > <b>Κωδικοί πρόσβασης</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Επιλέξτε <b>Εισαγωγή κωδικών πρόσβασης</b>... και ακολουθήστε τα βήματα για εισαγωγή]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Μόλις εισαχθεί στον υπολογιστή σας, μπορείτε να ρυθμίσετε τον συγχρονισμό στη συσκευή αυτή</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Αποκτήστε την εφαρμογή για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Αποκτήστε το DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Στον υπολογιστή σας, μεταβείτε στη διεύθυνση:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Κοινή χρήση συνδέσμου λήψης</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Αναφέρετε ένα πρόβλημα με την Αυτόματη συμπλήρωση</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Αναφέρετε ανώνυμα ότι η αυτόματη συμπλήρωση δεν λειτουργεί σε αυτόν τον ιστότοπο. Οι κωδικοί πρόσβασης δεν κοινοποιούνται ποτέ.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Δεν λειτουργεί η αυτόματη συμπλήρωση αναφοράς στο %1$s;</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Οι αναφορές που αποστέλλονται στο DuckDuckGo είναι ανώνυμες και δεν περιλαμβάνουν το όνομα χρήστη, τον κωδικό πρόσβασής σας ή οποιαδήποτε άλλη πληροφορία που μπορεί να σας ταυτοποιήσει.\n\nΗ αναφορά περιλαμβάνει μόνο τη διεύθυνση URL του ιστότοπου και την κατάσταση ορισμένων ρυθμίσεων αυτόματης συμπλήρωσης.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Αποστολή Αναφοράς</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Ακύρωση</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Σε ευχαριστούμε! Η αναφορά σας θα μας βοηθήσει ώστε να γίνει το DuckDuckGo καλύτερο για όλους.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Βασικά χαρακτηριστικά</string>
+    <string name="onboardingSaveDialogFeature1Title">Απρόσκοπτες συνδέσεις</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Δεν χρειάζεται να θυμάστε τα στοιχεία σύνδεσης.</string>
+    <string name="onboardingSaveDialogFeature2Title">Ασφαλής αποθήκευση</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Οι κωδικοί πρόσβασης κρυπτογραφούνται, αποθηκεύονται στη συσκευή και κλειδώνονται με το μοτίβο Android ή το PIN σας.</string>
+    <string name="onboardingSaveDialogFeature3Title">Συγχρονισμός μεταξύ συσκευών</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Κρυπτογραφημένο από άκρο σε άκρο και εύκολο στη ρύθμιση, όταν είστε έτοιμοι.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Μπορείτε να απενεργοποιήσετε την αποθήκευση κωδικού πρόσβασης οποιαδήποτε στιγμή.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Άνοιγμα ρυθμίσεων</string>
+
+    <string name="newTabPageShortcutPasswords">Κωδικοί πρόσβασης</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Εισαγωγή κωδικών πρόσβασης Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από το Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Άνοιγμα κωδικών πρόσβασης Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Εισαγωγή στο DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Η εισαγωγή ολοκληρώθηκε</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Το έπιασα</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Η εισαγωγή κωδικού πρόσβασης απέτυχε</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Παραλείφθηκε (διπλότυπο ή μη έγκυρο): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Κωδικοί πρόσβασης που εισήχθησαν: <b>%1$d</b>]]></string>
+
 </resources>

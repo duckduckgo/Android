@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
-import com.duckduckgo.mobile.android.vpn.feature.FakeFeatureToggleFactory
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.test.runTest
@@ -86,7 +86,7 @@ class AppTPVpnConnectivityLossListenerTest {
     fun whenRestartOnConnectivityLossIsDisabledThenNoop() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        appTpRemoteFeatures.restartOnConnectivityLoss().setEnabled(Toggle.State(enable = false))
+        appTpRemoteFeatures.restartOnConnectivityLoss().setRawStoredState(Toggle.State(enable = false))
 
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)

@@ -18,7 +18,6 @@ package com.duckduckgo.settings.api
 
 import android.content.Context
 import android.view.View
-import dagger.MapKey
 
 /**
  * Use this interface to create a new plugin that will be used to display a specific settings section
@@ -36,5 +35,7 @@ interface SettingsPlugin {
  */
 interface ProSettingsPlugin : SettingsPlugin
 
-@MapKey
-annotation class PositionKey(val pos: Int)
+/**
+ * This is the plugin for Duck Player settings
+ */
+interface DuckPlayerSettingsPlugin : SettingsPlugin

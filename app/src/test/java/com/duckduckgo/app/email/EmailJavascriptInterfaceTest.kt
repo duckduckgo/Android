@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.email
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
@@ -48,6 +49,7 @@ class EmailJavascriptInterfaceTest {
     lateinit var testee: EmailJavascriptInterface
     private var counter = 0
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun setup() {
         autofillFeature = com.duckduckgo.autofill.api.FakeAutofillFeature.create()
@@ -61,7 +63,7 @@ class EmailJavascriptInterfaceTest {
             mockAutofill,
         ) { counter++ }
 
-        autofillFeature.self().setEnabled(Toggle.State(enable = true))
+        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -128,10 +130,11 @@ class EmailJavascriptInterfaceTest {
         assertEquals(1, counter)
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
-        autofillFeature.self().setEnabled(Toggle.State(enable = false))
+        autofillFeature.self().setRawStoredState(Toggle.State(enable = false))
 
         testee.showTooltip()
 

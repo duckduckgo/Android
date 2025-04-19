@@ -25,6 +25,11 @@ interface DnsProvider {
     fun getSystemDns(): List<InetAddress>
 
     /**
+     * @return comma separated domains to search when resolving host names on this link or null
+     */
+    fun getSearchDomains(): String? = null
+
+    /**
      * @return Returns the list of private DNS set by the user via the Android Private DNS settings, or empty
      * if not set
      */

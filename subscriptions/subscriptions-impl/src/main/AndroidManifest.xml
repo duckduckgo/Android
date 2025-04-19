@@ -16,32 +16,46 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.subscriptions.impl">
-    <application android:supportsRtl="true">
+    <application>
         <activity
                 android:name=".ui.SubscriptionsWebViewActivity"
                 android:exported="false"
-                android:label="Subscriptions"
+                android:label="@string/activitySubscriptions"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".ui.SubscriptionSettingsActivity"
                 android:exported="false"
-                android:label="Subscription Settings"
+                android:label="@string/activitySubscriptionSettings"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-                android:screenOrientation="portrait" />
-
-        <activity
-                android:name=".ui.AddDeviceActivity"
-                android:exported="false"
-                android:label="Add Device"
-                android:parentActivityName=".ui.SubscriptionSettingsActivity"
                 android:screenOrientation="portrait" />
 
         <activity
                 android:name=".ui.RestoreSubscriptionActivity"
                 android:exported="false"
-                android:label="Activate Subscription"
+                android:label="@string/activityActivateSubscription"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".ui.ChangePlanActivity"
+                android:exported="false"
+                android:label="@string/changePlanTitle"
+                android:parentActivityName=".ui.SubscriptionSettingsActivity"
+                android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".pir.PirActivity"
+                android:exported="false"
+                android:label="@string/activityPir"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+                android:screenOrientation="portrait" />
+
+        <activity android:name=".feedback.SubscriptionFeedbackActivity"
+            android:exported="false"
+            android:label="@string/activitySendFeedback"
+            android:parentActivityName=".ui.SubscriptionSettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 </manifest>

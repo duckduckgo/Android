@@ -18,11 +18,11 @@ package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.withTimeoutOrNull
@@ -38,7 +38,7 @@ class LaunchViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        object Onboarding : Command()
+        data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 

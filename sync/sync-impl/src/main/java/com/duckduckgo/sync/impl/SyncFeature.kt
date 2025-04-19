@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -40,4 +41,16 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(true)
     fun level3AllowCreateAccount(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun gzipPatchRequests(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun seamlessAccountSwitching(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun exchangeKeysToSyncWithAnotherDevice(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun automaticallyUpdateSyncSettings(): Toggle
 }

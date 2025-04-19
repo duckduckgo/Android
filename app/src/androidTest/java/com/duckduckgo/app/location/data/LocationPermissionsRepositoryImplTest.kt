@@ -19,10 +19,10 @@ package com.duckduckgo.app.location.data
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.blockingObserve
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.After

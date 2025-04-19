@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
@@ -36,9 +37,11 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -64,6 +67,12 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     private val clickableSpan = object : ClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.onLearnMoreSelected()
+        }
+
+        override fun updateDrawState(ds: TextPaint) {
+            super.updateDrawState(ds)
+            ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
+            ds.isUnderlineText = false
         }
     }
 
@@ -93,7 +102,13 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        binding.autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
+        with(binding) {
+            autoconsentHeaderImage.setImageResource(
+                if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
+            )
+            autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
+            autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
+        }
     }
 
     private fun processCommand(it: Command) {
@@ -108,11 +123,14 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlText = getString(R.string.autoconsentDescription).html(this)
+        val htmlText = getString(
+            R.string.autoconsentDescription,
+        ).html(this)
         val spannableString = SpannableStringBuilder(htmlText)
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
             spannableString.apply {
+                insert(spannableString.getSpanStart(it), "\n")
                 setSpan(
                     clickableSpan,
                     spannableString.getSpanStart(it),
@@ -123,7 +141,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        binding.autoconsentDescription.apply {
+        binding.autoconsentDescriptionNew.apply {
             text = spannableString
             movementMethod = LinkMovementMethod.getInstance()
         }

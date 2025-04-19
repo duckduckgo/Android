@@ -22,13 +22,14 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.app.global.view.loadFavicon
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
@@ -36,18 +37,24 @@ import com.duckduckgo.common.utils.faviconLocation
 import com.duckduckgo.common.utils.touchFaviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import java.io.File
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private const val FAVICON_LOAD_RETRY_DELAY = 2000L
+private const val FAVICON_LOAD_RETRIES = 3
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
     private val savedSitesDao: SavedSitesEntitiesDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val savedSitesRepository: SavedSitesRepository,
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillStore: AutofillStore,
+    private val faviconsFetchingStore: FaviconsFetchingStore,
     private val context: Context,
 ) : FaviconManager {
 
@@ -87,6 +94,20 @@ class DuckDuckGoFaviconManager constructor(
 
             return@withContext if (favicon != null) {
                 saveFavicon(tabId, favicon, domain)
+            } else {
+                null
+            }
+        }
+    }
+
+    override suspend fun tryFetchFaviconForUrl(url: String): File? {
+        return withContext(dispatcherProvider.io()) {
+            val domain = url.extractDomain() ?: return@withContext null
+
+            val favicon = downloadFaviconFor(domain)
+
+            return@withContext if (favicon != null) {
+                saveFavicon(null, favicon, domain)
             } else {
                 null
             }
@@ -141,9 +162,36 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
+    override suspend fun loadToViewMaybeFromRemoteWithPlaceholder(
+        url: String,
+        view: ImageView,
+        placeholder: String?,
+    ) {
+        val bitmap = loadFromDisk(tabId = null, url = url)
+        if (bitmap == null && faviconsFetchingStore.isFaviconsFetchingEnabled) {
+            tryFetchFaviconForUrl(url)
+            view.loadFavicon(loadFromDisk(tabId = null, url = url), url, placeholder)
+        } else {
+            view.loadFavicon(bitmap, url, placeholder)
+        }
+    }
+
     override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
-        val bitmap = loadFromDisk(tabId, url)
+        var bitmap = loadFromDisk(tabId, url)
         view.loadFavicon(bitmap, url, placeholder)
+
+        // sometimes it takes a while to fetch a favicon, so we try to load it from disk again
+        repeat(FAVICON_LOAD_RETRIES) {
+            if (bitmap == null) {
+                view.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    delay(FAVICON_LOAD_RETRY_DELAY)
+                    bitmap = loadFromDisk(tabId, url)
+                    if (bitmap != null) {
+                        view.loadFavicon(bitmap, url, placeholder)
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun persistCachedFavicon(
@@ -239,7 +287,6 @@ class DuckDuckGoFaviconManager constructor(
 
         return withContext(dispatcherProvider.io()) {
             savedSitesDao.countEntitiesByUrl(query) +
-                locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
                 savedSitesRepository.getFavoritesCountByDomain(query) +
                 autofillStore.getCredentials(domain).size

@@ -16,7 +16,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application android:supportsRtl="true">
+    <application>
         <activity
             android:name="com.duckduckgo.macos.impl.MacOsActivity"
             android:exported="false"

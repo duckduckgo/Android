@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Повторен опит</string>
     <string name="notificationDownloadComplete">Изтеглянето е завършено.</string>
     <string name="notificationDownloadFailed">Неуспешно изтегляне.</string>
+
+    <string name="downloadConfirmationContinue">Запазване в Изтеглени файлове</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">От: %1$s</string>
 </resources>

@@ -27,16 +27,21 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.brokensite.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
+    testImplementation project(':feature-toggles-test')
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':broken-site-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
+    implementation project(path: ':common-ui')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':broken-site-store')
 
@@ -60,9 +65,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     implementation Google.dagger
     implementation JakeWharton.timber
 
@@ -74,6 +76,8 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
 
+    implementation AndroidX.dataStore.preferences
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -82,4 +86,6 @@ dependencies {
     testImplementation AndroidX.core
     testImplementation CashApp.turbine
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

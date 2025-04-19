@@ -1,8 +1,10 @@
 package com.duckduckgo.autofill.store.feature
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -11,7 +13,7 @@ import org.mockito.kotlin.whenever
 class RealAutofillDefaultStateDeciderTest {
 
     private val userBrowserProperties: UserBrowserProperties = mock()
-    private val autofillFeature = AutofillTestFeature()
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val testee = RealAutofillDefaultStateDecider(
         userBrowserProperties = userBrowserProperties,
@@ -21,7 +23,7 @@ class RealAutofillDefaultStateDeciderTest {
 
     @Test
     fun whenRemoteFeatureDisabledThenNumberOfDaysInstalledIsIrrelevant() {
-        configureRemoteFeatureEnabled(false)
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = false)
 
         configureDaysInstalled(0)
         assertFalse(testee.defaultState())
@@ -32,19 +34,30 @@ class RealAutofillDefaultStateDeciderTest {
 
     @Test
     fun whenNumberOfDaysInstalledIsNotZeroThenFeatureFlagIsIrrelevant() {
-        configureDaysInstalled(0)
+        configureDaysInstalled(10)
 
-        configureRemoteFeatureEnabled(false)
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = false)
         assertFalse(testee.defaultState())
 
-        configureRemoteFeatureEnabled(false)
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = true)
         assertFalse(testee.defaultState())
+    }
+
+    @Test
+    fun whenNumberOfDaysInstalledIsNotZeroThenReturnBasedOnExistingUsersRemoteFlag() {
+        configureDaysInstalled(10)
+
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = false, onByDefaultExistingUsers = false)
+        assertFalse(testee.defaultState())
+
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = true, onByDefaultExistingUsers = true)
+        assertTrue(testee.defaultState())
     }
 
     @Test
     fun whenInternalTesterThenAlwaysEnabledByDefault() {
         configureDaysInstalled(100)
-        configureRemoteFeatureEnabled(false)
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = false, onByDefaultExistingUsers = false)
         configureAsInternalTester()
         assertTrue(testee.defaultState())
     }
@@ -52,7 +65,7 @@ class RealAutofillDefaultStateDeciderTest {
     @Test
     fun whenInstalledSameDayAndFeatureFlagEnabledThenEnabledByDefault() {
         configureDaysInstalled(0)
-        configureRemoteFeatureEnabled(true)
+        configureRemoteFeatureEnabled(onByDefaultNewUsers = true)
         assertTrue(testee.defaultState())
     }
 
@@ -60,8 +73,9 @@ class RealAutofillDefaultStateDeciderTest {
         whenever(internalTestUserChecker.isInternalTestUser).thenReturn(true)
     }
 
-    private fun configureRemoteFeatureEnabled(enabled: Boolean) {
-        autofillFeature.onByDefault = enabled
+    private fun configureRemoteFeatureEnabled(onByDefaultNewUsers: Boolean, onByDefaultExistingUsers: Boolean = false) {
+        autofillFeature.onByDefault().setRawStoredState(State(enable = onByDefaultNewUsers))
+        autofillFeature.onForExistingUsers().setRawStoredState(State(enable = onByDefaultExistingUsers))
     }
 
     private fun configureDaysInstalled(daysInstalled: Long) {

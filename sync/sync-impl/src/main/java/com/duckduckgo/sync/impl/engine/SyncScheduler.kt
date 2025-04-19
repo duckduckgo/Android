@@ -22,9 +22,9 @@ import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Duration
+import java.time.OffsetDateTime
 import javax.inject.Inject
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 interface SyncScheduler {

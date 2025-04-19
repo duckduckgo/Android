@@ -74,8 +74,8 @@ class StatisticsRequesterJsonTest {
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+        val plugins = object : PluginPoint<AtbLifecyclePlugin> {
+            override fun getPlugins(): Collection<AtbLifecyclePlugin> {
                 return listOf()
             }
         }

@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.impl
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -32,7 +32,7 @@ class RealDuckAddressLoginCreatorTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
@@ -112,11 +112,11 @@ class RealDuckAddressLoginCreatorTest {
     }
 
     private suspend fun verifyLoginSaved() = verify(autofillStore).saveCredentials(eq(URL), any())
-    private suspend fun verifyLoginUpdated() = verify(autofillStore).updateCredentials(any())
+    private suspend fun verifyLoginUpdated() = verify(autofillStore).updateCredentials(any(), any())
 
     private suspend fun verifyNotSavedOrUpdated() {
         verify(autofillStore, never()).saveCredentials(any(), any())
-        verify(autofillStore, never()).updateCredentials(any())
+        verify(autofillStore, never()).updateCredentials(any(), any())
     }
 
     private fun aLogin(id: Long? = null, username: String? = null, password: String? = null): LoginCredentials {

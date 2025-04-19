@@ -16,10 +16,12 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.test.CoroutineTestRule
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -38,6 +40,8 @@ class RealBrokenSiteReportRepositoryTest {
 
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
+    private val mockDataStore: BrokenSitePromptDataStore = mock()
+    private val mockInMemoryStore: BrokenSitePromptInMemoryStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
     @Before
@@ -48,6 +52,8 @@ class RealBrokenSiteReportRepositoryTest {
             database = mockDatabase,
             coroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSitePromptDataStore = mockDataStore,
+            brokenSitePromptInMemoryStore = mockInMemoryStore,
         )
     }
 
@@ -108,5 +114,110 @@ class RealBrokenSiteReportRepositoryTest {
         testee.cleanupOldEntries()
 
         verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
+        verify(mockDataStore).deleteAllExpiredDismissals(any(), any())
+    }
+
+    @Test
+    fun whenSetMaxDismissStreakCalledThenSetMaxDismissStreakIsCalled() = runTest {
+        val maxDismissStreak = 3
+
+        testee.setMaxDismissStreak(maxDismissStreak)
+
+        verify(mockDataStore).setMaxDismissStreak(maxDismissStreak)
+    }
+
+    @Test
+    fun whenDismissStreakResetDaysCalledThenDismissStreakResetDaysIsCalled() = runTest {
+        val days = 30
+
+        testee.setDismissStreakResetDays(days)
+
+        verify(mockDataStore).setDismissStreakResetDays(days)
+    }
+
+    @Test
+    fun whenCoolDownDaysCalledThenCoolDownDaysIsCalled() = runTest {
+        val days = 7L
+
+        testee.setCoolDownDays(days)
+
+        verify(mockDataStore).setCoolDownDays(days)
+    }
+
+    @Test
+    fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
+        val nextShownDate = LocalDateTime.now()
+
+        testee.setNextShownDate(nextShownDate)
+
+        verify(mockDataStore).setNextShownDate(nextShownDate)
+    }
+
+    @Test
+    fun whenGetNextShownDateCalledThenReturnNextShownDate() = runTest {
+        val nextShownDate = LocalDateTime.now()
+        whenever(mockDataStore.getNextShownDate()).thenReturn(nextShownDate)
+
+        val result = testee.getNextShownDate()
+
+        assertEquals(nextShownDate, result)
+    }
+
+    @Test
+    fun whenAddDismissalCalledThenNewDismissalEventIsAdded() = runTest {
+        val newDismissal = LocalDateTime.now()
+
+        testee.addDismissal(newDismissal)
+
+        verify(mockDataStore).addDismissal(newDismissal)
+    }
+
+    @Test
+    fun whenClearAllDismissalsCalledThenAllDismissalEventsRemoved() = runTest {
+        testee.clearAllDismissals()
+
+        verify(mockDataStore).clearAllDismissals()
+    }
+
+    @Test
+    fun whenGetDismissalCountBetweenCalledThenDismissalCountBetweenDatesReturned() = runTest {
+        val dismissalCount = 2
+        whenever(mockDataStore.getDismissalCountBetween(any(), any())).thenReturn(dismissalCount)
+
+        val result = testee.getDismissalCountBetween(
+            LocalDateTime.now().minusDays(3),
+            LocalDateTime.now(),
+        )
+
+        assertEquals(dismissalCount, result)
+    }
+
+    @Test
+    fun whenResetRefreshCountCalledThenResetRefreshCountIsCalled() = runTest {
+        testee.resetRefreshCount()
+
+        verify(mockInMemoryStore).resetRefreshCount()
+    }
+
+    @Test
+    fun whenAddRefreshCalledThenAddRefreshIsCalled() = runTest {
+        val localDateTime = LocalDateTime.now()
+        val url: Uri = mock()
+
+        testee.addRefresh(url, localDateTime)
+
+        verify(mockInMemoryStore).addRefresh(url, localDateTime)
+    }
+
+    @Test
+    fun whenGetAndUpdateUserRefreshesBetweenCalledThenReturnRefreshCount() = runTest {
+        val t1 = LocalDateTime.now().minusDays(1)
+        val t2 = LocalDateTime.now()
+        val refreshCount = 5
+        whenever(mockInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)).thenReturn(refreshCount)
+
+        val result = testee.getAndUpdateUserRefreshesBetween(t1, t2)
+
+        assertEquals(refreshCount, result)
     }
 }

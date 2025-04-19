@@ -41,8 +41,8 @@ open class DaxButton @JvmOverloads constructor(
                 0,
             )
 
-        val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_buttonSize)) {
-            Size.from(typedArray.getInt(R.styleable.DaxButton_buttonSize, 0))
+        val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_daxButtonSize)) {
+            Size.from(typedArray.getInt(R.styleable.DaxButton_daxButtonSize, 0))
         } else {
             Small
         }
@@ -87,6 +87,27 @@ enum class Size {
                 Large -> R.dimen.buttonLargeHeight
                 else -> R.dimen.buttonSmallHeight
             }
+        }
+    }
+}
+
+enum class ButtonType {
+    PRIMARY,
+    GHOST,
+    SECONDARY,
+    DESTRUCTIVE,
+    GHOST_DESTRUCTIVE,
+    GHOST_ALT,
+    ;
+
+    fun getView(context: Context): DaxButton {
+        return when (this) {
+            PRIMARY -> DaxButtonPrimary(context, null)
+            GHOST -> DaxButtonGhost(context, null)
+            SECONDARY -> DaxButtonSecondary(context, null)
+            DESTRUCTIVE -> DaxButtonDestructive(context, null)
+            GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
+            GHOST_ALT -> DaxButtonGhostAlt(context, null)
         }
     }
 }

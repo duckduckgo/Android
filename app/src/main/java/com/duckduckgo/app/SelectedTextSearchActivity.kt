@@ -33,7 +33,7 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val query = extractQuery(intent)
-        startActivity(BrowserActivity.intent(this, queryExtra = query))
+        startActivity(BrowserActivity.intent(this, queryExtra = query, selectedText = true, interstitialScreen = true))
         finish()
     }
 

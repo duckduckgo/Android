@@ -4,7 +4,8 @@ apply plugin: 'org.jmailen.kotlinter'
 spotless {
     java {
         target 'src/*/java/**/*.java'
-        googleJavaFormat('1.8').aosp()
+        googleJavaFormat('1.22.0').aosp()
+        targetExclude("**/FragmentStateAdapter.java") // temporary
         removeUnusedImports()
         trimTrailingWhitespace()
         indentWithSpaces()

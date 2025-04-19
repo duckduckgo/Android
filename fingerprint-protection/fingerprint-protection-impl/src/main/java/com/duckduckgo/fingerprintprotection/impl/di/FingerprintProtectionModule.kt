@@ -19,6 +19,7 @@ package com.duckduckgo.fingerprintprotection.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.store.ALL_MIGRATIONS
@@ -60,8 +61,9 @@ object FingerprintProtectionModule {
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingBatteryRepository {
-        return RealFingerprintingBatteryRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealFingerprintingBatteryRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -70,8 +72,9 @@ object FingerprintProtectionModule {
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingCanvasRepository {
-        return RealFingerprintingCanvasRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealFingerprintingCanvasRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -80,8 +83,9 @@ object FingerprintProtectionModule {
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingHardwareRepository {
-        return RealFingerprintingHardwareRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealFingerprintingHardwareRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -90,8 +94,9 @@ object FingerprintProtectionModule {
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingScreenSizeRepository {
-        return RealFingerprintingScreenSizeRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealFingerprintingScreenSizeRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -100,8 +105,9 @@ object FingerprintProtectionModule {
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingTemporaryStorageRepository {
-        return RealFingerprintingTemporaryStorageRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealFingerprintingTemporaryStorageRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)

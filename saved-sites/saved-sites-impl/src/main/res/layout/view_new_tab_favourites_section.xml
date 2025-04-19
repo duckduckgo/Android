@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/sectionHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sectionHeaderText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/newTabPageFavorites"
+            app:textType="primary"
+            app:typography="h4" />
+
+        <com.duckduckgo.common.ui.view.button.IconButton
+            android:id="@+id/sectionHeaderOverflowIcon"
+            tools:ignore="ContentDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_info_black_16" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/quickAccessRecyclerView"
+        tools:itemCount="8"
+        tools:listItem="@layout/view_quick_access_item"
+        tools:spanCount="4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/keyline_2"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="@dimen/keyline_2"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <RelativeLayout
+        android:id="@+id/newTabFavoritesToggleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:paddingHorizontal="@dimen/keyline_5">
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+        <ImageView
+            android:id="@+id/newTabFavoritesToggle"
+            android:layout_width="@dimen/newTabCircularToggleSize"
+            android:layout_height="@dimen/newTabCircularToggleSize"
+            android:layout_gravity="center"
+            android:background="@drawable/selectable_circular_32dp_shape_container_ripple"
+            android:layout_centerHorizontal="true"
+            android:padding="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_chevron_small_down_16"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

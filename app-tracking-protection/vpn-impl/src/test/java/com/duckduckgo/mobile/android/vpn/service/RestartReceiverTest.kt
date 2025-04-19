@@ -56,7 +56,7 @@ class RestartReceiverTest {
         receiver.onVpnStarted(coroutineRule.testScope)
 
         verify(context).unregisterReceiver(any())
-        verify(context).registerReceiver(any(), any())
+        verify(context).registerReceiver(any(), any(), isNull(), isNull(), any())
     }
 
     @Test
@@ -66,7 +66,7 @@ class RestartReceiverTest {
         receiver.onVpnStarted(coroutineRule.testScope)
 
         verify(context, never()).unregisterReceiver(any())
-        verify(context, never()).registerReceiver(any(), any())
+        verify(context, never()).registerReceiver(any(), any(), isNull(), isNull(), any())
     }
 
     @Test
@@ -76,7 +76,7 @@ class RestartReceiverTest {
         receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
 
         verify(context).unregisterReceiver(any())
-        verify(context, never()).registerReceiver(any(), any())
+        verify(context, never()).registerReceiver(any(), any(), isNull(), isNull(), any())
     }
 
     @Test
@@ -86,6 +86,6 @@ class RestartReceiverTest {
         receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
 
         verify(context).unregisterReceiver(any())
-        verify(context, never()).registerReceiver(any(), any())
+        verify(context, never()).registerReceiver(any(), any(), isNull(), isNull(), any())
     }
 }

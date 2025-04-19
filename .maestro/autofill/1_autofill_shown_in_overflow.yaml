@@ -1,6 +1,14 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Autofill screen is reachable from overflow menu"
+tags:
+    - releaseTest
 ---
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible: "Passwords"
-- tapOn: "Passwords"
+# Pre-requisite: None (can be run whether auth is required or not)
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+            clearState: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: steps/access_passwords_screen.yaml

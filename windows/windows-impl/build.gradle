@@ -34,12 +34,13 @@ dependencies {
     implementation project(':common-ui')
     implementation project(':windows-api')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':macos-api')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
+    testImplementation project(':feature-toggles-test')
 
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -76,6 +77,8 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -89,5 +92,8 @@ android {
     }
     lint {
         baseline = file("lint-baseline.xml")
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }

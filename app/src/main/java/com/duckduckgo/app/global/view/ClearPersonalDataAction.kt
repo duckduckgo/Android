@@ -28,12 +28,14 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -52,7 +54,7 @@ interface ClearDataAction {
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess(notifyDataCleared: Boolean)
+    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
 }
 
 class ClearPersonalDataAction(
@@ -63,19 +65,21 @@ class ClearPersonalDataAction(
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer,
-    private val geoLocationPermissions: GeoLocationPermissions,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
     private val deviceSyncState: DeviceSyncState,
     private val savedSitesRepository: SavedSitesRepository,
+    private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
+    private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context, notifyDataCleared)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
     }
 
     override fun killProcess() {
@@ -90,7 +94,6 @@ class ClearPersonalDataAction(
         withContext(dispatchers.io()) {
             val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
-            geoLocationPermissions.clearAllButFireproofed()
             sitePermissionsManager.clearAllButFireproof(fireproofDomains)
             thirdPartyCookieManager.clearAllData()
 
@@ -99,7 +102,13 @@ class ClearPersonalDataAction(
                 savedSitesRepository.pruneDeleted()
             }
 
+            privacyProtectionsPopupDataClearer.clearPersonalData()
+
             clearTabsAsync(appInForeground)
+
+            webTrackersBlockedRepository.deleteAll()
+
+            navigationHistory.clearHistory()
         }
 
         withContext(dispatchers.main()) {

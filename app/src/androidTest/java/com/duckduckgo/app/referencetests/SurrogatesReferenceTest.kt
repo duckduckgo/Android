@@ -27,6 +27,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
+import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
@@ -52,15 +54,16 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
+import com.duckduckgo.user.agent.impl.UserAgent
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -99,6 +102,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockRequestFilterer: RequestFilterer = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -109,12 +113,11 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        mock(),
-        mock(),
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -170,6 +173,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
+            duckPlayer = mockDuckPlayer,
         )
     }
 
@@ -184,7 +189,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            documentUrl = testCase.siteURL,
+            documentUri = testCase.siteURL.toUri(),
             webView = webView,
             webViewClientListener = null,
         )
@@ -229,7 +234,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper())
+        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)

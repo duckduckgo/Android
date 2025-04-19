@@ -1,0 +1,56 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Will not backfill username if the form submission provides a username already"
+tags:
+    - autofillBackfillingUsername
+---
+# Pre-requisite: Requires app be built with -Pautofill-disable-auth-requirement flag to disable auth requirement
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../../shared/skip_all_onboarding.yaml
+
+      # get to autofill form
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://autofill.me/form/login-simple"
+      - pressKey: Enter
+
+      # simulate a partial login form by first submitting just the username
+      - tapOn: "Username"
+      - inputText: "usernameFromBackfill"
+      - pressKey: Back
+
+      - tapOn:
+          text: "Login"
+          index: 1
+
+      # now clear the username and submit just the password
+      - doubleTapOn: "Username"
+      - inputText: "usernameFromForm"
+      - pressKey: Back
+
+      - tapOn: "Password"
+      - inputText: "passwordFromForm"
+      - pressKey: Back
+
+      - tapOn:
+          text: "Login"
+          index: 1
+
+      # save the password when prompted
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/saveLoginButton"
+
+      # access the passwords screen and assert username and password both saved
+      - runFlow: ../steps/access_passwords_screen.yaml
+      - tapOn: "usernameFromForm"
+      - assertVisible: "usernameFromForm"
+      - assertVisible: "passwordFromForm"
+
+      # Delete login
+      - runFlow: "../steps/delete_login_from_credentials_details_screen.yaml"
+

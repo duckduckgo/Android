@@ -69,7 +69,6 @@
             app:layout_constraintTop_toBottomOf="@+id/error_title"
             app:typography="body1"
             app:textType="secondary"
-            android:textAlignment="center"
             tools:text="@string/webViewErrorBadUrl" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

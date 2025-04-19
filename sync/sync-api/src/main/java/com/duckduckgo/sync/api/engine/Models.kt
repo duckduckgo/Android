@@ -67,6 +67,7 @@ data class SyncErrorResponse(
 
 enum class FeatureSyncError {
     COLLECTION_LIMIT_REACHED,
+    INVALID_REQUEST,
 }
 
 enum class SyncableType(val field: String) {
@@ -80,6 +81,7 @@ sealed class SyncMergeResult {
 
     data class Success(
         val orphans: Boolean = false,
+        val timestampConflict: Boolean = false,
     ) : SyncMergeResult()
 
     data class Error(

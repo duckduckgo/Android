@@ -16,9 +16,13 @@
 
 package com.duckduckgo.app.appearance
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -26,7 +30,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -57,6 +64,12 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockAppTheme: AppTheme
+
+    private val omnibarFeatureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
+
+    @SuppressLint("DenyListedApi")
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -64,11 +77,16 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+
+        omnibarFeatureFlag.self().setRawStoredState(Toggle.State(enable = true))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
+            coroutineTestRule.testDispatcherProvider,
+            omnibarFeatureFlag,
         )
     }
 
@@ -158,6 +176,59 @@ internal class AppearanceViewModelTest {
             verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
 
             expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenForceDarkModeSettingEnabledChangeThenStoreUpdated() = runTest {
+        testee.onForceDarkModeSettingChanged(true)
+        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = true
+        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
+    }
+
+    @Test
+    fun whenForceDarkModeSettingDisabledChangeThenStoreUpdated() = runTest {
+        testee.onForceDarkModeSettingChanged(false)
+        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = false
+        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
+    }
+
+    @Test
+    fun whenOmnibarPositionSettingPressed() = runTest {
+        testee.commands().test {
+            testee.userRequestedToChangeAddressBarPosition()
+            assertEquals(Command.LaunchOmnibarPositionSettings(TOP), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+        }
+    }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToBottom() = runTest {
+        testee.onOmnibarPositionUpdated(BOTTOM)
+        verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
+        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+    }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToTop() = runTest {
+        testee.onOmnibarPositionUpdated(TOP)
+        verify(mockAppSettingsDataStore).omnibarPosition = TOP
+        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+    }
+
+    @Test
+    fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() = runTest {
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+        whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
+
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+
+            assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
+            assertEquals(AppIcon.DEFAULT, value.appIcon)
+            assertEquals(false, value.forceDarkModeEnabled)
 
             cancelAndConsumeRemainingEvents()
         }

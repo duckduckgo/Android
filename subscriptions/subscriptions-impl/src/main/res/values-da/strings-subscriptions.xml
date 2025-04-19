@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Annullér</string>
+    <string name="ok">Okay</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Administrer e-mailadresse</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Tilbage til indstillinger</string>
+    <string name="somethingWentWrong">Noget gik galt</string>
+    <string name="somethingWentWrongDescription">Google Play kunne ikke behandle dit køb. Prøv igen senere.</string>
+    <string name="youAreSet">Du er klar.</string>
+    <string name="viewPlans">Se abonnementer</string>
+    <string name="subscriptionNotFound">Abonnement ikke fundet</string>
+    <string name="subscriptionNotFoundDescription">Abonnementet, der er knyttet til denne Google Play-konto, er ikke længere aktivt.</string>
+    <string name="purchaseRestored">Dine køb er blevet gendannet.</string>
+    <string name="restoreSubscriptionTitle">Tilføj dit Privacy Pro-abonnement til denne enhed</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Tilføj via Google Play-konto</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Gendan dit abonnement på Android-enheder ved hjælp af din Google Play-konto.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Gendan køb</string>
+    <string name="restoreSubscriptionEmailTitle">Tilføj via e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Knyt en e-mailadresse til dit abonnement for at tilføje Privacy Pro til denne enhed.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Kom igang</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Fjern abonnement</string>
+    <string name="subscriptionRemoved">Dit abonnement er blevet fjernet fra denne enhed</string>
+    <string name="removeFromDevice">Fjern fra denne enhed?</string>
+    <string name="removeFromDeviceDescription">Du vil ikke længere kunne få adgang til dit Privacy Pro-abonnement på denne enhed. Dette vil ikke opsige dit abonnement, og det vil forblive aktivt på dine andre enheder.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Dit månedlige abonnement %1$s den %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Dit årlige abonnement %1$s den %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Dit abonnement udløb den %1$s.</string>
+    <string name="monthlySubscription">Månedligt abonnement</string>
+    <string name="yearlySubscription">Årligt abonnement</string>
+    <string name="renews">fornys</string>
+    <string name="expires">udløber</string>
+    <string name="activateOnOtherDevices">Tilføj Privacy Pro til andre enheder</string>
+    <string name="addToDevicePrimaryText">Tilføj til enhed</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Tilføj Privacy Pro til dine andre enheder via Google Play eller ved at tilknytte en e-mailadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Brug e-mailen ovenfor til at tilføje dit abonnement på dine andre enheder i DuckDuckGo-appen. Gå til Indstillinger &gt; Privacy Pro &gt; Jeg har et abonnement.</string>
+    <string name="editEmailPrimaryText">Rediger e-mailadresse</string>
+    <string name="learnMore">Mere info</string>
+    <string name="privacyProFaq">Har du brug for hjælp til Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Få svar på ofte stillede spørgsmål, eller kontakt Privacy Pro-support fra vores hjælpesider. Tilgængeligheden af funktioner varierer fra land til land.</string>
+    <string name="subscriptionStatusSubscribed">Abonneret</string>
+    <string name="privacyPolicyAndTermsOfService">Fortrolighedspolitik og servicevilkår</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Abonnementsindstillinger</string>
+    <string name="subscriptionSettingSubscribe">Beskyt din forbindelse og identitet med Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Inkluderer vores VPN, Personal Information Removal og Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Inkluderer vores VPN og Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Få Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Jeg har et abonnement</string>
+    <string name="subscriptionSettingExpired">Dit Privacy Pro-abonnement er udløbet</string>
+    <string name="subscriptionSettingExpiredViewPlans">Se abonnementer</string>
+    <string name="subscriptionSettingSectionSubscription">Abonnement</string>
+    <string name="subscriptionSettingRemoveFromDevice">Fjern fra denne enhed</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Hjælp og support</string>
+    <string name="subscriptionSettingSendFeedback">Send tilbagemelding</string>
+    <string name="subscriptionSettingActivating">Aktiverer</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Du er klar.</string>
+    <string name="purchaseCompletedText">Dit køb blev gennemført.</string>
+    <string name="purchaseRecoveredText">Du havde allerede et abonnement, og vi har gendannet det for dig.</string>
+    <string name="purchaseErrorTitle">Noget gik galt</string>
+    <string name="purchaseError">Vi har problemer med at få forbindelse. Prøv igen senere.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Opdater abonnement eller annuller</string>
+    <string name="changePlanDescription">Dit abonnement blev købt gennem Apple App Store. Hvis du vil ændre dit abonnement eller dine faktureringsindstillinger, skal du gå til Indstillinger &gt; Apple-konto &gt; Abonnementer på en enhed, der er logget ind med den samme Apple-konto, som blev brugt til at købe dit abonnement.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Aktivér Privacy Pro på en computer for at opsætte Personal Information Removal</string>
+    <string name="pirDescription">I DuckDuckGo-browseren til desktop skal du gå til <b>Indstillinger &gt; Privacy Pro</b> og klikke på <b>Jeg har et abonnement</b> for at komme i gang.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Åben</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Send tilbagemelding</string>
+    <string name="feedbackActionHeader">VÆLG EN KATEGORI</string>
+    <string name="feedbackActionReportIssue">Anmeld et problem</string>
+    <string name="feedbackActionGeneralFeedback">Generel feedback</string>
+    <string name="feedbackActionFeatureRequest">Foreslå en funktion</string>
+
+    <string name="feedbackGeneralHeader">VÆLG EN KATEGORI</string>
+    <string name="feedbackGeneralBrowser">Browserfeedback</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">VÆLG EN KATEGORI</string>
+    <string name="feedbackCategorySubscription">Abonnement og betalinger</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">VÆLG EN KATEGORI</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN kan ikke oprette forbindelse</string>
+    <string name="feedbackSubCategoryVpnSlow">VPN-forbindelsen er for langsom</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN forårsager problemer med andre apps eller websteder</string>
+    <string name="feedbackSubCategoryVpnIot">VPN lader mig ikke oprette forbindelse til en lokal enhed</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN får browseren til at gå ned eller fryse</string>
+    <string name="feedbackSubCategoryVpnOther">Andet</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Info er ikke for specifikt websted</string>
+    <string name="feedbackSubCategoryPirNotMe">Dataene tilhører ikke brugeren</string>
+    <string name="feedbackSubCategoryPirScanStuck">Scan sidder fast</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Fjernelse sidder fast</string>
+    <string name="feedbackSubCategoryPirOther">Andet</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problem med adgangskoden</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Kan ikke kontakte rådgiver</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Opkald til rådgiver var ikke hjælpsomt</string>
+    <string name="feedbackSubCategoryItrOther">Andet</string>
+
+    <string name="feedbackSubCategorySubsOtp">Engangsadgangskode</string>
+    <string name="feedbackSubCategorySubsOther">Andet</string>
+
+    <string name="feedbackSubmitVpnHeader">Har du fundet et problem, der ikke er dækket i vores <annotation type="faqs_link">hjælpecenter</annotation>? Vi vil helt sikkert gerne vide det.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Fortæl os, hvad der foregår...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Ud over de oplysninger, der er angivet ovenfor, sender vi nogle anonymiserede oplysninger med din feedback:\n\n• Om nogle browserfunktioner er aktive\n• Samlet app-diagnostik (f.eks. fejlkoder)\n\nVed at klikke på Send accepterer du, at DuckDuckGo kan bruge de indsendte oplysninger til at forbedre appen."</string>
+    <string name="feedbackSubmitVpnSubmit">Indsend</string>
+    <string name="feedbackSubmitCompletedMessage">Mange tak! Feedback sendt.</string>
+    <string name="feedbackSubmitFailedMessage">Noget gik galt</string>
+
+    <string name="feedbackSubmitEmailByLine">Angiv en e-mailadresse, hvis du gerne vil have, at vi kontakter dig angående dette problem (vi kan muligvis ikke svare på alle problemer):</string>
+    <string name="feedbackSubmitEmailHint">Emailadresse (valgfrit)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Giv os feedback...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Hvilken funktion kunne du tænke dig at se?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonnementer</string>
+    <string name="activitySubscriptionSettings">Abonnementsindstillinger</string>
+    <string name="activityActivateSubscription">Jeg har et abonnement</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Send tilbagemelding</string>
+</resources>

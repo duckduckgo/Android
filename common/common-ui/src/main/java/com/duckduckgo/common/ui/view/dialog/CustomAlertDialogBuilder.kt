@@ -32,6 +32,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         open fun onDialogDismissed() {}
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
+        open fun onDialogCancelled() {}
     }
 
     internal class DefaultEventListener : EventListener()
@@ -99,6 +100,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .apply {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
+                setOnCancelListener { listener.onDialogCancelled() }
             }
         dialog = dialogBuilder.create()
         setViews(binding, dialog!!)

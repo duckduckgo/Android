@@ -16,29 +16,35 @@
 
 package com.duckduckgo.common.ui.view.text
 
+import android.R.attr
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
+import android.text.InputType
 import android.text.TextUtils.TruncateAt
 import android.text.TextUtils.TruncateAt.END
 import android.text.TextWatcher
+import android.text.method.DigitsKeyListener
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_FORM_MODE
+import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_IP_ADDRESS_MODE
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
@@ -50,11 +56,13 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
+import java.util.*
 
 interface TextInput {
     var text: String
     var hint: String
     var isEditable: Boolean
+    var error: String?
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
@@ -63,15 +71,22 @@ interface TextInput {
         @DrawableRes endIconRes: Int,
         contentDescription: String? = null,
     )
+    fun setSelectAllOnFocus(boolean: Boolean)
 
     fun removeEndIcon()
 
     fun onAction(actionHandler: (Action) -> Unit)
 
+    fun setOnEditorActionListener(listener: OnEditorActionListener)
+    fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
+
     sealed class Action {
         object PerformEndAction : Action()
     }
 }
+
+private const val ENABLED_OPACITY = 1f
+private const val DISABLED_OPACITY = 0.4f
 
 class DaxTextInput @JvmOverloads constructor(
     context: Context,
@@ -114,10 +129,29 @@ class DaxTextInput @JvmOverloads constructor(
             truncated = getBoolean(R.styleable.DaxTextInput_singleLineTextTruncated, false)
             setSingleLineTextTruncation(truncated)
 
+            context.obtainStyledAttributes(attrs, intArrayOf(attr.imeOptions)).apply {
+                binding.internalEditText.imeOptions = getInt(0, EditorInfo.IME_NULL)
+                recycle()
+            }
+
+            if (getBoolean(R.styleable.DaxTextInput_capitalizeKeyboard, false)) {
+                binding.internalEditText.inputType = binding.internalEditText.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            }
+
+            val enabled = getBoolean(R.styleable.DaxTextInput_android_enabled, true)
+            isEnabled = enabled
+
             setFocusListener()
 
             recycle()
         }
+    }
+
+    override fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit) {
+        binding.internalEditText.doOnTextChanged(action)
+    }
+    override fun setOnEditorActionListener(listener: OnEditorActionListener) {
+        binding.internalEditText.setOnEditorActionListener(listener)
     }
 
     private fun setupInputMode(inputType: Type) {
@@ -157,6 +191,7 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.text.toString()
         set(value) {
             binding.internalEditText.setText(value)
+            binding.internalEditText.setSelection(value.length)
         }
 
     override var hint: String
@@ -170,6 +205,19 @@ class DaxTextInput @JvmOverloads constructor(
         set(value) {
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
+        }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        binding.internalInputLayout.isEnabled = enabled
+        binding.internalPasswordIcon.isEnabled = enabled
+        binding.root.alpha = if (enabled) ENABLED_OPACITY else DISABLED_OPACITY
+    }
+
+    override var error: String?
+        get() = binding.internalInputLayout.error.toString()
+        set(value) {
+            binding.internalInputLayout.error = value
         }
 
     fun showKeyboardDelayed() {
@@ -221,6 +269,10 @@ class DaxTextInput @JvmOverloads constructor(
         ContextCompat.getDrawable(context, endIconRes)?.let {
             setupEndIconDrawable(it, contentDescription.orEmpty())
         }
+    }
+
+    override fun setSelectAllOnFocus(boolean: Boolean) {
+        binding.internalEditText.setSelectAllOnFocus(boolean)
     }
 
     override fun removeEndIcon() {
@@ -311,12 +363,16 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.ellipsize = TruncateAt.END
         }
 
-        if (inputType == INPUT_TYPE_MULTI_LINE || inputType == INPUT_TYPE_FORM_MODE) {
+        if (inputType == INPUT_TYPE_IP_ADDRESS_MODE) {
+            binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL
+            binding.internalEditText.keyListener = DigitsKeyListener.getInstance("0123456789.")
+        } else if (inputType == INPUT_TYPE_MULTI_LINE || inputType == INPUT_TYPE_FORM_MODE) {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
         }
     }
+
     private fun setSingleLineTextTruncation(truncated: Boolean) {
         if (truncated) {
             binding.internalEditText.apply {
@@ -372,6 +428,7 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_SINGLE_LINE(1),
         INPUT_TYPE_PASSWORD(2),
         INPUT_TYPE_FORM_MODE(3),
+        INPUT_TYPE_IP_ADDRESS_MODE(4),
     }
 
     companion object {

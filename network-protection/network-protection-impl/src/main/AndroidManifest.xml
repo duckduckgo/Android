@@ -18,47 +18,16 @@
     package="com.duckduckgo.networkprotection.impl">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application>
         <activity
             android:name=".management.NetworkProtectionManagementActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".waitlist.NetPWaitlistInvitedActivity"
-            android:label="@string/netpWaitlistActivityLabel"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".waitlist.NetPWaitlistActivity"
-            android:label="@string/netpBetaFeature"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".waitlist.NetPWaitlistRedeemCodeActivity"
-            android:label="@string/netpWaitlistRedeemCodeActivityLabel"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".waitlist.NetPWaitlistActivity"
-            android:exported="false" />
-        <activity
             android:name=".exclusion.ui.NetpAppExclusionListActivity"
             android:label="@string/netpExclusionListTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".about.NetpAboutVpnActivity"
-            android:label="@string/netpInfoVPNTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".about.NetpFaqActivity"
-            android:label="@string/netpFaqTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".about.NetPTermsActivity"
-            android:label="@string/netpTermsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity
@@ -67,15 +36,17 @@
             android:parentActivityName=".management.NetworkProtectionManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".settings.NetPNotificationSettingsActivity"
-            android:label="@string/netpVpnNotificationSettingsTitle"
-            android:parentActivityName=".management.NetworkProtectionManagementActivity"
-            android:exported="false" />
-        <activity
             android:name=".settings.geoswitching.NetpGeoswitchingActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/netpGeoswitchingTitle"
             android:parentActivityName="settings.NetPVpnSettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".settings.custom_dns.VpnCustomDnsActivity"
+            android:label="@string/netpCustomDnsSettingText"
+            android:exported="false" />
+
         <receiver
             android:name=".notification.NetPEnableReceiver"
             android:exported="false"
@@ -91,5 +62,15 @@
                 android:name="androidx.work.multiprocess.RemoteWorkerService"
                 android:exported="false"
                 android:process=":vpn" />
+        <service
+            android:name=".quickaccess.VpnTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_quick_tile"
+            android:label="@string/netp_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

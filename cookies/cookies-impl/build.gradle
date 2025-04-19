@@ -34,7 +34,7 @@ dependencies {
     implementation project(':cookies-api')
     implementation project(':cookies-store')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
 
     implementation JakeWharton.timber
@@ -68,16 +68,24 @@ dependencies {
     testImplementation AndroidX.work.testing
 
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.cookies.impl'
 }

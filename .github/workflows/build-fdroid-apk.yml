@@ -1,0 +1,53 @@
+name: Build F-Droid apk
+
+on:
+  push:
+    branches:
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+  pull_request:
+    paths:
+      - 'subscriptions/subscriptions-api/**'
+      - 'subscriptions/subscriptions-dummy-impl/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_fdroid_apk:
+    name: Build F-Droid apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble F-Droid release apk
+        env:
+          MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
+        run: ./gradlew assembleFdroidRelease
+
+      - name: Create Asana task when workflow failed on push to develop
+        if: ${{ failure() && github.ref == 'refs/heads/develop' && github.event_name == 'push' }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Build F-Droid apk
+          asana-task-description: The build F-Droid apk workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}

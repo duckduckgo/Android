@@ -29,9 +29,9 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -78,7 +78,7 @@ class ClearDataSpecification(context: Context) : NotificationSpec {
     override val pixelSuffix = "cd"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = CommonR.color.cornflowerBlue
+    override val color: Int = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
 }
 
 @ContributesMultibinding(AppScope::class)

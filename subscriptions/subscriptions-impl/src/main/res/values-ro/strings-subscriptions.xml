@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Anulează</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">Gestionează adresa de e-mail</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Înapoi la Setări</string>
+    <string name="somethingWentWrong">Ceva nu a funcționat corect</string>
+    <string name="somethingWentWrongDescription">Google Play nu a putut procesa achiziția ta. Încearcă din nou mai târziu.</string>
+    <string name="youAreSet">Ești gata.</string>
+    <string name="viewPlans">Vezi planurile</string>
+    <string name="subscriptionNotFound">Abonament inexistent</string>
+    <string name="subscriptionNotFoundDescription">Abonamentul asociat acestui cont Google Play nu mai este activ.</string>
+    <string name="purchaseRestored">Achizițiile tale au fost restaurate.</string>
+    <string name="restoreSubscriptionTitle">Adaugă abonamentul tău Privacy Pro pe acest dispozitiv</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Adaugă prin intermediul contului Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restabilește-ți abonamentul pe dispozitivele Android folosind contul tău Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Restabilește achiziția</string>
+    <string name="restoreSubscriptionEmailTitle">Adaugă prin e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Adaugă o adresă de e-mail la abonamentul tău pentru a adăuga Privacy Pro pe acest dispozitiv.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Să începem</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Elimină abonamentul</string>
+    <string name="subscriptionRemoved">Abonamentul tău a fost eliminat de pe acest dispozitiv</string>
+    <string name="removeFromDevice">Dorești să elimini de pe acest dispozitiv?</string>
+    <string name="removeFromDeviceDescription">Nu vei mai putea-ți să accesezi abonamentul Privacy Pro de pe acest dispozitiv. Acest lucru nu îți va anula abonamentul, care va rămâne activ pe celelalte dispozitive.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Abonamentul tău lunar %1$s pe %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Abonamentul tău anual %1$s pe %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Abonamentul tău a expirat la data de %1$s.</string>
+    <string name="monthlySubscription">Abonament lunar</string>
+    <string name="yearlySubscription">Abonament anual</string>
+    <string name="renews">se reînnoiește</string>
+    <string name="expires">expiră</string>
+    <string name="activateOnOtherDevices">Adaugă Privacy Pro pe alte dispozitive</string>
+    <string name="addToDevicePrimaryText">Adaugă pe dispozitiv</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Adaugă Privacy Pro pe celelalte dispozitive ale tale prin Google Play sau prin conectarea unei adrese de e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Folosește adresa de e-mail de mai sus pentru a-ți adăuga abonamentul pe celelalte dispozitive în aplicația DuckDuckGo. Accesează Setări &gt; Privacy Pro &gt; Am un abonament.</string>
+    <string name="editEmailPrimaryText">Editează adresa de e-mail</string>
+    <string name="learnMore">Află mai multe</string>
+    <string name="privacyProFaq">Ai nevoie de ajutor cu Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Primește răspunsuri la întrebările frecvente sau contactează asistența Privacy Pro din paginile noastre de ajutor. Disponibilitatea funcțiilor variază în funcție de țară.</string>
+    <string name="subscriptionStatusSubscribed">Abonat</string>
+    <string name="privacyPolicyAndTermsOfService">Politica de confidențialitate și Condițiile de prestare a serviciului</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Setări pentru abonament</string>
+    <string name="subscriptionSettingSubscribe">Protejează-ți conexiunea și identitatea cu Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Include VPN, Personal Information Removal și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Include VPN-ul nostru și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Obține Privacy Pro</string>
+    <string name="subscriptionSettingRestore">Am un abonament</string>
+    <string name="subscriptionSettingExpired">Abonamentul tău Privacy Pro a expirat</string>
+    <string name="subscriptionSettingExpiredViewPlans">Vezi planurile</string>
+    <string name="subscriptionSettingSectionSubscription">Abonament</string>
+    <string name="subscriptionSettingRemoveFromDevice">Elimină de pe acest dispozitiv</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
+    <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
+    <string name="subscriptionSettingActivating">Se activează</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Ești gata.</string>
+    <string name="purchaseCompletedText">Achiziția ta a fost realizată.</string>
+    <string name="purchaseRecoveredText">Abonamentul tău era deja activ și l-am recuperat.</string>
+    <string name="purchaseErrorTitle">Ceva nu a funcționat corect</string>
+    <string name="purchaseError">Întâmpinăm probleme la conectare. Încearcă din nou mai târziu.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Actualizează planul sau anulează</string>
+    <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Activează Privacy Pro pe desktop pentru a configura Personal Information Removal</string>
+    <string name="pirDescription">În browserul DuckDuckGo pentru desktop, accesează <b>Setări &gt; Privacy Pro</b> și fă click pe <b>Am un abonament</b> pentru a începe.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Deschide</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Trimite feedback</string>
+    <string name="feedbackActionHeader">SELECTEAZĂ O CATEGORIE</string>
+    <string name="feedbackActionReportIssue">Raportează o problemă</string>
+    <string name="feedbackActionGeneralFeedback">Feedback general</string>
+    <string name="feedbackActionFeatureRequest">Solicită o funcționalitate</string>
+
+    <string name="feedbackGeneralHeader">SELECTEAZĂ O CATEGORIE</string>
+    <string name="feedbackGeneralBrowser">Feedback browser</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">SELECTEAZĂ O CATEGORIE</string>
+    <string name="feedbackCategorySubscription">Abonamente și plăți</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">SELECTEAZĂ O CATEGORIE</string>
+
+    <string name="feedbackSubCategoryVpnConnection">VPN nu reușește să se conecteze</string>
+    <string name="feedbackSubCategoryVpnSlow">Conexiunea VPN este prea lentă</string>
+    <string name="feedbackSubCategoryVpnOtherApps">VPN cauzează probleme cu alte aplicații sau site-uri</string>
+    <string name="feedbackSubCategoryVpnIot">VPN nu mă lasă să mă conectez la dispozitivul local</string>
+    <string name="feedbackSubCategoryVpnCrash">VPN face ca browserul să se închidă sau să se blocheze</string>
+    <string name="feedbackSubCategoryVpnOther">Altele</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">Informațiile nu sunt pe un site specific</string>
+    <string name="feedbackSubCategoryPirNotMe">Înregistrările nu aparțin utilizatorului</string>
+    <string name="feedbackSubCategoryPirScanStuck">Scanare blocată</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Eliminare blocată</string>
+    <string name="feedbackSubCategoryPirOther">Altele</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Problemă cu codul de acces</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Nu pot să iau legătura cu consilierul</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Apelul către consilier a fost inutil</string>
+    <string name="feedbackSubCategoryItrOther">Altele</string>
+
+    <string name="feedbackSubCategorySubsOtp">Parolă unică</string>
+    <string name="feedbackSubCategorySubsOther">Altele</string>
+
+    <string name="feedbackSubmitVpnHeader">Ai găsit o problemă care nu este prezentată în <annotation type="faqs_link">centrul nostru de ajutor</annotation> ? Ne dorim foarte mult să știm acest lucru.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Spune-ne ce se întâmplă...</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Pe lângă detaliile introduse mai sus, trimitem câteva informații anonimizate împreună cu feedbackul tău:\n\n• Dacă unele caracteristici ale browserului sunt active\n• Diagnosticarea agregată a aplicației (de exemplu, coduri de eroare)\n\nFăcând click pe Trimite, ești de acord că DuckDuckGo poate utiliza informațiile trimise pentru a îmbunătăți aplicația."</string>
+    <string name="feedbackSubmitVpnSubmit">Trimite</string>
+    <string name="feedbackSubmitCompletedMessage">Mulțumesc! Feedback trimis.</string>
+    <string name="feedbackSubmitFailedMessage">Ceva nu a funcționat corect</string>
+
+    <string name="feedbackSubmitEmailByLine">Furnizează o adresă de e-mail dacă dorești să te contactăm cu privire la această problemă (este posibil să nu putem răspunde la toate problemele):</string>
+    <string name="feedbackSubmitEmailHint">E-mail (opțional)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Te rugăm să ne comunici feedbackul tău...</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Ce caracteristică ai dori să vezi?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonamente</string>
+    <string name="activitySubscriptionSettings">Setări pentru abonament</string>
+    <string name="activityActivateSubscription">Am un abonament</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Trimite feedback</string>
+</resources>

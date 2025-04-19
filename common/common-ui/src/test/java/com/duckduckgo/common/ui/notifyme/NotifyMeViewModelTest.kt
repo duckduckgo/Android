@@ -210,20 +210,6 @@ class NotifyMeViewModelTest {
     }
 
     @Test
-    fun whenOnNotifyMeButtonClickedOnAndroid6ThenOpenSettingsCommandIsSent() = runTest {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.M)
-
-        testee.onNotifyMeButtonClicked()
-
-        testee.commands().test {
-            assertEquals(
-                NotifyMeViewModel.Command.OpenSettings,
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
     fun whenOnCloseButtonClickedThenCloseCommandIsSentAndSetDismissedIsCalled() = runTest {
         testee.onCloseButtonClicked()
 
@@ -260,21 +246,6 @@ class NotifyMeViewModelTest {
         testee.commands().test {
             assertEquals(
                 NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus,
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun whenHandleRequestPermissionRationaleOnAndroid6WithShouldShowRationaleFalseThenOpenSettingsCommandIsSent() = runTest {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.M)
-        val shouldShowRationale = false
-
-        testee.handleRequestPermissionRationale(shouldShowRationale)
-
-        testee.commands().test {
-            assertEquals(
-                NotifyMeViewModel.Command.OpenSettings,
                 awaitItem(),
             )
         }

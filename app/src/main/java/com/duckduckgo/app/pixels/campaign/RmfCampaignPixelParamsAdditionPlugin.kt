@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.pixels.campaign
+
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+
+@ContributesMultibinding(AppScope::class)
+class RmfCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixelParamsAdditionPlugin {
+    override fun extractCampaign(queryParams: Map<String, String>): String? {
+        return queryParams[Pixel.PixelParameter.MESSAGE_SHOWN]
+    }
+
+    override fun names(): List<String> = listOf(
+        "m_remote_message_shown",
+        "m_remote_message_shown_unique",
+        "m_remote_message_dismissed",
+        "m_remote_message_primary_action_clicked",
+        "m_remote_message_secondary_action_clicked",
+        "m_remote_message_action_clicked",
+        "m_remote_message_share",
+    )
+}

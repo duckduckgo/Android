@@ -16,16 +16,28 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -45,16 +57,29 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
 class BrowserViewModel @Inject constructor(
     private val tabRepository: TabRepository,
@@ -65,24 +90,37 @@ class BrowserViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
-) : ViewModel(),
-    CoroutineScope {
+    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
+) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = dispatchers.main()
 
     data class ViewState(
         val hideWebContent: Boolean = true,
+        val isTabSwipingEnabled: Boolean = false,
     )
 
     sealed class Command {
         data class Query(val query: String) : Command()
-        object LaunchPlayStore : Command()
-        object LaunchFeedbackView : Command()
+        data object LaunchPlayStore : Command()
+        data object LaunchFeedbackView : Command()
+        data object LaunchTabSwitcher : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
+        data class SwitchToTab(val tabId: String) : Command()
+        data class OpenInNewTab(val url: String) : Command()
         data class OpenSavedSite(val url: String) : Command()
+        data object ShowSetAsDefaultBrowserDialog : Command()
+        data object DismissSetAsDefaultBrowserDialog : Command()
+        data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
+        data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
+        data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -96,40 +134,72 @@ class BrowserViewModel @Inject constructor(
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private var dataClearingObserver = Observer<ApplicationClearDataState> {
-        it?.let { state ->
-            when (state) {
-                ApplicationClearDataState.INITIALIZING -> {
-                    Timber.i("App clear state initializing")
-                    viewState.value = currentViewState.copy(hideWebContent = true)
-                }
-                ApplicationClearDataState.FINISHED -> {
-                    Timber.i("App clear state finished")
-                    viewState.value = currentViewState.copy(hideWebContent = false)
-                }
+    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
+        .map { tab -> tab?.tabId }
+        .filterNotNull()
+        .distinctUntilChanged()
+        .debounce(100)
+
+    val tabsFlow: Flow<List<String>> = tabRepository.flowTabs
+        .map { tabs -> tabs.map { tab -> tab.tabId } }
+        .distinctUntilChanged()
+
+    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
+        tabs.indexOf(selectedTab)
+    }.filterNot { it == -1 }
+
+    private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
+        when (state) {
+            ApplicationClearDataState.INITIALIZING -> {
+                Timber.i("App clear state initializing")
+                viewState.value = currentViewState.copy(hideWebContent = true)
+            }
+            ApplicationClearDataState.FINISHED -> {
+                Timber.i("App clear state finished")
+                viewState.value = currentViewState.copy(hideWebContent = false)
             }
         }
     }
 
-    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
-        it?.let { promptType ->
-            when (promptType) {
-                is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
-                    command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
-                    command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
-                    command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
-                }
-                else -> {}
+    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> { promptType ->
+        when (promptType) {
+            is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
+                command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
             }
+            is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
+                command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+            }
+            is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
+                command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+            }
+            else -> {}
         }
     }
+
+    private var lastSystemDefaultAppsTrigger: SetAsDefaultActionTrigger = SetAsDefaultActionTrigger.UNKNOWN
+    private var lastSystemDefaultBrowserDialogTrigger: SetAsDefaultActionTrigger = SetAsDefaultActionTrigger.UNKNOWN
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+        viewModelScope.launch {
+            defaultBrowserPromptsExperiment.commands.collect {
+                when (it) {
+                    OpenMessageDialog -> {
+                        command.value = Command.ShowSetAsDefaultBrowserDialog
+                    }
+
+                    is OpenSystemDefaultAppsActivity -> {
+                        lastSystemDefaultAppsTrigger = it.trigger
+                        command.value = Command.ShowSystemDefaultAppsActivity(it.intent)
+                    }
+
+                    is OpenSystemDefaultBrowserDialog -> {
+                        lastSystemDefaultBrowserDialogTrigger = it.trigger
+                        command.value = Command.ShowSystemDefaultBrowserDialog(it.intent)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
@@ -145,15 +215,21 @@ class BrowserViewModel @Inject constructor(
         sourceTabId: String? = null,
         skipHome: Boolean = false,
     ): String {
+        val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+            query
+        } else {
+            queryUrlConverter.convertQueryToUrl(query)
+        }
+
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
-                url = queryUrlConverter.convertQueryToUrl(query),
+                url = url,
                 skipHome = skipHome,
                 sourceTabId = sourceTabId,
             )
         } else {
             tabRepository.add(
-                url = queryUrlConverter.convertQueryToUrl(query),
+                url = url,
                 skipHome = skipHome,
             )
         }
@@ -272,6 +348,114 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onBookmarksActivityResult(url: String) {
-        command.value = Command.OpenSavedSite(url)
+        if (swipingTabsFeature.isEnabled) {
+            launch {
+                val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
+                if (existingTab == null) {
+                    command.value = Command.OpenInNewTab(url)
+                } else {
+                    command.value = Command.SwitchToTab(existingTab.tabId)
+                }
+            }
+        } else {
+            command.value = Command.OpenSavedSite(url)
+        }
     }
+
+    fun onTabSelected(tabId: String) {
+        launch(dispatchers.io()) {
+            tabRepository.select(tabId)
+        }
+    }
+
+    fun handleShowOnAppLaunchOption() {
+        if (showOnAppLaunchFeature.self().isEnabled()) {
+            viewModelScope.launch {
+                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+            }
+        }
+    }
+
+    fun onTabActivated(tabId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.updateTabLastAccess(tabId)
+        }
+    }
+
+    fun onSetDefaultBrowserDialogShown() {
+        defaultBrowserPromptsExperiment.onMessageDialogShown()
+    }
+
+    fun onSetDefaultBrowserDialogCanceled() {
+        defaultBrowserPromptsExperiment.onMessageDialogCanceled()
+    }
+
+    fun onSetDefaultBrowserConfirmationButtonClicked() {
+        command.value = DismissSetAsDefaultBrowserDialog
+        defaultBrowserPromptsExperiment.onMessageDialogConfirmationButtonClicked()
+    }
+
+    fun onSetDefaultBrowserNotNowButtonClicked() {
+        command.value = DismissSetAsDefaultBrowserDialog
+        defaultBrowserPromptsExperiment.onMessageDialogNotNowButtonClicked()
+    }
+
+    fun onSystemDefaultBrowserDialogShown() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogShown()
+    }
+
+    fun onSystemDefaultBrowserDialogSuccess() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogSuccess(lastSystemDefaultBrowserDialogTrigger)
+    }
+
+    fun onSystemDefaultBrowserDialogCanceled() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogCanceled(lastSystemDefaultBrowserDialogTrigger)
+    }
+
+    fun onSystemDefaultAppsActivityClosed() {
+        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityClosed(lastSystemDefaultAppsTrigger)
+    }
+
+    fun onTabsSwiped() {
+        pixel.fire(AppPixelName.SWIPE_TABS_USED)
+        pixel.fire(pixel = AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
+    }
+
+    fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
+        viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
+    }
+
+    // user has not tapped the Undo action -> purge the deletable tabs and remove all data
+    fun purgeDeletableTabs() {
+        viewModelScope.launch {
+            tabRepository.purgeDeletableTabs()
+        }
+    }
+
+    // user has tapped the Undo action -> restore the closed tabs
+    fun undoDeletableTabs(tabIds: List<String>) {
+        viewModelScope.launch {
+            tabRepository.undoDeletable(tabIds, moveActiveTabToEnd = true)
+            command.value = LaunchTabSwitcher
+        }
+    }
+
+    fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
+        command.value = ShowUndoDeleteTabsMessage(tabIds)
+    }
+}
+
+/**
+ * Feature flag to skip converting the query to a URL when opening a new tab
+ * This is for fixing https://app.asana.com/0/1208134428464537/1207998553475892/f
+ *
+ * In case of unexpected side-effects, the old behaviour can be reverted by disabling this remote feature flag
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "androidSkipUrlConversionOnNewTab",
+)
+interface SkipUrlConversionOnNewTabFeature {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

@@ -23,9 +23,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.OffsetDateTime
 import javax.inject.Inject
 import javax.inject.Named
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
@@ -103,7 +103,7 @@ class SavedSitesTimestampPersister @Inject constructor(
 
 fun BookmarkFolder.modifiedAfter(after: String?): Boolean {
     return if (this.lastModified == null) {
-        true
+        false
     } else {
         if (after == null) {
             false
@@ -121,7 +121,7 @@ fun BookmarkFolder.isDeleted(): Boolean {
 
 fun SavedSite.modifiedAfter(after: String?): Boolean {
     return if (this.lastModified == null) {
-        true
+        false
     } else {
         if (after == null) {
             false

@@ -36,14 +36,9 @@ import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListAppBinding
 class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     RecyclerView.Adapter<TrackingProtectionAppViewHolder>() {
 
-    private var isListEnabled: Boolean = false
     private val excludedApps: MutableList<AppsProtectionType> = mutableListOf()
 
-    fun update(
-        newList: List<AppsProtectionType>,
-        isListStateEnabled: Boolean = true,
-    ) {
-        isListEnabled = isListStateEnabled
+    fun update(newList: List<AppsProtectionType>) {
         val oldData = excludedApps
         val diffResult = DiffCallback(oldData, newList).run { DiffUtil.calculateDiff(this) }
         excludedApps.clear().also { excludedApps.addAll(newList) }
@@ -68,7 +63,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
         position: Int,
     ) {
         val type = excludedApps[position] as AppInfoType
-        holder.bind(isListEnabled, type.appInfo, position, listener)
+        holder.bind(type.appInfo, position, listener)
     }
 
     override fun getItemCount(): Int {
@@ -112,7 +107,6 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
     private val context = binding.root.context
 
     fun bind(
-        isListEnabled: Boolean,
         excludedAppInfo: TrackingProtectionAppInfo,
         position: Int,
         listener: AppProtectionListener,
@@ -120,7 +114,7 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
         val appIcon = context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
         binding.deviceShieldAppEntryName.text = excludedAppInfo.name
-        binding.handleToggleState(excludedAppInfo.knownProblem, isListEnabled)
+        binding.handleToggleState(excludedAppInfo.knownProblem)
 
         if (excludedAppInfo.isProblematic()) {
             if (excludedAppInfo.isExcluded) {
@@ -162,12 +156,8 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
             }
         }
 
-        if (isListEnabled) {
-            binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
-                listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
-            }
-        } else {
-            binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
+        binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
+            listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
         }
     }
 
@@ -178,6 +168,7 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
         return when (excludingReason) {
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
                 context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
+
             TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP -> context.getString(R.string.atp_ExcludedReasonExcludedThroughNetP)
             else -> ""
         }
@@ -189,14 +180,15 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
             TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP,
             -> R.drawable.ic_apptp_alert
+
             else -> 0
         }
     }
 }
 
-internal fun RowExclusionListAppBinding.handleToggleState(knownProblem: Int, isListEnabled: Boolean) {
+internal fun RowExclusionListAppBinding.handleToggleState(knownProblem: Int) {
     (knownProblem != TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP).let { enabled ->
-        deviceShieldAppEntryShieldEnabled.isEnabled = enabled && isListEnabled
-        deviceShieldAppEntryShieldEnabled.setEnabledOpacity(enabled && isListEnabled)
+        deviceShieldAppEntryShieldEnabled.isEnabled = enabled
+        deviceShieldAppEntryShieldEnabled.setEnabledOpacity(enabled)
     }
 }

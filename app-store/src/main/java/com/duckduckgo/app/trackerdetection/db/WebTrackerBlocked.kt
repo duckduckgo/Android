@@ -18,8 +18,8 @@ package com.duckduckgo.app.trackerdetection.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Entity(tableName = "web_trackers_blocked")
 data class WebTrackerBlocked(

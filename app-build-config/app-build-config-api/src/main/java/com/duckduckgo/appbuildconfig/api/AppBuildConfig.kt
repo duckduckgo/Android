@@ -32,11 +32,18 @@ interface AppBuildConfig {
     val model: String
     val deviceLocale: Locale
     val isDefaultVariantForced: Boolean
+    val buildDateTimeMillis: Long
+    val canSkipOnboarding: Boolean
 
     /**
      * You should call [variantName] in a background thread
      */
     val variantName: String?
+
+    /**
+     * @return `true` if the user re-installed the app, `false` otherwise
+     */
+    suspend fun isAppReinstall(): Boolean
 }
 
 enum class BuildFlavor {

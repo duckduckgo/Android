@@ -22,6 +22,6 @@
     <string name="windows_description">В DuckDuckGo для Windows есть все необходимое для защиты данных в Интернете: приватный поиск, принудительное шифрование, блокировка трекеров и всплывающих куки, а также перспектива разработок передовых средств обеспечения безопасности.\n\nПерейдите на компьютере с Windows по ссылке:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Поделиться ссылкой</string>
-    <string name="windows_share_text">Конфиденциальность в Интернете на Windows?\n\nЗагрузите наше приложение по ссылке: \nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Конфиденциальность в интернете на Windows? Не проблема!\n\nЗагрузите наше приложение на ПК с Windows по ссылке:\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Ищете версию для Mac?</string>
 </resources>

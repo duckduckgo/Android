@@ -29,11 +29,10 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel
-import com.duckduckgo.common.ui.view.SwitchView
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
@@ -70,7 +69,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -108,12 +106,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val toggleAppSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppPermissionToggled(isChecked, getPackage())
-    }
-
-    private val isAppTPEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -189,7 +181,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
-        setToggleState(viewState.toggleChecked, viewState.toggleEnabled && isAppTPEnabled)
+        setToggleState(viewState.toggleChecked, viewState.toggleEnabled)
         binding.handleProtectionState(viewState.bannerState)
     }
 
@@ -230,7 +222,9 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 
@@ -238,7 +232,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        appEnabledSwitch = switchMenuItem?.actionView as SwitchView
+        appEnabledSwitch = switchMenuItem?.actionView as DaxSwitch
         appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
         return true
     }
@@ -246,8 +240,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         cachedState?.let { vpnState ->
             appEnabledSwitch.quietlySetIsChecked(vpnState.toggleChecked, toggleAppSwitchListener)
-            appEnabledSwitch.isEnabled = vpnState.toggleEnabled && isAppTPEnabled
-            appEnabledSwitch.setEnabledOpacity(vpnState.toggleEnabled && isAppTPEnabled)
+            appEnabledSwitch.isEnabled = vpnState.toggleEnabled
+            appEnabledSwitch.setEnabledOpacity(vpnState.toggleEnabled)
             cachedState = null
         }
 
@@ -263,6 +257,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         finish()
     }
 

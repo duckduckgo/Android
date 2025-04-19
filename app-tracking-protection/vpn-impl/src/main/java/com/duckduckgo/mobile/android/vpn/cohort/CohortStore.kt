@@ -23,20 +23,20 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
 
 interface CohortStore {
     /**
@@ -61,7 +61,7 @@ interface CohortStore {
     boundType = VpnServiceCallbacks::class,
 )
 class RealCohortStore @Inject constructor(
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
@@ -97,12 +97,13 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
-                // skip if already stored
-                getCohortStoredLocalDate()?.let { return@launch }
+            attemptAssignCohort()
+        }
+    }
 
-                setCohortLocalDate(LocalDate.now())
-            }
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            attemptAssignCohort()
         }
     }
 
@@ -111,6 +112,15 @@ class RealCohortStore @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         // noop
+    }
+
+    private suspend fun attemptAssignCohort() {
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+            // skip if already stored
+            getCohortStoredLocalDate()?.let { return }
+
+            setCohortLocalDate(LocalDate.now())
+        }
     }
 
     companion object {

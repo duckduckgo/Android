@@ -50,6 +50,7 @@ class RealFavoritesDelegate @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val favoritesDisplayModeSetting: FavoritesDisplayModeSettingsRepository,
+    private val relationsReconciler: RelationsReconciler,
     private val dispatcherProvider: DispatcherProvider,
 ) : FavoritesDelegate {
 
@@ -105,9 +106,12 @@ class RealFavoritesDelegate @Inject constructor(
 
     override fun updateWithPosition(favorites: List<SavedSite.Favorite>) {
         val favoriteFolder = favoritesDisplayModeSetting.getQueryFolder()
-        savedSitesRelationsDao.delete(favoriteFolder)
         val relations = favorites.map { Relation(folderId = favoriteFolder, entityId = it.id) }
-        savedSitesRelationsDao.insertList(relations)
+        val reconciledList = relationsReconciler.reconcileRelations(
+            originalRelations = savedSitesRelationsDao.relationsByFolderId(favoriteFolder).map { it.entityId },
+            newFolderRelations = relations.map { it.entityId },
+        )
+        savedSitesRelationsDao.replaceFavouriteFolder(favoriteFolder, reconciledList)
         savedSitesEntitiesDao.updateModified(favoriteFolder)
     }
 

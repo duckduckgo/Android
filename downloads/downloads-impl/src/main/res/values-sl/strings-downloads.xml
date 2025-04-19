@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Ponovi</string>
     <string name="notificationDownloadComplete">Prenos končan.</string>
     <string name="notificationDownloadFailed">Prenos ni uspel.</string>
+
+    <string name="downloadConfirmationContinue">Shrani med prenose</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">S spletnega mesta: %1$s</string>
 </resources>

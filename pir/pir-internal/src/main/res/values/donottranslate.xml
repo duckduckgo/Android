@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="pirDevSettings">Pir Dev Settings</string>
+    <string name="pirDevSettingsScan">PIR Scan</string>
+    <string name="pirDevScanTitle">PIR Dev Scan</string>
+    <string name="pirDevOptOutTitle">PIR Dev Opt-out</string>
+    <string name="pirDevDebugOptOutTitle">PIR Dev Debug Opt-out</string>
+    <string name="pirDevSettingsOptOut">PIR Opt-out</string>
+    <string name="pirDevRunSimpleScan">Run simple scan</string>
+    <string name="pirDevForceKillScan">Reset scan</string>
+    <string name="pirDevForceKillOptOut">Reset optout</string>
+    <string name="pirDevViewScanResults">View All Scan Results</string>
+    <string name="pirDevViewOptOutResults">View All OptOut Results</string>
+    <string name="pirDevViewRunEvents">View PIR Run events</string>
+    <string name="pirDevSchedule">Schedule Scan</string>
+    <string name="pirDevSimpleScanHeader">Simple Scan Results</string>
+    <string name="pirDevHeader">Test Actions</string>
+    <string name="pirDevProfileQueryHeader">Scan (if empty uses default)</string>
+    <string name="pirStatsStatusHeader">Completion summary: </string>
+    <string name="pirStatsOptOutStatusHeader">Submitted optouts: </string>
+    <string name="pirStatsStatusScanned" instruction="Placeholder is an integer">Sites Scanned: %1$d</string>
+    <string name="pirStatsStatusRecords" instruction="Placeholder is an integer">Total extracted profiles: %1$d</string>
+    <string name="pirStatsStatusBrokerFound" instruction="Placeholder is an integer">Brokers with records: %1$d</string>
+    <string name="pirStatsStatusError" instruction="Placeholder is an integer">Errors: %1$d</string>
+    <string name="pirNotificationTitle">Pir Manual Scan</string>
+    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress…</string>
+    <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
+    <string name="pirMessageSchedule">Successfully schedule background scan!</string>
+    <string name="pirDevScanLogHeader">Scan events log</string>
+    <string name="pirOptOutNotificationTitle">Pir Opt Out</string>
+    <string name="pirOptOutNotificationMessageInProgress">Opt out is currently in progress…</string>
+    <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
+    <string name="pirDevDebugOptOut">Debug opt out</string>
+    <string name="pirDevOptOut">Run opt out</string>
+    <string name="pirDevOptOutDisclaimer">Note: Only brokers with formOptOut are supported and will appear as an option for optout.</string>
+</resources>

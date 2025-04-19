@@ -219,7 +219,7 @@ class NgVpnNetworkStackTest {
 
     @Test
     fun whenMotoGAndPrivateDnsSetThenReturnNoDns() = runTest {
-        whenever(appBuildConfig.model).thenReturn("moto g play - 2023")
+        whenever(appBuildConfig.model).thenReturn("moto g play")
         fakeDnsProvider.mutableSystemDns.add(InetAddress.getLocalHost())
         fakeDnsProvider.mutablePrivateDns.add(InetAddress.getLocalHost())
         whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
@@ -231,6 +231,53 @@ class NgVpnNetworkStackTest {
         assertEquals(1500, config.mtu)
         assertTrue(config.routes.isEmpty())
         assertTrue(config.dns.isEmpty())
+        assertEquals(
+            mapOf(
+                InetAddress.getByName("10.0.0.2") to 32,
+                InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+            ),
+            config.addresses,
+        )
+    }
+
+    @Test
+    fun whenShortListedDeviceThenReturnSearchDomains() = runTest {
+        whenever(appBuildConfig.model).thenReturn("moto g play")
+        fakeDnsProvider.searchDomain = "internal.com"
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+
+        val configResult = ngVpnNetworkStack.onPrepareVpn()
+        assertTrue(configResult.isSuccess)
+
+        val config = configResult.getOrThrow()
+        assertEquals(1500, config.mtu)
+        assertTrue(config.routes.isEmpty())
+        assertTrue(config.dns.isEmpty())
+        assertEquals("internal.com", config.searchDomains)
+        assertEquals(
+            mapOf(
+                InetAddress.getByName("10.0.0.2") to 32,
+                InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+            ),
+            config.addresses,
+        )
+    }
+
+    @Test
+    fun whenNotShortListedDeviceThenReturnSearchDomains() = runTest {
+        whenever(appBuildConfig.model).thenReturn("wrong device")
+        fakeDnsProvider.mutableSystemDns.add(InetAddress.getLocalHost())
+        fakeDnsProvider.searchDomain = "internal.com"
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+
+        val configResult = ngVpnNetworkStack.onPrepareVpn()
+        assertTrue(configResult.isSuccess)
+
+        val config = configResult.getOrThrow()
+        assertEquals(1500, config.mtu)
+        assertTrue(config.routes.isEmpty())
+        assertTrue(config.dns.isEmpty())
+        assertEquals("internal.com", config.searchDomains)
         assertEquals(
             mapOf(
                 InetAddress.getByName("10.0.0.2") to 32,

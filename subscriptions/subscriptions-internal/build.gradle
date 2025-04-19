@@ -32,13 +32,13 @@ android {
 dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
-    implementation project(':subscriptions-store')
     implementation project(':subscriptions-impl')
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':app-build-config-api')
     implementation project(':internal-features-api')
+    implementation project(':navigation-api')
 
     implementation Square.moshi
     implementation Square.okHttp3.okHttp
@@ -59,4 +59,8 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"
+
+    testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
 }

@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ nori atidaryti jūsų DRM programinę įrangą</string>
+    <string name="drmSiteDialogSubtitle">Skaitmeninių teisių valdymo programinė įranga reikalinga norint atkurti apsaugotą medijos turinį, bet taip pat suteikia prieigą prie įrenginio identifikatorių. Suteikite leidimą tik toms svetainėms, kurioms patikite šiuos duomenis. Leidimus bet kada galite tvarkyti nustatymuose. <annotation type="drm_learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Visada</string>
+    <string name="drmSiteDialogAllowOnce">Tik šiam seansui</string>
+    <string name="drmSiteDialogDenyAlways">Visada atsisakyti</string>
+    <string name="drmSiteDialogDenyOnce">Atsisakyti šiam seansui</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ nori pasiekti jūsų vietą</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Įsiminti mano pasirinkimą</string>
+    <string name="preciseLocationDDGDialogSubtitle">Jūsų anoniminę buvimo vietą naudojame tik tam, kad galėtume pateikti geresnius rezultatus arčiau jūsų. Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Leisti „DuckDuckGo“ prašyti vietos prieigos šiame įrenginyje</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Svetainės gali naudoti jūsų buvimo vietą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Leisti „DuckDuckGo“ prašyti vietos prieigos</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Svetainės leidimai</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Galite tvarkyti mikrofonų ir kamerų prieigos leidimus, kuriuos Nustatymuose suteikėte atskiroms svetainėms.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Galite tvarkyti mikrofonų prieigos leidimus, kuriuos Nustatymuose suteikėte atskiroms svetainėms.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Galite tvarkyti kamerų prieigos leidimus, kuriuos Nustatymuose suteikėte atskiroms svetainėms.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ nori gauti prieigą prie fotoaparato ir mikrofono</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s“ nori gauti prieigą prie mikrofono</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ nori gauti prieigą prie fotoaparato</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Svetainės gali naudoti jūsų kamerą ir mikrofoną tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Atidaryti nustatymus</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Atšaukti</string>
+
+    <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio buvimo vietos, kameros, mikrofono arba DRM (skaitmeninių teisių valdymo) programinės įrangos. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>
+    <string name="sitePermissionsSettingsLocation">Vieta</string>
+    <string name="sitePermissionsSettingsCamera">Fotoaparatas</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofonas</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Tvarkyti svetaines</string>
+    <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Pašalinti visų svetainių leidimai</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Leidimai „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Klausti kiekvieną kartą</string>
+    <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
+    <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Išjungta visose svetainėse</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
+
 </resources>

@@ -20,7 +20,6 @@ import android.util.Log
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
-import com.duckduckgo.networkprotection.api.NetworkProtectionStatistics
 import com.duckduckgo.networkprotection.impl.config.PcapConfig
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
@@ -39,7 +38,7 @@ interface WgProtocol {
     ): Result<Unit>
 
     fun stopWg(): Result<Unit>
-    fun getStatistics(): NetworkProtectionStatistics // TODO: Expose API to Make this consumable from activities
+    fun getStatistics(): NetworkProtectionStatistics
 }
 
 @ContributesBinding(VpnScope::class)

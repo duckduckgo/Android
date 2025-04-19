@@ -44,6 +44,15 @@ fun Context.getSystemActiveNetworkDefaultDns(): List<String> {
     }.getOrDefault(emptyList())
 }
 
+fun Context.getSystemActiveNetworkSearchDomain(): String? {
+    return runCatching {
+        val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connectivityManager?.activeNetwork?.let { activeNetwork ->
+            connectivityManager.getLinkProperties(activeNetwork)?.domains
+        }
+    }.getOrNull()
+}
+
 fun InetAddress.isLocal(): Boolean {
     return isLoopbackAddress
 }

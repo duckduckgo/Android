@@ -29,10 +29,11 @@ interface FingerprintingCanvasRepository {
     var fingerprintingCanvasEntity: FingerprintingCanvasEntity
 }
 
-class RealFingerprintingCanvasRepository constructor(
+class RealFingerprintingCanvasRepository(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : FingerprintingCanvasRepository {
 
     private val fingerprintingCanvasDao: FingerprintingCanvasDao = database.fingerprintingCanvasDao()
@@ -40,7 +41,9 @@ class RealFingerprintingCanvasRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

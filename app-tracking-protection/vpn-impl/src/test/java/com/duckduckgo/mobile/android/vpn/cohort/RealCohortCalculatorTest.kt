@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
+import java.time.LocalDate
+import java.time.temporal.IsoFields
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.IsoFields
 
 class RealCohortCalculatorTest {
 
@@ -80,7 +80,7 @@ class RealCohortCalculatorTest {
     @Test
     fun whenLocalDateNowThenReturnWeeklyCohort() {
         val date = LocalDate.now()
-        val year = date.year
+        val year = date.get(IsoFields.WEEK_BASED_YEAR)
         assertEquals("$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}", cohortCalculator.calculateCohortForDate(date))
     }
 

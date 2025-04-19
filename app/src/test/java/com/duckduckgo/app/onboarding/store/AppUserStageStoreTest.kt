@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -73,6 +77,29 @@ class AppUserStageStoreTest {
     fun whenMoveToStageThenUpdateUserStageInDao() = runTest {
         testee.moveToStage(AppStage.DAX_ONBOARDING)
         verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun `when stage observer attached, then return NEW stage by default`() = runTest {
+        whenever(userStageDao.currentUserAppStageFlow()).thenReturn(flowOf(null))
+        val expected = AppStage.NEW
+
+        val actual = testee.userAppStageFlow().first()
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `when stage updated, then observer notified`() = runTest {
+        val flow = MutableSharedFlow<UserStage>()
+        whenever(userStageDao.currentUserAppStageFlow()).thenReturn(flow)
+        val expected = AppStage.ESTABLISHED
+
+        testee.userAppStageFlow().test {
+            flow.emit(UserStage(appStage = expected))
+            val actual = awaitItem()
+            assertEquals(expected, actual)
+        }
     }
 
     private suspend fun givenCurrentStage(appStage: AppStage) {

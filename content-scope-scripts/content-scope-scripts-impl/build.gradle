@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -33,6 +34,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
+    implementation project(':duckplayer-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -46,6 +48,11 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -57,6 +64,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -64,9 +72,13 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     sourceSets {
         main {
             java {
@@ -83,6 +95,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.contentscopescripts.impl'
 }

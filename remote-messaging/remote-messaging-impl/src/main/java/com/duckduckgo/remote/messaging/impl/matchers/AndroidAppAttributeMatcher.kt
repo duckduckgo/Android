@@ -26,7 +26,7 @@ class AndroidAppAttributeMatcher(
     private val appProperties: AppProperties,
     private val appBuildConfig: AppBuildConfig,
 ) : AttributeMatcherPlugin {
-    override suspend fun evaluate(matchingAttribute: MatchingAttribute<*>): Boolean? {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
             is Flavor -> {
                 matchingAttribute.matches(appBuildConfig.flavor.toString())

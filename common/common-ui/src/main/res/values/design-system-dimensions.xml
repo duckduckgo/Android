@@ -39,8 +39,11 @@
     <dimen name="toolbarOverflowPadding">10dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
 
+    <!-- Navigation Bar -->
+    <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>
+    <dimen name="experimentalNavigationBarPaddingBottom">8dp</dimen>
+
     <!-- Buttons -->
-    <dimen name="legacyButtonSmallHeight">36dp</dimen>
     <dimen name="buttonLargeHeight">60dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
     <dimen name="buttonSmallSidePadding">16dp</dimen>
@@ -52,21 +55,33 @@
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSmallSize">16dp</dimen>
     <dimen name="listItemImageMediumSize">24dp</dimen>
-    <dimen name="listItemImageLargeSize">40dp</dimen>
+    <dimen name="listItemImageLargeSize">32dp</dimen>
+    <dimen name="listItemImageExtraLargeSize">40dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
     <dimen name="oneLineItemHeight">48dp</dimen>
     <dimen name="oneLineItemWithLargeImageHeight">56dp</dimen>
     <dimen name="oneLineItemVerticalPadding">8dp</dimen>
     <dimen name="twoLineItemHeight">56dp</dimen>
     <dimen name="twoLineItemWithLargeImageHeight">64dp</dimen>
-    <dimen name="twoLineItemVerticalPadding">12dp</dimen>
-    <dimen name="twoLineItemVerticalBigPadding">14dp</dimen>
+    <dimen name="twoLineItemVerticalPadding">8dp</dimen>
+    <dimen name="twoLineItemVerticalBigPadding">10dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
 
+    <!-- Grid Item -->
+    <dimen name="gridItemSize">80dp</dimen>
+    <dimen name="gridItemImageSize">56dp</dimen>
+    <dimen name="gridItemIconSize">32dp</dimen>
+    <dimen name="gridItemTextWidth">72dp</dimen>
+    <dimen name="gridItemPreviewHeight">170dp</dimen>
+    <dimen name="gridItemPreviewHeightNew">162dp</dimen>
+
+    <!-- Extended FAB -->
+    <dimen name="fabHeight">56dp</dimen>
+
     <!-- PopupMenu -->
-    <dimen name="popupMenuWidth">280dp</dimen>
+    <dimen name="popupMenuWidth">200dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
     <dimen name="popupMenuItemWidth">198dp</dimen>
@@ -87,8 +102,8 @@
     <!-- Dividers -->
     <dimen name="horizontalDividerHeight">1dp</dimen>
     <dimen name="horizontalDividerSidePadding">@dimen/keyline_4</dimen>
-    <dimen name="horizontalDividerTopPadding">@dimen/keyline_4</dimen>
-    <dimen name="horizontalDividerBottomPadding">@dimen/keyline_4</dimen>
+    <dimen name="horizontalDividerTopPadding">@dimen/keyline_2</dimen>
+    <dimen name="horizontalDividerBottomPadding">@dimen/keyline_2</dimen>
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 
@@ -119,6 +134,7 @@
     <dimen name="changeAppIconSize">75dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
     <dimen name="savedSiteGridItemFavicon">56dp</dimen>
+    <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
 
     <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
     <dimen name="searchWidgetPadding">16dp</dimen>

@@ -21,12 +21,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestionBinding
-import com.duckduckgo.app.browser.databinding.ItemAutocompleteNoSuggestionsBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySearchSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.view.MessageCta.Message
 
 interface SuggestionViewHolderFactory {
 
@@ -37,10 +50,13 @@ interface SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
+        openSettingsClickListener: () -> Unit = {},
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit = {},
     )
 }
 
-class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -53,9 +69,69 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
-        searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
+        searchSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSearchSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener,
+            omnibarPosition,
+        )
+    }
+}
+
+class HistorySuggestionViewHolderFactory() : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteHistorySuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.HistorySuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySuggestionViewHolder
+        searchSuggestionViewHolder.bind(
+            suggestion as AutoCompleteHistorySuggestion,
+            immediateSearchClickListener,
+            longPressClickListener,
+        )
+    }
+}
+
+class HistorySearchSuggestionViewHolderFactory() : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteHistorySearchSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.HistorySearchSuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val historySearchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySearchSuggestionViewHolder
+        historySearchSuggestionViewHolder.bind(
+            suggestion as AutoCompleteHistorySearchSuggestion,
+            immediateSearchClickListener,
+            longPressClickListener,
+        )
     }
 }
 
@@ -72,17 +148,24 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
-        bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
+        bookmarkSuggestionViewHolder.bind(
+            suggestion as AutoCompleteBookmarkSuggestion,
+            immediateSearchClickListener,
+        )
     }
 }
 
-class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
+class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return AutoCompleteViewHolder.EmptySuggestionViewHolder(ItemAutocompleteNoSuggestionsBinding.inflate(inflater, parent, false))
+        val binding = ItemAutocompleteSwitchToTabSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -90,8 +173,80 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val switchToTabSuggestionViewHolder = holder as AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder
+        switchToTabSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSwitchToTabSuggestion,
+            immediateSearchClickListener,
+        )
+    }
+}
+
+class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val view = View(parent.context)
+        view.layoutParams = RecyclerView.LayoutParams(
+            RecyclerView.LayoutParams.MATCH_PARENT,
+            RecyclerView.LayoutParams.WRAP_CONTENT,
+        )
+        return AutoCompleteViewHolder.EmptySuggestionViewHolder(view)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
+    }
+}
+
+class DefaultSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return AutoCompleteViewHolder.DefaultSuggestionViewHolder(ItemAutocompleteDefaultBinding.inflate(inflater, parent, false))
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
+        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener, omnibarPosition)
+    }
+}
+
+class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return AutoCompleteViewHolder.InAppMessageViewHolder(ItemAutocompleteInAppMessageBinding.inflate(inflater, parent, false))
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val viewHolder = holder as InAppMessageViewHolder
+        viewHolder.bind(suggestion, deleteClickListener, openSettingsClickListener)
     }
 }
 
@@ -102,6 +257,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -110,6 +266,34 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
             editQueryImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
+
+            if (omnibarPosition == OmnibarPosition.BOTTOM) {
+                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
+            }
+
+            if (item.isAllowedInTopHits) {
+                root.tag = OTHER_ITEM
+            } else {
+                root.tag = SEARCH_ITEM
+            }
+        }
+    }
+
+    class HistorySearchSuggestionViewHolder(val binding: ItemAutocompleteHistorySearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteHistorySearchSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            phrase.text = item.phrase
+
+            root.setOnClickListener { immediateSearchListener(item) }
+            root.setOnLongClickListener {
+                longPressClickListener(item)
+                true
+            }
+
+            root.tag = OTHER_ITEM
         }
     }
 
@@ -117,15 +301,86 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteBookmarkSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = item.url
+            url.text = item.phrase
 
-            goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
+            bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_20 else R.drawable.ic_bookmark_20)
             root.setOnClickListener { immediateSearchListener(item) }
+
+            root.tag = OTHER_ITEM
         }
     }
 
-    class EmptySuggestionViewHolder(binding: ItemAutocompleteNoSuggestionsBinding) : AutoCompleteViewHolder(binding.root)
+    class HistorySuggestionViewHolder(val binding: ItemAutocompleteHistorySuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteHistorySuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.title
+            url.text = item.phrase
+
+            root.setOnClickListener { immediateSearchListener(item) }
+            root.setOnLongClickListener {
+                longPressClickListener(item)
+                true
+            }
+
+            root.tag = OTHER_ITEM
+        }
+    }
+
+    class SwitchToTabSuggestionViewHolder(val binding: ItemAutocompleteSwitchToTabSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSwitchToTabSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.title
+            url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
+
+            root.setOnClickListener { immediateSearchListener(item) }
+
+            root.tag = OTHER_ITEM
+        }
+    }
+
+    class EmptySuggestionViewHolder(view: View) : AutoCompleteViewHolder(view)
+
+    class DefaultSuggestionViewHolder(val binding: ItemAutocompleteDefaultBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteDefaultSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+            omnibarPosition: OmnibarPosition,
+        ) {
+            binding.phrase.text = item.phrase
+            binding.root.setOnClickListener { immediateSearchListener(item) }
+
+            if (omnibarPosition == OmnibarPosition.BOTTOM) {
+                binding.editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
+            }
+
+            binding.root.tag = OTHER_ITEM
+        }
+    }
+
+    class InAppMessageViewHolder(val binding: ItemAutocompleteInAppMessageBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSuggestion,
+            deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+            openSettingsClickListener: () -> Unit,
+        ) {
+            binding.messageCta.setMessage(
+                Message(
+                    title = binding.root.context.getString(R.string.improvedAutoCompleteIAMTitle),
+                    subtitle = binding.root.context.getString(R.string.improvedAutoCompleteIAMContent),
+                    action = binding.root.context.getString(R.string.openAutoCompleteSettings),
+                ),
+            )
+            binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
+            binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
+
+            binding.root.tag = OTHER_ITEM
+        }
+    }
 }

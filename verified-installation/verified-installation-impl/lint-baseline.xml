@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            if (appBuildConfig.sdkInt >= VERSION_CODES.R) {"
+        errorLine2="                                         ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/verifiedinstallation/installsource/InstallSourceExtractor.kt"
+            line="41"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @RequiresApi(VERSION_CODES.R)"
+        errorLine2="                 ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/verifiedinstallation/installsource/InstallSourceExtractor.kt"
+            line="54"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/verifiedinstallation/certificate/SigningCertificateHashExtractor.kt"
+            line="45"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @RequiresApi(Build.VERSION_CODES.P)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/verifiedinstallation/certificate/SigningCertificateHashExtractor.kt"
+            line="65"
+            column="18"/>
+    </issue>
+
+</issues>

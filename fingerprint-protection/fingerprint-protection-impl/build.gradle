@@ -27,6 +27,9 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.fingerprintprotection.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -35,7 +38,7 @@ dependencies {
     implementation project(path: ':fingerprint-protection-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
@@ -75,9 +78,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     implementation JakeWharton.timber
 
     implementation Square.retrofit2.converter.moshi
@@ -92,4 +92,6 @@ dependencies {
     testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

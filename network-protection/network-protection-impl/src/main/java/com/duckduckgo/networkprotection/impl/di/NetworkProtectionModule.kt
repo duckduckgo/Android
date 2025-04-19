@@ -19,20 +19,21 @@ package com.duckduckgo.networkprotection.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetpDataStore
+import com.duckduckgo.networkprotection.store.NetpDataStoreSharedPreferences
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
-import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.RealNetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStoreSharedPreferences
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -44,8 +45,8 @@ object DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetworkProtectionRepository(
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(vpnSharedPreferencesProvider)
+        sharedPreferencesProvider: SharedPreferencesProvider,
+    ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(sharedPreferencesProvider)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -59,10 +60,10 @@ object DataModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideNetPExclusionListRepository(
+    fun provideNetPManualExclusionListRepository(
         database: NetPDatabase,
-    ): NetPExclusionListRepository {
-        return RealNetPExclusionListRepository(database.exclusionListDao())
+    ): NetPManualExclusionListRepository {
+        return RealNetPManualExclusionListRepository(database.exclusionListDao())
     }
 
     @Provides
@@ -73,6 +74,12 @@ object DataModule {
         dispatcherProvider: DispatcherProvider,
     ): NetPGeoswitchingRepository {
         return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao(), dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAutoExcludeDao(netpDatabase: NetPDatabase): AutoExcludeDao {
+        return netpDatabase.autoExcludeDao()
     }
 }
 
@@ -106,9 +113,9 @@ object NetPBreakageCategoriesModule {
 
 @Module
 @ContributesTo(AppScope::class)
-object NetPWaitlistDataModule {
+object NetPDataStoreModule {
     @Provides
-    fun provideNetPWaitlistDataStore(
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetPWaitlistDataStore = NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider)
+    fun provideNetPDataStore(
+        sharedPreferencesProvider: SharedPreferencesProvider,
+    ): NetpDataStore = NetpDataStoreSharedPreferences(sharedPreferencesProvider)
 }

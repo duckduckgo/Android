@@ -1,6 +1,0 @@
-appId: com.duckduckgo.mobile.android
----
-- assertVisible:
-    text: "No passwords saved yet"
-- assertNotVisible:
-    id: searchLogins

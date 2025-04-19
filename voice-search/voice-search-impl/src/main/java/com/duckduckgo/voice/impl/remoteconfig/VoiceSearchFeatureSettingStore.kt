@@ -35,7 +35,7 @@ class VoiceSearchFeatureSettingStore @Inject constructor(
 
     override fun store(jsonSettings: String) {
         jsonAdapter.fromJson(jsonSettings)?.let {
-            voiceSearchFeatureRepository.updateAllExceptions(it.excludedManufacturers, it.minVersion)
+            voiceSearchFeatureRepository.updateAllExceptions(it.excludedManufacturers, it.excludedLocales, it.minVersion)
         }
     }
 

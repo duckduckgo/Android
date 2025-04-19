@@ -84,6 +84,16 @@ object BookmarkTestUtils {
         return relations
     }
 
+    fun createInvalidBookmark(): Bookmark {
+        val veryLongTitle = String(CharArray(3000) { 'a' + (it % 26) })
+        return aBookmark(id = "invalid", title = veryLongTitle, url = "invalid")
+    }
+
+    fun createInvalidFolder(): BookmarkFolder {
+        val veryLongName = String(CharArray(3000) { 'a' + (it % 26) })
+        return aBookmarkFolder(id = "invalidFolder", name = veryLongName, parentId = SavedSitesNames.BOOKMARKS_ROOT)
+    }
+
     fun aBookmarkFolder(
         id: String,
         name: String,

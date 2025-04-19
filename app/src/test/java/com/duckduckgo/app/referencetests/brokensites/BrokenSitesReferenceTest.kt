@@ -17,30 +17,40 @@
 package com.duckduckgo.app.referencetests.brokensites
 
 import android.net.Uri
-import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -80,6 +90,16 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
+    private val networkProtectionState: NetworkProtectionState = mock()
+
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
+
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+    private lateinit var testBlockListFeature: TestBlockListFeature
+    private lateinit var inventory: FeatureTogglesInventory
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -104,6 +124,25 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     fun before() {
         MockitoAnnotations.openMocks(this)
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
+        runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+
+        testBlockListFeature = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "blockList",
+        ).build().create(TestBlockListFeature::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        testBlockListFeature.tdsNextExperimentTest(),
+                        testBlockListFeature.tdsNextExperimentAnotherTest(),
+                    ),
+                ),
+            ),
+            coroutineRule.testDispatcherProvider,
+        )
+
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -119,6 +158,11 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mock(),
             mock(),
             mock(),
+            privacyProtectionsPopupExperimentExternalPixels,
+            networkProtectionState,
+            webViewVersionProvider,
+            ampLinks = mock(),
+            inventory,
         )
     }
 
@@ -146,8 +190,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             upgradeHttps = testCase.wasUpgraded,
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
             surrogates = testCase.surrogates.joinToString(","),
-            webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSite.SITE_TYPE_DESKTOP,
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
@@ -155,16 +198,20 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
+            userRefreshCount = 3,
+            openerContext = SERP.context,
+            jsPerformance = listOf(123.45),
         )
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
+        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(Count))
 
-        val params = paramsCaptor.firstValue
+        val params = paramsCaptor.firstValue.toMutableMap()
+        params["locale"] = "en-US"
         val encodedParams = encodedParamsCaptor.firstValue
 
         testCase.expectReportURLParams.forEach { param ->

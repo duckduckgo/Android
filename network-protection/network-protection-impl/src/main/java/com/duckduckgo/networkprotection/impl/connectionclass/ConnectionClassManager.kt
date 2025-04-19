@@ -105,7 +105,7 @@ class ConnectionClassManager @Inject constructor(
         val currentQuality = currentConnectionQuality.get() ?: return false
         val (bottomOfBand, topOfBand) = when (currentQuality) {
             ConnectionQuality.TERRIBLE -> {
-                ConnectionQuality.MODERATE.max to ConnectionQuality.POOR.max
+                ConnectionQuality.POOR.max to Double.MAX_VALUE
             }
             ConnectionQuality.POOR -> {
                 ConnectionQuality.MODERATE.max to ConnectionQuality.POOR.max
@@ -126,7 +126,7 @@ class ConnectionClassManager @Inject constructor(
         }
 
         val average = latencyMeasurements.average
-        return if (average > topOfBand * HYSTERESIS_TOP_MULTIPLIER) {
+        return if (average / HYSTERESIS_TOP_MULTIPLIER > topOfBand) { // avoid Double.MAX_VALUE overflow
             true
         } else if (average < bottomOfBand * HYSTERESIS_BOTTOM_MULTIPLIER) {
             true

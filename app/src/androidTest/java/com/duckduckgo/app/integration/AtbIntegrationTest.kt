@@ -19,7 +19,7 @@ package com.duckduckgo.app.integration
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.getDaggerComponent
-import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.model.Atb
@@ -68,8 +68,8 @@ class AtbIntegrationTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
         service = getDaggerComponent().retrofit().create(StatisticsService::class.java)
 
-        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+        val plugins = object : PluginPoint<AtbLifecyclePlugin> {
+            override fun getPlugins(): Collection<AtbLifecyclePlugin> {
                 return listOf()
             }
         }

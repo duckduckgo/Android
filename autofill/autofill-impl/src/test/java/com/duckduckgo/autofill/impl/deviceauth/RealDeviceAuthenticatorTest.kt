@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.impl.deviceauth
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.R.string
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -94,13 +94,22 @@ class RealDeviceAuthenticatorTest {
     @Test
     fun whenAuthenticateToAccessCredentialsIsCalledWithFragmentThenLaunchAuthLauncher() {
         testee.authenticate(fragment) {}
-        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_access), eq(fragment), any())
+        verifyAuthDialogLaunched()
     }
 
     @Test
     fun whenAuthenticateToAccessCredentialsIsCalledWithActivityThenLaunchAuthLauncher() {
         testee.authenticate(fragment) {}
-        verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_access), eq(fragment), any())
+        verifyAuthDialogLaunched()
+    }
+
+    private fun verifyAuthDialogLaunched() {
+        verify(authLauncher).launch(
+            featureTitleText = eq(string.biometric_prompt_title),
+            featureAuthText = eq(string.autofill_auth_text_for_access),
+            fragment = eq(fragment),
+            onResult = any(),
+        )
     }
 
     @Test
@@ -111,7 +120,7 @@ class RealDeviceAuthenticatorTest {
     }
 
     private fun verifyAuthNotLaunched() {
-        verify(authLauncher, never()).launch(any(), any<Fragment>(), any())
-        verify(authLauncher, never()).launch(any(), any<FragmentActivity>(), any())
+        verify(authLauncher, never()).launch(any(), any(), any<Fragment>(), any())
+        verify(authLauncher, never()).launch(any(), any(), any<FragmentActivity>(), any())
     }
 }

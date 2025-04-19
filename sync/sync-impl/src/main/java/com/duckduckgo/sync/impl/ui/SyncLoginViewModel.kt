@@ -16,19 +16,36 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.CodeType.EXCHANGE
+import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
+import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
+import com.duckduckgo.sync.impl.ExchangeResult.Pending
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.onFailure
+import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowError
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -46,6 +63,7 @@ class SyncLoginViewModel @Inject constructor(
         object ReadTextCode : Command()
         object LoginSucess : Command()
         object Error : Command()
+        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -61,15 +79,67 @@ class SyncLoginViewModel @Inject constructor(
         }
     }
 
+    fun onErrorDialogDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.Error)
+        }
+    }
+
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.processCode(qrCode)
-            if (result is Error) {
-                command.send(Command.Error)
-            } else {
-                syncPixels.fireLoginPixel()
-                command.send(LoginSucess)
+            val codeType = syncAccountRepository.getCodeType(qrCode)
+            when (val result = syncAccountRepository.processCode(qrCode)) {
+                is Error -> {
+                    processError(result)
+                }
+
+                is Success -> {
+                    if (codeType == EXCHANGE) {
+                        pollForRecoveryKey()
+                    } else {
+                        syncPixels.fireLoginPixel()
+                        command.send(LoginSucess)
+                    }
+                }
             }
+        }
+    }
+
+    private suspend fun processError(result: Error) {
+        when (result.code) {
+            ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
+            LOGIN_FAILED.code -> R.string.sync_connect_login_error
+            CONNECT_FAILED.code -> R.string.sync_connect_generic_error
+            CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
+            INVALID_CODE.code -> R.string.sync_invalid_code_error
+            else -> null
+        }?.let { message ->
+            command.send(ShowError(message = message, reason = result.reason))
+        }
+    }
+
+    private suspend fun pollForRecoveryKey() {
+        var polling = true
+        while (polling) {
+            delay(POLLING_INTERVAL_EXCHANGE_FLOW)
+            syncAccountRepository.pollForRecoveryCodeAndLogin()
+                .onSuccess { success ->
+                    when (success) {
+                        is Pending -> return@onSuccess // continue polling
+                        is AccountSwitchingRequired -> {
+                            polling = false
+                            processError(Error(ALREADY_SIGNED_IN.code, "user already signed in"))
+                        }
+                        LoggedIn -> {
+                            polling = false
+                            syncPixels.fireLoginPixel()
+                            command.send(LoginSucess)
+                        }
+                    }
+                }.onFailure {
+                    polling = false
+                    processError(it)
+                }
         }
     }
 }

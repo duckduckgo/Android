@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="cancel">Annuleren</string>
+    <string name="ok">OK</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="manageEmail">E-mail beheren</string>
+
+    <!--Restore Subscriptions Activity-->
+    <string name="backToSettings">Terug naar Instellingen</string>
+    <string name="somethingWentWrong">Er is iets misgegaan</string>
+    <string name="somethingWentWrongDescription">Google Play kon je aankoop niet verwerken. Probeer het later opnieuw.</string>
+    <string name="youAreSet">Je bent helemaal klaar.</string>
+    <string name="viewPlans">Abonnementen bekijken</string>
+    <string name="subscriptionNotFound">Abonnement niet gevonden</string>
+    <string name="subscriptionNotFoundDescription">Je abonnement dat aan dit Google Play-account is gekoppeld, is niet langer actief.</string>
+    <string name="purchaseRestored">Je aankopen zijn hersteld.</string>
+    <string name="restoreSubscriptionTitle">Voeg je Privacy Pro-abonnement toe aan dit apparaat</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Toevoegen via Google Play-account</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Herstel je abonnement op Android-apparaten met je Google Play-account.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Aankoop herstellen</string>
+    <string name="restoreSubscriptionEmailTitle">Toevoegen via e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Koppel een e-mailadres aan je abonnement om Privacy Pro aan dit apparaat toe te voegen.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Aan de slag</string>
+
+    <!--Settings Subscriptions Activity-->
+    <string name="removeSubscription">Abonnement verwijderen</string>
+    <string name="subscriptionRemoved">Je abonnement is van dit apparaat verwijderd</string>
+    <string name="removeFromDevice">Verwijderen van dit apparaat?</string>
+    <string name="removeFromDeviceDescription">Je hebt niet langer toegang tot je Privacy Pro-abonnement op dit apparaat. Je abonnement wordt niet opgezegd en het blijft actief op je andere apparaten.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Je maandabonnement %1$s op %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Je jaarabonnement %1$s op %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Je abonnement is verlopen op %1$s.</string>
+    <string name="monthlySubscription">Maandabonnement</string>
+    <string name="yearlySubscription">Jaarabonnement</string>
+    <string name="renews">wordt verlengd</string>
+    <string name="expires">vervalt</string>
+    <string name="activateOnOtherDevices">Privacy Pro toevoegen aan andere apparaten</string>
+    <string name="addToDevicePrimaryText">Toevoegen aan apparaat</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Voeg Privacy Pro toe aan je andere apparaten via Google Play of door een e-mailadres te koppelen.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Gebruik het e-mailadres hierboven om je abonnement toe te voegen op je andere apparaten in de DuckDuckGo-app. Ga naar Instellingen &gt; Privacy Pro &gt; Ik heb een abonnement.</string>
+    <string name="editEmailPrimaryText">E-mailadres bewerken</string>
+    <string name="learnMore">Meer informatie</string>
+    <string name="privacyProFaq">Hulp nodig met Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Krijg antwoorden op veelgestelde vragen of neem contact op met de klantenservice van Privacy Pro via onze hulppagina\'s. De beschikbaarheid van functies verschilt per land.</string>
+    <string name="subscriptionStatusSubscribed">Geabonneerd</string>
+    <string name="privacyPolicyAndTermsOfService">Privacybeleid en servicevoorwaarden</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Abonnementinstellingen</string>
+    <string name="subscriptionSettingSubscribe">Bescherm je verbinding en identiteit met Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Inclusief onze VPN, Personal Information Removal en Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Inclusief onze VPN en Identity Theft Restoration.</string>
+    <string name="subscriptionSettingGet">Privacy Pro kopen</string>
+    <string name="subscriptionSettingRestore">Ik heb een abonnement</string>
+    <string name="subscriptionSettingExpired">Je Privacy Pro-abonnement is verlopen</string>
+    <string name="subscriptionSettingExpiredViewPlans">Abonnementen bekijken</string>
+    <string name="subscriptionSettingSectionSubscription">Abonnement</string>
+    <string name="subscriptionSettingRemoveFromDevice">Verwijderen van dit apparaat</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
+    <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
+    <string name="subscriptionSettingActivating">Bezig met activeren</string>
+
+    <!--Purchase Subscriptions-->
+    <string name="purchaseCompletedTitle">Je bent klaar.</string>
+    <string name="purchaseCompletedText">Je aankoop is geslaagd.</string>
+    <string name="purchaseRecoveredText">Je had al een abonnement en dat hebben we voor je hersteld.</string>
+    <string name="purchaseErrorTitle">Er is iets misgegaan</string>
+    <string name="purchaseError">Er zijn problemen met de verbinding. Probeer het later opnieuw.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Plan bijwerken of annuleren</string>
+    <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Activeer Privacy Pro op je desktop om Personal Information Removal in te stellen.</string>
+    <string name="pirDescription">Ga in de DuckDuckGo-browser op je desktop naar <b>Instellingen &gt; Privacy Pro</b> en klik op <b>Ik heb een abonnement</b> om te beginnen.</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+
+    <string name="downloadsDownloadFinishedActionName">Openen</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
+
+    <!-- Feedback -->
+    <string name="feedbackTitle">Verstuur feedback</string>
+    <string name="feedbackActionHeader">SELECTEER EEN CATEGORIE</string>
+    <string name="feedbackActionReportIssue">Een probleem melden</string>
+    <string name="feedbackActionGeneralFeedback">Algemene feedback</string>
+    <string name="feedbackActionFeatureRequest">Een functie aanvragen</string>
+
+    <string name="feedbackGeneralHeader">SELECTEER EEN CATEGORIE</string>
+    <string name="feedbackGeneralBrowser">Browserfeedback</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
+    <string name="feedbackCategoryHeader">SELECTEER EEN CATEGORIE</string>
+    <string name="feedbackCategorySubscription">Abonnementen en betalingen</string>
+    <string name="feedbackCategoryVpn">VPN</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
+    <string name="feedbackSubCategoryHeader">SELECTEER EEN CATEGORIE</string>
+
+    <string name="feedbackSubCategoryVpnConnection">De VPN kan geen verbinding maken</string>
+    <string name="feedbackSubCategoryVpnSlow">De VPN-verbinding is te traag</string>
+    <string name="feedbackSubCategoryVpnOtherApps">De VPN veroorzaakt problemen met andere apps of websites</string>
+    <string name="feedbackSubCategoryVpnIot">De VPN laat me geen verbinding maken met een lokaal apparaat</string>
+    <string name="feedbackSubCategoryVpnCrash">De VPN zorgt ervoor dat de browser crasht of vastloopt</string>
+    <string name="feedbackSubCategoryVpnOther">Anders</string>
+
+    <string name="feedbackSubCategoryPirNothingOnSpecificSite">De info staat niet op de specifieke website</string>
+    <string name="feedbackSubCategoryPirNotMe">De records behoren niet tot de gebruiker</string>
+    <string name="feedbackSubCategoryPirScanStuck">Scan vastgelopen</string>
+    <string name="feedbackSubCategoryPirRemovalStuck">Verwijdering vastgelopen</string>
+    <string name="feedbackSubCategoryPirOther">Anders</string>
+
+    <string name="feedbackSubCategoryItrAccessCode">Probleem met toegangscode</string>
+    <string name="feedbackSubCategoryItrCantContactAdvisor">Ik kan geen contact opnemen met adviseur</string>
+    <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefoontje naar adviseur hielp niet</string>
+    <string name="feedbackSubCategoryItrOther">Anders</string>
+
+    <string name="feedbackSubCategorySubsOtp">Eenmalig wachtwoord</string>
+    <string name="feedbackSubCategorySubsOther">Anders</string>
+
+    <string name="feedbackSubmitVpnHeader">Heb je een probleem gevonden dat niet in ons <annotation type="faqs_link">helpcentrum</annotation> wordt besproken? We willen er zeker meer over weten.</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Vertel ons wat er aan de hand is …</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Naast de gegevens die je hierboven invult, sturen we ook geanonimiseerde informatie mee met je feedback:\n\n- Of bepaalde browserfuncties actief zijn\n- Samengevoegde app-diagnoses (bijv. foutcodes)\n\nDoor op 'Verzenden' te klikken, ga je ermee akkoord dat DuckDuckGo de ingediende informatie kan gebruiken om de app te verbeteren."</string>
+    <string name="feedbackSubmitVpnSubmit">Verzend</string>
+    <string name="feedbackSubmitCompletedMessage">Dank je wel! Feedback verzonden.</string>
+    <string name="feedbackSubmitFailedMessage">Er is iets misgegaan</string>
+
+    <string name="feedbackSubmitEmailByLine">Geef een e-mailadres op als je wilt dat we contact met je opnemen over dit probleem (we kunnen mogelijk niet op alle problemen reageren):</string>
+    <string name="feedbackSubmitEmailHint">E-mailadres (optioneel)</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Deel je feedback met ons …</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">Welke functie wil je zien?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonnementen</string>
+    <string name="activitySubscriptionSettings">Abonnementinstellingen</string>
+    <string name="activityActivateSubscription">Ik heb een abonnement</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Verstuur feedback</string>
+</resources>

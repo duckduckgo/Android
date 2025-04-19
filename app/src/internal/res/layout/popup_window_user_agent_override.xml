@@ -23,28 +23,10 @@
     android:background="@drawable/popup_menu_bg">
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/noAppId"
+        android:id="@+id/defaultUA"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentNoAppId" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/noVersion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentNoVersion" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/chrome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentChrome" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/duckDuckGo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentDuckDuckGo" />
+        app:primaryText="@string/devSettingsScreenUserAgentDefault" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/firefox"

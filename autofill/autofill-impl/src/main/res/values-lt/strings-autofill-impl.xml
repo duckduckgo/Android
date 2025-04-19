@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
 
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
+    <string name="saveLoginDialogTitle">Išsaugoti slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatinis slaptažodžių įrašymas nepasiekiamas, nes jūsų „Android WebView“ versija yra pasenusi arba nesuderinama.</string>
+
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 
     <string name="autofillDeleteLoginDialogCancel">Atšaukti</string>
     <string name="autofillDeleteLoginDialogDelete">Trinti</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
     <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Išeiti iš sąrankos</string>
 
     <string name="autofillManagementScreenTitle">Slaptažodžiai</string>
+    <string name="autofillManagementScreenTitleNew">Slaptažodžiai ir automatinis užpildymas</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje</string>
-    <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
+    <string name="credentialManagementAutofillSubtitle">Slaptažodžiai yra užšifruoti. Niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Slaptažodžių tvarkytuvės saugumas</string>
+    <string name="saveLoginDialogSubtitle">Saugiai išsaugokite slaptažodį įrenginyje naudodami „DuckDuckGo“ slaptažodžių ir automatinio pildymo parinktį.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
-    <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį slaptažodį?</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Paskutinį kartą atnaujinta %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Ar norite toliau saugoti slaptažodžius?</string>
@@ -133,6 +140,137 @@
     <string name="managementDisabledModeSubtitle">Slaptažodžiams apsaugoti reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="credentialManagementEditTitle">Redaguoti slaptažodį</string>
 
-    <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta prisijungimų riba. Ištrinkite kai kuriuos, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Valdyti prisijungimus</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nJūs viršijote slaptažodžių sinchronizavimo ribą. Pabandykite ištrinti kai kuriuos slaptažodžius. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų slaptažodžių kopijos.</string>
+    <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų slaptažodžių skaičių. Ištrinkite kai kuriuos slaptažodžius, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Tvarkyti slaptažodžius</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų slaptažodžių skaičių. Ištrinkite kai kuriuos slaptažodžius, kad tęstumėte sinchronizavimą.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinchronizavimas pristabdytas</b>\nKai kurie slaptažodžiai suformatuoti neteisingai arba yra per ilgi ir nebuvo sinchronizuoti.\n\n<annotation type="manage_logins">Tvarkyti slaptažodžius</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nKai kurie slaptažodžiai suformatuoti neteisingai arba yra per ilgi ir nebuvo sinchronizuoti.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Niekada neklauskite šioje svetainėje</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Ne, dėkoju</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Jei iš naujo nustatysite neįtrauktas svetaines, kitą kartą, kai prisijungsite prie bet kurios iš šių svetainių, būsite paraginti išsaugoti savo slaptažodį.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Iš naujo nustatyti neįtrauktas svetaines</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Iš naujo nustatyti neįtrauktas svetaines?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Nustatyti iš naujo</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atšaukti</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Ištrinti visus slaptažodžius</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d slaptažodis ištrintas</item>
+        <item quantity="few">%1$d slaptažodžiai ištrinti</item>
+        <item quantity="many">%1$d slaptažodžio ištrinta</item>
+        <item quantity="other">%1$d slaptažodžių ištrinti</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Patvirtinkite tapatybę, kad patvirtintumėte, jog norite ištrinti visus slaptažodžius</string>
+    <string name="autofill_title_text_for_delete_all">Ištrinti visus slaptažodžius</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Jūsų %1$s slaptažodžio negalima sinchronizuoti, nes tekstas, viename iš laukų, viršija simbolių limitą.</item>
+        <item quantity="few">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="many">Jūsų %1$s ir %2$d kitų svetainės slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Slaptažodžių valdymas</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ar tikrai norite ištrinti šį slaptažodį?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
+        <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
+        <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
+        <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
+        <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="other">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Galite importuoti išsaugotus slaptažodžius iš kitos naršyklės į „DuckDuckGo“.</string>
+
+    <string name="autofillManagementImportPasswords">Importuoti slaptažodžius</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kaip importuoti slaptažodžius</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importuokite slaptažodžius „DuckDuckGo“ naršyklės versijoje kompiuteriui, tada sinchronizuokite juos visuose įrenginiuose.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Gaukite kompiuterio naršyklę</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Nuoroda nukopijuota</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Gaukite „DuckDuckGo“ naršyklę, skirtą „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Ieškokite privačiai ir blokuokite sekimo priemones naudodami „DuckDuckGo“ naršyklę kompiuteriui. Spustelėkite šią nuorodą kompiuteryje, kad atsisiųstumėte šiandien.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sinchronizavimas su kompiuteriu</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importuoti iš kompiuterio naršyklės:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Atidarykite „DuckDuckGo“ sistemoje „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Eikite į <b>Nustatymai</b> > <b>Slaptažodžiai</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Pasirinkite <b>Importuoti slaptažodžius</b>... ir atlikite veiksmus, kad importuotumėte]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kai importuosite į savo kompiuterį, galite nustatyti sinchronizavimą šiame įrenginyje</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Gauti kompiuterio programą</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Gaukite „DuckDuckGo“, skirtą „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Kompiuteryje eikite į:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Bendrinti atsisiuntimo nuorodą</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Praneškite apie funkcijos „Automatinis užpildymas“ problemą</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonimiškai praneškite apie automatinį užpildymą, kuris neveikia šioje svetainėje. Slaptažodžiai niekada nėra bendrinami.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Pranešti, kad automatinis užpildymas neveikia %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">„DuckDuckGo“ siunčiami pranešimai yra anoniminiai, juose nėra jūsų naudotojo vardo, slaptažodžio ar kitos jūsų tapatybę identifikuojančios informacijos.\n\nPranešime pateikiamas tik interneto svetainės URL adresas ir kai kurių automatinio užpildymo nustatymų būsena.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Siųsti ataskaitą</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Atšaukti</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Dėkojame! Jūsų pranešimas padės mums tobulinti „DuckDuckGo“ visiems.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Pagrindinės savybės</string>
+    <string name="onboardingSaveDialogFeature1Title">Sklandus prisijungimas</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nereikia atsiminti prisijungimo informacijos.</string>
+    <string name="onboardingSaveDialogFeature2Title">Saugus saugojimas</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Slaptažodžiai šifruojami, saugomi įrenginyje ir užrakinami jūsų „Android“ piešiniu arba PIN kodu.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sinchronizavimas tarp įrenginių</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Užšifruojama tiesiogine šifruote ir lengvai nustatoma, kai būsite pasiruošę.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Bet kuriuo metu galite išjungti slaptažodžių išsaugojimą.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Atidaryti nustatymus</string>
+
+    <string name="newTabPageShortcutPasswords">Slaptažodžiai</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importuoti slaptažodžius iš „Google“</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš „Google“</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importuok slaptažodžius iš „Google“</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importuok slaptažodžius iš „Google“</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importuok savo slaptažodžius iš „Google“</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Atidaryk „Google“ slaptažodžius</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuoti iš darbalaukio naršyklės</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importuoti į „DuckDuckGo“</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importavimas baigtas</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Supratau</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Nepavyko importuoti slaptažodžio</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Praleista (dublikatas arba netinkamas): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importuoti slaptažodžiai: <b>%1$d</b>]]></string>
+
 </resources>

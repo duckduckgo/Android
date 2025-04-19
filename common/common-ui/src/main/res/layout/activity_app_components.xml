@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            android:background="?attr/daxColorSurface"
+            android:background="?attr/daxColorToolbar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
@@ -50,9 +50,9 @@
                     app:typography="h1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="viewStart"
+                    android:gravity="start"
                     android:paddingTop="@dimen/keyline_4"
-                    android:text="App Components"
+                    android:text="@string/ads_demo_header_title"
                     app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 
@@ -73,7 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:layout_gravity="bottom"
-            android:background="?attr/daxColorSurface"
+            android:background="?attr/daxColorToolbar"
             app:tabIndicatorColor="?attr/daxColorPrimaryText"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="?attr/daxColorPrimaryText"

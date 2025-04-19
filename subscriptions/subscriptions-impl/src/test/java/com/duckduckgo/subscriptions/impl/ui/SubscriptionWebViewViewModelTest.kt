@@ -2,20 +2,32 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.android.billingclient.api.ProductDetails.PricingPhase
-import com.android.billingclient.api.ProductDetails.PricingPhases
-import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PricingPhase
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
@@ -23,14 +35,20 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Subscri
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -41,20 +59,27 @@ class SubscriptionWebViewViewModelTest {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val subscriptionsRepository: SubscriptionsRepository = mock()
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
+    private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
+    private val subscriptionsChecker: SubscriptionsChecker = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
     @Before
     fun setup() = runTest {
-        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(NetPWaitlistInvitedScreenNoParams)
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
-            subscriptionsRepository,
-            networkProtectionWaitlist,
+            subscriptionsChecker,
+            networkProtectionAccessState,
+            pixelSender,
+            privacyProFeature,
+            freeTrialExperimentDataStore,
         )
+        givenSubscriptionStatus(UNKNOWN)
     }
 
     @Test
@@ -87,6 +112,40 @@ class SubscriptionWebViewViewModelTest {
 
             flowTest.emit(CurrentPurchase.PreFlowFinished)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseStateFailedThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Failure("test"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseStateCanceledThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Canceled)
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -136,10 +195,31 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenBackToSettingsActivateSuccessThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "backToSettingsActivateSuccess", "id", JSONObject("{}"))
+            assertTrue(awaitItem() is Command.BackToSettingsActivateSuccess)
+        }
+    }
+
+    @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
-        val monthly = getSubscriptionOfferDetails("monthly")
-        val yearly = getSubscriptionOfferDetails("yearly")
-        whenever(subscriptionsRepository.offerDetail()).thenReturn(mapOf(MONTHLY_PLAN to monthly, YEARLY_PLAN to yearly))
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -151,23 +231,80 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("id", response.id)
             assertEquals("test", response.featureName)
             assertEquals("getSubscriptionOptions", response.method)
-            assertEquals("yearly", params?.options?.first()?.id)
-            assertEquals("monthly", params?.options?.last()?.id)
+            assertEquals(YEARLY_PLAN_US, params?.options?.first()?.id)
+            assertEquals(MONTHLY_PLAN_US, params?.options?.last()?.id)
         }
     }
 
     @Test
-    fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+    fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+
         viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
-            assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
+    fun whenActivateSubscriptionAndSubscriptionActiveThenNoCommandSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        viewModel.commands().test {
+            expectNoEvents()
         }
     }
 
     @Test
     fun whenActivateSubscriptionAndSubscriptionInactiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(INACTIVE)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
@@ -176,7 +313,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndNoDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, null)
             ensureAllEventsConsumed()
@@ -185,7 +322,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("{}"))
             ensureAllEventsConsumed()
@@ -194,7 +331,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidFeatureThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("""{"feature":"test"}"""))
             ensureAllEventsConsumed()
@@ -203,7 +340,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -217,7 +354,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsItrThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -231,7 +368,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsPirThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        givenSubscriptionStatus(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -243,14 +380,197 @@ class SubscriptionWebViewViewModelTest {
         }
     }
 
-    private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
-        val subscriptionOfferDetails: SubscriptionOfferDetails = mock()
-        whenever(subscriptionOfferDetails.basePlanId).thenReturn(planId)
-        val phase: PricingPhase = mock()
-        val phases: PricingPhases = mock()
-        whenever(phase.formattedPrice).thenReturn("$1.1")
-        whenever(phases.pricingPhaseList).thenReturn(listOf(phase))
-        whenever(subscriptionOfferDetails.pricingPhases).thenReturn(phases)
-        return subscriptionOfferDetails
+    @Test
+    fun whenSubscriptionSelectedThenPixelIsSent() = runTest {
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionSelected",
+            id = "id",
+            data = JSONObject("""{"id":"myId"}"""),
+        )
+        verify(pixelSender).reportOfferSubscribeClick()
+    }
+
+    @Test
+    fun whenRestorePurchaseClickedThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "activateSubscription",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOfferRestorePurchaseClick()
+    }
+
+    @Test
+    fun whenAddEmailClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeAddEmailClicked",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOnboardingAddDeviceClick()
+    }
+
+    @Test
+    fun whenAddEmailClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeAddEmailClicked",
+            id = null,
+            data = null,
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsNetPAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+        )
+        verify(pixelSender).reportOnboardingVpnClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsNetPAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsItrAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+        )
+        verify(pixelSender).reportOnboardingIdtrClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsItrAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verify(pixelSender).reportOnboardingPirClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOnboardingFaqClick()
+    }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionExpiredThenCommandIsSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestored()
+            val result = awaitItem()
+            assertTrue(result is BackToSettings)
+        }
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionActiveThenCommandIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestored()
+            val result = awaitItem()
+            assertTrue(result is Reload)
+        }
+    }
+
+    private fun givenSubscriptionStatus(subscriptionStatus: SubscriptionStatus) = runBlocking {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(subscriptionStatus)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(subscriptionStatus))
     }
 }

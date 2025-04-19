@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.email.incontext
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
@@ -90,7 +89,7 @@ class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     @Suppress("DEPRECATION")
     @SuppressLint("NewApi")
     private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        if (appBuildConfig.sdkInt >= 33) {
             getParcelable(key, T::class.java)
         } else {
             getParcelable(key)

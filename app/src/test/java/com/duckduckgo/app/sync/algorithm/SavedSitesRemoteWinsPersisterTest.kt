@@ -29,22 +29,24 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesRemoteWinsPersister
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesRemoteWinsPersisterTest {
@@ -63,8 +65,10 @@ class SavedSitesRemoteWinsPersisterTest {
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
-
     private lateinit var persister: SavedSitesRemoteWinsPersister
+    private val store = RealSavedSitesSyncEntitiesStore(
+        InstrumentationRegistry.getInstrumentation().context,
+    )
 
     private val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
 
@@ -88,13 +92,15 @@ class SavedSitesRemoteWinsPersisterTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             FakeDisplayModeSettingsRepository(),
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao, store)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDelegate,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
 

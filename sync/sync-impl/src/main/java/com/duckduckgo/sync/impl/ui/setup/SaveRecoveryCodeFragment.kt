@@ -25,6 +25,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -39,9 +40,10 @@ import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.FinishWithError
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
@@ -118,11 +120,11 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
 
     private fun processCommand(it: Command) {
         when (it) {
-            Error -> {
+            FinishWithError -> {
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-            is Finish -> {
+            is Next -> {
                 listener?.launchDeviceConnectedScreen()
             }
             is RecoveryCodePDFSuccess -> {
@@ -137,7 +139,24 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             is ShowMessage -> {
                 Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
             }
+
+            is ShowError -> showDialogError(it)
         }
+    }
+
+    private fun showDialogError(it: ShowError) {
+        val context = context ?: return
+        TextAlertDialogBuilder(context)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     private fun renderViewState(viewState: ViewState) {

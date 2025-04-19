@@ -38,12 +38,14 @@ class RealSupportedDeviceAuthChecker @Inject constructor(
         BiometricManager.from(context)
     }
 
-    private val keyguardManager: KeyguardManager by lazy {
-        context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    private val keyguardManager: KeyguardManager? by lazy {
+        runCatching { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager? }.getOrNull()
     }
 
     override fun supportsStrongAuthentication(): Boolean =
         biometricManager.canAuthenticate(Authenticators.BIOMETRIC_STRONG or Authenticators.DEVICE_CREDENTIAL) == BIOMETRIC_SUCCESS
 
-    override fun supportsLegacyAuthentication(): Boolean = keyguardManager.isDeviceSecure
+    override fun supportsLegacyAuthentication(): Boolean {
+        return keyguardManager?.isDeviceSecure ?: false
+    }
 }

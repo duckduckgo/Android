@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sünkroonimine ja varundamine pole saadaval</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
     <string name="sync_flows_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sünkroonimine ja varundamine peatatud</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sünkroonimine ja varundamine peatatud</b>\nVabandust, kuid sünkroonimine ja varundamine pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
     <string name="sync_paused_notification"><b>Sünkroonimine ja varundus on peatatud</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_error_notification"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_error_warning"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_signed_out_notification"><b>Sünkroonimine on peatatud</b>\nSünkroonimine on peatatud. Kui soovid selle seadme sünkroonimist jätkata, loo uuesti ühendus, kasutades mõnda teist seadet või taastamiskoodi.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sünkroonimine ja varundamine</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sünkrooni järjehoidjaid ja paroole turvaliselt oma seadmete vahel.</string>
     <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse krüpteerimisvõtmele ligi.</string>
     <string name="sync_setup_single_device_title">Ühe seadme seadistamine</string>
+    <string name="sync_setup_other_options_title">Muud valikud</string>
     <string name="sync_setup_single_recover_data_cta_title">Taasta sünkroonitud andmed</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Selle seadme sünkroonimine ja varundamine</string>
 
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sünkrooni</string>
     <string name="sync_notify_me_title">Teavitused on välja lülitatud</string>
     <string name="sync_notify_me_description">Saad teavituse, kui sünkroonimisel ja varundamisel tekib mõni tõrge.</string>
-    <string name="sync_rollout_banner_text">Sünkroonimine ja varundamine võetakse kasutusele järk-järgult ning see ei pruugi teiste seadmete DuckDuckGos veel saadaval olla</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Sünkroonimist ja varundamist ei saa välja lülitada.</string>
+    <string name="sync_edit_device_error">Seadme nime ei saa uuendada.</string>
+    <string name="sync_remove_device_error">Seda seadet ei saa sünkroonimisest ja varundamisest eemaldada.</string>
+    <string name="sync_delete_data_error">Serveris olevaid andmeid ei saa kustutada.</string>
+    <string name="sync_login_authenticated_device_error">"Nende seadmete sidumiseks lülitage ühes seadmes välja Sync &amp; Backup ning puudutage siis teises seadmes suvandit „Sünkrooni teise seadmega“."</string>
+    <string name="sync_connect_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_connect_login_error">Teise seadmega ei saa sünkroonida.</string>
+    <string name="sync_create_account_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_invalid_code_error">Kahjuks on see kood kehtetu. Veenduge, et sisestatud või skaneeritud kood on õige.</string>
+    <string name="sync_recovery_pdf_error">Taaste-PDFi ei saa luua.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sünkroonimine ja varundamine</string>
+    <string name="sync_encryption_not_supported_error_title">Seadet ei toetata</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup on otsast lõpuni krüptitud ja peab olema võimeline krüptima ja salvestama andmeid teie seadmes. Kuna teie seade ei toeta krüptitud salvestusruumi, pole Sync &amp; Backup saadaval.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Sync &amp; Backup funktsiooni juurde pääsemiseks avage seade.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup on lukustatud</string>
+    <string name="sync_require_device_passcode_dialog_title">Funktsiooni Sync &amp; Backup kasutamiseks kindlusta oma seade</string>
+    <string name="sync_require_device_passcode_dialog_body">Seadme lukustusmuster, PIN-kood või biomeetria on vajalik funktsiooni Sync &amp; Backup kasutamiseks.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ava Sätted</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>
+    <string name="sync_delete_server_data_dialog_content">Kõigi seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Andmete kustutamine</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Oma paroolide sünkroonimine ja varundamine</string>
+    <string name="syncPromoSubtitlePasswords">Kontot pole vaja. Otsast lõpuni krüptimine tähendab, et keegi peale sinu ei näe sinu paroole, isegi mitte meie.</string>
+
+    <string name="syncPromoTitleBookmarks">Oma järjehoidjate sünkroonimine ja varundamine</string>
+    <string name="syncPromoSubtitleBookmarks">Kontot pole vaja. Otsast lõpuni krüptimine tähendab, et keegi peale sinu ei näe sinu järjehoidjaid, isegi mitte meie.</string>
+
+    <string name="syncPromoPrimaryButton">Sünkroonimise seadistamine</string>
+    <string name="syncPromoSecondaryButton">Ei, aitäh</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hangi DuckDuckGo teistele seadmetele</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Hangi DuckDuckGo teistesse seadmetesse, et selle seadmega sünkroonida</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hangi DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">DuckDuckGo arvutisse või muusse mobiilseadmesse allalaadimiseks külasta:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Jaga allalaadimise linki</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Kas lülituda teisele Sync\'ile?</string>
+    <string name="sync_dialog_switch_account_primary_button">Synci lülitamine</string>
+    <string name="sync_dialog_switch_account_secondary_button">Loobu</string>
+    <string name="sync_dialog_switch_account_description">See seade on juba sünkroonitud, kas soovid kindlasti seda sünkroonida teise varukoopia või seadmega? Vahetamine ei eemalda selle seadmega juba sünkroonitud andmeid.</string>
 </resources>

@@ -47,6 +47,7 @@ class RealTrackingParametersRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
     }
 
@@ -58,6 +59,7 @@ class RealTrackingParametersRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
 
         assertEquals(trackingParameterExceptionEntity.toFeatureException(), testee.exceptions.first())
@@ -70,6 +72,7 @@ class RealTrackingParametersRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
 
         testee.updateAll(listOf(), listOf())
@@ -85,6 +88,7 @@ class RealTrackingParametersRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.parameters.size)

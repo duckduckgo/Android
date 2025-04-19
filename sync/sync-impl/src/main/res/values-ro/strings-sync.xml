@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sincronizare și backup indisponibilă</b>\nNe pare rău, dar Sincronizare și backup nu este disponibilă în prezent. Încearcă din nou mai târziu.</string>
     <string name="sync_flows_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibilă. Încearcă din nou mai târziu.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibilă în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
     <string name="sync_paused_notification"><b>Sincronizare și backup întrerupt temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibil. Încearcă din nou mai târziu.</string>
+    <string name="sync_error_notification"><b>Eroare de sincronizare</b>\nSync &amp; Backup sunt temporar indisponibile.</string>
+    <string name="sync_error_warning"><b>Eroare de sincronizare</b>\nSync &amp; Backup este indisponibil temporar.</string>
+    <string name="sync_signed_out_notification"><b>Sincronizarea este întreruptă</b>\nSincronizarea a fost întreruptă. Dacă dorești să continui sincronizarea acestui dispozitiv, reconectează-te folosind un alt dispozitiv sau codul de recuperare.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sincronizare și copiere de rezervă</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sincronizează în siguranță marcajele și parolele între dispozitivele tale.</string>
     <string name="sync_off_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de criptare.</string>
     <string name="sync_setup_single_device_title">Configurare pe un singur dispozitiv</string>
+    <string name="sync_setup_other_options_title">Alte opțiuni</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperează datele sincronizate</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizează și fă backup pentru acest dispozitiv</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Descarcă  automat pictograme pentru marcajele sincronizate.</string>
     <string name="sync_enable_connecting">Se conectează…</string>
     <string name="sync_intro_enable_title">Sincronizează și fă backup pentru acest dispozitiv</string>
-    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa...</string>
+    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
     <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Sincronizare</string>
     <string name="sync_notify_me_title">Notificările sunt dezactivate</string>
     <string name="sync_notify_me_description">Primește o notificare în cazul în care Sincronizare și backup întâmpină o eroare.</string>
-    <string name="sync_rollout_banner_text">Sincronizare și backup se implementează treptat și este posibil să nu fie încă disponibilă în DuckDuckGo pe celelalte dispozitive ale tale</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nu se pot opri Sincronizare și backup.</string>
+    <string name="sync_edit_device_error">Nu se poate actualiza numele dispozitivului.</string>
+    <string name="sync_remove_device_error">Nu se poate elimina acest dispozitiv din Sincronizare și backup.</string>
+    <string name="sync_delete_data_error">Nu se pot șterge datele de pe server.</string>
+    <string name="sync_login_authenticated_device_error">"Pentru a asocia aceste dispozitive, dezactivează Sync &amp; Backup și backup pe un dispozitiv, apoi atinge „Sincronizează cu un alt dispozitiv” pe celălalt dispozitiv."</string>
+    <string name="sync_connect_generic_error">Nu se poate conecta la server.</string>
+    <string name="sync_connect_login_error">Nu se poate sincroniza cu un alt dispozitiv.</string>
+    <string name="sync_create_account_generic_error">Nu se poate conecta la server.</string>
+    <string name="sync_invalid_code_error">Ne pare rău, acest cod este nevalid. Asigură-te că ai completat sau scanat codul corect.</string>
+    <string name="sync_recovery_pdf_error">Nu se poate crea fișierul PDF de recuperare.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sincronizare și copiere de rezervă</string>
+    <string name="sync_encryption_not_supported_error_title">Dispozitivul nu este acceptat</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup este criptat de la un capăt la altul și trebuie să fie capabil să cripteze și să stocheze datele de pe dispozitivul tău. Deoarece dispozitivul tău nu acceptă stocarea criptată, Sync &amp; Backup nu este disponibil.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Deblochează dispozitivul pentru a accesa Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup blocat</string>
+    <string name="sync_require_device_passcode_dialog_title">Securizează-ți dispozitivul pentru a utiliza Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Este necesară secvența de blocare a dispozitivului, codul PIN sau identificarea biometrică pentru a utiliza Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Mergi la Setări</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Ștergi datele serverului?</string>
+    <string name="sync_delete_server_data_dialog_content">Toate dispozitivele vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Șterge datele</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Anulare</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincronizează și creează copii de rezervă pentru parolele tale</string>
+    <string name="syncPromoSubtitlePasswords">Nu este nevoie să ai un cont. Criptarea de la un punct la altul (end-to-end) înseamnă că nimeni în afară de tine nu îți poate vedea parolele, nici măcar noi.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincronizează și creează copii de rezervă pentru marcajele tale</string>
+    <string name="syncPromoSubtitleBookmarks">Nu este nevoie să ai un cont. Criptarea de la un punct la altul (end-to-end) înseamnă că nimeni în afară de tine nu îți poate vedea marcajele, nici măcar noi.</string>
+
+    <string name="syncPromoPrimaryButton">Configurează sincronizarea</string>
+    <string name="syncPromoSecondaryButton">Nu, mulțumesc</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Obține DuckDuckGo pe alte dispozitive</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Obține DuckDuckGo pe alte dispozitive pentru a le sincroniza cu acesta</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Obține DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Pentru a descărca DuckDuckGo pe desktop sau pe un alt dispozitiv mobil, vizitează:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Trimite linkul de descărcare</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Treci la o altă sincronizare?</string>
+    <string name="sync_dialog_switch_account_primary_button">Comută sincronizarea</string>
+    <string name="sync_dialog_switch_account_secondary_button">Anulare</string>
+    <string name="sync_dialog_switch_account_description">Acest dispozitiv este deja sincronizat, sigur dorești să-l sincronizezi cu o altă copie de rezervă sau alt dispozitiv? Schimbarea nu va șterge datele deja sincronizate cu acest dispozitiv.</string>
 </resources>

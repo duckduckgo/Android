@@ -34,6 +34,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
+        open fun onDialogCancelled() {}
         open fun onButtonClicked(position: Int) {}
     }
 
@@ -99,6 +100,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .apply {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
+                setOnCancelListener { listener.onDialogCancelled() }
             }
 
         dialog = dialogBuilder.create()
@@ -157,7 +159,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
                     ghostButton.setTextColor(
                         ContextCompat.getColorStateList(
                             context,
-                            R.color.red_text_color_selector,
+                            R.color.destructive_text_color_selector,
                         ),
                     )
                     ghostButton

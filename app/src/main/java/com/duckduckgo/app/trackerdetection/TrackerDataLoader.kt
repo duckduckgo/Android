@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -37,6 +38,8 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okio.buffer
+import okio.source
 import timber.log.Timber
 
 @WorkerThread
@@ -57,6 +60,7 @@ class TrackerDataLoader @Inject constructor(
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val dispatcherProvider: DispatcherProvider,
+    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -78,11 +82,16 @@ class TrackerDataLoader @Inject constructor(
 
     private fun updateTdsFromFile() {
         Timber.d("Updating tds from file")
-        val json = context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
-        val adapter = moshi.adapter(TdsJson::class.java)
-        persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
-    }
+        runCatching {
+            val adapter = moshi.adapter(TdsJson::class.java)
+            val inputStream = context.resources.openRawResource(R.raw.tds).source()
 
+            val tdsJson = adapter.fromJson(inputStream.buffer())
+            tdsJson?.let {
+                persistTds(DEFAULT_ETAG, it)
+            }
+        }
+    }
     fun persistTds(
         eTag: String,
         tdsJson: TdsJson,
@@ -99,7 +108,7 @@ class TrackerDataLoader @Inject constructor(
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
-        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper)
+        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
         trackerDetector.addClient(client)
     }
 

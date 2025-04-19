@@ -18,14 +18,27 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Message
+import android.print.PrintDocumentAdapter
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.webkit.DownloadListener
+import android.webkit.WebBackForwardList
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import timber.log.Timber
 
 /**
  * WebView subclass which allows the WebView to
@@ -49,6 +62,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
 
+    private var isDestroyed: Boolean = false
+    var isSafeWebViewEnabled: Boolean = false
+
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
@@ -61,6 +77,137 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         super.onAttachedToWindow()
         helper.onViewAttached(this)
     }
+
+    override fun destroy() {
+        isDestroyed = true && isSafeWebViewEnabled
+        super.destroy()
+    }
+
+    override fun stopLoading() {
+        if (!isDestroyed) {
+            super.stopLoading()
+        }
+    }
+
+    override fun onPause() {
+        if (!isDestroyed) {
+            super.onPause()
+        }
+    }
+
+    override fun onResume() {
+        if (!isDestroyed) {
+            super.onResume()
+        }
+    }
+
+    override fun loadUrl(url: String) {
+        if (!isDestroyed) {
+            super.loadUrl(url)
+        }
+    }
+
+    override fun loadUrl(
+        url: String,
+        additionalHttpHeaders: Map<String, String>,
+    ) {
+        if (!isDestroyed) {
+            super.loadUrl(url, additionalHttpHeaders)
+        }
+    }
+
+    override fun reload() {
+        if (!isDestroyed) {
+            super.reload()
+        }
+    }
+
+    override fun goForward() {
+        if (!isDestroyed) {
+            super.goForward()
+        }
+    }
+
+    override fun goBackOrForward(steps: Int) {
+        if (!isDestroyed) {
+            super.goBackOrForward(steps)
+        }
+    }
+
+    override fun findAllAsync(find: String) {
+        if (!isDestroyed) {
+            super.findAllAsync(find)
+        }
+    }
+
+    override fun findNext(forward: Boolean) {
+        if (!isDestroyed) {
+            super.findNext(forward)
+        }
+    }
+
+    override fun clearSslPreferences() {
+        if (!isDestroyed) {
+            super.clearSslPreferences()
+        }
+    }
+
+    override fun setDownloadListener(listener: DownloadListener?) {
+        if (!isDestroyed) {
+            super.setDownloadListener(listener)
+        }
+    }
+
+    override fun requestFocusNodeHref(hrefMsg: Message?) {
+        if (!isDestroyed) {
+            super.requestFocusNodeHref(hrefMsg)
+        }
+    }
+
+    override fun setWebChromeClient(client: WebChromeClient?) {
+        if (!isDestroyed) {
+            super.setWebChromeClient(client)
+        }
+    }
+
+    override fun setWebViewClient(client: WebViewClient) {
+        if (!isDestroyed) {
+            super.setWebViewClient(client)
+        }
+    }
+
+    override fun setFindListener(listener: FindListener?) {
+        if (!isDestroyed) {
+            super.setFindListener(listener)
+        }
+    }
+
+    override fun getUrl(): String? {
+        if (isDestroyed) return null
+        return super.getUrl()
+    }
+
+    fun safeCopyBackForwardList(): WebBackForwardList? {
+        if (isDestroyed) return null
+        return (this as WebView).safeCopyBackForwardList()
+    }
+
+    fun createSafePrintDocumentAdapter(documentName: String): PrintDocumentAdapter? {
+        if (isDestroyed) return null
+        return createPrintDocumentAdapter(documentName)
+    }
+
+    val safeSettings: WebSettings?
+        get() {
+            if (isDestroyed) return null
+            return getSettings()
+        }
+
+    val safeHitTestResult: HitTestResult?
+        get() {
+            if (isDestroyed) return null
+            return getHitTestResult()
+        }
 
     fun setBottomMatchingBehaviourEnabled(value: Boolean) {
         helper.setBottomMatchingBehaviourEnabled(value)
@@ -80,7 +227,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        var returnValue = false
+        parent.requestDisallowInterceptTouchEvent(true)
+
+        val returnValue: Boolean
 
         val event = MotionEvent.obtain(ev)
         val action = event.actionMasked
@@ -96,6 +245,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 returnValue = super.onTouchEvent(event)
                 stopNestedScroll()
             }
+
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
 
@@ -258,6 +408,48 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         if (!allowed) {
             enableSwipeRefresh(false)
         }
+    }
+
+    @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
+    suspend fun safeAddWebMessageListener(
+        webViewCapabilityChecker: WebViewCapabilityChecker,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebMessageListener,
+    ): Boolean = runCatching {
+        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
+            WebViewCompat.addWebMessageListener(
+                this,
+                jsObjectName,
+                allowedOriginRules,
+                listener,
+            )
+            true
+        } else {
+            false
+        }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error adding WebMessageListener: $jsObjectName")
+        false
+    }
+
+    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
+    suspend fun safeRemoveWebMessageListener(
+        webViewCapabilityChecker: WebViewCapabilityChecker,
+        jsObjectName: String,
+    ): Boolean = runCatching {
+        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
+            WebViewCompat.removeWebMessageListener(
+                this,
+                jsObjectName,
+            )
+            true
+        } else {
+            false
+        }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error removing WebMessageListener: $jsObjectName")
+        false
     }
 
     companion object {

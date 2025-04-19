@@ -1,0 +1,58 @@
+appId: com.duckduckgo.mobile.android
+name: "Onboarding: Ensuring we can navigate through pre-onboarding flow and dismissing all dialogs"
+tags:
+  - onboardingTest
+---
+# Pre-requisite: None
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/pre_onboarding.yaml
+      - assertVisible:
+          id: daxDialogDismissButton
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertVisible:
+          id: ddgLogo
+      - inputText: "https://www.search-company.site/#ad-id-14"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*As you tap and scroll, I'll block pesky trackers..*"
+      - assertVisible:
+          id: daxDialogDismissButton
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertNotVisible:
+          text: ".*As you tap and scroll, I'll block pesky trackers..*"
+      - assertVisible:
+          id: "ad-id-14"
+      - tapOn:
+          id: "ad-id-14"
+      - assertVisible:
+          text: ".*was trying to track you here. I blocked them!.*"
+      - assertVisible:
+          id: daxDialogDismissButton
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertNotVisible:
+          text: ".*was trying to track you here. I blocked them!.*"
+      - assertVisible:
+          text: "Publisher site"
+      - tapOn:
+          text: "Publisher site"
+      - assertVisible:
+          text: ".*Remember: every time you browse with me a creepy ad loses its wings..*"
+      - assertVisible:
+          id: daxDialogDismissButton
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertNotVisible:
+          text: ".*Remember: every time you browse with me a creepy ad loses its wings..*"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/tabCount"
+      - tapOn: "New Tab"
+      - assertVisible:
+          text: ".*Try our search widget!.*"

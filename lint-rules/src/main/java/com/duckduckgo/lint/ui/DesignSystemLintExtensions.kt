@@ -68,7 +68,7 @@ class DesignSystemLintExtensions {
         private const val BUTTON_GHOST_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall"
         private const val ONE_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
         private const val TWO_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem"
-        private const val SWITCH_VIEW = "com.duckduckgo.mobile.android.ui.view.SwitchView"
+        private const val SWITCH_VIEW = "com.duckduckgo.mobile.android.ui.view.DaxSwitch"
         private const val DAX_TEXT = "com.duckduckgo.mobile.android.ui.view.text.DaxTextView"
 
         val ANDROID_DESIGN_COMPONENTS =

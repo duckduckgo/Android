@@ -1,15 +1,20 @@
+import javax.inject.Inject
+import org.gradle.api.provider.ValueSourceParameters
+import java.nio.charset.Charset
+
 ext {
 
     buildVersionCode = {
+        def versionCode = buildNumberCode()
         def versionName = getVersionName()
         def (major, minor, patch) = versionName.toLowerCase().tokenize('.')
         (major, minor, patch) = [major, minor, patch].collect { it.toInteger() }
-        (major * 10_000_000) + (minor * 10_000) + (patch * 1_000) + buildNumberCode()
+        (major * 10_000_000) + (minor * 10_000) + (patch * 1_000) + versionCode
     }
 
     getVersionName = {
         def props = new Properties()
-        file("version/version.properties").withInputStream { props.load(it) }
+        file("$rootDir/app/version/version.properties").withInputStream { props.load(it) }
         return props.getProperty("VERSION")
     }
 
@@ -30,16 +35,31 @@ ext {
         }
     }
 
-    buildNumberCode = {
-        filePath = "${CI_HOME_DIR}/build_number.properties"
-        if(!new File(filePath).exists()) return 0
+    getStoredTag = {
+        if(project.hasProperty("latestTag")) {
+            return project["latestTag"]
+        } else {
+            def latestGitTagProvider = providers.of(LatestGitTagValueSource.class) {}
+            return latestGitTagProvider.get()
+        }
+    }
 
+    buildNumberCode = {
         def suffix = getVersionNameSuffix()
         if (suffix?.trim()) {
-            def props = new Properties()
-            props.load(new FileInputStream(filePath))
-            String buildNumber = props["build"]
-            if (buildNumber == null) return 0 else return Integer.valueOf(buildNumber)
+            def tag = getStoredTag()
+            if (tag.contains('nightly')) {
+                def (major, minor, patch, nightly) = tag.toLowerCase().tokenize('.')
+                (major, minor, patch, nightly) = [major, minor, patch, nightly].collect { it.toString() }
+
+                def (code, sufix) = nightly.toLowerCase().tokenize('-')
+                (code, sufix) = [code, sufix].collect { it.toString() }
+
+                def newCode = Integer.parseInt(code) + 1
+                return newCode
+            } else {
+                return 1
+            }
         } else {
             return 0
         }
@@ -96,5 +116,25 @@ tasks.register('incrementBuildNumber') {
 tasks.register('getBuildVersionName') {
     doLast {
         print buildVersionName()
+    }
+}
+
+tasks.register('getBuildVersionCode') {
+    doLast {
+        print buildNumberCode()
+    }
+}
+
+abstract class LatestGitTagValueSource implements ValueSource<String, ValueSourceParameters.None> {
+    @Inject
+    abstract ExecOperations getExecOperations()
+
+    String obtain() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream()
+        execOperations.exec {
+            it.commandLine "git", "describe", "--tags", "--abbrev=0"
+            it.standardOutput = output
+        }
+        return new String(output.toByteArray(), Charset.defaultCharset())
     }
 }

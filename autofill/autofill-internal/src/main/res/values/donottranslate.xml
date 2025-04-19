@@ -21,6 +21,12 @@
     <string name="autofillDevSettingsSubtitle">Autofill and Email Protection dev options</string>
     <string name="autofillDevSettingsClearNeverAskAgainSettingButton">Clear \'never ask again\' setting</string>
     <string name="autofillDevSettingsEmailProtectionSignOutButton">Sign out</string>
+    <string name="autofillDevSettingsReportBreakageTitle">Autofill Breakage Reporting</string>
+    <string name="autofillDevSettingsReportBreakageClearHistory">Clear Reporting History</string>
+    <string name="autofillDevSettingsReportBreakageHistoryCleared">Breakage reporting history cleared</string>
+    <string name="autofillDevSettingsEngagementTitle">Engagement KPIs</string>
+    <string name="autofillDevSettingsEngagementClearHistory">Clear Engagement History</string>
+    <string name="autofillDevSettingsEngagementHistoryCleared">Cleared All Engagement History</string>
     <string name="autofillDevSettingsEmailProtectionTitle">Email Protection Settings</string>
     <string name="autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared">Never ask again choice cleared</string>
     <string name="autofillDevSettingsEmailProtectionSignedOut">Signed out</string>
@@ -30,6 +36,14 @@
     <string name="autofillDevSettingsNeverSavedSitesCountTitle">Reset Excluded Sites</string>
     <string name="autofillDevSettingsNeverSavedSitesCountSubtitle" instruction="%1$d is count of how many websites have been added to a list">Number of sites: %1$d</string>
     <string name="autofillDevSettingsNeverSavedSitesAddSampleButton">Add sample site (fill.dev)</string>
+
+    <string name="autofillDevSettingsAutofillSystemServiceAccessTitle">Autofill System Settings</string>
+    <string name="autofillDevSettingsAutofillSystemServiceAccessSubtitle">Enable to use autofill in other apps</string>
+    <string name="autofillDevSettingsImportPasswordsTitle">Import Passwords</string>
+    <string name="autofillDevSettingsImportPasswordsExportPasswordsOurAppTitle">Launch Google Passwords (normal tab)</string>
+    <string name="autofillDevSettingsImportPasswordsExportPasswordsImportFlowTitle">Launch Google Passwords (import flow)</string>
+    <string name="autofillDevSettingsImportPasswordsImportPasswordsCsvTitle">Import CSV</string>
+    <string name="autofillDevSettingsImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords we were able to import">%1$d passwords imported from Google</string>
 
     <string name="autofillDevSettingsOverrideMaxInstallDialogTitle">Maximum number of days since install</string>
     <string name="autofillDevSettingsOverrideMaxInstallDialogOkButtonText">OK</string>
@@ -61,8 +75,22 @@
 
     <string name="autofillDevSettingsAddSampleLogins">Add a few sample logins</string>
     <string name="autofillDevSettingsAddSampleLoginsSubtitle">Adds a few logins for https://fill.dev</string>
+    <string name="autofillDevSettingsAddManySampleLogins">Add a lot of sample logins</string>
+    <string name="autofillDevSettingsAddManyLoginsSubtitle">Adds 100 sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLogins">Add an extreme amount of sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLoginsSubtitle">Adds 1,000 sample logins</string>
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomain">Add duplicate logins (same domain)</string>
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle">Adds multiple logins for https://fill.dev with same username and password</string>
     <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomains">Add duplicate logins (across different subdomains)</string>
     <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle">Adds multiple logins for https://fill.dev with same username and password but across different subdomains</string>
+    <string name="autofillDevSettingsAddMixedUsernameCaseLogins">Add mixed case username duplicates</string>
+    <string name="autofillDevSettingsAddMixedUsernameCaseLoginsSubtitle">Adds multiple duplicate logins, different only from the case of the username</string>
+
+    <string name="autofillDevSettingsSurveySectionTitle">Autofill Survey</string>
+    <string name="autofillDevSettingsSurveySectionResetPreviousSurveysTitle">Previously Seen Surveys</string>
+    <string name="autofillDevSettingsDeclineCounterResetTitle">Decline counters</string>
+    <string name="autofillDevSettingsDeclineCounterResetInstruction">Tap to reset decline counter</string>
+    <string name="autofillDevSettingsSurveySectionInstruction">Tap to reset available surveys</string>
+    <string name="autofillDevSettingsSurveySectionResetted">Previously seen surveys available again</string>
+    <string name="autofillDevSettingsDeclineCounterResetted">Decline counter is 0 and now active. Restart the app.</string>
 </resources>

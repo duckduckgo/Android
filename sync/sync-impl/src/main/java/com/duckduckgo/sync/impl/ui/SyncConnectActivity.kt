@@ -24,18 +24,22 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,8 +51,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
+    ) { result ->
+        if (result != EnterCodeContractOutput.Error) {
             viewModel.onLoginSuccess()
         }
     }
@@ -74,7 +78,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
+            .viewState(extractSource())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -104,12 +108,13 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
-            Error -> {
+            FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
+            is ShowError -> showError(it)
         }
     }
 
@@ -122,9 +127,29 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
+    }
+
+    private fun extractSource(): String? = intent.getStringExtra(SOURCE_INTENT_KEY)
+
     companion object {
-        internal fun intent(context: Context): Intent {
-            return Intent(context, SyncConnectActivity::class.java)
+        internal fun intent(context: Context, source: String?): Intent {
+            return Intent(context, SyncConnectActivity::class.java).also {
+                it.putExtra(SOURCE_INTENT_KEY, source)
+            }
         }
+
+        private const val SOURCE_INTENT_KEY = "source"
     }
 }

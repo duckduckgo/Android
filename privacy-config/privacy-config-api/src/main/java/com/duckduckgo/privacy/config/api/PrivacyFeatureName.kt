@@ -25,7 +25,6 @@ enum class PrivacyFeatureName(val value: String) {
     DrmFeatureName("eme"),
     AmpLinksFeatureName("ampLinks"),
     TrackingParametersFeatureName("trackingParameters"),
-    UserAgentFeatureName("customUserAgent"),
 }
 
 const val PRIVACY_REMOTE_CONFIG_URL = "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/android-config.json"

@@ -33,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
@@ -47,19 +48,24 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
 ) : VpnEnabledNotificationContentPlugin {
 
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
+    private val deletePendingIntent by lazy { appTpEnabledNotificationIntentProvider.getDeleteNotificationIntent() }
+
+    override val uuid: String = "1cc717cf-f046-40de-948c-fd8bc26300d4"
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
-            val title = networkProtectionState.serverLocation()?.run {
+            val text = networkProtectionState.serverLocation()?.run {
                 HtmlCompat.fromHtml(
                     resources.getString(R.string.vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlocked, this),
                     HtmlCompat.FROM_HTML_MODE_LEGACY,
                 )
             } ?: resources.getString(R.string.vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlockedNoLocation)
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(title),
+                title = null,
+                text = SpannableStringBuilder(text),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationActions = NotificationActions.VPNActions,
+                deleteIntent = deletePendingIntent,
             )
         } else {
             null
@@ -72,6 +78,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
         }
 
         return repository.getVpnTrackers({ dateOfLastHour() })
+            .filter { isActive() } // make sure we only emit when this plugin is active
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
                 val location = networkProtectionState.serverLocation()
@@ -107,9 +114,11 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
                 }
 
                 VpnEnabledNotificationContent(
-                    title = SpannableStringBuilder(notificationText),
+                    title = null,
+                    text = SpannableStringBuilder(notificationText),
                     onNotificationPressIntent = notificationPendingIntent,
                     notificationActions = NotificationActions.VPNActions,
+                    deleteIntent = deletePendingIntent,
                 )
             }
     }

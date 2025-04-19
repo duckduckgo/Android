@@ -72,11 +72,13 @@ object NotificationModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationScheduler(
         workManager: WorkManager,
+        notificationManager: NotificationManagerCompat,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
+            notificationManager,
             clearDataNotification,
             privacyProtectionNotification,
         )

@@ -23,6 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation KotlinX.coroutines.core
+    implementation Google.android.material
 }
 android {
   namespace 'com.duckduckgo.downloads.api'

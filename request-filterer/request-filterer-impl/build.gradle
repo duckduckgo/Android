@@ -34,7 +34,7 @@ dependencies {
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-store')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
 
     implementation JakeWharton.timber
     implementation Square.retrofit2.converter.moshi
@@ -63,6 +63,8 @@ dependencies {
     testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -73,6 +75,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.request.filterer.impl'
 }

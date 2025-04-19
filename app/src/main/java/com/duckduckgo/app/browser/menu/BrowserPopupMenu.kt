@@ -17,110 +17,326 @@
 package com.duckduckgo.app.browser.menu
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.LayoutInflater
-import android.view.ViewGroup.LayoutParams
+import android.view.View
 import androidx.core.view.isVisible
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBottomBinding
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.BOTTOM
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.TOP
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.R.dimen
+import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
-    context: Context,
+    private val context: Context,
     layoutInflater: LayoutInflater,
+    private val popupMenuResourceType: ResourceType,
 ) : PopupMenu(
     layoutInflater,
-    resourceId = R.layout.popup_window_browser_menu,
-    width = getPopupMenuWidth(context),
+    resourceId = if (popupMenuResourceType == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
+    width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
 ) {
-    private val binding = PopupWindowBrowserMenuBinding.inflate(layoutInflater)
+    private val topBinding = PopupWindowBrowserMenuBinding.bind(contentView)
+    private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
 
     init {
-        contentView = binding.root
+        contentView = when (popupMenuResourceType) {
+            TOP -> topBinding.root
+            BOTTOM -> bottomBinding.root
+        }
+    }
+
+    internal val backMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.backMenuItem
+            BOTTOM -> bottomBinding.backMenuItem
+        }
+    }
+
+    internal val forwardMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.forwardMenuItem
+            BOTTOM -> bottomBinding.forwardMenuItem
+        }
+    }
+
+    internal val refreshMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.refreshMenuItem
+            BOTTOM -> bottomBinding.refreshMenuItem
+        }
+    }
+
+    internal val printPageMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.printPageMenuItem
+            BOTTOM -> bottomBinding.printPageMenuItem
+        }
+    }
+
+    internal val newTabMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.newTabMenuItem
+            BOTTOM -> bottomBinding.newTabMenuItem
+        }
+    }
+
+    internal val defaultBrowserMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+            BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+        }
+    }
+
+    internal val duckChatMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.includeDuckChatMenuItem.duckChatMenuItem
+            BOTTOM -> bottomBinding.includeDuckChatMenuItem.duckChatMenuItem
+        }
+    }
+
+    internal val sharePageMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.sharePageMenuItem
+            BOTTOM -> bottomBinding.sharePageMenuItem
+        }
+    }
+
+    internal val bookmarksMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.bookmarksMenuItem
+            BOTTOM -> bottomBinding.bookmarksMenuItem
+        }
+    }
+
+    internal val downloadsMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.downloadsMenuItem
+            BOTTOM -> bottomBinding.downloadsMenuItem
+        }
+    }
+
+    internal val settingsMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.settingsMenuItem
+            BOTTOM -> bottomBinding.settingsMenuItem
+        }
+    }
+
+    internal val addBookmarksMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.addBookmarksMenuItem
+            BOTTOM -> bottomBinding.addBookmarksMenuItem
+        }
+    }
+
+    internal val fireproofWebsiteMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.fireproofWebsiteMenuItem
+            BOTTOM -> bottomBinding.fireproofWebsiteMenuItem
+        }
+    }
+
+    internal val createAliasMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.createAliasMenuItem
+            BOTTOM -> bottomBinding.createAliasMenuItem
+        }
+    }
+
+    internal val changeBrowserModeMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.changeBrowserModeMenuItem
+            BOTTOM -> bottomBinding.changeBrowserModeMenuItem
+        }
+    }
+
+    internal val openInAppMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.openInAppMenuItem
+            BOTTOM -> bottomBinding.openInAppMenuItem
+        }
+    }
+
+    internal val findInPageMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.findInPageMenuItem
+            BOTTOM -> bottomBinding.findInPageMenuItem
+        }
+    }
+
+    internal val addToHomeMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.addToHomeMenuItem
+            BOTTOM -> bottomBinding.addToHomeMenuItem
+        }
+    }
+
+    internal val privacyProtectionMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.privacyProtectionMenuItem
+            BOTTOM -> bottomBinding.privacyProtectionMenuItem
+        }
+    }
+
+    internal val brokenSiteMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.brokenSiteMenuItem
+            BOTTOM -> bottomBinding.brokenSiteMenuItem
+        }
+    }
+
+    internal val autofillMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.autofillMenuItem
+            BOTTOM -> bottomBinding.autofillMenuItem
+        }
+    }
+
+    internal val runningInDdgBrowserMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.runningInDdgBrowserMenuItem
+            BOTTOM -> bottomBinding.runningInDdgBrowserMenuItem
+        }
+    }
+
+    internal val siteOptionsMenuDivider: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.siteOptionsMenuDivider
+            BOTTOM -> bottomBinding.siteOptionsMenuDivider
+        }
+    }
+
+    internal val browserOptionsMenuDivider: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.browserOptionsMenuDivider
+            BOTTOM -> bottomBinding.browserOptionsMenuDivider
+        }
+    }
+
+    internal val settingsMenuDivider: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.settingsMenuDivider
+            BOTTOM -> bottomBinding.settingsMenuDivider
+        }
+    }
+
+    internal val customTabsMenuDivider: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.customTabsMenuDivider
+            BOTTOM -> bottomBinding.customTabsMenuDivider
+        }
+    }
+
+    internal val openInDdgBrowserMenuItem: MenuItemView by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.openInDdgBrowserMenuItem
+            BOTTOM -> bottomBinding.openInDdgBrowserMenuItem
+        }
     }
 
     fun renderState(
         browserShowing: Boolean,
         viewState: BrowserViewState,
+        displayedInCustomTabScreen: Boolean,
     ) {
-        contentView.apply {
-            binding.backMenuItem.isEnabled = viewState.canGoBack
-            binding.forwardMenuItem.isEnabled = viewState.canGoForward
-            binding.refreshMenuItem.isEnabled = browserShowing
-            binding.printPageMenuItem.isEnabled = browserShowing
+        backMenuItem.isEnabled = viewState.canGoBack
+        forwardMenuItem.isEnabled = viewState.canGoForward
+        refreshMenuItem.isEnabled = browserShowing
 
-            binding.newTabMenuItem.isVisible = browserShowing
-            binding.sharePageMenuItem.isVisible = viewState.canSharePage
-            binding.addBookmarksMenuItem.isVisible = viewState.canSaveSite
-            val isBookmark = viewState.bookmark != null
-            binding.addBookmarksMenuItem.label {
-                context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
-            }
-            binding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+        printPageMenuItem.isEnabled = browserShowing
 
-            binding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite
-            binding.fireproofWebsiteMenuItem.label {
-                context.getString(
-                    if (viewState.isFireproofWebsite) {
-                        R.string.fireproofWebsiteMenuTitleRemove
-                    } else {
-                        R.string.fireproofWebsiteMenuTitleAdd
-                    },
-                )
-            }
-            binding.fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
+        newTabMenuItem.isVisible = !displayedInCustomTabScreen
+        duckChatMenuItem.isVisible = viewState.showDuckChatOption && !displayedInCustomTabScreen
+        sharePageMenuItem.isVisible = viewState.canSharePage
 
-            binding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn
+        defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
 
-            binding.changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
-            binding.changeBrowserModeMenuItem.label {
-                context.getString(
-                    if (viewState.isDesktopBrowsingMode) {
-                        R.string.requestMobileSiteMenuTitle
-                    } else {
-                        R.string.requestDesktopSiteMenuTitle
-                    },
-                )
-            }
-            binding.changeBrowserModeMenuItem.setIcon(
-                if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
+        bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
+        downloadsMenuItem.isVisible = !displayedInCustomTabScreen
+        settingsMenuItem.isVisible = !displayedInCustomTabScreen
+
+        addBookmarksMenuItem.isVisible = viewState.canSaveSite && !displayedInCustomTabScreen
+        val isBookmark = viewState.bookmark != null
+        addBookmarksMenuItem.label {
+            context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
+        }
+        addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+
+        fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
+        fireproofWebsiteMenuItem.label {
+            context.getString(
+                if (viewState.isFireproofWebsite) {
+                    R.string.fireproofWebsiteMenuTitleRemove
+                } else {
+                    R.string.fireproofWebsiteMenuTitleAdd
+                },
             )
+        }
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
 
-            binding.openInAppMenuItem.isVisible = viewState.previousAppLink != null
-            binding.findInPageMenuItem.isVisible = viewState.canFindInPage
-            binding.addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
-            binding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
-            binding.privacyProtectionMenuItem.label {
-                context.getText(
-                    if (viewState.isPrivacyProtectionDisabled) {
-                        R.string.enablePrivacyProtection
-                    } else {
-                        R.string.disablePrivacyProtection
-                    },
-                ).toString()
-            }
-            binding.privacyProtectionMenuItem.setIcon(
-                if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+        createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
+
+        changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
+        changeBrowserModeMenuItem.label {
+            context.getString(
+                if (viewState.isDesktopBrowsingMode) {
+                    R.string.requestMobileSiteMenuTitle
+                } else {
+                    R.string.requestDesktopSiteMenuTitle
+                },
             )
-            binding.brokenSiteMenuItem.isVisible = viewState.canReportSite
+        }
+        changeBrowserModeMenuItem.setIcon(
+            if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
+        )
 
-            binding.siteOptionsMenuDivider.isVisible = viewState.browserShowing
-            binding.browserOptionsMenuDivider.isVisible = viewState.browserShowing
-            binding.settingsMenuDivider.isVisible = viewState.browserShowing
-            binding.printPageMenuItem.isVisible = viewState.canPrintPage
-            binding.autofillMenuItem.isVisible = viewState.showAutofill
+        openInAppMenuItem.isVisible = viewState.previousAppLink != null
+        findInPageMenuItem.isVisible = viewState.canFindInPage
+        addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
+        privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
+        privacyProtectionMenuItem.label {
+            context.getText(
+                if (viewState.isPrivacyProtectionDisabled) {
+                    R.string.enablePrivacyProtection
+                } else {
+                    R.string.disablePrivacyProtection
+                },
+            ).toString()
+        }
+        privacyProtectionMenuItem.setIcon(
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+        )
+        brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
+
+        siteOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        browserOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        settingsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        printPageMenuItem.isVisible = viewState.canPrintPage && !displayedInCustomTabScreen
+        autofillMenuItem.isVisible = viewState.showAutofill && !displayedInCustomTabScreen
+
+        openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
+        customTabsMenuDivider.isVisible = displayedInCustomTabScreen
+        runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
+        overrideForSSlError(viewState, displayedInCustomTabScreen)
+    }
+
+    private fun overrideForSSlError(
+        viewState: BrowserViewState,
+        displayedInCustomTabScreen: Boolean,
+    ) {
+        if (viewState.sslError != NONE && !displayedInCustomTabScreen) {
+            newTabMenuItem.isVisible = true
+            siteOptionsMenuDivider.isVisible = true
         }
     }
-}
 
-private fun getPopupMenuWidth(context: Context): Int {
-    val orientation = context.resources.configuration.orientation
-    return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        LayoutParams.WRAP_CONTENT
-    } else {
-        context.resources.getDimensionPixelSize(dimen.popupMenuWidth)
+    enum class ResourceType {
+        TOP,
+        BOTTOM,
     }
 }

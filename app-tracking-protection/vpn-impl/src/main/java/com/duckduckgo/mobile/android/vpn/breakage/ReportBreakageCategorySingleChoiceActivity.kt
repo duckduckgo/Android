@@ -95,27 +95,29 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         viewModel.setCategories(brokenApp.breakageCategories)
         val categories = brokenApp.breakageCategories.map { it.description }
         binding.categoriesSelection.onAction {
-            RadioListAlertDialogBuilder(this)
-                .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
-                .setOptions(categories, viewModel.indexSelected + 1)
-                .setPositiveButton(android.R.string.ok)
-                .setNegativeButton(android.R.string.cancel)
-                .addEventListener(
-                    object : RadioListAlertDialogBuilder.EventListener() {
-                        override fun onRadioItemSelected(selectedItem: Int) {
-                            viewModel.onCategoryIndexChanged(selectedItem - 1)
-                        }
+            if (!isFinishing && !isDestroyed) {
+                RadioListAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
+                    .setOptions(categories, viewModel.indexSelected + 1)
+                    .setPositiveButton(android.R.string.ok)
+                    .setNegativeButton(android.R.string.cancel)
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onRadioItemSelected(selectedItem: Int) {
+                                viewModel.onCategoryIndexChanged(selectedItem - 1)
+                            }
 
-                        override fun onPositiveButtonClicked(selectedItem: Int) {
-                            viewModel.onCategoryAccepted()
-                        }
+                            override fun onPositiveButtonClicked(selectedItem: Int) {
+                                viewModel.onCategoryAccepted()
+                            }
 
-                        override fun onNegativeButtonClicked() {
-                            viewModel.onCategorySelectionCancelled()
-                        }
-                    },
-                )
-                .show()
+                            override fun onNegativeButtonClicked() {
+                                viewModel.onCategorySelectionCancelled()
+                            }
+                        },
+                    )
+                    .show()
+            }
         }
         binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
     }

@@ -31,11 +31,3 @@ class RealDerivedKeySecretFactory : DerivedKeySecretFactory {
 
     override fun getKey(spec: PBEKeySpec): Key = secretKeyFactory.generateSecret(spec)
 }
-
-class LegacyDerivedKeySecretFactory : DerivedKeySecretFactory {
-    private val secretKeyFactory by lazy {
-        SecretKeyFactory.getInstance("PBKDF2withHmacSHA1")
-    }
-
-    override fun getKey(spec: PBEKeySpec): Key = secretKeyFactory.generateSecret(spec)
-}

@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -34,14 +34,27 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.remote.messaging.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     implementation AndroidX.room.ktx
+    implementation AndroidX.core.ktx
     ksp AndroidX.room.compiler
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    implementation JakeWharton.timber
+    implementation project(path: ':common-utils')
 
     testImplementation project(path: ':common-test')
-    testImplementation "org.threeten:threetenbp:_"
     testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

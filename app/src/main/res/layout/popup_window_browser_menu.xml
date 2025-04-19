@@ -23,7 +23,7 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/header"
+        android:id="@+id/navigationButtonsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -66,6 +66,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/navigationButtonsSectionDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:defaultPadding="false" />
@@ -91,11 +92,19 @@
                 app:iconDrawable="@drawable/ic_add_16"
                 app:primaryText="@string/newTabMenuItem" />
 
+            <include
+                android:id="@+id/includeDuckChatMenuItem"
+                layout="@layout/view_menu_item_duck_chat" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <include
+                android:id="@+id/includeDefaultBrowserMenuItem"
+                layout="@layout/view_menu_item_default_browser" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/sharePageMenuItem"
@@ -215,6 +224,31 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_settings_16"
                 app:primaryText="@string/settingsMenuItemTitle" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/openInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_open_in_16"
+                app:primaryText="@string/openInDdgMenuItemTitle" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:visibility="gone"
+                android:id="@+id/customTabsMenuDivider"
+                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/runningInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body2"
+                app:iconDrawable="@drawable/ic_dax_icon"
+                app:primaryText="@string/runningInDdgMenuItemTitle" />
 
         </LinearLayout>
 

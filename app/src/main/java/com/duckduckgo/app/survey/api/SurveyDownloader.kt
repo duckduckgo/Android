@@ -26,10 +26,10 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import io.reactivex.Completable
 import java.io.IOException
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
-import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.ChronoUnit
 import retrofit2.Response
 import timber.log.Timber
 

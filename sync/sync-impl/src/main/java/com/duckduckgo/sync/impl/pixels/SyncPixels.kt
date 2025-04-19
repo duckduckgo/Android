@@ -20,24 +20,40 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_PIXEL
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 interface SyncPixels {
 
     /**
      * Fired once per day, for all users with sync enabled
+     * Sent during the first sync of the day
      */
     fun fireDailyPixel()
+
+    /**
+     * Fired once per day, for all users with sync enabled
+     * It carries the daily stats for errors and sync count
+     */
+    fun fireDailySuccessRatePixel()
+
+    /**
+     * Fired after a sync operation has found timestamp conflict
+     */
+    fun fireTimestampConflictPixel(feature: String)
 
     /**
      * Fired when adding new device to existing account
@@ -46,37 +62,32 @@ interface SyncPixels {
 
     /**
      * Fired when user sets up a sync account from connect flow
+     * @param source: the source of the signup, e.g. "promotion_bookmarks", "promotion_passwords" etc.... Can be null if not applicable.
      */
-    fun fireSignupConnectPixel()
+    fun fireSignupConnectPixel(source: String?)
 
     /**
      * Fired when user sets up a sync account directly.
+     * @param source: the source of the signup, e.g. "promotion_bookmarks", "promotion_passwords" etc.... Can be null if not applicable.
      */
-    fun fireSignupDirectPixel()
-
-    fun fireStatsPixel()
-
-    fun fireOrphanPresentPixel(feature: String)
-
-    fun firePersisterErrorPixel(
-        feature: String,
-        mergeError: SyncMergeResult.Error,
-    )
-
-    fun fireEncryptFailurePixel()
-
-    fun fireDecryptFailurePixel()
-
-    fun fireCountLimitPixel(feature: String)
-
-    fun fireSyncAttemptErrorPixel(
-        feature: String,
-        result: Error,
-    )
+    fun fireSignupDirectPixel(source: String?)
 
     fun fireSyncAccountErrorPixel(
         result: Error,
+        type: SyncAccountOperation,
     )
+
+    fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
+    )
+
+    fun fireAskUserToSwitchAccount()
+    fun fireUserAcceptedSwitchingAccount()
+    fun fireUserCancelledSwitchingAccount()
+    fun fireUserSwitchedAccount()
+    fun fireUserSwitchedLogoutError()
+    fun fireUserSwitchedLoginError()
 }
 
 @ContributesBinding(AppScope::class)
@@ -92,97 +103,130 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireDailyPixel() {
-        tryToFireDailyPixel(SYNC_DAILY_PIXEL)
+        tryToFireDailyPixel(SYNC_DAILY)
+    }
+
+    override fun fireDailySuccessRatePixel() {
+        val dailyStats = statsRepository.getYesterdayDailyStats()
+        val payload = mapOf(
+            SyncPixelParameters.COUNT to dailyStats.attempts,
+            SyncPixelParameters.DATE to dailyStats.date,
+        ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
+        tryToFireDailyPixel(SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
+    }
+
+    override fun fireTimestampConflictPixel(feature: String) {
+        pixel.fire(
+            String.format(Locale.US, SyncPixelName.SYNC_TIMESTAMP_RESOLUTION_TRIGGERED.pixelName, feature),
+        )
     }
 
     override fun fireLoginPixel() {
         pixel.fire(SyncPixelName.SYNC_LOGIN)
     }
 
-    override fun fireSignupConnectPixel() {
-        pixel.fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+    override fun fireSignupConnectPixel(source: String?) {
+        pixel.fire(SyncPixelName.SYNC_SIGNUP_CONNECT, buildSourceMap(source))
     }
 
-    override fun fireSignupDirectPixel() {
-        pixel.fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
+    override fun fireSignupDirectPixel(source: String?) {
+        pixel.fire(SyncPixelName.SYNC_SIGNUP_DIRECT, buildSourceMap(source))
     }
 
-    override fun fireStatsPixel() {
-        val dailyStats = statsRepository.getDailyStats()
-        pixel.fire(
-            SyncPixelName.SYNC_SUCCESS_RATE,
-            mapOf(
-                SyncPixelParameters.RATE to dailyStats.successRate.toString(),
-            ),
-        )
-        pixel.fire(
-            SyncPixelName.SYNC_DAILY_ATTEMPTS,
-            mapOf(
-                SyncPixelParameters.ATTEMPTS to dailyStats.attempts.toString(),
-            ),
-        )
-    }
-
-    override fun fireOrphanPresentPixel(feature: String) {
-        pixel.fire(
-            SyncPixelName.SYNC_ORPHAN_PRESENT,
-            mapOf(
-                SyncPixelParameters.FEATURE to feature,
-            ),
-        )
-    }
-
-    override fun firePersisterErrorPixel(
-        feature: String,
-        mergeError: SyncMergeResult.Error,
-    ) {
-        pixel.fire(
-            SyncPixelName.SYNC_PERSISTER_FAILURE,
-            mapOf(
-                SyncPixelParameters.FEATURE to feature,
-                SyncPixelParameters.ERROR_CODE to mergeError.code.toString(),
-                SyncPixelParameters.ERROR_REASON to mergeError.reason,
-            ),
-        )
-    }
-
-    override fun fireEncryptFailurePixel() {
-        // pixel.fire(SyncPixelName.SYNC_ENCRYPT_FAILURE)
-    }
-
-    override fun fireDecryptFailurePixel() {
-        // pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
-    }
-
-    override fun fireCountLimitPixel(feature: String) {
-        pixel.fire(
-            SyncPixelName.SYNC_COUNT_LIMIT,
-            mapOf(
-                SyncPixelParameters.FEATURE to feature,
-            ),
-        )
-    }
-
-    override fun fireSyncAttemptErrorPixel(
-        feature: String,
+    override fun fireSyncAccountErrorPixel(
         result: Error,
+        type: SyncAccountOperation,
     ) {
-        pixel.fire(
-            SyncPixelName.SYNC_ATTEMPT_FAILURE,
-            mapOf(
-                SyncPixelParameters.FEATURE to feature,
-                SyncPixelParameters.ERROR_CODE to result.code.toString(),
-                SyncPixelParameters.ERROR_REASON to result.reason,
-            ),
-        )
+        when (type) {
+            SyncAccountOperation.SIGNUP -> fireSignupErrorPixel(result)
+            SyncAccountOperation.LOGIN -> fireLoginErrorPixel(result)
+            SyncAccountOperation.LOGOUT -> fireLogoutErrorPixel(result)
+            SyncAccountOperation.UPDATE_DEVICE -> fireUpdateDeviceErrorPixel(result)
+            SyncAccountOperation.REMOVE_DEVICE -> fireRemoveDeviceErrorPixel(result)
+            SyncAccountOperation.DELETE_ACCOUNT -> fireDeleteAccountErrorPixel(result)
+            SyncAccountOperation.USER_SIGNED_IN -> fireAlreadySignedInErrorPixel(result)
+            SyncAccountOperation.CREATE_PDF -> fireSaveRecoveryPdfErrorPixel(result)
+            SyncAccountOperation.GENERIC -> fireSyncAccountErrorPixel(result)
+        }
     }
 
-    override fun fireSyncAccountErrorPixel(result: Error) {
+    override fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
+    ) {
+        when (apiError.code) {
+            API_CODE.COUNT_LIMIT.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SYNC_OBJECT_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.CONTENT_TOO_LARGE.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.VALIDATION_ERROR.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_VALIDATION_ERROR_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_TOO_MANY_REQUESTS_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+        }
+    }
+
+    private fun fireSyncAccountErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_ACCOUNT_FAILURE)
+    }
+
+    private fun fireSignupErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_SIGN_UP_FAILURE)
+    }
+
+    private fun fireLoginErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_LOGIN_FAILURE)
+    }
+
+    private fun fireLogoutErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_LOGOUT_FAILURE)
+    }
+
+    private fun fireUpdateDeviceErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_UPDATE_DEVICE_FAILURE)
+    }
+
+    private fun fireRemoveDeviceErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_REMOVE_DEVICE_FAILURE)
+    }
+
+    private fun fireDeleteAccountErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_DELETE_ACCOUNT_FAILURE)
+    }
+
+    private fun fireAlreadySignedInErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_USER_SIGNED_IN_FAILURE)
+    }
+
+    private fun fireSaveRecoveryPdfErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_CREATE_PDF_FAILURE)
+    }
+
+    private fun Error.fireAddingErrorAsParams(pixelName: SyncPixelName) {
         pixel.fire(
-            SyncPixelName.SYNC_ACCOUNT_FAILURE,
+            pixelName,
             mapOf(
-                SyncPixelParameters.ERROR_CODE to result.code.toString(),
-                SyncPixelParameters.ERROR_REASON to result.reason,
+                SyncPixelParameters.ERROR_CODE to this.code.toString(),
+                SyncPixelParameters.ERROR_REASON to this.reason,
             ),
         )
     }
@@ -203,11 +247,43 @@ class RealSyncPixels @Inject constructor(
 
     private fun getUtcIsoLocalDate(): String {
         // returns YYYY-MM-dd
-        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        return Instant.now().atOffset(java.time.ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
     private fun String.appendTimestampSuffix(): String {
         return "${this}_timestamp"
+    }
+
+    private fun buildSourceMap(source: String?): Map<String, String> {
+        return if (source != null) {
+            mapOf(SYNC_FEATURE_PROMOTION_SOURCE to source)
+        } else {
+            emptyMap()
+        }
+    }
+
+    override fun fireUserSwitchedAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_ACCOUNT)
+    }
+
+    override fun fireAskUserToSwitchAccount() {
+        pixel.fire(SyncPixelName.SYNC_ASK_USER_TO_SWITCH_ACCOUNT)
+    }
+
+    override fun fireUserAcceptedSwitchingAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_ACCEPTED_SWITCHING_ACCOUNT)
+    }
+
+    override fun fireUserCancelledSwitchingAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_CANCELLED_SWITCHING_ACCOUNT)
+    }
+
+    override fun fireUserSwitchedLoginError() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR)
+    }
+
+    override fun fireUserSwitchedLogoutError() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
     }
 
     companion object {
@@ -215,28 +291,72 @@ class RealSyncPixels @Inject constructor(
     }
 }
 
+enum class SyncAccountOperation {
+    GENERIC,
+    SIGNUP,
+    LOGIN,
+    LOGOUT,
+    UPDATE_DEVICE,
+    REMOVE_DEVICE,
+    DELETE_ACCOUNT,
+    USER_SIGNED_IN,
+    CREATE_PDF,
+}
+
 // https://app.asana.com/0/72649045549333/1205649300615861
 enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
-    SYNC_DAILY_PIXEL("m_sync_daily"),
+    SYNC_DAILY("m_sync_daily"),
+    SYNC_DAILY_SUCCESS_RATE_PIXEL("m_sync_success_rate_daily"),
+    SYNC_TIMESTAMP_RESOLUTION_TRIGGERED("m_sync_%s_local_timestamp_resolution_triggered"),
     SYNC_LOGIN("m_sync_login"),
     SYNC_SIGNUP_DIRECT("m_sync_signup_direct"),
     SYNC_SIGNUP_CONNECT("m_sync_signup_connect"),
-
-    SYNC_SUCCESS_RATE("m_sync_daily_success_rate"),
-    SYNC_DAILY_ATTEMPTS("m_sync_daily_attempts"),
-    SYNC_ORPHAN_PRESENT("m_sync_orphan_present"),
-    SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
-    SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
-    SYNC_COUNT_LIMIT("m_sync_count_limit"),
-    SYNC_ATTEMPT_FAILURE("m_sync_attempt_failure"),
     SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
-    SYNC_PERSISTER_FAILURE("m_sync_persister_failure"),
+    SYNC_SIGN_UP_FAILURE("m_sync_signup_error"),
+    SYNC_LOGIN_FAILURE("m_sync_login_error"),
+    SYNC_LOGOUT_FAILURE("m_sync_logout_error"),
+    SYNC_UPDATE_DEVICE_FAILURE("m_update_device_error"),
+    SYNC_REMOVE_DEVICE_FAILURE("m_remove_device_error"),
+    SYNC_DELETE_ACCOUNT_FAILURE("m_delete_account_error"),
+    SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
+    SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
+    SYNC_PATCH_COMPRESS_FAILED("m_sync_patch_compression_failed"),
+    SYNC_TOO_MANY_REQUESTS_DAILY("m_sync_%s_too_many_requests_daily"),
+    SYNC_OBJECT_LIMIT_EXCEEDED_DAILY("m_sync_%s_object_limit_exceeded_daily"),
+    SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY("m_sync_%s_request_size_limit_exceeded_daily"),
+    SYNC_VALIDATION_ERROR_DAILY("m_sync_%s_validation_error_daily"),
+
+    SYNC_FEATURE_PROMOTION_DISPLAYED("sync_promotion_displayed"),
+    SYNC_FEATURE_PROMOTION_CONFIRMED("sync_promotion_confirmed"),
+    SYNC_FEATURE_PROMOTION_DISMISSED("sync_promotion_dismissed"),
+
+    SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN("sync_get_other_devices"),
+    SYNC_GET_OTHER_DEVICES_LINK_COPIED("sync_get_other_devices_copy"),
+    SYNC_GET_OTHER_DEVICES_LINK_SHARED("sync_get_other_devices_share"),
+    SYNC_ASK_USER_TO_SWITCH_ACCOUNT("sync_ask_user_to_switch_account"),
+    SYNC_USER_ACCEPTED_SWITCHING_ACCOUNT("sync_user_accepted_switching_account"),
+    SYNC_USER_CANCELLED_SWITCHING_ACCOUNT("sync_user_cancelled_switching_account"),
+    SYNC_USER_SWITCHED_ACCOUNT("sync_user_switched_account"),
+    SYNC_USER_SWITCHED_LOGOUT_ERROR("sync_user_switched_logout_error"),
+    SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
 }
 
 object SyncPixelParameters {
-    const val ATTEMPTS = "attempts"
-    const val RATE = "rate"
-    const val FEATURE = "feature"
+    const val COUNT = "sync_count"
+    const val DATE = "date"
+    const val OBJECT_LIMIT_EXCEEDED_COUNT = "%s_object_limit_exceeded_count"
+    const val REQUEST_SIZE_LIMIT_EXCEEDED_COUNT = "%s_request_size_limit_exceeded_count"
+    const val VALIDATION_ERROR_COUNT = "%s_validation_error"
+    const val TOO_MANY_REQUESTS = "%s_too_many_requests_count"
+    const val DATA_ENCRYPT_ERROR = "encrypt_error_count"
+    const val DATA_DECRYPT_ERROR = "decrypt_error_count"
+    const val DATA_PERSISTER_ERROR_PARAM = "%s_persister_error_count"
+    const val DATA_PROVIDER_ERROR_PARAM = "%s_provider_error_count"
+    const val TIMESTAMP_CONFLICT = "%s_local_timestamp_resolution_triggered"
+    const val ORPHANS_PRESENT = "%s_orphans_present"
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
+    const val ERROR = "error"
+    const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
+    const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
 }

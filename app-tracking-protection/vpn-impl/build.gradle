@@ -37,6 +37,9 @@ android {
         }
     }
     namespace 'com.duckduckgo.mobile.android.vpn'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -52,15 +55,17 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':common-ui')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':vpn-network-api')
     implementation project(':remote-messaging-api')
-    implementation project(':statistics')
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
+    implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':subscriptions-api')
 
     implementation AndroidX.core.ktx
 
@@ -73,13 +78,13 @@ dependencies {
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
 
+    // WorkManager
+    implementation "androidx.work:work-multiprocess:_"
+
     implementation "androidx.viewpager2:viewpager2:_"
 
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
-
-    // Security crypto
-    implementation AndroidX.security.crypto
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
@@ -99,9 +104,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation "com.squareup.logcat:logcat:_"
 
@@ -134,4 +136,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
+    testImplementation project(':feature-toggles-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

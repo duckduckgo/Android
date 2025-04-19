@@ -24,6 +24,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.subscriptions.impl'
+
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }
 
 dependencies {
@@ -32,6 +36,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
+    implementation project(path: ':cookies-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':app-build-config-api')
@@ -40,14 +45,23 @@ dependencies {
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
-    implementation project(path: ':subscriptions-store')
     implementation project(path: ':settings-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
+    implementation project(path: ':macos-api')
+    implementation project(path: ':windows-api')
+    implementation project(path: ':downloads-api')
+    implementation project(path: ':statistics-api')
+    implementation project(':privacy-config-api') // remote feature flag
+    implementation project(':data-store-api')
+    implementation project(':remote-messaging-api') // remote feature flag
+    implementation project(':survey-api')
+    implementation project(':vpn-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
+    implementation AndroidX.work.runtimeKtx
     implementation Google.android.material
 
     implementation "com.android.billingclient:billing:_"
@@ -56,13 +70,22 @@ dependencies {
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.constraintLayout
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
+    implementation AndroidX.security.crypto
+
+    implementation "io.jsonwebtoken:jjwt-api:_"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
+        exclude(group: 'org.json', module: 'json') // provided by Android natively
+    }
 
     // Testing dependencies
+    testImplementation project(':feature-toggles-test')
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -70,6 +93,7 @@ dependencies {
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation Testing.robolectric
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation project(path: ':common-test')
@@ -78,6 +102,9 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation AndroidX.work.testing
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -88,6 +115,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.subscriptions.impl'
 }

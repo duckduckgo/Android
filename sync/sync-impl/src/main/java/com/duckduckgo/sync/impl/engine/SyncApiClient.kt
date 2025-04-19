@@ -25,7 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -45,7 +45,7 @@ interface SyncApiClient {
 class AppSyncApiClient @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
-    private val syncPixels: SyncPixels,
+    private val syncApiErrorRecorder: SyncApiErrorRecorder,
 ) : SyncApiClient {
 
     override fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
@@ -61,6 +61,7 @@ class AppSyncApiClient @Inject constructor(
         Timber.d("Sync-Engine: patch data generated $updates")
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
+                syncApiErrorRecorder.record(changes.type, result)
                 result
             }
 
@@ -83,70 +84,26 @@ class AppSyncApiClient @Inject constructor(
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        return when (type) {
-            BOOKMARKS -> getBookmarks(type, token, since)
-            CREDENTIALS -> getCredentials(type, token, since)
-            SETTINGS -> getSettings(type, token, since)
-        }
+        return get(type, token, since)
     }
 
-    private fun getSettings(type: SyncableType, token: String, since: String): Result<SyncChangesResponse> {
-        return when (val result = syncApi.getSettings(token, since)) {
-            is Result.Error -> {
-                if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty(type))
-                } else {
-                    Result.Error(result.code, result.reason)
-                }
-            }
-
-            is Result.Success -> {
-                val remoteChanges = mapResponse(type, result.data)
-                Result.Success(remoteChanges)
-            }
-        }
-    }
-
-    private fun getBookmarks(
+    private fun get(
         type: SyncableType,
         token: String,
         since: String,
     ): Result<SyncChangesResponse> {
-        return when (val result = syncApi.getBookmarks(token, since)) {
-            is Result.Error -> {
-                when (result.code) {
-                    API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
-                    API_CODE.COUNT_LIMIT.code -> {
-                        syncPixels.fireCountLimitPixel(BOOKMARKS.toString())
-                        Result.Error(result.code, result.reason)
-                    }
-                    else -> {
-                        Result.Error(result.code, result.reason)
-                    }
-                }
-            }
-
-            is Result.Success -> {
-                val remoteChanges = mapResponse(type, result.data)
-                Result.Success(remoteChanges)
-            }
+        val result = when (type) {
+            BOOKMARKS -> syncApi.getBookmarks(token, since)
+            CREDENTIALS -> syncApi.getCredentials(token, since)
+            SETTINGS -> syncApi.getSettings(token, since)
         }
-    }
 
-    private fun getCredentials(
-        type: SyncableType,
-        token: String,
-        since: String,
-    ): Result<SyncChangesResponse> {
-        return when (val result = syncApi.getCredentials(token, since)) {
+        return when (result) {
             is Result.Error -> {
                 when (result.code) {
                     API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
-                    API_CODE.COUNT_LIMIT.code -> {
-                        syncPixels.fireCountLimitPixel(CREDENTIALS.toString())
-                        Result.Error(result.code, result.reason)
-                    }
                     else -> {
+                        syncApiErrorRecorder.record(type, result)
                         Result.Error(result.code, result.reason)
                     }
                 }

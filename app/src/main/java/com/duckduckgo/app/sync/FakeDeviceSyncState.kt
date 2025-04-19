@@ -18,6 +18,7 @@ package com.duckduckgo.app.sync
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.*
 
@@ -26,9 +27,10 @@ import javax.inject.*
  */
 @ContributesBinding(
     scope = AppScope::class,
-    priority = ContributesBinding.Priority.NORMAL,
+    rank = ContributesBinding.RANK_NORMAL,
 )
 class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
     override fun isFeatureEnabled(): Boolean = false
     override fun isUserSignedInOnDevice(): Boolean = false
+    override fun getAccountState(): SyncAccountState = SyncAccountState.SignedOut
 }

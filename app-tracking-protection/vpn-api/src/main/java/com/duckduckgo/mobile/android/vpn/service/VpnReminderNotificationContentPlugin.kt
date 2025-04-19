@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.PendingIntent
-import androidx.annotation.LayoutRes
 import androidx.core.app.NotificationCompat
 
 interface VpnReminderNotificationContentPlugin {
@@ -48,7 +47,7 @@ interface VpnReminderNotificationContentPlugin {
     data class NotificationContent(
         val isSilent: Boolean,
         val shouldAutoCancel: Boolean?,
-        @LayoutRes val customViewLayout: Int,
+        val title: String,
         val onNotificationPressIntent: PendingIntent?,
         val notificationAction: List<NotificationCompat.Action>,
     ) {
@@ -56,7 +55,7 @@ interface VpnReminderNotificationContentPlugin {
             val EMPTY = NotificationContent(
                 isSilent = false,
                 shouldAutoCancel = null,
-                customViewLayout = -1,
+                title = "",
                 onNotificationPressIntent = null,
                 notificationAction = emptyList(),
             )

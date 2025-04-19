@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
+    <string name="saveLoginDialogTitle">Kas salvestada parool?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
@@ -56,12 +56,18 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automaatne täitmine paroolide jaoks pole saadaval, sest sinu Android WebView\'i versioon on aegunud või ühildumatu.</string>
+
     <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
 
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
@@ -114,13 +120,14 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Välju seadistusest</string>
 
     <string name="autofillManagementScreenTitle">Paroolid</string>
+    <string name="autofillManagementScreenTitleNew">Paroolid ja automaatne täitmine</string>
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Paroole hoitakse turvaliselt sinu seadmes</string>
-    <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="credentialManagementAutofillSubtitle">Paroolid on krüpteeritud. Keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Paroolihalduri turvalisus</string>
+    <string name="saveLoginDialogSubtitle">Salvesta oma parool turvaliselt seadmesse DuckDuckGo paroolide ja automaatse täitmisega.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
-    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid selle parooli kustutada?</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimati uuendatud %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Kas soovid jätkata paroolide salvestamist?</string>
@@ -133,6 +140,125 @@
     <string name="managementDisabledModeSubtitle">Paroolide kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="credentialManagementEditTitle">Parooli muutmine</string>
 
-    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nSisselogimisandmete limiit on täis. Kustuta mõni, et jätkata sünkroonimist.\n\n<annotation type="manage_logins">Halda sisselogimisandmeid</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled paroolide sünkroonimise limiidi ületanud. Proovi mõned paroolid kustutada. Kuni see pole lahendatud, ei varundata sinu paroole.</string>
+    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Kustuta mõni, et jätkata sünkroonimisega.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Sünkroonimise jätkamiseks kustuta mõned paroolid.</string>
+    <string name="credentials_invalid_request_warning"><b>Sünkroonimine peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Ära selle saidi kohta rohkem küsi</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Ei, aitäh</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Kui lähtestad välistatud saidid, pakutakse sulle järgmisel korral, kui logid neile saitidele sisse, võimalust parool salvestada.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Lähtesta välistatud saidid</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Kas lähtestada välistatud saidid?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Lähtesta</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Loobu</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Kustuta kõik paroolid</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d parool kustutatud</item>
+        <item quantity="other">%1$d parooli kustutatud</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Autendi end, et kinnitada kõigi paroolide kustutamine</string>
+    <string name="autofill_title_text_for_delete_all">Kustuta kõik paroolid</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sinu parooli %1$s jaoks ei saa sünkroonida, sest üks selle väljadest ületab tähemärgipiirangu.</item>
+        <item quantity="other">Sinu paroolid %1$s ja %2$d muu saidi jaoks ei saa sünkroonida, kuna mõned nende väljad ületavad tähemärgipiirangu.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Halda paroole</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Teie parool kustutatakse sellest seadmest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sinu parool kustutatakse sellest seadmest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse sellest seadmest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Sinu parool kustutatakse kõigist sünkroonitud seadmetest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sinu parool kustutatakse kõikidest sünkroonitud seadmetest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Kas oled kindel, et soovid selle parooli kustutada?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
+        <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</item>
+        <item quantity="other">Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Salvestatud paroole saad importida teisest brauserist DuckDuckGo-sse.</string>
+
+    <string name="autofillManagementImportPasswords">Impordi paroolid</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kuidas importida paroole</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Impordi paroolid DuckDuckGo brauseri töölauaversiooni, seejärel sünkrooni need kõigis seadmetes.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hangi töölaua brauser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopeeritud</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hangi DuckDuckGo brauser Maci või Windowsi jaoks</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Otsi privaatselt ja blokeeri jälgurid DuckDuckGo töölaua brauseriga. Külasta oma arvutis seda linki, et laadida see alla juba täna.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sünkrooni töölauaga</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Impordi töölaua brauserist:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ava DuckDuckGo Macis või Windowsis</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ava <b>Seaded</b> > <b>Paroolid</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vali <b>Impordi paroolid</b>... ja järgi samme importimiseks]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kui need on arvutisse imporditud, saad seadistada selle seadme sünkroonimise</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hangi töölaua rakendus</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hangi DuckDuckGo Maci või Windowsi jaoks</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ava oma arvutis:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaga allalaadimise linki</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Teata automaatse täitmise probleemist</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Teata anonüümselt, et automaatne täitmine sellel saidil ei tööta. Paroole ei jagata kunagi.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Teata, et automaatne täitmine ei tööta saidil %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGo\'le saadetud aruanded on anonüümsed ega sisalda sinu kasutajanime, parooli ega muid isikuandmeid.\n\nAruanne sisaldab ainult veebisaidi url-i ja mõne automaatse täitmise sätete olekut.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Saada aruanne</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Loobu</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Aitäh! Sinu aruanne aitab meil muuta DuckDuckGo kõigi jaoks paremaks.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Peamised omadused</string>
+    <string name="onboardingSaveDialogFeature1Title">Sujuvad sisselogimised</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Sisselogimisandmeid pole vaja meeles pidada.</string>
+    <string name="onboardingSaveDialogFeature2Title">Turvaline hoiustamine</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Paroolid on krüpteeritud, salvestatud seadmesse ja lukustatud sinu Androidi mustri või PIN-koodiga.</string>
+    <string name="onboardingSaveDialogFeature3Title">Seadmete vaheline sünkroonimine</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Otsast lõpuni krüpteeritud ja lihtne seadistada, kui oled valmis.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Paroolide salvestamise saad igal ajal välja lülitada.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Ava sätted</string>
+
+    <string name="newTabPageShortcutPasswords">Paroolid</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Impordi Google\'i paroolid</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi Google\'ist</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi CSV-st</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Impordi paroolid Google\'ist</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Impordi paroolid Google\'ist</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo paroolide sünkroonimine</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sünkrooni DuckDuckGo paroolid</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Impordi oma Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Ava Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Impordi töölaua brauserist</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Impordi DuckDuckGo-sse</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import on lõpetatud</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Sain aru</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Parooli import ebaõnnestus</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Vahele jäetud (duplikaat või kehtetu): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Imporditud paroolid: <b>%1$d</b>]]></string>
+
 </resources>

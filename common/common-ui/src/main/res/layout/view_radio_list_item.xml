@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="@dimen/oneLineItemHeight"
+    android:paddingTop="@dimen/oneLineItemVerticalPadding"
+    android:paddingBottom="@dimen/oneLineItemVerticalPadding">
+
+    <com.duckduckgo.common.ui.view.button.RadioButton
+        android:id="@+id/radioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_3"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/leadingIconBackground"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:layout_marginStart="@dimen/keyline_3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/radioButton"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/leadingIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            app:typography="h2" />
+
+    </FrameLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/primaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_1"
+        android:textColor="@color/primary_text_color_selector"
+        app:layout_constraintBottom_toTopOf="@+id/secondaryText"
+        app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
+        app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:typography="body1"
+        tools:ignore="InvalidColorAttribute"
+        tools:text="Title" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/secondaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
+        app:layout_constraintStart_toStartOf="@id/primaryText"
+        app:layout_constraintTop_toBottomOf="@id/primaryText"
+        app:textType="secondary"
+        app:typography="body2"
+        tools:text="Secondary Text" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/trailingBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="trailingIconContainer,endTrailingPadding" />
+
+    <FrameLayout
+        android:id="@+id/trailingIconContainer"
+        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/trailingIcon"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_menu_vertical_24"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <View
+        android:id="@+id/endTrailingPadding"
+        android:layout_width="@dimen/keyline_0"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/keyline_3"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

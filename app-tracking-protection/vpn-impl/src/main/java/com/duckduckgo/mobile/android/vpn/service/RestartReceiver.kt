@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -56,7 +57,7 @@ class RestartReceiver @Inject constructor(
         if (appBuildConfig.isInternalBuild()) {
             logcat { "Starting vpn-service receiver" }
             unregister()
-            context.registerReceiver(this, IntentFilter("vpn-service"))
+            context.registerNotExportedReceiver(this, IntentFilter("vpn-service"))
         }
     }
 

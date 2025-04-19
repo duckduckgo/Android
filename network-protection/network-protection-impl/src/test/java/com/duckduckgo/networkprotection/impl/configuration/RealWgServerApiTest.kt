@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
@@ -39,6 +41,9 @@ class RealWgServerApiTest {
     @Mock
     private lateinit var netpEgressServersProvider: NetpEgressServersProvider
 
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -50,11 +55,13 @@ class RealWgServerApiTest {
             wgVpnControllerService,
             internalWgServerDebugProvider,
             netpEgressServersProvider,
+            appBuildConfig,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             netpEgressServersProvider,
+            appBuildConfig,
         )
     }
 
@@ -65,10 +72,9 @@ class RealWgServerApiTest {
                 serverName = "egress.usw.1",
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Newark, US",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
@@ -76,6 +82,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenRegisterInInternalAndServerSelectedThenReturnSelectedServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
 
         assertEquals(
@@ -83,10 +90,9 @@ class RealWgServerApiTest {
                 serverName = "egress.euw.2",
                 publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
                 publicEndpoint = "31.204.129.39:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -94,6 +100,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenRegisterInInternalAndServerSelectedWithNoServerCountryThenReturnSelectedServerWithNullLocation() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw"
 
         assertEquals(
@@ -101,10 +108,9 @@ class RealWgServerApiTest {
                 serverName = "egress.euw",
                 publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
                 publicEndpoint = "euw.egress.np.duck.com:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = null,
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -119,10 +125,9 @@ class RealWgServerApiTest {
                 serverName = "egress.usw.1",
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Newark, US",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -137,6 +142,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalApi.registerPublicKey("testpublickey")
 
         assertEquals(8, internalWgServerDebugProvider.cachedServers.size)
@@ -146,29 +152,29 @@ class RealWgServerApiTest {
     fun whenRegisterInProductionThenDownloadGeoswitchingData() = runTest {
         productionApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())
     }
 
     @Test
     fun whenRegisterInInternalThenDownloadGeoswitchingData() = runTest {
         internalApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())
     }
 
     @Test
     fun whenUserPreferredCountrySetThenRegisterPublicKeyShouldRequestForCountry() = runTest {
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(PreferredLocation("nl"))
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations()))
+            .thenReturn(PreferredLocation("nl"))
 
         assertEquals(
             WgServerData(
                 serverName = "egress.euw.2",
                 publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
                 publicEndpoint = "31.204.129.39:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
@@ -176,7 +182,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenUserPreferredLocationSetThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())).thenReturn(
             PreferredLocation(countryCode = "us", cityName = "Des Moines"),
         )
 
@@ -185,10 +191,9 @@ class RealWgServerApiTest {
                 serverName = "egress.usc",
                 publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
                 publicEndpoint = "109.200.208.196:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Des Moines, US",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
@@ -196,8 +201,9 @@ class RealWgServerApiTest {
 
     @Test
     fun whenUserPreferredLocationSetAndInternalDebugServerSelectedThenRegisterPublicKeyShouldReturnDebugServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
-        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred(wgVpnControllerService.getEligibleLocations())).thenReturn(
             PreferredLocation(countryCode = "us", cityName = "Des Moines"),
         )
 
@@ -206,10 +212,9 @@ class RealWgServerApiTest {
                 serverName = "egress.euw.2",
                 publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
                 publicEndpoint = "31.204.129.39:443",
-                address = "",
+                address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
             ),
             internalApi.registerPublicKey("testpublickey"),
         )

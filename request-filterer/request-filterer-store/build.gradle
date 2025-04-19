@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -56,4 +56,7 @@ dependencies {
 
 android {
     namespace 'com.duckduckgo.request.filterer.store'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }

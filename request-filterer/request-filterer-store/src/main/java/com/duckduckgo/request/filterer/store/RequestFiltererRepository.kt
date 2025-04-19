@@ -32,6 +32,7 @@ class RealRequestFiltererRepository(
     val database: RequestFiltererDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : RequestFiltererRepository {
 
     private val requestFiltererDao: RequestFiltererDao = database.requestFiltererDao()
@@ -41,7 +42,9 @@ class RealRequestFiltererRepository(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

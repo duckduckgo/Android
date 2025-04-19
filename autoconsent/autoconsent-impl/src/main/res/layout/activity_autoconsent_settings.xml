@@ -37,14 +37,49 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
+            <ImageView
+                android:id="@+id/autoconsentHeaderImage"
+                android:layout_width="128dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/cookie_popups_check_128" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/autoconsentDescription"
+                android:id="@+id/autoconsentTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/keyline_4"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:gravity="center"
+                android:text="@string/autoconsentTitle"
+                app:typography="h2" />
+
+            <com.duckduckgo.common.ui.view.StatusIndicatorView
+                android:id="@+id/autoconsentStatusIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:layout_gravity="center" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/autoconsentDescriptionNew"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_6"
+                android:gravity="center"
                 android:text="@string/autoconsentDescription"
                 app:textType="secondary"
                 app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:fullWidth="true" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/autoconsentToggle"

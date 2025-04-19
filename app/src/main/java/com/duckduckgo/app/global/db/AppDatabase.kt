@@ -26,9 +26,15 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageEntity
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
+import com.duckduckgo.app.browser.refreshpixels.RefreshDao
+import com.duckduckgo.app.browser.refreshpixels.RefreshEntity
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -52,6 +58,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.*
@@ -68,7 +75,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 50,
+    version = 57,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -96,10 +103,13 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         LocationPermissionEntity::class,
         PixelEntity::class,
         PageLoadedPixelEntity::class,
+        PagePaintedPixelEntity::class,
         WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
+        RefreshEntity::class,
+        ExperimentAppUsageEntity::class,
     ],
 )
 
@@ -116,6 +126,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     LocationPermissionTypeConverter::class,
     QueryParamsTypeConverter::class,
     EntityTypeConverter::class,
+    LocalDateTimeTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -144,12 +155,17 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
 
     abstract fun pageLoadedPixelDao(): PageLoadedPixelDao
+    abstract fun pagePaintedPixelDao(): PagePaintedPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
+
+    abstract fun refreshDao(): RefreshDao
+
+    abstract fun experimentAppUsageDao(): ExperimentAppUsageDao
 }
 
 @Suppress("PropertyName")
@@ -629,6 +645,60 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_50_TO_51: Migration = object : Migration(50, 51) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `trackerOptimizationEnabled` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    private val MIGRATION_51_TO_52: Migration = object : Migration(51, 52) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `cpmEnabled` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    private val MIGRATION_52_TO_53: Migration = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM `page_loaded_pixel_entity`")
+        }
+    }
+
+    private val MIGRATION_53_TO_54: Migration = object : Migration(53, 54) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_painted_pixel_entity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`appVersion` TEXT NOT NULL, `elapsedTimeFirstPaint` INTEGER NOT NULL, `webViewVersion` TEXT NOT NULL)",
+            )
+        }
+    }
+
+    private val MIGRATION_54_TO_55: Migration = object : Migration(54, 55) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `refreshes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`timestamp` INTEGER NOT NULL)",
+            )
+        }
+    }
+
+    private val MIGRATION_55_TO_56: Migration = object : Migration(55, 56) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `lastAccessTime` TEXT")
+        }
+    }
+
+    private val MIGRATION_56_TO_57: Migration = object : Migration(56, 57) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `experiment_app_usage_entity` (`isoDateET` TEXT NOT NULL, PRIMARY KEY(`isoDateET`))")
+        }
+    }
+
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -641,12 +711,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    /**
-     * WARNING ⚠️
-     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
-     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
-     * constraint.
-     */
     val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
         override fun onOpen(db: SupportSQLiteDatabase) {
             db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
@@ -704,6 +768,13 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_47_TO_48,
             MIGRATION_48_TO_49,
             MIGRATION_49_TO_50,
+            MIGRATION_50_TO_51,
+            MIGRATION_51_TO_52,
+            MIGRATION_52_TO_53,
+            MIGRATION_53_TO_54,
+            MIGRATION_54_TO_55,
+            MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57,
         )
 
     @Deprecated(

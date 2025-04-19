@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -32,6 +32,9 @@ android {
         }
     }
     namespace 'com.duckduckgo.saved.sites.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -49,8 +52,6 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':common-utils')
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
@@ -64,4 +65,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

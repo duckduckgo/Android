@@ -28,11 +28,12 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':site-permissions-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':navigation-api')
     api project(path: ':site-permissions-store')
 
     anvil project(path: ':anvil-compiler')

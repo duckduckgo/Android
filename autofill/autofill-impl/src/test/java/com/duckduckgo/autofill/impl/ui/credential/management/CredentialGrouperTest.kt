@@ -19,12 +19,12 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.Credential
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialInitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.list.ListItem
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.list.ListItem.CredentialListItem.Credential
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.list.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

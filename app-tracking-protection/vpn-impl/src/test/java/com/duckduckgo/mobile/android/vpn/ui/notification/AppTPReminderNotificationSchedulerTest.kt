@@ -27,7 +27,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.NotificationContent
@@ -433,7 +432,7 @@ class AppTPReminderNotificationSchedulerTest {
         override fun getContent(): NotificationContent = NotificationContent(
             isSilent = false,
             shouldAutoCancel = false,
-            customViewLayout = R.layout.notification_device_shield_revoked,
+            title = "",
             onNotificationPressIntent = null,
             notificationAction = emptyList(),
         )
@@ -446,7 +445,7 @@ class AppTPReminderNotificationSchedulerTest {
         override fun getContent(): NotificationContent = NotificationContent(
             isSilent = false,
             shouldAutoCancel = false,
-            customViewLayout = R.layout.notification_device_shield_disabled,
+            title = "",
             onNotificationPressIntent = null,
             notificationAction = emptyList(),
         )

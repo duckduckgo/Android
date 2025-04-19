@@ -8,8 +8,20 @@
             android:label="@string/devSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.dev.settings.notifications.NotificationsActivity"
+            android:label="@string/devSettingsScreenNotificationsTitle"
+            android:parentActivityName="com.duckduckgo.app.dev.settings.DevSettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.audit.AuditSettingsActivity"
             android:label="@string/auditSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity"
+            android:label="@string/customTabsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.tabs.DevTabsActivity"
+            android:label="@string/devSettingsScreenTabs"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 

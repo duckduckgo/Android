@@ -36,12 +36,12 @@ dependencies {
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':experiments-api')
+    implementation project(path: ':statistics-api')
 
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     implementation KotlinX.coroutines.core
 
@@ -72,15 +72,19 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.threeten:threetenbp:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {
@@ -88,5 +92,8 @@ android {
         }
     }
   namespace 'com.duckduckgo.privacy.config.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

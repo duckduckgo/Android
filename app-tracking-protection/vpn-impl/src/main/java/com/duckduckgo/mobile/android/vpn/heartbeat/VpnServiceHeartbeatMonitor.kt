@@ -41,6 +41,7 @@ import dagger.android.AndroidInjection
 import dagger.multibindings.IntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
@@ -118,6 +119,9 @@ class VpnServiceHeartbeatMonitorWorker(
 
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
+            // this worker is called as soon as the app is launched, and it tries to restart the VPN. There is some state that needs to settle
+            // before that, giving it a bit of time
+            delay(2_000)
             TrackerBlockingVpnService.startService(context)
         }
 

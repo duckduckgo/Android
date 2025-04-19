@@ -1,0 +1,33 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Manually updating an existing credential"
+---
+# Pre-requisite: the user is viewing the password manager screen with some saved passwords added by a previous test step, on an autofill-eligible device
+
+- scrollUntilVisible:
+      element:
+          text: "a.example.com"
+- tapOn:
+    text: "a.example.com"
+
+- tapOn: "More options"
+- tapOn: "Edit"
+
+- scrollUntilVisible:
+      element:
+          id: notesEditText
+- tapOn:
+    id: notesEditText
+
+- eraseText
+
+- inputText: "new note"
+
+- tapOn:
+    id: view_menu_save
+    retryTapIfNoChange: false
+
+- scrollUntilVisible:
+      element:
+          text: "new note"
+- assertVisible: "new note"
+- tapOn: "Navigate up"

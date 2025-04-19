@@ -27,6 +27,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -153,8 +154,7 @@ class PrivacyConfigInternalSettingsActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle("Something went wrong :(")
             .setMessage(message)
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.ok)
+            .setPositiveButton(R.string.ok, DESTRUCTIVE)
             .show()
     }
 

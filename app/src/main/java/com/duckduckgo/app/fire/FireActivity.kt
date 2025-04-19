@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.view.fadeTransitionConfig
+import com.duckduckgo.app.global.view.noAnimationConfig
 import com.duckduckgo.di.scopes.ActivityScope
 
 /**
@@ -47,29 +48,27 @@ class FireActivity : AppCompatActivity() {
         killProcess()
     }
 
-    override fun onBackPressed() {
-        // do nothing - the activity will kill itself soon enough
-    }
-
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
         fun triggerRestart(
             context: Context,
             notifyDataCleared: Boolean,
-        ) {
-            triggerRestart(context, getRestartIntent(context, notifyDataCleared))
-        }
-
-        private fun triggerRestart(
-            context: Context,
-            nextIntent: Intent,
+            enableTransitionAnimation: Boolean = true,
         ) {
             val intent = Intent(context, FireActivity::class.java)
+            val nextIntent = getRestartIntent(context, notifyDataCleared)
+
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
 
-            context.startActivity(intent, context.fadeTransitionConfig())
+            val transitionAnimationConfig = if (enableTransitionAnimation) {
+                context.fadeTransitionConfig()
+            } else {
+                context.noAnimationConfig()
+            }
+
+            context.startActivity(intent, transitionAnimationConfig)
             if (context is Activity) {
                 context.overridePendingTransition(0, 0)
                 context.finish()
@@ -81,7 +80,7 @@ class FireActivity : AppCompatActivity() {
             context: Context,
             notifyDataCleared: Boolean = false,
         ): Intent {
-            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared)
+            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared, isLaunchFromClearDataAction = true)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }

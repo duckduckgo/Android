@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -34,8 +35,11 @@ import javax.inject.Inject
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
+
+    @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var maliciousSiteProtectionEnabled: Boolean
     var appIcon: AppIcon
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
@@ -44,12 +48,25 @@ interface SettingsDataStore {
     @Deprecated(message = "Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith(expression = "automaticFireproofSetting"))
     var appLoginDetection: Boolean
     var automaticFireproofSetting: AutomaticFireproofSetting
+
+    @Deprecated(
+        message = "Not used anymore after migration to SitePermissionsRepository - https://app.asana.com/0/1174433894299346/1206170291275949/f",
+        replaceWith = ReplaceWith(expression = "SitePermissionsRepository.askLocationEnabled"),
+    )
     var appLocationPermission: Boolean
+
+    @Deprecated(
+        message = "Not used anymore after migration to SitePermissionsRepository - https://app.asana.com/0/1174433894299346/1206170291275949/f",
+        replaceWith = ReplaceWith(expression = "SitePermissionsRepository.askLocationEnabled"),
+    )
     var appLocationPermissionDeniedForever: Boolean
+    var appLocationPermissionMigrated: Boolean
+
     var globalPrivacyControlEnabled: Boolean
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
+    var omnibarPosition: OmnibarPosition
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -64,6 +81,7 @@ interface SettingsDataStore {
     var appBackgroundedTimestamp: Long
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
+    var experimentalWebsiteDarkMode: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -100,6 +118,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
+    override var maliciousSiteProtectionEnabled: Boolean
+        get() = preferences.getBoolean(KEY_MALICIOUS_SITE_PROTECTION_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_MALICIOUS_SITE_PROTECTION_ENABLED, enabled) }
+
     override var appLoginDetection: Boolean
         get() = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
         set(enabled) = preferences.edit { putBoolean("KEY_LOGIN_DETECTION_ENABLED", enabled) }
@@ -115,6 +137,10 @@ class SettingsSharedPreferences @Inject constructor(
     override var appLocationPermissionDeniedForever: Boolean
         get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, false)
         set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, enabled) }
+
+    override var appLocationPermissionMigrated: Boolean
+        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_MIGRATED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_MIGRATED, enabled) }
 
     override var appIcon: AppIcon
         get() {
@@ -173,6 +199,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
+    override var omnibarPosition: OmnibarPosition
+        get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
+        set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -219,10 +249,15 @@ class SettingsSharedPreferences @Inject constructor(
         }
     }
 
+    override var experimentalWebsiteDarkMode: Boolean
+        get() = preferences.getBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, enabled) }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
+        const val KEY_MALICIOUS_SITE_PROTECTION_ENABLED = "MALICIOUS_SITE_PROTECTION_ENABLED"
         const val KEY_AUTOMATIC_FIREPROOF_SETTING = "KEY_AUTOMATIC_FIREPROOF_SETTING"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
@@ -235,11 +270,14 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
+        const val KEY_SITE_LOCATION_PERMISSION_MIGRATED = "KEY_SITE_LOCATION_PERMISSION_MIGRATED"
         const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
         const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
+        const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
     }
 
     private class FireAnimationPrefsMapper {

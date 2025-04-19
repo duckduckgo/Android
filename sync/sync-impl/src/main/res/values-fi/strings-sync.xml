@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
     <string name="sync_flows_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
     <string name="sync_paused_notification"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+    <string name="sync_error_notification"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
+    <string name="sync_error_warning"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
+    <string name="sync_signed_out_notification"><b>Synkronointi on keskeytetty</b>\nSynkronointi on keskeytetty. Jos haluat jatkaa tämän laitteen synkronointia, muodosta yhteys uudelleen toisella laitteella tai palautuskoodilla.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synkronoi ja varmuuskopioi</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synkronoi kirjanmerkit ja salasanat turvallisesti laitteittesi välillä.</string>
     <string name="sync_off_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salausavainta.</string>
     <string name="sync_setup_single_device_title">Yhden laitteen asennus</string>
+    <string name="sync_setup_other_options_title">Muut vaihtoehdot</string>
     <string name="sync_setup_single_recover_data_cta_title">Palauta synkronoidut tiedot</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synkronoi ja varmuuskopioi tämä laite</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_enable_connecting">Yhdistetään…</string>
     <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
-    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.…</string>
+    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
     <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Synkronoi</string>
     <string name="sync_notify_me_title">Ilmoitukset on poistettu käytöstä</string>
     <string name="sync_notify_me_description">Saat ilmoituksen, jos synkronointi ja varmuuskopiointi kohtaa virheen.</string>
-    <string name="sync_rollout_banner_text">Synkronointi ja varmuuskopiointi otetaan käyttöön vähitellen, eikä se välttämättä ole vielä käytettävissä DuckDuckGo-sovelluksessa muilla laitteillasi</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Synkronointia ja varmuuskopiointia ei voida poistaa käytöstä.</string>
+    <string name="sync_edit_device_error">Laitteen nimen päivittäminen ei onnistu.</string>
+    <string name="sync_remove_device_error">Tätä laitetta ei voida poistaa synkronoinnista ja varmuuskopioinnista.</string>
+    <string name="sync_delete_data_error">Tietojen poisto palvelimelta epäonnistui.</string>
+    <string name="sync_login_authenticated_device_error">"Jos haluat yhdistää laitteet, poista yhdeltä laitteelta käytöstä Sync &amp; Backup ja napauta toisessa laitteessa \"Synkronoi toisen laitteen kanssa\"."</string>
+    <string name="sync_connect_generic_error">Yhteyden muodostaminen palvelimeen ei onnistu.</string>
+    <string name="sync_connect_login_error">Synkronointi toisen laitteen kanssa ei onnistu.</string>
+    <string name="sync_create_account_generic_error">Yhteyden muodostaminen palvelimeen ei onnistu.</string>
+    <string name="sync_invalid_code_error">Tämä koodi ei kelpaa. Varmista, että oikea koodi annettiin tai skannattiin.</string>
+    <string name="sync_recovery_pdf_error">PDF-palautustiedoston luominen epäonnistui.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synkronoi ja varmuuskopioi</string>
+    <string name="sync_encryption_not_supported_error_title">Laitetta ei tueta</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup on päästä päähän salattu, ja sen on pystyttävä salaamaan ja tallentamaan tiedot laitteellesi. Koska laitteesi ei tue salattua tallennustilaa, Sync &amp; Backup ei ole käytettävissä.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Avaa laitteen lukitus käyttääksesi Sync &amp; Backupia.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup lukittu</string>
+    <string name="sync_require_device_passcode_dialog_title">Suojaa laitteesi käyttääksesi Sync &amp; Backup -ominaisuutta</string>
+    <string name="sync_require_device_passcode_dialog_body">Sync &amp; Backup -ominaisuuden käyttäminen edellyttää laitteen lukituskuviota, PIN-koodia tai biometrisiä tietoja.</string>
+    <string name="sync_require_device_passcode_dialog_action">Siirry kohtaan Asetukset</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Poista palvelimen tiedot?</string>
+    <string name="sync_delete_server_data_dialog_content">Kaikkien laitteiden yhteys katkaistaan, ja synkronoidut tietosi poistetaan palvelimelta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Poista tiedot</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Peruuta</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synkronoi ja varmuuskopioi salasanasi</string>
+    <string name="syncPromoSubtitlePasswords">Tiliä ei tarvita. Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe salasanojasi, emme edes me.</string>
+
+    <string name="syncPromoTitleBookmarks">Synkronoi ja varmuuskopioi kirjanmerkkisi</string>
+    <string name="syncPromoSubtitleBookmarks">Tiliä ei tarvita. Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe kirjanmerkkejäsi, emme edes me.</string>
+
+    <string name="syncPromoPrimaryButton">Määritä synkronointi</string>
+    <string name="syncPromoSecondaryButton">Ei kiitos</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hanki DuckDuckGo toiselle laitteelle</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Hanki DuckDuckGo toiseen laitteeseen synkronoitavaksi tämän laitteen kanssa</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hanki DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Lataa DuckDuckGo tietokoneeseen tai toiseen mobiililaitteeseen täältä:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Jaa latauslinkki</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Linkki kopioitu</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Vaihdetaanko toiseen synkronointiin?</string>
+    <string name="sync_dialog_switch_account_primary_button">Vaihda synkronointi</string>
+    <string name="sync_dialog_switch_account_secondary_button">Peruuta</string>
+    <string name="sync_dialog_switch_account_description">Tämä laite on jo synkronoitu. Haluatko varmasti synkronoida sen toisen varmuuskopion tai laitteen kanssa? Vaihtaminen ei poista tähän laitteeseen jo synkronoituja tietoja.</string>
 </resources>

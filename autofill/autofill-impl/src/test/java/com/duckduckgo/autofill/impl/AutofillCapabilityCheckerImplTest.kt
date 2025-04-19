@@ -16,18 +16,24 @@
 
 package com.duckduckgo.autofill.impl
 
+import android.annotation.SuppressLint
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class AutofillCapabilityCheckerImplTest {
 
     @get:Rule
@@ -125,6 +131,7 @@ class AutofillCapabilityCheckerImplTest {
         assertFalse(testee.canSaveCredentialsFromWebView(URL))
     }
 
+    @SuppressLint("DenyListedApi")
     private suspend fun setupConfig(
         topLevelFeatureEnabled: Boolean = false,
         autofillEnabledByUser: Boolean = false,
@@ -133,13 +140,12 @@ class AutofillCapabilityCheckerImplTest {
         canGeneratePassword: Boolean = false,
         canAccessCredentialManagement: Boolean = false,
     ) {
-        val autofillFeature = AutofillTestFeature().also {
-            it.topLevelFeatureEnabled = topLevelFeatureEnabled
-            it.canInjectCredentials = canInjectCredentials
-            it.canGeneratePassword = canGeneratePassword
-            it.canSaveCredentials = canSaveCredentials
-            it.canAccessCredentialManagement = canAccessCredentialManagement
-        }
+        val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+        autofillFeature.self().setRawStoredState(State(enable = topLevelFeatureEnabled))
+        autofillFeature.canInjectCredentials().setRawStoredState(State(enable = canInjectCredentials))
+        autofillFeature.canSaveCredentials().setRawStoredState(State(enable = canSaveCredentials))
+        autofillFeature.canGeneratePasswords().setRawStoredState(State(enable = canGeneratePassword))
+        autofillFeature.canAccessCredentialManagement().setRawStoredState(State(enable = canAccessCredentialManagement))
 
         whenever(autofillGlobalCapabilityChecker.isSecureAutofillAvailable()).thenReturn(true)
         whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)

@@ -1,0 +1,67 @@
+name: 'Assign Android Release Task in Asana'
+description: 'Assigns the latest Asana Release task to the user who runs the workflow'
+inputs:
+  task_name:
+    description: 'The name of the task to search for'
+    required: true
+  asana_token:
+    description: 'Asana Personal Access Token'
+    required: true
+  project_gid:
+    description: 'Asana Project GID to search within'
+    required: true
+  username:
+    description: 'The Github username to search for'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Find task in Asana and assign it to owner
+      shell: bash
+      run: |
+        task_name="${{ inputs.task_name }}"
+        asana_token="${{ inputs.asana_token }}"
+        project_gid="${{ inputs.project_gid }}"
+        username="${{ inputs.username }}"
+
+        # Make the API request to get tasks from the specified project
+        response=$(curl -s -X GET "https://app.asana.com/api/1.0/projects/${project_gid}/tasks" \
+          -H "Authorization: Bearer ${asana_token}")
+
+        # Check if the response contains any tasks that match the specified task name exactly
+        task_id=$(echo "$response" | jq -r '.data[] | select(.name == "'"$task_name"'") | .gid')
+
+        if [ -z "$task_id" ]; then
+          echo "No tasks with the exact name '$task_name' found in project GID '$project_gid'."
+          exit 1
+        else
+          echo "Task ID for the task named '$task_name': $task_id"        
+        fi
+      
+        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+
+        if [ -z "asana_user_id" ]; then
+          echo "User $username not found."
+          exit 1
+        else
+          echo "User ID for $username: $asana_user_id"            
+        fi
+        
+        echo "Assigning task ID $task_id to user ID $asana_user_id"
+
+        # Assign the task to the user
+        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
+          -H "Authorization: Bearer ${asana_token}" \
+          -H "Content-Type: application/json" \
+          -d "{\"data\": {\"assignee\": \"${asana_user_id}\"}}")            
+
+        # Check if the assignment was successful
+        status=$(echo $response | jq -r '.errors')
+
+        if [ "$status" == "null" ]; then
+          echo "Task $task_id successfully assigned to user $asana_user_id."                
+        else
+          echo "Failed to assign task: $status"
+          exit 1
+        fi
+        

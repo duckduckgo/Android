@@ -3,28 +3,30 @@ name: "ReleaseTest: Fire button is working"
 tags:
     - releaseTest
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
 
-- runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/pre_onboarding.yaml
 
-- tapOn:
-    text: "search or type URL"
-- inputText: "https://privacy-test-pages.site"
-- tapOn:
-    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
-- assertVisible:
-    text: ".*keep browsing.*"
-- tapOn:
-    text: "got it"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/fireIconImageView"
-- assertVisible: "Personal data can build up in your browser.*"
-- tapOn: "Cancel"
-- assertNotVisible: "Personal data can build up in your browser.*"
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/fireIconImageView"
-- assertNotVisible: "Personal data can build up in your browser.*"
-- tapOn: "Clear All Tabs And Data"
-- assertVisible: "You've got this!.*"
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*keep browsing.*"
+      - tapOn:
+          text: "got it"
+      - assertVisible:
+            text: ".*browsing activity with the fire button.*"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - tapOn: "Cancel"
+      - assertNotVisible: ".*browsing activity with the Fire Button.*"
+      - tapOn:
+            id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - tapOn: "Clear All Tabs And Data"
+      - assertVisible: "You've got this!.*"

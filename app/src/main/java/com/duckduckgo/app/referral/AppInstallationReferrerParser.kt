@@ -17,7 +17,8 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,14 +32,21 @@ interface AppInstallationReferrerParser {
 
 @Suppress("SameParameterValue")
 @ContributesBinding(AppScope::class)
-class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerParser {
+class QueryParamReferrerParser @Inject constructor(
+    private val originAttributeHandler: ReferrerOriginAttributeHandler,
+) : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
+        Timber.v("Full referrer string: %s", referrer)
+
         val referrerParts = splitIntoConstituentParts(referrer)
-        if (referrerParts.isNullOrEmpty()) return ReferrerNotFound(fromCache = false)
+        if (referrerParts.isEmpty()) return ReferrerNotFound(fromCache = false)
+
+        // processing this doesn't change anything with the ATB-based campaign referrer or EU search/ballot logic
+        originAttributeHandler.process(referrerParts)
 
         val auctionReferrer = extractEuAuctionReferrer(referrerParts)
-        if (auctionReferrer is EuAuctionReferrerFound) {
+        if (auctionReferrer is EuAuctionSearchChoiceReferrerFound || auctionReferrer is EuAuctionBrowserChoiceReferrerFound) {
             return auctionReferrer
         }
 
@@ -49,13 +57,17 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         Timber.d("Looking for Google EU Auction referrer data")
         for (part in referrerParts) {
             Timber.v("Analysing query param part: $part")
-            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
-                Timber.i("App installed as a result of the EU auction")
-                return EuAuctionReferrerFound()
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
+                Timber.i("App installed as a result of the EU auction - Search Choice")
+                return EuAuctionSearchChoiceReferrerFound()
+            }
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
+                Timber.i("App installed as a result of the EU auction - Browser Choice")
+                return EuAuctionBrowserChoiceReferrerFound()
             }
         }
 
-        Timber.d("App not installed as a result of EU auction")
+        Timber.d("No EU referrer data found; app not installed as a result of EU auction or choice screen")
         return ReferrerNotFound()
     }
 
@@ -96,20 +108,22 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return fullCampaignName.substringAfter(prefix, "")
     }
 
-    private fun splitIntoConstituentParts(referrer: String?): List<String>? {
-        return referrer?.split("&")
+    private fun splitIntoConstituentParts(referrer: String?): List<String> {
+        return referrer?.split("&") ?: emptyList()
     }
 
     companion object {
         private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
 
         private const val INSTALLATION_SOURCE_KEY = "utm_source"
-        private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-browser-choice"
     }
 }
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
-    data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionSearchChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionBrowserChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class CampaignReferrerFound(
         val campaignSuffix: String,
         override val fromCache: Boolean = false,
@@ -117,7 +131,7 @@ sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
 
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
-    object ReferrerInitialising : ParsedReferrerResult()
+    data object ReferrerInitialising : ParsedReferrerResult()
 }
 
 sealed class ParseFailureReason {

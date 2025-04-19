@@ -21,5 +21,6 @@ interface SetupFlowListener {
     fun launchCreateAccountScreen()
     fun launchRecoverAccountScreen()
     fun launchDeviceConnectedScreen()
+    fun launchGetAppOnOtherPlatformsScreen()
     fun finishSetup()
 }

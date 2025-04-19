@@ -10,6 +10,10 @@
     "firstPartyCookiePolicy": {
       "threshold": 1,
       "maxAge": 2
-    }
+    },
+    "thirdPartyCookieNames": [
+      "cookie1",
+      "cookie2"
+    ]
   }
 }

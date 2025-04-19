@@ -69,6 +69,16 @@ interface SyncService {
         @Path("device_id") deviceId: String,
     ): Call<ConnectKey>
 
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/exchange/{key_id}")
+    fun getEncryptedMessage(
+        @Path("key_id") keyId: String,
+    ): Call<EncryptedMessage>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/exchange")
+    fun sendEncryptedMessage(
+        @Body request: EncryptedMessage,
+    ): Call<Void>
+
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
     fun patch(
         @Header("Authorization") token: String,
@@ -130,6 +140,11 @@ data class ConnectKey(
     @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
 )
 
+data class EncryptedMessage(
+    @field:Json(name = "key_id") val keyId: String,
+    @field:Json(name = "encrypted_message") val encryptedMessage: String,
+)
+
 data class Connect(
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "encrypted_recovery_key") val encryptedRecoveryKey: String,
@@ -171,4 +186,9 @@ enum class API_CODE(val code: Int) {
     NOT_MODIFIED(304),
     COUNT_LIMIT(409),
     CONTENT_TOO_LARGE(413),
+    VALIDATION_ERROR(400),
+    TOO_MANY_REQUESTS_1(429),
+    TOO_MANY_REQUESTS_2(418),
+    NOT_FOUND(404),
+    GONE(410),
 }

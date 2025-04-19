@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
@@ -69,6 +70,10 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
         binding.footerPrimaryButton.setOnClickListener {
             viewModel.onDoneClicked()
         }
+
+        binding.footerSecondaryButton.setOnClickListener {
+            viewModel.onGetAppOnOtherDevicesClicked()
+        }
     }
 
     private fun processCommand(it: Command) {
@@ -77,6 +82,7 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
             Command.Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }
+            LaunchSyncGetOnOtherPlatforms -> listener?.launchGetAppOnOtherPlatformsScreen()
         }
     }
 

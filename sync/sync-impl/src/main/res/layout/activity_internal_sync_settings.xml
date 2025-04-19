@@ -59,8 +59,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:buttonSize="large"
+            app:daxButtonSize="large"
             android:text="@string/sync_internal_recovery_code_cta"/>
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_device_header" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sync_favicons_prompt_cta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:daxButtonSize="large"
+            android:text="@string/sync_internal_favicons_prompt_cta"/>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"

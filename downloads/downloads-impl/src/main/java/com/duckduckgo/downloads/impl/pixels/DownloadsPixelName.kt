@@ -18,7 +18,7 @@ package com.duckduckgo.downloads.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-enum class DownloadsPixelName(override val pixelName: String) : Pixel.PixelName {
+internal enum class DownloadsPixelName(override val pixelName: String) : Pixel.PixelName {
     DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
     DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
     DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),

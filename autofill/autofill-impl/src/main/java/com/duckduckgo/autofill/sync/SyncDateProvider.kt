@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.sync
 
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class SyncDateProvider {
     companion object {

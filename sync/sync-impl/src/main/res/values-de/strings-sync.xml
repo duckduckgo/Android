@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synchronisieren und sichern nicht verfügbar</b>\nEntschuldigung, aber Synchronisieren und sichern ist derzeit nicht verfügbar. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
     <string name="sync_flows_disabled_new_version"><b>Synchronisieren und Sichern nicht verfügbar</b>\nLeider ist Synchronisieren und Sichern in dieser App-Version nicht mehr verfügbar. Bitte aktualisiere DuckDuckGo auf die neueste Version, um fortzufahren.</string>
@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synchronisieren und sichern angehalten</b>\nLeider ist Synchronisieren und sichern derzeit nicht verfügbar. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synchronisieren und Sichern pausiert</b>\nLeider ist Synchronisieren und Sichern in dieser App-Version nicht mehr verfügbar. Bitte aktualisiere DuckDuckGo auf die neueste Version, um fortzufahren.</string>
     <string name="sync_paused_notification"><b>Synchronisieren und Sichern pausiert</b>\nLeider ist Synchronisieren und Sichern derzeit nicht verfügbar. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
+    <string name="sync_error_notification"><b>Synchronisierungsfehler</b>\nSync &amp; Backup ist vorübergehend nicht verfügbar.</string>
+    <string name="sync_error_warning"><b>Synchronisierungsfehler</b>\nSync &amp; Backup ist vorübergehend nicht verfügbar.</string>
+    <string name="sync_signed_out_notification"><b>Synchronisierung wurde angehalten</b>\nDie Synchronisierung wurde angehalten. Wenn du die Synchronisierung dieses Geräts fortsetzen möchtest, stelle die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronisieren und sichern</string>
@@ -33,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Lesezeichen und Passwörter sicher zwischen deinen Geräten synchronisieren.</string>
     <string name="sync_off_hint">Deine Daten sind Ende-zu-Ende-verschlüsselt. DuckDuckGo hat keinen Zugriff auf den Verschlüsselungsschlüssel.</string>
     <string name="sync_setup_single_device_title">Einrichtung für ein einzelnes Gerät</string>
+    <string name="sync_setup_other_options_title">Andere Optionen</string>
     <string name="sync_setup_single_recover_data_cta_title">Synchronisierte Daten wiederherstellen</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Dieses Gerät synchronisieren und sichern</string>
 
@@ -46,7 +50,7 @@
     <string name="sync_enable_option_favicons_subtitle">Symbole für synchronisierte Lesezeichen automatisch herunterladen.</string>
     <string name="sync_enable_connecting">Verbinden ...</string>
     <string name="sync_intro_enable_title">Dieses Gerät synchronisieren und sichern</string>
-    <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen …</string>
+    <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen.</string>
     <string name="sync_intro_enable_footer">Du kannst später mit deinen anderen Geräten synchronisieren.</string>
     <string name="sync_intro_enable_cta">„Synchronisieren und sichern“ aktivieren</string>
     <string name="sync_intro_recover_title">Synchronisierte Daten wiederherstellen</string>
@@ -139,5 +143,58 @@
     <string name="sync_notification_channel_name">Synchronisieren</string>
     <string name="sync_notify_me_title">Benachrichtigungen sind deaktiviert</string>
     <string name="sync_notify_me_description">Lass dich benachrichtigen, wenn bei Synchronisieren und speichern ein Fehler auftritt.</string>
-    <string name="sync_rollout_banner_text">Synchronisieren und sichern wird schrittweise eingeführt und ist möglicherweise noch nicht in DuckDuckGo auf deinen anderen Geräten verfügbar</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">„Synchronisieren und sichern“ kann nicht deaktiviert werden.</string>
+    <string name="sync_edit_device_error">Der Gerätename kann nicht aktualisiert werden.</string>
+    <string name="sync_remove_device_error">Dieses Gerät kann nicht aus „Synchronisieren und sichern“ entfernt werden.</string>
+    <string name="sync_delete_data_error">Daten auf dem Server können nicht gelöscht werden.</string>
+    <string name="sync_login_authenticated_device_error">"Um diese Geräte zu koppeln, deaktiviere „Sync &amp; Backup“ auf einem Gerät und tippe dann auf dem anderen Gerät auf „Mit anderem Gerät synchronisieren“."</string>
+    <string name="sync_connect_generic_error">Es kann keine Verbindung zum Server hergestellt werden.</string>
+    <string name="sync_connect_login_error">Synchronisierung mit einem anderen Gerät nicht möglich.</string>
+    <string name="sync_create_account_generic_error">Es kann keine Verbindung zum Server hergestellt werden.</string>
+    <string name="sync_invalid_code_error">Sorry, dieser Code ist ungültig. Bitte stelle sicher, dass du den richtigen Code eingegeben oder gescannt hast.</string>
+    <string name="sync_recovery_pdf_error">Das Wiederherstellungs-PDF kann nicht erstellt werden.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronisieren und sichern</string>
+    <string name="sync_encryption_not_supported_error_title">Gerät nicht unterstützt</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup ist Ende-zu-Ende-verschlüsselt und muss in der Lage sein, Daten auf deinem Gerät zu verschlüsseln und zu speichern. Da dein Gerät keine verschlüsselte Speicherung unterstützt, ist Sync &amp; Backup nicht verfügbar.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Entsperre das Gerät, um auf Sync &amp; Backup zuzugreifen.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup gesperrt</string>
+    <string name="sync_require_device_passcode_dialog_title">Sichere dein Gerät, um Sync &amp; Backup zu nutzen</string>
+    <string name="sync_require_device_passcode_dialog_body">Für die Verwendung von Sync &amp; Backup sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich.</string>
+    <string name="sync_require_device_passcode_dialog_action">Gehe zu Einstellungen</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Serverdaten löschen?</string>
+    <string name="sync_delete_server_data_dialog_content">Alle Geräte werden getrennt und deine synchronisierten Daten werden vom Server gelöscht.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Daten löschen</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Abbrechen</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Passwörter synchronisieren und sichern</string>
+    <string name="syncPromoSubtitlePasswords">Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Passwörter sehen kann, nicht einmal wir.</string>
+
+    <string name="syncPromoTitleBookmarks">Lesezeichen synchronisieren und sichern</string>
+    <string name="syncPromoSubtitleBookmarks">Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Lesezeichen sehen kann, nicht einmal wir.</string>
+
+    <string name="syncPromoPrimaryButton">Sync einrichten</string>
+    <string name="syncPromoSecondaryButton">Nein, danke</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hol dir DuckDuckGo auf anderen Geräten</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">DuckDuckGo auf anderen Geräten installieren, um sie mit diesem zu synchronisieren</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">DuckDuckGo herunterladen</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Um DuckDuckGo auf einen Desktop-Computer oder ein anderes mobiles Gerät herunterzuladen, besuche:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Download-Link teilen</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopiert</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Zu einer anderen Synchronisierung wechseln?</string>
+    <string name="sync_dialog_switch_account_primary_button">Synchronisierung wechseln</string>
+    <string name="sync_dialog_switch_account_secondary_button">Abbrechen</string>
+    <string name="sync_dialog_switch_account_description">Dieses Gerät ist bereits synchronisiert. Bist du sicher, dass du es mit einem anderen Back-up oder Gerät synchronisieren möchtest? Beim Wechsel werden keine bereits mit diesem Gerät synchronisierten Daten entfernt.</string>
 </resources>

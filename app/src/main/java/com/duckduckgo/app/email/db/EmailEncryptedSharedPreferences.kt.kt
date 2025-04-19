@@ -25,6 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import java.io.IOException
 import java.security.GeneralSecurityException
+import javax.crypto.AEADBadTagException
 
 class EmailEncryptedSharedPreferences(
     private val context: Context,
@@ -47,6 +48,14 @@ class EmailEncryptedSharedPreferences(
             )
         } catch (t: Throwable) {
             when (t) {
+                is AEADBadTagException -> {
+                    val recoverable = canInitialiseEncryptedPreferencesTestFile()
+                    pixel.enqueueFire(
+                        AppPixelName.ENCRYPTION_UNABLE_TO_DECRYPT_SECURE_EMAIL_DATA,
+                        mapOf(PIXEL_RECOVERABLE_KEY to recoverable.toString()),
+                    )
+                }
+
                 is IOException -> pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
                 is GeneralSecurityException -> pixel.enqueueFire(AppPixelName.ENCRYPTED_GENERAL_EXCEPTION)
                 else -> { /* noop */ }
@@ -117,6 +126,23 @@ class EmailEncryptedSharedPreferences(
 
     override fun canUseEncryption(): Boolean = encryptedPreferences != null
 
+    private fun canInitialiseEncryptedPreferencesTestFile(): Boolean {
+        return kotlin.runCatching {
+            EncryptedSharedPreferences.create(
+                context,
+                TEST_FILENAME,
+                MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
+            return true.also {
+                context.deleteSharedPreferences(TEST_FILENAME)
+            }
+        }.getOrElse { false }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
         const val KEY_EMAIL_TOKEN = "KEY_EMAIL_TOKEN"
@@ -124,5 +150,7 @@ class EmailEncryptedSharedPreferences(
         const val KEY_NEXT_ALIAS = "KEY_NEXT_ALIAS"
         const val KEY_COHORT = "KEY_COHORT"
         const val KEY_LAST_USED_DATE = "KEY_LAST_USED_DATE"
+        private const val TEST_FILENAME = "com.duckduckgo.app.email.settings.encryptiontest"
+        private const val PIXEL_RECOVERABLE_KEY = "recoverable"
     }
 }
