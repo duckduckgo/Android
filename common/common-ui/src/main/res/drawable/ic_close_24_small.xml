@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2023 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M6.293,6.293C6.683,5.902 7.317,5.902 7.707,6.293L12,10.586L16.293,6.293C16.683,5.902 17.317,5.902 17.707,6.293C18.098,6.683 18.098,7.317 17.707,7.707L13.414,12L17.707,16.293C18.098,16.683 18.098,17.317 17.707,17.707C17.317,18.098 16.683,18.098 16.293,17.707L12,13.414L7.707,17.707C7.317,18.098 6.683,18.098 6.293,17.707C5.902,17.317 5.902,16.683 6.293,16.293L10.586,12L6.293,7.707C5.902,7.317 5.902,6.683 6.293,6.293Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillType="evenOdd"/>
+      android:pathData="M6.22,7.28a0.75,0.75 0,0 1,1.06 -1.06L12,10.94l4.72,-4.72a0.75,0.75 0,0 1,1.06 1.06L13.06,12l4.72,4.72a0.75,0.75 0,0 1,-1.06 1.06L12,13.06l-4.72,4.72a0.75,0.75 0,1 1,-1.06 -1.06L10.94,12 6.22,7.28Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>

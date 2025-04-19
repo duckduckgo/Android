@@ -46,7 +46,7 @@
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/newTabMenuItem"
-                android:src="@drawable/ic_add_24e" />
+                android:src="@drawable/ic_add_24" />
         </FrameLayout>
 
         <FrameLayout
@@ -85,7 +85,7 @@
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
             android:contentDescription="@string/bookmarksMenuTitle"
-            android:src="@drawable/ic_bookmarks_stacked_24e" />
+            android:src="@drawable/ic_bookmarks_24" />
     </FrameLayout>
 
     <Space

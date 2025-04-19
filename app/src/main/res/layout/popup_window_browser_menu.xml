@@ -124,7 +124,7 @@
                 android:id="@+id/bookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_library_16"
+                app:iconDrawable="@drawable/ic_bookmarks_16"
                 app:primaryText="@string/bookmarksMenuTitle" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
