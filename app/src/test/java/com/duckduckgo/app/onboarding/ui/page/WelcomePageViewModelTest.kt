@@ -24,20 +24,29 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -58,6 +67,7 @@ class WelcomePageViewModelTest {
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -66,6 +76,8 @@ class WelcomePageViewModelTest {
             mockPixel,
             mockAppInstallStore,
             mockSettingsDataStore,
+            coroutineRule.testDispatcherProvider,
+            mockAppBuildConfig,
         )
     }
 
@@ -206,12 +218,83 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenLoadingInitialDaxDialogThenShowDaxExperimentCta() = runTest {
+    fun whenLoadingInitialDaxDialogWithReinstallFalseThenShowDaxInitialCta() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
         testee.loadDaxDialog()
 
         testee.commands.test {
             val command = awaitItem()
             Assert.assertTrue(command is ShowInitialDialog)
         }
+    }
+
+    @Test
+    fun whenInitialReinstallUserDialogIsShownThenSendPixel() {
+        testee.onDialogShown(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+
+        verify(mockPixel).fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenSkipOnboardingDialogIsShownThenSendPixel() {
+        testee.onDialogShown(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+
+        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenLoadingInitialDaxDialogWithReinstallTrueThenShowDaxInitialReinstallUserCta() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowInitialReinstallUserDialog)
+        }
+    }
+
+    @Test
+    fun givenInitialReinstallUserDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowComparisonChart)
+        }
+    }
+
+    @Test
+    fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenShowOnboardingSkippedAndSendPixel() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is OnboardingSkipped)
+        }
+        verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+    }
+
+    @Test
+    fun givenInitialReinstallUserDialogWhenOnSecondaryCtaClickedThenShowSkipOnboardingOptionAndSendPixel() = runTest {
+        testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowSkipOnboardingOption)
+        }
+        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+    }
+
+    @Test
+    fun givenSkipOnboardingDialogWhenOnSecondaryCtaClickedThenShowComparisonChartAndSendPixel() = runTest {
+        testee.onSecondaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowComparisonChart)
+        }
+        verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
     }
 }

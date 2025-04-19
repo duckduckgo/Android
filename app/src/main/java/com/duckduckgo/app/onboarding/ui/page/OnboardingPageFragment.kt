@@ -27,4 +27,10 @@ abstract class OnboardingPageFragment(@LayoutRes contentLayoutId: Int = 0) : Duc
             is OnboardingActivity -> (activity as OnboardingActivity).onContinueClicked()
         }
     }
+
+    fun onSkipPressed() {
+        when (activity) {
+            is OnboardingActivity -> (activity as OnboardingActivity).onSkipClicked()
+        }
+    }
 }

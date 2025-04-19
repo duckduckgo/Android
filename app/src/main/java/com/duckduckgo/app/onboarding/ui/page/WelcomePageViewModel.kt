@@ -31,24 +31,36 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboarding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -56,6 +68,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
@@ -65,6 +78,8 @@ class WelcomePageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val settingsDataStore: SettingsDataStore,
+    private val dispatchers: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -73,17 +88,26 @@ class WelcomePageViewModel @Inject constructor(
     private var defaultAddressBarPosition: Boolean = true
 
     sealed interface Command {
+        data object ShowInitialReinstallUserDialog : Command
         data object ShowInitialDialog : Command
         data object ShowComparisonChart : Command
+        data object ShowSkipOnboardingOption : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object ShowAddressBarPositionDialog : Command
         data object Finish : Command
+        data object OnboardingSkipped : Command
         data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
         data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
     }
 
     fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
         when (currentDialog) {
+            INITIAL_REINSTALL_USER -> {
+                viewModelScope.launch {
+                    _commands.send(ShowComparisonChart)
+                }
+            }
+
             INITIAL -> {
                 viewModelScope.launch {
                     _commands.send(ShowComparisonChart)
@@ -113,6 +137,13 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
+            SKIP_ONBOARDING_OPTION -> {
+                viewModelScope.launch {
+                    _commands.send(OnboardingSkipped)
+                    pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                }
+            }
+
             ADDRESS_BAR_POSITION -> {
                 if (!defaultAddressBarPosition) {
                     settingsDataStore.omnibarPosition = OmnibarPosition.BOTTOM
@@ -121,6 +152,36 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     _commands.send(Finish)
                 }
+            }
+        }
+    }
+
+    fun onSecondaryCtaClicked(currentDialog: PreOnboardingDialogType) {
+        when (currentDialog) {
+            INITIAL_REINSTALL_USER -> {
+                viewModelScope.launch {
+                    _commands.send(ShowSkipOnboardingOption)
+                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                }
+            }
+
+            INITIAL -> {
+                // no-op
+            }
+
+            COMPARISON_CHART -> {
+                // no-op
+            }
+
+            SKIP_ONBOARDING_OPTION -> {
+                viewModelScope.launch {
+                    _commands.send(ShowComparisonChart)
+                    pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+                }
+            }
+
+            ADDRESS_BAR_POSITION -> {
+                // no-op
             }
         }
     }
@@ -158,8 +219,10 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
+            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
         }
     }
@@ -184,7 +247,17 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
-            _commands.send(ShowInitialDialog)
+            if (isAppReinstall()) {
+                _commands.send(ShowInitialReinstallUserDialog)
+            } else {
+                _commands.send(ShowInitialDialog)
+            }
+        }
+    }
+
+    private suspend fun isAppReinstall(): Boolean {
+        return withContext(dispatchers.io()) {
+            appBuildConfig.isAppReinstall()
         }
     }
 }
