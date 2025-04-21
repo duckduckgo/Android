@@ -115,11 +115,8 @@ class RealMaliciousSiteProtection @Inject constructor(
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
-                        if (feed != SCAM || maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
-                            Malicious(feed)
-                        } else {
-                            Ignored
-                        }
+                        if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
+                        return@let Malicious(feed)
                     } ?: Safe
                     is MatchesResult.Ignored -> Ignored
                 }

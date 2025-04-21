@@ -100,7 +100,8 @@ class RealMaliciousSiteRepository @Inject constructor(
                     SCAM.name -> SCAM
                     else -> null
                 }
-            }        }
+            }
+        }
     }
 
     override suspend fun getFilters(hash: String): FilterSet? {
@@ -169,7 +170,9 @@ class RealMaliciousSiteRepository @Inject constructor(
 
             val localRevisions = getLocalRevisions(type)
 
-            val result = Feed.entries.fold(Result.success(Unit)) { acc, feed ->
+            val result = Feed.entries.filter {
+                it != SCAM || maliciousSiteProtectionFeature.scamProtectionEnabled()
+            }.fold(Result.success(Unit)) { acc, feed ->
                 try {
                     loadData(localRevisions, networkRevision, feed)
                     acc
@@ -189,12 +192,8 @@ class RealMaliciousSiteRepository @Inject constructor(
         updateFunction: suspend (T?) -> Unit,
     ) {
         val revision = latestRevision.getRevisionForFeed(feed)
-        val data: T? = if (networkRevision > revision) {
-            if (feed == SCAM && !maliciousSiteProtectionFeature.scamProtectionEnabled()) {
-                null
-            } else {
-                getFunction(revision)
-            }
+        val data = if (networkRevision > revision) {
+            getFunction(revision)
         } else {
             null
         }
