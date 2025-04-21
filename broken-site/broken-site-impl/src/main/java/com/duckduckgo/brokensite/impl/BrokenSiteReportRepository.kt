@@ -59,7 +59,7 @@ interface BrokenSiteReportRepository {
 
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
 }
 
 class RealBrokenSiteReportRepository(
@@ -160,8 +160,8 @@ class RealBrokenSiteReportRepository(
         brokenSiteRefreshesInMemoryStore.addRefresh(url, localDateTime)
     }
 
-    override fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
-        return brokenSiteRefreshesInMemoryStore.checkForRefreshPatterns(currentDateTime)
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
+        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime)
     }
 
     private fun convertToShortDate(dateString: String): String {

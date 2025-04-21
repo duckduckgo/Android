@@ -17,7 +17,6 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -25,12 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal const val REFRESH_COUNT_WINDOW = 20L
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal const val REFRESH_COUNT_LIMIT = 3
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSitePrompt @Inject constructor(
@@ -71,7 +64,7 @@ class RealBrokenSitePrompt @Inject constructor(
     }
 
     override fun getUserRefreshesCount(): Set<Int> {
-        return brokenSiteReportRepository.checkForRefreshPatterns(currentTimeProvider.localDateTimeNow())
+        return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {

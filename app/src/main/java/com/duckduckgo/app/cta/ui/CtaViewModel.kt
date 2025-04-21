@@ -21,6 +21,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -82,6 +83,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
+    private val refreshPixelSender: RefreshPixelSender,
     private val userBrowserProperties: UserBrowserProperties,
 ) {
     @ExperimentalCoroutinesApi
@@ -203,12 +205,11 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
-        showBrokenSitePrompt: Boolean,
     ): Cta? {
         return withContext(dispatcher) {
             markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
-                getBrowserCta(site, showBrokenSitePrompt)
+                getBrowserCta(site)
             } else {
                 getHomeCta()
             }
@@ -307,7 +308,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?, showBrokenSitePrompt: Boolean): Cta? {
+    private suspend fun getBrowserCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -321,7 +322,13 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (showBrokenSitePrompt) {
+                val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
+                refreshPixelSender.onRefreshPatternDetected(detectedRefreshPatterns)
+
+                return if (3 in detectedRefreshPatterns &&
+                    brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)
+                ) {
+                    Timber.d("KateTest--> 3 refreshes + shouldShowPrompt")
                     BrokenSitePromptDialogCta()
                 } else {
                     null

@@ -27,7 +27,7 @@ import timber.log.Timber
 interface BrokenSiteRefreshesInMemoryStore {
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
 }
 
 @ContributesBinding(AppScope::class)
@@ -52,12 +52,12 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         }
     }
 
-    override fun checkForRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
         val currentRefreshes = refreshes ?: return emptySet()
         val detectedPatterns = mutableSetOf<Int>()
 
-        val twiceWindowSecondsAgo = currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW)
-        val thriceWindowSecondsAgo = currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW)
+        val twiceWindowSecondsAgo = currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS)
+        val thriceWindowSecondsAgo = currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)
 
         val refreshesWithinTwiceWindow = currentRefreshes.time.filter {
             it.isAfter(twiceWindowSecondsAgo) && it.isBefore(currentDateTime)
@@ -85,9 +85,9 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
 
     companion object {
         private const val TWICE_REFRESH = 2
-        private const val TWICE_REFRESH_WINDOW = 12L
+        private const val TWICE_REFRESH_WINDOW_IN_SECS = 12L
         private const val THRICE_REFRESH = 3
-        private const val THRICE_REFRESH_WINDOW = 20L
+        private const val THRICE_REFRESH_WINDOW_IN_SECS = 20L
     }
 }
 

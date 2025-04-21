@@ -628,6 +628,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             userBrowserProperties = mockUserBrowserProperties,
+            refreshPixelSender = refreshPixelSender,
         )
 
         val siteFactory = SiteFactoryImpl(

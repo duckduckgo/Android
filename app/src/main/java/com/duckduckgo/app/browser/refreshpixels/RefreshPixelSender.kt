@@ -37,7 +37,7 @@ interface RefreshPixelSender {
     fun sendMenuRefreshPixels()
     fun sendCustomTabRefreshPixel()
     fun sendPullToRefreshPixels()
-    fun sendBreakageRefreshPixels(patternsDetected: Set<Int>)
+    fun onRefreshPatternDetected(patternsDetected: Set<Int>)
 }
 
 @ContributesBinding(AppScope::class)
@@ -63,7 +63,7 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
     }
 
-    override fun sendBreakageRefreshPixels(patternsDetected: Set<Int>) {
+    override fun onRefreshPatternDetected(patternsDetected: Set<Int>) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             patternsDetected.forEach { pattern ->
                 when (pattern) {

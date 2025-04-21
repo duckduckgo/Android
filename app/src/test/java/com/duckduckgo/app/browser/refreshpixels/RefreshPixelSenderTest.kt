@@ -22,12 +22,14 @@ import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.never
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
@@ -115,17 +117,52 @@ class RefreshPixelSenderTest {
     }
 
     @Test
-    fun whenRefreshedTwiceOrThriceAndAssignedToExperimentThen2XRefreshPixelsFired() = kotlinx.coroutines.test.runTest {
+    fun whenRefreshedTwiceAndThriceAndAssignedToExperimentThen2XRefreshPixelsFired() = runTest {
         assignToExperiment()
-        testee.sendBreakageRefreshPixels(setOf(2, 3))
+        testee.onRefreshPatternDetected(setOf(2, 3))
+
+        blockListPixelsPlugin.get2XRefresh()!!.getPixelDefinitions().forEach {
+            verify(mockPixel).fire(it.pixelName, it.params)
+        }
+        blockListPixelsPlugin.get3XRefresh()!!.getPixelDefinitions().forEach {
+            verify(mockPixel).fire(it.pixelName, it.params)
+        }
+        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+    }
+
+    @Test
+    fun whenRefreshedTwiceAndNotAssignedToExperimentThenExperiment2XRefreshPixelsNotFired() = runTest {
+        testee.onRefreshPatternDetected(setOf(2))
 
         blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel).fire(it.pixelName, it.params)
+            verify(mockPixel, never()).fire(it.pixelName, it.params)
         }
+        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+    }
+
+    @Test
+    fun whenRefreshedThriceAndNotAssignedToExperimentThenExperiment3XRefreshPixelsNotFired() = runTest {
+        testee.onRefreshPatternDetected(setOf(3))
 
         blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel).fire(it.pixelName, it.params)
+            verify(mockPixel, never()).fire(it.pixelName, it.params)
         }
+        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+    }
+
+    @Test
+    fun whenUnknownRefreshPatternDetectedThenNoPixelsFired() = runTest {
+        testee.onRefreshPatternDetected(setOf(5))
+
+        blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
+            verify(mockPixel, never()).fire(it.pixelName, it.params)
+        }
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
+            verify(mockPixel, never()).fire(it.pixelName, it.params)
+        }
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
     }
 
     private fun assignToExperiment() {
