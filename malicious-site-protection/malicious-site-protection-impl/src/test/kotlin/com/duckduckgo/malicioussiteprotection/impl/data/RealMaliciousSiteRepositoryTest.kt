@@ -5,6 +5,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.P
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
+import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
@@ -116,7 +117,7 @@ class RealMaliciousSiteRepositoryTest {
     fun containsHashPrefix_returnsTrueWhenHashPrefixExists() = runTest {
         val hashPrefix = "testPrefix"
 
-        whenever(maliciousSiteDao.hashPrefixExists(hashPrefix)).thenReturn(true)
+        whenever(maliciousSiteDao.getHashPrefix(hashPrefix)).thenReturn(HashPrefixEntity(hashPrefix, PHISHING.name))
 
         val result = repository.getFeedForHashPrefix(hashPrefix)
 
