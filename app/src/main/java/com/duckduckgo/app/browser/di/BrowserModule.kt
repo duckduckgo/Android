@@ -366,12 +366,6 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideRefreshDao(appDatabase: AppDatabase): RefreshDao {
-        return appDatabase.refreshDao()
-    }
-
-    @Provides
     fun provideSiteErrorStringHandler(): StringSiteErrorHandler {
         return StringSiteErrorHandlerImpl()
     }

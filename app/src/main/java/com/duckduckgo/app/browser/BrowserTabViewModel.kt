@@ -481,7 +481,6 @@ class BrowserTabViewModel @Inject constructor(
     private val appPersonalityFeature: AppPersonalityFeature,
     private val userStageStore: UserStageStore,
     private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
-    private val blockListPixelsPlugin: BlockListPixelsPlugin,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
