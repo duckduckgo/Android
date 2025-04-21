@@ -104,6 +104,18 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
 
         assertEquals(retry(), result)
     }
+
+    @Test
+    fun doWork_returnsSuccessWhenLoadFiltersWithScamAndRCFlagDisabled() = runTest {
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
+        whenever(maliciousSiteProtectionFeature.scamProtectionEnabled()).thenReturn(false)
+
+        val result = scamWorker.doWork()
+
+        assertEquals(success(), result)
+        verify(maliciousSiteRepository, never()).loadFilters(SCAM)
+    }
 }
 
 class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
