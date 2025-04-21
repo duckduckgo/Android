@@ -155,18 +155,18 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun loadFilters(vararg feeds: Feed): Result<Unit> {
         return loadDataOfType(FILTER_SET) {
-                latestRevision, networkRevision ->
+                localRevisions, networkRevision ->
             feeds.forEach { feed ->
-                loadFilters(latestRevision, networkRevision, feed)
+                loadFilters(localRevisions, networkRevision, feed)
             }
         }
     }
 
     override suspend fun loadHashPrefixes(vararg feeds: Feed): Result<Unit> {
         return loadDataOfType(HASH_PREFIXES) {
-                latestRevision, networkRevision ->
+                localRevisions, networkRevision ->
             feeds.forEach { feed ->
-                loadHashPrefixes(latestRevision, networkRevision, feed)
+                loadHashPrefixes(localRevisions, networkRevision, feed)
             }
         }
     }

@@ -65,9 +65,15 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorker(
 
             val feeds = inputData.getStringArray(TYPE)
                 ?.mapNotNull { Feed.fromString(it) }
-                ?.filter { it != SCAM || maliciousSiteProtectionFeature.scamProtectionEnabled() }
+                ?.let { feeds ->
+                    if (!maliciousSiteProtectionFeature.scamProtectionEnabled()) {
+                        return@let feeds.filterNot { it == SCAM }
+                    }
+                    feeds
+                }
                 ?.toTypedArray() ?: return@withContext Result.failure()
 
+            if (feeds.isEmpty()) return@withContext Result.success()
             return@withContext if (maliciousSiteRepository.loadHashPrefixes(*feeds).isSuccess) {
                 Result.success()
             } else {
