@@ -45,26 +45,4 @@
             column="42"/>
     </issue>
 
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        return store.data.first().let { prefs ->"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ToggleReportsDataStore.kt"
-            line="145"
-            column="16"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        return store.data.first().let { prefs ->"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ToggleReportsDataStore.kt"
-            line="168"
-            column="16"/>
-    </issue>
-
 </issues>

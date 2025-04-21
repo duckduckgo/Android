@@ -113,17 +113,6 @@
 
     <issue
         id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        playBillingManager.productsFlow"
-        errorLine2="        ^">
-        <location
-            file="src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionFeaturesFetcher.kt"
-            line="67"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
