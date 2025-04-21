@@ -49,9 +49,12 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator.CodeType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,6 +80,7 @@ class SyncWithAnotherDeviceViewModelTest {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
         this.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
     }
+    private val urlDecorator: SyncBarcodeDecorator = mock()
 
     private val testee = SyncWithAnotherActivityViewModel(
         syncRepository,
@@ -85,7 +89,13 @@ class SyncWithAnotherDeviceViewModelTest {
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
         syncFeature,
+        urlDecorator,
     )
+
+    @Before
+    fun setup() = runTest {
+        whenever(urlDecorator.decorateCode(any(), any())).thenAnswer { it.arguments[0] as String }
+    }
 
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {
@@ -106,6 +116,17 @@ class SyncWithAnotherDeviceViewModelTest {
         testee.viewState().test {
             val viewState = awaitItem()
             Assert.assertEquals(expectedBitmap, viewState.qrCodeBitmap)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenScreenStartedWithExchangeCodeThenUrlDecoratorIsInvokedWithCorrectCodeType() = runTest {
+        configureExchangeKeysSupported()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            verify(urlDecorator).decorateCode(any(), eq(CodeType.Exchange))
             cancelAndIgnoreRemainingEvents()
         }
     }
