@@ -32,6 +32,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator.CodeType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -55,6 +57,14 @@ class SyncConnectViewModelTest {
     private val clipboard: Clipboard = mock()
     private val qrEncoder: QREncoder = mock()
     private val syncPixels: SyncPixels = mock()
+    private val noOpSyncCodeDecorator: SyncBarcodeDecorator = object : SyncBarcodeDecorator {
+        override suspend fun decorateCode(
+            originalCodeB64Encoded: String,
+            codeType: CodeType,
+        ): String {
+            return originalCodeB64Encoded
+        }
+    }
 
     private val testee = SyncConnectViewModel(
         syncRepository,
@@ -62,6 +72,7 @@ class SyncConnectViewModelTest {
         clipboard,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        noOpSyncCodeDecorator,
     )
 
     @Test

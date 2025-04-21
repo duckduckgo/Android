@@ -48,7 +48,8 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import javax.inject.*
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -67,6 +68,7 @@ class SyncConnectViewModel @Inject constructor(
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val urlDecorator: SyncBarcodeDecorator,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -127,9 +129,11 @@ class SyncConnectViewModel @Inject constructor(
 
     private suspend fun showQRCode() {
         syncAccountRepository.getConnectQR()
-            .onSuccess { connectQR ->
+            .onSuccess { originalCode ->
                 val qrBitmap = withContext(dispatchers.io()) {
-                    qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                    // wrap the code inside a URL if feature flag allows it
+                    val barcodeString = urlDecorator.decorateCode(originalCode, SyncBarcodeDecorator.CodeType.Connect)
+                    qrEncoder.encodeAsBitmap(barcodeString, dimen.qrSizeSmall, dimen.qrSizeSmall)
                 }
                 viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
             }.onFailure {
