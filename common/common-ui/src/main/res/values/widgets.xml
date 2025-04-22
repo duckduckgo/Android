@@ -233,6 +233,10 @@
         <item name="cornerSize">@dimen/keyline_3</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.FloatingActionButton.Circular" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton</item>
+    </style>
+
     <!-- List Items -->
     <style name="Widget.DuckDuckGo.OneLineListItem">
         <item name="android:layout_width">match_parent</item>

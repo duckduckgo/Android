@@ -60,6 +60,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close_24"
+            app:style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
             app:tint="?attr/daxColorPrimaryIcon" />
 
         <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
