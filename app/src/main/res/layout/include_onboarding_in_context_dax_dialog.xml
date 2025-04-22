@@ -50,6 +50,7 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/daxDialogDismissButton"
+            style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_0"
@@ -60,7 +61,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close_24"
-            app:style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
             app:tint="?attr/daxColorPrimaryIcon" />
 
         <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
