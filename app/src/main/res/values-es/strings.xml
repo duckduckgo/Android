@@ -823,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">¡Choca esos cinco!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Pruébalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Omitir</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">He estado aquí antes</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Entendido. Me saltaré los otros consejos.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Recuerda: puedes eliminar todas tus pestañas, historial y datos de navegación en dos toques con el <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Mostrar tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de direcciones</string>

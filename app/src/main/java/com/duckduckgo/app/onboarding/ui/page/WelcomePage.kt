@@ -42,13 +42,18 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBindin
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -101,11 +106,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         viewModel.setBackgroundResource(appTheme.isLightModeEnabled())
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
+                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
                 is ShowInitialDialog -> configureDaxCta(INITIAL)
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
                 is Finish -> onContinuePressed()
+                is OnboardingSkipped -> onSkipPressed()
                 is SetBackgroundResource -> setBackgroundRes(it.backgroundRes)
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
             }
@@ -178,10 +186,34 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
+                INITIAL_REINSTALL_USER -> {
+                    binding.daxDialogCta.root.show()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.show()
+
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.daxDialogContentImage.gone()
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
                 INITIAL -> {
                     binding.daxDialogCta.root.show()
                     binding.daxDialogCta.progressBarText.gone()
                     binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.gone()
 
                     val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
@@ -196,6 +228,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 }
 
                 COMPARISON_CHART -> {
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.gone()
                     binding.daxDialogCta.dialogTextCta.text = ""
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
@@ -218,7 +252,36 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
+                SKIP_ONBOARDING_OPTION -> {
+                    binding.daxDialogCta.descriptionCta.show()
+                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.dialogTextCta.text = ""
+
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+
+                    val ctaDialog3Text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaDialog3Text.html(it)
+                    val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                    binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaDialog3Text) { afterAnimation() }
+                }
+
                 ADDRESS_BAR_POSITION -> {
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.gone()
                     binding.daxDialogCta.dialogTextCta.text = ""
                     binding.daxDialogCta.comparisonChart.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
@@ -318,7 +381,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     companion object {
 
         enum class PreOnboardingDialogType {
+            INITIAL_REINSTALL_USER,
             INITIAL,
+            SKIP_ONBOARDING_OPTION,
             COMPARISON_CHART,
             ADDRESS_BAR_POSITION,
         }
