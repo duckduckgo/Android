@@ -1,7 +1,7 @@
 # DuckDuckGo Android
-
+https://GitHub.com/
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
+Marques A Ware Sr
 ## We are hiring!
 DuckDuckGo is growing fast and we continue to expand our fully distributed team. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. If you are a senior software engineer capable in either iOS or Android, visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more about our openings!
 
@@ -23,7 +23,7 @@ We have taken steps to update our terminology and remove words with problematic 
 Please refer to [contributing](CONTRIBUTING.md).
 
 ## Discuss
-
+Security and Transparency is key! 🔑 
 Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
 
 ## License
