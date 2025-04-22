@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -135,7 +135,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
                 //  because the omnibar implementation that relies on this value can't recreate itself dynamically,
                 //  it requires the whole activity to be recreated. To avoid that recreation right after initial launch,
                 //  we need the initial value to actually use the valid persisted state.
-                isEnabled = _available.value && runBlocking { _enabled.first() },
+                isEnabled = _available.value && runBlocking { _enabled.firstOrNull() == true },
             ),
         )
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DenyListedApi"
@@ -80,89 +80,45 @@
 
     <issue
         id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertFalse(subscriptionsManager.isSignedIn.first())"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="30"
-            column="9"/>
+            file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
+            line="308"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertFalse(subscriptionsManager.isSignedIn.first())"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
+            line="1343"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertTrue(subscriptionsManager.isSignedIn.first())"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
+            line="1349"
+            column="20"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="39"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="48"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="57"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="66"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="75"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="84"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/serp_promo/SerpPromoTest.kt"
-            line="93"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
+            line="222"
             column="9"/>
     </issue>
 
@@ -173,18 +129,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="199"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="227"
+            line="241"
             column="9"/>
     </issue>
 
@@ -195,7 +140,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="248"
+            line="277"
             column="9"/>
     </issue>
 
@@ -206,7 +151,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionsWebViewActivity.kt"
-            line="379"
+            line="370"
             column="41"/>
     </issue>
 
@@ -277,6 +222,2118 @@
     </issue>
 
     <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="22"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;pirSettingTitle&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="88"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;itrSettingTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;itrSettingTitle&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="91"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirWindowsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;pirWindowsButton&quot; translatable=&quot;false&quot;>Windows&lt;/string>"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="100"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;pirMacOsButton&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;pirMacOsButton&quot; translatable=&quot;false&quot;>Mac&lt;/string>"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="101"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryPir&quot; translatable=&quot;false&quot;>Personal Information Removal&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="120"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;feedbackCategoryItr&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;feedbackCategoryItr&quot; translatable=&quot;false&quot;>Identity Theft Restoration&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="121"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="162"
+            column="32"/>
+    </issue>
+
+    <issue
         id="VectorPath"
         message="Very long vector path (878 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="        android:pathData=&quot;M27.759,12.885L28.891,10.927C29.59,9.704 31.15,9.291 32.373,9.991C33.597,10.69 34.009,12.249 33.31,13.472L22.396,32.363H30.29C32.848,32.363 34.282,35.369 33.17,37.452H10.029C8.617,37.452 7.484,36.32 7.484,34.907C7.484,33.495 8.617,32.363 10.029,32.363H16.517L24.823,17.968L22.229,13.465C21.53,12.242 21.942,10.697 23.166,9.984C24.389,9.284 25.934,9.697 26.647,10.92L27.759,12.885ZM17.943,40.074L15.496,44.318C14.797,45.541 13.238,45.954 12.014,45.255C10.791,44.555 10.378,42.996 11.078,41.773L12.895,38.627C14.951,37.991 16.622,38.48 17.943,40.074ZM39.015,32.377H45.636C47.048,32.377 48.18,33.509 48.18,34.921C48.18,36.334 47.048,37.466 45.636,37.466H41.958L44.44,41.773C45.139,42.996 44.727,44.541 43.503,45.255C42.28,45.954 40.735,45.541 40.021,44.318C35.841,37.068 32.702,31.642 30.618,28.028C28.486,24.351 30.01,20.659 31.513,19.408C33.184,22.274 35.68,26.602 39.015,32.377Z&quot;"
@@ -295,6 +2352,39 @@
         <location
             file="src/main/res/drawable/ic_information_remover.xml"
             line="24"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1136 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M62,26C60.93,26 59.87,26.4 59.1,27.17C57.87,28.41 56.8,29.08 55.72,29.42C54.63,29.77 53.31,29.86 51.44,29.63C50.39,29.5 49.3,29.76 48.44,30.41C47.58,31.06 47.01,32.06 47,33.18C46.94,40.23 47.97,44.85 50.21,48.2C52.58,51.75 56.38,53.67 59.65,55.32C59.8,55.4 59.96,55.48 60.11,55.55C61.29,56.15 62.71,56.15 63.89,55.55C64.04,55.48 64.19,55.4 64.35,55.32C65.85,54.56 67.46,53.75 69,52.74V49C69,44.5 72.3,40.78 76.61,40.11C76.89,38.09 77.02,35.8 77,33.18C76.99,32.06 76.42,31.06 75.56,30.4C74.7,29.76 73.61,29.49 72.55,29.63C70.7,29.86 69.38,29.78 68.29,29.45C67.21,29.11 66.13,28.45 64.89,27.18C64.13,26.41 63.06,26 62,26ZM64.25,34.25C64.25,33.42 63.58,32.75 62.75,32.75H61.25C60.42,32.75 59.75,33.42 59.75,34.25V37.25C59.75,38.08 59.08,38.75 58.25,38.75H55.25C54.42,38.75 53.75,39.42 53.75,40.25V41.75C53.75,42.58 54.42,43.25 55.25,43.25H58.25C59.08,43.25 59.75,43.92 59.75,44.75V47.75C59.75,48.58 60.42,49.25 61.25,49.25H62.75C63.58,49.25 64.25,48.58 64.25,47.75V44.75C64.25,43.92 64.92,43.25 65.75,43.25H68.75C69.58,43.25 70.25,42.58 70.25,41.75V40.25C70.25,39.42 69.58,38.75 68.75,38.75H65.75C64.92,38.75 64.25,38.08 64.25,37.25V34.25Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_privacy_pro_add_device.xml"
+            line="44"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1118 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M84.24,56.51C84.58,56.17 85.04,56 85.5,56C85.96,56 86.42,56.18 86.75,56.51C87.29,57.06 87.76,57.35 88.23,57.49C88.7,57.64 89.27,57.67 90.07,57.57C90.53,57.51 91,57.63 91.38,57.91C91.75,58.19 91.99,58.62 92,59.11C92.03,62.16 91.58,64.17 90.61,65.62C89.58,67.16 87.93,67.99 86.52,68.71C86.45,68.74 86.38,68.77 86.32,68.81C85.81,69.06 85.19,69.06 84.68,68.81C84.62,68.77 84.55,68.74 84.48,68.7C83.07,67.99 81.42,67.16 80.39,65.62C79.42,64.17 78.98,62.16 79,59.11C79.01,58.62 79.25,58.19 79.62,57.91C80,57.63 80.47,57.51 80.93,57.57C81.73,57.67 82.31,57.63 82.78,57.48C83.25,57.33 83.71,57.04 84.24,56.51ZM85.82,58.92C86.18,58.92 86.47,59.22 86.47,59.58V60.88C86.47,61.23 86.77,61.53 87.13,61.53H88.43C88.78,61.53 89.07,61.82 89.07,62.17V62.83C89.07,63.18 88.78,63.47 88.43,63.47H87.13C86.77,63.47 86.47,63.77 86.47,64.13V65.43C86.47,65.78 86.18,66.07 85.82,66.07H85.18C84.82,66.07 84.53,65.78 84.53,65.43V64.13C84.53,63.77 84.23,63.47 83.88,63.47H82.57C82.22,63.47 81.93,63.18 81.93,62.83V62.17C81.93,61.82 82.22,61.53 82.57,61.53H83.88C84.23,61.53 84.53,61.23 84.53,60.88V59.58C84.53,59.22 84.82,58.92 85.18,58.92H85.82Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_privacy_pro_add_device.xml"
+            line="69"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1092 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M10.211,2.72A2.51,2.51 0,0 1,11.997 2a2.508,2.508 0,0 1,1.782 0.728c0.876,0.893 1.654,1.374 2.45,1.62 0.796,0.248 1.741,0.3 3.035,0.136a2.569,2.569 0,0 1,1.86 0.478c0.53,0.4 0.869,1.006 0.874,1.68 0.041,4.809 -0.661,7.91 -2.152,10.14 -1.576,2.356 -3.924,3.546 -6.377,4.79l-0.082,0.04c-0.916,0.465 -1.84,0.475 -2.774,0l-0.082,-0.04c-2.453,-1.244 -4.801,-2.434 -6.377,-4.79 -1.49,-2.23 -2.193,-5.331 -2.152,-10.14 0.005,-0.673 0.344,-1.28 0.874,-1.678a2.569,2.569 0,0 1,1.857 -0.48c1.303,0.164 2.251,0.101 3.047,-0.153 0.794,-0.254 1.564,-0.738 2.431,-1.612ZM11.993,3.5c-0.296,0 -0.555,0.112 -0.717,0.276 -0.99,0.997 -1.96,1.638 -3.04,1.983 -1.07,0.343 -2.255,0.394 -3.69,0.213a1.07,1.07 0,0 0,-0.769 0.19c-0.193,0.146 -0.274,0.33 -0.275,0.492 -0.04,4.692 0.655,7.433 1.9,9.294 1.338,2.003 3.343,3.036 5.89,4.327 0.503,0.255 0.922,0.25 1.417,0 2.546,-1.29 4.55,-2.324 5.89,-4.327 1.244,-1.861 1.94,-4.602 1.9,-9.294 -0.002,-0.162 -0.083,-0.347 -0.277,-0.492a1.07,1.07 0,0 0,-0.768 -0.19c-1.42,0.18 -2.598,0.142 -3.67,-0.19 -1.088,-0.338 -2.07,-0.979 -3.076,-2.003a1.01,1.01 0,0 0,-0.715 -0.279Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_privacy_pro_color_24.xml"
+            line="16"
             column="25"/>
     </issue>
 
@@ -321,24 +2411,343 @@
     </issue>
 
     <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingActivating&quot;>Aktiviranje u tijeku...&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="78"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Кажете ни какъв е проблемът...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Řekni nám, o co jde...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Fortæl os, hvad der foregår...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Πείτε μας τι συμβαίνει...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Ütle meile, mis toimub...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Kerro meille, mitä tapahtuu...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Reci nam što se događa...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Raccontaci cosa sta succedendo...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Praneškite, kas vyksta...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Spune-ne ce se întâmplă...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Сообщите нам, что происходит...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Povedz nám, čo sa deje...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Povejte nam, kaj se dogaja ...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Berätta för oss vad som händer ...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Bize neler olduğunu anlatın...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="146"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pošli nám svou zpětnou vazbu...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Giv os feedback...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Στείλτε μας τα σχόλιά σας...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Palun anna meile tagasisidet...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Anna meille palautetta...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Comunicaci la tua opinione...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pateikite mums savo atsiliepimą...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Przekaż opinię...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Te rugăm să ne comunici feedbackul tău...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Оставьте комментарий здесь...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Prosím, daj nám svoju spätnú väzbu...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pošljite nam povratne informacije ...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Ge din feedback ...&lt;/string>"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="155"
+            column="57"/>
+    </issue>
+
+    <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``OneLineListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``TwoLineListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="        binding.subscriptionSetting.setOnTouchListener(null)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="105"
+            line="104"
             column="9"/>
     </issue>
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``CheckListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
+        message="Custom view ``TwoLineListItem`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="        binding.subscriptionBuy.setOnTouchListener(null)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="107"
+            line="106"
             column="9"/>
     </issue>
 
@@ -349,7 +2758,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="109"
+            line="108"
             column="9"/>
     </issue>
 
@@ -360,7 +2769,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="110"
+            line="109"
             column="9"/>
     </issue>
 
@@ -395,17 +2804,6 @@
             file="src/main/res/layout/activity_subscription_settings.xml"
             line="91"
             column="18"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;@dimen/keyline_2&quot;` to better support right-to-left layouts"
-        errorLine1="                android:layout_marginLeft=&quot;@dimen/keyline_2&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_restore_subscription.xml"
-            line="87"
-            column="17"/>
     </issue>
 
 </issues>
