@@ -44,7 +44,7 @@
         android:id="@+id/ddgOnOtherPlatformsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_downloads_color_24"
+        app:leadingIcon="@drawable/ic_downloads_accent_blue_24"
         app:primaryText="@string/settingsDDGOnOtherPlatforms"
         app:trailingIcon="@drawable/ic_open_in_16"
         app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
