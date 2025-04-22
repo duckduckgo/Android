@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Dá cá cinco!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Experimenta-o</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorar</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Já estive aqui antes</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Entendido! Vou ignorar as outras dicas.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atenção: podes eliminar todos os separadores, o histórico e os dados de navegação em dois toques com o <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Mostrar Tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de endereço</string>

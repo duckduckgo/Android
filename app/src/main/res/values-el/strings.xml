@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>

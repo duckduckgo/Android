@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Schlag ein!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Verstanden. Ich überspringe die anderen Tipps.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Denk daran: Mit dem <b>Fire Button</b> musst du nur zweimal tippen, um alle deine Tabs, den Verlauf und deine Browserdaten zu löschen 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial anzeigen</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresszeile</string>

@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Ik snap het! Ik sla de andere tips over.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Onthoud: je kunt al je tabbladen, geschiedenis en browsegegevens in twee tikken wissen met de <b>Fire Button</b> 🔥.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial weergeven</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>

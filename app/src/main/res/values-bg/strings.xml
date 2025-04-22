@@ -818,6 +818,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Дай пет!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
