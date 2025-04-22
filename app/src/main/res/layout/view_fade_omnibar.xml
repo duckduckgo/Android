@@ -255,7 +255,7 @@
                                 android:layout_marginEnd="@dimen/keyline_0"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/clearButtonContentDescription"
-                                android:src="@drawable/ic_close_24"
+                                android:src="@drawable/ic_close_24_secondary"
                                 android:scaleType="center"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
