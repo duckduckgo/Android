@@ -30,7 +30,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.AddressBarSettings
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -100,10 +99,6 @@ data class DuckChatSettingJson(
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
     val addressBarEntryPoint: Boolean,
-    val addressBarAnimation: Boolean,
-    val addressBarChangeBoundsDuration: Long,
-    val addressBarFadeDuration: Long,
-    val addressBarTension: Float,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -135,12 +130,6 @@ class RealDuckChat @Inject constructor(
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
-    private var addressBarSettings = AddressBarSettings(
-        isAnimationEnabled = false,
-        changeBoundsDuration = DEFAULT_CHANGE_BOUNDS_DURATION,
-        fadeDuration = DEFAULT_FADE_DURATION,
-        tension = DEFAULT_TENSION,
-    )
 
     init {
         if (isMainProcess) {
@@ -308,10 +297,6 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.wasOpenedBefore()
     }
 
-    override fun getAddressBarSettings(): AddressBarSettings {
-        return addressBarSettings
-    }
-
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
@@ -327,12 +312,6 @@ class RealDuckChat @Inject constructor(
                     bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
-            addressBarSettings = AddressBarSettings(
-                isAnimationEnabled = settingsJson?.addressBarAnimation ?: false,
-                changeBoundsDuration = settingsJson?.addressBarChangeBoundsDuration ?: DEFAULT_CHANGE_BOUNDS_DURATION,
-                fadeDuration = settingsJson?.addressBarFadeDuration ?: DEFAULT_FADE_DURATION,
-                tension = settingsJson?.addressBarTension ?: DEFAULT_TENSION,
-            )
             cacheUserSettings()
         }
     }
@@ -351,8 +330,5 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
-        private const val DEFAULT_CHANGE_BOUNDS_DURATION = 400L
-        private const val DEFAULT_FADE_DURATION = 200L
-        private const val DEFAULT_TENSION = 1F
     }
 }

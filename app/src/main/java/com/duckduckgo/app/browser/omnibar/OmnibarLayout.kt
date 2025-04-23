@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -176,6 +177,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
+    @Inject
+    lateinit var omnibarAnimationManager: OmnibarAnimationManager
+
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -234,13 +238,13 @@ open class OmnibarLayout @JvmOverloads constructor(
             ordering = TransitionSet.ORDERING_TOGETHER
             addTransition(
                 ChangeBounds().apply {
-                    duration = duckChat.getAddressBarSettings().changeBoundsDuration
-                    interpolator = OvershootInterpolator(duckChat.getAddressBarSettings().tension)
+                    duration = omnibarAnimationManager.getChangeBoundsDuration()
+                    interpolator = OvershootInterpolator(omnibarAnimationManager.getTension())
                 },
             )
             addTransition(
                 Fade().apply {
-                    duration = duckChat.getAddressBarSettings().fadeDuration
+                    duration = omnibarAnimationManager.getFadeDuration()
                     addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
@@ -633,7 +637,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
-        if (duckChat.getAddressBarSettings().isAnimationEnabled &&
+        if (omnibarAnimationManager.isFeatureEnabled() &&
             previousTransitionState != null &&
             newTransitionState != previousTransitionState &&
             !viewState.isLoading
@@ -662,7 +666,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
 
-        if (duckChat.getAddressBarSettings().isAnimationEnabled) {
+        if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
         }
 

@@ -165,32 +165,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenNoConfigGetAddressBarSettingsReturnDefaults() {
-        val settings = testee.getAddressBarSettings()
-        assertFalse(settings.isAnimationEnabled)
-        assertEquals(400L, settings.changeBoundsDuration)
-        assertEquals(200L, settings.fadeDuration)
-        assertEquals(1F, settings.tension)
-    }
-
-    @Test
-    fun whenConfigSetsAddressBarSettingsThenGetAddressBarSettingsReturnConfiguredValues() = runTest {
-        duckChatFeature.self().setRawStoredState(
-            State(
-                enable = true,
-                settings = SETTINGS_JSON_ADDRESS_BAR,
-            ),
-        )
-        testee.onPrivacyConfigDownloaded()
-
-        val settings = testee.getAddressBarSettings()
-        assertTrue(settings.isAnimationEnabled)
-        assertEquals(123L, settings.changeBoundsDuration)
-        assertEquals(456L, settings.fadeDuration)
-        assertEquals(7.8F, settings.tension)
-    }
-
-    @Test
     fun whenConfigSetsAddressBarEntryPointThenIsAddressBarEntryPointEnabledReturnsTrue() = runTest {
         duckChatFeature.self().setRawStoredState(
             State(
