@@ -6218,6 +6218,32 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
+    @Test
+    fun whenOpenDuckChatWithNonEmptyQueryThenOpenWithAutoPrompt() = runTest {
+        val query = "example"
+
+        testee.openDuckChat("example")
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpenDuckChatWithEmptyStringQueryThenOpenDuckChat() = runTest {
+        testee.openDuckChat("")
+
+        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithNullQueryThenOpenDuckChat() = runTest {
+        testee.openDuckChat(null)
+
+        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
