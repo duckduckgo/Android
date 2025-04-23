@@ -87,6 +87,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -171,6 +172,9 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
+
+    @Inject
+    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     private var isInitialRender = true
     private var previousButtonState: ButtonState? = null
@@ -484,7 +488,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             is NewTab -> {
                 if (duckChat.showInAddressBar()) {
                     omnibarTextInput.hint = context.getString(R.string.search)
-                } else{
+                } else {
                     omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
                 }
                 renderBrowserMode(viewState)
@@ -500,8 +504,12 @@ open class OmnibarLayout @JvmOverloads constructor(
         } else {
             lastSeenPrivacyShield = null
         }
-        // renderButtons(viewState)
-        renderAnimatedButtons(viewState)
+
+        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            renderButtons(viewState)
+        } else {
+            renderAnimatedButtons(viewState)
+        }
 
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
