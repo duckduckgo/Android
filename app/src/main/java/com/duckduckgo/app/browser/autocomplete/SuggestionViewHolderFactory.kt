@@ -261,7 +261,8 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         ) = with(binding) {
             phrase.text = item.phrase
 
-            val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_20 else com.duckduckgo.mobile.android.R.drawable.ic_find_search_20
+            val phraseOrUrlImage =
+                if (item.isUrl) com.duckduckgo.mobile.android.R.drawable.ic_globe_20 else com.duckduckgo.mobile.android.R.drawable.ic_find_search_20
             phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
 
             editQueryImage.setOnClickListener { editableSearchClickListener(item) }
