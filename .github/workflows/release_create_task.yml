@@ -9,7 +9,7 @@ on:
         default: 'PLACEHOLDER'
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   emoji_start: ":flight_departure:" # 🛫
   emoji_info: ":information_source:" # ℹ️
 
@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/assign-release-task
         with:
           task_name: 'Android Release ${{ github.event.inputs.app-version }}'
-          asana_token: ${{ secrets.GH_ASANA_SECRET }}
+          asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
@@ -77,7 +77,7 @@ jobs:
         if: ${{ failure() }}
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Create Android App Release Task
