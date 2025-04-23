@@ -176,7 +176,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
-    private var isInitialRender = true
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -635,7 +634,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         )
 
         if (duckChat.getAddressBarSettings().isAnimationEnabled &&
-            !isInitialRender && newTransitionState != previousTransitionState && !viewState.isLoading
+            previousTransitionState != null &&
+            newTransitionState != previousTransitionState &&
+            !viewState.isLoading
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
@@ -665,7 +666,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             toolbarContainer.requestLayout()
         }
 
-        isInitialRender = false
         previousTransitionState = newTransitionState
     }
 
