@@ -21,6 +21,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
@@ -46,6 +48,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val moshi: Moshi,
     private val pixel: DeviceShieldPixels,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : Interceptor, ApiInterceptorPlugin {
 
     private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
@@ -58,7 +61,11 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
             ?.method()
             ?.isAnnotationPresent(AppTPTdsRequired::class.java) == true
 
-        return if (tdsRequired) {
+        val appTpEnabled = runBlocking {
+            vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
+        }
+
+        return if (tdsRequired && appTpEnabled) {
             logcat { "[AppTP]: Intercepted AppTP TDS Request: ${chain.request()}" }
             val activeExperiment = runBlocking {
                 inventory.activeAppTpTdsFlag()

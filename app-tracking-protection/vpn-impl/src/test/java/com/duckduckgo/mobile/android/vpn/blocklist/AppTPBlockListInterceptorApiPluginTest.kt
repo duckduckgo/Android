@@ -28,6 +28,10 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
+import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
@@ -36,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -68,6 +73,7 @@ class AppTPBlockListInterceptorApiPluginTest {
     private val sharedPreferencesProvider = FakeSharedPreferencesProvider()
 
     private lateinit var deviceShieldPixels: DeviceShieldPixels
+    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Before
     fun setup() {
@@ -76,8 +82,13 @@ class AppTPBlockListInterceptorApiPluginTest {
             featureName = "appTrackerProtection",
         ).build().create(TestBlockListFeature::class.java)
 
-        inventory = mock<FeatureTogglesInventory>()
+        vpnFeaturesRegistry = VpnFeaturesRegistryImpl(
+            mock<VpnServiceWrapper>(),
+            sharedPreferencesProvider,
+            coroutineRule.testDispatcherProvider,
+        )
 
+        inventory = mock<FeatureTogglesInventory>()
         runBlocking {
             whenever(inventory.getAllTogglesForParent(Mockito.anyString())).thenReturn(
                 listOf(
@@ -95,7 +106,17 @@ class AppTPBlockListInterceptorApiPluginTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        interceptor = AppTPBlockListInterceptorApiPlugin(inventory, moshi, deviceShieldPixels)
+        interceptor = AppTPBlockListInterceptorApiPlugin(
+            inventory,
+            moshi,
+            deviceShieldPixels,
+            vpnFeaturesRegistry,
+        )
+
+        runBlocking {
+            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            mockVpnEnabled()
+        }
     }
 
     @Test
@@ -125,6 +146,13 @@ class AppTPBlockListInterceptorApiPluginTest {
     fun `when cohort is control use control URL`() {
         testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
         checkEndpointIntercept("controlUrl")
+    }
+
+    @Test
+    fun `if AppTP is disabled, does not enroll`() = runTest {
+        mockVpnDisabled()
+        testBlockListFeature.atpTdsNextExperimentAnotherTest().setRawStoredState(makeExperiment())
+        checkEndpointIntercept(APPTP_TDS_PATH)
     }
 
     @Test
@@ -216,6 +244,14 @@ class AppTPBlockListInterceptorApiPluginTest {
                 State.Cohort(name = TREATMENT.cohortName, weight = if (useTreatment) 1 else 0),
             ),
         )
+    }
+
+    private suspend fun mockVpnEnabled() {
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+    }
+
+    private suspend fun mockVpnDisabled() {
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
     }
 }
 
