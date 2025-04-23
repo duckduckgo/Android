@@ -141,7 +141,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
-    data class ButtonState(
+    data class TransitionState(
         val showClearButton: Boolean,
         val showVoiceSearch: Boolean,
         val showTabsMenu: Boolean,
@@ -177,7 +177,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     private var isInitialRender = true
-    private var previousButtonState: ButtonState? = null
+    private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -623,7 +623,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderAnimatedButtons(viewState: ViewState) {
-        val newButtonState = ButtonState(
+        val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,
             showTabsMenu = viewState.showTabsMenu,
@@ -635,38 +635,38 @@ open class OmnibarLayout @JvmOverloads constructor(
         )
 
         if (duckChat.getAddressBarSettings().isAnimationEnabled &&
-            !isInitialRender && newButtonState != previousButtonState && !viewState.isLoading
+            !isInitialRender && newTransitionState != previousTransitionState && !viewState.isLoading
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
 
-        if (!newButtonState.showVoiceSearch) {
-            clearTextButton.isInvisible = !newButtonState.showClearButton
-            spacer1X?.isVisible = newButtonState.showSpacer
+        if (!newTransitionState.showVoiceSearch) {
+            clearTextButton.isInvisible = !newTransitionState.showClearButton
+            spacer1X?.isVisible = newTransitionState.showSpacer
             spacer2X?.isVisible = false
         } else {
-            clearTextButton.isVisible = newButtonState.showClearButton
-            if (newButtonState.showClearButton) {
-                spacer2X?.isVisible = newButtonState.showSpacer
+            clearTextButton.isVisible = newTransitionState.showClearButton
+            if (newTransitionState.showClearButton) {
+                spacer2X?.isVisible = newTransitionState.showSpacer
                 spacer1X?.isVisible = false
             } else {
-                spacer1X?.isVisible = newButtonState.showSpacer
+                spacer1X?.isVisible = newTransitionState.showSpacer
                 spacer2X?.isVisible = false
             }
         }
-        voiceSearchButton.isInvisible = !newButtonState.showVoiceSearch
-        tabsMenu.isVisible = newButtonState.showTabsMenu
-        fireIconMenu.isVisible = newButtonState.showFireIcon
-        browserMenu.isVisible = newButtonState.showBrowserMenu
-        browserMenuHighlight.isVisible = newButtonState.showBrowserMenuHighlight
-        aiChatMenu?.isVisible = newButtonState.showChatMenu
+        voiceSearchButton.isInvisible = !newTransitionState.showVoiceSearch
+        tabsMenu.isVisible = newTransitionState.showTabsMenu
+        fireIconMenu.isVisible = newTransitionState.showFireIcon
+        browserMenu.isVisible = newTransitionState.showBrowserMenu
+        browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
+        aiChatMenu?.isVisible = newTransitionState.showChatMenu
 
         if (duckChat.getAddressBarSettings().isAnimationEnabled) {
             toolbarContainer.requestLayout()
         }
 
         isInitialRender = false
-        previousButtonState = newButtonState
+        previousTransitionState = newTransitionState
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
