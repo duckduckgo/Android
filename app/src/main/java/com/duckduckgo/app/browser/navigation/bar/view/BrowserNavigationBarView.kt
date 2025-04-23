@@ -45,7 +45,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.webview.BrowserContainerLayoutBehavior
+import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -70,7 +70,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         /**
          * This notifies all view behaviors that depend on the [BrowserNavigationBarView] to recalculate whenever the bar's visibility changes,
-         * for example, we require that in [BrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
+         * for example, we require that in [TopOmnibarBrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
          * The base coordinator behavior doesn't notify dependent views when visibility changes, so we need to do that manually.
          */
         val parent = parent

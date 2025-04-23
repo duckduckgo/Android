@@ -27,6 +27,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
@@ -51,7 +52,12 @@ class BottomAppBarBehavior<V : View>(
             updateSnackbar(child, dependency)
         }
 
-        if (dependency.id != R.id.webViewFullScreenContainer) {
+        /**
+         * We don't want any offset when in full screen.
+         *
+         * The browser padding management, to avoid omnibar overlapping with the browser content, is handled in [BottomOmnibarBrowserContainerLayoutBehavior].
+         */
+        if (dependency.id != R.id.webViewFullScreenContainer && dependency.id != R.id.browserLayout) {
             offsetBottomByToolbar(dependency)
         }
 
