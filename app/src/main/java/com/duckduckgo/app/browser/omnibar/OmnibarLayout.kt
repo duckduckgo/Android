@@ -221,6 +221,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
     internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
+    internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
     internal val spacer1X: FrameLayout? by lazy { findViewById(R.id.spacer1X) }
@@ -495,7 +496,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         } else {
             lastSeenPrivacyShield = null
         }
-        renderButtons(viewState)
+        //renderButtons(viewState)
+        renderAnimatedButtons(viewState)
+
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
         }
@@ -598,6 +601,16 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
+        clearTextButton.isVisible = viewState.showClearButton
+        voiceSearchButton.isVisible = viewState.showVoiceSearch
+        tabsMenu.isVisible = viewState.showTabsMenu
+        fireIconMenu.isVisible = viewState.showFireIcon
+        browserMenu.isVisible = viewState.showBrowserMenu
+        browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
+        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+    }
+
+    private fun renderAnimatedButtons(viewState: ViewState) {
         val newButtonState = ButtonState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,

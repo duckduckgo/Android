@@ -137,9 +137,9 @@ class RealDuckChat @Inject constructor(
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var addressBarSettings = AddressBarSettings(
         isAnimationEnabled = false,
-        changeBoundsDuration = 400L,
-        fadeDuration = 200L,
-        tension = 1.3F,
+        changeBoundsDuration = DEFAULT_CHANGE_BOUNDS_DURATION,
+        fadeDuration = DEFAULT_FADE_DURATION,
+        tension = DEFAULT_TENSION,
     )
 
     init {
@@ -329,9 +329,9 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             addressBarSettings = AddressBarSettings(
                 isAnimationEnabled = settingsJson?.addressBarAnimation ?: false,
-                changeBoundsDuration = settingsJson?.addressBarChangeBoundsDuration ?: 400L,
-                fadeDuration = settingsJson?.addressBarFadeDuration ?: 200L,
-                tension = settingsJson?.addressBarTension ?: 1.3F,
+                changeBoundsDuration = settingsJson?.addressBarChangeBoundsDuration ?: DEFAULT_CHANGE_BOUNDS_DURATION,
+                fadeDuration = settingsJson?.addressBarFadeDuration ?: DEFAULT_FADE_DURATION,
+                tension = settingsJson?.addressBarTension ?: DEFAULT_TENSION,
             )
             cacheUserSettings()
         }
@@ -351,5 +351,8 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
+        private const val DEFAULT_CHANGE_BOUNDS_DURATION = 400L
+        private const val DEFAULT_FADE_DURATION = 200L
+        private const val DEFAULT_TENSION = 1.3F
     }
 }
