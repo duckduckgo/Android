@@ -482,7 +482,11 @@ open class OmnibarLayout @JvmOverloads constructor(
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
             is NewTab -> {
-                omnibarTextInput.hint = context.getString(R.string.omnibarInputHintShort)
+                if (duckChat.showInAddressBar()) {
+                    omnibarTextInput.hint = context.getString(R.string.search)
+                } else{
+                    omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
+                }
                 renderBrowserMode(viewState)
             }
             else -> {
