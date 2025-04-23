@@ -63,7 +63,7 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/previousSearchTermDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_chevron_up_24e" />
+        android:src="@drawable/ic_chevron_up_24" />
 
     <ImageView
         android:id="@+id/nextSearchTermButton"
@@ -72,7 +72,7 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/nextSearchTermDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_chevron_down_24e" />
+        android:src="@drawable/ic_chevron_down_24" />
 
     <ImageView
         android:id="@+id/closeFindInPagePanel"
