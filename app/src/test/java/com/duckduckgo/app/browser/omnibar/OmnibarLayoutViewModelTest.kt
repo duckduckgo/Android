@@ -1072,6 +1072,77 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenViewModelAttachedThenShowChatMenuTrue() = runTest {
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryNotBlankThenShowChatMenuTrue() = runTest {
+        testee.onOmnibarFocusChanged(true, QUERY)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryBlankThenShowChatMenuFalse() = runTest {
+        testee.onOmnibarFocusChanged(true, "")
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedThenShowChatMenuFalse() = runTest {
+        testee.onOmnibarFocusChanged(false, QUERY)
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToCustomTabThenShowChatMenuTrue() = runTest {
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenClearTextButtonPressedThenShowChatMenuFalse() = runTest {
+        testee.onClearTextButtonPressed()
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuFalse() = runTest {
+        testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenInputStateChangedWithNonEmptyQueryThenShowChatMenuTrue() = runTest {
+        testee.onInputStateChanged(QUERY, hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
