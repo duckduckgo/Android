@@ -46,6 +46,7 @@
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/newTabMenuItem"
+                android:scaleType="center"
                 android:src="@drawable/ic_add_24e" />
         </FrameLayout>
 
@@ -63,6 +64,7 @@
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/autofillManagementScreenTitle"
+                android:scaleType="center"
                 android:src="@drawable/ic_key_24e" />
         </FrameLayout>
 
@@ -85,6 +87,7 @@
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
             android:contentDescription="@string/bookmarksMenuTitle"
+            android:scaleType="center"
             android:src="@drawable/ic_bookmarks_stacked_24e" />
     </FrameLayout>
 
@@ -106,6 +109,7 @@
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
             android:contentDescription="@string/fireMenu"
+            android:scaleType="center"
             android:src="@drawable/ic_fire_new_24e" />
     </FrameLayout>
 
@@ -126,6 +130,7 @@
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
             android:contentDescription="@string/tabsMenuItem"
+            android:scaleType="center"
             android:src="@drawable/ic_tab_switcher_experiment" />
     </FrameLayout>
 
@@ -146,6 +151,7 @@
             android:layout_height="@dimen/bottomNavIcon"
             android:layout_gravity="center"
             android:contentDescription="@string/browserPopupMenu"
+            android:scaleType="center"
             android:src="@drawable/ic_menu_vertical_24"
             app:tint="?daxColorPrimaryIcon" />
     </FrameLayout>
