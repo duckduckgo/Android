@@ -20,7 +20,7 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">A Duck.ai egy opcionális funkció, amely lehetővé teszi a harmadik féltől származó népszerű AI-csevegési modellekkel való névtelen csevegést. A csevegéseidet nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
     <string name="duck_chat_visibility_setting">Duck.ai megjelenítése a böngésző menüjében</string>
-
+    <string name="duck_chat_address_bar_visibility_setting">Duck.ai megjelenítése a címsorban</string>
     <string name="duck_chat_download_finished_action_name">Megnyitás</string>
     <string name="duck_chat_cannot_open_file_error_message">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 </resources>
