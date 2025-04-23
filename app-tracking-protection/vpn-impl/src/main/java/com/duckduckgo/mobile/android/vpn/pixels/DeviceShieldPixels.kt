@@ -25,6 +25,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
 import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
+import com.duckduckgo.mobile.android.vpn.feature.getDisabledProtectionForApp
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromAll
 import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDetail
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
@@ -763,6 +764,9 @@ class RealDeviceShieldPixels @Inject constructor(
             appTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail()?.getPixelDefinitions()?.forEach {
                 firePixel(it.pixelName, it.params)
             }
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
         }
     }
 
@@ -774,6 +778,9 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appTpTDSPixelsPlugin.getProtectionDisabledAppFromAll()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
                 firePixel(it.pixelName, it.params)
             }
         }
