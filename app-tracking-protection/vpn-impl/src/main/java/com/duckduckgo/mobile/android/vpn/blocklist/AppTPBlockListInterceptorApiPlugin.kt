@@ -60,11 +60,11 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
             ?.method()
             ?.isAnnotationPresent(AppTPTdsRequired::class.java) == true
 
-        val appTpEnabled = runBlocking {
+        val shouldInterceptRequest = tdsRequired && runBlocking {
             appTrackingProtection.isEnabled()
         }
 
-        return if (tdsRequired && appTpEnabled) {
+        return if (shouldInterceptRequest) {
             logcat { "[AppTP]: Intercepted AppTP TDS Request: ${chain.request()}" }
             val activeExperiment = runBlocking {
                 inventory.activeAppTpTdsFlag()
