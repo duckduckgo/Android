@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.webview
 
-import android.content.Context
-import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
@@ -39,10 +37,7 @@ import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
  *
  * Note: If bottom [OmnibarLayout] is used ([OmnibarPosition.BOTTOM]), [BottomOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
  */
-class TopOmnibarBrowserContainerLayoutBehavior(
-    context: Context,
-    attrs: AttributeSet?,
-) : ScrollingViewBehavior(context, attrs) {
+class TopOmnibarBrowserContainerLayoutBehavior : ScrollingViewBehavior() {
 
     override fun layoutDependsOn(
         parent: CoordinatorLayout,

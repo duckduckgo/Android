@@ -40,104 +40,107 @@
         android:elevation="10dp"
         android:visibility="gone" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/autoCompleteSuggestionsList"
+    <FrameLayout
+        android:id="@+id/browserContentFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/daxColorBrowserOverlay"
-        android:clipToPadding="false"
-        android:elevation="2dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_autocomplete_search_suggestion"
-        tools:visibility="visible" />
+        android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.newtab.FocusedView
-        android:id="@+id/focusedView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/daxColorBrowserOverlay"
-        android:elevation="4dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_scrollFlags="noScroll" />
-
-    <include
-        android:id="@+id/includeNewBrowserTab"
-        layout="@layout/include_new_browser_tab"
-        android:visibility="gone" />
-
-    <com.duckduckgo.app.browser.webview.SslWarningLayout
-        android:id="@+id/sslErrorWarningLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
-        android:id="@+id/maliciousSiteWarningLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <RelativeLayout
-        android:id="@+id/browserLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:orientation="vertical"
-        app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
-        tools:context="com.duckduckgo.app.browser.BrowserActivity">
-
-        <FrameLayout
-            android:id="@+id/daxDialogOnboardingCtaContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:elevation="@dimen/keyline_4">
-
-            <include
-                android:id="@+id/includeOnboardingInContextDaxDialog"
-                layout="@layout/include_onboarding_in_context_dax_dialog"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/includeBrokenSitePromptDialog"
-                layout="@layout/prompt_broken_site"
-                android:visibility="gone" />
-        </FrameLayout>
-
-        <com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout
-            android:id="@+id/swipeRefreshContainer"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/autoCompleteSuggestionsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/daxDialogOnboardingCtaContent">
+            android:background="?attr/daxColorBrowserOverlay"
+            android:clipToPadding="false"
+            android:elevation="2dp"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_autocomplete_search_suggestion"
+            tools:visibility="visible" />
+
+        <com.duckduckgo.app.browser.newtab.FocusedView
+            android:id="@+id/focusedView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/daxColorBrowserOverlay"
+            android:elevation="4dp"
+            app:layout_scrollFlags="noScroll" />
+
+        <include
+            android:id="@+id/includeNewBrowserTab"
+            layout="@layout/include_new_browser_tab"
+            android:visibility="gone" />
+
+        <com.duckduckgo.app.browser.webview.SslWarningLayout
+            android:id="@+id/sslErrorWarningLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+            android:id="@+id/maliciousSiteWarningLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:id="@+id/browserLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:orientation="vertical"
+            tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
             <FrameLayout
+                android:id="@+id/daxDialogOnboardingCtaContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true">
-
-                <FrameLayout
-                    android:id="@+id/webViewContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:background="#4F00" />
+                android:animateLayoutChanges="true"
+                android:elevation="@dimen/keyline_4">
 
                 <include
-                    android:id="@+id/includeErrorView"
-                    layout="@layout/include_error_view"
+                    android:id="@+id/includeOnboardingInContextDaxDialog"
+                    layout="@layout/include_onboarding_in_context_dax_dialog"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/includeBrokenSitePromptDialog"
+                    layout="@layout/prompt_broken_site"
                     android:visibility="gone" />
             </FrameLayout>
-        </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
-        <View
-            android:id="@+id/focusDummy"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/daxDialogOnboardingCtaContent"
-            android:focusableInTouchMode="true" />
+            <com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout
+                android:id="@+id/swipeRefreshContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/daxDialogOnboardingCtaContent">
 
-    </RelativeLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true">
+
+                    <FrameLayout
+                        android:id="@+id/webViewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:background="#4F00" />
+
+                    <include
+                        android:id="@+id/includeErrorView"
+                        layout="@layout/include_error_view"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
+
+            <View
+                android:id="@+id/focusDummy"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/daxDialogOnboardingCtaContent"
+                android:focusableInTouchMode="true" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
 
     <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
         android:id="@+id/newOmnibarBottom"

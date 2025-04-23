@@ -52,15 +52,6 @@ class BottomAppBarBehavior<V : View>(
             updateSnackbar(child, dependency)
         }
 
-        /**
-         * We don't want any offset when in full screen.
-         *
-         * The browser padding management, to avoid omnibar overlapping with the browser content, is handled in [BottomOmnibarBrowserContainerLayoutBehavior].
-         */
-        if (dependency.id != R.id.webViewFullScreenContainer && dependency.id != R.id.browserLayout) {
-            offsetBottomByToolbar(dependency)
-        }
-
         return super.layoutDependsOn(parent, child, dependency)
     }
 
@@ -96,18 +87,6 @@ class BottomAppBarBehavior<V : View>(
             // only hide the app bar in the browser layout
             if (target.id == R.id.browserWebView) {
                 toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
-            }
-        }
-    }
-
-    private fun offsetBottomByToolbar(view: View?) {
-        (view?.layoutParams as? CoordinatorLayout.LayoutParams)?.let { layoutParams ->
-            val newBottomMargin = omnibar.measuredHeight() - omnibar.getTranslation().roundToInt()
-            if (layoutParams.bottomMargin != newBottomMargin) {
-                layoutParams.bottomMargin = newBottomMargin
-                view.postOnAnimation {
-                    view.requestLayout()
-                }
             }
         }
     }
