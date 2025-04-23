@@ -634,7 +634,9 @@ open class OmnibarLayout @JvmOverloads constructor(
             showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
-        if (duckChat.getAddressBarSettings().isAnimationEnabled && !isInitialRender && newButtonState != previousButtonState && !viewState.isLoading) {
+        if (duckChat.getAddressBarSettings().isAnimationEnabled &&
+            !isInitialRender && newButtonState != previousButtonState && !viewState.isLoading
+        ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
 
