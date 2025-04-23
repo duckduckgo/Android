@@ -62,6 +62,8 @@ class FingerprintProtectionTest {
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
+        waitFor(5000)
+
         onWebView()
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start the test")))
@@ -69,6 +71,8 @@ class FingerprintProtectionTest {
 
         val idlingResourceForScript = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
+
+        waitFor(5000)
 
         val results = onWebView()
             .perform(script(SCRIPT))
