@@ -83,7 +83,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setProgress(100, progress, progress == 0)
             .setOngoing(true)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
-            .addAction(com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16, applicationContext.getString(R.string.downloadsCancel), pendingIntent)
+            .addAction(
+                com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16,
+                applicationContext.getString(R.string.downloadsCancel),
+                pendingIntent,
+            )
             .build()
 
         val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
@@ -147,7 +151,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
                         FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
-                    addAction(com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
+                    addAction(
+                        com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16,
+                        applicationContext.getString(R.string.downloadsRetry),
+                        pendingIntent,
+                    )
                 }
                 groupNotificationsCounter.get()[downloadId]?.let { fileName ->
                     setContentText(fileName)

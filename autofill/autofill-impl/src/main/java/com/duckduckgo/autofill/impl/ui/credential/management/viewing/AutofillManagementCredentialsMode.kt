@@ -429,7 +429,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
             is Activated -> {
                 duckAddressManagementLabel.quietlySetIsChecked(true, activationStatusChangeListener)
-                duckAddressManagementLabel.setLeadingIconResource(R.drawable.ic_email_24)
+                duckAddressManagementLabel.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_email_16)
                 duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressActivatedLabel))
                 duckAddressManagementLabel.show()
                 duckAddressManagementLabel.isEnabled = true
