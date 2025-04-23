@@ -277,7 +277,7 @@ class BrowserPopupMenu(
                 },
             )
         }
-        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_solid_16 else drawable.ic_fireproofed_16)
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
 

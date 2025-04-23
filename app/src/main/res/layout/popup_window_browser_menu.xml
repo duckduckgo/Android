@@ -137,7 +137,7 @@
                 android:id="@+id/fireproofWebsiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_fire_16"
+                app:iconDrawable="@drawable/ic_fire_solid_16"
                 app:primaryText="@string/fireproofWebsiteMenuTitleAdd" />
 
             <com.duckduckgo.common.ui.view.MenuItemView

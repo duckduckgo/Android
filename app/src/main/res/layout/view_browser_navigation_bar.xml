@@ -110,7 +110,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/fireMenu"
             android:scaleType="center"
-            android:src="@drawable/ic_fire_new_24e" />
+            android:src="@drawable/ic_fire_24" />
     </FrameLayout>
 
     <Space

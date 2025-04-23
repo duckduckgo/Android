@@ -100,7 +100,7 @@
             android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/browserPopupMenu"
-            android:src="@drawable/ic_fire" />
+            android:src="@drawable/ic_fire_24" />
     </FrameLayout>
 
     <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton
