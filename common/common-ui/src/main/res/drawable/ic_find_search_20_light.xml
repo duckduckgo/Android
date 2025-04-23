@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@
     android:viewportWidth="20"
     android:viewportHeight="20">
   <path
-      android:pathData="M9,2C5.134,2 2,5.134 2,9C2,12.866 5.134,16 9,16C10.645,16 12.157,15.433 13.352,14.483L16.634,17.766C16.947,18.078 17.453,18.078 17.766,17.766C18.078,17.453 18.078,16.947 17.766,16.634L14.483,13.352C15.433,12.157 16,10.645 16,9C16,5.134 12.866,2 9,2ZM3.6,9C3.6,6.018 6.018,3.6 9,3.6C11.982,3.6 14.4,6.018 14.4,9C14.4,11.982 11.982,14.4 9,14.4C6.018,14.4 3.6,11.982 3.6,9Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillAlpha="0.5"
+      android:pathData="M9,2C5.134,2 2,5.134 2,9C2,12.866 5.134,16 9,16C10.663,16 12.19,15.42 13.391,14.452L16.72,17.78C17.013,18.073 17.487,18.073 17.78,17.78C18.073,17.487 18.073,17.013 17.78,16.72L14.452,13.391C15.42,12.19 16,10.663 16,9C16,5.134 12.866,2 9,2ZM3.5,9C3.5,5.962 5.962,3.5 9,3.5C12.038,3.5 14.5,5.962 14.5,9C14.5,12.038 12.038,14.5 9,14.5C5.962,14.5 3.5,12.038 3.5,9Z"
+      android:fillColor="@color/black84"
       android:fillType="evenOdd"/>
 </vector>

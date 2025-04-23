@@ -117,7 +117,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="6dp"
-                        android:src="@drawable/ic_find_search_20_a05" />
+                        android:src="@drawable/ic_find_search_small_24" />
 
                     <ImageView
                         android:id="@+id/globeIcon"

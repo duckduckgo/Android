@@ -144,7 +144,7 @@
                                 android:gravity="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_2"
-                                android:src="@drawable/ic_find_search_24" />
+                                android:src="@drawable/ic_find_search_small_24" />
 
                             <ImageView
                                 android:id="@+id/backIcon"
