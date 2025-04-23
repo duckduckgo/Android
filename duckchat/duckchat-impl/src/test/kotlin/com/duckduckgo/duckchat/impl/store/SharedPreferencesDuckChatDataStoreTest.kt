@@ -26,10 +26,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -92,5 +93,62 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.updateUserPreferences(null)
 
         assertFalse(testDataStore.data.first().contains(DUCK_CHAT_USER_PREFERENCES))
+    }
+
+    @Test
+    fun whenGetShowInBrowserMenuDefaultThenTrue() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+    }
+
+    @Test
+    fun whenGetShowInAddressBarDefaultThenFollowMenuDefault() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenMenuFlagChangesThenAddressBarDefaultsToMenuValue() = runTest {
+        testee.setShowInBrowserMenu(false)
+        assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuThenGetShowInBrowserMenuReturnsValue() = runTest {
+        testee.setShowInBrowserMenu(false)
+        assertFalse(testee.getShowInBrowserMenu())
+    }
+
+    @Test
+    fun whenSetShowInAddressBarThenGetShowInAddressBarReturnsValue() = runTest {
+        testee.setShowInAddressBar(false)
+        assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenObserveShowInBrowserMenuThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeShowInBrowserMenu()
+                .take(2)
+                .toList(results)
+        }
+        testee.setShowInBrowserMenu(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun whenObserveShowInAddressBarThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeShowInAddressBar()
+                .take(2)
+                .toList(results)
+        }
+        testee.setShowInAddressBar(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
     }
 }
