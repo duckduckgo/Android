@@ -489,15 +489,9 @@ open class OmnibarLayout @JvmOverloads constructor(
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
             is NewTab -> {
-                if (duckChat.showInAddressBar()) {
-                    omnibarTextInput.hint = context.getString(R.string.search)
-                } else {
-                    omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
-                }
                 renderBrowserMode(viewState)
             }
             else -> {
-                omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
                 renderBrowserMode(viewState)
             }
         }
@@ -697,6 +691,12 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState.leadingIconState)
+
+        if (viewState.viewMode is NewTab && duckChat.showInAddressBar()) {
+            omnibarTextInput.hint = context.getString(R.string.search)
+        } else {
+            omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
+        }
     }
 
     private fun renderCustomTabMode(
