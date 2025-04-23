@@ -186,6 +186,10 @@ class SiteMonitor(
         return PROTECTED
     }
 
+    override fun resetTrackingEvents() {
+        trackingEvents.clear()
+    }
+
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
         return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
@@ -212,6 +216,8 @@ class SiteMonitor(
     override val realBrokenSiteContext: BrokenSiteContext = brokenSiteContext
 
     override var maliciousSiteStatus: MaliciousSiteStatus? = null
+
+    override var previousNumberOfBlockedTrackers: Int? = null
 
     companion object {
         private val specialDomainTypes = setOf(

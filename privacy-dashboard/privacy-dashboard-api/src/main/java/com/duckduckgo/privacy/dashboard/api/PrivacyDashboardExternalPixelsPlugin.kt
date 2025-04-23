@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.di
+package com.duckduckgo.privacy.dashboard.api
 
-import javax.inject.Qualifier
+interface PrivacyDashboardExternalPixelParams {
 
-/** Identifies a production version of the config toggles DAO */
-@Qualifier
-@MustBeDocumented
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ProtectedVpnControllerService
+    fun getPixelParams(): Map<String, String>
+
+    fun setPixelParams(key: String, value: String)
+
+    fun clearPixelParams()
+}

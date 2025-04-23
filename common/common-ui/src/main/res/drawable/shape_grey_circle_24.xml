@@ -20,6 +20,6 @@
         android:width="24dp"
         android:height="24dp"/>
     <stroke
-        android:width="2dp"
+        android:width="?attr/tabItemSelectionCircleWidth"
         android:color="?attr/daxColorTextInputEnabledOutline"/>
 </shape>

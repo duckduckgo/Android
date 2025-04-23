@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd aktiverat för %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd inaktiverat för %1$s</string>
     <string name="undoSnackbarAction">Återställ</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Spårare har blockerats</item>
+        <item quantity="other">Spårare har blockerats</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Ladda ned bild</string>

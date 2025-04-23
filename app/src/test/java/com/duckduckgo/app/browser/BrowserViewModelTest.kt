@@ -433,6 +433,14 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenOnTabsDeletedInTabSwitcherCalledThenUndoSnackbarCommandTriggered() {
+        val tabIds = listOf("tab1", "tab2")
+        testee.onTabsDeletedInTabSwitcher(tabIds)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(tabIds), commandCaptor.lastValue)
+    }
+
+    @Test
     fun whenOmnibarIsInEditModeTabSwipingIsDisabled() {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
 

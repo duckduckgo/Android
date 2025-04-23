@@ -20,6 +20,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -117,8 +118,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
                 top = 0,
             )
         }
-
-        outlineProvider = null
     }
 
     override fun onDetachedFromWindow() {
@@ -127,16 +126,25 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     override fun render(viewState: ViewState) {
-        val experimentalViewState = viewState.copy(
-            showBrowserMenu = false,
-            showFireIcon = false,
-            showTabsMenu = false,
-        )
-        super.render(experimentalViewState)
+        if (viewState.viewMode is ViewMode.CustomTab) {
+            // adds a drop shadow for the AppBarLayout, in case it was removed at any point
+            outlineProvider = ViewOutlineProvider.BACKGROUND
+            super.render(viewState)
+        } else {
+            // removes the drop shadow from the AppBarLayout to make it appear flat in the view hierarchy
+            outlineProvider = null
 
-        val showChatMenu = viewState.viewMode !is ViewMode.CustomTab
-        aiChat.isVisible = showChatMenu
-        aiChatDivider.isVisible = viewState.showVoiceSearch || viewState.showClearButton
+            // removes the duplicate buttons that are also present in the navigation bar
+            val experimentalViewState = viewState.copy(
+                showBrowserMenu = false,
+                showFireIcon = false,
+                showTabsMenu = false,
+            )
+            super.render(experimentalViewState)
+        }
+
+        aiChat.isVisible = viewState.showChat
+        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChat
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {

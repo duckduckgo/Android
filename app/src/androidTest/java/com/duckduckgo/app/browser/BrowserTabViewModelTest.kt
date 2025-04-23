@@ -105,8 +105,11 @@ import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
+import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -210,6 +213,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -251,6 +255,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -540,6 +545,16 @@ class BrowserTabViewModelTest {
     private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
 
+    private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
+    private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
+    private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
+
+    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
+
+    private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -573,6 +588,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(selectedTab))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
@@ -655,6 +671,8 @@ class BrowserTabViewModelTest {
             defaultVisualExperimentNavBarStateFlow,
         )
 
+        whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
+
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
@@ -723,6 +741,12 @@ class BrowserTabViewModelTest {
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
+            siteErrorHandler = mockSiteErrorHandler,
+            siteHttpErrorHandler = mockSiteHttpErrorHandler,
+            appPersonalityFeature = fakeAppPersonalityFeature,
+            userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4917,8 +4941,29 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+    fun whenErrorHandlerKilledAndPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+        whenever(mockSiteErrorHandlerKillSwitchToggle.isEnabled()).thenReturn(false)
         testee.recordHttpErrorCode(statusCode = 404, url = "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
+            url = "example2.com",
+            httpErrorCodes = listOf(404),
+            hasBrowserError = false,
+        )
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+        val siteCaptor = argumentCaptor<Site>()
+        whenever(mockSiteHttpErrorHandler.assignErrorsAndClearCache(siteCaptor.capture())).then {
+            siteCaptor.lastValue.onHttpErrorDetected(404)
+        }
 
         updateUrl(
             originalUrl = "example.com",
@@ -6083,6 +6128,94 @@ class BrowserTabViewModelTest {
             assertEquals(cta, this.onboardingCta)
         }
         verify(mockPixel).fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_SERP_CTA))
+    }
+
+    @Test
+    fun whenRecordErrorCodeThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "some.domain"
+        val errorValue = "error value"
+
+        testee.recordErrorCode(url = errorUrl, error = errorValue)
+
+        verify(mockSiteErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordHttpErrorCodeThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "some.domain"
+        val errorValue = -1
+
+        testee.recordHttpErrorCode(url = errorUrl, statusCode = errorValue)
+
+        verify(mockSiteHttpErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordErrorCodeNotMatchingCurrentSiteThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "error.com"
+        val errorValue = "error value"
+
+        testee.recordErrorCode(url = errorUrl, error = errorValue)
+
+        verify(mockSiteErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenRecordHttpErrorCodeNotMatchingCurrentSiteThenProvideValueToErrorHandler() {
+        val site = givenCurrentSite("some.domain")
+        val siteCaptor = argumentCaptor<Site>()
+        val errorUrl = "error.com"
+        val errorValue = -1
+
+        testee.recordHttpErrorCode(url = errorUrl, statusCode = errorValue)
+
+        verify(mockSiteHttpErrorHandler).handleError(currentSite = siteCaptor.capture(), urlWithError = eq(errorUrl), error = eq(errorValue))
+        assertEquals(site.url, siteCaptor.lastValue.url)
+    }
+
+    @Test
+    fun whenSiteLoadedThenAssignCachedErrors() {
+        val site = givenCurrentSite("some.domain")
+
+        verify(mockSiteErrorHandler).assignErrorsAndClearCache(site)
+        verify(mockSiteHttpErrorHandler).assignErrorsAndClearCache(site)
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        // Variant 2 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished()
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
+    }
+
+    @Test
+    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
+        // Variant 3 is enabled
+        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
+        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
+        // All other variants are disabled
+        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
+        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
+
+        testee.onAnimationFinished()
+
+        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
     }
 
     private fun aCredential(): LoginCredentials {

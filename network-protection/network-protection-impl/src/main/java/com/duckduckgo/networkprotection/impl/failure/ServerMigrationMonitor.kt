@@ -25,7 +25,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
-import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -39,7 +38,7 @@ import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class ServerMigrationMonitor @Inject constructor(
-    @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
+    private val wgVpnControllerService: WgVpnControllerService,
     private val wgTunnelConfig: WgTunnelConfig,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,

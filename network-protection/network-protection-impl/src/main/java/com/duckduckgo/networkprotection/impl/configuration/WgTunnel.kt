@@ -38,6 +38,7 @@ import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Qualifier
 import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -212,7 +213,11 @@ class RealWgTunnel @Inject constructor(
             null
         }
 
-        val serverData = wgServerApi.registerPublicKey(publicKey, mode = mode) ?: throw NullPointerException("serverData = null")
+        val serverData = kotlin.runCatching {
+            wgServerApi.registerPublicKey(publicKey, mode = mode) ?: throw NullPointerException("serverData = null")
+        }.onFailure {
+            logcat(ERROR) { "Error registering public key" }
+        }.getOrThrow()
 
         return Config.Builder()
             .setInterface(

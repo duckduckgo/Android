@@ -18,8 +18,7 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
-import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.configuration.EligibleLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
@@ -29,7 +28,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface NetpEgressServersProvider {
-    suspend fun updateServerLocationsAndReturnPreferred(): PreferredLocation?
+    suspend fun updateServerLocationsAndReturnPreferred(eligibleLocations: List<EligibleLocation>): PreferredLocation?
     suspend fun getServerLocations(): List<ServerLocation>
 
     data class ServerLocation(
@@ -46,12 +45,13 @@ interface NetpEgressServersProvider {
 
 @ContributesBinding(AppScope::class)
 class RealNetpEgressServersProvider @Inject constructor(
-    @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val dispatcherProvider: DispatcherProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
 ) : NetpEgressServersProvider {
-    override suspend fun updateServerLocationsAndReturnPreferred(): PreferredLocation? = withContext(dispatcherProvider.io()) {
-        val serverLocations = wgVpnControllerService.getEligibleLocations()
+    override suspend fun updateServerLocationsAndReturnPreferred(eligibleLocations: List<EligibleLocation>): PreferredLocation? = withContext(
+        dispatcherProvider.io(),
+    ) {
+        val serverLocations = eligibleLocations
             .map { location ->
                 NetPGeoswitchingLocation(
                     countryCode = location.country,

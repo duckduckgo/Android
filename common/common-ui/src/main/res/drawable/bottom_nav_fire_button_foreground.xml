@@ -14,8 +14,8 @@
    ~ limitations under the License.
    -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?daxColorSurfaceTransparent">
-    <item android:id="@android:id/mask">9
+    android:color="?daxColorControlFillTertiary">
+    <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
             <solid android:color="?attr/daxColorControlFillPrimary" />
             <corners android:radius="@dimen/largeShapeCornerRadius" />
