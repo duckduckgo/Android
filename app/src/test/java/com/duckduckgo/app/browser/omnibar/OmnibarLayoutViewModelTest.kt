@@ -1108,11 +1108,11 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModeChangedToCustomTabThenShowChatMenuTrue() = runTest {
+    fun whenViewModeChangedToCustomTabThenShowChatMenuFalse() = runTest {
         testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
+            assertFalse(viewState.showChatMenu)
         }
     }
 

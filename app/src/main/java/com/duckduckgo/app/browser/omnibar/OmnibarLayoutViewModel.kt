@@ -333,7 +333,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
-                            showChatMenu = true,
+                            showChatMenu = false,
                         )
                     }
                 }
