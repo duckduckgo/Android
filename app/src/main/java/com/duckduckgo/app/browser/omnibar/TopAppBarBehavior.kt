@@ -33,22 +33,6 @@ class TopAppBarBehavior(
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
 
-    private companion object {
-        private val viewsExemptedFromOffset = setOf(
-            R.id.browserLayout,
-            R.id.webViewFullScreenContainer,
-            R.id.navigationBar,
-        )
-    }
-
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: AppBarLayout, dependency: View): Boolean {
-        if (!viewsExemptedFromOffset.contains(dependency.id)) {
-            offsetBottomByToolbar(dependency)
-        }
-
-        return super.layoutDependsOn(parent, child, dependency)
-    }
-
     override fun onNestedPreScroll(
         coordinatorLayout: CoordinatorLayout,
         child: AppBarLayout,
@@ -61,19 +45,6 @@ class TopAppBarBehavior(
         if (target.id == R.id.browserWebView) {
             if (omnibar.isOmnibarScrollingEnabled()) {
                 super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-            }
-        }
-    }
-
-    private fun offsetBottomByToolbar(view: View?) {
-        val omnibarHeight = omnibar.measuredHeight()
-        if (omnibarHeight > 0 && view is View && view.layoutParams is MarginLayoutParams) {
-            val layoutParams = view.layoutParams as MarginLayoutParams
-            if (layoutParams.bottomMargin != omnibarHeight) {
-                layoutParams.bottomMargin = omnibarHeight
-                view.postOnAnimation {
-                    view.requestLayout()
-                }
             }
         }
     }
