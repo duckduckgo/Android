@@ -228,8 +228,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-    internal val spacer1X: FrameLayout? by lazy { findViewById(R.id.spacer1X) }
-    internal val spacer2X: FrameLayout? by lazy { findViewById(R.id.spacer2X) }
+    internal val spacer1X: View? by lazy { findViewById(R.id.spacer1X) }
+    internal val spacer2X: View? by lazy { findViewById(R.id.spacer2X) }
     internal val omniBarButtonTransitionSet: TransitionSet by lazy {
         TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
