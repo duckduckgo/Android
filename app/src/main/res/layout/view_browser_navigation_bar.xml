@@ -131,7 +131,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/tabsMenuItem"
             android:scaleType="center"
-            android:src="@drawable/ic_tab_switcher_experiment" />
+            android:src="@drawable/ic_tab_24" />
     </FrameLayout>
 
     <Space
