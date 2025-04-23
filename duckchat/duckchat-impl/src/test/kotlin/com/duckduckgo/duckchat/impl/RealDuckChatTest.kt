@@ -178,8 +178,8 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(
             State(
                 enable = true,
-                settings = SETTINGS_JSON_ADDRESS_BAR
-            )
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
         )
         testee.onPrivacyConfigDownloaded()
 
@@ -195,8 +195,8 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(
             State(
                 enable = true,
-                settings = SETTINGS_JSON_ADDRESS_BAR
-            )
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
         )
         testee.onPrivacyConfigDownloaded()
 
@@ -208,8 +208,8 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(
             State(
                 enable = true,
-                settings = SETTINGS_JSON_ADDRESS_BAR
-            )
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
         )
         testee.onPrivacyConfigDownloaded()
         whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
