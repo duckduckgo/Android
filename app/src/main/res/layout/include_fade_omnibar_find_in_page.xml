@@ -36,7 +36,7 @@
         android:gravity="center"
         android:importantForAccessibility="no"
         android:scaleType="center"
-        android:src="@drawable/ic_find_in_page_24e" />
+        android:src="@drawable/ic_find_in_page_24" />
 
     <EditText
         android:id="@+id/findInPageInput"

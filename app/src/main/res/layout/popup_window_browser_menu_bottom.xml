@@ -110,7 +110,7 @@
                 android:id="@+id/findInPageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_find_search_16"
+                app:iconDrawable="@drawable/ic_find_in_page_16"
                 app:primaryText="@string/findInPageMenuTitle" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
