@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">1 onglet</item>
-        <item quantity="other">%1$d onglets</item>
+        <item quantity="one">%1$d onglet privé</item>
+        <item quantity="other">%1$d onglets privés</item>
     </plurals>
 
     <!-- Private voice search -->
