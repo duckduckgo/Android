@@ -353,6 +353,6 @@ class RealDuckChat @Inject constructor(
         private const val BANG_QUERY_VALUE = "true"
         private const val DEFAULT_CHANGE_BOUNDS_DURATION = 400L
         private const val DEFAULT_FADE_DURATION = 200L
-        private const val DEFAULT_TENSION = 1.3F
+        private const val DEFAULT_TENSION = 1F
     }
 }
