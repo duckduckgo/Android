@@ -21,8 +21,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.CONTROL
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TREATMENT
 import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
@@ -48,7 +47,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val moshi: Moshi,
     private val pixel: DeviceShieldPixels,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : Interceptor, ApiInterceptorPlugin {
 
     private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
@@ -62,7 +61,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
             ?.isAnnotationPresent(AppTPTdsRequired::class.java) == true
 
         val appTpEnabled = runBlocking {
-            vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
+            appTrackingProtection.isEnabled()
         }
 
         return if (tdsRequired && appTpEnabled) {
