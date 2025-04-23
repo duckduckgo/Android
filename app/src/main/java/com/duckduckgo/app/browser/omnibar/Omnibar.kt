@@ -28,7 +28,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
@@ -209,7 +208,7 @@ class Omnibar(
         }
     }
 
-    private val findInPage: IncludeFindInPageBinding by lazy {
+    private val findInPage: FindInPage by lazy {
         newOmnibar.findInPage
     }
 

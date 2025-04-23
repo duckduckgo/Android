@@ -197,6 +197,7 @@ class ProSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.BUY_URL,
+                        origin = "funnel_appsettings_android",
                     ),
                 )
             }

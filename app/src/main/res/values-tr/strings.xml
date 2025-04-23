@@ -823,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Eğitimi Göster</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>

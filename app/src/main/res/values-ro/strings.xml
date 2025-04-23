@@ -839,6 +839,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Bate palma!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Afișează tutorialul</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>

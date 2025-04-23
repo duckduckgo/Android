@@ -855,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Piątka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Wypróbuj</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Pomiń</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Rozumiem! Pominę pozostałe wskazówki.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamiętaj: możesz usunąć wszystkie swoje karty, historię i dane przeglądania, dotykając dwukrotnie przycisku <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Pokaż samouczek</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>

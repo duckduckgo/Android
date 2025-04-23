@@ -855,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Daj pet!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Shvaćam! Preskočit ću ostale savjete.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Zapamti: pomoću <b>Fire Buttona</b> 🔥 u samo dva dodira možeš izbrisati sve svoje kartice, povijest i podatke pregledavanja.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vodič</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>

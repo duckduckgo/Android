@@ -64,7 +64,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -133,7 +132,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             val privacyShield: Boolean,
         ) : Decoration()
 
-        data class Outline(val enabled: Boolean) : Decoration()
         data class DisableVoiceSearch(val url: String) : Decoration()
     }
 
@@ -192,7 +190,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
-    internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    internal open val findInPage: FindInPage by lazy {
+        FindInPageImpl(IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)))
+    }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
@@ -718,10 +718,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             is PrivacyShieldChanged -> {
                 viewModel.onPrivacyShieldChanged(decoration.privacyShield)
-            }
-
-            is Outline -> {
-                viewModel.onOutlineEnabled(decoration.enabled)
             }
 
             Decoration.CancelAnimations -> {

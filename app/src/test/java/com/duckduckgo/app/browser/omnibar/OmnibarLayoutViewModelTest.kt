@@ -521,24 +521,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOutlineEnabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(true)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.hasFocus)
-        }
-    }
-
-    @Test
-    fun whenOutlineDisabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(false)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.hasFocus)
-        }
-    }
-
-    @Test
     fun whenClearTextButtonPressedThenViewStateCorrect() = runTest {
         testee.onClearTextButtonPressed()
         testee.viewState.test {

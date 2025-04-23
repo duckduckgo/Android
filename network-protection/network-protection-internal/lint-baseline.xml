@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="SimpleDateFormat"
@@ -19,7 +19,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="198"
+            line="200"
             column="17"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="216"
+            line="218"
             column="17"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="244"
+            line="256"
             column="17"/>
     </issue>
 

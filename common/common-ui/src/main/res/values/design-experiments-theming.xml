@@ -30,8 +30,8 @@
 
         <!-- Icons -->
         <item name="daxColorPrimaryIcon">@color/icon_primary_dark</item>
-        <item name="daxColorIconDisabled">@color/text_primary_dark</item>
         <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
+        <item name="daxColorIconDisabled">@color/icon_tertiary_dark</item>
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_dark</item>
@@ -63,6 +63,7 @@
         <!-- Icons -->
         <item name="daxColorPrimaryIcon">@color/icon_primary_light</item>
         <item name="daxColorSecondaryIcon">@color/icon_secondary_light</item>
+        <item name="daxColorIconDisabled">@color/icon_tertiary_light</item>
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_light</item>
