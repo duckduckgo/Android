@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -62,7 +63,8 @@ class FaviconModule {
     fun faviconDownloader(
         context: Context,
         dispatcherProvider: DispatcherProvider,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): FaviconDownloader {
-        return GlideFaviconDownloader(context, dispatcherProvider)
+        return GlideFaviconDownloader(context, dispatcherProvider, androidBrowserConfigFeature)
     }
 }
