@@ -496,7 +496,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         } else {
             lastSeenPrivacyShield = null
         }
-        //renderButtons(viewState)
+        // renderButtons(viewState)
         renderAnimatedButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
