@@ -65,7 +65,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/autofillManagementScreenTitle"
                 android:scaleType="center"
-                android:src="@drawable/ic_key_24e" />
+                android:src="@drawable/ic_key_24" />
         </FrameLayout>
 
     </FrameLayout>
