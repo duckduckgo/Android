@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="16dp"
-    android:height="16dp"
-    android:viewportWidth="16"
-    android:viewportHeight="16">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M16,8A8,8 0,1 1,0 8a8,8 0,0 1,16 0Z"
+      android:pathData="M12,2C6.477,2 2,6.477 2,12s4.477,10 10,10 10,-4.477 10,-10S17.523,2 12,2Z"
       android:fillColor="#FFCC33"/>
   <path
-      android:pathData="M8,2.667c-0.752,0 -1.338,0.652 -1.258,1.4l0.595,5.56a0.667,0.667 0,0 0,1.326 0l0.596,-5.56c0.08,-0.748 -0.506,-1.4 -1.259,-1.4ZM8,13.556a1.111,1.111 0,1 0,0 -2.223,1.111 1.111,0 0,0 0,2.223Z"
-      android:fillColor="#000"/>
+      android:pathData="M11.611,13.5a0.375,0.375 0,0 1,-0.375 -0.36l-0.253,-6.62a0.5,0.5 0,0 1,0.5 -0.52h1.032a0.5,0.5 0,0 1,0.5 0.519l-0.251,6.62a0.375,0.375 0,0 1,-0.375 0.361h-0.778ZM12,18a1.25,1.25 0,1 0,0 -2.5,1.25 1.25,0 0,0 0,2.5Z"
+      android:fillColor="?attr/daxColorWhite"/>
 </vector>

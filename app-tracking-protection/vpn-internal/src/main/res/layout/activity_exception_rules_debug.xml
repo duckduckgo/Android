@@ -44,7 +44,7 @@
                 android:id="@+id/exclusionListAppsWithIssuesLabel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"
-                app:panelDrawable="@drawable/ic_info_panel_alert"
+                app:panelDrawable="@drawable/ic_exclamation_yellow_16"
                 app:panelText="@string/exceptionRulesPanelTitle"
                 android:layout_margin="16dp"/>
 

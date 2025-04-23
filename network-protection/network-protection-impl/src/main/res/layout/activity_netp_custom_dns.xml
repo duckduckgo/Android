@@ -56,7 +56,7 @@
                 android:layout_margin="16dp"
                 android:visibility="gone"
                 app:panelBackground="@drawable/info_panel_alert_background"
-                app:panelDrawable="@drawable/ic_info_panel_alert" />
+                app:panelDrawable="@drawable/ic_exclamation_yellow_16" />
 
             <RadioGroup
                 android:layout_width="match_parent"
