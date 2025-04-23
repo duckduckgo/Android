@@ -81,6 +81,6 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/closeFindInPageButtonDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_close_24e" />
+        android:src="@drawable/ic_close_24" />
 
 </LinearLayout>
