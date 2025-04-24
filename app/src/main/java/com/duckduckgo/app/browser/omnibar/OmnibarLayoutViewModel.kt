@@ -104,7 +104,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isNavigationBarEnabled = navigationBarState.isEnabled,
-            showChat = shouldShowAIChat(state.viewMode, state.hasFocus),
+            showExperimentalChatButton = shouldShowExperimentalAIChatButton(state.viewMode, state.hasFocus),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -132,7 +132,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showBrowserMenu: Boolean = true,
         val showChatMenu: Boolean = true,
         val showBrowserMenuHighlight: Boolean = false,
-        val showChat: Boolean = false,
+        val showExperimentalChatButton: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -192,7 +192,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    showChat = shouldShowAIChat(it.viewMode, true),
+                    showExperimentalChatButton = shouldShowExperimentalAIChatButton(it.viewMode, true),
                     showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
@@ -227,7 +227,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
-                    showChat = shouldShowAIChat(it.viewMode, false),
+                    showExperimentalChatButton = shouldShowExperimentalAIChatButton(it.viewMode, false),
                     showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
@@ -309,8 +309,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
     }
 
-    private fun shouldShowAIChat(viewMode: ViewMode, hasFocus: Boolean): Boolean {
-        Timber.d("Omnibar: shouldShowAIChat viewMode $viewMode hasFocus $hasFocus")
+    /**
+     * We can't use [showChatMenu] because it takes the animation state into account
+     * Until we only have one omnibar we'll have to have two separate chat Booleans.
+     */
+    private fun shouldShowExperimentalAIChatButton(viewMode: ViewMode, hasFocus: Boolean): Boolean {
         return duckChat.showInAddressBar() && (hasFocus || viewMode is NewTab)
     }
 
@@ -331,7 +334,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showTabsMenu = false,
                             showFireIcon = false,
                             showChatMenu = false,
-                            showChat = false,
+                            showExperimentalChatButton = false,
                         )
                     }
                 }
@@ -360,7 +363,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
-                            showChat = shouldShowAIChat(it.viewMode, it.hasFocus),
+                            showExperimentalChatButton = shouldShowExperimentalAIChatButton(it.viewMode, it.hasFocus),
                         )
                     }
                 }
@@ -476,7 +479,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
                 showChatMenu = !showControls,
-                showChat = shouldShowAIChat(it.viewMode, hasFocus),
+                showExperimentalChatButton = shouldShowExperimentalAIChatButton(it.viewMode, hasFocus),
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
@@ -503,7 +506,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
-                showChat = shouldShowAIChat(it.viewMode, hasFocus = it.hasFocus),
+                showExperimentalChatButton = shouldShowExperimentalAIChatButton(it.viewMode, hasFocus = it.hasFocus),
             )
         }
     }

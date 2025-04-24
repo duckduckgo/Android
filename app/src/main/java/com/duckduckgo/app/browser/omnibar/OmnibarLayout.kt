@@ -614,7 +614,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = viewState.showBrowserMenu
         browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
-        aiChatMenu?.isVisible = viewState.showChat
+        aiChatMenu?.isVisible = viewState.showExperimentalChatButton
     }
 
     private fun renderAnimatedButtons(viewState: ViewState) {
