@@ -488,9 +488,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
-            is NewTab -> {
-                renderBrowserMode(viewState)
-            }
             else -> {
                 renderBrowserMode(viewState)
             }
