@@ -203,7 +203,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
-    internal val aiChatMenu: FrameLayout? by lazy { findViewById(R.id.aiChatIconMenu) }
+    internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
@@ -614,6 +614,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = viewState.showBrowserMenu
         browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+        aiChatMenu?.isVisible = viewState.showChat
     }
 
     private fun renderAnimatedButtons(viewState: ViewState) {

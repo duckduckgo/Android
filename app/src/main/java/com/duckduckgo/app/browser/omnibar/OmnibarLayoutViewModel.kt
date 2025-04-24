@@ -45,7 +45,6 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -59,7 +58,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -91,8 +89,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val appPersonalityFeature: AppPersonalityFeature,
-    private val userStageStore: UserStageStore,
-    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -108,7 +104,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isNavigationBarEnabled = navigationBarState.isEnabled,
-            showChat = shouldShowAIChat(),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -196,7 +191,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    showChat = shouldShowAIChat(),
+                    showChat = shouldShowAIChat(it.viewMode, true),
                     showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
@@ -231,7 +226,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
-                    showChat = shouldShowAIChat(),
+                    showChat = shouldShowAIChat(it.viewMode, false),
                     showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
@@ -313,8 +308,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
     }
 
-    private fun shouldShowAIChat(): Boolean {
-        return duckChat.isEnabled() && duckChat.showInBrowserMenu()
+    private fun shouldShowAIChat(viewMode: ViewMode, hasFocus: Boolean): Boolean {
+        Timber.d("Omnibar: shouldShowAIChat viewMode $viewMode hasFocus $hasFocus")
+        return duckChat.showInAddressBar() && (hasFocus || viewMode is NewTab)
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
@@ -477,6 +473,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
                 showChatMenu = !showControls,
+                showChat = shouldShowAIChat(it.viewMode, hasFocus),
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
@@ -503,7 +500,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
-                showChat = shouldShowAIChat(),
+                showChat = shouldShowAIChat(it.viewMode, hasFocus = it.hasFocus),
             )
         }
     }

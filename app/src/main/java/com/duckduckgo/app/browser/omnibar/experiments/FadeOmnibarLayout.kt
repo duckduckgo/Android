@@ -55,7 +55,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
 
-    private val aiChat: ImageView by lazy { findViewById(R.id.aiChat) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
@@ -169,8 +168,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             super.render(experimentalViewState)
         }
 
-        aiChat.isVisible = viewState.showChat
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChat
+        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
         spacer.isVisible = false
 
         val showBackArrow = viewState.hasFocus
@@ -297,9 +295,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
         fadeOmnibarItemPressedListener = itemPressedListener
-        aiChat.setOnClickListener {
-            fadeOmnibarItemPressedListener?.onDuckChatButtonPressed()
-        }
         backIcon.setOnClickListener {
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
@@ -311,6 +306,5 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 }
 
 interface FadeOmnibarItemPressedListener {
-    fun onDuckChatButtonPressed()
     fun onBackButtonPressed()
 }
