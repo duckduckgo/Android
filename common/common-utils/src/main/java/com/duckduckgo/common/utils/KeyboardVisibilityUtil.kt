@@ -29,32 +29,13 @@ class KeyboardVisibilityUtil(private val rootView: View) {
         rootView.viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    if (isKeyboardVisible()) {
+                    if (rootView.isKeyboardVisible()) {
                         rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                         onKeyboardVisible()
                     }
                 }
             },
         )
-    }
-
-    fun addKeyboardHiddenListener(onKeyboardHidden: () -> Unit) {
-        var wasKeyboardVisible = isKeyboardVisible()
-        rootView.viewTreeObserver.addOnGlobalLayoutListener {
-            val isVisible = isKeyboardVisible()
-            if (wasKeyboardVisible && !isVisible) {
-                onKeyboardHidden()
-            }
-            wasKeyboardVisible = isVisible
-        }
-    }
-
-    private fun isKeyboardVisible(): Boolean {
-        val rect = Rect()
-        rootView.getWindowVisibleDisplayFrame(rect)
-        val screenHeight = rootView.height
-        val keypadHeight = screenHeight - rect.bottom
-        return keypadHeight > screenHeight * KEYBOARD_VISIBILITY_THRESHOLD
     }
 }
 
