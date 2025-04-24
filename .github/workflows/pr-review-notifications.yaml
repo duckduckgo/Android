@@ -11,4 +11,4 @@ jobs:
     with:
       trigger-phrase: "Task/Issue URL:"
     secrets:
-      asana_pat: ${{ secrets.GH_ASANA_SECRET }}
+      asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

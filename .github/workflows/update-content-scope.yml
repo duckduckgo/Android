@@ -79,7 +79,7 @@ jobs:
         id: create-task
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
@@ -95,7 +95,7 @@ jobs:
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
@@ -117,7 +117,7 @@ jobs:
         if: ${{ failure() }}
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Update content scope scripts
