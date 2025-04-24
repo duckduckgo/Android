@@ -353,7 +353,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="AI Chat"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_ai_chat_outline_24" />
+                    android:src="@drawable/ic_ai_chat_24" />
             </FrameLayout>
 
             <FrameLayout
