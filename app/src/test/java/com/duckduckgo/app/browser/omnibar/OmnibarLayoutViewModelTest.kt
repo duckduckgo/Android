@@ -18,7 +18,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,9 +34,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -124,31 +121,83 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChat)
+            assertFalse(viewState.showExperimentalChatButton)
         }
     }
 
     @Test
-    fun whenViewModelAttachedAndDuckChatAndChatInBrowserEnabledThenDuckChatIconEnabled() = runTest {
+    fun whenNewTabShownAndDuckChatEnabledThenDuckChatIconEnabled() = runTest {
         whenever(duckChat.showInAddressBar()).thenReturn(true)
 
-        initializeViewModel()
+        testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChat)
+            assertTrue(viewState.showExperimentalChatButton)
         }
     }
 
     @Test
-    fun whenViewModelAttachedAndDuckChatOnlyEnabledThenDuckChatIconDisabled() = runTest {
+    fun whenNewTabShownAndDuckChatDisabledThenDuckChatIconDisabled() = runTest {
         whenever(duckChat.showInAddressBar()).thenReturn(false)
 
-        initializeViewModel()
+        testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertFalse(viewState.showChat)
+            assertFalse(viewState.showExperimentalChatButton)
+        }
+    }
+
+    @Test
+    fun whenBrowserShownAndDuckChatDisabledAndOmnibarFocusedThenDuckChatIconDisabled() = runTest {
+        whenever(duckChat.showInAddressBar()).thenReturn(false)
+
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onOmnibarFocusChanged(true, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showExperimentalChatButton)
+        }
+    }
+
+    @Test
+    fun whenBrowserShownAndDuckChatDisabledAndOmnibarNotFocusedThenDuckChatIconDisabled() = runTest {
+        whenever(duckChat.showInAddressBar()).thenReturn(false)
+
+        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showExperimentalChatButton)
+        }
+    }
+
+    @Test
+    fun whenBrowserShownAndDuckChatEnabledAndOmnibarFocusedThenDuckChatIconEnabled() = runTest {
+        whenever(duckChat.showInAddressBar()).thenReturn(true)
+
+        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
+        testee.onOmnibarFocusChanged(true, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showExperimentalChatButton)
+        }
+    }
+
+    @Test
+    fun whenBrowserShownAndDuckChatEnabledAndOmnibarNotFocusedThenDuckChatIconDisabled() = runTest {
+        whenever(duckChat.showInAddressBar()).thenReturn(true)
+
+        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showExperimentalChatButton)
         }
     }
 
@@ -156,11 +205,9 @@ class OmnibarLayoutViewModelTest {
     fun whenViewModelAttachedAndDuckChatDisabledThenDuckChatIconEnabled() = runTest {
         whenever(duckChat.showInAddressBar()).thenReturn(false)
 
-        initializeViewModel()
-
         testee.viewState.test {
             val viewState = awaitItem()
-            assertFalse(viewState.showChat)
+            assertFalse(viewState.showExperimentalChatButton)
         }
     }
 
