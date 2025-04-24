@@ -88,6 +88,7 @@ class RealDuckChatTest {
     @Before
     fun setup() = runTest {
         whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
+        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         setFeatureToggle(true)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
@@ -103,6 +104,18 @@ class RealDuckChatTest {
     fun whenSetShowInBrowserMenuSetFalseThenPixelOffIsSent() = runTest {
         testee.setShowInBrowserMenuUserSetting(false)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuUserSettingThenRepositorySetCalled() = runTest {
+        testee.setShowInBrowserMenuUserSetting(true)
+        verify(mockDuckPlayerFeatureRepository).setShowInBrowserMenu(true)
+    }
+
+    @Test
+    fun whenSetShowInAddressBarUserSettingThenRepositorySetCalled() = runTest {
+        testee.setShowInAddressBarUserSetting(true)
+        verify(mockDuckPlayerFeatureRepository).setShowInAddressBar(true)
     }
 
     @Test
@@ -129,6 +142,15 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenObserveShowInAddressBarUserSettingThenEmitCorrectValues() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.observeShowInAddressBar()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeShowInAddressBarUserSetting().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
         val result = testee.showInBrowserMenu()
         assertTrue(result)
@@ -140,6 +162,38 @@ class RealDuckChatTest {
 
         val result = testee.showInBrowserMenu()
         assertFalse(result)
+    }
+
+    @Test
+    fun whenConfigSetsAddressBarEntryPointThenIsAddressBarEntryPointEnabledReturnsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isAddressBarEntryPointEnabled())
+    }
+
+    @Test
+    fun showInAddressBarReturnsCorrectValueBasedOnUserSettingAndConfig() = runTest {
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        testee.onPrivacyConfigDownloaded()
+        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+
+        testee.setShowInAddressBarUserSetting(true)
+        assertTrue(testee.showInAddressBar())
+
+        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        testee.setShowInAddressBarUserSetting(false)
+        assertFalse(testee.showInAddressBar())
     }
 
     @Test
@@ -331,6 +385,16 @@ class RealDuckChatTest {
         val SETTINGS_JSON_NO_REGEX = """
         {
             "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+        }
+        """.trimIndent()
+
+        val SETTINGS_JSON_ADDRESS_BAR = """
+        {
+            "addressBarEntryPoint": true,
+            "addressBarAnimation": true,
+            "addressBarChangeBoundsDuration": 123,
+            "addressBarFadeDuration": 456,
+            "addressBarTension": 7.8
         }
         """.trimIndent()
     }

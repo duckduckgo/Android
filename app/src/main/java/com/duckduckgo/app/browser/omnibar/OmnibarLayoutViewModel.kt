@@ -134,6 +134,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
+        val showChatMenu: Boolean = true,
         val showBrowserMenuHighlight: Boolean = false,
         val showChat: Boolean = false,
         val scrollingEnabled: Boolean = true,
@@ -196,6 +197,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
                     showChat = shouldShowAIChat(),
+                    showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -230,6 +232,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showFireIcon = true,
                     showBrowserMenu = true,
                     showChat = shouldShowAIChat(),
+                    showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -330,6 +333,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
+                            showChatMenu = false,
                         )
                     }
                 }
@@ -392,6 +396,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
+                showChatMenu = false,
             )
         }
     }
@@ -471,6 +476,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
+                showChatMenu = !showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,

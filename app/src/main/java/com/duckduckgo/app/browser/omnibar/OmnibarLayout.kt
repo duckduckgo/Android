@@ -21,10 +21,15 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -32,6 +37,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -51,6 +57,7 @@ import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
@@ -70,6 +77,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -80,6 +88,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -92,6 +101,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -132,6 +142,17 @@ open class OmnibarLayout @JvmOverloads constructor(
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
+    data class TransitionState(
+        val showClearButton: Boolean,
+        val showVoiceSearch: Boolean,
+        val showTabsMenu: Boolean,
+        val showFireIcon: Boolean,
+        val showBrowserMenu: Boolean,
+        val showBrowserMenuHighlight: Boolean,
+        val showChatMenu: Boolean,
+        val showSpacer: Boolean,
+    )
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -145,10 +166,21 @@ open class OmnibarLayout @JvmOverloads constructor(
     lateinit var pixel: Pixel
 
     @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
+
+    @Inject
+    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+
+    @Inject
+    lateinit var omnibarAnimationManager: OmnibarAnimationManager
+
+    private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -171,6 +203,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val aiChatMenu: FrameLayout? by lazy { findViewById(R.id.aiChatIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
@@ -178,7 +211,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
     internal val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
-    internal val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    internal val toolbarContainer: ViewGroup by lazy { findViewById(R.id.toolbarContainer) }
     internal val customTabToolbarContainer by lazy {
         IncludeCustomTabToolbarBinding.bind(
             findViewById(R.id.customTabToolbarContainer),
@@ -198,6 +231,30 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
+    internal val spacer1X: View? by lazy { findViewById(R.id.spacer1X) }
+    internal val spacer2X: View? by lazy { findViewById(R.id.spacer2X) }
+    internal val omniBarButtonTransitionSet: TransitionSet by lazy {
+        TransitionSet().apply {
+            ordering = TransitionSet.ORDERING_TOGETHER
+            addTransition(
+                ChangeBounds().apply {
+                    duration = omnibarAnimationManager.getChangeBoundsDuration()
+                    interpolator = OvershootInterpolator(omnibarAnimationManager.getTension())
+                },
+            )
+            addTransition(
+                Fade().apply {
+                    duration = omnibarAnimationManager.getFadeDuration()
+                    addTarget(clearTextButton)
+                    addTarget(voiceSearchButton)
+                    addTarget(fireIconMenu)
+                    addTarget(tabsMenu)
+                    addTarget(aiChatMenu)
+                    addTarget(browserMenu)
+                },
+            )
+        }
+    }
 
     internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
@@ -401,6 +458,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
+        aiChatMenu?.setOnClickListener {
+            omnibarItemPressedListener?.onDuckChatButtonPressed()
+        }
         shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onPrivacyShieldButtonPressed()
@@ -428,7 +488,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
-
             else -> {
                 renderBrowserMode(viewState)
             }
@@ -439,7 +498,16 @@ open class OmnibarLayout @JvmOverloads constructor(
         } else {
             lastSeenPrivacyShield = null
         }
-        renderButtons(viewState)
+
+        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            renderButtons(viewState)
+        } else {
+            renderAnimatedButtons(viewState)
+        }
+
+        omniBarButtonTransitionSet.doOnEnd {
+            omnibarTextInput.requestLayout()
+        }
     }
 
     open fun processCommand(command: OmnibarLayoutViewModel.Command) {
@@ -548,6 +616,54 @@ open class OmnibarLayout @JvmOverloads constructor(
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
+    private fun renderAnimatedButtons(viewState: ViewState) {
+        val newTransitionState = TransitionState(
+            showClearButton = viewState.showClearButton,
+            showVoiceSearch = viewState.showVoiceSearch,
+            showTabsMenu = viewState.showTabsMenu,
+            showFireIcon = viewState.showFireIcon,
+            showBrowserMenu = viewState.showBrowserMenu,
+            showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
+            showChatMenu = duckChat.showInAddressBar() && (viewState.showChatMenu || viewState.viewMode is NewTab),
+            showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+        )
+
+        if (omnibarAnimationManager.isFeatureEnabled() &&
+            previousTransitionState != null &&
+            newTransitionState != previousTransitionState &&
+            !viewState.isLoading
+        ) {
+            TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
+        }
+
+        if (!newTransitionState.showVoiceSearch) {
+            clearTextButton.isInvisible = !newTransitionState.showClearButton
+            spacer1X?.isVisible = newTransitionState.showSpacer
+            spacer2X?.isVisible = false
+        } else {
+            clearTextButton.isVisible = newTransitionState.showClearButton
+            if (newTransitionState.showClearButton) {
+                spacer2X?.isVisible = newTransitionState.showSpacer
+                spacer1X?.isVisible = false
+            } else {
+                spacer1X?.isVisible = newTransitionState.showSpacer
+                spacer2X?.isVisible = false
+            }
+        }
+        voiceSearchButton.isInvisible = !newTransitionState.showVoiceSearch
+        tabsMenu.isVisible = newTransitionState.showTabsMenu
+        fireIconMenu.isVisible = newTransitionState.showFireIcon
+        browserMenu.isVisible = newTransitionState.showBrowserMenu
+        browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
+        aiChatMenu?.isVisible = newTransitionState.showChatMenu
+
+        if (omnibarAnimationManager.isFeatureEnabled()) {
+            toolbarContainer.requestLayout()
+        }
+
+        previousTransitionState = newTransitionState
+    }
+
     private fun renderBrowserMode(viewState: ViewState) {
         renderOutline(viewState.hasFocus)
         if (viewState.updateOmnibarText) {
@@ -572,6 +688,16 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState.leadingIconState)
+
+        renderHint(viewState)
+    }
+
+    private fun renderHint(viewState: ViewState) {
+        if (viewState.viewMode is NewTab && duckChat.showInAddressBar()) {
+            omnibarTextInput.hint = context.getString(R.string.search)
+        } else {
+            omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
+        }
     }
 
     private fun renderCustomTabMode(

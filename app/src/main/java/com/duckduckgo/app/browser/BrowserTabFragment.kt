@@ -2708,6 +2708,10 @@ class BrowserTabFragment :
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
                 }
+
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
+                }
             },
         )
         omnibar.configureFadeOmnibarItemPressedListeners(

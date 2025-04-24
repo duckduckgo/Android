@@ -41,24 +41,34 @@ class DuckChatSettingsViewModelTest {
     private val duckChat: DuckChatInternal = mock()
 
     @Before
-    fun setUp() {
-        runTest {
-            testee = DuckChatSettingsViewModel(duckChat)
-        }
+    fun setUp() = runTest {
+        whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
+        whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
+        testee = DuckChatSettingsViewModel(duckChat)
     }
 
     @Test
     fun whenShowDuckChatInMenuDisabledThenSetUserSetting() = runTest {
         testee.onShowDuckChatInMenuToggled(false)
-
         verify(duckChat).setShowInBrowserMenuUserSetting(false)
     }
 
     @Test
     fun whenShowDuckChatInMenuEnabledThenSetUserSetting() = runTest {
         testee.onShowDuckChatInMenuToggled(true)
-
         verify(duckChat).setShowInBrowserMenuUserSetting(true)
+    }
+
+    @Test
+    fun whenShowDuckChatInAddressBarDisabledThenSetUserSetting() = runTest {
+        testee.onShowDuckChatInAddressBarToggled(false)
+        verify(duckChat).setShowInAddressBarUserSetting(false)
+    }
+
+    @Test
+    fun whenShowDuckChatInAddressBarEnabledThenSetUserSetting() = runTest {
+        testee.onShowDuckChatInAddressBarToggled(true)
+        verify(duckChat).setShowInAddressBarUserSetting(true)
     }
 
     @Test
@@ -78,6 +88,26 @@ class DuckChatSettingsViewModelTest {
 
         testee.viewState.test {
             assertFalse(awaitItem().showInBrowserMenu)
+        }
+    }
+
+    @Test
+    fun whenViewModelIsCreatedAndShowInAddressBarIsEnabledThenEmitEnabled() = runTest {
+        whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(true))
+        testee = DuckChatSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().showInAddressBar)
+        }
+    }
+
+    @Test
+    fun whenViewModelIsCreatedAndShowInAddressBarIsDisabledThenEmitDisabled() = runTest {
+        whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
+        testee = DuckChatSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().showInAddressBar)
         }
     }
 }
