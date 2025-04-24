@@ -147,7 +147,7 @@
                 android:id="@+id/brokenSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_feedback_16"
+                app:iconDrawable="@drawable/ic_feedback_blank_16"
                 app:primaryText="@string/brokenSiteReportBrokenSiteMenuItem" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
