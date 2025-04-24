@@ -108,7 +108,6 @@ class OnboardingDaxDialogTests {
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
-            mockRefreshPixelSender,
             mockUserBrowserProperties,
         )
     }

@@ -12,6 +12,7 @@ import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
 import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -119,7 +120,7 @@ class RefreshPixelSenderTest {
     @Test
     fun whenRefreshedTwiceAndThriceAndAssignedToExperimentThen2XRefreshPixelsFired() = runTest {
         assignToExperiment()
-        testee.onRefreshPatternDetected(setOf(2, 3))
+        testee.onRefreshPatternDetected(setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS))
 
         blockListPixelsPlugin.get2XRefresh()!!.getPixelDefinitions().forEach {
             verify(mockPixel).fire(it.pixelName, it.params)
@@ -133,7 +134,7 @@ class RefreshPixelSenderTest {
 
     @Test
     fun whenRefreshedTwiceAndNotAssignedToExperimentThenExperiment2XRefreshPixelsNotFired() = runTest {
-        testee.onRefreshPatternDetected(setOf(2))
+        testee.onRefreshPatternDetected(setOf(RefreshPattern.TWICE_IN_12_SECONDS))
 
         blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
             verify(mockPixel, never()).fire(it.pixelName, it.params)
@@ -143,26 +144,12 @@ class RefreshPixelSenderTest {
 
     @Test
     fun whenRefreshedThriceAndNotAssignedToExperimentThenExperiment3XRefreshPixelsNotFired() = runTest {
-        testee.onRefreshPatternDetected(setOf(3))
+        testee.onRefreshPatternDetected(setOf(RefreshPattern.THRICE_IN_20_SECONDS))
 
         blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
             verify(mockPixel, never()).fire(it.pixelName, it.params)
         }
         verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-    }
-
-    @Test
-    fun whenUnknownRefreshPatternDetectedThenNoPixelsFired() = runTest {
-        testee.onRefreshPatternDetected(setOf(5))
-
-        blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel, never()).fire(it.pixelName, it.params)
-        }
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
-        blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel, never()).fire(it.pixelName, it.params)
-        }
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
     }
 
     private fun assignToExperiment() {

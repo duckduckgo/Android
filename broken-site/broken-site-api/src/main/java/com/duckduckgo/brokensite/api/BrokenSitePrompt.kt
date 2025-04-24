@@ -30,9 +30,15 @@ interface BrokenSitePrompt {
 
     fun resetRefreshCount()
 
-    fun getUserRefreshesCount(): Set<Int>
+    fun getUserRefreshesCount(): Set<RefreshPattern>
 
     suspend fun shouldShowBrokenSitePrompt(url: String): Boolean
 
     suspend fun ctaShown()
+}
+
+enum class RefreshPattern(val value: Int) {
+    TWICE_IN_12_SECONDS(2),
+    THRICE_IN_20_SECONDS(3),
+    ;
 }

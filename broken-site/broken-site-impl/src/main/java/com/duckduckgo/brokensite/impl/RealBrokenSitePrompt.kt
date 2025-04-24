@@ -19,6 +19,7 @@ package com.duckduckgo.brokensite.impl
 import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -63,7 +64,7 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.resetRefreshCount()
     }
 
-    override fun getUserRefreshesCount(): Set<Int> {
+    override fun getUserRefreshesCount(): Set<RefreshPattern> {
         return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 

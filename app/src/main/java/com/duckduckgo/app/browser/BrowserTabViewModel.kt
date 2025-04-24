@@ -279,6 +279,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -2782,11 +2783,14 @@ class BrowserTabViewModel @Inject constructor(
             val isBrowserShowing = currentBrowserViewState().browserShowing
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
+            val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
+            handleBreakageRefreshPatterns(detectedRefreshPatterns)
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
                     isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
+                    detectedRefreshPatterns,
                 )
             }
             val contextDaxDialogsShown = withContext(dispatchers.io()) {
@@ -3999,16 +4003,6 @@ class BrowserTabViewModel @Inject constructor(
         newTabPixels.get().fireNewTabDisplayed()
     }
 
-    // private suspend fun shouldShowPromptForBrokenSiteReport(): Boolean {
-    //     val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
-    //     refreshPixelSender.sendBreakageRefreshPixels(detectedRefreshPatterns)
-    //     if (3 in detectedRefreshPatterns) {
-    //         Timber.d("KateTest--> should show bc 3 refreshes")
-    //         return site?.url?.let { brokenSitePrompt.shouldShowBrokenSitePrompt(it) } ?: false
-    //     }
-    //     return false
-    // }
-
     fun handleMenuRefreshAction() {
         refreshPixelSender.sendMenuRefreshPixels()
     }
@@ -4019,6 +4013,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
+    }
+
+    fun handleBreakageRefreshPatterns(refreshPatterns: Set<RefreshPattern>) {
+        refreshPixelSender.onRefreshPatternDetected(refreshPatterns)
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {

@@ -18,6 +18,7 @@ package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -59,7 +60,7 @@ interface BrokenSiteReportRepository {
 
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
 }
 
 class RealBrokenSiteReportRepository(
@@ -160,7 +161,7 @@ class RealBrokenSiteReportRepository(
         brokenSiteRefreshesInMemoryStore.addRefresh(url, localDateTime)
     }
 
-    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
         return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime)
     }
 

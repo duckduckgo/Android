@@ -17,6 +17,7 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -27,7 +28,7 @@ import timber.log.Timber
 interface BrokenSiteRefreshesInMemoryStore {
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int>
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
 }
 
 @ContributesBinding(AppScope::class)
@@ -52,9 +53,9 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         }
     }
 
-    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<Int> {
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
         val currentRefreshes = refreshes ?: return emptySet()
-        val detectedPatterns = mutableSetOf<Int>()
+        val detectedPatterns = mutableSetOf<RefreshPattern>()
 
         val twiceWindowSecondsAgo = currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS)
         val thriceWindowSecondsAgo = currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)
@@ -64,7 +65,7 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         }
 
         if (refreshesWithinTwiceWindow.size >= TWICE_REFRESH) {
-            detectedPatterns.add(TWICE_REFRESH)
+            detectedPatterns.add(RefreshPattern.TWICE_IN_12_SECONDS)
             Timber.d("KateTest-> Detected 2 refreshes in 12 seconds for URL: ${currentRefreshes.url}")
         }
 
@@ -73,7 +74,7 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         }
 
         if (refreshesWithinThriceWindow.size >= THRICE_REFRESH) {
-            detectedPatterns.add(THRICE_REFRESH)
+            detectedPatterns.add(RefreshPattern.THRICE_IN_20_SECONDS)
             Timber.d("KateTest-> Detected 3 refreshes in 20 seconds for URL: ${currentRefreshes.url}")
         }
 
