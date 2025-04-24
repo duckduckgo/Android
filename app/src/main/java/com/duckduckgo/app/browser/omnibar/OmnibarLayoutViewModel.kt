@@ -104,6 +104,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isNavigationBarEnabled = navigationBarState.isEnabled,
+            showChat = shouldShowAIChat(state.viewMode, state.hasFocus),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -330,6 +331,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showTabsMenu = false,
                             showFireIcon = false,
                             showChatMenu = false,
+                            showChat = false,
                         )
                     }
                 }
@@ -358,6 +360,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
+                            showChat = shouldShowAIChat(it.viewMode, it.hasFocus),
                         )
                     }
                 }

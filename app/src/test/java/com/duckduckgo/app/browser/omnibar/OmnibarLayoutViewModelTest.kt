@@ -73,10 +73,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
-    private val mockToggle: Toggle = mock()
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
-    private val mockUserStageStore: UserStageStore = mock()
-    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -122,9 +119,18 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenViewModelAttachedThenDuckChatIconDisabled() = runTest {
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChat)
+        }
+    }
+
+    @Test
     fun whenViewModelAttachedAndDuckChatAndChatInBrowserEnabledThenDuckChatIconEnabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(true)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(true)
+        whenever(duckChat.showInAddressBar()).thenReturn(true)
 
         initializeViewModel()
 
@@ -136,8 +142,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModelAttachedAndDuckChatOnlyEnabledThenDuckChatIconDisabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(true)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
+        whenever(duckChat.showInAddressBar()).thenReturn(false)
 
         initializeViewModel()
 
@@ -149,8 +154,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModelAttachedAndDuckChatDisabledThenDuckChatIconEnabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(false)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
+        whenever(duckChat.showInAddressBar()).thenReturn(false)
 
         initializeViewModel()
 
@@ -174,8 +178,6 @@ class OmnibarLayoutViewModelTest {
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             appPersonalityFeature = fakeAppPersonalityFeature,
-            userStageStore = mockUserStageStore,
-            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
     }
 
