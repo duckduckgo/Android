@@ -49,6 +49,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
@@ -118,11 +119,7 @@ class Omnibar(
                     }
                 }
 
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
         }
     }
@@ -198,6 +195,21 @@ class Omnibar(
                     FADE -> binding.fadeOmnibarBottom
                 }
             }
+        }
+    }
+
+    /**
+     * When bottom omnibar is used, this function removes the default top app bar behavior as most of the offsets are handled via [BottomAppBarBehavior].
+     *
+     * However, the browser (web view) content offset is managed via [BottomOmnibarBrowserContainerLayoutBehavior].
+     */
+    private fun adjustCoordinatorLayoutBehaviorForBottomOmnibar() {
+        removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+        removeAppBarBehavior(binding.focusedView)
+        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+
+        binding.browserLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = BottomOmnibarBrowserContainerLayoutBehavior()
         }
     }
 
