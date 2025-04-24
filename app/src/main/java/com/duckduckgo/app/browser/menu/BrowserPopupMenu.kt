@@ -309,7 +309,7 @@ class BrowserPopupMenu(
             ).toString()
         }
         privacyProtectionMenuItem.setIcon(
-            if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
         )
         brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
 

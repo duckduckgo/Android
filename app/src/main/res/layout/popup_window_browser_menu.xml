@@ -188,7 +188,7 @@
                 android:id="@+id/privacyProtectionMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_protections_blocked_16"
+                app:iconDrawable="@drawable/ic_shield_disabled_16"
                 app:primaryText="@string/enablePrivacyProtection" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
