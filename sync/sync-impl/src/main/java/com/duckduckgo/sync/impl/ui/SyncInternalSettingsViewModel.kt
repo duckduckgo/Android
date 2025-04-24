@@ -210,7 +210,8 @@ constructor(
 
     fun onQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.processCode(contents)
+            val codeType = syncAccountRepository.getCodeType(contents)
+            val result = syncAccountRepository.processCode(codeType)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -220,7 +221,8 @@ constructor(
 
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.processCode(contents)
+            val codeType = syncAccountRepository.getCodeType(contents)
+            val result = syncAccountRepository.processCode(codeType)
             when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
@@ -289,7 +291,8 @@ constructor(
     private suspend fun authFlow(
         pastedCode: String,
     ) {
-        val result = syncAccountRepository.processCode(pastedCode)
+        val codeType = syncAccountRepository.getCodeType(pastedCode)
+        val result = syncAccountRepository.processCode(codeType)
         when (result) {
             is Result.Success -> command.send(Command.LoginSuccess)
             is Result.Error -> {
