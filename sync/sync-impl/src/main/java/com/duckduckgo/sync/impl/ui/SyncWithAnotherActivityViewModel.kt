@@ -29,7 +29,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType.EXCHANGE
+import com.duckduckgo.sync.impl.CodeType
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -172,14 +172,14 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
             val codeType = syncAccountRepository.getCodeType(qrCode)
-            when (val result = syncAccountRepository.processCode(qrCode)) {
+            when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     Timber.w("Sync: error processing code ${result.reason}")
                     emitError(result, qrCode)
                 }
 
                 is Success -> {
-                    if (codeType == EXCHANGE) {
+                    if (codeType is CodeType.Exchange) {
                         pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
                         onLoginSuccess(previousPrimaryKey)

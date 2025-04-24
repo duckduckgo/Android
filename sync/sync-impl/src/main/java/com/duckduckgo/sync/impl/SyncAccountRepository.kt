@@ -33,12 +33,16 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.CodeType.UNKNOWN
+import com.duckduckgo.sync.impl.CodeType.Connect
+import com.duckduckgo.sync.impl.CodeType.Exchange
+import com.duckduckgo.sync.impl.CodeType.Recovery
+import com.duckduckgo.sync.impl.CodeType.Unknown
 import com.duckduckgo.sync.impl.ExchangeResult.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
@@ -56,7 +60,7 @@ interface SyncAccountRepository {
     fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(stringCode: String): Result<Boolean>
+    fun processCode(code: CodeType): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -129,57 +133,71 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(stringCode: String): Result<Boolean> {
-        val decodedCode: String? = kotlin.runCatching {
-            return@runCatching stringCode.decodeB64()
-        }.getOrNull()
-        if (decodedCode == null) {
-            Timber.w("Failed while b64 decoding barcode; barcode is unusable")
-            return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
-        }
-
-        kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
-        }.getOrNull()?.let {
-            Timber.d("Sync: code is a recovery code")
-            return login(it)
-        }
-
-        kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
-        }.getOrNull()?.let {
-            Timber.d("Sync: code is a connect code")
-            return connectDevice(it)
-        }
-
-        kotlin.runCatching {
-            Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
-        }.getOrNull()?.let {
-            if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
-                Timber.w("Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled")
-                return@let null
+    override fun processCode(code: CodeType): Result<Boolean> {
+        when (code) {
+            is Recovery -> {
+                Timber.d("Sync: code is a recovery code")
+                return login(code.code)
             }
 
-            return onInvitationCodeReceived(it)
-        }
+            is Connect -> {
+                Timber.d("Sync: code is a connect code")
+                return connectDevice(code.code)
+            }
 
-        Timber.e("Sync: code is not supported")
+            is Exchange -> {
+                if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
+                    Timber.w("Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled")
+                } else {
+                    return onInvitationCodeReceived(code.code)
+                }
+            }
+
+            else -> {
+                Timber.d("Sync: code type unknown")
+            }
+        }
+        Timber.e("Sync: code type (${code.javaClass.simpleName}) is not supported")
         return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
     }
 
     override fun getCodeType(stringCode: String): CodeType {
+        // check first if it's a URL which contains the code
+        val (code, wasInUrl) = kotlin.runCatching {
+            SyncBarcodeUrl.parseUrl(stringCode)?.webSafeB64EncodedCode?.removeUrlSafetyToRestoreB64()
+                ?.let { Pair(it, true) }
+                ?: Pair(stringCode, false)
+        }.getOrDefault(Pair(stringCode, false))
+
+        if (wasInUrl && syncFeature.canScanUrlBasedSyncSetupBarcodes().isEnabled().not()) {
+            Timber.e("Feature to allow scanning URL-based sync setup codes is disabled")
+            return Unknown(code)
+        }
+
         return kotlin.runCatching {
-            val decodedCode = stringCode.decodeB64()
-            when {
-                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery != null -> CodeType.RECOVERY
-                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect != null -> CodeType.CONNECT
-                Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey != null -> CodeType.EXCHANGE
-                else -> UNKNOWN
+            val decodedCode = code.decodeB64()
+
+            canParseAsRecoveryCode(decodedCode)?.let {
+                if (wasInUrl) {
+                    throw IllegalArgumentException("Sync: Recovery code found inside a URL which is not acceptable")
+                } else {
+                    Recovery(it)
+                }
             }
-        }.onFailure {
+                ?: canParseAsExchangeCode(decodedCode)?.let { Exchange(it) }
+                ?: canParseAsConnectCode(decodedCode)?.let { Connect(it) }
+                ?: Unknown(code)
+        }.onSuccess {
+            Timber.i("Sync: code type is ${it.javaClass.simpleName}. was inside url: $wasInUrl")
+        }.getOrElse {
             Timber.e(it, "Failed to decode code")
-        }.getOrDefault(UNKNOWN)
+            Unknown(code)
+        }
     }
+
+    private fun canParseAsRecoveryCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
+    private fun canParseAsExchangeCode(decodedCode: String) = Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
+    private fun canParseAsConnectCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
 
     private fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
         // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
@@ -625,7 +643,8 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Success -> {
-                val loginResult = processCode(stringCode)
+                val codeType = getCodeType(stringCode)
+                val loginResult = processCode(codeType)
                 if (loginResult is Error) {
                     syncPixels.fireUserSwitchedLoginError()
                 }
@@ -911,11 +930,11 @@ enum class AccountErrorCodes(val code: Int) {
     EXCHANGE_FAILED(56),
 }
 
-enum class CodeType {
-    RECOVERY,
-    CONNECT,
-    EXCHANGE,
-    UNKNOWN,
+sealed interface CodeType {
+    data class Recovery(val code: RecoveryCode) : CodeType
+    data class Connect(val code: ConnectCode) : CodeType
+    data class Exchange(val code: InvitationCode) : CodeType
+    data class Unknown(val code: String) : CodeType
 }
 
 sealed class Result<out R> {

@@ -56,4 +56,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun syncSetupBarcodeIsUrlBased(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canScanUrlBasedSyncSetupBarcodes(): Toggle
 }

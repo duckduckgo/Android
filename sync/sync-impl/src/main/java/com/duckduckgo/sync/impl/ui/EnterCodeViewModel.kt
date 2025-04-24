@@ -28,7 +28,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType.EXCHANGE
+import com.duckduckgo.sync.impl.CodeType
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -101,9 +101,9 @@ class EnterCodeViewModel @Inject constructor(
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
         val codeType = syncAccountRepository.getCodeType(pastedCode)
-        when (val result = syncAccountRepository.processCode(pastedCode)) {
+        when (val result = syncAccountRepository.processCode(codeType)) {
             is Result.Success -> {
-                if (codeType == EXCHANGE) {
+                if (codeType is CodeType.Exchange) {
                     pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
                 } else {
                     onLoginSuccess(previousPrimaryKey)
