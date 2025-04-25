@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Gizli Sekme</item>
-        <item quantity="other">%1$d Gizli Sekme</item>
+        <item quantity="one">1 Sekme</item>
+        <item quantity="other">%1$d Sekme</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Bu web sitesi, şifre veya kredi kartı numarası gibi kişisel bilgilerinizi vermeniz için sizi kandırmak amacıyla meşru bir siteyi taklit ediyor olabilir.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo, sizi yanlış iddialarla para transfer etmeye, sahte ürünler satın almaya veya kötü amaçlı yazılım yüklemenizi sağlamaya çalışıyor olabileceği için bu sayfayı engelledi.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Bu Siteden Ayrılın</string>
     <string name="maliciousSiteAdvancedCTA">Gelişmiş</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Bu web sitesinin güvenli olduğuna inanıyorsanız <a href=\"\">bir hata bildirebilirsiniz</a>. Riski göze alabiliyorsanız web sitesini yine de ziyaret edebilirsiniz.]]></string>
