@@ -35,6 +35,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.saved.sites.impl.databinding.ViewFavouritesSettingsItemBinding
@@ -112,6 +113,6 @@ class FavouritesNewTabSectionSettingsPlugin @Inject constructor() : NewTabPageSe
     featureName = "newTabFavouritesSectionSetting",
 )
 interface NewTabFavouritesSectionSetting {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.pixels.remoteconfig
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
  * This is the class that represents the browser feature flags
@@ -33,7 +34,7 @@ interface AndroidBrowserConfigFeature {
      * @return `true` when the remote config has the global "androidBrowserConfig" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     /**
@@ -41,7 +42,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun collectFullWebViewVersion(): Toggle
 
     /**
@@ -49,7 +50,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun screenLock(): Toggle
 
     /**
@@ -57,7 +58,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun optimizeTrackerEvaluationV2(): Toggle
 
     /**
@@ -65,7 +66,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun errorPagePixel(): Toggle
 
     /**
@@ -73,7 +74,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun featuresRequestHeader(): Toggle
 
     /**
@@ -81,7 +82,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun webLocalStorage(): Toggle
 
     /**
@@ -89,7 +90,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun enableMaliciousSiteProtection(): Toggle
 
     /**
@@ -97,7 +98,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun fireproofedWebLocalStorage(): Toggle
 
     /**
@@ -105,10 +106,10 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun httpError5xxPixel(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun glideSuspend(): Toggle
 
     /**
@@ -116,6 +117,6 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun omnibarAnimation(): Toggle
 }
