@@ -26,10 +26,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.AutofillSettings
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
@@ -76,7 +76,7 @@ class AutofillSettings : DuckDuckGoActivity() {
             }
         }
 
-    private fun getAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource? =
+    private fun getAutofillSettingsLaunchSource(): AutofillScreenLaunchSource? =
         intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
             return it.source
         }
@@ -114,11 +114,7 @@ class AutofillSettings : DuckDuckGoActivity() {
                     is NavigatePasswordList -> {
                         globalActivityStarter.start(
                             this@AutofillSettings,
-                            AutofillSettingsScreenShowSuggestionsForSiteParams(
-                                currentUrl = null,
-                                source = AutofillSettings,
-                                privacyProtectionEnabled = true,
-                            ),
+                            AutofillPasswordsManagementScreen(source = AutofillSettings),
                         )
                     }
 

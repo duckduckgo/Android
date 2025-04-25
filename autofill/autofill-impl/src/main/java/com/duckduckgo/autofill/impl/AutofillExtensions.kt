@@ -16,18 +16,18 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.AutofillSettings
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Unknown
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.AutofillSettings
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserSnackbar
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.NewTabShortcut
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.SettingsActivity
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Unknown
 
-fun AutofillSettingsLaunchSource.asString(): String {
+fun AutofillScreenLaunchSource.asString(): String {
     return when (this) {
         SettingsActivity -> "settings"
         BrowserOverflow -> "overflow_menu"
