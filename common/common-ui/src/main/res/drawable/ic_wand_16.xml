@@ -1,49 +1,9 @@
-<!--
-  ~ Copyright (c) 2024 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="16dp"
     android:height="16dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
   <path
-      android:pathData="M10.25,0C10.665,0 11,0.336 11,0.75V1.75C11,2.164 10.665,2.5 10.25,2.5C9.836,2.5 9.5,2.164 9.5,1.75V0.75C9.5,0.336 9.836,0 10.25,0Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M11,9.75C11,9.336 10.665,9 10.25,9C9.836,9 9.5,9.336 9.5,9.75V10.75C9.5,11.164 9.836,11.5 10.25,11.5C10.665,11.5 11,11.164 11,10.75V9.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M16,5.75C16,6.164 15.665,6.5 15.25,6.5H14.25C13.836,6.5 13.5,6.164 13.5,5.75C13.5,5.336 13.836,5 14.25,5H15.25C15.665,5 16,5.336 16,5.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M6.25,6.5C6.665,6.5 7,6.164 7,5.75C7,5.336 6.665,5 6.25,5H5.25C4.836,5 4.5,5.336 4.5,5.75C4.5,6.164 4.836,6.5 5.25,6.5H6.25Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M14.316,9.815C14.023,10.108 13.548,10.108 13.255,9.815L12.548,9.108C12.255,8.815 12.255,8.341 12.548,8.048C12.841,7.755 13.316,7.755 13.609,8.048L14.316,8.755C14.609,9.048 14.609,9.523 14.316,9.815Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M6.891,3.452C7.184,3.745 7.659,3.745 7.952,3.452C8.245,3.159 8.245,2.684 7.952,2.392L7.245,1.684C6.952,1.392 6.477,1.392 6.184,1.684C5.891,1.977 5.891,2.452 6.184,2.745L6.891,3.452Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M12.549,3.452C12.256,3.159 12.256,2.684 12.549,2.391L13.256,1.684C13.549,1.391 14.023,1.391 14.316,1.684C14.609,1.977 14.609,2.452 14.316,2.745L13.609,3.452C13.316,3.745 12.841,3.745 12.549,3.452Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M10.781,6.28C11.074,5.987 11.073,5.512 10.78,5.219C10.487,4.927 10.012,4.927 9.72,5.22L4.207,10.741L5.269,11.801L10.781,6.28Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
-  <path
-      android:pathData="M1.925,15.136L3.95,13.153L2.9,12.081L0.876,14.064C0.58,14.354 0.575,14.829 0.865,15.125C1.154,15.421 1.629,15.426 1.925,15.136Z"
+      android:pathData="M10.75,1.5a0.625,0.625 0,1 0,-1.25 0v1.625a0.625,0.625 0,1 0,1.25 0L10.75,1.5ZM9.5,10.398a0.625,0.625 0,1 0,1.25 0L10.75,8.773a0.625,0.625 0,1 0,-1.25 0v1.625ZM15.2,5.95c0,0.344 -0.28,0.624 -0.625,0.624L12.95,6.574a0.625,0.625 0,1 1,0 -1.25h1.625c0.345,0 0.625,0.28 0.625,0.625ZM5.676,5.324a0.625,0.625 0,1 0,0 1.25h1.625a0.625,0.625 0,0 0,0 -1.25L5.676,5.324ZM13.714,9.538a0.625,0.625 0,0 1,-0.884 0l-1.15,-1.15a0.625,0.625 0,0 1,0.885 -0.883l1.149,1.149a0.625,0.625 0,0 1,0 0.884ZM7.421,2.36a0.625,0.625 0,1 0,-0.884 0.885l1.15,1.149a0.625,0.625 0,0 0,0.883 -0.884L7.421,2.36ZM11.683,4.34a0.625,0.625 0,0 1,0 -0.883l1.15,-1.15a0.625,0.625 0,0 1,0.883 0.884l-1.15,1.15a0.625,0.625 0,0 1,-0.883 0ZM10.704,6.254a0.625,0.625 0,1 0,-0.884 -0.883L4.44,10.75l0.885,0.884 5.38,-5.38ZM3.709,13.25l-0.884,-0.884 -1.317,1.317a0.625,0.625 0,0 0,0.884 0.884l1.317,-1.317Z"
       android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>
