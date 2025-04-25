@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privát lap</item>
-        <item quantity="other">%1$d privát lap</item>
+        <item quantity="one">1 lap</item>
+        <item quantity="other">%1$d lap</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[A DuckDuckGo letiltotta ezt az oldalt, mert feltehetően megtévesztő vagy manipulatív módon, valótlan állításokkal próbál meg rávenni pénz átutalására, hamisított termékek vásárlására vagy rosszindulatú program telepítésére.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
     <string name="maliciousSiteAdvancedCTA">Haladó</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>
