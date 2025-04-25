@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.duckchat.DuckChatOmnibarImpressionPixelSender
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -179,6 +180,9 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
+
+    @Inject
+    lateinit var duckChatOmnibarImpressionPixelSender: DuckChatOmnibarImpressionPixelSender
 
     private var previousTransitionState: TransitionState? = null
 
@@ -355,6 +359,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
         super.onDetachedFromWindow()
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility != View.VISIBLE) {
+            duckChatOmnibarImpressionPixelSender.sendImpressionPixel(false)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -656,6 +667,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
+
+        duckChatOmnibarImpressionPixelSender.sendImpressionPixel(newTransitionState.showChatMenu)
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()

@@ -4037,6 +4037,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatOmnibarButtonClicked(query: String?) {
         openDuckChat(query = query)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
