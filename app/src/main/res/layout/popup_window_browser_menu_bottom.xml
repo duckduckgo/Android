@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:iconDrawable="@drawable/ic_open_in_app_android_alt_16"
+                app:iconDrawable="@drawable/ic_open_in_16"
                 app:primaryText="@string/appLinkMenuItemTitle" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
