@@ -1,6 +1,7 @@
 package com.duckduckgo.app.browser.omnibar.animations.omnibaranimation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -21,17 +22,17 @@ class RealOmnibarAnimationManagerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val mockOmnibarAnimationFeature: OmnibarAnimationFeature = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockToggle: Toggle = mock()
 
     private lateinit var testee: RealOmnibarAnimationManager
 
     @Before
     fun setup() {
-        whenever(mockOmnibarAnimationFeature.self()).thenReturn(mockToggle)
+        whenever(mockAndroidBrowserConfigFeature.omnibarAnimation()).thenReturn(mockToggle)
         testee = RealOmnibarAnimationManager(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            omnibarAnimationFeature = mockOmnibarAnimationFeature,
+            androidBrowserConfigFeature = mockAndroidBrowserConfigFeature,
             isMainProcess = true,
             appCoroutineScope = coroutinesTestRule.testScope,
         )

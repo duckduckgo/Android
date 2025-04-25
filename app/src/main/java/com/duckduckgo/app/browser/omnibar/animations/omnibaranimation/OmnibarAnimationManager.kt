@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations.omnibaranimation
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -41,7 +42,7 @@ interface OmnibarAnimationManager {
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
 class RealOmnibarAnimationManager @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val omnibarAnimationFeature: OmnibarAnimationFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : OmnibarAnimationManager, PrivacyConfigCallbackPlugin {
@@ -79,8 +80,8 @@ class RealOmnibarAnimationManager @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = omnibarAnimationFeature.self().isEnabled()
-            omnibarAnimationFeature.self().getSettings()?.let {
+            isFeatureEnabled = androidBrowserConfigFeature.omnibarAnimation().isEnabled()
+            androidBrowserConfigFeature.omnibarAnimation().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     runCatching {
                         changeBoundsDuration = settings.getLong("changeBoundsDuration")
