@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
@@ -124,11 +124,11 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
     }
 
-    fun onDisableAutofill(autofillSettingsLaunchSource: AutofillSettingsLaunchSource?) {
+    fun onDisableAutofill(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         autofillStore.autofillEnabled = false
         _viewState.value = _viewState.value.copy(autofillEnabled = false)
 
-        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED, mapOf("source" to autofillSettingsLaunchSource?.asString().orEmpty()))
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED, mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()))
     }
 
     fun onPasswordListClicked() {

@@ -26,14 +26,14 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserSnackbar
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.NewTabShortcut
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.SettingsActivity
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
@@ -110,7 +110,7 @@ import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class AutofillSettingsViewModelTest {
+class AutofillSettingsScreenViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -1101,8 +1101,8 @@ class AutofillSettingsViewModelTest {
         assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }
 
-    private fun aAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource {
-        return AutofillSettingsLaunchSource.entries.random()
+    private fun aAutofillSettingsLaunchSource(): AutofillScreenLaunchSource {
+        return AutofillScreenLaunchSource.entries.random()
     }
 }
 
