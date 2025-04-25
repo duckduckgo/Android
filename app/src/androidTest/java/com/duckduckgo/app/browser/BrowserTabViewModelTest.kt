@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -214,7 +215,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -256,7 +256,6 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -537,6 +536,7 @@ class BrowserTabViewModelTest {
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -550,9 +550,6 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
-
-    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
-    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
 
@@ -629,6 +626,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             userBrowserProperties = mockUserBrowserProperties,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -745,9 +743,7 @@ class BrowserTabViewModelTest {
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
-            appPersonalityFeature = fakeAppPersonalityFeature,
-            userStageStore = mockUserStageStore,
-            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6223,26 +6219,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        // Variant 2 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-
-        testee.onAnimationFinished()
-
-        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
 
         testee.onAnimationFinished()
 

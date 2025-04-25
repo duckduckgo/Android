@@ -46,7 +46,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         val protectedShieldDark: Int
         val unprotectedShield: Int
         val unprotectedShieldDark: Int
-        if (!senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
+        if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
             protectedShield = R.raw.protected_shield_experiment
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment

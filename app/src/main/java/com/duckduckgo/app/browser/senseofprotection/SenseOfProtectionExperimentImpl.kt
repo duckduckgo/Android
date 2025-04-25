@@ -27,9 +27,9 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -77,7 +77,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     override fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean =
         getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
-        getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
+            getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
 
     override fun isMemberOfVariant2Cohort(): Boolean =
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName ||

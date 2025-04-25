@@ -28,13 +28,13 @@ import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import java.util.Date
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Test
-import java.util.Date
-import org.junit.Assert.assertEquals
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 

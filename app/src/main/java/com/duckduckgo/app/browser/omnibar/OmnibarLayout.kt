@@ -555,7 +555,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                val isExperimentEnabled = !senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
+                val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
                 if (isExperimentEnabled) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()

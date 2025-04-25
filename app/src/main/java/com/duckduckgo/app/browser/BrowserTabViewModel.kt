@@ -1040,7 +1040,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-                -> {
+            -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
