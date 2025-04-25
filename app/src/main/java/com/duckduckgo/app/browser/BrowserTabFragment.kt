@@ -624,6 +624,7 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+    private var isWebViewGestureInProgress = false
 
     private val tabSwitcherActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -2859,11 +2860,29 @@ class BrowserTabFragment :
             }
 
             it.setOnTouchListener { webView, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isWebViewGestureInProgress = true
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isWebViewGestureInProgress = false
+                    }
+                }
+
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
                 false
+            }
+            it.setOnScrollChangeListener { v, _, _, _, _ ->
+                if (!v.canScrollVertically(-1) && !isWebViewGestureInProgress) {
+                    // Automatically expand the omnibar when the web view is at the top, but only if the user isn't actively scrolling.
+                    // Expanding the omnibar changes the web view's offset, which could otherwise be misinterpreted by the framework
+                    // as a fling gesture in the opposite direction and cause unintended content shifting.
+                    omnibar.setExpanded(true)
+                }
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
