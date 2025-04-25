@@ -88,7 +88,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -173,9 +172,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
-
-    @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
@@ -499,11 +495,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
 
-        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            renderButtons(viewState)
-        } else {
-            renderAnimatedButtons(viewState)
-        }
+        renderAnimatedButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
@@ -606,18 +598,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderButtons(viewState: ViewState) {
-        clearTextButton.isVisible = viewState.showClearButton
-        voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = viewState.showTabsMenu
-        fireIconMenu.isVisible = viewState.showFireIcon
-        browserMenu.isVisible = viewState.showBrowserMenu
-        browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
-        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
-        aiChatMenu?.isVisible = viewState.showExperimentalChatButton
-    }
-
-    private fun renderAnimatedButtons(viewState: ViewState) {
+    open fun renderAnimatedButtons(viewState: ViewState) {
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,

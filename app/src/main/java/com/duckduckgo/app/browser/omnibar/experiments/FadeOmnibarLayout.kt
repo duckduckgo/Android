@@ -151,25 +151,36 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     override fun render(viewState: ViewState) {
-        if (viewState.viewMode is ViewMode.CustomTab) {
+        super.render(viewState)
+        outlineProvider = if (viewState.viewMode is ViewMode.CustomTab) {
             // adds a drop shadow for the AppBarLayout, in case it was removed at any point
-            outlineProvider = ViewOutlineProvider.BACKGROUND
-            super.render(viewState)
+            ViewOutlineProvider.BACKGROUND
         } else {
             // removes the drop shadow from the AppBarLayout to make it appear flat in the view hierarchy
-            outlineProvider = null
-
-            // removes the duplicate buttons that are also present in the navigation bar
-            val experimentalViewState = viewState.copy(
-                showBrowserMenu = false,
-                showFireIcon = false,
-                showTabsMenu = false,
-            )
-            super.render(experimentalViewState)
+            null
         }
 
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
+        renderButtons(viewState)
+
+        if (viewState.hasFocus || isFindInPageVisible) {
+            animateOmnibarFocusedState(focused = true)
+        } else {
+            animateOmnibarFocusedState(focused = false)
+        }
+    }
+
+    private fun renderButtons(viewState: ViewState) {
+        tabsMenu.isVisible = false
+        fireIconMenu.isVisible = false
+        browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab
+        browserMenuHighlight.isVisible = false // TODO add menu highlight to bottom nav to bottom nav
+        clearTextButton.isVisible = viewState.showClearButton
+        voiceSearchButton.isVisible = viewState.showVoiceSearch
         spacer.isVisible = false
+
+        val showAiChat = shouldShowExperimentalAIChatButton(viewState)
+        aiChatMenu?.isVisible = showAiChat
+        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && showAiChat
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
@@ -182,12 +193,14 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
+    }
 
-        if (viewState.hasFocus || isFindInPageVisible) {
-            animateOmnibarFocusedState(focused = true)
-        } else {
-            animateOmnibarFocusedState(focused = false)
-        }
+    override fun renderAnimatedButtons(viewState: ViewState) {
+        // no-op
+    }
+
+    private fun shouldShowExperimentalAIChatButton(viewState: ViewState): Boolean {
+        return duckChat.showInAddressBar() && (viewState.hasFocus || viewState.viewMode is ViewMode.NewTab)
     }
 
     /**
