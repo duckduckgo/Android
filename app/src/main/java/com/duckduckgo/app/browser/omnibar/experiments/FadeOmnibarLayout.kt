@@ -20,6 +20,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
@@ -42,6 +43,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
@@ -59,6 +61,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
+    private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -170,7 +173,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     override fun renderButtons(viewState: ViewState) {
         tabsMenu.isVisible = false
         fireIconMenu.isVisible = false
-        browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab
+        browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab && viewState.showBrowserMenu && !isFindInPageVisible
         browserMenuHighlight.isVisible = false
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
@@ -290,11 +293,21 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private fun onFindInPageShown() {
         omniBarContentContainer.gone()
+        customTabToolbarContainerWrapper.gone()
+        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
+            omniBarContainer.show()
+            browserMenu.gone()
+        }
         animateOmnibarFocusedState(focused = true)
     }
 
     private fun onFindInPageHidden() {
         omniBarContentContainer.show()
+        customTabToolbarContainerWrapper.show()
+        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
+            omniBarContainer.hide()
+            browserMenu.isVisible = viewModel.viewState.value.showBrowserMenu
+        }
         if (!viewModel.viewState.value.hasFocus) {
             animateOmnibarFocusedState(focused = false)
         }
