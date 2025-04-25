@@ -61,6 +61,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     }
 
     private suspend fun getAsyncDatabase(): SecureStorageDatabase? {
+        _database?.let { return it }
         return mutex.withLock {
             getInnerDatabase()
         }
