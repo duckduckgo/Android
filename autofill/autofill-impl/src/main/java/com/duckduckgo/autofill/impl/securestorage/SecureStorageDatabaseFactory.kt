@@ -46,7 +46,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     private val mutex = Mutex()
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
-        return if (autofillFeature.canCreateAsyncPreferences().isEnabled()) {
+        return if (autofillFeature.createAsyncPreferences().isEnabled()) {
             getAsyncDatabase()
         } else {
             getDatabaseSynchronized()

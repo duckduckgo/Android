@@ -61,7 +61,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
     private val l2KeyMutex = Mutex()
 
     override suspend fun getl1Key(): ByteArray {
-        if (autofillFeature.canCreateAsyncPreferences().isEnabled()) {
+        if (autofillFeature.createAsyncPreferences().isEnabled()) {
             return getl1KeyAsync()
         } else {
             return getl1KeySync()
@@ -93,7 +93,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
     }
 
     override suspend fun getl2Key(): Key {
-        if (autofillFeature.canCreateAsyncPreferences().isEnabled()) {
+        if (autofillFeature.createAsyncPreferences().isEnabled()) {
             return getl2KeyAsync()
         } else {
             return getl2KeySync()

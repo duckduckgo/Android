@@ -139,5 +139,5 @@ interface AutofillFeature {
     fun siteSpecificFixes(): Toggle
 
     @Toggle.DefaultValue(defaultValue = true)
-    fun canCreateAsyncPreferences(): Toggle
+    fun createAsyncPreferences(): Toggle
 }

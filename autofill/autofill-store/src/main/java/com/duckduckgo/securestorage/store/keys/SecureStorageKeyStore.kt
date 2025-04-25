@@ -29,6 +29,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
@@ -69,7 +70,9 @@ class RealSecureStorageKeyStore constructor(
     private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
 
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
-        return if (autofillFeature.canCreateAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        return withContext(dispatcherProvider.io()) {
+            if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        }
     }
 
     private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
