@@ -326,6 +326,7 @@
             </androidx.appcompat.widget.Toolbar>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/customTabToolbarContainerWrapper"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/experimentalToolbarSize"
                 android:layout_marginHorizontal="@dimen/keyline_2"
