@@ -107,4 +107,7 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun httpError5xxPixel(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun glideSuspend(): Toggle
 }
