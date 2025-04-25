@@ -18,7 +18,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,9 +34,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -73,10 +70,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
-    private val mockToggle: Toggle = mock()
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
-    private val mockUserStageStore: UserStageStore = mock()
-    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -121,45 +115,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
-    @Test
-    fun whenViewModelAttachedAndDuckChatAndChatInBrowserEnabledThenDuckChatIconEnabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(true)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(true)
-
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.showChat)
-        }
-    }
-
-    @Test
-    fun whenViewModelAttachedAndDuckChatOnlyEnabledThenDuckChatIconDisabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(true)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
-
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.showChat)
-        }
-    }
-
-    @Test
-    fun whenViewModelAttachedAndDuckChatDisabledThenDuckChatIconEnabled() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(false)
-        whenever(duckChat.showInBrowserMenu()).thenReturn(false)
-
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.showChat)
-        }
-    }
-
     private fun initializeViewModel() {
         testee = OmnibarLayoutViewModel(
             tabRepository = tabRepository,
@@ -174,8 +129,6 @@ class OmnibarLayoutViewModelTest {
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             appPersonalityFeature = fakeAppPersonalityFeature,
-            userStageStore = mockUserStageStore,
-            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
     }
 

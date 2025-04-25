@@ -292,11 +292,11 @@
                                 android:importantForAccessibility="no"
                                 tools:ignore="MissingVerticalDivider"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/aiChat"
+                                app:layout_constraintEnd_toStartOf="@id/aiChatIconMenu"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
-                                android:id="@+id/aiChat"
+                                android:id="@+id/aiChatIconMenu"
                                 android:layout_width="@dimen/toolbarIcon"
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"

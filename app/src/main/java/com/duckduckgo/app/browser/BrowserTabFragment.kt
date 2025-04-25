@@ -2716,10 +2716,6 @@ class BrowserTabFragment :
         )
         omnibar.configureFadeOmnibarItemPressedListeners(
             object : FadeOmnibarItemPressedListener {
-                override fun onDuckChatButtonPressed() {
-                    onOmnibarDuckChatPressed(omnibar.getText())
-                }
-
                 override fun onBackButtonPressed() {
                     hideKeyboard()
                 }

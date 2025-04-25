@@ -88,7 +88,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -175,9 +174,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     lateinit var appPersonalityFeature: AppPersonalityFeature
 
     @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
-
-    @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
 
     private var previousTransitionState: TransitionState? = null
@@ -203,7 +199,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
-    internal val aiChatMenu: FrameLayout? by lazy { findViewById(R.id.aiChatIconMenu) }
+    internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
@@ -499,11 +495,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
 
-        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            renderButtons(viewState)
-        } else {
-            renderAnimatedButtons(viewState)
-        }
+        renderButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
@@ -606,17 +598,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderButtons(viewState: ViewState) {
-        clearTextButton.isVisible = viewState.showClearButton
-        voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = viewState.showTabsMenu
-        fireIconMenu.isVisible = viewState.showFireIcon
-        browserMenu.isVisible = viewState.showBrowserMenu
-        browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
-        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
-    }
-
-    private fun renderAnimatedButtons(viewState: ViewState) {
+    open fun renderButtons(viewState: ViewState) {
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,

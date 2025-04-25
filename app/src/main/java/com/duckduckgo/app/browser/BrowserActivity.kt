@@ -1095,11 +1095,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
+
+                if (!duckChat.showInAddressBar()) {
+                    experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
+                }
             } else {
                 experimentalToolbarMockupBottomBinding = binding.bottomMockupExperimentalToolbar
                 binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+
+                if (!duckChat.showInAddressBar()) {
+                    experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
+                }
             }
         } else {
             toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
