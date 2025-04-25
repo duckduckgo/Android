@@ -147,12 +147,16 @@ class RealDuckChat @Inject constructor(
         } else {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
         }
-
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
         cacheUserSettings()
     }
 
     override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
+        if (showDuckChat) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
+        } else {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
+        }
         duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
         cacheUserSettings()
     }

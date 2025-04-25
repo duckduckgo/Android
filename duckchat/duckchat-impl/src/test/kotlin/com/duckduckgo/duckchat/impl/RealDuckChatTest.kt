@@ -119,6 +119,18 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenSetShowInAddressBarSetTrueThenPixelOnIsSent() = runTest {
+        testee.setShowInAddressBarUserSetting(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
+    }
+
+    @Test
+    fun whenSetShowInAddressBarSetFalseThenPixelOffIsSent() = runTest {
+        testee.setShowInAddressBarUserSetting(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
+    }
+
+    @Test
     fun whenSetShowInAddressBarUserSettingThenRepositorySetCalled() = runTest {
         testee.setShowInAddressBarUserSetting(true)
         verify(mockDuckChatFeatureRepository).setShowInAddressBar(true)
