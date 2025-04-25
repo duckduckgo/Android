@@ -5964,6 +5964,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChatAndSendPixel() {
+        testee.onDuckChatOmnibarButtonClicked("example")
+        verify(mockDuckChat).openDuckChatWithAutoPrompt("example")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+    }
+
+    @Test
     fun whenPageFinishedWithMaliciousSiteBlockedThenDoNotUpdateSite() {
         testee.browserViewState.value = testee.browserViewState.value?.copy(
             browserShowing = false,
