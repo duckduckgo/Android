@@ -102,7 +102,7 @@ class AppShortcutCreator @Inject constructor(
     private fun buildNewTabShortcut(context: Context): ShortcutInfo {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_NEW_TAB)
             .setShortLabel(context.getString(R.string.newTabMenuItem))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab_solid_24))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab))
             .setIntent(
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
@@ -115,7 +115,7 @@ class AppShortcutCreator @Inject constructor(
     private fun buildClearDataShortcut(context: Context): ShortcutInfo {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_24))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire))
             .setIntent(
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
@@ -135,7 +135,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmark_solid_24))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
@@ -164,7 +164,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_ai_chat_solid_24))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
