@@ -495,7 +495,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
 
-        renderAnimatedButtons(viewState)
+        renderButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
@@ -598,7 +598,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    open fun renderAnimatedButtons(viewState: ViewState) {
+    open fun renderButtons(viewState: ViewState) {
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,

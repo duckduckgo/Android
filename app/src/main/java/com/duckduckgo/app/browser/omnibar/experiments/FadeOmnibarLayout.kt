@@ -160,8 +160,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        renderButtons(viewState)
-
         if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
         } else {
@@ -169,11 +167,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderButtons(viewState: ViewState) {
+    override fun renderButtons(viewState: ViewState) {
         tabsMenu.isVisible = false
         fireIconMenu.isVisible = false
         browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab
-        browserMenuHighlight.isVisible = false // TODO add menu highlight to bottom nav to bottom nav
+        browserMenuHighlight.isVisible = false
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         spacer.isVisible = false
@@ -193,10 +191,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
-    }
-
-    override fun renderAnimatedButtons(viewState: ViewState) {
-        // no-op
     }
 
     private fun shouldShowExperimentalAIChatButton(viewState: ViewState): Boolean {
