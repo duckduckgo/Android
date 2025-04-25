@@ -28,8 +28,8 @@ interface DuckChatFeatureRepository {
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
-    fun shouldShowInBrowserMenu(): Boolean
-    fun shouldShowInAddressBar(): Boolean
+    suspend fun shouldShowInBrowserMenu(): Boolean
+    suspend fun shouldShowInAddressBar(): Boolean
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
 }
@@ -56,11 +56,11 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.observeShowInAddressBar()
     }
 
-    override fun shouldShowInBrowserMenu(): Boolean {
+    override suspend fun shouldShowInBrowserMenu(): Boolean {
         return duckChatDataStore.getShowInBrowserMenu()
     }
 
-    override fun shouldShowInAddressBar(): Boolean {
+    override suspend fun shouldShowInAddressBar(): Boolean {
         return duckChatDataStore.getShowInAddressBar()
     }
 
