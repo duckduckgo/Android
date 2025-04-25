@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -45,6 +46,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -59,10 +61,10 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class RealDuckChatTest {
 
-    @get:org.junit.Rule
-    var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
-    private val mockDuckPlayerFeatureRepository: DuckChatFeatureRepository = mock()
+    private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
@@ -71,26 +73,30 @@ class RealDuckChatTest {
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
 
-    private val testee = spy(
-        RealDuckChat(
-            mockDuckPlayerFeatureRepository,
-            duckChatFeature,
-            moshi,
-            dispatcherProvider,
-            mockGlobalActivityStarter,
-            mockContext,
-            true,
-            coroutineRule.testScope,
-            mockPixel,
-        ),
-    )
+    private lateinit var testee: RealDuckChat
 
     @Before
     fun setup() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
-        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
-        setFeatureToggle(true)
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+
+        testee = spy(
+            RealDuckChat(
+                mockDuckChatFeatureRepository,
+                duckChatFeature,
+                moshi,
+                dispatcherProvider,
+                mockGlobalActivityStarter,
+                mockContext,
+                true,
+                coroutineRule.testScope,
+                mockPixel,
+            ),
+        )
+        coroutineRule.testScope.advanceUntilIdle()
+
         whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
     }
 
@@ -109,32 +115,32 @@ class RealDuckChatTest {
     @Test
     fun whenSetShowInBrowserMenuUserSettingThenRepositorySetCalled() = runTest {
         testee.setShowInBrowserMenuUserSetting(true)
-        verify(mockDuckPlayerFeatureRepository).setShowInBrowserMenu(true)
+        verify(mockDuckChatFeatureRepository).setShowInBrowserMenu(true)
     }
 
     @Test
     fun whenSetShowInAddressBarUserSettingThenRepositorySetCalled() = runTest {
         testee.setShowInAddressBarUserSetting(true)
-        verify(mockDuckPlayerFeatureRepository).setShowInAddressBar(true)
+        verify(mockDuckChatFeatureRepository).setShowInAddressBar(true)
     }
 
     @Test
     fun whenDuckChatIsEnabledThenReturnTrue() = runTest {
-        val result = testee.isEnabled()
-        assertTrue(result)
+        assertTrue(testee.isEnabled())
     }
 
     @Test
     fun whenDuckChatIsDisabledThenReturnFalse() = runTest {
-        setFeatureToggle(false)
+        duckChatFeature.self().setRawStoredState(State(false))
 
-        val result = testee.isEnabled()
-        assertFalse(result)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabled())
     }
 
     @Test
     fun whenObserveShowInBrowserMenuUserSettingThenEmitCorrectValues() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
+        whenever(mockDuckChatFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
         val results = testee.observeShowInBrowserMenuUserSetting().take(2).toList()
         assertTrue(results[0])
@@ -143,7 +149,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenObserveShowInAddressBarUserSettingThenEmitCorrectValues() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.observeShowInAddressBar()).thenReturn(flowOf(true, false))
+        whenever(mockDuckChatFeatureRepository.observeShowInAddressBar()).thenReturn(flowOf(true, false))
 
         val results = testee.observeShowInAddressBarUserSetting().take(2).toList()
         assertTrue(results[0])
@@ -152,16 +158,16 @@ class RealDuckChatTest {
 
     @Test
     fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
-        val result = testee.showInBrowserMenu()
-        assertTrue(result)
+        assertTrue(testee.showInBrowserMenu())
     }
 
     @Test
     fun whenFeatureDisabledThenShowInBrowserMenuReturnsFalse() {
-        setFeatureToggle(false)
+        duckChatFeature.self().setRawStoredState(State(false))
 
-        val result = testee.showInBrowserMenu()
-        assertFalse(result)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInBrowserMenu())
     }
 
     @Test
@@ -186,12 +192,12 @@ class RealDuckChatTest {
             ),
         )
         testee.onPrivacyConfigDownloaded()
-        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.setShowInAddressBarUserSetting(true)
         assertTrue(testee.showInAddressBar())
 
-        whenever(mockDuckPlayerFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         testee.setShowInAddressBarUserSetting(false)
         assertFalse(testee.showInAddressBar())
     }
@@ -206,7 +212,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
-        verify(mockDuckPlayerFeatureRepository).registerOpened()
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -219,7 +225,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
-        verify(mockDuckPlayerFeatureRepository).registerOpened()
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -235,7 +241,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
-        verify(mockDuckPlayerFeatureRepository).registerOpened()
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -251,7 +257,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
-        verify(mockDuckPlayerFeatureRepository).registerOpened()
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -296,7 +302,7 @@ class RealDuckChatTest {
             ),
         )
         verify(mockContext).startActivity(any())
-        verify(mockDuckPlayerFeatureRepository).registerOpened()
+        verify(mockDuckChatFeatureRepository).registerOpened()
     }
 
     @Test
@@ -316,7 +322,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenWasOpenedBeforeQueriedThenRepoStateIsReturned() = runTest {
-        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.wasOpenedBefore()).thenReturn(true)
 
         assertTrue(testee.wasOpenedBefore())
     }
@@ -354,11 +360,6 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertTrue(onCloseCalled)
-    }
-
-    private fun setFeatureToggle(enabled: Boolean) {
-        duckChatFeature.self().setRawStoredState(State(enabled))
-        testee.onPrivacyConfigDownloaded()
     }
 
     companion object {

@@ -44,8 +44,8 @@ interface DuckChatDataStore {
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
-    fun getShowInBrowserMenu(): Boolean
-    fun getShowInAddressBar(): Boolean
+    suspend fun getShowInBrowserMenu(): Boolean
+    suspend fun getShowInAddressBar(): Boolean
     suspend fun fetchAndClearUserPreferences(): String?
     suspend fun updateUserPreferences(userPreferences: String?)
     suspend fun registerOpened()
@@ -66,17 +66,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
     }
 
+    private fun Preferences.defaultShowInAddressBar(): Boolean {
+        return this[DUCK_CHAT_SHOW_IN_ADDRESS_BAR]
+            ?: this[DUCK_CHAT_SHOW_IN_MENU]
+            ?: true
+    }
+
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
-        .map { prefs ->
-            prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true
-        }
+        .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
     private val duckChatShowInAddressBar: StateFlow<Boolean> = store.data
-        .map { prefs ->
-            prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] ?: duckChatShowInBrowserMenu.value
-        }
+        .map { prefs -> prefs.defaultShowInAddressBar() }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
@@ -88,20 +90,16 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = showDuckChat }
     }
 
-    override fun observeShowInBrowserMenu(): Flow<Boolean> {
-        return duckChatShowInBrowserMenu
+    override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
+
+    override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
+
+    override suspend fun getShowInBrowserMenu(): Boolean {
+        return store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
     }
 
-    override fun observeShowInAddressBar(): Flow<Boolean> {
-        return duckChatShowInAddressBar
-    }
-
-    override fun getShowInBrowserMenu(): Boolean {
-        return duckChatShowInBrowserMenu.value
-    }
-
-    override fun getShowInAddressBar(): Boolean {
-        return duckChatShowInAddressBar.value
+    override suspend fun getShowInAddressBar(): Boolean {
+        return store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
     }
 
     override suspend fun fetchAndClearUserPreferences(): String? {

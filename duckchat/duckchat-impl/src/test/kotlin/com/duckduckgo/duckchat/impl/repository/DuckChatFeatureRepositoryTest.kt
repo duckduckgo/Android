@@ -50,7 +50,7 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
-    fun whenShouldShowInBrowserMenuThenGetFromDatabase() {
+    fun whenShouldShowInBrowserMenuThenGetFromDatabase() = runTest {
         whenever(mockDatabase.getShowInBrowserMenu()).thenReturn(true)
 
         assertTrue(testee.shouldShowInBrowserMenu())

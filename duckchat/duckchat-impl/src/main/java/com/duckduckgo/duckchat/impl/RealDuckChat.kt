@@ -152,7 +152,7 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
-    override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) {
+    override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
         duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
         cacheUserSettings()
     }
@@ -316,7 +316,7 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    private fun cacheUserSettings() {
+    private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
         showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
     }
