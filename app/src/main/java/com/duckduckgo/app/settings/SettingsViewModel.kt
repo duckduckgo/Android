@@ -45,8 +45,8 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettingsLegacy
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
@@ -128,7 +128,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchDefaultBrowser : Command()
         data class LaunchEmailProtection(val url: String) : Command()
         data object LaunchEmailProtectionNotSupported : Command()
-        data object LaunchAutofillSettingsLegacy : Command()
+        data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
@@ -261,7 +261,7 @@ class SettingsViewModel @Inject constructor(
             if (autofillFeature.settingsScreen().isEnabled()) {
                 command.send(LaunchAutofillSettings)
             } else {
-                command.send(LaunchAutofillSettingsLegacy)
+                command.send(LaunchAutofillPasswordsManagement)
             }
         }
     }

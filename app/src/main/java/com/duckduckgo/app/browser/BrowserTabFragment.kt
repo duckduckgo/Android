@@ -202,9 +202,9 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -3179,9 +3179,9 @@ class BrowserTabFragment :
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let {
-                        val screen = AutofillSettingsScreenDirectlyViewCredentialsParams(
+                        val screen = AutofillPasswordsManagementViewCredential(
                             loginCredentials = loginCredentials,
-                            source = AutofillSettingsLaunchSource.BrowserSnackbar,
+                            source = AutofillScreenLaunchSource.BrowserSnackbar,
                         )
                         globalActivityStarter.start(it, screen)
                     }
@@ -3192,9 +3192,9 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen(privacyProtectionEnabled: Boolean) {
-        val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
+        val screen = AutofillPasswordsManagementScreenWithSuggestions(
             currentUrl = webView?.url,
-            source = AutofillSettingsLaunchSource.BrowserOverflow,
+            source = AutofillScreenLaunchSource.BrowserOverflow,
             privacyProtectionEnabled = privacyProtectionEnabled,
         )
         globalActivityStarter.start(requireContext(), screen)
