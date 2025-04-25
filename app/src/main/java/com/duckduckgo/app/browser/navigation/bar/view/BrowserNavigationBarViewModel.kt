@@ -130,6 +130,14 @@ class BrowserNavigationBarViewModel @Inject constructor(
         }
     }
 
+    fun setFireButtonHighlight(highlighted: Boolean) {
+        _viewState.update {
+            it.copy(
+                fireButtonHighlighted = highlighted,
+            )
+        }
+    }
+
     sealed class Command {
         data object NotifyFireButtonClicked : Command()
         data object NotifyTabsButtonClicked : Command()
@@ -149,6 +157,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val autofillButtonVisible: Boolean = true,
         val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
+        val fireButtonHighlighted: Boolean = false,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
         val shouldUpdateTabsCount: Boolean = false,

@@ -80,6 +80,10 @@ class BrowserNavigationBarViewIntegration(
         navigationBarView.setViewMode(NewTab)
     }
 
+    fun configureFireButtonHighlight(highlighted: Boolean) {
+        navigationBarView.setFireButtonHighlight(highlighted)
+    }
+
     fun onDestroyView() {
         stateObserverJob?.cancel()
         onDisabled()
