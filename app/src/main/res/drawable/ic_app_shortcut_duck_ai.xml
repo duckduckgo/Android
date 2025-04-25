@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
@@ -6,12 +22,8 @@
   <path
       android:pathData="M12,0L12,0A12,12 0,0 1,24 12L24,12A12,12 0,0 1,12 24L12,24A12,12 0,0 1,0 12L0,12A12,12 0,0 1,12 0z"
       android:fillColor="#F0F0F0"/>
-  <group>
-    <clip-path
-        android:pathData="M4,4h16v16h-16z"/>
-    <path
-        android:pathData="M6.458,17.272C6.737,16.95 6.677,16.459 6.358,16.176C4.902,14.886 4,13.099 4,11.125C4,7.19 7.582,4 12,4C16.418,4 20,7.19 20,11.125C20,14.11 17.939,16.667 15.015,17.727C13.123,18.595 8.47,19.477 5.814,19.933C5.15,20.047 4.723,19.273 5.164,18.763L6.458,17.272ZM12.322,7.226C12.238,6.891 11.762,6.891 11.678,7.226L11.365,8.477C11.117,9.468 10.343,10.242 9.352,10.49L8.101,10.803C7.766,10.887 7.766,11.363 8.101,11.447L9.352,11.76C10.343,12.008 11.117,12.782 11.365,13.773L11.678,15.024C11.762,15.359 12.238,15.359 12.322,15.024L12.635,13.773C12.883,12.782 13.657,12.008 14.648,11.76L15.899,11.447C16.234,11.363 16.235,10.887 15.899,10.803L14.648,10.49C13.657,10.242 12.883,9.468 12.635,8.477L12.322,7.226Z"
-        android:fillColor="#DE5833"
-        android:fillType="evenOdd"/>
-  </group>
+  <path
+      android:pathData="M8.536,15.291C8.711,15.09 8.673,14.783 8.474,14.607C7.563,13.8 7,12.684 7,11.45C7,8.99 9.239,6.997 12,6.997C14.761,6.997 17,8.99 17,11.45C17,13.315 15.712,14.913 13.884,15.576C12.702,16.118 9.794,16.669 8.134,16.954C7.719,17.026 7.452,16.542 7.728,16.224L8.536,15.291ZM12.191,9.142C12.141,8.943 11.859,8.943 11.809,9.142L11.624,9.883C11.477,10.471 11.018,10.93 10.43,11.077L9.689,11.262C9.49,11.312 9.49,11.594 9.689,11.644L10.43,11.83C11.018,11.976 11.477,12.435 11.624,13.023L11.809,13.764C11.859,13.963 12.141,13.963 12.191,13.764L12.376,13.023C12.523,12.435 12.982,11.976 13.57,11.83L14.311,11.644C14.51,11.594 14.51,11.312 14.311,11.262L13.57,11.077C12.982,10.93 12.523,10.471 12.376,9.883L12.191,9.142Z"
+      android:fillColor="#DE5833"
+      android:fillType="evenOdd"/>
 </vector>
