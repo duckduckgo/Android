@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Separador privado</item>
-        <item quantity="other">%1$d Separadores privados</item>
+        <item quantity="one">1 separador</item>
+        <item quantity="other">%1$d separadores</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[O DuckDuckGo bloqueou esta página porque pode estar a distribuir malware projetado para comprometer o teu dispositivo ou roubar as tuas informações pessoais.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Este site pode estar a fazer-se passar por um site legítimo para te enganar a fornecer informações pessoais, como palavras-passe ou números de cartão de crédito.\n<a href=\"\">Sabe mais</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[O DuckDuckGo bloqueou esta página porque pode estar a tentar enganar-te ou manipular-te para transferires dinheiro, comprares produtos falsificados ou instalares malware sob falsos pretextos.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Deixar este site</string>
     <string name="maliciousSiteAdvancedCTA">Avançado</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Se considerares que este site é seguro, podes <a href=\"\">denunciar um erro</a>. Mesmo assim, podes visitar o site por tua conta e risco.]]></string>
