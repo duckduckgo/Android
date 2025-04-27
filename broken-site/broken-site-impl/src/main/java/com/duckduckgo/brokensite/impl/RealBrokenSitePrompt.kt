@@ -19,6 +19,7 @@ package com.duckduckgo.brokensite.impl
 import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -64,11 +65,11 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.resetRefreshCount()
     }
 
-    override fun getUserRefreshesCount(): Set<RefreshPattern> {
+    override fun getUserRefreshesCount(): Set<DetectedRefreshPattern> {
         return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 
-    override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
+    override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<DetectedRefreshPattern>): Boolean {
         if (!isFeatureEnabled() || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
             val reason = when {
                 !isFeatureEnabled() -> "DISABLED"
@@ -76,6 +77,10 @@ class RealBrokenSitePrompt @Inject constructor(
                 else -> "SOMETHING WEIRD HAPPENED for $url"
             }
             Timber.d("KateTest--> should NOT show bc $reason")
+            return false
+        }
+
+        if (refreshPatterns.none { it.pattern == RefreshPattern.THRICE_IN_20_SECONDS }) {
             return false
         }
 

@@ -24,7 +24,6 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -50,6 +49,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -115,11 +115,9 @@ class CtaViewModelTest {
 
     private val mockSubscriptions: Subscriptions = mock()
 
-    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
+    private val detectedRefreshPatterns: Set<DetectedRefreshPattern> = emptySet()
 
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
-
-    private val mockRefreshPixelSender: RefreshPixelSender = mock()
 
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
@@ -155,7 +153,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
-        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any())).thenReturn(false)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshesCount()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
@@ -328,20 +326,19 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePromptAndFireRefreshPixels() = runTest {
+    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        whenever(mockBrokenSitePrompt.getUserRefreshesCount()).thenReturn(setOf(RefreshPattern.THRICE_IN_20_SECONDS))
-        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any())).thenReturn(true)
+        val refreshPatterns = setOf(DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1))
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
             site = site,
-            detectedRefreshPatterns = detectedRefreshPatterns,
+            detectedRefreshPatterns = refreshPatterns,
         )
         assertTrue(value is BrokenSitePromptDialogCta)
-        verify(mockRefreshPixelSender).onRefreshPatternDetected(setOf(RefreshPattern.THRICE_IN_20_SECONDS))
     }
 
     @Test

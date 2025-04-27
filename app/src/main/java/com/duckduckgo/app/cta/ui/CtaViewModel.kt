@@ -42,7 +42,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -204,7 +204,7 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
-        detectedRefreshPatterns: Set<RefreshPattern>,
+        detectedRefreshPatterns: Set<DetectedRefreshPattern>,
     ): Cta? {
         return withContext(dispatcher) {
             markOnboardingAsCompletedIfRequiredCtasShown()
@@ -308,7 +308,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {
+    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<DetectedRefreshPattern>): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -322,10 +322,9 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (RefreshPattern.THRICE_IN_20_SECONDS in detectedRefreshPatterns &&
-                    brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)
                 ) {
-                    Timber.d("KateTest--> 3 refreshes + shouldShowPrompt")
+                    Timber.d("KateTest--> shouldShowPrompt")
                     BrokenSitePromptDialogCta()
                 } else {
                     null

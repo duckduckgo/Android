@@ -3,6 +3,8 @@ package com.duckduckgo.brokensite.impl
 import android.annotation.SuppressLint
 import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.brokensite.api.DetectedRefreshPattern
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -105,52 +107,86 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenAllRequirementsMetThenShouldShowBrokenSitePromptReturnsTrue() = runTest {
+        val detectedRefreshPatterns = setOf(
+            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
+            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
+        )
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(2)
 
-        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
-
+        val result = testee.shouldShowBrokenSitePrompt(
+            "https://example.com",
+            detectedRefreshPatterns,
+        )
         assertTrue(result)
     }
 
     @Test
     fun whenFeatureEnabledAndUrlIsDuckDuckGoThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        val detectedRefreshPatterns = setOf(
+            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
+            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
+        )
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
 
-        val result = testee.shouldShowBrokenSitePrompt("https://duckduckgo.com")
+        val result = testee.shouldShowBrokenSitePrompt(
+            "https://duckduckgo.com",
+            detectedRefreshPatterns,
+        )
 
         assertFalse(result)
     }
 
     @Test
     fun whenFeatureEnabledAndUserStillInCooldownPeriodThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        val detectedRefreshPatterns = setOf(
+            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
+            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
+        )
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(3))
 
-        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
+        val result = testee.shouldShowBrokenSitePrompt(
+            "https://example.com",
+            detectedRefreshPatterns,
+        )
 
         assertFalse(result)
     }
 
     @Test
     fun whenFeatureEnabledAndUserHasDismissedMaxDismissStreakTimesThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        val detectedRefreshPatterns = setOf(
+            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
+            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
+        )
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(3)
 
-        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
+        val result = testee.shouldShowBrokenSitePrompt(
+            "https://example.com",
+            detectedRefreshPatterns,
+        )
 
         assertFalse(result)
     }
 
     @Test
     fun whenFeatureDisabledThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        val detectedRefreshPatterns = setOf(
+            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
+            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
+        )
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 
-        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
+        val result = testee.shouldShowBrokenSitePrompt(
+            "https://example.com",
+            detectedRefreshPatterns,
+        )
 
         assertFalse(result)
     }
