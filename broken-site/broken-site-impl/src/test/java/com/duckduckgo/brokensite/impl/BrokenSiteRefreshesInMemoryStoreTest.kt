@@ -91,7 +91,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenTwoRefreshesOccurWithin12SecondsThenPatternDetected() = runTest {
+    fun whenTwoRefreshesOccurWithin12SecondsThenTwicePatternDetectedOnce() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
 
@@ -112,7 +112,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenThreeRefreshesOccurWithin20SecondsThenTwiceAndThricePatternDetected() = runTest {
+    fun whenThreeRefreshesOccurWithin20SecondsThenTwiceAndThricePatternDetectedOnceEach() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
         store.addRefresh(testUrl, baseTime.plusSeconds(10))
@@ -138,14 +138,14 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenMultiplePatternsOccurThenAllAreDetectedWithCorrectCounts() = runTest {
+    fun whenFiveRefreshesOccurWithin20SecondsThen2TwicePatternsAnd1ThricePatternDetected() = runTest {
         store.addRefresh(testUrl, baseTime)
-        store.addRefresh(testUrl, baseTime.plusSeconds(6))
-        store.addRefresh(testUrl, baseTime.plusSeconds(10))
+        store.addRefresh(testUrl, baseTime.plusSeconds(5))
+        store.addRefresh(testUrl, baseTime.plusSeconds(7))
         store.addRefresh(testUrl, baseTime.plusSeconds(15))
-        store.addRefresh(testUrl, baseTime.plusSeconds(20))
+        store.addRefresh(testUrl, baseTime.plusSeconds(18))
 
-        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(25))
+        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(19))
         assertEquals(2, patterns.size)
 
         val twicePattern = patterns.first { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS }

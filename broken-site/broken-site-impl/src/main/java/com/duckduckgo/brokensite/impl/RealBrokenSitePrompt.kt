@@ -71,12 +71,6 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<DetectedRefreshPattern>): Boolean {
         if (!isFeatureEnabled() || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
-            val reason = when {
-                !isFeatureEnabled() -> "DISABLED"
-                duckGoUrlDetector.isDuckDuckGoUrl(url) -> "DDG"
-                else -> "SOMETHING WEIRD HAPPENED for $url"
-            }
-            Timber.d("KateTest--> should NOT show bc $reason")
             return false
         }
 
@@ -89,25 +83,25 @@ class RealBrokenSitePrompt @Inject constructor(
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
             if (currentTimestamp.isBefore(nextDate)) {
-                Timber.d("KateTest--> should NOT show bc cooldown: NextDate= $nextDate")
+                Timber.d("BrokenSitePrompt should NOT show bc cooldown: NextDate= $nextDate")
                 return false
             }
-            Timber.d("KateTest--> Passed cooldown test: NextDate= $nextDate")
         }
 
+        // Check if we've reached max dismissals
         val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
         val dismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
-            currentTimestamp.minusMinutes(dismissStreakResetDays),
+            currentTimestamp.minusDays(dismissStreakResetDays),
             currentTimestamp,
         )
-        Timber.d("KateTest--> SHOULDshow()?  dismissCount= $dismissalCount, resetDays= $dismissStreakResetDays")
+        Timber.d("BrokenSitePrompt final check: dismissCount($dismissalCount) < maxDismissStreak?")
 
         return dismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }
 
     override suspend fun ctaShown() {
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
-        val newNextShownDate = currentTimestamp.plusSeconds(brokenSiteReportRepository.getCoolDownDays())
+        val newNextShownDate = currentTimestamp.plusDays(brokenSiteReportRepository.getCoolDownDays())
         brokenSiteReportRepository.setNextShownDate(newNextShownDate)
     }
 }

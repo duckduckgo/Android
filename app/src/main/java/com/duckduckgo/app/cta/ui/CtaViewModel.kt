@@ -324,7 +324,6 @@ class CtaViewModel @Inject constructor(
             if (areInContextDaxDialogsCompleted()) {
                 return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)
                 ) {
-                    Timber.d("KateTest--> shouldShowPrompt")
                     BrokenSitePromptDialogCta()
                 } else {
                     null
