@@ -18,93 +18,91 @@ package com.duckduckgo.autofill.store
 
 import com.duckduckgo.securestorage.store.RealSecureStorageKeyRepository
 import com.duckduckgo.securestorage.store.keys.SecureStorageKeyStore
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class RealSecureStorageKeyRepositoryTest {
-    @Mock
-    private lateinit var keyStore: SecureStorageKeyStore
+    private val keyStore: SecureStorageKeyStore = mock()
     private lateinit var testee: RealSecureStorageKeyRepository
     private val testValue = "TestValue".toByteArray()
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
         testee = RealSecureStorageKeyRepository(keyStore)
     }
 
     @Test
-    fun whenPasswordIsSetThenUpdateKeyForPasswordInKeyStore() {
-        testee.password = testValue
+    fun whenPasswordIsSetThenUpdateKeyForPasswordInKeyStore() = runTest {
+        testee.setPassword(testValue)
 
         verify(keyStore).updateKey("KEY_GENERATED_PASSWORD", testValue)
     }
 
     @Test
-    fun whenGettingPasswordThenGetKeyForPasswordInKeyStore() {
+    fun whenGettingPasswordThenGetKeyForPasswordInKeyStore() = runTest {
         whenever(keyStore.getKey("KEY_GENERATED_PASSWORD")).thenReturn(testValue)
 
-        assertEquals(testValue, testee.password)
+        assertEquals(testValue, testee.getPassword())
     }
 
     @Test
-    fun whenL1KeyIsSetThenUpdateKeyForL1KeyInKeyStore() {
-        testee.l1Key = testValue
+    fun whenL1KeyIsSetThenUpdateKeyForL1KeyInKeyStore() = runTest {
+        testee.setL1Key(testValue)
 
         verify(keyStore).updateKey("KEY_L1KEY", testValue)
     }
 
     @Test
-    fun whenGettingL1KeyThenGetKeyForL1KeyInKeyStore() {
+    fun whenGettingL1KeyThenGetKeyForL1KeyInKeyStore() = runTest {
         whenever(keyStore.getKey("KEY_L1KEY")).thenReturn(testValue)
 
-        assertEquals(testValue, testee.l1Key)
+        assertEquals(testValue, testee.getL1Key())
     }
 
     @Test
-    fun whenPasswordSaltIsSetThenUpdateKeyForPasswordSaltInKeyStore() {
-        testee.passwordSalt = testValue
+    fun whenPasswordSaltIsSetThenUpdateKeyForPasswordSaltInKeyStore() = runTest {
+        testee.setPasswordSalt(testValue)
 
         verify(keyStore).updateKey("KEY_PASSWORD_SALT", testValue)
     }
 
     @Test
-    fun whenGettingPasswordSaltThenGetKeyForPasswordSaltKeyInKeyStore() {
+    fun whenGettingPasswordSaltThenGetKeyForPasswordSaltKeyInKeyStore() = runTest {
         whenever(keyStore.getKey("KEY_PASSWORD_SALT")).thenReturn(testValue)
 
-        assertEquals(testValue, testee.passwordSalt)
+        assertEquals(testValue, testee.getPasswordSalt())
     }
 
     @Test
-    fun whenEncryptedL2KeyIsSetThenUpdateKeyForEncryptedL2KeyInKeyStore() {
-        testee.encryptedL2Key = testValue
+    fun whenEncryptedL2KeyIsSetThenUpdateKeyForEncryptedL2KeyInKeyStore() = runTest {
+        testee.setEncryptedL2Key(testValue)
 
         verify(keyStore).updateKey("KEY_ENCRYPTED_L2KEY", testValue)
     }
 
     @Test
-    fun whenGettingEncryptedL2KeyThenGetKeyForEncryptedL2KeyInKeyStore() {
+    fun whenGettingEncryptedL2KeyThenGetKeyForEncryptedL2KeyInKeyStore() = runTest {
         whenever(keyStore.getKey("KEY_ENCRYPTED_L2KEY")).thenReturn(testValue)
 
-        assertEquals(testValue, testee.encryptedL2Key)
+        assertEquals(testValue, testee.getEncryptedL2Key())
     }
 
     @Test
-    fun whenEncryptedL2KeyIVIsSetThenUpdateKeyForEncryptedL2KeyIVInKeyStore() {
-        testee.encryptedL2KeyIV = testValue
+    fun whenEncryptedL2KeyIVIsSetThenUpdateKeyForEncryptedL2KeyIVInKeyStore() = runTest {
+        testee.setEncryptedL2KeyIV(testValue)
 
         verify(keyStore).updateKey("KEY_ENCRYPTED_L2KEY_IV", testValue)
     }
 
     @Test
-    fun whenGettingEncryptedL2KeyIVThenGetKeyForEncryptedL2KeyIVInKeyStore() {
+    fun whenGettingEncryptedL2KeyIVThenGetKeyForEncryptedL2KeyIVInKeyStore() = runTest {
         whenever(keyStore.getKey("KEY_ENCRYPTED_L2KEY_IV")).thenReturn(testValue)
 
-        assertEquals(testValue, testee.encryptedL2KeyIV)
+        assertEquals(testValue, testee.getEncryptedL2KeyIV())
     }
 }
