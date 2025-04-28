@@ -12,7 +12,7 @@ tags:
       - runFlow: ../shared/skip_all_onboarding.yaml
 
       - tapOn:
-          text: "search or type URL"
+          id: "omnibarTextInput"
       - inputText: "https://duckduckgo.com/pro"
       - pressKey: Enter
       - runFlow:
