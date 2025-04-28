@@ -1396,6 +1396,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
         fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
             State(
                 remoteEnableState = true,
@@ -1406,7 +1407,6 @@ class TabSwitcherViewModelTest {
         )
 
         initializeViewModel(FakeTabSwitcherDataStore())
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
 
         testee.onTrackerAnimationInfoPanelClicked()
 
