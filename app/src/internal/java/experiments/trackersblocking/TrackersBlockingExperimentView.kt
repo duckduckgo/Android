@@ -29,12 +29,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.internal.databinding.ViewTrackersBlockingExperimentBinding
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import experiments.trackersblocking.TrackersBlockingExperimentViewModel.ViewState
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import experiments.trackersblocking.TrackersBlockingExperimentViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

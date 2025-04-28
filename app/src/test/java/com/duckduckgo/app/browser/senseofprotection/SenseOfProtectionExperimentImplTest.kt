@@ -179,6 +179,60 @@ class SenseOfProtectionExperimentImplTest {
 
         assertTrue(params.isEmpty())
     }
+
+    @Test
+    fun `when user is enrolled in modified control variant then we can detect it`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(MODIFIED_CONTROL.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertTrue(testee.isUserEnrolledInModifiedControlCohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInVariant1CohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInVariant2CohortAndExperimentEnabled())
+
+        assertTrue(testee.isUserEnrolledInAVariantAndExperimentEnabled())
+    }
+
+    @Test
+    fun `when user is enrolled in variant 1 then other variants are not enabled`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertTrue(testee.isUserEnrolledInVariant1CohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInModifiedControlCohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInVariant2CohortAndExperimentEnabled())
+
+        assertTrue(testee.isUserEnrolledInAVariantAndExperimentEnabled())
+    }
+
+    @Test
+    fun `when user is enrolled in variant 2 then other variants are not enabled`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertTrue(testee.isUserEnrolledInVariant2CohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInVariant1CohortAndExperimentEnabled())
+        assertFalse(testee.isUserEnrolledInModifiedControlCohortAndExperimentEnabled())
+
+        assertTrue(testee.isUserEnrolledInAVariantAndExperimentEnabled())
+    }
 }
 
 class FakeUserBrowserProperties : UserBrowserProperties {
