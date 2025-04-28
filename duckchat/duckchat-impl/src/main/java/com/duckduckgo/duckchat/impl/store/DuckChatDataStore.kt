@@ -83,12 +83,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
     }
 
-    private fun storeDerivedValues() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            val current = store.data.firstOrNull() ?: return@launch
-            if (current[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] == null) {
-                val initial = current[DUCK_CHAT_SHOW_IN_MENU] ?: true
-                store.edit { it[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = initial }
+    private fun storeDerivedValues() = appCoroutineScope.launch(dispatchers.io()) {
+        store.data.firstOrNull()?.let { prefs ->
+            if (prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] == null) {
+                val default = prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true
+                store.edit { it[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = default }
             }
         }
     }
