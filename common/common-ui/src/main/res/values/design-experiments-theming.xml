@@ -46,6 +46,8 @@
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
 
         <item name="tabItemSelectionCircleWidth">1dp</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@android:color/transparent</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
@@ -78,6 +80,8 @@
         <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
 
         <item name="tabItemSelectionCircleWidth">1dp</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@android:color/transparent</item>
     </style>
 
 </resources>

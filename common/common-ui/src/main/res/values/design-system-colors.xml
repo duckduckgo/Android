@@ -118,6 +118,8 @@
     <attr name="daxColorTextInputFocusedOutline" format="color"/>
     <attr name="daxColorTextInputEnabledOutline" format="color"/>
 
+    <attr name="daxColorWebViewScrollbarTrack" format="color"/>
+
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
     <color name="alertGreen">#21C000</color>
