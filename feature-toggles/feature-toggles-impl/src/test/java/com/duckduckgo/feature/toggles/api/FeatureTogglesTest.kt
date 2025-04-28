@@ -34,7 +34,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.times
 
 class FeatureTogglesTest {
 
@@ -68,6 +67,29 @@ class FeatureTogglesTest {
     @Test
     fun assertSubFeatureName() {
         assertEquals(FeatureName(parentName = "test", name = "disableByDefault"), feature.disableByDefault().featureName())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndInternalBuildReturnTrue() {
+        provider.flavorName = BuildFlavor.INTERNAL.name
+        assertTrue(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndPlayBuildReturnFalse() {
+        provider.flavorName = BuildFlavor.PLAY.name
+        assertFalse(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndFdroidBuildReturnFalse() {
+        provider.flavorName = BuildFlavor.FDROID.name
+        assertFalse(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndNoFlavourBuildReturnFalse() {
+        assertFalse(feature.internalByDefault().isEnabled())
     }
 
     @Test
@@ -561,6 +583,9 @@ class FeatureTogglesTest {
 interface TestFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun internalByDefault(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun disableByDefault(): Toggle

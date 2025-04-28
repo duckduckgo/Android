@@ -63,6 +63,16 @@ class FooActivePlugin @Inject constructor() : MyPlugin {
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = MyPlugin::class,
+    defaultActiveValue = DefaultFeatureValue.INTERNAL,
+)
+class FooActiveInternalPlugin @Inject constructor() : MyPlugin {
+    override fun doSomething() {
+    }
+}
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
     priority = 1000,
 )
 class BarActivePlugin @Inject constructor() : MyPlugin {
