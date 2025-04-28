@@ -4,7 +4,8 @@ appId: com.duckduckgo.mobile.android
 - runScript: script_add_bookmark_domains.js
 # Until here we've joined an account that has predefined data
 # Now, we add a couple bookmarks
-- tapOn: "Search or type URL"
+- tapOn:
+    id: "omnibarTextInput"
 - inputText: "${output.bookmarks.domains[0]}"
 # We need this because Dax Dialogs sometimes appears before pressing Enter
 - runFlow:
@@ -25,7 +26,8 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn: "Add Bookmark"
-- tapOn: "Search or type URL"
+- tapOn:
+    id: "omnibarTextInput"
 # Now, we add a favourite
 - inputText: "${output.bookmarks.domains[1]}"
 - pressKey: Enter

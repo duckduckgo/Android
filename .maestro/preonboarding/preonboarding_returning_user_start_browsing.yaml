@@ -22,4 +22,4 @@ tags:
     text: "Show Tutorial"
 - tapOn: "Start Browsing"
 - assertVisible:
-    text: "Search or type URL"
+    id: "omnibarTextInput"

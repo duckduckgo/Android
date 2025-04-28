@@ -13,7 +13,7 @@ tags:
       - runFlow: ../shared/pre_onboarding.yaml
 
       - tapOn:
-          text: "search or type URL"
+          id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
