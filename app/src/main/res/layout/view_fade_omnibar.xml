@@ -58,13 +58,13 @@
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                     android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     app:strokeColor="?daxColorAccentBlue"
-                    app:contentPadding="@dimen/experimentalOmnibarContentPadding"
                     app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContentContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center">
 
                         <ProgressBar
                             android:id="@+id/pageLoadingIndicator"

@@ -26,11 +26,13 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -45,6 +47,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
@@ -98,17 +101,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
     private val omnibarCardFocusedMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginTop) }
     private val omnibarCardFocusedMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginBottom) }
-    private val omnibarContentPadding by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarContentPadding) }
-    private val omnibarContentFocusedPaddingHorizontal by lazy {
-        resources.getDimensionPixelSize(
-            CommonR.dimen.experimentalOmnibarContentFocusedPaddingHorizontal,
-        )
-    }
-    private val omnibarContentFocusedPaddingVertical by lazy {
-        resources.getDimensionPixelSize(
-            CommonR.dimen.experimentalOmnibarContentFocusedPaddingVertical,
-        )
-    }
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
@@ -127,6 +119,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
+
+            omnibarCard.elevation = 1f.toDp(context)
         } else {
             navigationBar = navBar
 
@@ -134,11 +128,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
             )
-
             // at the same time, we remove that space from the navigation bar which now sits below the omnibar
             navBar.findViewById<LinearLayout>(R.id.rootView).updatePadding(
                 top = 0,
             )
+
+            omnibarCard.elevation = 0.5f.toDp(context)
         }
     }
 
@@ -151,6 +146,19 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         super.onDetachedFromWindow()
         focusAnimator?.cancel()
         findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
+    }
+
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w != oldw || h != oldh) {
+            // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
+            unlockContentDimensions()
+        }
     }
 
     override fun render(viewState: ViewState) {
@@ -216,20 +224,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val startCardMarginBottom = omnibarCard.marginBottom
         val startCardMarginStart = omnibarCard.marginStart
         val startCardMarginEnd = omnibarCard.marginEnd
-        val startContentPaddingTop = omnibarCard.contentPaddingTop
-        val startContentPaddingBottom = omnibarCard.contentPaddingBottom
-        val startContentPaddingStart = omnibarCard.contentPaddingLeft
-        val startContentPaddingEnd = omnibarCard.contentPaddingRight
         val startCardStrokeWidth = omnibarCard.strokeWidth
 
         val endCardMarginTop: Int
         val endCardMarginBottom: Int
         val endCardMarginStart: Int
         val endCardMarginEnd: Int
-        val endContentPaddingTop: Int
-        val endContentPaddingBottom: Int
-        val endContentPaddingStart: Int
-        val endContentPaddingEnd: Int
         val endCardStrokeWidth: Int
 
         if (focused) {
@@ -237,20 +237,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             endCardMarginBottom = omnibarCardFocusedMarginBottom
             endCardMarginStart = omnibarCardFocusedMarginHorizontal
             endCardMarginEnd = omnibarCardFocusedMarginHorizontal
-            endContentPaddingTop = omnibarContentFocusedPaddingVertical
-            endContentPaddingBottom = omnibarContentFocusedPaddingVertical
-            endContentPaddingStart = omnibarContentFocusedPaddingHorizontal
-            endContentPaddingEnd = omnibarContentFocusedPaddingHorizontal
             endCardStrokeWidth = omnibarOutlineFocusedWidth
         } else {
             endCardMarginTop = omnibarCardMarginTop
             endCardMarginBottom = omnibarCardMarginBottom
             endCardMarginStart = omnibarCardMarginHorizontal
             endCardMarginEnd = omnibarCardMarginHorizontal
-            endContentPaddingTop = omnibarContentPadding
-            endContentPaddingBottom = omnibarContentPadding
-            endContentPaddingStart = omnibarContentPadding
-            endContentPaddingEnd = omnibarContentPadding
             endCardStrokeWidth = omnibarOutlineWidth
         }
 
@@ -264,10 +256,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             val animatedCardMarginBottom = (startCardMarginBottom + (endCardMarginBottom - startCardMarginBottom) * fraction).toInt()
             val animatedCardMarginStart = (startCardMarginStart + (endCardMarginStart - startCardMarginStart) * fraction).toInt()
             val animatedCardMarginEnd = (startCardMarginEnd + (endCardMarginEnd - startCardMarginEnd) * fraction).toInt()
-            val animatedContentPaddingTop = (startContentPaddingTop + (endContentPaddingTop - startContentPaddingTop) * fraction).toInt()
-            val animatedContentPaddingBottom = (startContentPaddingBottom + (endContentPaddingBottom - startContentPaddingBottom) * fraction).toInt()
-            val animatedContentPaddingStart = (startContentPaddingStart + (endContentPaddingStart - startContentPaddingStart) * fraction).toInt()
-            val animatedContentPaddingEnd = (startContentPaddingEnd + (endContentPaddingEnd - startContentPaddingEnd) * fraction).toInt()
             val animatedCardStrokeWidth = (startCardStrokeWidth + (endCardStrokeWidth - startCardStrokeWidth) * fraction).toInt()
 
             val params = omnibarCard.layoutParams as MarginLayoutParams
@@ -277,18 +265,52 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             params.bottomMargin = animatedCardMarginBottom
             omnibarCard.setLayoutParams(params)
 
-            omnibarCard.setContentPadding(
-                animatedContentPaddingStart,
-                animatedContentPaddingTop,
-                animatedContentPaddingEnd,
-                animatedContentPaddingBottom,
-            )
-
             omnibarCard.strokeWidth = animatedCardStrokeWidth
         }
 
+        animator.addListener(
+            onStart = {
+                lockContentDimensions()
+            },
+            onEnd = {
+                // Only unlock content size when we're back to unfocused state.
+                if (!focused) {
+                    unlockContentDimensions()
+                }
+            },
+            onCancel = {
+                // Ensuring that onEnd, and consequently #unlockContentDimensions(), is not called when transition is canceled,
+                // which can result in content jumping to match_parent while the transition is not finished yet.
+                // We only want to unlock when we're fully transitioned back to unfocused state.
+                animator.removeAllListeners()
+            },
+        )
+
         animator.start()
         focusAnimator = animator
+    }
+
+    /**
+     * Lock content dimensions so that the view doesn't respond to the wrapping card's size changes.
+     *
+     * When focused, we resize the wrapping card to make the stroke appear "outside" but we don't want the content to expand with it.
+     */
+    private fun lockContentDimensions() {
+        omniBarContentContainer.updateLayoutParams {
+            width = omniBarContentContainer.measuredWidth
+            height = omniBarContentContainer.measuredHeight
+        }
+    }
+
+    /**
+     * Unlock content dimensions so that the view can correctly respond to changes in the viewport size,
+     * like resizing the app window or changing device orientation.
+     */
+    private fun unlockContentDimensions() {
+        omniBarContentContainer.updateLayoutParams {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
     }
 
     private fun onFindInPageShown() {
