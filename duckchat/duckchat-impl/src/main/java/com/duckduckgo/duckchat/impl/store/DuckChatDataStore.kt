@@ -22,6 +22,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
@@ -56,6 +59,8 @@ interface DuckChatDataStore {
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesDuckChatDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
+    private val dispatchers: DispatcherProvider,
+    @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckChatDataStore {
 
@@ -70,6 +75,22 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         return this[DUCK_CHAT_SHOW_IN_ADDRESS_BAR]
             ?: this[DUCK_CHAT_SHOW_IN_MENU]
             ?: true
+    }
+
+    init {
+        if (isMainProcess) {
+            storeDerivedValues()
+        }
+    }
+
+    private fun storeDerivedValues() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val current = store.data.firstOrNull() ?: return@launch
+            if (current[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] == null) {
+                val initial = current[DUCK_CHAT_SHOW_IN_MENU] ?: true
+                store.edit { it[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = initial }
+            }
+        }
     }
 
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
