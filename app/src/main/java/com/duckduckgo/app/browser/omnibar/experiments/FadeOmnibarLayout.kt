@@ -100,17 +100,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
     private val omnibarCardFocusedMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginTop) }
     private val omnibarCardFocusedMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginBottom) }
-    private val omnibarContentPadding by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarContentPadding) }
-    private val omnibarContentFocusedPaddingHorizontal by lazy {
-        resources.getDimensionPixelSize(
-            CommonR.dimen.experimentalOmnibarContentFocusedPaddingHorizontal,
-        )
-    }
-    private val omnibarContentFocusedPaddingVertical by lazy {
-        resources.getDimensionPixelSize(
-            CommonR.dimen.experimentalOmnibarContentFocusedPaddingVertical,
-        )
-    }
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
@@ -159,29 +148,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         w: Int,
         h: Int,
         oldw: Int,
-        oldh: Int
+        oldh: Int,
     ) {
         super.onSizeChanged(w, h, oldw, oldh)
         if (w != oldw || h != oldh) {
-            omniBarContentContainer.updateLayoutParams {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                height = ViewGroup.LayoutParams.MATCH_PARENT
-            }
-            if (viewModel.viewState.value.hasOutline()) {
-                omnibarCard.setContentPadding(
-                    omnibarContentFocusedPaddingHorizontal,
-                    omnibarContentFocusedPaddingVertical,
-                    omnibarContentFocusedPaddingHorizontal,
-                    omnibarContentFocusedPaddingVertical,
-                )
-            } else {
-                omnibarCard.setContentPadding(
-                    omnibarContentPadding,
-                    omnibarContentPadding,
-                    omnibarContentPadding,
-                    omnibarContentPadding,
-                )
-            }
+            // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
+            unlockContentDimensions()
         }
     }
 
@@ -195,7 +167,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        if (viewState.hasOutline()) {
+        if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
         } else {
             animateOmnibarFocusedState(focused = false)
@@ -294,38 +266,47 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         animator.addListener(
             onStart = {
-                // While we resize the wrapping card to make the outline appear "outside",
-                // we don't want the content to expand with it, so we're locking the dimensions.
-                omniBarContentContainer.updateLayoutParams {
-                    width = omniBarContentContainer.measuredWidth
-                    height = omniBarContentContainer.measuredHeight
-                }
+                lockContentDimensions()
             },
             onEnd = {
-                post {
-                    // Once the transition finishes, we're unlocking the dimensions so that the view can resize with configuration changes,
-                    // like changing size of the viewport size, or rotating the device.
-                    if (!focused) {
-                        omniBarContentContainer.updateLayoutParams {
-                            width = ViewGroup.LayoutParams.MATCH_PARENT
-                            height = ViewGroup.LayoutParams.MATCH_PARENT
-                        }
-                        omnibarCard.setContentPadding(
-                            omnibarContentPadding,
-                            omnibarContentPadding,
-                            omnibarContentPadding,
-                            omnibarContentPadding,
-                        )
-                    }
+                // Only unlock content size when we're back to unfocused state.
+                if (!focused) {
+                    unlockContentDimensions()
                 }
             },
             onCancel = {
+                // Ensuring that onEnd, and consequently #unlockContentDimensions(), is not called when transition is canceled,
+                // which can result in content jumping to match_parent while the transition is not finished yet.
+                // We only want to unlock when we're fully transitioned back to unfocused state.
                 animator.removeAllListeners()
-            }
+            },
         )
 
         animator.start()
         focusAnimator = animator
+    }
+
+    /**
+     * Lock content dimensions so that the view doesn't respond to the wrapping card's size changes.
+     *
+     * When focused, we resize the wrapping card to make the stroke appear "outside" but we don't want the content to expand with it.
+     */
+    private fun lockContentDimensions() {
+        omniBarContentContainer.updateLayoutParams {
+            width = omniBarContentContainer.measuredWidth
+            height = omniBarContentContainer.measuredHeight
+        }
+    }
+
+    /**
+     * Unlock content dimensions so that the view can correctly respond to changes in the viewport size,
+     * like resizing the app window or changing device orientation.
+     */
+    private fun unlockContentDimensions() {
+        omniBarContentContainer.updateLayoutParams {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
     }
 
     private fun onFindInPageShown() {
@@ -356,8 +337,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
     }
-
-    private fun ViewState.hasOutline() = hasFocus || isFindInPageVisible
 
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
