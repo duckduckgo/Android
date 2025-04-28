@@ -180,15 +180,6 @@
                                 <include layout="@layout/cookie_scene_1" />
                             </FrameLayout>
 
-                            <!-- Placeholder should have same size a sibling ImageViews. size = image_width + padding -->
-                            <View
-                                android:id="@+id/placeholder"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_gravity="center"
-                                android:layout_marginEnd="@dimen/keyline_1"
-                                android:visibility="invisible" />
-
                         </FrameLayout>
 
                         <View
@@ -324,6 +315,31 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.appcompat.widget.Toolbar>
+
+            <FrameLayout
+                android:layout_width="76dp"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/experimentalOmnibarCardMarginTop"
+                android:paddingBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:documentation="The values of layout width and paddings is tweaked manually to position the pulsing circle
+                precisely on top of the lottie-animated shield, keeping in mind that the added animated ImageView will use Gravity.CENTER.">
+
+                <View
+                    android:id="@+id/placeholder"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:visibility="invisible"
+                    tools:documentation="This view is a reference for the PulseAnimation.kt.
+                    PulseAnimation class will add a new ImageView to the parent layout, with a Gravity.CENTER, and size equal to the size of this view.
+                    However, the animator will scale the resulting ImageView from 0.95x to 2.0x size of this view.
+                    Keep this in mind when considering clipping - the PulseAnimation will try to disable clipping for all parents in the hierarchy,
+                    but you might start running against views that always have clipping enabled (like material cards), or system UI." />
+
+            </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/customTabToolbarContainerWrapper"
