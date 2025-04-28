@@ -2813,12 +2813,7 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        val webViewLayout = if (!isActiveCustomTab() && visualDesignExperimentDataStore.getOmnibarType() == FADE) {
-            R.layout.include_duckduckgo_browser_experiment_webview
-        } else {
-            R.layout.include_duckduckgo_browser_webview
-        }
-
+        val webViewLayout = R.layout.include_duckduckgo_browser_webview
         webView = layoutInflater.inflate(
             webViewLayout,
             binding.webViewContainer,
