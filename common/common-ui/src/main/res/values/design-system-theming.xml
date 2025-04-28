@@ -132,6 +132,8 @@
         <item name="elevationOverlayEnabled">false</item>
 
         <item name="tabItemSelectionCircleWidth">2dp</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@color/webViewScrollbarTrackColor</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
