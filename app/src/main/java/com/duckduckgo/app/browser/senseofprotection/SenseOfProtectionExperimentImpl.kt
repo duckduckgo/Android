@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.senseofprotection
 
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_1
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -39,6 +40,7 @@ interface SenseOfProtectionExperiment {
     fun getTabManagerPixelParams(): Map<String, String>
     fun firePrivacyDashboardClickedPixelIfInExperiment()
     fun isUserEnrolledInAVariantAndExperimentEnabled(): Boolean
+    fun isUserEnrolledInVariant1CohortAndExperimentEnabled(): Boolean
     fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean
     fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean
     fun isMemberOfVariant2Cohort(): Boolean
@@ -61,7 +63,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     init {
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
         if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-            if (isNotEnrolledInNewUserExperiment()) {
+            if (!isEnrolledInNewUserExperiment()) {
                 isExistingUserExperimentEnabled(cohortName = MODIFIED_CONTROL)
             }
         }
@@ -74,6 +76,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
             false
         }
     }
+
+    override fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
+        getNewUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isNewUserExperimentEnabled(MODIFIED_CONTROL) ||
+            getExistingUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isExistingUserExperimentEnabled(MODIFIED_CONTROL)
+
+    override fun isUserEnrolledInVariant1CohortAndExperimentEnabled(): Boolean =
+        getNewUserExperimentCohortName() == VARIANT_1.cohortName && isNewUserExperimentEnabled(VARIANT_1) ||
+            getExistingUserExperimentCohortName() == VARIANT_1.cohortName && isExistingUserExperimentEnabled(VARIANT_1)
 
     override fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean =
         getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
@@ -111,49 +121,25 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         }
     }
 
-    override fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
-        getNewUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isNewUserExperimentEnabled(MODIFIED_CONTROL) ||
-            getExistingUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isExistingUserExperimentEnabled(MODIFIED_CONTROL)
-
-    // TODO this _might_ be able to be simplified like the isUserEnrolledInModifiedControlCohortAndExperimentEnabled function
     override fun isUserEnrolledInAVariantAndExperimentEnabled(): Boolean {
-        return when {
-            isEnrolledInNewUserExperiment() -> {
-                val cohortNameString = senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
-                val cohortName = cohortNameString?.let {
-                    SenseOfProtectionToggles.Cohorts.valueOf(it)
-                } ?: return false
+        val enrolledInModifiedControl = isUserEnrolledInModifiedControlCohortAndExperimentEnabled()
+        val enrolledInVariant1 = isUserEnrolledInVariant1CohortAndExperimentEnabled()
+        val enrolledInVariant2 = isUserEnrolledInVariant2CohortAndExperimentEnabled()
 
-                isNewUserExperimentEnabled(cohortName) && cohortName.isVariantCohort()
-            }
-
-            isEnrolledInExistingUserExperiment() -> {
-                val cohortNameString = senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name
-                val cohortName = cohortNameString?.let {
-                    SenseOfProtectionToggles.Cohorts.valueOf(it)
-                } ?: return false
-
-                isExistingUserExperimentEnabled(cohortName) && cohortName.isVariantCohort()
-            }
-
-            else -> false
-        }
+        return enrolledInModifiedControl || enrolledInVariant1 || enrolledInVariant2
     }
 
     private fun isEnrolledInNewUserExperiment(): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort() != null
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnrolled()
 
     private fun isEnrolledInExistingUserExperiment(): Boolean =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort() != null
-
-    private fun isNotEnrolledInNewUserExperiment(): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort() == null
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnrolled()
 
     private fun isNewUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnabled(cohort = cohortName)
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnrolledAndEnabled(cohortName)
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnabled(cohort = cohortName)
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnrolledAndEnabled(cohortName)
 
     private fun getNewUserExperimentCohortName(): String? =
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
