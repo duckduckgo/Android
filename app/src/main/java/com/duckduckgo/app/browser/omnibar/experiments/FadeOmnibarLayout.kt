@@ -26,11 +26,13 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -153,6 +155,36 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
     }
 
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int
+    ) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w != oldw || h != oldh) {
+            omniBarContentContainer.updateLayoutParams {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            if (viewModel.viewState.value.hasOutline()) {
+                omnibarCard.setContentPadding(
+                    omnibarContentFocusedPaddingHorizontal,
+                    omnibarContentFocusedPaddingVertical,
+                    omnibarContentFocusedPaddingHorizontal,
+                    omnibarContentFocusedPaddingVertical,
+                )
+            } else {
+                omnibarCard.setContentPadding(
+                    omnibarContentPadding,
+                    omnibarContentPadding,
+                    omnibarContentPadding,
+                    omnibarContentPadding,
+                )
+            }
+        }
+    }
+
     override fun render(viewState: ViewState) {
         super.render(viewState)
         outlineProvider = if (viewState.viewMode is ViewMode.CustomTab) {
@@ -163,7 +195,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        if (viewState.hasFocus || isFindInPageVisible) {
+        if (viewState.hasOutline()) {
             animateOmnibarFocusedState(focused = true)
         } else {
             animateOmnibarFocusedState(focused = false)
@@ -216,20 +248,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val startCardMarginBottom = omnibarCard.marginBottom
         val startCardMarginStart = omnibarCard.marginStart
         val startCardMarginEnd = omnibarCard.marginEnd
-        val startContentPaddingTop = omnibarCard.contentPaddingTop
-        val startContentPaddingBottom = omnibarCard.contentPaddingBottom
-        val startContentPaddingStart = omnibarCard.contentPaddingLeft
-        val startContentPaddingEnd = omnibarCard.contentPaddingRight
         val startCardStrokeWidth = omnibarCard.strokeWidth
 
         val endCardMarginTop: Int
         val endCardMarginBottom: Int
         val endCardMarginStart: Int
         val endCardMarginEnd: Int
-        val endContentPaddingTop: Int
-        val endContentPaddingBottom: Int
-        val endContentPaddingStart: Int
-        val endContentPaddingEnd: Int
         val endCardStrokeWidth: Int
 
         if (focused) {
@@ -237,20 +261,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             endCardMarginBottom = omnibarCardFocusedMarginBottom
             endCardMarginStart = omnibarCardFocusedMarginHorizontal
             endCardMarginEnd = omnibarCardFocusedMarginHorizontal
-            endContentPaddingTop = omnibarContentFocusedPaddingVertical
-            endContentPaddingBottom = omnibarContentFocusedPaddingVertical
-            endContentPaddingStart = omnibarContentFocusedPaddingHorizontal
-            endContentPaddingEnd = omnibarContentFocusedPaddingHorizontal
             endCardStrokeWidth = omnibarOutlineFocusedWidth
         } else {
             endCardMarginTop = omnibarCardMarginTop
             endCardMarginBottom = omnibarCardMarginBottom
             endCardMarginStart = omnibarCardMarginHorizontal
             endCardMarginEnd = omnibarCardMarginHorizontal
-            endContentPaddingTop = omnibarContentPadding
-            endContentPaddingBottom = omnibarContentPadding
-            endContentPaddingStart = omnibarContentPadding
-            endContentPaddingEnd = omnibarContentPadding
             endCardStrokeWidth = omnibarOutlineWidth
         }
 
@@ -264,10 +280,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             val animatedCardMarginBottom = (startCardMarginBottom + (endCardMarginBottom - startCardMarginBottom) * fraction).toInt()
             val animatedCardMarginStart = (startCardMarginStart + (endCardMarginStart - startCardMarginStart) * fraction).toInt()
             val animatedCardMarginEnd = (startCardMarginEnd + (endCardMarginEnd - startCardMarginEnd) * fraction).toInt()
-            val animatedContentPaddingTop = (startContentPaddingTop + (endContentPaddingTop - startContentPaddingTop) * fraction).toInt()
-            val animatedContentPaddingBottom = (startContentPaddingBottom + (endContentPaddingBottom - startContentPaddingBottom) * fraction).toInt()
-            val animatedContentPaddingStart = (startContentPaddingStart + (endContentPaddingStart - startContentPaddingStart) * fraction).toInt()
-            val animatedContentPaddingEnd = (startContentPaddingEnd + (endContentPaddingEnd - startContentPaddingEnd) * fraction).toInt()
             val animatedCardStrokeWidth = (startCardStrokeWidth + (endCardStrokeWidth - startCardStrokeWidth) * fraction).toInt()
 
             val params = omnibarCard.layoutParams as MarginLayoutParams
@@ -277,15 +289,40 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             params.bottomMargin = animatedCardMarginBottom
             omnibarCard.setLayoutParams(params)
 
-            omnibarCard.setContentPadding(
-                animatedContentPaddingStart,
-                animatedContentPaddingTop,
-                animatedContentPaddingEnd,
-                animatedContentPaddingBottom,
-            )
-
             omnibarCard.strokeWidth = animatedCardStrokeWidth
         }
+
+        animator.addListener(
+            onStart = {
+                // While we resize the wrapping card to make the outline appear "outside",
+                // we don't want the content to expand with it, so we're locking the dimensions.
+                omniBarContentContainer.updateLayoutParams {
+                    width = omniBarContentContainer.measuredWidth
+                    height = omniBarContentContainer.measuredHeight
+                }
+            },
+            onEnd = {
+                post {
+                    // Once the transition finishes, we're unlocking the dimensions so that the view can resize with configuration changes,
+                    // like changing size of the viewport size, or rotating the device.
+                    if (!focused) {
+                        omniBarContentContainer.updateLayoutParams {
+                            width = ViewGroup.LayoutParams.MATCH_PARENT
+                            height = ViewGroup.LayoutParams.MATCH_PARENT
+                        }
+                        omnibarCard.setContentPadding(
+                            omnibarContentPadding,
+                            omnibarContentPadding,
+                            omnibarContentPadding,
+                            omnibarContentPadding,
+                        )
+                    }
+                }
+            },
+            onCancel = {
+                animator.removeAllListeners()
+            }
+        )
 
         animator.start()
         focusAnimator = animator
@@ -319,6 +356,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
     }
+
+    private fun ViewState.hasOutline() = hasFocus || isFindInPageVisible
 
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
