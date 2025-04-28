@@ -147,7 +147,6 @@ import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedList
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
