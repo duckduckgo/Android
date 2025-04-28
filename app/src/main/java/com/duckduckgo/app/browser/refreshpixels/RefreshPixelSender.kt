@@ -73,7 +73,6 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
                             pixel.fire(it.pixelName, it.params)
                         }
                         pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
-                        Timber.d("KateTest--> Fired pixel for 2x refresh in 12 seconds")
                     }
 
                     RefreshPattern.THRICE_IN_20_SECONDS -> {
@@ -81,9 +80,8 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
                         blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
                             pixel.fire(it.pixelName, it.params)
                         }
-                        Timber.d("KateTest--> Fired pixel for 3x refresh in 20 seconds")
                     }
-                    else -> Timber.w("KateTest--> Unknown refresh pattern: $detectedPattern, no pixels fired")
+                    else -> Timber.w("Unknown refresh pattern: $detectedPattern, no pixels fired")
                 }
             }
         }

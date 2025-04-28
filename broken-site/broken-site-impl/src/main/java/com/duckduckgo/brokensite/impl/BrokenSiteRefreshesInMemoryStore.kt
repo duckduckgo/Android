@@ -23,7 +23,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
 import javax.inject.Inject
-import timber.log.Timber
 
 interface BrokenSiteRefreshesInMemoryStore {
     fun resetRefreshCount(pattern: RefreshPattern)
@@ -49,15 +48,12 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         url: Uri,
         localDateTime: LocalDateTime,
     ) {
-        Timber.d("KateTest--> addRefresh called with url: $url, localDateTime: $localDateTime")
-
         doubleRefreshes.let {
             doubleRefreshes = if (it == null || it.url != url) {
                 LastRefreshedUrl(url, mutableListOf(localDateTime))
             } else {
                 it.copy(time = it.time.plus(localDateTime))
             }
-            Timber.d("KateTest--> doubleRefreshes updated to: ${doubleRefreshes!!.url} with ${doubleRefreshes!!.time.size} timestamps")
         }
 
         tripleRefreshes.let {
@@ -66,30 +62,14 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
             } else {
                 it.copy(time = it.time.plus(localDateTime))
             }
-            Timber.d("KateTest--> tripleRefreshes updated to: ${tripleRefreshes!!.url} with ${tripleRefreshes!!.time.size} timestamps")
         }
-        // refreshes.let {
-        //     refreshes = if (it == null || it.url != url) {
-        //         LastRefreshedUrl(url, mutableListOf(localDateTime))
-        //     } else {
-        //         it.copy(time = it.time.plus(localDateTime))
-        //     }
-        // }
     }
 
     override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
-        Timber.d("KateTest--> getRefreshPatterns called with currentDateTime: $currentDateTime")
-        Timber.d("KateTest--> doubleRefreshes: $doubleRefreshes, tripleRefreshes: $tripleRefreshes")
-
         var twiceRefreshCount = 0
         var thriceRefreshCount = 0
 
         pruneOldRefreshes(currentDateTime)
-
-        Timber.d(
-            "KateTest--> prunedDoubleRefreshes.size: ${doubleRefreshes?.time?.size}," +
-                "prunedTripleRefreshes.size: ${tripleRefreshes?.time?.size}",
-        )
 
         when {
             doubleRefreshes == null && tripleRefreshes == null -> return emptySet()
@@ -122,7 +102,7 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
             detectedPatterns.add(RefreshPattern.THRICE_IN_20_SECONDS)
             resetRefreshCount(RefreshPattern.THRICE_IN_20_SECONDS)
         }
-        Timber.d("KateTest--> detectedPatterns: $detectedPatterns")
+
         return detectedPatterns
     }
 

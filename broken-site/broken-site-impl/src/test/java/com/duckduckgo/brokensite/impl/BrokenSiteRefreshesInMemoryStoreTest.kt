@@ -112,7 +112,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenThreeRefreshesOccurWithin20SecondsThenTwiceAndThricePatternDetected() = runTest {
+    fun whenThreeRefreshesOccurWithin10SecondsThenTwiceAndThricePatternDetected() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
         store.addRefresh(testUrl, baseTime.plusSeconds(10))

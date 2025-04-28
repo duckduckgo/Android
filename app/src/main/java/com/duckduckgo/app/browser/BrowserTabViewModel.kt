@@ -2784,7 +2784,6 @@ class BrowserTabViewModel @Inject constructor(
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
-            Timber.d("Katetest--> About to handleBreakageRefreshPatterns: $detectedRefreshPatterns")
             handleBreakageRefreshPatterns(detectedRefreshPatterns)
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
