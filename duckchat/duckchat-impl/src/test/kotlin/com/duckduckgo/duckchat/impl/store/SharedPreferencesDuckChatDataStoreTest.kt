@@ -50,7 +50,12 @@ class SharedPreferencesDuckChatDataStoreTest {
         )
 
     private val testee: DuckChatDataStore =
-        SharedPreferencesDuckChatDataStore(testDataStore, coroutineRule.testScope)
+        SharedPreferencesDuckChatDataStore(
+            testDataStore,
+            coroutineRule.testDispatcherProvider,
+            true,
+            coroutineRule.testScope,
+        )
 
     companion object {
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
@@ -107,9 +112,14 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenMenuFlagChangesThenAddressBarDefaultsToMenuValue() = runTest {
+    fun whenMenuFlagChangesLaterThenAddressBarRemainsUnchanged() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
+
         testee.setShowInBrowserMenu(false)
-        assertFalse(testee.getShowInAddressBar())
+
+        assertFalse(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
     }
 
     @Test
