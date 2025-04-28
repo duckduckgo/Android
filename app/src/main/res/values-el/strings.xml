@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d ιδιωτική καρτέλα</item>
-        <item quantity="other">%1$d ιδιωτικές καρτέλες</item>
+        <item quantity="one">1 Καρτέλα</item>
+        <item quantity="other">%1$d Καρτέλες</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ο ιστότοπος αυτός μπορεί να υποδύεται έναν νόμιμο ιστότοπο προκειμένου να σας εξαπατήσει ώστε να παράσχετε προσωπικές πληροφορίες, όπως κωδικούς πρόσβασης ή αριθμούς πιστωτικών καρτών.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Το DuckDuckGo απέκλεισε αυτήν τη σελίδα επειδή μπορεί να προσπαθεί να σας εξαπατήσει ή να σας χειραγωγήσει για να μεταφέρετε χρήματα, να αγοράσετε παραποιημένα προϊόντα ή να εγκαταστήσετε κακόβουλο λογισμικό με ψευδείς προφάσεις.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Αποχωρήστε από τον ιστότοπο αυτόν</string>
     <string name="maliciousSiteAdvancedCTA">Προχωρημένο</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Εάν πιστεύετε ότι αυτός ο ιστότοπος είναι ασφαλής, μπορείτε να <a href=\"\">αναφέρετε ένα σφάλμα</a>. Μπορείτε ακόμα να επισκεφθείτε τον ιστότοπο, με δική σας ευθύνη.]]></string>
