@@ -1500,6 +1500,8 @@ class TabSwitcherViewModelTest {
     }
 
     private fun TestScope.prepareSelectionMode() {
+        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
+
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.selectionViewState.collect()
         }
