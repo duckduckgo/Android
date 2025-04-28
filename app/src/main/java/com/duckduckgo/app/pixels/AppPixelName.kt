@@ -382,7 +382,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS("m_tab_manager_select_mode_menu_close_other_tabs"),
     TAB_MANAGER_SELECT_MODE_MENU_CLOSE_OTHER_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_tabs_daily"),
     TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS("m_tab_manager_select_mode_menu_close_tabs"),
-    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY("m_tab_manager_select_mode_menu_close_other_daily"),
+    TAB_MANAGER_SELECT_MODE_MENU_CLOSE_TABS_DAILY("m_tab_manager_select_mode_menu_close_tabs_daily"),
 
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
