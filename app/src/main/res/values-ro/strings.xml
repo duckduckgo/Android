@@ -724,9 +724,9 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d filă privată</item>
-        <item quantity="few">%1$d file private</item>
-        <item quantity="other">%1$d de file private</item>
+        <item quantity="one">1 filă</item>
+        <item quantity="few">%1$d file</item>
+        <item quantity="other">%1$d de file</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -876,6 +876,7 @@
     <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Acest site poate imita un site legitim pentru a te induce în eroare să furnizezi informații personale, cum ar fi parole sau numere de carduri de credit.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece ar putea încerca să te înșele sau să te manipuleze pentru a transfera bani, a cumpăra bunuri contrafăcute sau a instala programe rău intenționate (malware) sub pretexte false.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Părăsește acest site</string>
     <string name="maliciousSiteAdvancedCTA">Avansat</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Dacă crezi că acest site este sigur, poți <a href=\"\">să raportezi o eroare</a>. Poți vizita în continuare site-ul pe propriul risc.]]></string>
