@@ -737,10 +737,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d приватная вкладка</item>
-        <item quantity="few">%1$d приватных вкладки</item>
-        <item quantity="many">%1$d приватных вкладок</item>
-        <item quantity="other">Приватных вкладок: %1$d</item>
+        <item quantity="one">1 вкладка</item>
+        <item quantity="few">%1$d вкладки</item>
+        <item quantity="many">%1$d вкладок</item>
+        <item quantity="other">Вкладок: %1$d</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -892,6 +892,7 @@
     <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу: возможно, она распространяет вредоносное ПО для взлома устройств или кражи личной информации.\n<a href=\"\">Подробнее</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Возможно, это лишь имитация настоящего сайта, созданная с целью собрать ваши данные (например, пароли и номера платежных карт) обманным путем.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу. Есть подозрение, она работает с целью убедить посетителей перевести деньги, купить поддельные товары или установить вредоносное ПО под ложным предлогом.\n<a href=\"\">Подробнее...</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Покинуть сайт</string>
     <string name="maliciousSiteAdvancedCTA">Дополнительно</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Если вы уверены в безопасности этого сайта, можете <a href=\"\">сообщить нам об ошибке</a>. Решив посетить его, вы принимаете на себя все связанные с этим риски.]]></string>
