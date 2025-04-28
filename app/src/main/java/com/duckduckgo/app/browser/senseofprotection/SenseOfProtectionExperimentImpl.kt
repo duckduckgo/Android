@@ -64,14 +64,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
         if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
             if (!isEnrolledInNewUserExperiment()) {
-                isExistingUserExperimentEnabled(cohortName = MODIFIED_CONTROL)
+                enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
             }
         }
     }
 
     override fun enrolUserInNewExperimentIfEligible(): Boolean {
         return if (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) {
-            isNewUserExperimentEnabled(cohortName = MODIFIED_CONTROL)
+            enrollInNewUserExperiment(cohortName = MODIFIED_CONTROL)
         } else {
             false
         }
@@ -127,6 +127,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         val enrolledInVariant2 = isUserEnrolledInVariant2CohortAndExperimentEnabled()
 
         return enrolledInModifiedControl || enrolledInVariant1 || enrolledInVariant2
+    }
+
+    private fun enrollInNewUserExperiment(cohortName: CohortName): Boolean {
+        return senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnabled(cohortName)
+    }
+
+    private fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
+        return senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnabled(cohortName)
     }
 
     private fun isEnrolledInNewUserExperiment(): Boolean =
