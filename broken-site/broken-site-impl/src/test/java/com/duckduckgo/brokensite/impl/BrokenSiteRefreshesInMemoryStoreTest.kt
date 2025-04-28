@@ -54,10 +54,12 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     fun whenResetCalledThenRefreshCountReset() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
+        store.addRefresh(testUrl, baseTime.plusSeconds(10))
 
-        store.resetRefreshCount()
+        store.resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
+        store.resetRefreshCount(RefreshPattern.THRICE_IN_20_SECONDS)
 
-        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(10))
+        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(11))
         assertTrue(patterns.isEmpty())
     }
 
@@ -77,7 +79,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
         val updatedPatterns = store.getRefreshPatterns(baseTime.plusSeconds(15))
         assertEquals(1, updatedPatterns.size)
-        assertTrue(updatedPatterns.any { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS })
+        assertEquals(updatedPatterns, setOf(RefreshPattern.TWICE_IN_12_SECONDS))
     }
 
     @Test
@@ -87,19 +89,17 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(10))
         assertEquals(1, patterns.size)
-        assertTrue(patterns.any { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS })
+        assertEquals(patterns, setOf(RefreshPattern.TWICE_IN_12_SECONDS))
     }
 
     @Test
-    fun whenTwoRefreshesOccurWithin12SecondsThenTwicePatternDetectedOnce() = runTest {
+    fun whenTwoRefreshesOccurWithin12SecondsThenPatternDetected() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(10))
         assertEquals(1, patterns.size)
-        val detectedPattern = patterns.first()
-        assertEquals(RefreshPattern.TWICE_IN_12_SECONDS, detectedPattern.pattern)
-        assertEquals(1, detectedPattern.count)
+        assertEquals(patterns, setOf(RefreshPattern.TWICE_IN_12_SECONDS))
     }
 
     @Test
@@ -108,23 +108,18 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(15))
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(20))
-        assertTrue(patterns.isEmpty() || patterns.none { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS })
+        assertTrue(patterns.isEmpty())
     }
 
     @Test
-    fun whenThreeRefreshesOccurWithin20SecondsThenTwiceAndThricePatternDetectedOnceEach() = runTest {
+    fun whenThreeRefreshesOccurWithin20SecondsThenTwiceAndThricePatternDetected() = runTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
         store.addRefresh(testUrl, baseTime.plusSeconds(10))
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(15))
         assertEquals(2, patterns.size)
-
-        val twicePattern = patterns.first { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS }
-        assertEquals(1, twicePattern.count)
-
-        val thricePattern = patterns.first { it.pattern == RefreshPattern.THRICE_IN_20_SECONDS }
-        assertEquals(1, thricePattern.count)
+        assertEquals(patterns, (setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)))
     }
 
     @Test
@@ -138,30 +133,13 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     }
 
     @Test
-    fun whenFiveRefreshesOccurWithin20SecondsThen2TwicePatternsAnd1ThricePatternDetected() = runTest {
+    fun whenRefreshesAreOlderThanRespectiveWindowThenTheyArePruned() = runTest {
         store.addRefresh(testUrl, baseTime)
-        store.addRefresh(testUrl, baseTime.plusSeconds(5))
-        store.addRefresh(testUrl, baseTime.plusSeconds(7))
-        store.addRefresh(testUrl, baseTime.plusSeconds(15))
-        store.addRefresh(testUrl, baseTime.plusSeconds(18))
-
-        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(19))
-        assertEquals(2, patterns.size)
-
-        val twicePattern = patterns.first { it.pattern == RefreshPattern.TWICE_IN_12_SECONDS }
-        assertEquals(2, twicePattern.count)
-
-        val thricePattern = patterns.first { it.pattern == RefreshPattern.THRICE_IN_20_SECONDS }
-        assertEquals(1, thricePattern.count)
-    }
-
-    @Test
-    fun whenRefreshesAreOlderThanWindowThenTheyArePruned() = runTest {
-        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(3))
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
 
-        val patternsBeforePruning = store.getRefreshPatterns(baseTime.plusSeconds(10))
-        assertEquals(1, patternsBeforePruning.size)
+        val patternsBeforePruning = store.getRefreshPatterns(baseTime.plusSeconds(7))
+        assertEquals(2, patternsBeforePruning.size)
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(25))
         assertTrue(patterns.isEmpty())

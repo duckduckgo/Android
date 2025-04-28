@@ -3,7 +3,6 @@ package com.duckduckgo.brokensite.impl
 import android.annotation.SuppressLint
 import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -90,9 +89,9 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenResetRefreshCountThenResetRefreshCountCalled() {
-        testee.resetRefreshCount()
+        testee.resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
 
-        verify(mockBrokenSiteReportRepository).resetRefreshCount()
+        verify(mockBrokenSiteReportRepository).resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
     }
 
     @Test
@@ -107,10 +106,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenAllRequirementsMetThenShouldShowBrokenSitePromptReturnsTrue() = runTest {
-        val detectedRefreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val detectedRefreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(2)
@@ -124,10 +120,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenFeatureEnabledAndUrlIsDuckDuckGoThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
-        val detectedRefreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val detectedRefreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
 
@@ -141,10 +134,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenFeatureEnabledAndUserStillInCooldownPeriodThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
-        val detectedRefreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val detectedRefreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(3))
 
@@ -158,10 +148,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenFeatureEnabledAndUserHasDismissedMaxDismissStreakTimesThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
-        val detectedRefreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val detectedRefreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().minusDays(3))
         whenever(mockBrokenSiteReportRepository.getDismissalCountBetween(any(), any())).thenReturn(3)
@@ -176,10 +163,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenFeatureDisabledThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
-        val detectedRefreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val detectedRefreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 

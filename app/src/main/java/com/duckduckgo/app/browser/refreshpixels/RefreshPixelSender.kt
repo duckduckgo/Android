@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
 import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -39,7 +38,7 @@ interface RefreshPixelSender {
     fun sendMenuRefreshPixels()
     fun sendCustomTabRefreshPixel()
     fun sendPullToRefreshPixels()
-    fun onRefreshPatternDetected(patternsDetected: Set<DetectedRefreshPattern>)
+    fun onRefreshPatternDetected(patternsDetected: Set<RefreshPattern>)
 }
 
 @ContributesBinding(AppScope::class)
@@ -65,30 +64,26 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
     }
 
-    override fun onRefreshPatternDetected(patternsDetected: Set<DetectedRefreshPattern>) {
+    override fun onRefreshPatternDetected(patternsDetected: Set<RefreshPattern>) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             patternsDetected.forEach { detectedPattern ->
-                when (detectedPattern.pattern) {
+                when (detectedPattern) {
                     RefreshPattern.TWICE_IN_12_SECONDS -> {
-                        repeat(detectedPattern.count) {
-                            blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-                                pixel.fire(it.pixelName, it.params)
-                            }
-                            pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
-                            Timber.d("Fired pixel for 2x refresh in 12 seconds")
+                        blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
+                            pixel.fire(it.pixelName, it.params)
                         }
+                        pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+                        Timber.d("KateTest--> Fired pixel for 2x refresh in 12 seconds")
                     }
 
                     RefreshPattern.THRICE_IN_20_SECONDS -> {
-                        repeat(detectedPattern.count) {
-                            pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-                            blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-                                pixel.fire(it.pixelName, it.params)
-                            }
-                            Timber.d("Fired pixel for 3x refresh in 20 seconds")
+                        pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+                        blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
+                            pixel.fire(it.pixelName, it.params)
                         }
+                        Timber.d("KateTest--> Fired pixel for 3x refresh in 20 seconds")
                     }
-                    else -> Timber.w("Unknown refresh pattern: $detectedPattern, no pixels fired")
+                    else -> Timber.w("KateTest--> Unknown refresh pattern: $detectedPattern, no pixels fired")
                 }
             }
         }

@@ -209,7 +209,6 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
@@ -2591,7 +2590,7 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val expectedRefreshPatterns = setOf(DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1))
+        val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockBrokenSitePrompt.getUserRefreshesCount()).thenReturn(expectedRefreshPatterns)
         testee.refreshCta()
         verify(mockBrokenSitePrompt).getUserRefreshesCount()
@@ -5788,10 +5787,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleBreakageRefreshPatternsThenSendBreakageRefreshPixels() {
-        val refreshPatterns = setOf(
-            DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, 1),
-            DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1),
-        )
+        val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         testee.handleBreakageRefreshPatterns(refreshPatterns)
 
         verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)

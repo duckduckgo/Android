@@ -17,95 +17,132 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.time.Duration
 import java.time.LocalDateTime
 import javax.inject.Inject
+import timber.log.Timber
 
 interface BrokenSiteRefreshesInMemoryStore {
-    fun resetRefreshCount()
+    fun resetRefreshCount(pattern: RefreshPattern)
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<DetectedRefreshPattern>
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRefreshesInMemoryStore {
 
-    private var refreshes: LastRefreshedUrl? = null
+    private var doubleRefreshes: LastRefreshedUrl? = null
+    private var tripleRefreshes: LastRefreshedUrl? = null
 
-    override fun resetRefreshCount() {
-        this.refreshes = null
+    override fun resetRefreshCount(pattern: RefreshPattern) {
+        when (pattern) {
+            RefreshPattern.TWICE_IN_12_SECONDS -> this.doubleRefreshes = null
+            RefreshPattern.THRICE_IN_20_SECONDS -> this.tripleRefreshes = null
+        }
     }
 
     override fun addRefresh(
         url: Uri,
         localDateTime: LocalDateTime,
     ) {
-        refreshes.let {
-            refreshes = if (it == null || it.url != url) {
+        Timber.d("KateTest--> addRefresh called with url: $url, localDateTime: $localDateTime")
+
+        doubleRefreshes.let {
+            doubleRefreshes = if (it == null || it.url != url) {
                 LastRefreshedUrl(url, mutableListOf(localDateTime))
             } else {
                 it.copy(time = it.time.plus(localDateTime))
             }
+            Timber.d("KateTest--> doubleRefreshes updated to: ${doubleRefreshes!!.url} with ${doubleRefreshes!!.time.size} timestamps")
         }
+
+        tripleRefreshes.let {
+            tripleRefreshes = if (it == null || it.url != url) {
+                LastRefreshedUrl(url, mutableListOf(localDateTime))
+            } else {
+                it.copy(time = it.time.plus(localDateTime))
+            }
+            Timber.d("KateTest--> tripleRefreshes updated to: ${tripleRefreshes!!.url} with ${tripleRefreshes!!.time.size} timestamps")
+        }
+        // refreshes.let {
+        //     refreshes = if (it == null || it.url != url) {
+        //         LastRefreshedUrl(url, mutableListOf(localDateTime))
+        //     } else {
+        //         it.copy(time = it.time.plus(localDateTime))
+        //     }
+        // }
     }
 
-    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<DetectedRefreshPattern> {
-        val currentRefreshes = refreshes ?: return emptySet()
-        val prunedRefreshes = pruneOldRefreshes(currentDateTime, currentRefreshes)
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
+        Timber.d("KateTest--> getRefreshPatterns called with currentDateTime: $currentDateTime")
+        Timber.d("KateTest--> doubleRefreshes: $doubleRefreshes, tripleRefreshes: $tripleRefreshes")
 
-        val twiceRefreshCount = countPattern(
-            refreshEvents = prunedRefreshes.time,
-            pattern = RefreshPattern.TWICE_IN_12_SECONDS,
-            window = TWICE_REFRESH_WINDOW_IN_SECS,
-        )
-        val thriceRefreshCount = countPattern(
-            refreshEvents = prunedRefreshes.time,
-            pattern = RefreshPattern.THRICE_IN_20_SECONDS,
-            window = THRICE_REFRESH_WINDOW_IN_SECS,
+        var twiceRefreshCount = 0
+        var thriceRefreshCount = 0
+
+        pruneOldRefreshes(currentDateTime)
+
+        Timber.d(
+            "KateTest--> prunedDoubleRefreshes.size: ${doubleRefreshes?.time?.size}," +
+                "prunedTripleRefreshes.size: ${tripleRefreshes?.time?.size}",
         )
 
-        val detectedPatterns = mutableSetOf<DetectedRefreshPattern>()
-        if (twiceRefreshCount > 0) {
-            detectedPatterns.add(DetectedRefreshPattern(RefreshPattern.TWICE_IN_12_SECONDS, twiceRefreshCount))
+        when {
+            doubleRefreshes == null && tripleRefreshes == null -> return emptySet()
+            doubleRefreshes == null -> {
+                thriceRefreshCount = tripleRefreshes!!.time.filter {
+                    it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS))
+                }.size
+            }
+            tripleRefreshes == null -> {
+                twiceRefreshCount = doubleRefreshes!!.time.filter {
+                    it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS))
+                }.size
+            }
+            else -> {
+                thriceRefreshCount = tripleRefreshes!!.time.filter {
+                    it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS))
+                }.size
+                twiceRefreshCount = doubleRefreshes!!.time.filter {
+                    it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS))
+                }.size
+            }
         }
-        if (thriceRefreshCount > 0) {
-            detectedPatterns.add(DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, thriceRefreshCount))
+
+        val detectedPatterns = mutableSetOf<RefreshPattern>()
+        if (twiceRefreshCount > 1) {
+            detectedPatterns.add(RefreshPattern.TWICE_IN_12_SECONDS)
+            resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
         }
+        if (thriceRefreshCount > 2) {
+            detectedPatterns.add(RefreshPattern.THRICE_IN_20_SECONDS)
+            resetRefreshCount(RefreshPattern.THRICE_IN_20_SECONDS)
+        }
+        Timber.d("KateTest--> detectedPatterns: $detectedPatterns")
         return detectedPatterns
     }
 
     private fun pruneOldRefreshes(
         currentTime: LocalDateTime,
-        refreshes: LastRefreshedUrl,
-    ): LastRefreshedUrl {
-        val cutoffTime = currentTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)
-        val newTimes = refreshes.time.filter { it.isAfter(cutoffTime) }
-        return refreshes.copy(time = newTimes)
-    }
+    ) {
+        val doubleTimes = doubleRefreshes?.time
+        val tripleTimes = tripleRefreshes?.time
 
-    private fun countPattern(refreshEvents: List<LocalDateTime>, pattern: RefreshPattern, window: Long): Int {
-        var count = 0
-        var i = 0
-
-        while (i <= refreshEvents.size - pattern.number) {
-            val startTime = refreshEvents[i]
-            val endTime = refreshEvents[i + pattern.number - 1]
-            val diffSeconds = Duration.between(startTime, endTime).seconds
-
-            if (diffSeconds < window) {
-                count++
-                i += pattern.number
-            } else {
-                i++
-            }
+        if (doubleTimes != null) {
+            val cutoffTime = currentTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS)
+            val newDoubleTimes = doubleTimes.filter { it.isAfter(cutoffTime) }
+            this.doubleRefreshes = this.doubleRefreshes?.copy(time = newDoubleTimes)
         }
-        return count
+
+        if (tripleTimes != null) {
+            val cutoffTime = currentTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS)
+            val newTripleTimes = tripleTimes.filter { it.isAfter(cutoffTime) }
+            this.tripleRefreshes = this.tripleRefreshes?.copy(time = newTripleTimes)
+        }
     }
 
     companion object {

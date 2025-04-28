@@ -28,11 +28,11 @@ interface BrokenSitePrompt {
 
     fun pageRefreshed(url: Uri)
 
-    fun resetRefreshCount()
+    fun resetRefreshCount(refreshPattern: RefreshPattern)
 
-    fun getUserRefreshesCount(): Set<DetectedRefreshPattern>
+    fun getUserRefreshesCount(): Set<RefreshPattern>
 
-    suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<DetectedRefreshPattern>): Boolean
+    suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean
 
     suspend fun ctaShown()
 }
@@ -42,8 +42,3 @@ enum class RefreshPattern(val number: Int) {
     THRICE_IN_20_SECONDS(3),
     ;
 }
-
-data class DetectedRefreshPattern(
-    val pattern: RefreshPattern,
-    val count: Int,
-)

@@ -19,7 +19,6 @@ package com.duckduckgo.brokensite.impl
 import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -61,20 +60,20 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
     }
 
-    override fun resetRefreshCount() {
-        brokenSiteReportRepository.resetRefreshCount()
+    override fun resetRefreshCount(refreshPattern: RefreshPattern) {
+        brokenSiteReportRepository.resetRefreshCount(refreshPattern)
     }
 
-    override fun getUserRefreshesCount(): Set<DetectedRefreshPattern> {
+    override fun getUserRefreshesCount(): Set<RefreshPattern> {
         return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 
-    override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<DetectedRefreshPattern>): Boolean {
+    override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {
         if (!isFeatureEnabled() || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
             return false
         }
 
-        if (refreshPatterns.none { it.pattern == RefreshPattern.THRICE_IN_20_SECONDS }) {
+        if (refreshPatterns.none { it == RefreshPattern.THRICE_IN_20_SECONDS }) {
             return false
         }
 

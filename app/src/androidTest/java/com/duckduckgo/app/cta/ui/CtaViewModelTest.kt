@@ -49,7 +49,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -115,7 +114,7 @@ class CtaViewModelTest {
 
     private val mockSubscriptions: Subscriptions = mock()
 
-    private val detectedRefreshPatterns: Set<DetectedRefreshPattern> = emptySet()
+    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
 
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
 
@@ -329,14 +328,14 @@ class CtaViewModelTest {
     fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        val refreshPatterns = setOf(DetectedRefreshPattern(RefreshPattern.THRICE_IN_20_SECONDS, 1))
+        val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
             site = site,
-            detectedRefreshPatterns = refreshPatterns,
+            detectedRefreshPatterns = detectedRefreshPatterns,
         )
         assertTrue(value is BrokenSitePromptDialogCta)
     }

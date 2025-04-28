@@ -279,7 +279,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.DetectedRefreshPattern
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -2784,6 +2784,7 @@ class BrowserTabViewModel @Inject constructor(
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshesCount()
+            Timber.d("Katetest--> About to handleBreakageRefreshPatterns: $detectedRefreshPatterns")
             handleBreakageRefreshPatterns(detectedRefreshPatterns)
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
@@ -4015,7 +4016,7 @@ class BrowserTabViewModel @Inject constructor(
         refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
-    fun handleBreakageRefreshPatterns(refreshPatterns: Set<DetectedRefreshPattern>) {
+    fun handleBreakageRefreshPatterns(refreshPatterns: Set<RefreshPattern>) {
         refreshPixelSender.onRefreshPatternDetected(refreshPatterns)
     }
 
