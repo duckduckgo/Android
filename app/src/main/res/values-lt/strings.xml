@@ -737,10 +737,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privatus skirtukas</item>
-        <item quantity="few">%1$d privatūs skirtukai</item>
-        <item quantity="many">%1$d privataus skirtuko</item>
-        <item quantity="other">%1$d privačiu skirtukų</item>
+        <item quantity="one">1 skirtukas</item>
+        <item quantity="few">%1$d skirtukai</item>
+        <item quantity="many">%1$d skirtuko</item>
+        <item quantity="other">%1$d skirtukų</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -892,6 +892,7 @@
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jis gali bandyti apgauti ar manipuliuoti tavimi, siekdamas, kad pervestum pinigus, pirktum padirbtas prekes arba įdiegtum kenkėjiškas programas prisidengiant melagingais pretekstais.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Išeiti iš šios svetainės</string>
     <string name="maliciousSiteAdvancedCTA">Išplėstinė</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jei manote, kad ši svetainė yra saugi, galite <a href=\"\">pranešti apie klaidą</a>. Vis dar galite apsilankyti svetainėje savo rizika.]]></string>
