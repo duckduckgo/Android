@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
@@ -118,6 +119,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
+
+            omnibarCard.elevation = 1f.toDp(context)
         } else {
             navigationBar = navBar
 
@@ -125,11 +128,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
             )
-
             // at the same time, we remove that space from the navigation bar which now sits below the omnibar
             navBar.findViewById<LinearLayout>(R.id.rootView).updatePadding(
                 top = 0,
             )
+
+            omnibarCard.elevation = 0.5f.toDp(context)
         }
     }
 
