@@ -193,7 +193,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">You can import saved passwords from another browser into DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Import Passwords</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sync Desktop Passwords</string>
     <string name="autofillManagementImportPasswordsHowToTitle">How To Import Passwords</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">How to Sync Desktop Passwords</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Import passwords in the desktop version of the DuckDuckGo browser, then sync across devices.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Get Desktop Browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copied</string>
@@ -241,8 +243,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Import Passwords From Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Import Passwords From Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sync DuckDuckGo Passwords</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sync DuckDuckGo Passwords</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sync Desktop Passwords</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sync Desktop Passwords</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Import Your Google Passwords</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google may ask you to sign in or enter your password to confirm.</string>
@@ -264,11 +266,11 @@
     <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Reset</string>
     <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Cancel</string>
     <string name="autofillSettingsPasswordsEntry">Passwords</string>
-    <string name="autofillSettingsAutofillToggleLabel">Save and Autofill Passwords</string>
+    <string name="autofillSettingsAutofillToggleLabel">Ask to Save and Autofill</string>
     <string name="autofillSettingsAutofillSubtitle">Passwords are encrypted. Nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="autofillSettingsImportSectionLabel">Import Passwords</string>
-    <string name="autofillSettingsImportFromGoogleLabel">Import Passwords from Google...</string>
-    <string name="autofillSettingsImportFromDesktopSync">Sync Desktop Passwords...</string>
-    <string name="autofillSettingsResetExcludedSitesTitle">Reset Excluded Sites...</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Import Passwords from Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sync Desktop Passwords</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Reset Excluded Sites</string>
 
 </resources>
