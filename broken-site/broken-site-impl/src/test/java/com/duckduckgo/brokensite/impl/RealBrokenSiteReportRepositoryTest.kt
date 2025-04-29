@@ -17,7 +17,6 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
@@ -191,13 +190,6 @@ class RealBrokenSiteReportRepositoryTest {
         )
 
         assertEquals(dismissalCount, result)
-    }
-
-    @Test
-    fun whenResetRefreshCountCalledThenResetRefreshCountIsCalled() = runTest {
-        testee.resetRefreshCount(refreshPattern = RefreshPattern.TWICE_IN_12_SECONDS)
-
-        verify(mockInMemoryStore).resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
     }
 
     @Test

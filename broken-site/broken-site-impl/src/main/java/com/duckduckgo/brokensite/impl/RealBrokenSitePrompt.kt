@@ -60,11 +60,7 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
     }
 
-    override fun resetRefreshCount(refreshPattern: RefreshPattern) {
-        brokenSiteReportRepository.resetRefreshCount(refreshPattern)
-    }
-
-    override fun getUserRefreshesCount(): Set<RefreshPattern> {
+    override fun getUserRefreshPatterns(): Set<RefreshPattern> {
         return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 

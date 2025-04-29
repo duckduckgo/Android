@@ -2591,9 +2591,9 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
-        whenever(mockBrokenSitePrompt.getUserRefreshesCount()).thenReturn(expectedRefreshPatterns)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(expectedRefreshPatterns)
         testee.refreshCta()
-        verify(mockBrokenSitePrompt).getUserRefreshesCount()
+        verify(mockBrokenSitePrompt).getUserRefreshPatterns()
     }
 
     @Test

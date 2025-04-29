@@ -27,6 +27,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(JUnit4::class)
@@ -38,7 +41,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
     @Before
     fun setup() {
-        store = RealBrokenSiteRefreshesInMemoryStore()
+        store = spy(RealBrokenSiteRefreshesInMemoryStore())
         baseTime = LocalDateTime.of(2025, 1, 1, 12, 0, 0)
         testUrl = mock(Uri::class.java)
         whenever(testUrl.toString()).thenReturn("https://example.com")
@@ -143,5 +146,18 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
         val patterns = store.getRefreshPatterns(baseTime.plusSeconds(25))
         assertTrue(patterns.isEmpty())
+    }
+
+    @Test
+    fun whenEachRefreshPatternIsRecordedThenItsMemoryListIsCleared() = runTest {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(5))
+        store.addRefresh(testUrl, baseTime.plusSeconds(10))
+
+        val patterns = store.getRefreshPatterns(baseTime.plusSeconds(11))
+        assertEquals(2, patterns.size)
+        assertEquals(patterns, setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS))
+        verify(store, times(1)).resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
+        verify(store, times(1)).resetRefreshCount(RefreshPattern.THRICE_IN_20_SECONDS)
     }
 }

@@ -154,7 +154,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
         whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
-        whenever(mockBrokenSitePrompt.getUserRefreshesCount()).thenReturn(emptySet())
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
 
         testee = CtaViewModel(

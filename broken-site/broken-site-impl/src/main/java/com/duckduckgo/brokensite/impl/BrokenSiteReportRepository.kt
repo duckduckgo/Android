@@ -58,7 +58,6 @@ interface BrokenSiteReportRepository {
     suspend fun clearAllDismissals()
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 
-    fun resetRefreshCount(refreshPattern: RefreshPattern)
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
     fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
 }
@@ -151,10 +150,6 @@ class RealBrokenSiteReportRepository(
 
     override suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
         return brokenSitePromptDataStore.getDismissalCountBetween(t1, t2)
-    }
-
-    override fun resetRefreshCount(refreshPattern: RefreshPattern) {
-        brokenSiteRefreshesInMemoryStore.resetRefreshCount(refreshPattern)
     }
 
     override fun addRefresh(url: Uri, localDateTime: LocalDateTime) {

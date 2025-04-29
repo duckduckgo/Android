@@ -88,18 +88,11 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenResetRefreshCountThenResetRefreshCountCalled() {
-        testee.resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
-
-        verify(mockBrokenSiteReportRepository).resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
-    }
-
-    @Test
-    fun whenGetUserRefreshesCountThenGetRefreshPatternsCalled() {
+    fun whenGetUserRefreshPatternsThenGetRefreshPatternsCalled() {
         val now = LocalDateTime.now()
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
 
-        testee.getUserRefreshesCount()
+        testee.getUserRefreshPatterns()
 
         verify(mockBrokenSiteReportRepository).getRefreshPatterns(now)
     }

@@ -48,62 +48,41 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         url: Uri,
         localDateTime: LocalDateTime,
     ) {
-        doubleRefreshes.let {
-            doubleRefreshes = if (it == null || it.url != url) {
-                LastRefreshedUrl(url, mutableListOf(localDateTime))
-            } else {
-                it.copy(time = it.time.plus(localDateTime))
-            }
-        }
-
-        tripleRefreshes.let {
-            tripleRefreshes = if (it == null || it.url != url) {
-                LastRefreshedUrl(url, mutableListOf(localDateTime))
-            } else {
-                it.copy(time = it.time.plus(localDateTime))
-            }
-        }
+        doubleRefreshes = updateRefreshes(doubleRefreshes, url, localDateTime)
+        tripleRefreshes = updateRefreshes(tripleRefreshes, url, localDateTime)
     }
 
     override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
-        var twiceRefreshCount = 0
-        var thriceRefreshCount = 0
-
         pruneOldRefreshes(currentDateTime)
 
-        when {
-            doubleRefreshes == null && tripleRefreshes == null -> return emptySet()
-            doubleRefreshes == null -> {
-                thriceRefreshCount = tripleRefreshes!!.time.filter {
-                    it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS))
-                }.size
-            }
-            tripleRefreshes == null -> {
-                twiceRefreshCount = doubleRefreshes!!.time.filter {
-                    it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS))
-                }.size
-            }
-            else -> {
-                thriceRefreshCount = tripleRefreshes!!.time.filter {
-                    it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS))
-                }.size
-                twiceRefreshCount = doubleRefreshes!!.time.filter {
-                    it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS))
-                }.size
-            }
+        if (doubleRefreshes == null && tripleRefreshes == null) {
+            return emptySet()
         }
+        val thriceRefreshCount = tripleRefreshes?.time?.count {
+            it.isAfter(currentDateTime.minusSeconds(THRICE_REFRESH_WINDOW_IN_SECS))
+        } ?: 0
+
+        val twiceRefreshCount = doubleRefreshes?.time?.count {
+            it.isAfter(currentDateTime.minusSeconds(TWICE_REFRESH_WINDOW_IN_SECS))
+        } ?: 0
 
         val detectedPatterns = mutableSetOf<RefreshPattern>()
-        if (twiceRefreshCount > 1) {
-            detectedPatterns.add(RefreshPattern.TWICE_IN_12_SECONDS)
-            resetRefreshCount(RefreshPattern.TWICE_IN_12_SECONDS)
-        }
-        if (thriceRefreshCount > 2) {
-            detectedPatterns.add(RefreshPattern.THRICE_IN_20_SECONDS)
-            resetRefreshCount(RefreshPattern.THRICE_IN_20_SECONDS)
-        }
+        addPatternsAndResetCount(detectedPatterns, twiceRefreshCount, TWICE_REFRESH_THRESHOLD, RefreshPattern.TWICE_IN_12_SECONDS)
+        addPatternsAndResetCount(detectedPatterns, thriceRefreshCount, THRICE_REFRESH_THRESHOLD, RefreshPattern.THRICE_IN_20_SECONDS)
 
         return detectedPatterns
+    }
+
+    private fun addPatternsAndResetCount(
+        detectedPatterns: MutableSet<RefreshPattern>,
+        refreshCount: Int,
+        threshold: Int,
+        pattern: RefreshPattern,
+    ) {
+        if (refreshCount >= threshold) {
+            detectedPatterns.add(pattern)
+            resetRefreshCount(pattern)
+        }
     }
 
     private fun pruneOldRefreshes(
@@ -125,9 +104,23 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         }
     }
 
+    private fun updateRefreshes(
+        currentRefreshes: LastRefreshedUrl?,
+        url: Uri,
+        localDateTime: LocalDateTime,
+    ): LastRefreshedUrl {
+        return if (currentRefreshes == null || currentRefreshes.url != url) {
+            LastRefreshedUrl(url, mutableListOf(localDateTime))
+        } else {
+            currentRefreshes.copy(time = currentRefreshes.time.plus(localDateTime))
+        }
+    }
+
     companion object {
         private const val TWICE_REFRESH_WINDOW_IN_SECS = 12L
         private const val THRICE_REFRESH_WINDOW_IN_SECS = 20L
+        private const val TWICE_REFRESH_THRESHOLD = 2
+        private const val THRICE_REFRESH_THRESHOLD = 3
     }
 }
 
