@@ -21,5 +21,9 @@
             android:name="com.duckduckgo.daxprompts.impl.ui.DaxPromptDuckPlayerActivity"
             android:exported="false"
             android:label="@string/dax_prompt_duck_player_title" />
+        <activity
+            android:name="com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity"
+            android:exported="false"
+            android:label="@string/dax_prompt_browser_comparison_title" />
     </application>
 </manifest>
