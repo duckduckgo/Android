@@ -44,6 +44,7 @@ interface SenseOfProtectionExperiment {
     fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean
     fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean
     fun isMemberOfVariant2Cohort(): Boolean
+    fun shouldShowNewPrivacyShield(): Boolean
 }
 
 @ContributesBinding(
@@ -90,8 +91,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
             getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
 
     override fun isMemberOfVariant2Cohort(): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName ||
-            senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25()
+            .getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName ||
+            senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25()
+            .getCohort()?.name == SenseOfProtectionToggles.Cohorts.VARIANT_2.cohortName
+
+    override fun shouldShowNewPrivacyShield(): Boolean {
+        return isUserEnrolledInVariant1CohortAndExperimentEnabled() || isUserEnrolledInVariant2CohortAndExperimentEnabled()
+    }
 
     override fun getTabManagerPixelParams(): Map<String, String> {
         return when {

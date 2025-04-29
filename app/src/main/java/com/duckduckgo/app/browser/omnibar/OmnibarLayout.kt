@@ -416,7 +416,12 @@ open class OmnibarLayout @JvmOverloads constructor(
                     )
                 }
 
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {
                     Timber.d("Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after")
                     clearQuery = start == 0 && after == 0
                     deleteLastCharacter = count == 1 && clearQuery
@@ -484,6 +489,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
+
             else -> {
                 renderBrowserMode(viewState)
             }
@@ -555,8 +561,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
-                if (isExperimentEnabled) {
+                if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()
                 } else {
@@ -776,12 +781,15 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (targetView != null) {
             // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
             val isPrivacyShieldAnimation = targetView == placeholder
-            val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
             doOnLayout {
-                pulseAnimation.playOn(targetView, isPrivacyShieldAnimation && isExperimentEnabled)
+                pulseAnimation.playOn(
+                    targetView,
+                    isPrivacyShieldAnimation &&
+                        senseOfProtectionExperiment.shouldShowNewPrivacyShield(),
+                )
             }
         } else {
             pulseAnimation.stop()
@@ -790,7 +798,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     fun isPulseAnimationPlaying() = pulseAnimation.isActive
 
-    private fun createCookiesAnimation(isCosmetic: Boolean, enqueueAnimation: Boolean = false) {
+    private fun createCookiesAnimation(
+        isCosmetic: Boolean,
+        enqueueAnimation: Boolean = false,
+    ) {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.createCookiesAnimation(
                 context,
@@ -855,7 +866,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
             val shieldIconView = if (viewMode is ViewMode.Browser) {
-                val isExperimentEnabled = senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()
+                val isExperimentEnabled = senseOfProtectionExperiment.shouldShowNewPrivacyShield()
                 if (isExperimentEnabled) shieldIconExperiment else shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon

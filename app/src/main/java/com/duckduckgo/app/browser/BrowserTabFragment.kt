@@ -1262,7 +1262,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
+            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon

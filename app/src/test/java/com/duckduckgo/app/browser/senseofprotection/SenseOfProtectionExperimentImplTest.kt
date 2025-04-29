@@ -233,6 +233,65 @@ class SenseOfProtectionExperimentImplTest {
 
         assertTrue(testee.isUserEnrolledInAVariantAndExperimentEnabled())
     }
+
+    @Test
+    fun `when user is enrolled in modified control then legacy privacy shield is shown`() {
+        fakeUserBrowserProperties.setDaysSinceInstalled(20)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(MODIFIED_CONTROL.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertFalse(testee.shouldShowNewPrivacyShield())
+    }
+
+    @Test
+    fun `when user is not enrolled in any variant`() {
+        fakeUserBrowserProperties.setDaysSinceInstalled(20)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                cohorts = cohorts,
+            ),
+        )
+
+        assertFalse(testee.shouldShowNewPrivacyShield())
+    }
+
+    @Test
+    fun `when user is enrolled in variant 1 then new privacy shield is shown`() {
+        fakeUserBrowserProperties.setDaysSinceInstalled(20)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertTrue(testee.shouldShowNewPrivacyShield())
+    }
+
+    @Test
+    fun `when user is enrolled in variant 2 then new privacy shield is shown`() {
+        fakeUserBrowserProperties.setDaysSinceInstalled(20)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(VARIANT_2.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        assertTrue(testee.shouldShowNewPrivacyShield())
+    }
 }
 
 class FakeUserBrowserProperties : UserBrowserProperties {

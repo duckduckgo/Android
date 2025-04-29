@@ -56,7 +56,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -83,7 +82,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
     private val pixel: Pixel,
-    private val duckChat: DuckChat,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
@@ -137,7 +135,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
         val isNavigationBarEnabled: Boolean = false,
-        val experimentalIconsEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
     ) {
