@@ -17,11 +17,10 @@
 package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Companion.updatesAdapter
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
-import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
@@ -36,6 +35,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
@@ -45,6 +45,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     private val strategies: DaggerMap<SyncConflictResolution, CredentialsMergeStrategy>,
     private val appBuildConfig: AppBuildConfig,
     private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncableDataPersister {
     override fun onSyncEnabled() {
         if (isLocalDataDirty()) {
@@ -56,17 +57,17 @@ class CredentialsSyncDataPersister @Inject constructor(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        if (appBuildConfig.isInternalBuild()) checkMainThread()
-
-        return if (changes.type == CREDENTIALS) {
-            Timber.d("Sync-autofill-Persist: received remote changes ${changes.jsonString}")
-            Timber.d("Sync-autofill-Persist: received remote changes, merging with resolution $conflictResolution")
-            credentialsSyncFeatureListener.onSuccess(changes)
-            val result = process(changes, conflictResolution)
-            Timber.d("Sync-autofill-Persist: merging credentials finished with $result")
-            return result
-        } else {
-            Success(false)
+        return withContext(dispatcherProvider.io()) {
+            if (changes.type == CREDENTIALS) {
+                Timber.d("Sync-autofill-Persist: received remote changes ${changes.jsonString}")
+                Timber.d("Sync-autofill-Persist: received remote changes, merging with resolution $conflictResolution")
+                credentialsSyncFeatureListener.onSuccess(changes)
+                val result = process(changes, conflictResolution)
+                Timber.d("Sync-autofill-Persist: merging credentials finished with $result")
+                return@withContext result
+            } else {
+                Success(false)
+            }
         }
     }
 

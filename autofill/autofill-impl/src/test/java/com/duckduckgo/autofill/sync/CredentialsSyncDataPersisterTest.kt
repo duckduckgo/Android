@@ -75,6 +75,7 @@ internal class CredentialsSyncDataPersisterTest {
         strategies = strategies,
         appBuildConfig = appBuildConfig,
         credentialsSyncFeatureListener = credentialsSyncFeatureListener,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @After
