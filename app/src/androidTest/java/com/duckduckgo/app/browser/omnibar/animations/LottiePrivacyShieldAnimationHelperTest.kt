@@ -111,7 +111,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
         whenever(senseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
@@ -127,8 +127,8 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndUnprotectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
@@ -143,8 +143,8 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndProtectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
@@ -159,8 +159,8 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndUnprotectedAndSelfEnabledAndVariant1DisabledThenUseExperimentAssets() {
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
@@ -175,8 +175,8 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndVariant1EnabledThenUseNonExperimentAssets() {
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewShieldThenUseNonExperimentAssets() {
+        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
