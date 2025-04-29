@@ -52,7 +52,7 @@ class CredentialsSyncDataPersister @Inject constructor(
         }
     }
 
-    override fun onSuccess(
+    override suspend fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {

@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Show
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -47,6 +48,11 @@ class SyncCreateAccountViewModelTest {
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
     )
+
+    @Before
+    fun setup() = runTest {
+        whenever(syncRepostitory.isSignedIn()).thenReturn(false)
+    }
 
     @Test
     fun whenUserIsNotSignedInThenAccountCreatedAndViewStateUpdated() = runTest {

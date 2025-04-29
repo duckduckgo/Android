@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.DeviceSyncState.Type
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -36,30 +37,30 @@ class AppSyncDeviceIdsTest {
     private var deviceInfo: DeviceInfo = mock()
 
     @Test
-    fun whenUserIdExistsInStoreThenReturnsStoredValue() {
+    fun whenUserIdExistsInStoreThenReturnsStoredValue() = runTest {
         val syncStore = getFakeSyncStore()
         val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
-        assertEquals(syncStore.userId, appSyncDeviceIds.userId())
+        assertEquals(syncStore.getUserId(), appSyncDeviceIds.userId())
     }
 
     @Test
-    fun whenDeviceIdExistsInStoreThenReturnsStoredValue() {
+    fun whenDeviceIdExistsInStoreThenReturnsStoredValue() = runTest {
         val syncStore = getFakeSyncStore()
         val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
-        assertEquals(syncStore.deviceId, appSyncDeviceIds.deviceId())
+        assertEquals(syncStore.getDeviceId(), appSyncDeviceIds.deviceId())
     }
 
     @Test
-    fun whenDeviceNameExistsInStoreThenReturnsStoredValue() {
+    fun whenDeviceNameExistsInStoreThenReturnsStoredValue() = runTest {
         val syncStore = getFakeSyncStore()
         val appSyncDeviceIds = AppSyncDeviceIds(syncStore, deviceInfo)
-        assertEquals(syncStore.deviceName, appSyncDeviceIds.deviceName())
+        assertEquals(syncStore.getDeviceName(), appSyncDeviceIds.deviceName())
     }
 
     @Test
-    fun whenUserIdDoesNotExistInStoreThenNewIdIsReturned() {
+    fun whenUserIdDoesNotExistInStoreThenNewIdIsReturned() = runTest {
         val emptySyncStore = getFakeEmptySyncStore()
-        assertNull(emptySyncStore.userId)
+        assertNull(emptySyncStore.getUserId())
 
         val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
@@ -68,9 +69,9 @@ class AppSyncDeviceIdsTest {
     }
 
     @Test
-    fun whenDeviceIdDoesNotExistInStoreThenNewIdIsReturned() {
+    fun whenDeviceIdDoesNotExistInStoreThenNewIdIsReturned() = runTest {
         val emptySyncStore = getFakeEmptySyncStore()
-        assertNull(emptySyncStore.deviceId)
+        assertNull(emptySyncStore.getDeviceId())
 
         val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
@@ -79,9 +80,9 @@ class AppSyncDeviceIdsTest {
     }
 
     @Test
-    fun whenDeviceNameDoesNotExistInStoreThenNewIdIsReturned() {
+    fun whenDeviceNameDoesNotExistInStoreThenNewIdIsReturned() = runTest {
         val emptySyncStore = getFakeEmptySyncStore()
-        assertNull(emptySyncStore.deviceName)
+        assertNull(emptySyncStore.getDeviceName())
         val appSyncDeviceIds = AppSyncDeviceIds(emptySyncStore, deviceInfo)
 
         val deviceName = appSyncDeviceIds.deviceName()
@@ -102,20 +103,48 @@ class AppSyncDeviceIdsTest {
 
     private fun getFakeSyncStore(): SyncStore {
         return object : SyncStore {
-            override var syncingDataEnabled = true
-            override var userId: String? = "testUserId"
-            override var deviceName: String? = "testDeviceName"
-            override var deviceId: String? = "deviceId"
-            override var token: String? = "token"
-            override var primaryKey: String? = "primaryKey"
-            override var secretKey: String? = "secretKey"
-            override fun isEncryptionSupported() = true
+            override suspend fun getSyncingDataEnabled() = true
+            override suspend fun setSyncingDataEnabled(enabled: Boolean) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getUserId(): String? = "testUserId"
+            override suspend fun setUserId(userId: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getDeviceName(): String? = "testDeviceName"
+            override suspend fun setDeviceName(deviceName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getDeviceId(): String? = "deviceId"
+            override suspend fun setDeviceId(deviceId: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getToken(): String? = "token"
+            override suspend fun setToken(token: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getPrimaryKey(): String? = "primaryKey"
+            override suspend fun setPrimaryKey(primaryKey: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getSecretKey(): String? = "secretKey"
+            override suspend fun setSecretKey(secretKey: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
-            override fun isSignedIn(): Boolean = primaryKey != null
+            override suspend fun isSignedIn(): Boolean = getPrimaryKey() != null
 
-            override fun storeCredentials(
+            override suspend fun storeCredentials(
                 userId: String,
                 deviceId: String,
                 deviceName: String,
@@ -126,7 +155,7 @@ class AppSyncDeviceIdsTest {
                 /* no-op */
             }
 
-            override fun clearAll() {
+            override suspend fun clearAll() {
                 /* no-op */
             }
         }
@@ -134,20 +163,48 @@ class AppSyncDeviceIdsTest {
 
     private fun getFakeEmptySyncStore(): SyncStore {
         return object : SyncStore {
-            override var syncingDataEnabled = true
-            override var userId: String? = null
-            override var deviceName: String? = null
-            override var deviceId: String? = null
-            override var token: String? = null
-            override var primaryKey: String? = null
-            override var secretKey: String? = null
-            override fun isEncryptionSupported() = true
+            override suspend fun getSyncingDataEnabled() = true
+            override suspend fun setSyncingDataEnabled(enabled: Boolean) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getUserId(): String? = null
+            override suspend fun setUserId(userId: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getDeviceName(): String? = null
+            override suspend fun setDeviceName(deviceName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getDeviceId(): String? = null
+            override suspend fun setDeviceId(deviceId: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getToken(): String? = null
+            override suspend fun setToken(token: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getPrimaryKey(): String? = null
+            override suspend fun setPrimaryKey(primaryKey: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getSecretKey(): String? = null
+            override suspend fun setSecretKey(secretKey: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
-            override fun isSignedIn(): Boolean = false
+            override suspend fun isSignedIn(): Boolean = false
 
-            override fun storeCredentials(
+            override suspend fun storeCredentials(
                 userId: String,
                 deviceId: String,
                 deviceName: String,
@@ -158,7 +215,7 @@ class AppSyncDeviceIdsTest {
                 /* no-op */
             }
 
-            override fun clearAll() {
+            override suspend fun clearAll() {
                 /* no-op */
             }
         }

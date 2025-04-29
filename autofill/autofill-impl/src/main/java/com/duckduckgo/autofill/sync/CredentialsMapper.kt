@@ -24,7 +24,7 @@ import javax.inject.Inject
 class CredentialsSyncMapper @Inject constructor(
     private val syncCrypto: SyncCrypto,
 ) {
-    fun toLoginCredential(
+    suspend fun toLoginCredential(
         remoteEntry: CredentialsSyncEntryResponse,
         localId: Long? = null,
         lastModified: String,
@@ -40,7 +40,7 @@ class CredentialsSyncMapper @Inject constructor(
         )
     }
 
-    private fun String?.decrypt(): String {
+    private suspend fun String?.decrypt(): String {
         return if (this == null) "" else syncCrypto.decrypt(this)
     }
 }

@@ -30,6 +30,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.impl.error.RealSyncApiErrorRepository
@@ -67,8 +68,9 @@ object SyncStoreModule {
         sharedPrefsProvider: SharedPrefsProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        syncFeature: SyncFeature,
     ): SyncStore {
-        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope, dispatcherProvider)
+        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope, dispatcherProvider, syncFeature.createAsyncPreferences().isEnabled())
     }
 
     @Provides

@@ -95,7 +95,7 @@ class ImportPasswordsViewModel @Inject constructor(
         }
     }
 
-    private fun userJourneySuccessCriteriaMet(): Boolean {
+    private suspend fun userJourneySuccessCriteriaMet(): Boolean {
         val state = deviceSyncState.getAccountState()
         if (state.isSyncedWithDesktopDevice()) {
             Timber.i("user-journey completed immediately upon returning to screen")

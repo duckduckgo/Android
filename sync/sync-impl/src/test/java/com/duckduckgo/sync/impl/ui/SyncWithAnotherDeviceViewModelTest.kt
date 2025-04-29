@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -297,8 +298,10 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenUserAcceptsToSwitchAccountThenPerformAction() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
 
         testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
@@ -315,8 +318,10 @@ class SyncWithAnotherDeviceViewModelTest {
         configureExchangeKeysSupported()
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
 
         testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
@@ -332,8 +337,10 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenSignedInUserScansRecoveryCodeAndLoginSucceedsThenReturnSwitchAccount() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
 
         testee.commands().test {
@@ -349,8 +356,10 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
 
         testee.commands().test {
@@ -386,7 +395,7 @@ class SyncWithAnotherDeviceViewModelTest {
         }
     }
 
-    private fun configureExchangeKeysSupported(): Pair<Bitmap, String> {
+    private suspend fun configureExchangeKeysSupported(): Pair<Bitmap, String> {
         syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
         whenever(syncRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Success(true))
         whenever(syncRepository.getCodeType(any())).thenReturn(EXCHANGE)

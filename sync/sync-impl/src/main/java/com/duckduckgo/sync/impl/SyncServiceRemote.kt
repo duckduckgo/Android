@@ -28,7 +28,7 @@ import retrofit2.Response
 import timber.log.Timber
 
 interface SyncApi {
-    fun createAccount(
+    suspend fun createAccount(
         userID: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
@@ -37,7 +37,7 @@ interface SyncApi {
         deviceType: String,
     ): Result<AccountCreatedResponse>
 
-    fun login(
+    suspend fun login(
         userID: String,
         hashedPassword: String,
         deviceId: String,
@@ -45,48 +45,48 @@ interface SyncApi {
         deviceType: String,
     ): Result<LoginResponse>
 
-    fun logout(
+    suspend fun logout(
         token: String,
         deviceId: String,
     ): Result<Logout>
 
-    fun connect(
+    suspend fun connect(
         token: String,
         deviceId: String,
         publicKey: String,
     ): Result<Boolean>
 
-    fun connectDevice(
+    suspend fun connectDevice(
         deviceId: String,
     ): Result<String>
 
-    fun getEncryptedMessage(keyId: String): Result<String>
+    suspend fun getEncryptedMessage(keyId: String): Result<String>
 
-    fun sendEncryptedMessage(
+    suspend fun sendEncryptedMessage(
         keyId: String,
         encryptedSecrets: String,
     ): Result<Boolean>
 
-    fun deleteAccount(token: String): Result<Boolean>
+    suspend fun deleteAccount(token: String): Result<Boolean>
 
-    fun getDevices(token: String): Result<List<Device>>
+    suspend fun getDevices(token: String): Result<List<Device>>
 
-    fun patch(
+    suspend fun patch(
         token: String,
         updates: JSONObject,
     ): Result<JSONObject?>
 
-    fun getBookmarks(
+    suspend fun getBookmarks(
         token: String,
         since: String,
     ): Result<JSONObject>
 
-    fun getCredentials(
+    suspend fun getCredentials(
         token: String,
         since: String,
     ): Result<JSONObject>
 
-    fun getSettings(
+    suspend fun getSettings(
         token: String,
         since: String,
     ): Result<JSONObject>
@@ -97,7 +97,7 @@ class SyncServiceRemote @Inject constructor(
     private val syncService: SyncService,
     private val syncStore: SyncStore,
 ) : SyncApi {
-    override fun createAccount(
+    override suspend fun createAccount(
         userID: String,
         hashedPassword: String,
         protectedEncryptionKey: String,
@@ -135,7 +135,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun logout(
+    override suspend fun logout(
         token: String,
         deviceId: String,
     ): Result<Logout> {
@@ -153,7 +153,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getDevices(token: String): Result<List<Device>> {
+    override suspend fun getDevices(token: String): Result<List<Device>> {
         val response = runCatching {
             val logoutCall = syncService.getDevices("Bearer $token")
             logoutCall.execute()
@@ -167,7 +167,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun connect(
+    override suspend fun connect(
         token: String,
         deviceId: String,
         publicKey: String,
@@ -184,7 +184,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun connectDevice(deviceId: String): Result<String> {
+    override suspend fun connectDevice(deviceId: String): Result<String> {
         val response = runCatching {
             val logoutCall = syncService.connectDevice(deviceId)
             logoutCall.execute()
@@ -199,7 +199,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getEncryptedMessage(keyId: String): Result<String> {
+    override suspend fun getEncryptedMessage(keyId: String): Result<String> {
         Timber.v("Sync-exchange: Looking for exchange for keyId: $keyId")
         val response = runCatching {
             val request = syncService.getEncryptedMessage(keyId)
@@ -215,7 +215,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun sendEncryptedMessage(
+    override suspend fun sendEncryptedMessage(
         keyId: String,
         encryptedSecrets: String,
     ): Result<Boolean> {
@@ -235,7 +235,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun deleteAccount(token: String): Result<Boolean> {
+    override suspend fun deleteAccount(token: String): Result<Boolean> {
         val response = runCatching {
             val deleteAccountCall = syncService.deleteAccount("Bearer $token")
             deleteAccountCall.execute()
@@ -248,7 +248,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun login(
+    override suspend fun login(
         userID: String,
         hashedPassword: String,
         deviceId: String,
@@ -285,7 +285,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patch(
+    override suspend fun patch(
         token: String,
         updates: JSONObject,
     ): Result<JSONObject> {
@@ -306,7 +306,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getBookmarks(
+    override suspend fun getBookmarks(
         token: String,
         since: String,
     ): Result<JSONObject> {
@@ -328,7 +328,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getCredentials(
+    override suspend fun getCredentials(
         token: String,
         since: String,
     ): Result<JSONObject> {
@@ -352,7 +352,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getSettings(
+    override suspend fun getSettings(
         token: String,
         since: String,
     ): Result<JSONObject> {
@@ -376,7 +376,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    private fun <T, R> onSuccess(
+    private suspend fun <T, R> onSuccess(
         response: Response<T?>,
         onSuccess: (T?) -> Result<R>,
     ): Result<R> {
@@ -400,7 +400,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    private fun Result.Error.removeKeysIfInvalid() {
+    private suspend fun Result.Error.removeKeysIfInvalid() {
         if (code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
             syncStore.clearAll()
         }

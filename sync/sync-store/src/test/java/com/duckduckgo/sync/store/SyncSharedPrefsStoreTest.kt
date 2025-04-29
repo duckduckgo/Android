@@ -39,7 +39,12 @@ class SyncSharedPrefsStoreTest {
 
     @Before
     fun setUp() {
-        store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope(), coroutineRule.testDispatcherProvider)
+        store = SyncSharedPrefsStore(
+            sharedPrefsProvider,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            syncFeature.createAsyncPreferences().isEnabled(),
+        )
     }
 
     @Test

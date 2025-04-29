@@ -41,7 +41,7 @@ class SettingsSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
 
     override fun getType(): SyncableType = SETTINGS
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         val syncableSettings = syncableSettings.getPlugins()
         if (settingsSyncStore.serverModifiedSince == "0") {
             val keys = syncableSettings.map { it.key }
@@ -55,7 +55,7 @@ class SettingsSyncDataProvider @Inject constructor(
         return formatUpdates(updates)
     }
 
-    private fun getUpdatesSince(
+    private suspend fun getUpdatesSince(
         syncableSettings: Collection<SyncableSetting>,
         clientModifiedSince: String,
     ): List<SettingEntry> {
@@ -107,7 +107,7 @@ class SettingsSyncDataProvider @Inject constructor(
         }
     }
 
-    private fun SyncableSetting.asSettingEntry(clientModifiedSince: String): SettingEntry {
+    private suspend fun SyncableSetting.asSettingEntry(clientModifiedSince: String): SettingEntry {
         val value = getValue()?.let { syncCrypto.encrypt(it) }
         return SettingEntry(
             key = key,

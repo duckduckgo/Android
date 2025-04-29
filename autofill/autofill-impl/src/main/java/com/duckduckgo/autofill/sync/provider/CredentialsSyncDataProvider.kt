@@ -42,8 +42,9 @@ class CredentialsSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = CREDENTIALS
 
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
+        // TODO: Check if runBlocking is still needed
         return runBlocking(dispatchers.io()) {
             if (credentialsSyncStore.serverModifiedSince == "0") {
                 credentialsSync.initMetadata()

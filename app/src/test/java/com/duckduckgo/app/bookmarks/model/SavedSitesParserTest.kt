@@ -75,7 +75,7 @@ class SavedSitesParserTest {
     private val store: SyncStore = mock()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -99,7 +99,7 @@ class SavedSitesParserTest {
         )
         parser = RealSavedSitesParser()
 
-        whenever(store.primaryKey).thenReturn("primaryKey")
+        whenever(store.getPrimaryKey()).thenReturn("primaryKey")
 
         whenever(nativeLib.encryptData(ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
             .thenAnswer { invocation -> EncryptResult(result = 0, encryptedData = invocation.getArgument(0)) }

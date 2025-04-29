@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentialEntryRe
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.api.SyncCrypto
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -30,7 +31,7 @@ import org.mockito.kotlin.verify
 internal class CredentialsSyncMapperTest {
 
     @Test
-    fun whenMapRemoteLoginCredentialThenLoginCredentials() {
+    fun whenMapRemoteLoginCredentialThenLoginCredentials() = runTest {
         val syncCrypto = FakeCrypto()
         val credentialsSyncMapper = CredentialsSyncMapper(syncCrypto)
         val toLoginCredentialEntryResponse = twitterCredentials.toLoginCredentialEntryResponse()
@@ -53,7 +54,7 @@ internal class CredentialsSyncMapperTest {
     }
 
     @Test
-    fun whenMapRemoteLoginCredentialThenEnsureFieldsDecrypted() {
+    fun whenMapRemoteLoginCredentialThenEnsureFieldsDecrypted() = runTest {
         val syncCrypto = mock<SyncCrypto>()
         val credentialsSyncMapper = CredentialsSyncMapper(syncCrypto)
         val toLoginCredentialEntryResponse = twitterCredentials.toLoginCredentialEntryResponse()
