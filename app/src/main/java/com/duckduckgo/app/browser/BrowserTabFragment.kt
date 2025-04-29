@@ -891,16 +891,28 @@ class BrowserTabFragment :
         Timber.d("Resuming webview: $tabId")
         webView?.let { webView ->
             if (webView.isShown) {
+                webView.ensureVisible()
                 webView.onResume()
             } else if (swipingTabsFeature.isEnabled) {
-                // Sometimes the tab is brought back from the background but the WebView is not visible yet due to
-                // ViewPager page change delay; this fixes an issue when a tab was blank.
+                // Sometimes a tab is brought back from the background but the WebView is not shown yet due to
+                // ViewPager page change delay; this makes sure the WebView is resumed when it is shown.
                 webView.post {
                     if (webView.isShown) {
+                        webView.ensureVisible()
                         webView.onResume()
                     }
                 }
+            } else {
+                Timber.d("WebView is not shown, not resuming")
             }
+        }
+    }
+
+    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    private fun DuckDuckGoWebView.ensureVisible() = postDelayed(100) {
+        if (swipingTabsFeature.isEnabled) {
+            scrollBy(0, 1)
+            scrollBy(0, -1)
         }
     }
 
