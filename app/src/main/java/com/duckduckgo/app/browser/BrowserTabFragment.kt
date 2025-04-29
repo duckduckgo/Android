@@ -2800,6 +2800,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
+        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 

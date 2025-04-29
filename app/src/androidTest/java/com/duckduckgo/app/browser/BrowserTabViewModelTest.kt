@@ -6252,6 +6252,28 @@ class BrowserTabViewModelTest {
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
+    @Test
+    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChatWithoutQuery() = runTest {
+        val url = "https://example.com"
+        loadUrl(url)
+
+        testee.openDuckChat(url)
+
+        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithLastSubmittedQueryThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery(query)
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
