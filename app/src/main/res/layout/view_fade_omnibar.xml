@@ -103,6 +103,15 @@
                             app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
                             app:layout_constraintTop_toTopOf="parent" />
 
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/shieldIconExperiment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent" />
+
                         <FrameLayout
                             android:id="@+id/omnibarIconContainer"
                             android:layout_width="wrap_content"
@@ -424,16 +433,6 @@
                     android:contentDescription="@string/browserPopupMenu"
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/shieldIconExperiment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
