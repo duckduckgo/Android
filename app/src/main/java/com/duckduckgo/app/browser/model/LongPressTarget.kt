@@ -20,4 +20,5 @@ data class LongPressTarget(
     val url: String?,
     val type: Int,
     val imageUrl: String? = null,
+    val text: String? = null,
 )
