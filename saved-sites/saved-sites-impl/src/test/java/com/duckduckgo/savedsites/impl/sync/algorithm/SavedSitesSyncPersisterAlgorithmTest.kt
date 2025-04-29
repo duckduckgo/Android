@@ -37,6 +37,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -82,7 +83,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingEntriesWithDeduplicationStrategyThenDeduplicationPersisterIsUsed() {
+    fun whenProcessingEntriesWithDeduplicationStrategyThenDeduplicationPersisterIsUsed() = runTest {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,
             name = SavedSitesNames.BOOKMARKS_NAME,
@@ -110,7 +111,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingEntriesWithTimestampStrategyThenTimestampPersisterIsUsed() {
+    fun whenProcessingEntriesWithTimestampStrategyThenTimestampPersisterIsUsed() = runTest {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,
             name = SavedSitesNames.BOOKMARKS_NAME,
@@ -138,7 +139,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingEntriesWithRemoteStrategyThenRemotePersisterIsUsed() {
+    fun whenProcessingEntriesWithRemoteStrategyThenRemotePersisterIsUsed() = runTest {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,
             name = SavedSitesNames.BOOKMARKS_NAME,
@@ -166,7 +167,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingEntriesWithLocalStrategyThenLocalPersisterIsUsed() {
+    fun whenProcessingEntriesWithLocalStrategyThenLocalPersisterIsUsed() = runTest {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,
             name = SavedSitesNames.BOOKMARKS_NAME,
@@ -199,7 +200,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingOrphansThenResultIsSuccess() {
+    fun whenProcessingOrphansThenResultIsSuccess() = runTest {
         val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
         val someEntries = SyncBookmarkEntries(
@@ -245,11 +246,11 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     class FakeCrypto : SyncCrypto {
-        override fun encrypt(text: String): String {
+        override suspend fun encrypt(text: String): String {
             return text
         }
 
-        override fun decrypt(data: String): String {
+        override suspend fun decrypt(data: String): String {
             return data
         }
     }
