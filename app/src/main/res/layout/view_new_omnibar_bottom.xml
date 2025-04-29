@@ -107,7 +107,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
-                        app:srcCompat="@drawable/ic_duckplayer"
+                        app:srcCompat="@drawable/ic_video_player_color_24"
                         android:visibility="gone" />
 
                     <ImageView
