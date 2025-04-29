@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="24dp"
@@ -16,7 +32,7 @@
   <path
       android:pathData="M16.188,2A2.813,2.813 0,0 1,19 4.813v14.375A2.813,2.813 0,0 1,16.187 22H7.813A2.813,2.813 0,0 1,5 19.187V4.813A2.813,2.813 0,0 1,7.813 2h8.375ZM7.813,3.25c-0.863,0 -1.563,0.7 -1.563,1.563v14.375c0,0.862 0.7,1.562 1.563,1.562h8.375c0.862,0 1.562,-0.7 1.562,-1.563V4.813c0,-0.862 -0.7,-1.562 -1.563,-1.562H7.813Z">
     <aapt:attr name="android:fillColor">
-      <gradient 
+      <gradient
           android:startX="12"
           android:startY="2"
           android:endX="12"
