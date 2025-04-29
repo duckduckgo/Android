@@ -6253,7 +6253,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChatWithoutQuery() = runTest {
+    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChat() = runTest {
         val url = "https://example.com"
         loadUrl(url)
 
@@ -6264,7 +6264,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckChatWithLastSubmittedQueryThenOpenDuckChatWithQuery() = runTest {
+    fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
         val query = "example"
         testee.setLastSubmittedUserQuery(query)
 
@@ -6272,6 +6272,29 @@ class BrowserTabViewModelTest {
 
         verify(mockDuckChat).openDuckChat(query)
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasTextThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery("foo")
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     private fun aCredential(): LoginCredentials {
