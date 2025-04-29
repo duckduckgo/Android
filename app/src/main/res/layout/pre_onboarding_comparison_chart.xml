@@ -279,7 +279,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/ic_comparison_chart_fire" />
+        app:srcCompat="@drawable/ic_fire_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature5"
