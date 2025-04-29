@@ -31,7 +31,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -60,7 +59,6 @@ class OmnibarLayoutViewModelTest {
     private val tabRepository: TabRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
-    private val duckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl()
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
@@ -123,7 +121,6 @@ class OmnibarLayoutViewModelTest {
             duckPlayer = duckPlayer,
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
-            duckChat = duckChat,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
