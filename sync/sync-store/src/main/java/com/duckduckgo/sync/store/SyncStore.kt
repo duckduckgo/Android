@@ -200,12 +200,16 @@ class SyncSharedPrefsStore(
         setPrimaryKey(primaryKey)
         setSecretKey(secretKey)
 
-        isSignedInStateFlow.emit(true)
+        withContext(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(true)
+        }
     }
 
     override suspend fun clearAll() {
         getEncryptedPreferences()?.edit(commit = true) { clear() }
-        isSignedInStateFlow.emit(false)
+        withContext(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(false)
+        }
     }
 
     companion object {
