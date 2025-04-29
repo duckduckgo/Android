@@ -737,10 +737,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d prywatna karta</item>
-        <item quantity="few">%1$d prywatne karty</item>
-        <item quantity="many">%1$d prywatnych kart</item>
-        <item quantity="other">%1$d prywatnych kart</item>
+        <item quantity="one">1 karta</item>
+        <item quantity="few">%1$d karty</item>
+        <item quantity="many">%1$d kart</item>
+        <item quantity="other">%1$d karty</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -892,6 +892,7 @@
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ta witryna może podszywać się pod legalną witrynę w celu nakłonienia użytkownika do podania danych osobowych, takich jak hasła lub numery kart kredytowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Przeglądarka DuckDuckGo zablokowała tę stronę ze względu na prawdopodobieństwo próby oszukania użytkownika, skłonienia do przesłania pieniędzy, zakupu podrobionych towarów lub zainstalowania złośliwego oprogramowania pod fałszywym pretekstem.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Opuść tę stronę</string>
     <string name="maliciousSiteAdvancedCTA">Zaawansowane</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jeśli uważasz, że ta strona jest bezpieczna, możesz <a href=\"\">zgłosić błąd</a>. Możesz odwiedzić tę stronę internetową na własne ryzyko.]]></string>
