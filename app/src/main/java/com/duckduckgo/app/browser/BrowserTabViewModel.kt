@@ -4015,7 +4015,7 @@ class BrowserTabViewModel @Inject constructor(
         refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
-    fun handleBreakageRefreshPatterns(refreshPatterns: Set<RefreshPattern>) {
+    private fun handleBreakageRefreshPatterns(refreshPatterns: Set<RefreshPattern>) {
         refreshPixelSender.onRefreshPatternDetected(refreshPatterns)
     }
 

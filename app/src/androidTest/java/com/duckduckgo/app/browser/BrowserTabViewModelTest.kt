@@ -5786,9 +5786,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleBreakageRefreshPatternsThenSendBreakageRefreshPixels() {
+    fun whenRefreshCtaAndPatternsDetectedThenSendBreakageRefreshPixels() = runTest {
         val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
-        testee.handleBreakageRefreshPatterns(refreshPatterns)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+        testee.refreshCta()
 
         verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
     }
