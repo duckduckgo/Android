@@ -139,6 +139,22 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
+    fun `when user is enrolled in new user experiment but experiment is disabled then getTabManagerPixelParams returns empty map`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        val params = testee.getTabManagerPixelParams()
+
+        assertTrue(params.isEmpty())
+    }
+
+    @Test
     fun `when user is enrolled in existing user experiment then getTabManagerPixelParams returns existing user experiment params`() {
         fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
             State(
@@ -153,6 +169,22 @@ class SenseOfProtectionExperimentImplTest {
 
         assertEquals(VARIANT_2.cohortName, params["cohort"])
         assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name, params["experiment"])
+    }
+
+    @Test
+    fun `when user is enrolled in existing user experiment but experiment is disabled then getTabManagerPixelParams returns empty map`() {
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = VARIANT_1.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        val params = testee.getTabManagerPixelParams()
+
+        assertTrue(params.isEmpty())
     }
 
     @Test
