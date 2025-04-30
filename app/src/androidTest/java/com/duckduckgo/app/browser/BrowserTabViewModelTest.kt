@@ -209,6 +209,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -2581,6 +2582,18 @@ class BrowserTabViewModelTest {
         testee.refreshCta()
 
         assertTrue(testee.ctaViewState.value!!.isErrorShowing)
+    }
+
+    @Test
+    fun whenCtaRefreshedGetUserRefreshesCalled() = runTest {
+        setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(expectedRefreshPatterns)
+        testee.refreshCta()
+        verify(mockBrokenSitePrompt).getUserRefreshPatterns()
     }
 
     @Test
@@ -5770,6 +5783,17 @@ class BrowserTabViewModelTest {
         testee.fireCustomTabRefreshPixel()
 
         verify(refreshPixelSender).sendCustomTabRefreshPixel()
+    }
+
+    @Test
+    fun whenRefreshCtaAndPatternsDetectedThenSendBreakageRefreshPixels() = runTest {
+        setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+        testee.refreshCta()
+
+        verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
     }
 
     @Test

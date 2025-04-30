@@ -94,7 +94,8 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     private val coolDownDays: Flow<Long?> = store.data
         .map { prefs ->
             prefs[COOL_DOWN_DAYS]
-        }.distinctUntilChanged()
+        }
+        .distinctUntilChanged()
 
     private val nextShownDate: Flow<String?> = store.data
         .map { prefs ->
