@@ -63,9 +63,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     init {
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
-        if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-            if (!isEnrolledInNewUserExperiment()) {
-                enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
+                if (!isEnrolledInNewUserExperiment()) {
+                    enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
+                }
             }
         }
     }
