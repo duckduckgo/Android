@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.lang.Exception
@@ -30,6 +31,7 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 interface EncryptionHelper {
     @Throws(SecureStorageException::class)
@@ -58,6 +60,7 @@ interface EncryptionHelper {
 @ContributesBinding(AppScope::class)
 class RealEncryptionHelper @Inject constructor(
     private val autofillFeature: AutofillFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : EncryptionHelper {
     private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
     private val decryptionCipher = Cipher.getInstance(TRANSFORMATION)
@@ -68,8 +71,8 @@ class RealEncryptionHelper @Inject constructor(
     override suspend fun encrypt(
         raw: ByteArray,
         key: Key,
-    ): EncryptedBytes {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) {
+    ): EncryptedBytes = withContext(dispatcherProvider.io()) {
+        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
             encryptAsync(raw, key)
         } else {
             encryptSync(raw, key)
@@ -111,8 +114,8 @@ class RealEncryptionHelper @Inject constructor(
     override suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
-    ): ByteArray {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) {
+    ): ByteArray = withContext(dispatcherProvider.io()) {
+        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
             decryptAsync(toDecrypt, key)
         } else {
             decryptSync(toDecrypt, key)
