@@ -5787,6 +5787,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRefreshCtaAndPatternsDetectedThenSendBreakageRefreshPixels() = runTest {
+        setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
         testee.refreshCta()
