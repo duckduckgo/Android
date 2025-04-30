@@ -83,6 +83,6 @@ class SenseOfProtectionPixelsPlugin @Inject constructor(private val inventory: F
 
 suspend fun FeatureTogglesInventory.activeSenseOfProtectionFlag(): Toggle? {
     return this.getAllTogglesForParent(BASE_EXPERIMENT_NAME).firstOrNull {
-        it.featureName().name.startsWith(BASE_EXPERIMENT_NAME) && it.isEnabled()
+        it.featureName().name.startsWith(BASE_EXPERIMENT_NAME) && it.isEnrolled() && it.isEnabled()
     }
 }
