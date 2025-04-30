@@ -119,7 +119,9 @@ class ContributesActivePluginPointCodeGeneratorTest {
         )
         assertEquals(
             Toggle.DefaultFeatureValue.INTERNAL,
-            clazzInternal.kotlin.java.methods.find { it.name == "pluginFooActiveInternalPlugin" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+            clazzInternal.kotlin.java.methods.find {
+                it.name == "pluginFooActiveInternalPlugin"
+            }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
