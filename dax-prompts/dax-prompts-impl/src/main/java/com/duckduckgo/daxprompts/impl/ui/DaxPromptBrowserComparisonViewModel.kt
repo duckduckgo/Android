@@ -34,7 +34,7 @@ import logcat.logcat
 @ContributesViewModel(ActivityScope::class)
 class DaxPromptBrowserComparisonViewModel @Inject constructor(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val context: Context,
+    private val applicationContext: Context,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -58,7 +58,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
     fun onPrimaryButtonClicked() {
         viewModelScope.launch {
             if (defaultRoleBrowserDialog.shouldShowDialog()) {
-                val intent = defaultRoleBrowserDialog.createIntent(context)
+                val intent = defaultRoleBrowserDialog.createIntent(applicationContext)
                 if (intent != null) {
                     command.send(Command.BrowserComparisonChart(intent))
                 } else {

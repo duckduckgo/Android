@@ -62,4 +62,31 @@ class RealDaxPromptsTest {
         assertEquals(false, result)
         verify(mockRepository).getDaxPromptsShowDuckPlayer()
     }
+
+    @Test
+    fun whenShouldShowBrowserComparisonPromptCalledThenReturnValueFromRepository() = runTest {
+        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+
+        val result = testee.shouldShowBrowserComparisonPrompt()
+
+        assertEquals(true, result)
+        verify(mockRepository).getDaxPromptsShowBrowserComparison()
+    }
+
+    @Test
+    fun whenShouldShowBrowserComparisonPromptCalledWithFalseValueThenReturnFalse() = runTest {
+        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(false)
+
+        val result = testee.shouldShowBrowserComparisonPrompt()
+
+        assertEquals(false, result)
+        verify(mockRepository).getDaxPromptsShowBrowserComparison()
+    }
+
+    @Test
+    fun whenMarkBrowserComparisonPromptAsShownCalledThenSetRepositoryValueToFalse() = runTest {
+        testee.markBrowserComparisonPromptAsShown()
+
+        verify(mockRepository).setDaxPromptsShowBrowserComparison(false)
+    }
 }

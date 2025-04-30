@@ -90,4 +90,55 @@ class RealDaxPromptsRepositoryRepositoryTest {
 
         verify(mockDataStore, times(2)).setDaxPromptsShowDuckPlayer(true)
     }
+
+    @Test
+    fun whenGetDaxPromptsShowBrowserComparisonAndNoCachedValueThenReturnFromDataStore() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+
+        val result = testee.getDaxPromptsShowBrowserComparison()
+
+        assertEquals(true, result)
+        verify(mockDataStore, times(1)).getDaxPromptsShowBrowserComparison()
+    }
+
+    @Test
+    fun whenGetDaxPromptsShowBrowserComparisonAndCachedValueExistsThenReturnCachedValue() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+        testee.setDaxPromptsShowBrowserComparison(false)
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true) // This shouldn't be called
+
+        val result = testee.getDaxPromptsShowBrowserComparison()
+
+        assertEquals(false, result)
+        verify(mockDataStore, never()).getDaxPromptsShowBrowserComparison()
+    }
+
+    @Test
+    fun whenSetDaxPromptsShowBrowserComparisonThenUpdateBothCacheAndDataStore() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(true)
+
+        verify(mockDataStore, times(1)).setDaxPromptsShowBrowserComparison(true)
+        assertEquals(true, testee.getDaxPromptsShowBrowserComparison())
+    }
+
+    @Test
+    fun whenSetDaxPromptsShowBrowserComparisonThenSubsequentGetReturnsNewValue() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(false)
+
+        val initialResult = testee.getDaxPromptsShowBrowserComparison()
+        testee.setDaxPromptsShowBrowserComparison(true)
+        val finalResult = testee.getDaxPromptsShowBrowserComparison()
+
+        assertEquals(false, initialResult)
+        assertEquals(true, finalResult)
+    }
+
+    @Test
+    fun whenSetDaxPromptsShowBrowserComparisonWithSameValueThenStillUpdateDataStore() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(true)
+
+        testee.setDaxPromptsShowBrowserComparison(true)
+
+        verify(mockDataStore, times(2)).setDaxPromptsShowBrowserComparison(true)
+    }
 }

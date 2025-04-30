@@ -81,7 +81,7 @@ class LaunchViewModel @Inject constructor(
 
     fun onDaxPromptBrowserComparisonActivityResult(showComparisonChart: Boolean? = false) {
         viewModelScope.launch {
-            daxPrompts.markComparisonChartPromptAsShown()
+            daxPrompts.markBrowserComparisonPromptAsShown()
         }
         if (showComparisonChart != null) {
             appInstallStore.defaultBrowser = showComparisonChart
@@ -105,6 +105,6 @@ class LaunchViewModel @Inject constructor(
     }
 
     private suspend fun shouldShowDaxPromptBrowserComparison(): Boolean {
-        return daxPrompts.shouldShowComparisonChartPrompt()
+        return daxPrompts.shouldShowBrowserComparisonPrompt()
     }
 }
