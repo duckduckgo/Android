@@ -47,7 +47,7 @@ class FakeEncryptionHelper constructor(
     private val expectedEncryptedIv: String,
     private val expectedDecryptedData: String,
 ) : EncryptionHelper {
-    override fun encrypt(
+    override suspend fun encrypt(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes = EncryptedBytes(
@@ -55,7 +55,7 @@ class FakeEncryptionHelper constructor(
         expectedEncryptedIv.decodeBase64()!!.toByteArray(),
     )
 
-    override fun decrypt(
+    override suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray = expectedDecryptedData.decodeBase64()!!.toByteArray()
