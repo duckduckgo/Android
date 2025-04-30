@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d onglet privé</item>
-        <item quantity="other">%1$d onglets privés</item>
+        <item quantity="one">1 onglet</item>
+        <item quantity="other">%1$d onglets</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ce site Web se fait peut-être passer pour un site légitime afin de vous inciter à communiquer des informations personnelles, telles que des mots de passe ou des numéros de carte bancaire.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait essayer de vous tromper ou de vous manipuler pour vous amener à transférer de l’argent, à acheter des produits contrefaits ou à installer des logiciels malveillants sous de faux prétextes.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Quitter ce site</string>
     <string name="maliciousSiteAdvancedCTA">Options avancées</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Si vous pensez que ce site Web est sûr, vous pouvez <a href=\"\">signaler une erreur</a>. La visite du site Web se fera à vos risques et périls.]]></string>

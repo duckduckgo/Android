@@ -859,6 +859,7 @@
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blocked this page because it may be trying to deceive or manipulate you into transferring money, buying counterfeit goods, or installing malware under false pretenses.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Leave This Site</string>
     <string name="maliciousSiteAdvancedCTA">Advanced</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>

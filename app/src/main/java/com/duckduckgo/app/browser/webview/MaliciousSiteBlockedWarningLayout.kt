@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.webview
 
 import android.content.Context
 import android.text.SpannableStringBuilder
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
@@ -40,6 +41,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 
 class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     context: Context,
@@ -79,12 +81,9 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     ) {
         with(binding) {
             val errorResource = when (feed) {
-                MALWARE -> {
-                    R.string.maliciousSiteMalwareHeadline
-                }
-                PHISHING -> {
-                    R.string.maliciousSitePhishingHeadline
-                }
+                MALWARE -> R.string.maliciousSiteMalwareHeadline
+                PHISHING -> R.string.maliciousSitePhishingHeadline
+                SCAM -> R.string.maliciousSiteScamHeadline
             }
             errorHeadline.setSpannable(errorResource) { actionHandler(LearnMore) }
             expandedHeadline.setSpannable(R.string.maliciousSiteExpandedHeadline) { actionHandler(ReportError) }
@@ -99,6 +98,11 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 actionHandler()
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.color = currentTextColor
+                ds.isUnderlineText = true
             }
         }
         val htmlContent = context.getString(errorResource).html(context)

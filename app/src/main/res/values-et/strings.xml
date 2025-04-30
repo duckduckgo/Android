@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privaatne vahekaart</item>
-        <item quantity="other">%1$d privaatset vahekaarti</item>
+        <item quantity="one">1 vahekaart</item>
+        <item quantity="other">%1$d vahekaarti</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokeeris selle lehe, kuna see võib püüda teid petta või manipuleerida tegema rahaülekandeid, ostma võltsitud kaupu või installima pahavara valel ettekäändel.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Lahku sellelt saidilt</string>
     <string name="maliciousSiteAdvancedCTA">Täiustatud</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Kui arvate, et see veebisait on turvaline, võite <a href=\"\">teatada veast</a>. Võite siiski külastada veebisaiti omal vastutusel.]]></string>

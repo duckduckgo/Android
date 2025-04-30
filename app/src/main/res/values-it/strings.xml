@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d scheda privata</item>
-        <item quantity="other">%1$d schede private</item>
+        <item quantity="one">1 scheda</item>
+        <item quantity="other">%1$d schede</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Attenzione: questo sito potrebbe essere un rischio per la sicurezza</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe distribuire malware progettato per compromettere il tuo dispositivo o rubare le tue informazioni personali.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Questo sito web potrebbe imitare un sito legittimo per ingannarti e indurti a rivelare informazioni personali, come password o numeri di carta di credito.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe tentare di ingannare o manipolarti per far trasferire denaro, acquistare beni contraffatti o installare malware con falsi pretesti.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Esci da questo sito</string>
     <string name="maliciousSiteAdvancedCTA">Avanzate</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Se ritieni che questo sito web sia sicuro, puoi <a href=\"\">segnalare un errore</a>. Puoi comunque visitare il sito web a tuo rischio e pericolo.]]></string>

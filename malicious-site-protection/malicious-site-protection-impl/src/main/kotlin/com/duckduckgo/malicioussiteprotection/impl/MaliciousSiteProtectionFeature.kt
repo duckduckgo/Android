@@ -44,4 +44,8 @@ interface MaliciousSiteProtectionFeature {
 
     @Toggle.DefaultValue(true)
     fun canUpdateDatasets(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun scamProtection(): Toggle
 }

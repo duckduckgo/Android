@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privat flik</item>
-        <item quantity="other">%1$d privata flikar</item>
+        <item quantity="one">1 flik</item>
+        <item quantity="other">%1$d flikar</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan distribuera skadlig programvara avsedd att göra intrång på din enhet eller stjäla din personliga information.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Den här webbplatsen kan utge sig för att vara en legitim webbplats för att lura dig att lämna ut personlig information som lösenord eller kortnummer.\n<a href=\"\">Mer information</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan försöka lura eller manipulera dig att överföra pengar, köpa förfalskade varor eller installera skadlig programvara under falska förevändningar.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Lämna denna webbplats</string>
     <string name="maliciousSiteAdvancedCTA">Avancerat</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Om du tror att den här webbplatsen är säker kan du <a href=\"\">rapportera ett fel</a>. Du kan fortfarande besöka webbplatsen på egen risk.]]></string>
