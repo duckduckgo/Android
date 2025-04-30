@@ -107,7 +107,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
-                        app:srcCompat="@drawable/ic_duckplayer"
+                        app:srcCompat="@drawable/ic_video_player_color_24"
                         android:visibility="gone" />
 
                     <ImageView
@@ -117,7 +117,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="6dp"
-                        android:src="@drawable/ic_find_search_20_a05" />
+                        android:src="@drawable/ic_find_search_small_24" />
 
                     <ImageView
                         android:id="@+id/globeIcon"
@@ -353,7 +353,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="AI Chat"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_ai_chat_outline_24" />
+                    android:src="@drawable/ic_ai_chat_24" />
             </FrameLayout>
 
             <FrameLayout
@@ -368,15 +368,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible">
 
-                <ImageView
-                    android:id="@+id/fireIconImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_fire" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/fireIconImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_fire_24" />
+        </FrameLayout>
 
             <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton
                 android:id="@+id/tabsMenu"

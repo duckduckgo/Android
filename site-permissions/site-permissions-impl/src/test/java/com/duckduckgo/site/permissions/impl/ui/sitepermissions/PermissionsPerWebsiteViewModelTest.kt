@@ -149,7 +149,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, ASK)
+            WebsitePermissionSetting(0, R.string.sitePermissionsSettingsCamera, ASK)
         viewModel.permissionSettingSelected(websitePermissionSetting)
 
         viewModel.commands.test {
@@ -164,7 +164,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
+            WebsitePermissionSetting(0, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
         val sitePermissionSetting =
             SitePermissionsEntity(
                 domain,

@@ -47,7 +47,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/newTabMenuItem"
                 android:scaleType="center"
-                android:src="@drawable/ic_add_24e" />
+                android:src="@drawable/ic_add_24" />
         </FrameLayout>
 
         <FrameLayout
@@ -65,7 +65,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/autofillManagementScreenTitle"
                 android:scaleType="center"
-                android:src="@drawable/ic_key_24e" />
+                android:src="@drawable/ic_key_24" />
         </FrameLayout>
 
     </FrameLayout>
@@ -88,7 +88,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/bookmarksMenuTitle"
             android:scaleType="center"
-            android:src="@drawable/ic_bookmarks_stacked_24e" />
+            android:src="@drawable/ic_bookmarks_24" />
     </FrameLayout>
 
     <Space
@@ -110,7 +110,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/fireMenu"
             android:scaleType="center"
-            android:src="@drawable/ic_fire_new_24e" />
+            android:src="@drawable/ic_fire_24" />
     </FrameLayout>
 
     <Space
@@ -131,7 +131,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/tabsMenuItem"
             android:scaleType="center"
-            android:src="@drawable/ic_tab_switcher_experiment" />
+            android:src="@drawable/ic_tab_24" />
     </FrameLayout>
 
     <Space

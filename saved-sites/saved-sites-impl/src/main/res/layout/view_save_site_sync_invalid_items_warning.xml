@@ -21,4 +21,4 @@
     style="@style/Widget.DuckDuckGo.InfoPanel"
     android:layout_margin="@dimen/keyline_4"
     app:panelBackground="@drawable/info_panel_alert_background"
-    app:panelDrawable="@drawable/ic_info_panel_alert" />
+    app:panelDrawable="@drawable/ic_exclamation_yellow_16" />

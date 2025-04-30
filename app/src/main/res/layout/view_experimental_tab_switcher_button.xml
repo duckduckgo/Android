@@ -27,12 +27,11 @@
         android:layout_height="@dimen/bottomNavIcon"
         android:textColor="?attr/daxColorPrimaryIcon"
         android:textSize="11sp"
-        android:fontFamily="sans-serif-black"
-        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:paddingBottom="3dp"
         android:paddingStart="3dp"
-        android:background="@drawable/ic_tab_switcher_experiment"
+        android:background="@drawable/ic_tab_24"
         tools:text="66" />
 
 </merge>

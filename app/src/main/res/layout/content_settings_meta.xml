@@ -31,14 +31,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingAbout"
-        app:leadingIcon="@drawable/ic_dax_icon" />
+        app:leadingIcon="@drawable/ic_duckduckgo_color_24" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/shareFeedbackSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/leaveFeedbackNew"
-        app:leadingIcon="@drawable/ic_heart_gray_color_24" />
+        app:leadingIcon="@drawable/ic_feedback_color_24" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/ddgOnOtherPlatformsSetting"

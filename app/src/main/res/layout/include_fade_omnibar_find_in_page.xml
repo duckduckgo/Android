@@ -36,7 +36,7 @@
         android:gravity="center"
         android:importantForAccessibility="no"
         android:scaleType="center"
-        android:src="@drawable/ic_find_in_page_24e" />
+        android:src="@drawable/ic_find_in_page_24" />
 
     <EditText
         android:id="@+id/findInPageInput"
@@ -63,7 +63,7 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/previousSearchTermDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_chevron_up_24e" />
+        android:src="@drawable/ic_chevron_up_24" />
 
     <ImageView
         android:id="@+id/nextSearchTermButton"
@@ -72,7 +72,7 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/nextSearchTermDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_chevron_down_24e" />
+        android:src="@drawable/ic_chevron_down_24" />
 
     <ImageView
         android:id="@+id/closeFindInPagePanel"
@@ -81,6 +81,6 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/closeFindInPageButtonDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_close_24e" />
+        android:src="@drawable/ic_close_24" />
 
 </LinearLayout>

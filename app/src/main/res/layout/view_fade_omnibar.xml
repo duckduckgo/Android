@@ -55,6 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
+                    app:cardElevation="1dp"
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                     android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     app:strokeColor="?daxColorAccentBlue"
@@ -133,7 +134,7 @@
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_1"
                                 android:visibility="gone"
-                                app:srcCompat="@drawable/ic_duckplayer" />
+                                app:srcCompat="@drawable/ic_video_player_color_24" />
 
                             <ImageView
                                 android:id="@+id/searchIcon"
@@ -143,7 +144,7 @@
                                 android:gravity="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_2"
-                                android:src="@drawable/ic_find_search_24" />
+                                android:src="@drawable/ic_find_search_small_24" />
 
                             <ImageView
                                 android:id="@+id/backIcon"
@@ -154,7 +155,7 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
-                                android:src="@drawable/ic_arrow_left_24e"
+                                android:src="@drawable/ic_arrow_left_24"
                                 android:visibility="gone" />
 
                             <ImageView
@@ -294,7 +295,7 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/browserPopupMenu"
                                 android:scaleType="center"
-                                android:src="@drawable/ic_ai_chat_outline_24"
+                                android:src="@drawable/ic_ai_chat_24"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -421,7 +422,7 @@
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
-                    android:src="@drawable/ic_fire" />
+                    android:src="@drawable/ic_fire_24" />
             </FrameLayout>
 
             <com.airbnb.lottie.LottieAnimationView

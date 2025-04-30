@@ -21,17 +21,17 @@
     <item
         android:id="@+id/top_app_bar_menu_share"
         android:title="@string/app_bar_menu_share"
-        android:icon="@drawable/ic_share_control_normal_24dp"
+        android:icon="@drawable/ic_share_android_24"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/top_app_bar_menu_bookmark"
         android:title="@string/app_bar_menu_bookmark"
-        android:icon="@drawable/ic_bookmark_control_normal_24dp"
+        android:icon="@drawable/ic_bookmark_solid_24"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/top_app_bar_menu_search"
         android:title="@string/app_bar_menu_search"
-        android:icon="@drawable/ic_search_24"
+        android:icon="@drawable/ic_find_search_24"
         app:showAsAction="ifRoom" />
 </menu>

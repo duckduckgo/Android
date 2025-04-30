@@ -1,30 +1,12 @@
-<!--
-  ~ Copyright (c) 2024 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M7,5C5.895,5 5,5.895 5,7V17C5,18.105 5.895,19 7,19H17C18.105,19 19,18.105 19,17V13C19,12.448 19.448,12 20,12C20.552,12 21,12.448 21,13V17C21,19.209 19.209,21 17,21H7C4.791,21 3,19.209 3,17V7C3,4.791 4.791,3 7,3H11C11.552,3 12,3.448 12,4C12,4.552 11.552,5 11,5H7Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillAlpha="0.84"/>
+      android:pathData="M8,4.5A3.5,3.5 0,0 0,4.5 8v8A3.5,3.5 0,0 0,8 19.5h8a3.5,3.5 0,0 0,3.5 -3.5v-2.25a0.75,0.75 0,0 1,1.5 0V16a5,5 0,0 1,-5 5H8a5,5 0,0 1,-5 -5V8a5,5 0,0 1,5 -5h2.25a0.75,0.75 0,1 1,0 1.5H8Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
   <path
-      android:pathData="M14,4C14,3.448 14.448,3 15,3H20C20.552,3 21,3.448 21,4V9C21,9.552 20.552,10 20,10C19.448,10 19,9.552 19,9V6.414L13.707,11.707C13.317,12.098 12.683,12.098 12.293,11.707C11.902,11.317 11.902,10.683 12.293,10.293L17.586,5H15C14.448,5 14,4.552 14,4Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillAlpha="0.84"/>
+      android:pathData="M14.5,3.75a0.75,0.75 0,0 1,0.75 -0.75h3.25A2.5,2.5 0,0 1,21 5.5v3.25a0.75,0.75 0,0 1,-1.5 0V5.56l-6.219,6.22a0.75,0.75 0,0 1,-1.06 -1.061L18.44,4.5h-3.19a0.75,0.75 0,0 1,-0.75 -0.75Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>
