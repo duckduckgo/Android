@@ -27,6 +27,8 @@ import kotlinx.coroutines.withContext
 interface DaxPromptsRepository {
     suspend fun setDaxPromptsShowDuckPlayer(show: Boolean)
     suspend fun getDaxPromptsShowDuckPlayer(): Boolean
+    suspend fun setDaxPromptsShowBrowserComparison(show: Boolean)
+    suspend fun getDaxPromptsShowBrowserComparison(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -37,6 +39,7 @@ class RealDaxPromptsRepository @Inject constructor(
 ) : DaxPromptsRepository {
 
     private var showDuckPlayer: Boolean? = null
+    private var showBrowserComparison: Boolean? = null
 
     override suspend fun setDaxPromptsShowDuckPlayer(show: Boolean) {
         showDuckPlayer = show
@@ -47,5 +50,14 @@ class RealDaxPromptsRepository @Inject constructor(
 
     override suspend fun getDaxPromptsShowDuckPlayer(): Boolean {
         return showDuckPlayer ?: daxPromptsDataStore.getDaxPromptsShowDuckPlayer()
+    }
+
+    override suspend fun setDaxPromptsShowBrowserComparison(show: Boolean) {
+        showBrowserComparison = show
+        daxPromptsDataStore.setDaxPromptsShowBrowserComparison(show)
+    }
+
+    override suspend fun getDaxPromptsShowBrowserComparison(): Boolean {
+        return showBrowserComparison ?: daxPromptsDataStore.getDaxPromptsShowBrowserComparison()
     }
 }

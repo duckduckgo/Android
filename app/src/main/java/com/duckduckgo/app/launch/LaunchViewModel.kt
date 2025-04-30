@@ -17,14 +17,18 @@
 package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.common.utils.SingleLiveEvent
+import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
@@ -32,6 +36,8 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val daxPrompts: DaxPrompts,
+    private val appInstallStore: AppInstallStore,
 ) :
     ViewModel() {
 
@@ -40,16 +46,47 @@ class LaunchViewModel @Inject constructor(
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
+        data object DaxPromptDuckPlayer : Command()
+        data class PlayVideoInDuckPlayer(val url: String) : Command()
+        data object DaxPromptBrowserComparison : Command()
+        data object CloseDaxPrompt : Command()
     }
 
     suspend fun determineViewToShow() {
         waitForReferrerData()
 
-        if (userStageStore.isNewUser()) {
+//        if (shouldShowDaxPromptDuckPlayer()) {
+//            command.value = Command.DaxPromptDuckPlayer
+//        }
+
+        if (shouldShowDaxPromptBrowserComparison()) {
+            command.value = Command.DaxPromptBrowserComparison
+        } else if (userStageStore.isNewUser()) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()
         }
+    }
+
+    fun onDaxPromptDuckPlayerActivityResult(url: String? = null) {
+        viewModelScope.launch {
+            daxPrompts.markDuckPlayerPromptAsShown()
+        }
+        if (url != null) {
+            command.value = Command.PlayVideoInDuckPlayer(url)
+        } else {
+            command.value = Command.CloseDaxPrompt
+        }
+    }
+
+    fun onDaxPromptBrowserComparisonActivityResult(showComparisonChart: Boolean? = false) {
+        viewModelScope.launch {
+            daxPrompts.markComparisonChartPromptAsShown()
+        }
+        if (showComparisonChart != null) {
+            appInstallStore.defaultBrowser = showComparisonChart
+        }
+        command.value = Command.CloseDaxPrompt
     }
 
     private suspend fun waitForReferrerData() {
@@ -61,5 +98,13 @@ class LaunchViewModel @Inject constructor(
         }
 
         Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
+    }
+
+    private suspend fun shouldShowDaxPromptDuckPlayer(): Boolean {
+        return daxPrompts.shouldShowDuckPlayerPrompt()
+    }
+
+    private suspend fun shouldShowDaxPromptBrowserComparison(): Boolean {
+        return daxPrompts.shouldShowComparisonChartPrompt()
     }
 }

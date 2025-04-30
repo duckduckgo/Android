@@ -16,22 +16,59 @@
 
 package com.duckduckgo.daxprompts.impl.ui
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Annotation
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.view.View
+import android.view.WindowManager
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.impl.R
 import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserComparisonBinding
+import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DaxPromptBrowserComparisonNoParams::class)
 class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     private val viewModel: DaxPromptBrowserComparisonViewModel by bindViewModel()
     private val binding: ActivityDaxPromptBrowserComparisonBinding by viewBinding()
+
+    private val startBrowserComparisonChartActivityForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                logcat { "Received RESULT_OK from BrowserComparisonChart" }
+                viewModel.onDefaultBrowserSet()
+            } else {
+                logcat { "Received non-OK result from BrowserComparisonChart" }
+                viewModel.onDefaultBrowserNotSet()
+            }
+        }
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -40,5 +77,124 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        configureClickableLinks()
+        setupListeners()
+        setupObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyFullScreenFlags()
+    }
+
+    private fun configureClickableLinks() {
+        with(binding.daxPromptBrowserComparisonMoreLink) {
+            text = addClickableLinks()
+            movementMethod = LinkMovementMethod.getInstance()
+        }
+    }
+
+    private fun addClickableLinks(): SpannableString {
+        val fullText = getText(R.string.dax_prompt_browser_comparison_more_link) as SpannedString
+
+        val spannableString = SpannableString(fullText)
+        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+
+        annotations?.find { it.value == LINK_ANNOTATION }?.let {
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onMoreLinkClicked()
+            }
+        }
+
+        return spannableString
+    }
+
+    private fun addSpannable(
+        spannableString: SpannableString,
+        fullText: SpannedString,
+        it: Annotation,
+        onClick: (widget: View) -> Unit,
+    ) {
+        spannableString.apply {
+            setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        onClick(widget)
+                    }
+                },
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE,
+            )
+            setSpan(
+                ForegroundColorSpan(
+                    getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue),
+                ),
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE,
+            )
+        }
+    }
+
+    private fun setupListeners() {
+        binding.daxPromptBrowserComparisonCloseButton.setOnClickListener {
+            viewModel.onCloseButtonClicked()
+        }
+        binding.daxPromptBrowserComparisonPrimaryButton.setOnClickListener {
+            viewModel.onPrimaryButtonClicked()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.CloseScreen -> {
+                if (command.defaultBrowserSet == null) {
+                    setResult(RESULT_OK)
+                } else {
+                    val resultIntent = Intent().apply {
+                        putExtra(DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA, command.defaultBrowserSet)
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                }
+                finish()
+            }
+
+            is Command.BrowserComparisonChart -> {
+                startBrowserComparisonChartActivityForResult.launch(command.intent)
+            }
+
+            is Command.OpenDetailsPage -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = command.url,
+                        screenTitle = "",
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun applyFullScreenFlags() {
+        window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            WindowCompat.setDecorFitsSystemWindows(this, false)
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.BLACK
+        }
+        ViewCompat.requestApplyInsets(binding.daxPromptBrowserComparisonContainer)
+    }
+
+    companion object {
+        private const val LINK_ANNOTATION = "more_link"
+        const val DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA = "DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA"
     }
 }

@@ -27,4 +27,18 @@ interface DaxPrompts {
      * @return true if the Duck Player prompt should be displayed, false otherwise.
      */
     suspend fun shouldShowDuckPlayerPrompt(): Boolean
+
+    /**
+     * Determines if the Comparison Chart prompt should be shown to the user.
+     *
+     * @return true if the Comparison Chart prompt should be displayed, false otherwise.
+     */
+    suspend fun shouldShowComparisonChartPrompt(): Boolean
+
+    /**
+     * Records that the ComparisonChart prompt has been shown to the user.
+     * Should be called after the user has interacted with the prompt or dismissed it
+     * to prevent showing it again in future app launches.
+     */
+    suspend fun markComparisonChartPromptAsShown()
 }
