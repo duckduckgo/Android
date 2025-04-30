@@ -228,7 +228,7 @@ class TabSwitcherAdapter(
         when (tab) {
             is SelectableTab -> {
                 if (tab.isSelected) {
-                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_24)
+                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_round_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabSelectedIndicator)
                 } else {
                     holder.selectionIndicator.setImageResource(CommonR.drawable.shape_grey_circle_24)
