@@ -70,9 +70,7 @@ class RealSecureStorageKeyStore constructor(
     private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
 
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
-        return withContext(dispatcherProvider.io()) {
-            if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
-        }
+        return if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
     }
 
     private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
@@ -114,20 +112,28 @@ class RealSecureStorageKeyStore constructor(
         keyName: String,
         keyValue: ByteArray?,
     ) {
-        getEncryptedPreferences()?.edit(commit = true) {
-            if (keyValue == null) {
-                remove(keyName)
-            } else {
-                putString(keyName, keyValue.toByteString().base64())
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
+                if (keyValue == null) {
+                    remove(keyName)
+                } else {
+                    putString(keyName, keyValue.toByteString().base64())
+                }
             }
         }
     }
 
-    override suspend fun getKey(keyName: String): ByteArray? = getEncryptedPreferences()?.getString(keyName, null)?.run {
-        this.decodeBase64()?.toByteArray()
+    override suspend fun getKey(keyName: String): ByteArray? {
+        return withContext(dispatcherProvider.io()) {
+            return@withContext getEncryptedPreferences()?.getString(keyName, null)?.run {
+                this.decodeBase64()?.toByteArray()
+            }
+        }
     }
 
-    override suspend fun canUseEncryption(): Boolean = getEncryptedPreferences() != null
+    override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
+        getEncryptedPreferences() != null
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.securestorage.store"
