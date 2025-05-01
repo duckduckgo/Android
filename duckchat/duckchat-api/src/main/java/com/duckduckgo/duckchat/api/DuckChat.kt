@@ -39,6 +39,14 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
+     * Checks whether DuckChat should be shown in app shortcuts based on user settings.
+     * Uses cached values - does not perform disk I/O.
+     *
+     * @return true if DuckChat should be shown, false otherwise.
+     */
+    fun showInAppShortcuts(): Boolean
+
+    /**
      * Checks whether DuckChat should be shown in address bar based on user settings.
      * Uses cached values - does not perform disk I/O.
      *

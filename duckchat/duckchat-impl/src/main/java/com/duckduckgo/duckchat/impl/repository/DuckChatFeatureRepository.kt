@@ -26,10 +26,16 @@ import kotlinx.coroutines.flow.Flow
 interface DuckChatFeatureRepository {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+    suspend fun setShowInAppShortcuts(showDuckChat: Boolean)
+
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
+    fun observeShowInAppShortcuts(): Flow<Boolean>
+
     suspend fun shouldShowInBrowserMenu(): Boolean
     suspend fun shouldShowInAddressBar(): Boolean
+    suspend fun shouldShowInAppShortcuts(): Boolean
+
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
 }
@@ -48,6 +54,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInAddressBar(showDuckChat)
     }
 
+    override suspend fun setShowInAppShortcuts(showDuckChat: Boolean) {
+        duckChatDataStore.setShowInAppShortcuts(showDuckChat)
+    }
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
         return duckChatDataStore.observeShowInBrowserMenu()
     }
@@ -56,12 +66,20 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.observeShowInAddressBar()
     }
 
+    override fun observeShowInAppShortcuts(): Flow<Boolean> {
+        return duckChatDataStore.observeShowInAppShortcuts()
+    }
+
     override suspend fun shouldShowInBrowserMenu(): Boolean {
         return duckChatDataStore.getShowInBrowserMenu()
     }
 
     override suspend fun shouldShowInAddressBar(): Boolean {
         return duckChatDataStore.getShowInAddressBar()
+    }
+
+    override suspend fun shouldShowInAppShortcuts(): Boolean {
+        return duckChatDataStore.getShowInAppShortcuts()
     }
 
     override suspend fun registerOpened() {

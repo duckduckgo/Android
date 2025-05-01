@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_APP_SHORTCUTS
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -45,10 +46,16 @@ import kotlinx.coroutines.launch
 interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+    suspend fun setShowInAppShortcuts(showDuckChat: Boolean)
+
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
+    fun observeShowInAppShortcuts(): Flow<Boolean>
+
     suspend fun getShowInBrowserMenu(): Boolean
     suspend fun getShowInAddressBar(): Boolean
+    suspend fun getShowInAppShortcuts(): Boolean
+
     suspend fun fetchAndClearUserPreferences(): String?
     suspend fun updateUserPreferences(userPreferences: String?)
     suspend fun registerOpened()
@@ -67,6 +74,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     private object Keys {
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
+        val DUCK_CHAT_SHOW_IN_APP_SHORTCUTS = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_APP_SHORTCUTS")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
     }
@@ -102,6 +110,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
+    private val duckChatShowInAppShortcuts: StateFlow<Boolean> = store.data
+        .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_APP_SHORTCUTS] ?: true }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -110,9 +123,15 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = showDuckChat }
     }
 
+    override suspend fun setShowInAppShortcuts(showDuckChat: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_APP_SHORTCUTS] = showDuckChat }
+    }
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
+
+    override fun observeShowInAppShortcuts(): Flow<Boolean> = duckChatShowInAppShortcuts
 
     override suspend fun getShowInBrowserMenu(): Boolean {
         return store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
@@ -120,6 +139,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun getShowInAddressBar(): Boolean {
         return store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
+    }
+
+    override suspend fun getShowInAppShortcuts(): Boolean {
+        return store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_APP_SHORTCUTS] } ?: true
     }
 
     override suspend fun fetchAndClearUserPreferences(): String? {

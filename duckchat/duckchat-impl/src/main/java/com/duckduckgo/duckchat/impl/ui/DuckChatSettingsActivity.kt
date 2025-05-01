@@ -59,6 +59,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onShowDuckChatInAddressBarToggled(isChecked)
         }
 
+    private val appShortcutsToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowDuckChatInAppShortcutsToggled(isChecked)
+        }
+
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -94,6 +99,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.showDuckChatInMenuToggle.setOnCheckedChangeListener(menuToggleListener)
         binding.showDuckChatInAddressBarToggle.setOnCheckedChangeListener(addressBarToggleListener)
+        binding.showDuckChatInAppShortcutsToggle.setOnCheckedChangeListener(appShortcutsToggleListener)
     }
 
     private fun observeViewModel() {
@@ -111,6 +117,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         binding.showDuckChatInMenuToggle.quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
         binding.showDuckChatInAddressBarToggle.quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
+        binding.showDuckChatInAppShortcutsToggle.quietlySetIsChecked(viewState.showInAppShortcuts, appShortcutsToggleListener)
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
