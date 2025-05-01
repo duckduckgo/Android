@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/yellowBackground"
-    tools:context=".ui.DaxPromptBrowserComparisonActivity">
+    tools:context=".ui.DaxPromptBrowserComparisonActivity"
+    tools:ignore="InvalidColorAttribute">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/daxPromptBrowserComparisonCloseButton"
