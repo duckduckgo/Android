@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
 import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -11,6 +12,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -68,6 +70,8 @@ class OmnibarLayoutViewModelTest {
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
 
+    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -120,6 +124,7 @@ class OmnibarLayoutViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
         )
     }
 
@@ -461,24 +466,6 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.privacyShield == privacyShield)
-        }
-    }
-
-    @Test
-    fun whenOutlineEnabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(true)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.hasFocus)
-        }
-    }
-
-    @Test
-    fun whenOutlineDisabledThenViewStateCorrect() = runTest {
-        testee.onOutlineEnabled(false)
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.hasFocus)
         }
     }
 
@@ -886,6 +873,41 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1EnabledThenStartExperimentVariant1AnimationCommandSent() = runTest {
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(true)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()).thenReturn(false)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant1CohortAndExperimentEnabled()).thenReturn(false)
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.StartExperimentVariant1Animation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2Or3AnimationCommandSent() = runTest {
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.StartExperimentVariant2OrVariant3Animation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test
     fun whenOmnibarFocusedAndAnimationPlayingThenAnimationsCanceled() = runTest {
         givenSiteLoaded(RANDOM_URL)
@@ -991,6 +1013,77 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun whenViewModelAttachedThenShowChatMenuTrue() = runTest {
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryNotBlankThenShowChatMenuTrue() = runTest {
+        testee.onOmnibarFocusChanged(true, QUERY)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryBlankThenShowChatMenuFalse() = runTest {
+        testee.onOmnibarFocusChanged(true, "")
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedThenShowChatMenuFalse() = runTest {
+        testee.onOmnibarFocusChanged(false, QUERY)
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToCustomTabThenShowChatMenuFalse() = runTest {
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenClearTextButtonPressedThenShowChatMenuFalse() = runTest {
+        testee.onClearTextButtonPressed()
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuFalse() = runTest {
+        testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenInputStateChangedWithNonEmptyQueryThenShowChatMenuTrue() = runTest {
+        testee.onInputStateChanged(QUERY, hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
         }
     }
 

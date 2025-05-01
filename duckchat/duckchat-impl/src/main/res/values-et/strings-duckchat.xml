@@ -20,7 +20,7 @@
     <string name="duck_chat_title">Duck.ai</string>
     <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="duck_chat_visibility_setting">Kuva Duck.ai brauseri menüüs</string>
-
+    <string name="duck_chat_address_bar_visibility_setting">Kuva Duck.ai aadressiribal</string>
     <string name="duck_chat_download_finished_action_name">Avatud</string>
     <string name="duck_chat_cannot_open_file_error_message">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
 </resources>

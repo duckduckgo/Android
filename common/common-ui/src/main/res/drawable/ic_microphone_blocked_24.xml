@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M8,6a4,4 0,1 1,8 0v5c0,0.24 -0.021,0.476 -0.062,0.705A6.015,6.015 0,0 0,12.044 15L12,15a4,4 0,0 1,-4 -4L8,6ZM12,3.5A2.5,2.5 0,0 0,9.5 6v5a2.5,2.5 0,1 0,5 0L14.5,6A2.5,2.5 0,0 0,12 3.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M11.5,17.481A6.5,6.5 0,0 1,5.5 11v-0.25a0.75,0.75 0,0 0,-1.5 0V11a8,8 0,0 0,7.25 7.965V20.5h-4.5a0.75,0.75 0,1 0,0 1.5h6.781a5.985,5.985 0,0 1,-2.03 -4.5v-0.019ZM20,11c0,0.344 -0.021,0.683 -0.064,1.015a5.953,5.953 0,0 0,-1.461 -0.436c0.017,-0.19 0.025,-0.384 0.025,-0.579v-0.25a0.75,0.75 0,0 1,1.5 0V11Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+  <path
+      android:pathData="M22,17.5a4.5,4.5 0,1 1,-9 0,4.5 4.5,0 0,1 9,0ZM14.75,17.25a0.5,0.5 0,0 1,0.5 -0.5h4.5a0.5,0.5 0,0 1,0.5 0.5v0.5a0.5,0.5 0,0 1,-0.5 0.5h-4.5a0.5,0.5 0,0 1,-0.5 -0.5v-0.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+</vector>

@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí vypnutá pro %1$s</string>
     <string name="undoSnackbarAction">Vrátit</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker je zablokovaný</item>
+        <item quantity="few">Trackery jsou zablokované</item>
+        <item quantity="many">Trackery jsou zablokované</item>
+        <item quantity="other">Trackery jsou zablokované</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
@@ -730,10 +737,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d soukromá karta</item>
-        <item quantity="few">%1$d soukromé karty</item>
-        <item quantity="many">%1$d soukromých karet</item>
-        <item quantity="other">%1$d soukromých karet</item>
+        <item quantity="one">1 karta</item>
+        <item quantity="few">%1$d karty</item>
+        <item quantity="many">%1$d karty</item>
+        <item quantity="other">%1$d karet</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -848,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Plácnutí!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
@@ -881,6 +892,7 @@
     <string name="maliciousSiteTitle">Pozor: Tahle stránka může představovat bezpečnostní riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Služba DuckDuckGo tuhle stránku zablokovala, protože může šířit malware, jehož cílem je narušit zabezpečení zařízení nebo odcizit osobní údaje.\n<a href=\"\">Přečti si víc</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tahle webová stránka se může vydávat za legitimní web, aby tě přiměla k poskytnutí osobních údajů, jako jsou hesla nebo čísla kreditních karet.\n<a href=\"\">Přečti si víc</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Služba DuckDuckGo zablokovala tuto stránku, protože se tě může pokoušet pod falešnými záminkami přimět k převodu peněz, nákupu padělaného zboží nebo instalaci malwaru.\n<a href=\"\">Přečti si víc</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Opustit tuhle stránku</string>
     <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Pokud věříš, že je tahle stránka bezpečná, můžeš <a href=\"\">nahlásit chybu</a>. Můžeš taky stránku navštívit na vlastní nebezpečí.]]></string>

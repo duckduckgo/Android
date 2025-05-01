@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Adatvédelem engedélyezve a következőhöz: %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Adatvédelem letiltva a következőhöz: %1$s</string>
     <string name="undoSnackbarAction">Visszavonás</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Nyomkövető blokkolva</item>
+        <item quantity="other">Nyomkövetők blokkolva</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Kép letöltése</string>
@@ -706,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privát lap</item>
-        <item quantity="other">%1$d privát lap</item>
+        <item quantity="one">1 lap</item>
+        <item quantity="other">%1$d lap</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -818,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Pacsi!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
@@ -851,6 +860,7 @@
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[A DuckDuckGo letiltotta ezt az oldalt, mert feltehetően megtévesztő vagy manipulatív módon, valótlan állításokkal próbál meg rávenni pénz átutalására, hamisított termékek vásárlására vagy rosszindulatú program telepítésére.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
     <string name="maliciousSiteAdvancedCTA">Haladó</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>

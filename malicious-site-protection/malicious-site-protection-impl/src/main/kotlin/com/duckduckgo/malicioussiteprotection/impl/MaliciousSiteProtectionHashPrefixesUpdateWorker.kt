@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -28,6 +29,10 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -35,6 +40,8 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+
+private const val TYPE = "type"
 
 @ContributesWorker(AppScope::class)
 class MaliciousSiteProtectionHashPrefixesUpdateWorker(
@@ -55,7 +62,19 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorker(
             if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not()) {
                 return@withContext Result.success()
             }
-            return@withContext if (maliciousSiteRepository.loadHashPrefixes().isSuccess) {
+
+            val feeds = inputData.getStringArray(TYPE)
+                ?.mapNotNull { Feed.fromString(it) }
+                ?.let { feeds ->
+                    if (!maliciousSiteProtectionFeature.scamProtectionEnabled()) {
+                        return@let feeds.filterNot { it == SCAM }
+                    }
+                    feeds
+                }
+                ?.toTypedArray() ?: return@withContext Result.failure()
+
+            if (feeds.isEmpty()) return@withContext Result.success()
+            return@withContext if (maliciousSiteRepository.loadHashPrefixes(*feeds).isSuccess) {
                 Result.success()
             } else {
                 Result.retry()
@@ -81,10 +100,12 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler @Inject construct
 
     override fun onCreate(owner: LifecycleOwner) {
         enqueuePeriodicWork()
+        enqueuePeriodicScamWork()
     }
 
     override fun onPrivacyConfigDownloaded() {
         enqueuePeriodicWork()
+        enqueuePeriodicScamWork()
     }
 
     private fun enqueuePeriodicWork() {
@@ -92,21 +113,38 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler @Inject construct
             workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG)
             return
         }
-        val workerRequest = PeriodicWorkRequestBuilder<MaliciousSiteProtectionHashPrefixesUpdateWorker>(
+        enqueueWorker(PHISHING, MALWARE, tag = MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG)
+    }
+
+    private fun enqueuePeriodicScamWork() {
+        with(maliciousSiteProtectionFeature) {
+            if (isFeatureEnabled().not() || canUpdateDatasets().not() || scamProtectionEnabled().not()) {
+                workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG)
+                return
+            }
+        }
+        enqueueWorker(SCAM, tag = MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG)
+    }
+
+    private fun enqueueWorker(vararg feeds: Feed, tag: String) {
+        PeriodicWorkRequestBuilder<MaliciousSiteProtectionHashPrefixesUpdateWorker>(
             maliciousSiteProtectionFeature.getHashPrefixUpdateFrequency(),
             TimeUnit.MINUTES,
-        )
-            .addTag(MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG)
+        ).addTag(tag)
+            .setInputData(Data.Builder().putStringArray(TYPE, feeds.map { it.name }.toTypedArray()).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(
-            MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG,
-            ExistingPeriodicWorkPolicy.UPDATE,
-            workerRequest,
-        )
+            .build().let {
+                workManager.enqueueUniquePeriodicWork(
+                    tag,
+                    ExistingPeriodicWorkPolicy.UPDATE,
+                    it,
+                )
+            }
     }
 
     companion object {
         private const val MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG = "MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"
+        private const val MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG =
+            "MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG"
     }
 }

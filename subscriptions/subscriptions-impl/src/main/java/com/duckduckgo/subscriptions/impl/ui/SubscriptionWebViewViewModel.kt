@@ -224,18 +224,26 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
+            val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
+            val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther()
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
-                command.send(SubscriptionSelected(id, offerId))
+                command.send(SubscriptionSelected(id, offerId, experimentName, experimentCohort))
             }
         }
     }
 
-    fun purchaseSubscription(activity: Activity, planId: String, offerId: String?) {
+    fun purchaseSubscription(
+        activity: Activity,
+        planId: String,
+        offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.purchase(activity, planId, offerId)
+            subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort)
         }
     }
 
@@ -411,6 +419,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SubscriptionSelected(
             val id: String,
             val offerId: String?,
+            val experimentName: String?,
+            val experimentCohort: String?,
         ) : Command()
         data object RestoreSubscription : Command()
         data object GoToITR : Command()

@@ -25,6 +25,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
@@ -58,6 +60,8 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
     private val dismissedCtaDao: DismissedCtaDao,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val settingsDataStore: SettingsDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -133,7 +137,11 @@ class NewTabLegacyPageViewModel @Inject constructor(
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     private fun isHomeOnboardingComplete(): Boolean {
-        return dismissedCtaDao.exists(CtaId.DAX_END)
+        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+        return dismissedCtaDao.exists(CtaId.DAX_END) ||
+            noBrowserCtaExperiment ||
+            settingsDataStore.hideTips ||
+            dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     fun onMessageShown() {

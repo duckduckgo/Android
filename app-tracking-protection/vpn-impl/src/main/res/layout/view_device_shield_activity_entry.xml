@@ -78,7 +78,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_chevron_forward_small_24" />
+        app:srcCompat="@drawable/ic_chevron_small_right_24" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"

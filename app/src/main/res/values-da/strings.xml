@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet aktiveret for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet deaktiveret for %1$s</string>
     <string name="undoSnackbarAction">Fortryd</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker blokeret</item>
+        <item quantity="other">Trackere blokeret</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download billede</string>
@@ -706,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Privat fane</item>
-        <item quantity="other">%1$d Private faner</item>
+        <item quantity="one">1 fane</item>
+        <item quantity="other">%1$d faner</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -818,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Giv mig fem!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
@@ -851,6 +860,7 @@
     <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette websted efterligner muligvis et legitimt websted for at narre dig til at give personlige oplysninger, såsom adgangskoder eller kreditkortnumre.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis forsøger at bedrage eller manipulere dig til at overføre penge, købe forfalskede varer eller installere malware under falske forudsætninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Forlad dette websted</string>
     <string name="maliciousSiteAdvancedCTA">Avanceret</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener, at dette websted er sikkert, kan du <a href=\"\">anmelde en fejl</a>. Du kan stadig besøge webstedet på eget ansvar.]]></string>

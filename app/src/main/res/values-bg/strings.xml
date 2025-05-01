@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е активирана за %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е деактивирана за %1$s</string>
     <string name="undoSnackbarAction">Отмяна</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Блокиран тракер</item>
+        <item quantity="other">Блокирани тракери</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Изтегляне на изображение</string>
@@ -706,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d поверителен раздел</item>
-        <item quantity="other">%1$d поверителни раздела</item>
+        <item quantity="one">1 раздел</item>
+        <item quantity="other">%1$d раздела</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -818,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Дай пет!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
@@ -851,6 +860,7 @@
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да се опитва да Ви измами или манипулира да преведете пари, да купите фалшиви стоки или да инсталирате зловреден софтуер под фалшив претекст.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Напускане на този сайт</string>
     <string name="maliciousSiteAdvancedCTA">Разширени</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ако смятате, че този уебсайт е безопасен, можете да <a href=\"\">съобщите за грешка</a>. Все пак можете да посетите уебсайта на свой собствен риск.]]></string>

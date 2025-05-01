@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja käytössä: %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja ei käytössä: %1$s</string>
     <string name="undoSnackbarAction">Kumoa</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">seurantatoiminto estetty</item>
+        <item quantity="other">seurantatoimintoa estetty</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lataa kuva</string>
@@ -706,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d yksityinen välilehti</item>
-        <item quantity="other">%1$d yksityistä välilehteä</item>
+        <item quantity="one">1 välilehti</item>
+        <item quantity="other">%1$d välilehteä</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -818,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Ylävitonen!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Selvä! Ohitan muut vinkit.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Muista: voit poistaa kaikki välilehdet, historian ja selaustiedot kahdella napautuksella <b>Fire Button</b> ‑painikkeella 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näytä opetusohjelma</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
@@ -851,6 +860,7 @@
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tämä verkkosivusto saattaa esiintyä laillisena sivustona huijatakseen sinua antamaan henkilötietoja, kuten salasanan tai luottokortin numeron.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa yrittää huijata tai manipuloida sinua siirtämään rahaa, ostamaan väärennettyjä tuotteita tai asentamaan haittaohjelmia väärin perustein.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Poistu sivustolta</string>
     <string name="maliciousSiteAdvancedCTA">Lisäasetukset</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jos uskot, että tämä verkkosivusto on turvallinen, voit <a href=\"\">ilmoittaa virheestä</a>. Voit silti vierailla verkkosivustolla omalla vastuullasi.]]></string>

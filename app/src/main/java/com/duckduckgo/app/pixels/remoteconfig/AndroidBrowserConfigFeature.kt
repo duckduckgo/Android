@@ -107,4 +107,15 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun httpError5xxPixel(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun glideSuspend(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "omnibarAnimation" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun omnibarAnimation(): Toggle
 }

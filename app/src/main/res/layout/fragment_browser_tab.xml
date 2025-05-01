@@ -84,7 +84,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:orientation="vertical"
-        app:layout_behavior="com.duckduckgo.app.browser.webview.BrowserContainerLayoutBehavior"
+        app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
         <FrameLayout

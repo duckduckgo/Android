@@ -17,9 +17,11 @@
 package com.duckduckgo.autofill.impl.securestorage.encryption
 
 import android.security.keystore.KeyProperties
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.lang.Exception
@@ -27,16 +29,19 @@ import java.security.Key
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 interface EncryptionHelper {
     @Throws(SecureStorageException::class)
-    fun encrypt(
+    suspend fun encrypt(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes
 
     @Throws(SecureStorageException::class)
-    fun decrypt(
+    suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray
@@ -53,12 +58,45 @@ interface EncryptionHelper {
 }
 
 @ContributesBinding(AppScope::class)
-class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
+class RealEncryptionHelper @Inject constructor(
+    private val autofillFeature: AutofillFeature,
+    private val dispatcherProvider: DispatcherProvider,
+) : EncryptionHelper {
     private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
     private val decryptionCipher = Cipher.getInstance(TRANSFORMATION)
 
+    private val encryptMutex = Mutex()
+    private val decryptMutex = Mutex()
+
+    override suspend fun encrypt(
+        raw: ByteArray,
+        key: Key,
+    ): EncryptedBytes = withContext(dispatcherProvider.io()) {
+        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
+            encryptAsync(raw, key)
+        } else {
+            encryptSync(raw, key)
+        }
+    }
+
     @Synchronized
-    override fun encrypt(
+    private fun encryptSync(
+        raw: ByteArray,
+        key: Key,
+    ): EncryptedBytes {
+        return innerEncrypt(raw, key)
+    }
+
+    private suspend fun encryptAsync(
+        raw: ByteArray,
+        key: Key,
+    ): EncryptedBytes {
+        encryptMutex.withLock {
+            return innerEncrypt(raw, key)
+        }
+    }
+
+    private fun innerEncrypt(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes {
@@ -73,8 +111,35 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         return EncryptedBytes(encrypted, iv)
     }
 
+    override suspend fun decrypt(
+        toDecrypt: EncryptedBytes,
+        key: Key,
+    ): ByteArray = withContext(dispatcherProvider.io()) {
+        return@withContext if (autofillFeature.createAsyncPreferences().isEnabled()) {
+            decryptAsync(toDecrypt, key)
+        } else {
+            decryptSync(toDecrypt, key)
+        }
+    }
+
     @Synchronized
-    override fun decrypt(
+    private fun decryptSync(
+        toDecrypt: EncryptedBytes,
+        key: Key,
+    ): ByteArray {
+        return innerDecrypt(toDecrypt, key)
+    }
+
+    private suspend fun decryptAsync(
+        toDecrypt: EncryptedBytes,
+        key: Key,
+    ): ByteArray {
+        decryptMutex.withLock {
+            return innerDecrypt(toDecrypt, key)
+        }
+    }
+
+    private fun innerDecrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray {

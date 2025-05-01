@@ -63,6 +63,12 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Iespējota %1$s privātuma aizsardzība</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Atspējota %1$s privātuma aizsardzība</string>
     <string name="undoSnackbarAction">Atsaukt</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Bloķētie izsekotāji</item>
+        <item quantity="one">Bloķētais izsekotājs</item>
+        <item quantity="other">Bloķētie izsekotāji</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lejupielādēt attēlu</string>
@@ -718,9 +724,9 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="zero">%1$d privātās cilnes</item>
-        <item quantity="one">%1$d privātā cilne</item>
-        <item quantity="other">%1$d privātās cilnes</item>
+        <item quantity="zero">%1$d cilnes</item>
+        <item quantity="one">1 cilne</item>
+        <item quantity="other">%1$d cilnes</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -833,6 +839,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Dod pieci!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Parādīt pamācību</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
@@ -866,6 +876,7 @@
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tā, iespējams, mēģina tevi apkrāpt vai manipulēt ar tevi, lai tu pārskaitītu naudu, iegādātos viltotas preces vai maldināšanas rezultātā instalētu ļaunprātīgu programmatūru.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Pamest šo vietni</string>
     <string name="maliciousSiteAdvancedCTA">Detalizēti</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ja uzskati, ka šī vietne ir droša, vari <a href=\"\">ziņot par kļūdu</a>. Tu joprojām vari apmeklēt šo vietni, apzinoties savu risku.]]></string>

@@ -1,9 +1,12 @@
 package com.duckduckgo.malicioussiteprotection.impl.data
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
+import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
@@ -41,12 +44,14 @@ class RealMaliciousSiteRepositoryTest {
     private val maliciousSiteService: MaliciousSiteService = mock()
     private val maliciousSiteDatasetService: MaliciousSiteDatasetService = mock()
     private val mockPixel: Pixel = mock()
+    private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
         maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
+        mockMaliciousSiteProtectionRCFeature,
     )
 
     @Test
@@ -59,7 +64,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
         whenever(maliciousSiteDatasetService.getPhishingFilterSet(any())).thenReturn(phishingFilterSetResponse)
 
-        repository.loadFilters()
+        repository.loadFilters(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService).getPhishingFilterSet(latestRevision.first().revision)
         verify(maliciousSiteDao).updateFilters(any<PhishingFilterSetWithRevision>())
@@ -73,7 +78,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
 
-        repository.loadFilters()
+        repository.loadFilters(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService, never()).getPhishingFilterSet(any())
         verify(maliciousSiteDao, never()).updateFilters(any())
@@ -89,7 +94,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
         whenever(maliciousSiteDatasetService.getPhishingHashPrefixes(any())).thenReturn(phishingHashPrefixResponse)
 
-        repository.loadHashPrefixes()
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService).getPhishingHashPrefixes(latestRevision.first().revision)
         verify(maliciousSiteDao).updateHashPrefixes(any<PhishingHashPrefixesWithRevision>())
@@ -103,7 +108,7 @@ class RealMaliciousSiteRepositoryTest {
         whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(networkRevision))
         whenever(maliciousSiteDao.getLatestRevision()).thenReturn(latestRevision)
 
-        repository.loadHashPrefixes()
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService, never()).getPhishingHashPrefixes(any())
         verify(maliciousSiteDao, never()).updateHashPrefixes(any())
@@ -113,11 +118,11 @@ class RealMaliciousSiteRepositoryTest {
     fun containsHashPrefix_returnsTrueWhenHashPrefixExists() = runTest {
         val hashPrefix = "testPrefix"
 
-        whenever(maliciousSiteDao.hashPrefixExists(hashPrefix)).thenReturn(true)
+        whenever(maliciousSiteDao.getHashPrefix(hashPrefix)).thenReturn(HashPrefixEntity(hashPrefix, PHISHING.name))
 
-        val result = repository.containsHashPrefix(hashPrefix)
+        val result = repository.getFeedForHashPrefix(hashPrefix)
 
-        assertTrue(result)
+        assertEquals(PHISHING, result)
     }
 
     @Test

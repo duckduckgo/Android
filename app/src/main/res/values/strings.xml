@@ -62,6 +62,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection enabled for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection disabled for %1$s</string>
     <string name="undoSnackbarAction">Undo</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Tracker Blocked</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Trackers Blocked</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download Image</string>
@@ -705,8 +710,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">1 Private Tab</item>
-        <item quantity="other">%1$d Private Tabs</item>
+        <item quantity="one">1 Tab</item>
+        <item quantity="other">%1$d Tabs</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -817,6 +822,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Got it! I\'ll skip the other tips.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Remember: you can delete all your tabs, history, and browsing data in two taps with the <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Show Tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
@@ -850,6 +859,7 @@
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blocked this page because it may be trying to deceive or manipulate you into transferring money, buying counterfeit goods, or installing malware under false pretenses.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Leave This Site</string>
     <string name="maliciousSiteAdvancedCTA">Advanced</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>

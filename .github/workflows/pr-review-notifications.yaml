@@ -7,8 +7,18 @@ on:
 jobs:
   pr-reviewed:
     name: Add PR reviewed comment
-    uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v1.8
-    with:
-      trigger-phrase: "Task/Issue URL:"
-    secrets:
-      asana_pat: ${{ secrets.GH_ASANA_SECRET }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout native actions repo
+        uses: actions/checkout@v4
+        with:
+            ref: v1.9
+            # Do not change the below path (downstream actions expect it)
+            path: native-github-asana-sync
+            repository: duckduckgo/native-github-asana-sync
+
+      - name: Trigger PR review workflow
+        uses: ./native-github-asana-sync/.github/actions/pr-review-notifications
+        with:
+          trigger-phrase: "Task/Issue URL:"
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

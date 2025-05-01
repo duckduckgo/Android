@@ -23,6 +23,6 @@
     app:isExpandable="false"
     app:showPlaceholders="false"
     app:favoritesPlacement="focused_state"
-    android:background="?attr/daxColorSurface" />
+    android:background="?attr/daxColorBrowserOverlay" />
 
 

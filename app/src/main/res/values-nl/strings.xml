@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacybescherming ingeschakeld voor %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privacybescherming uitgeschakeld voor %1$s</string>
     <string name="undoSnackbarAction">Ongedaan maken</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker geblokkeerd</item>
+        <item quantity="other">Trackers geblokkeerd</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Afbeelding downloaden</string>
@@ -706,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privétabblad</item>
-        <item quantity="other">%1$d privétabbladen</item>
+        <item quantity="one">%1$d tabblad</item>
+        <item quantity="other">%1$d tabbladen</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -818,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Ik snap het! Ik sla de andere tips over.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Onthoud: je kunt al je tabbladen, geschiedenis en browsegegevens in twee tikken wissen met de <b>Fire Button</b> 🔥.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial weergeven</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>
@@ -851,6 +860,7 @@
     <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat hij je mogelijk probeert te misleiden of manipuleren om onder valse voorwendselen geld over te maken, namaakproducten te kopen of malware te installeren.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Deze website verlaten</string>
     <string name="maliciousSiteAdvancedCTA">Geavanceerd</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Je kunt <a href=\"\">een fout melden</a> als je denkt dat deze website veilig is. Je kunt de website nog steeds bezoeken op eigen risico.]]></string>

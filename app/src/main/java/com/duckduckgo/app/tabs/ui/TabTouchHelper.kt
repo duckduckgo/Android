@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import kotlin.math.abs
 
@@ -151,7 +150,8 @@ class TabTouchHelper(
         return ObjectAnimator.ofFloat(view, View.SCALE_Y, view.scaleY, scaleTo)
     }
 
-    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean = this is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder
+    private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean =
+        this is TabSwitcherAdapter.TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder
 
     companion object {
         private const val ANIM_DURATION = 100L

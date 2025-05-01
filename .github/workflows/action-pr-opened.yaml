@@ -14,7 +14,7 @@ jobs:
       - name: Add comment in Asana task
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
           action: 'add-asana-comment'
           is-pinned: true

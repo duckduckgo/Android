@@ -103,6 +103,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -146,10 +147,10 @@ import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedList
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -539,6 +540,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
+    @Inject
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
+
+    @Inject
+    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -616,6 +623,7 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+    private var isWebViewGestureInProgress = false
 
     private val tabSwitcherActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -668,7 +676,20 @@ class BrowserTabFragment :
         override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
-            viewModel.onAutoConsentPopUpHandled(isCosmetic)
+            launch {
+                context?.let {
+                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
+                        viewModel.trackersCount().isNotEmpty()
+                    ) {
+                        if (isCosmetic) {
+                            delay(COOKIES_ANIMATION_DELAY)
+                        }
+                        omnibar.enqueueCookiesAnimation(isCosmetic)
+                    } else {
+                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
+                    }
+                }
+            }
         }
 
         override fun onResultReceived(
@@ -801,6 +822,28 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
+
+    private fun showTrackersExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
+                listOf(
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
+                )
+            } else {
+                listOf(
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+                )
+            },
+            omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
+                binding.newOmnibar.omnibarTextInput
+            } else {
+                binding.newOmnibarBottom.omnibarTextInput
+            },
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1038,11 +1081,12 @@ class BrowserTabFragment :
 
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onBrowserMenuClicked()
+        viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onOmnibarPrivacyShieldButtonPressed()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1074,8 +1118,8 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
-            // when bottom navigation bar is enabled, we always inflate the popup menu from the bottom
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
             when (settingsDataStore.omnibarPosition) {
@@ -1218,7 +1262,11 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = omnibar.shieldIcon,
+            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
+                omnibar.shieldIconExperiment
+            } else {
+                omnibar.shieldIcon
+            },
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1261,6 +1309,7 @@ class BrowserTabFragment :
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
         val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
+            viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
@@ -1288,6 +1337,7 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -2010,6 +2060,7 @@ class BrowserTabFragment :
                 browserActivity?.launchBookmarks()
             }
 
+            is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }
@@ -2655,14 +2706,14 @@ class BrowserTabFragment :
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
                 }
+
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
+                }
             },
         )
         omnibar.configureFadeOmnibarItemPressedListeners(
             object : FadeOmnibarItemPressedListener {
-                override fun onDuckChatButtonPressed() {
-                    onOmnibarDuckChatPressed(omnibar.getText())
-                }
-
                 override fun onBackButtonPressed() {
                     hideKeyboard()
                 }
@@ -2701,6 +2752,10 @@ class BrowserTabFragment :
                         state.hasFocus,
                         true,
                     )
+                }
+
+                override fun onTrackersCountFinished() {
+                    viewModel.onAnimationFinished()
                 }
             },
         )
@@ -2756,12 +2811,7 @@ class BrowserTabFragment :
 
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        val webViewLayout = if (visualDesignExperimentDataStore.getOmnibarType() == FADE) {
-            R.layout.include_duckduckgo_browser_experiment_webview
-        } else {
-            R.layout.include_duckduckgo_browser_webview
-        }
-
+        val webViewLayout = R.layout.include_duckduckgo_browser_webview
         webView = layoutInflater.inflate(
             webViewLayout,
             binding.webViewContainer,
@@ -2802,11 +2852,29 @@ class BrowserTabFragment :
             }
 
             it.setOnTouchListener { webView, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isWebViewGestureInProgress = true
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isWebViewGestureInProgress = false
+                    }
+                }
+
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
                 false
+            }
+            it.setOnScrollChangeListener { v, _, _, _, _ ->
+                if (!v.canScrollVertically(-1) && !isWebViewGestureInProgress) {
+                    // Automatically expand the omnibar when the web view is at the top, but only if the user isn't actively scrolling.
+                    // Expanding the omnibar changes the web view's offset, which could otherwise be misinterpreted by the framework
+                    // as a fling gesture in the opposite direction and cause unintended content shifting.
+                    omnibar.setExpanded(true)
+                }
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
@@ -4054,6 +4122,7 @@ class BrowserTabFragment :
                 }
 
                 omnibar.renderBrowserViewState(viewState)
+                browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }

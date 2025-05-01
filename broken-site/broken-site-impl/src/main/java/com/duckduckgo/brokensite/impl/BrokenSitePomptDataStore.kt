@@ -41,7 +41,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
@@ -80,22 +79,23 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     }
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    private val maxDismissStreak: Flow<Int> = store.data
+    private val maxDismissStreak: Flow<Int?> = store.data
         .map { prefs ->
-            prefs[MAX_DISMISS_STREAK] ?: 3
+            prefs[MAX_DISMISS_STREAK]
         }
         .distinctUntilChanged()
 
-    private val dismissStreakResetDays: Flow<Int> = store.data
+    private val dismissStreakResetDays: Flow<Int?> = store.data
         .map { prefs ->
-            prefs[DISMISS_STREAK_RESET_DAYS] ?: 30
+            prefs[DISMISS_STREAK_RESET_DAYS]
         }
         .distinctUntilChanged()
 
-    private val coolDownDays: Flow<Long> = store.data
+    private val coolDownDays: Flow<Long?> = store.data
         .map { prefs ->
-            prefs[COOL_DOWN_DAYS] ?: 7
+            prefs[COOL_DOWN_DAYS]
         }
+        .distinctUntilChanged()
 
     private val nextShownDate: Flow<String?> = store.data
         .map { prefs ->
@@ -107,19 +107,19 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[MAX_DISMISS_STREAK] = maxDismissStreak }
     }
 
-    override suspend fun getMaxDismissStreak(): Int = maxDismissStreak.first()
+    override suspend fun getMaxDismissStreak(): Int = maxDismissStreak.firstOrNull() ?: 3
 
     override suspend fun setDismissStreakResetDays(days: Int) {
         store.edit { prefs -> prefs[DISMISS_STREAK_RESET_DAYS] = days }
     }
 
-    override suspend fun getDismissStreakResetDays(): Int = dismissStreakResetDays.first()
+    override suspend fun getDismissStreakResetDays(): Int = dismissStreakResetDays.firstOrNull() ?: 30
 
     override suspend fun setCoolDownDays(days: Long) {
         store.edit { prefs -> prefs[COOL_DOWN_DAYS] = days }
     }
 
-    override suspend fun getCoolDownDays(): Long = coolDownDays.first()
+    override suspend fun getCoolDownDays(): Long = coolDownDays.firstOrNull() ?: 7
 
     override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         store.edit { prefs ->
@@ -180,6 +180,6 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     }
 
     override suspend fun getNextShownDate(): LocalDateTime? {
-        return nextShownDate.first()?.let { LocalDateTime.parse(it, formatter) }
+        return nextShownDate.firstOrNull()?.let { LocalDateTime.parse(it, formatter) }
     }
 }

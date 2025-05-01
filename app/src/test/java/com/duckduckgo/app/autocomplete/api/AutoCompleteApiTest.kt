@@ -24,6 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion.phrase
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
@@ -93,6 +94,7 @@ class AutoCompleteApiTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(TabEntity("0", position = 0)))
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
         whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         runTest {
@@ -1459,6 +1461,51 @@ class AutoCompleteApiTest {
                 AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenCurrentTabIsInResultsThenItIsNotShownInSwitchToTabSuggestions() = runTest {
+        val searchTerm = "example"
+
+        val tabs = listOf(
+            TabEntity(tabId = "1", position = 1, title = "example", url = "https://example.com"),
+            TabEntity(tabId = "2", position = 2, title = "other", url = "https://other.com"),
+        )
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(tabs))
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabs[0]))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("example", isNav = false),
+                AutoCompleteServiceRawResult("example.com", isNav = true),
+            ),
+        )
+        var result = testee.autoComplete(searchTerm)
+        var value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabs[1]))
+
+        result = testee.autoComplete(searchTerm)
+        value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "example.com", title = "example", url = "https://example.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )

@@ -16,5 +16,6 @@
 
 <com.duckduckgo.common.ui.view.MessageCta xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/newTabIndonesiaMessage"
+    android:layout_marginTop="@dimen/keyline_1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DefaultLocale"
@@ -29,20 +29,9 @@
             message="Defined here, included via layout/activity_sync.xml => layout/view_sync_enabled.xml defines @+id/syncSetupOtherPlatforms"/>
         <location
             file="src/main/res/layout/view_sync_disabled.xml"
-            line="77"
+            line="80"
             column="9"
             message="Defined here, included via layout/activity_sync.xml => layout/view_sync_disabled.xml defines @+id/syncSetupOtherPlatforms"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/AppSyncAccountRepositoryTest.kt"
-            line="100"
-            column="9"/>
     </issue>
 
     <issue
@@ -118,7 +107,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
-            line="63"
+            line="66"
             column="9"/>
     </issue>
 
@@ -129,7 +118,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
-            line="137"
+            line="150"
             column="9"/>
     </issue>
 
@@ -173,7 +162,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/sync/impl/SyncFeatureToggle.kt"
-            line="115"
+            line="121"
             column="30"/>
     </issue>
 
@@ -409,28 +398,6 @@
     </issue>
 
     <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
-            line="62"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
-            line="135"
-            column="9"/>
-    </issue>
-
-    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;302dp&quot;"
@@ -558,7 +525,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -569,7 +536,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -580,7 +547,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -591,7 +558,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -602,7 +569,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -613,7 +580,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -624,7 +591,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -635,7 +602,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -646,7 +613,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -657,7 +624,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -668,7 +635,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -679,7 +646,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -690,7 +657,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -701,7 +668,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -712,7 +679,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -723,7 +690,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -734,7 +701,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -745,7 +712,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -756,7 +723,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -767,7 +734,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -778,7 +745,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -789,7 +756,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -800,7 +767,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -811,7 +778,7 @@
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="190"
+            line="191"
             column="61"/>
     </issue>
 
@@ -998,7 +965,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1009,7 +976,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1020,7 +987,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1031,7 +998,7 @@
         errorLine2="                                          ~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1042,7 +1009,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1053,7 +1020,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1064,7 +1031,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1075,7 +1042,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1086,7 +1053,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1097,7 +1064,7 @@
         errorLine2="                                          ~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1108,7 +1075,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1119,7 +1086,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1130,7 +1097,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1141,7 +1108,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="50"
+            line="51"
             column="43"/>
     </issue>
 
@@ -1152,7 +1119,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1163,7 +1130,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1174,7 +1141,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1185,7 +1152,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1196,7 +1163,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1207,7 +1174,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1218,7 +1185,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1229,7 +1196,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1240,7 +1207,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1251,7 +1218,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="104"
+            line="105"
             column="45"/>
     </issue>
 
@@ -1262,7 +1229,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1273,7 +1240,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1284,7 +1251,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1295,7 +1262,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1306,7 +1273,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1317,7 +1284,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1328,7 +1295,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1339,7 +1306,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1350,7 +1317,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1361,7 +1328,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-sync.xml"
-            line="105"
+            line="106"
             column="43"/>
     </issue>
 
@@ -1372,7 +1339,7 @@
         errorLine2="                                    ~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1383,7 +1350,7 @@
         errorLine2="                                    ~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1394,7 +1361,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1405,7 +1372,7 @@
         errorLine2="                                    ~~~~~~">
         <location
             file="src/main/res/values-fi/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1416,7 +1383,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1427,7 +1394,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1438,7 +1405,7 @@
         errorLine2="                                    ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1449,7 +1416,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1460,7 +1427,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 
@@ -1471,7 +1438,7 @@
         errorLine2="                                    ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-sync.xml"
-            line="115"
+            line="116"
             column="37"/>
     </issue>
 

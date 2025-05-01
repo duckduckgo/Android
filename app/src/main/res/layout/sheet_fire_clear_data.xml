@@ -40,7 +40,7 @@
             android:id="@+id/clearAllOption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_fire_red"
+            app:leadingIcon="@drawable/ic_fire_red_24"
             app:primaryText="@string/fireClearAll"
             app:primaryTextColorOverlay="?attr/daxColorDestructive" />
 

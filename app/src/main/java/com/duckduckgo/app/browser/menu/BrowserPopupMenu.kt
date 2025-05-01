@@ -277,7 +277,7 @@ class BrowserPopupMenu(
                 },
             )
         }
-        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproof_solid_16)
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
 
@@ -309,7 +309,7 @@ class BrowserPopupMenu(
             ).toString()
         }
         privacyProtectionMenuItem.setIcon(
-            if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
         )
         brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
 

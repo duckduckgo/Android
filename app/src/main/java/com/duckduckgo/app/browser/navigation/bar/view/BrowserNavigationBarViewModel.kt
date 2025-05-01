@@ -66,22 +66,10 @@ class BrowserNavigationBarViewModel @Inject constructor(
         visualDesignExperimentDataStore.navigationBarState,
     ) { state, isCustomTab, tabs, navigationBarState ->
         state.copy(
-            isVisible = navigationBarState.isEnabled,
+            isVisible = navigationBarState.isEnabled && !isCustomTab,
             tabsCount = tabs.size,
             shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
-        ).let { newState ->
-            if (isCustomTab) {
-                newState.copy(
-                    newTabButtonVisible = false,
-                    autofillButtonVisible = false,
-                    bookmarksButtonVisible = false,
-                    fireButtonVisible = false,
-                    tabsButtonVisible = false,
-                )
-            } else {
-                newState
-            }
-        }
+        )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     fun onFireButtonClicked() {
@@ -142,6 +130,14 @@ class BrowserNavigationBarViewModel @Inject constructor(
         }
     }
 
+    fun setFireButtonHighlight(highlighted: Boolean) {
+        _viewState.update {
+            it.copy(
+                fireButtonHighlighted = highlighted,
+            )
+        }
+    }
+
     sealed class Command {
         data object NotifyFireButtonClicked : Command()
         data object NotifyTabsButtonClicked : Command()
@@ -161,6 +157,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val autofillButtonVisible: Boolean = true,
         val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
+        val fireButtonHighlighted: Boolean = false,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
         val shouldUpdateTabsCount: Boolean = false,

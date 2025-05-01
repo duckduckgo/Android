@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je omogočena za spletno mesto %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je onemogočena za spletno mesto %1$s</string>
     <string name="undoSnackbarAction">Prekliči spremembe</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Blokiran sledilnik</item>
+        <item quantity="two">Blokirana sledilnika</item>
+        <item quantity="few">Blokirani sledilniki</item>
+        <item quantity="other">Blokiranih sledilnikov</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Prenesi sliko</string>
@@ -730,10 +737,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d zasebni zavihek</item>
-        <item quantity="two">%1$d zasebna zavihka</item>
-        <item quantity="few">%1$d zasebni zavihki</item>
-        <item quantity="other">%1$d zasebnih zavihkov</item>
+        <item quantity="one">1 zavihek</item>
+        <item quantity="two">%1$d zavihka</item>
+        <item quantity="few">%1$d zavihki</item>
+        <item quantity="other">%1$d zavihkov</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -848,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Petka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tukaj sem že bil/-a</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Razumem! Druge nasvete bom preskočil/-a.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne pozabite: Z gumbom <b>Fire Button</b> 🔥 lahko z dvema dotikoma izbrišete vse zavihke, zgodovino in podatke o brskanju.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vadnico</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
@@ -881,6 +892,7 @@
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[To spletno mesto se morda predstavlja kot zakonito spletno mesto, da bi vas pretentalo, da posredujete osebne podatke, kot so gesla ali številke kreditnih kartic.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker vas morda poskuša z lažnimi obljubami preslepiti ali zavesti k prenosu denarja, nakupu ponarejenega blaga ali namestitvi zlonamerne programske opreme.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Zapustite to spletno mesto</string>
     <string name="maliciousSiteAdvancedCTA">Napredno</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Če menite, da je to spletno mesto varno, lahko <a href=\"\">prijavite napako</a>. Spletno mesto lahko še vedno obiščete na lastno odgovornost.]]></string>
