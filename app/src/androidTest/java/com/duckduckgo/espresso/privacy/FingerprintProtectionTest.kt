@@ -48,7 +48,7 @@ class FingerprintProtectionTest {
     fun whenProtectionsAreFingerprintProtected() {
         preparationsForPrivacyTest()
 
-        var webView: WebView? = null
+        lateinit var webView: WebView
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
@@ -59,16 +59,18 @@ class FingerprintProtectionTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+        val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
+        IdlingRegistry.getInstance().register(jsIdlingResource)
 
         onWebView()
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start the test")))
             .perform(webClick())
 
-        val idlingResourceForScript = WebViewIdlingResource(webView!!)
-        IdlingRegistry.getInstance().register(idlingResourceForScript)
+        val jsIdlingResourceForResult = JsObjectIdlingResource(webView, "window.results.results")
+        IdlingRegistry.getInstance().register(jsIdlingResourceForResult)
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -82,7 +84,7 @@ class FingerprintProtectionTest {
                 assertEquals(sortProperties(expected), sortProperties(actual))
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, jsIdlingResourceForResult)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
