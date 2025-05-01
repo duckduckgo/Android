@@ -82,11 +82,4 @@ class RealDaxPromptsTest {
         assertEquals(false, result)
         verify(mockRepository).getDaxPromptsShowBrowserComparison()
     }
-
-    @Test
-    fun whenMarkBrowserComparisonPromptAsShownCalledThenSetRepositoryValueToFalse() = runTest {
-        testee.markBrowserComparisonPromptAsShown()
-
-        verify(mockRepository).setDaxPromptsShowBrowserComparison(false)
-    }
 }

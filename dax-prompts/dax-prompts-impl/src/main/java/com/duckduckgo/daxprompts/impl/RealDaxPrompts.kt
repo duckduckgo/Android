@@ -39,10 +39,4 @@ class RealDaxPrompts @Inject constructor(
     override suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
         daxPromptsRepository.getDaxPromptsShowBrowserComparison()
     }
-
-    override suspend fun markBrowserComparisonPromptAsShown() {
-        withContext(dispatchers.io()) {
-            daxPromptsRepository.setDaxPromptsShowBrowserComparison(false)
-        }
-    }
 }

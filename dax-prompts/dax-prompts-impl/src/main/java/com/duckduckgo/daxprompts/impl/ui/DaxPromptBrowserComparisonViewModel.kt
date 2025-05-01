@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,6 +35,7 @@ import logcat.logcat
 @ContributesViewModel(ActivityScope::class)
 class DaxPromptBrowserComparisonViewModel @Inject constructor(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val daxPromptsRepository: DaxPromptsRepository,
     private val applicationContext: Context,
 ) : ViewModel() {
 
@@ -83,6 +85,12 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         viewModelScope.launch {
             command.send(Command.CloseScreen(false))
+        }
+    }
+
+    fun markBrowserComparisonPromptAsShown() {
+        viewModelScope.launch {
+            daxPromptsRepository.setDaxPromptsShowBrowserComparison(false)
         }
     }
 

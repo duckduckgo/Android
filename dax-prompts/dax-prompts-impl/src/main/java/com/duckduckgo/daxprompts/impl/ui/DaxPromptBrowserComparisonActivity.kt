@@ -85,6 +85,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
         applyFullScreenFlags()
+        markAsShown()
     }
 
     private fun configureClickableLinks() {
@@ -191,6 +192,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             navigationBarColor = Color.BLACK
         }
         ViewCompat.requestApplyInsets(binding.daxPromptBrowserComparisonContainer)
+    }
+
+    private fun markAsShown() {
+        viewModel.markBrowserComparisonPromptAsShown()
     }
 
     companion object {

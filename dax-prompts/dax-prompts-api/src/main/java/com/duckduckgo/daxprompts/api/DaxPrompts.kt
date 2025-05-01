@@ -34,11 +34,4 @@ interface DaxPrompts {
      * @return true if the Browser Comparison prompt should be displayed, false otherwise.
      */
     suspend fun shouldShowBrowserComparisonPrompt(): Boolean
-
-    /**
-     * Records that the Browser Comparison prompt has been shown to the user.
-     * Should be called after the user has interacted with the prompt or dismissed it
-     * to prevent showing it again in future app launches.
-     */
-    suspend fun markBrowserComparisonPromptAsShown()
 }

@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Companion.BROWSER_COMPARISON_MORE_URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -45,12 +46,14 @@ class DaxPromptBrowserComparisonViewModelTest {
     private lateinit var testee: DaxPromptBrowserComparisonViewModel
 
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
+    private val mockDaxPromptsRepository: DaxPromptsRepository = org.mockito.kotlin.mock()
     private val mockApplicationContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {
         testee = DaxPromptBrowserComparisonViewModel(
             mockDefaultRoleBrowserDialog,
+            mockDaxPromptsRepository,
             mockApplicationContext,
         )
     }
