@@ -8,9 +8,12 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -163,5 +166,74 @@ class DefaultTabManagerTest {
 
         verify(tabRepository).add(url = query, skipHome = false)
         verify(omnibarEntryConverter, never()).convertQueryToUrl(query)
+    }
+
+    @Test
+    fun whenRequestAndWaitForNewTabAndTabIsFoundImmediatelyThenReturnTabEntity() = runTest {
+        val tabId = "tabId"
+        val tabEntity = TabEntity(tabId = tabId, position = 0)
+        whenever(tabRepository.flowTabs).thenReturn(flowOf(listOf(tabEntity)))
+        whenever(tabRepository.add()).thenReturn(tabId)
+
+        val result = testee.requestAndWaitForNewTab()
+
+        assertEquals(tabEntity, result)
+    }
+
+    @Test
+    fun whenRequestAndWaitForNewTabAndTabIsFoundAfterDelayThenReturnTabEntity() = runTest {
+        val tabId = "tabId"
+        val tabEntity = TabEntity(tabId = tabId, position = 0)
+
+        val flow = flow {
+            emit(emptyList())
+            delay(500) // Delay less than the timeout
+            emit(listOf(tabEntity))
+        }
+        whenever(tabRepository.flowTabs).thenReturn(flow)
+        whenever(tabRepository.add()).thenReturn(tabId)
+
+        val result = testee.requestAndWaitForNewTab()
+
+        assertEquals(tabEntity, result)
+    }
+
+    @Test
+    fun whenRequestAndWaitForNewTabAndTimeoutOccursThenThrowException() = runTest {
+        val tabId = "tabId"
+
+        val flow = flow {
+            while(true) {
+                emit(emptyList<TabEntity>())
+                delay(300)
+            }
+        }
+        whenever(tabRepository.flowTabs).thenReturn(flow)
+        whenever(tabRepository.add()).thenReturn(tabId)
+
+        try {
+            testee.requestAndWaitForNewTab()
+            fail("Expected IllegalStateException was not thrown")
+        } catch (e: IllegalStateException) {
+            assertEquals("A new tab failed to be created within 1 second", e.message)
+        }
+    }
+
+    @Test
+    fun whenRequestAndWaitForNewTabAndFlowCompletesWithoutFindingTabThenThrowException() = runTest {
+        val tabId = "tabId"
+        val otherTabId = "otherTabId"
+        val otherTabEntity = TabEntity(tabId = otherTabId, position = 0)
+
+        val flow = flowOf(listOf(otherTabEntity))
+        whenever(tabRepository.flowTabs).thenReturn(flow)
+        whenever(tabRepository.add()).thenReturn(tabId)
+
+        try {
+            testee.requestAndWaitForNewTab()
+            fail("Expected IllegalStateException was not thrown")
+        } catch (e: IllegalStateException) {
+            assertEquals("Tabs flow completed before finding the new tab", e.message)
+        }
     }
 }
