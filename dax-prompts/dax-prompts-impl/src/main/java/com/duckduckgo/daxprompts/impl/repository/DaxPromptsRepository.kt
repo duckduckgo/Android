@@ -31,7 +31,7 @@ interface DaxPromptsRepository {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealDaxPromptsRepositoryRepository @Inject constructor(
+class RealDaxPromptsRepository @Inject constructor(
     private val daxPromptsDataStore: DaxPromptsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : DaxPromptsRepository {

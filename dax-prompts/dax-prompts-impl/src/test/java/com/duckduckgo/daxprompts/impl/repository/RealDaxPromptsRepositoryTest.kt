@@ -31,18 +31,18 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class RealDaxPromptsRepositoryRepositoryTest {
+class RealDaxPromptsRepositoryTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private lateinit var testee: RealDaxPromptsRepositoryRepository
+    private lateinit var testee: RealDaxPromptsRepository
 
     private val mockDataStore: DaxPromptsDataStore = mock()
 
     @Before
     fun setup() {
-        testee = RealDaxPromptsRepositoryRepository(mockDataStore, coroutineTestRule.testDispatcherProvider)
+        testee = RealDaxPromptsRepository(mockDataStore, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test
