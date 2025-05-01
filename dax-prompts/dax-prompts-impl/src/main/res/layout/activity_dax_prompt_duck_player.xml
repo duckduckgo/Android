@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:background="@drawable/background_close_button"
+        android:background="@drawable/background_close_button_with_ripple"
         android:drawableStart="@drawable/ic_close_16"
         android:drawablePadding="@dimen/keyline_2"
         android:paddingStart="@dimen/keyline_4"
