@@ -35,10 +35,4 @@ class RealDaxPrompts @Inject constructor(
     override suspend fun shouldShowDuckPlayerPrompt(): Boolean = withContext(dispatchers.io()) {
         daxPromptsRepository.getDaxPromptsShowDuckPlayer()
     }
-
-    override suspend fun markDuckPlayerPromptAsShown() {
-        withContext(dispatchers.io()) {
-            daxPromptsRepository.setDaxPromptsShowDuckPlayer(false)
-        }
-    }
 }

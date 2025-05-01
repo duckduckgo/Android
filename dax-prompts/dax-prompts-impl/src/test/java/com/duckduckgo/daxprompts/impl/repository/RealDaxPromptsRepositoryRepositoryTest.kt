@@ -16,11 +16,13 @@
 
 package com.duckduckgo.daxprompts.impl.repository
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.impl.store.DaxPromptsDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.never
@@ -31,13 +33,16 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class RealDaxPromptsRepositoryRepositoryTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private lateinit var testee: RealDaxPromptsRepositoryRepository
 
     private val mockDataStore: DaxPromptsDataStore = mock()
 
     @Before
     fun setup() {
-        testee = RealDaxPromptsRepositoryRepository(mockDataStore)
+        testee = RealDaxPromptsRepositoryRepository(mockDataStore, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test

@@ -18,6 +18,7 @@ package com.duckduckgo.daxprompts.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,10 +38,11 @@ class DaxPromptDuckPlayerViewModelTest {
 
     private lateinit var testee: DaxPromptDuckPlayerViewModel
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
 
     @Before
     fun setup() {
-        testee = DaxPromptDuckPlayerViewModel(mockDuckPlayer)
+        testee = DaxPromptDuckPlayerViewModel(mockDuckPlayer, mockDaxPromptsRepository)
     }
 
     @Test

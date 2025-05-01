@@ -52,6 +52,7 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
         applyFullScreenFlags()
+        markAsShown()
     }
 
     private fun setupListeners() {
@@ -104,6 +105,10 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
             navigationBarColor = Color.BLACK
         }
         ViewCompat.requestApplyInsets(binding.daxPromptDuckPlayerContainer)
+    }
+
+    private fun markAsShown() {
+        viewModel.markDuckPlayerPromptAsShown()
     }
 
     companion object {

@@ -62,11 +62,4 @@ class RealDaxPromptsTest {
         assertEquals(false, result)
         verify(mockRepository).getDaxPromptsShowDuckPlayer()
     }
-
-    @Test
-    fun whenMarkDuckPlayerPromptAsShownCalledThenSetRepositoryValueToFalse() = runTest {
-        testee.markDuckPlayerPromptAsShown()
-
-        verify(mockRepository).setDaxPromptsShowDuckPlayer(false)
-    }
 }

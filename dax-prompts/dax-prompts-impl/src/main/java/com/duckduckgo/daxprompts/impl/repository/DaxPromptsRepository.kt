@@ -16,11 +16,13 @@
 
 package com.duckduckgo.daxprompts.impl.repository
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.impl.store.DaxPromptsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface DaxPromptsRepository {
     suspend fun setDaxPromptsShowDuckPlayer(show: Boolean)
@@ -31,13 +33,16 @@ interface DaxPromptsRepository {
 @ContributesBinding(AppScope::class)
 class RealDaxPromptsRepositoryRepository @Inject constructor(
     private val daxPromptsDataStore: DaxPromptsDataStore,
+    private val dispatchers: DispatcherProvider,
 ) : DaxPromptsRepository {
 
     private var showDuckPlayer: Boolean? = null
 
     override suspend fun setDaxPromptsShowDuckPlayer(show: Boolean) {
         showDuckPlayer = show
-        daxPromptsDataStore.setDaxPromptsShowDuckPlayer(show)
+        withContext(dispatchers.io()) {
+            daxPromptsDataStore.setDaxPromptsShowDuckPlayer(show)
+        }
     }
 
     override suspend fun getDaxPromptsShowDuckPlayer(): Boolean {

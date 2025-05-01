@@ -27,11 +27,4 @@ interface DaxPrompts {
      * @return true if the Duck Player prompt should be displayed, false otherwise.
      */
     suspend fun shouldShowDuckPlayerPrompt(): Boolean
-
-    /**
-     * Records that the Duck Player prompt has been shown to the user.
-     * Should be called after the user has interacted with the prompt or dismissed it
-     * to prevent showing it again in future app launches.
-     */
-    suspend fun markDuckPlayerPromptAsShown()
 }

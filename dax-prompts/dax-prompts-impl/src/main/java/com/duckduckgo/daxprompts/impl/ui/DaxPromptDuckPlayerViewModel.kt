@@ -19,6 +19,7 @@ package com.duckduckgo.daxprompts.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class DaxPromptDuckPlayerViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
+    private val daxPromptsRepository: DaxPromptsRepository,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -61,6 +63,12 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     fun updateDuckPlayerSettings() {
         viewModelScope.launch {
             duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = PrivatePlayerMode.AlwaysAsk.value)
+        }
+    }
+
+    fun markDuckPlayerPromptAsShown() {
+        viewModelScope.launch {
+            daxPromptsRepository.setDaxPromptsShowDuckPlayer(false)
         }
     }
 
