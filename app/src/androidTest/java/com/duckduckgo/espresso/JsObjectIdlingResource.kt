@@ -22,7 +22,6 @@ import android.webkit.WebView
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
 
-
 class JsObjectIdlingResource(
     private val webView: WebView,
     private val objectName: String,

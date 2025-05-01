@@ -30,9 +30,9 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
-import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -55,13 +55,13 @@ class GpcTest {
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
 
-        var webView: WebView? = null
+        lateinit var webView: WebView
 
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
         val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
         IdlingRegistry.getInstance().register(jsIdlingResource)
@@ -84,7 +84,7 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, jsIdlingResourceForResult)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
