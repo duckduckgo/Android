@@ -12,6 +12,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -28,13 +29,9 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -62,7 +59,6 @@ class OmnibarLayoutViewModelTest {
     private val tabRepository: TabRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
-    private val duckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl()
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
@@ -70,10 +66,11 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
-    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+
+    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -124,11 +121,10 @@ class OmnibarLayoutViewModelTest {
             duckPlayer = duckPlayer,
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
-            duckChat = duckChat,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
-            appPersonalityFeature = fakeAppPersonalityFeature,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
         )
     }
 
@@ -880,14 +876,12 @@ class OmnibarLayoutViewModelTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1EnabledThenStartExperimentVariant1AnimationCommandSent() = runTest {
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(true)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()).thenReturn(false)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant1CohortAndExperimentEnabled()).thenReturn(false)
+
         testee.onOmnibarFocusChanged(false, SERP_URL)
         val trackers = givenSomeTrackers()
-        // Variant 1 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
 
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 
@@ -900,14 +894,11 @@ class OmnibarLayoutViewModelTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2Or3AnimationCommandSent() = runTest {
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
+
         testee.onOmnibarFocusChanged(false, SERP_URL)
         val trackers = givenSomeTrackers()
-        // Variant 2 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
-        // All other variants are disabled, including Variant 1
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
 
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 

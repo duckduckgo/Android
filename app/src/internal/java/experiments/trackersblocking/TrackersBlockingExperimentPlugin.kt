@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.internal.experiments.trackersblocking
+package experiments.trackersblocking
 
 import android.content.Context
 import android.view.View

@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
@@ -31,7 +32,6 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICK
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
@@ -93,7 +93,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
@@ -566,7 +566,10 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(TAB_MANAGER_INFO_PANEL_TAPPED)
+        pixel.fire(
+            pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
+            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+        )
         command.value = ShowAnimatedTileDismissalDialog
     }
 
@@ -580,12 +583,19 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-            pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to trackerCount.toString()))
+            pixel.fire(
+                pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
+                parameters = mapOf("trackerCount" to trackerCount.toString()) +
+                    senseOfProtectionExperiment.getTabManagerPixelParams(),
+            )
         }
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+        pixel.fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
+            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+        )
     }
 
     private suspend fun getTabItems(
@@ -599,7 +609,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (tabSwitcherAnimationFeature.self().isEnabled()) {
+            return if (senseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()) {
                 if (!isAnimationTileDismissed) {
                     val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
