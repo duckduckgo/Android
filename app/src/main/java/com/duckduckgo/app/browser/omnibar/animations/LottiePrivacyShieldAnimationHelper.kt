@@ -55,9 +55,9 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
         } else if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
             protectedShield = R.raw.protected_shield_visual_updates
-            protectedShieldDark = R.raw.protected_shield_visual_updates
+            protectedShieldDark = R.raw.dark_protected_shield_visual_updates
             unprotectedShield = R.raw.unprotected_shield_visual_updates
-            unprotectedShieldDark = R.raw.unprotected_shield_visual_updates
+            unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
         } else {
             protectedShield = R.raw.protected_shield
             protectedShieldDark = R.raw.dark_protected_shield
