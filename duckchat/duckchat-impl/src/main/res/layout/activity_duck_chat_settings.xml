@@ -72,6 +72,19 @@
                 android:id="@+id/divider"/>
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/userEnabledDuckChatToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_chat_enable_duck_ai_setting"
+                app:showSwitch="true"/>
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/settingsSettingsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_chat_show_in_heading" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/showDuckChatInMenuToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

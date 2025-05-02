@@ -49,6 +49,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
 
+    private val userEnabledDuckChatToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onDuckChatUserEnabledToggled(isChecked)
+        }
+
     private val menuToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onShowDuckChatInMenuToggled(isChecked)
@@ -86,12 +91,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         observeViewModel()
 
-        binding.showDuckChatInAddressBarToggle.isVisible = viewModel.isAddressBarEntryPointEnabled()
+        setToggleVisibility()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
     }
 
+    private fun setToggleVisibility() {
+        binding.showDuckChatInMenuToggle.isVisible = viewModel.isDuckChatUserEnabled()
+        binding.showDuckChatInAddressBarToggle.isVisible = viewModel.isAddressBarEntryPointEnabled() && viewModel.isDuckChatUserEnabled()
+    }
+
     private fun configureUiEventHandlers() {
+        binding.userEnabledDuckChatToggle.setOnCheckedChangeListener(userEnabledDuckChatToggleListener)
         binding.showDuckChatInMenuToggle.setOnCheckedChangeListener(menuToggleListener)
         binding.showDuckChatInAddressBarToggle.setOnCheckedChangeListener(addressBarToggleListener)
     }
@@ -109,8 +120,16 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.showDuckChatInMenuToggle.quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
-        binding.showDuckChatInAddressBarToggle.quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
+        binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
+
+        binding.showDuckChatInMenuToggle.apply {
+            isVisible = viewState.isDuckChatUserEnabled
+            quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
+        }
+        binding.showDuckChatInAddressBarToggle.apply {
+            isVisible = viewState.isDuckChatUserEnabled && viewModel.isAddressBarEntryPointEnabled()
+            quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
+        }
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
