@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_PREFERENCES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -52,7 +53,7 @@ interface DuckChatDataStore {
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
 
-    suspend fun getIsDuckChatUserEnabled(): Boolean
+    suspend fun isDuckChatUserEnabled(): Boolean
     suspend fun getShowInBrowserMenu(): Boolean
     suspend fun getShowInAddressBar(): Boolean
 
@@ -133,7 +134,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
 
-    override suspend fun getIsDuckChatUserEnabled(): Boolean {
+    override suspend fun isDuckChatUserEnabled(): Boolean {
         return store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
     }
 
@@ -146,17 +147,17 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun fetchAndClearUserPreferences(): String? {
-        val userPreferences = store.data.map { it[Keys.DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
-        store.edit { prefs -> prefs.remove(Keys.DUCK_CHAT_USER_PREFERENCES) }
+        val userPreferences = store.data.map { it[DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
+        store.edit { prefs -> prefs.remove(DUCK_CHAT_USER_PREFERENCES) }
         return userPreferences
     }
 
     override suspend fun updateUserPreferences(userPreferences: String?) {
         store.edit { prefs ->
             if (userPreferences == null) {
-                prefs.remove(Keys.DUCK_CHAT_USER_PREFERENCES)
+                prefs.remove(DUCK_CHAT_USER_PREFERENCES)
             } else {
-                prefs[Keys.DUCK_CHAT_USER_PREFERENCES] = userPreferences
+                prefs[DUCK_CHAT_USER_PREFERENCES] = userPreferences
             }
         }
     }

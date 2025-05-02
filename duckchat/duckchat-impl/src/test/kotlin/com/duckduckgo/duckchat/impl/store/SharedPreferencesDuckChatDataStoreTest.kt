@@ -163,14 +163,14 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenGetIsDuckChatUserEnabledDefaultThenTrue() = runTest {
-        assertTrue(testee.getIsDuckChatUserEnabled())
+    fun whenIsDuckChatUserEnabledDefaultThenTrue() = runTest {
+        assertTrue(testee.isDuckChatUserEnabled())
     }
 
     @Test
-    fun whenSetDuckChatUserEnabledThenGetIsDuckChatUserEnabledReturnsValue() = runTest {
+    fun whenSetDuckChatUserEnabledThenIsDuckChatUserEnabledReturnsValue() = runTest {
         testee.setDuckChatUserEnabled(false)
-        assertFalse(testee.getIsDuckChatUserEnabled())
+        assertFalse(testee.isDuckChatUserEnabled())
     }
 
     @Test

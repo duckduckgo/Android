@@ -70,7 +70,7 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isDuckChatUserEnabled(): Boolean {
-        return duckChatDataStore.getIsDuckChatUserEnabled()
+        return duckChatDataStore.isDuckChatUserEnabled()
     }
 
     override suspend fun shouldShowInBrowserMenu(): Boolean {

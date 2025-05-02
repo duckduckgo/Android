@@ -83,7 +83,7 @@ class DuckChatFeatureRepositoryTest {
 
     @Test
     fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
-        whenever(mockDataStore.getIsDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
         assertFalse(testee.isDuckChatUserEnabled())
     }
 
