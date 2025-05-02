@@ -458,6 +458,50 @@ class BrowserViewModelTest {
         assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
     }
 
+    @Test
+    fun whenBrowserIsNotInFullscreenModeTabSwipingIsEnabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isFullScreen = false
+        testee.onFullScreenModeChanged(isFullScreen)
+        assertEquals(true, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
+    @Test
+    fun whenBrowserIsInFullscreenModeTabSwipingIsDisabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
+    @Test
+    fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        val isInEditMode = false
+        testee.onOmnibarEditModeChanged(isInEditMode)
+
+        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
+    @Test
+    fun whenOmnibarIsInEditModeAndBrowserIsNotInFullscreenModeTabSwipingIsDisabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isFullScreen = false
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        val isInEditMode = true
+        testee.onOmnibarEditModeChanged(isInEditMode)
+
+        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
