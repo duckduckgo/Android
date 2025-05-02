@@ -1820,6 +1820,7 @@
       }
       url.searchParams.set("rel", "0");
       url.searchParams.set("modestbranding", "1");
+      url.searchParams.set("color", "white");
       if (this.timestamp && this.timestamp.seconds > 0) {
         url.searchParams.set("start", String(this.timestamp.seconds));
       }
