@@ -87,6 +87,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -756,6 +757,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             },
             300,
         )
+    }
+
+    override fun toggleFullScreen() {
+        super.toggleFullScreen()
+
+        viewModel.onFullScreenModeChanged(isFullScreen())
     }
 
     companion object {

@@ -187,11 +187,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.isFullScreen
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -236,6 +233,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -250,6 +248,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.isFullScreen
+import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -4364,7 +4364,7 @@ class BrowserTabFragment :
         private fun goFullScreen() {
             omnibar.hide()
             binding.webViewFullScreenContainer.show()
-            activity?.toggleFullScreen()
+            (activity as DuckDuckGoActivity).toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
@@ -4372,7 +4372,7 @@ class BrowserTabFragment :
             omnibar.show()
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
-            activity?.toggleFullScreen()
+            (activity as DuckDuckGoActivity).toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
     }

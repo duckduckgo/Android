@@ -102,8 +102,11 @@ class BrowserViewModel @Inject constructor(
 
     data class ViewState(
         val hideWebContent: Boolean = true,
-        val isTabSwipingEnabled: Boolean = false,
-    )
+        private val isInEditMode: Boolean = false,
+        private val isInFullScreenMode: Boolean = false,
+    ) {
+        val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode
+    }
 
     sealed class Command {
         data class Query(val query: String) : Command()
@@ -422,7 +425,11 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
-        viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
+        viewState.value = currentViewState.copy(isInEditMode = isInEditMode)
+    }
+
+    fun onFullScreenModeChanged(isFullScreen: Boolean) {
+        viewState.value = currentViewState.copy(isInFullScreenMode = isFullScreen)
     }
 
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data
