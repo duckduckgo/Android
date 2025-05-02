@@ -42,18 +42,15 @@ class DuckChatSettingsViewModel @Inject constructor(
     data class ViewState(
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
-        val showInAppShortcuts: Boolean = false,
     )
 
     val viewState = combine(
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
-        duckChat.observeShowInAppShortcutsUserSetting(),
-    ) { showInBrowserMenu, showInAddressBar, showInAppShortcuts ->
+    ) { showInBrowserMenu, showInAddressBar ->
         ViewState(
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
-            showInAppShortcuts = showInAppShortcuts,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -70,12 +67,6 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setShowInAddressBarUserSetting(checked)
-        }
-    }
-
-    fun onShowDuckChatInAppShortcutsToggled(checked: Boolean) {
-        viewModelScope.launch {
-            duckChat.setShowInAppShortcutsUserSetting(checked)
         }
     }
 

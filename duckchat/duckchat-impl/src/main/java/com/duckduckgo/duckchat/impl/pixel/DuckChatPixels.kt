@@ -20,8 +20,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_APP_SHORTCUTS_SETTING_OFF
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_APP_SHORTCUTS_SETTING_ON
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
@@ -43,8 +41,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_MENU_SETTING_ON("aichat_menu_setting_on"),
     DUCK_CHAT_SEARCHBAR_SETTING_OFF("aichat_searchbar_setting_off"),
     DUCK_CHAT_SEARCHBAR_SETTING_ON("aichat_searchbar_setting_on"),
-    DUCK_CHAT_APP_SHORTCUTS_SETTING_OFF("aichat_app_shortcuts_setting_off"),
-    DUCK_CHAT_APP_SHORTCUTS_SETTING_ON("aichat_app_shortcuts_setting_on"),
     DUCK_CHAT_SETTINGS_PRESSED("settings_aichat_pressed"),
     DUCK_CHAT_SETTINGS_DISPLAYED("m_aichat_settings_displayed"),
     DUCK_CHAT_SEARCHBAR_BUTTON_OPEN("aichat_searchbar_button_open"),
@@ -61,8 +57,6 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_MENU_SETTING_ON.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SEARCHBAR_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SEARCHBAR_SETTING_ON.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_APP_SHORTCUTS_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_APP_SHORTCUTS_SETTING_ON.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_DISPLAYED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SEARCHBAR_BUTTON_OPEN.pixelName to PixelParameter.removeAtb(),

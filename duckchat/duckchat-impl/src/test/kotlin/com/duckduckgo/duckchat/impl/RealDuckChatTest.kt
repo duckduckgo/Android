@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.AppShortcuts
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -72,6 +73,7 @@ class RealDuckChatTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
+    private val mockAppShortcuts: AppShortcuts = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -93,6 +95,7 @@ class RealDuckChatTest {
                 true,
                 coroutineRule.testScope,
                 mockPixel,
+                mockAppShortcuts,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()

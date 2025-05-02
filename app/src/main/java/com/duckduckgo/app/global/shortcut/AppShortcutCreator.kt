@@ -90,7 +90,7 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
 
-            if (duckChatProvider.get().showInAppShortcuts()) {
+            if (duckChatProvider.get().showInBrowserMenu()) {
                 shortcutList.add(buildDuckChatShortcut(context))
             }
 
