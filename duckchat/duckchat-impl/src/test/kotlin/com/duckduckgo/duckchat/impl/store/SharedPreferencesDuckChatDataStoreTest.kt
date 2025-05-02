@@ -101,7 +101,12 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenGetShowInBrowserMenuDefaultThenTrue() = runTest {
+    fun whenIsDuckChatUserEnabledDefaultThenReturnTrue() = runTest {
+        assertTrue(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenGetShowInBrowserMenuDefaultThenReturnTrue() = runTest {
         assertTrue(testee.getShowInBrowserMenu())
     }
 
@@ -123,15 +128,35 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenSetShowInBrowserMenuThenGetShowInBrowserMenuReturnsValue() = runTest {
+    fun whenSetDuckChatUserEnabledThenIsDuckChatUserEnabledThenReturnValue() = runTest {
+        testee.setDuckChatUserEnabled(false)
+        assertFalse(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuThenGetShowInBrowserMenuThenReturnValue() = runTest {
         testee.setShowInBrowserMenu(false)
         assertFalse(testee.getShowInBrowserMenu())
     }
 
     @Test
-    fun whenSetShowInAddressBarThenGetShowInAddressBarReturnsValue() = runTest {
+    fun whenSetShowInAddressBarThenGetShowInAddressBarThenReturnValue() = runTest {
         testee.setShowInAddressBar(false)
         assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenObserveDuckChatUserEnabledThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeDuckChatUserEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setDuckChatUserEnabled(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
     }
 
     @Test
@@ -163,32 +188,7 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenIsDuckChatUserEnabledDefaultThenTrue() = runTest {
-        assertTrue(testee.isDuckChatUserEnabled())
-    }
-
-    @Test
-    fun whenSetDuckChatUserEnabledThenIsDuckChatUserEnabledReturnsValue() = runTest {
-        testee.setDuckChatUserEnabled(false)
-        assertFalse(testee.isDuckChatUserEnabled())
-    }
-
-    @Test
-    fun whenObserveDuckChatUserEnabledThenReceiveUpdates() = runTest {
-        val results = mutableListOf<Boolean>()
-        val job = launch {
-            testee.observeDuckChatUserEnabled()
-                .take(2)
-                .toList(results)
-        }
-        testee.setDuckChatUserEnabled(false)
-        job.join()
-
-        assertEquals(listOf(true, false), results)
-    }
-
-    @Test
-    fun whenRegisterOpenedThenWasOpenedBeforeReturnsTrue() = runTest {
+    fun whenRegisterOpenedThenWasOpenedBeforeThenReturnTrue() = runTest {
         assertFalse(testee.wasOpenedBefore())
         testee.registerOpened()
         assertTrue(testee.wasOpenedBefore())
