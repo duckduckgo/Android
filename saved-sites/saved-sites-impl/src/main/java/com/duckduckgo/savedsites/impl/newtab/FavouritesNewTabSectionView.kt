@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -82,7 +83,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -170,6 +170,11 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        parent.requestDisallowInterceptTouchEvent(true)
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun configureHomeTabQuickAccessGrid() {

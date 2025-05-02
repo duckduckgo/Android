@@ -967,7 +967,7 @@ class BrowserTabFragment :
     private fun disableSwipingOutsideTheOmnibar() {
         newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
-            false
+            true
         }
         binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
