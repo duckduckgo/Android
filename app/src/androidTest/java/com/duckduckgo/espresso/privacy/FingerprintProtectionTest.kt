@@ -69,8 +69,8 @@ class FingerprintProtectionTest {
             .check(webMatches(getText(), containsString("Start the test")))
             .perform(webClick())
 
-        val jsIdlingResourceForResult = JsObjectIdlingResource(webView, "window.results.results")
-        IdlingRegistry.getInstance().register(jsIdlingResourceForResult)
+        val idlingResourceForScript = WebViewIdlingResource(webView!!)
+        IdlingRegistry.getInstance().register(idlingResourceForScript)
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -84,7 +84,7 @@ class FingerprintProtectionTest {
                 assertEquals(sortProperties(expected), sortProperties(actual))
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, jsIdlingResourceForResult)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
