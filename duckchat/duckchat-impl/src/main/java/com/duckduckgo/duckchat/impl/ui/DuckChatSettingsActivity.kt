@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duck.ai")
+@ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duck.ai_settings")
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
