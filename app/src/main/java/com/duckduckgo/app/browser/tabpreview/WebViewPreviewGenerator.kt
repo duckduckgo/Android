@@ -33,13 +33,17 @@ interface WebViewPreviewGenerator {
 class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvider) : WebViewPreviewGenerator {
 
     override suspend fun generatePreview(webView: WebView): Bitmap {
-        disableScrollbars(webView)
-        val fullSizeBitmap = createBitmap(webView)
+        val scaledBitmap: Bitmap
+        try {
+            disableScrollbars(webView)
+            val fullSizeBitmap = createBitmap(webView)
 
-        val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeight).toPx()
-        val scaledWidth = scaledHeight / fullSizeBitmap.height * fullSizeBitmap.width
-        val scaledBitmap = scaleBitmap(fullSizeBitmap, scaledHeight.roundToInt(), scaledWidth.roundToInt())
-        enableScrollbars(webView)
+            val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeight).toPx()
+            val scaledWidth = scaledHeight / fullSizeBitmap.height * fullSizeBitmap.width
+            scaledBitmap = scaleBitmap(fullSizeBitmap, scaledHeight.roundToInt(), scaledWidth.roundToInt())
+        } finally {
+            enableScrollbars(webView)
+        }
         return scaledBitmap
     }
 
