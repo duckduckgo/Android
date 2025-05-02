@@ -324,7 +324,7 @@ class RealDuckChat @Inject constructor(
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
         showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
-        appShortcuts.configureAppShortcuts()
+        appShortcuts.refreshAppShortcuts()
     }
 
     companion object {

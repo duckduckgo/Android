@@ -20,5 +20,5 @@ interface AppShortcuts {
     /**
      * Refreshes the list of shortcuts to be used in the app shortcut menu
      */
-    fun configureAppShortcuts()
+    fun refreshAppShortcuts()
 }

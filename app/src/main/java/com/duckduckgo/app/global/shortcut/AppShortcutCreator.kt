@@ -68,7 +68,7 @@ class AppShortcutCreatorLifecycleObserver(
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
         Timber.i("Configure app shortcuts")
-        appShortcutCreator.configureAppShortcuts()
+        appShortcutCreator.refreshAppShortcuts()
     }
 }
 
@@ -82,7 +82,7 @@ class AppShortcutCreator @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AppShortcuts {
 
-    override fun configureAppShortcuts() {
+    override fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
             val shortcutList = mutableListOf<ShortcutInfo>()
 
