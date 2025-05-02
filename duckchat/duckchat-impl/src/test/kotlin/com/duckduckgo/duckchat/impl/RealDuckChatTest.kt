@@ -51,6 +51,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.reset
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -375,6 +376,18 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertTrue(onCloseCalled)
+    }
+
+    @Test
+    fun whenDuckChatInitializedThenAppShortcutsAreRefreshed() = runTest {
+        verify(mockAppShortcuts).refreshAppShortcuts()
+    }
+
+    @Test
+    fun whenUserSettingChangedThenAppShortcutsAreRefreshed() = runTest {
+        reset(mockAppShortcuts)
+        testee.setShowInBrowserMenuUserSetting(true)
+        verify(mockAppShortcuts).refreshAppShortcuts()
     }
 
     companion object {
