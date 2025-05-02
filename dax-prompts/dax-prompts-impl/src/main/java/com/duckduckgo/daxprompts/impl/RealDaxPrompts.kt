@@ -35,4 +35,8 @@ class RealDaxPrompts @Inject constructor(
     override suspend fun shouldShowDuckPlayerPrompt(): Boolean = withContext(dispatchers.io()) {
         daxPromptsRepository.getDaxPromptsShowDuckPlayer()
     }
+
+    override suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
+        daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+    }
 }

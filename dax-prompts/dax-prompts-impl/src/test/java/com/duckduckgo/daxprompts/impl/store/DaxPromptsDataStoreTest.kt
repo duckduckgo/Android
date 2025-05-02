@@ -89,4 +89,40 @@ class DaxPromptsDataStoreTest {
         val result = testee.getDaxPromptsShowDuckPlayer()
         assertEquals(false, result)
     }
+
+    @Test
+    fun whenNoValueSetThenGetDaxPromptsShowBrowserComparisonReturnsDefaultTrue() = runTest {
+        val result = testee.getDaxPromptsShowBrowserComparison()
+
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun whenValueSetToFalseThenGetDaxPromptsShowBrowserComparisonReturnsFalse() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(false)
+
+        val result = testee.getDaxPromptsShowBrowserComparison()
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun whenValueSetToTrueThenGetDaxPromptsShowBrowserComparisonReturnsTrue() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(false)
+
+        testee.setDaxPromptsShowBrowserComparison(true)
+
+        val result = testee.getDaxPromptsShowBrowserComparison()
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun whenValueManuallySetInDataStoreThenGetDaxPromptsShowBrowserComparisonReturnsCorrectValue() = runTest {
+        val key = booleanPreferencesKey(name = "DAX_PROMPTS_SHOW_BROWSER_COMPARISON")
+        testDataStore.edit { preferences ->
+            preferences[key] = false
+        }
+
+        val result = testee.getDaxPromptsShowBrowserComparison()
+        assertEquals(false, result)
+    }
 }

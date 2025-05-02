@@ -27,4 +27,11 @@ interface DaxPrompts {
      * @return true if the Duck Player prompt should be displayed, false otherwise.
      */
     suspend fun shouldShowDuckPlayerPrompt(): Boolean
+
+    /**
+     * Determines if the Browser Comparison prompt should be shown to the user.
+     *
+     * @return true if the Browser Comparison prompt should be displayed, false otherwise.
+     */
+    suspend fun shouldShowBrowserComparisonPrompt(): Boolean
 }

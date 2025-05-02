@@ -24,12 +24,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 
-interface DefaultRoleBrowserDialog {
-    fun createIntent(context: Context): Intent?
-    fun shouldShowDialog(): Boolean
-    fun dialogShown()
-}
-
 class RealDefaultRoleBrowserDialog(
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
