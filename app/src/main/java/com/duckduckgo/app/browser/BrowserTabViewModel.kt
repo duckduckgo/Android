@@ -4108,7 +4108,7 @@ class BrowserTabViewModel @Inject constructor(
 
         query == lastSubmittedUserQuery ||
             (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
-            -> duckChat.openDuckChat(query)
+        -> duckChat.openDuckChat(query)
 
         else -> duckChat.openDuckChatWithAutoPrompt(query)
     }
