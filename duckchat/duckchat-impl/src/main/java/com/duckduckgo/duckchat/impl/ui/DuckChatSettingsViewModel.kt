@@ -43,6 +43,8 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isDuckChatUserEnabled: Boolean = false,
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
+        val shouldShowBrowserMenuToggle: Boolean = false,
+        val shouldShowAddressBarToggle: Boolean = false,
     )
 
     val viewState = combine(
@@ -54,6 +56,8 @@ class DuckChatSettingsViewModel @Inject constructor(
             isDuckChatUserEnabled = isDuckChatUserEnabled,
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
+            shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
+            shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -83,13 +87,5 @@ class DuckChatSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
         }
-    }
-
-    fun isAddressBarEntryPointEnabled(): Boolean {
-        return duckChat.isAddressBarEntryPointEnabled()
-    }
-
-    fun isDuckChatUserEnabled(): Boolean {
-        return duckChat.isDuckChatUserEnabled()
     }
 }

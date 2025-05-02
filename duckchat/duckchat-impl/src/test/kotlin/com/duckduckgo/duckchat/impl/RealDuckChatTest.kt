@@ -79,6 +79,7 @@ class RealDuckChatTest {
     fun setup() = runTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
 
@@ -372,6 +373,48 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertTrue(onCloseCalled)
+    }
+
+    @Test
+    fun whenSetEnableDuckChatUserSettingTrueThenEnabledPixelSentAndRepositoryUpdated() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.setEnableDuckChatUserSetting(true)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
+        verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(true)
+        assertTrue(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenSetEnableDuckChatUserSettingFalseThenDisabledPixelSentAndRepositoryUpdated() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.setEnableDuckChatUserSetting(false)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(false)
+        assertFalse(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenObserveEnableDuckChatUserSettingThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeEnableDuckChatUserSetting().take(2).toList()
+
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun whenUserDisablesDuckChatThenShowInBrowserMenuReturnsFalse() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
+
+        testee.setEnableDuckChatUserSetting(false)
+
+        assertFalse(testee.showInBrowserMenu())
     }
 
     companion object {
