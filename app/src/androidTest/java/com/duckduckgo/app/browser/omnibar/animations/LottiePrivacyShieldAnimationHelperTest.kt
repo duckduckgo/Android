@@ -283,6 +283,9 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() {
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
+        whenever(visualDesignExperimentDataStore.experimentState).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
@@ -292,6 +295,6 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, PROTECTED)
 
-        verify(holder).setAnimation(R.raw.protected_shield_visual_updates)
+        verify(holder).setAnimation(R.raw.protected_shield)
     }
 }
