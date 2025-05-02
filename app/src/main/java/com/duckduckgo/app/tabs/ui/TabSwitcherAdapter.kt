@@ -152,9 +152,15 @@ class TabSwitcherAdapter(
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
 
+                val stringRes = if (trackerAnimationInfoPanel.trackerCount == 1) {
+                    R.string.trackerBlockedInTheLast7days
+                } else {
+                    R.string.trackersBlockedInTheLast7days
+                }
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
-                    stringRes = R.string.trackersBlockedInTheLast7days,
+                    stringRes = stringRes,
                     totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
                     trackerTextView = holder.binding.infoPanelText,
                 )
