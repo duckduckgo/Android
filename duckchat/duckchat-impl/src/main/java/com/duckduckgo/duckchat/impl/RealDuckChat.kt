@@ -55,6 +55,11 @@ import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
     /**
+     * Set user setting to determine whether DuckChat should be enabled or disabled.
+     */
+    suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
+
+    /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      */
     suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
@@ -63,6 +68,11 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether DuckChat should be shown in address bar.
      */
     suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean)
+
+    /**
+     * Observes whether DuckChat is user enabled or disabled.
+     */
+    fun observeEnableDuckChatUserSetting(): Flow<Boolean>
 
     /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
@@ -93,6 +103,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether address bar entry point is enabled or not.
      */
     fun isAddressBarEntryPointEnabled(): Boolean
+
+    /**
+     * Returns whether DuckChat is user enabled or not.
+     */
+    fun isDuckChatUserEnabled(): Boolean
 }
 
 data class DuckChatSettingJson(
@@ -127,6 +142,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private var isDuckChatEnabled = false
+    private var isDuckChatUserEnabled = false
     private var showInAddressBar = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
@@ -140,6 +156,16 @@ class RealDuckChat @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         cacheConfig()
+    }
+
+    override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
+        if (enabled) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
+        } else {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+        duckChatFeatureRepository.setDuckChatUserEnabled(enabled)
+        cacheUserSettings()
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
@@ -164,6 +190,10 @@ class RealDuckChat @Inject constructor(
 
     override fun isEnabled(): Boolean {
         return isDuckChatEnabled
+    }
+
+    override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
+        return duckChatFeatureRepository.observeDuckChatUserEnabled()
     }
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
@@ -199,6 +229,10 @@ class RealDuckChat @Inject constructor(
 
     override fun isAddressBarEntryPointEnabled(): Boolean {
         return isAddressBarEntryPointEnabled
+    }
+
+    override fun isDuckChatUserEnabled(): Boolean {
+        return isDuckChatUserEnabled
     }
 
     override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
@@ -320,10 +354,11 @@ class RealDuckChat @Inject constructor(
     }
 
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
+        isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         _showInBrowserMenu.emit(showInBrowserMenu)
 
-        showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
+        showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled && isDuckChatUserEnabled
     }
 
     companion object {

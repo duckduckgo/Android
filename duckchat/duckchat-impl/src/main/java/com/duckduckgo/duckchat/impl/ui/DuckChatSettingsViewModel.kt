@@ -40,15 +40,18 @@ class DuckChatSettingsViewModel @Inject constructor(
     val commands = commandChannel.receiveAsFlow()
 
     data class ViewState(
+        val isDuckChatUserEnabled: Boolean = false,
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
     )
 
     val viewState = combine(
+        duckChat.observeEnableDuckChatUserSetting(),
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
-    ) { showInBrowserMenu, showInAddressBar ->
+    ) { isDuckChatUserEnabled, showInBrowserMenu, showInAddressBar ->
         ViewState(
+            isDuckChatUserEnabled = isDuckChatUserEnabled,
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
         )
@@ -56,6 +59,12 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data class OpenLearnMore(val learnMoreLink: String) : Command()
+    }
+
+    fun onDuckChatUserEnabledToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setEnableDuckChatUserSetting(checked)
+        }
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
@@ -78,5 +87,9 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun isAddressBarEntryPointEnabled(): Boolean {
         return duckChat.isAddressBarEntryPointEnabled()
+    }
+
+    fun isDuckChatUserEnabled(): Boolean {
+        return duckChat.isDuckChatUserEnabled()
     }
 }

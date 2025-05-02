@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -43,12 +44,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 interface DuckChatDataStore {
+    suspend fun setDuckChatUserEnabled(enabled: Boolean)
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+
+    fun observeDuckChatUserEnabled(): Flow<Boolean>
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
+
+    suspend fun getIsDuckChatUserEnabled(): Boolean
     suspend fun getShowInBrowserMenu(): Boolean
     suspend fun getShowInAddressBar(): Boolean
+
     suspend fun fetchAndClearUserPreferences(): String?
     suspend fun updateUserPreferences(userPreferences: String?)
     suspend fun registerOpened()
@@ -65,6 +72,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 ) : DuckChatDataStore {
 
     private object Keys {
+        val DUCK_CHAT_USER_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_USER_ENABLED")
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
@@ -92,6 +100,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
     }
 
+    private val duckChatUserEnabled: StateFlow<Boolean> = store.data
+        .map { prefs -> prefs[DUCK_CHAT_USER_ENABLED] ?: true }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
     private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
         .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true }
         .distinctUntilChanged()
@@ -102,6 +115,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
+    override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_USER_ENABLED] = enabled }
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -110,9 +127,15 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = showDuckChat }
     }
 
+    override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatUserEnabled
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
+
+    override suspend fun getIsDuckChatUserEnabled(): Boolean {
+        return store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
+    }
 
     override suspend fun getShowInBrowserMenu(): Boolean {
         return store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
