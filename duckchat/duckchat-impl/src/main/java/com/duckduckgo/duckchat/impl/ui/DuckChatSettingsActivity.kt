@@ -91,14 +91,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         observeViewModel()
 
-        setToggleVisibility()
-
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
-    }
-
-    private fun setToggleVisibility() {
-        binding.showDuckChatInMenuToggle.isVisible = viewModel.isDuckChatUserEnabled()
-        binding.showDuckChatInAddressBarToggle.isVisible = viewModel.isAddressBarEntryPointEnabled() && viewModel.isDuckChatUserEnabled()
     }
 
     private fun configureUiEventHandlers() {
@@ -122,12 +115,14 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
+        binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
+
         binding.showDuckChatInMenuToggle.apply {
-            isVisible = viewState.isDuckChatUserEnabled
+            isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
         }
         binding.showDuckChatInAddressBarToggle.apply {
-            isVisible = viewState.isDuckChatUserEnabled && viewModel.isAddressBarEntryPointEnabled()
+            isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
     }

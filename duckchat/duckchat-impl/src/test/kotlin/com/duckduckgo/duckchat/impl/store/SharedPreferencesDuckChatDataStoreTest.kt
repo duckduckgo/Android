@@ -161,4 +161,36 @@ class SharedPreferencesDuckChatDataStoreTest {
 
         assertEquals(listOf(true, false), results)
     }
+
+    @Test
+    fun whenGetIsDuckChatUserEnabledDefaultThenTrue() = runTest {
+        assertTrue(testee.getIsDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenSetDuckChatUserEnabledThenGetIsDuckChatUserEnabledReturnsValue() = runTest {
+        testee.setDuckChatUserEnabled(false)
+        assertFalse(testee.getIsDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenObserveDuckChatUserEnabledThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeDuckChatUserEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setDuckChatUserEnabled(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun whenRegisterOpenedThenWasOpenedBeforeReturnsTrue() = runTest {
+        assertFalse(testee.wasOpenedBefore())
+        testee.registerOpened()
+        assertTrue(testee.wasOpenedBefore())
+    }
 }

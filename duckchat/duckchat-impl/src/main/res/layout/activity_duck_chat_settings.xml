@@ -79,7 +79,7 @@
                 app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/settingsSettingsTitle"
+                android:id="@+id/duckChatToggleSettingsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/duck_chat_show_in_heading" />
