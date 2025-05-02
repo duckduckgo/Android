@@ -71,8 +71,8 @@ class GpcTest {
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val jsIdlingResourceForResult = JsObjectIdlingResource(webView, "window.results.results")
-        IdlingRegistry.getInstance().register(jsIdlingResourceForResult)
+        val idlingResourceForScript = WebViewIdlingResource(webView!!)
+        IdlingRegistry.getInstance().register(idlingResourceForScript)
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -84,7 +84,7 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, jsIdlingResourceForResult)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
