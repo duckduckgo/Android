@@ -609,7 +609,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun shouldShowUpdatedPrivacyShield(navigationBarEnabled: Boolean): Boolean {
-        Timber.d("Trackers: shouldShowUpdatedPrivacyShield navigationBarEnabled $navigationBarEnabled")
         return senseOfProtectionExperiment.shouldShowNewPrivacyShield() || navigationBarEnabled
     }
 
@@ -887,7 +886,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     ) {
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
-            Timber.d("Trackers: renderPrivacyShield mode $viewMode navigationBarEnabled $navigationBarEnabled")
             val shieldIconView = if (viewMode is ViewMode.Browser) {
                 val isExperimentEnabled = shouldShowUpdatedPrivacyShield(navigationBarEnabled)
                 if (isExperimentEnabled) shieldIconExperiment else shieldIcon

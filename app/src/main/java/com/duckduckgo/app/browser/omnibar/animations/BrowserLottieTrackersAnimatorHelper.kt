@@ -53,7 +53,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -90,7 +89,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>?,
         visualDesignExperimentEnabled: Boolean,
     ) {
-        Timber.d("Trackers: startTrackersAnimation visualDesignExperimentEnabled $visualDesignExperimentEnabled")
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
         if (trackersAnimationView.isAnimating) return
 

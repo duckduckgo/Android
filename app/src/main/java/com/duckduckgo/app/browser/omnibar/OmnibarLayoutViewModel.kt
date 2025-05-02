@@ -597,7 +597,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 if (!decoration.entities.isNullOrEmpty()) {
                     val hasFocus = viewState.value.hasFocus
                     val visualDesignExperiment = viewState.value.isNavigationBarEnabled
-                    Timber.d("Omnibar: LaunchTrackersAnimation hasFocus $hasFocus visualDesignExperiment $visualDesignExperiment")
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
@@ -607,26 +606,22 @@ class OmnibarLayoutViewModel @Inject constructor(
                         viewModelScope.launch {
                             when {
                                 senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
-                                    Timber.d("Omnibar: LaunchTrackersAnimation StartExperimentVariant1Animation")
                                     command.send(Command.StartExperimentVariant1Animation)
                                 }
 
                                 senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
-                                    Timber.d("Omnibar: LaunchTrackersAnimation StartExperimentVariant2OrVariant3Animation")
                                     command.send(
                                         Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
                                     )
                                 }
 
                                 visualDesignExperiment -> {
-                                    Timber.d("Omnibar: LaunchTrackersAnimation StartVisualDesignTrackersAnimation")
                                     command.send(
                                         Command.StartVisualDesignTrackersAnimation(decoration.entities),
                                     )
                                 }
 
                                 else -> {
-                                    Timber.d("Omnibar: LaunchTrackersAnimation StartTrackersAnimation")
                                     command.send(Command.StartTrackersAnimation(decoration.entities))
                                 }
                             }
