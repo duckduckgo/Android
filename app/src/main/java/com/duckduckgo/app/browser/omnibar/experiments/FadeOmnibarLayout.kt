@@ -187,9 +187,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         spacer.isVisible = false
 
-        val showAiChat = shouldShowExperimentalAIChatButton(viewState)
-        aiChatMenu?.isVisible = showAiChat
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && showAiChat
+        aiChatMenu?.isVisible = viewState.showChatMenu
+        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
@@ -202,10 +201,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
-    }
-
-    private fun shouldShowExperimentalAIChatButton(viewState: ViewState): Boolean {
-        return duckChat.showInAddressBar() && (viewState.hasFocus || viewState.viewMode is ViewMode.NewTab)
     }
 
     /**
