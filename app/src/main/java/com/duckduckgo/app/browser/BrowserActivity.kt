@@ -762,7 +762,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun toggleFullScreen() {
         super.toggleFullScreen()
 
-        viewModel.onFullScreenModeChanged(isFullScreen())
+        if (swipingTabsFeature.isEnabled) {
+            viewModel.onFullScreenModeChanged(isFullScreen())
+        }
     }
 
     companion object {
