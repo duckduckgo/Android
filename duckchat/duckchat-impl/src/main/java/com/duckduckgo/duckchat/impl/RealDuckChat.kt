@@ -136,6 +136,7 @@ class RealDuckChat @Inject constructor(
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInBrowserMenu = MutableStateFlow(false)
+    private val _showInAddressBar = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -143,7 +144,6 @@ class RealDuckChat @Inject constructor(
 
     private var isDuckChatEnabled = false
     private var isDuckChatUserEnabled = false
-    private var showInAddressBar = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
@@ -237,9 +237,7 @@ class RealDuckChat @Inject constructor(
 
     override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
 
-    override fun showInAddressBar(): Boolean {
-        return showInAddressBar && isAddressBarEntryPointEnabled
-    }
+    override val showInAddressBar: StateFlow<Boolean> get() = _showInAddressBar.asStateFlow()
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->
@@ -358,7 +356,9 @@ class RealDuckChat @Inject constructor(
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         _showInBrowserMenu.emit(showInBrowserMenu)
 
-        showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled && isDuckChatUserEnabled
+        val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
+            isDuckChatEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
+        _showInAddressBar.emit(showInAddressBar)
     }
 
     companion object {
