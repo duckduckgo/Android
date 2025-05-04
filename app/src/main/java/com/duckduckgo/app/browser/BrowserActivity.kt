@@ -1106,7 +1106,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar()) {
+                if (!duckChat.showInAddressBar.value) {
                     experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
             } else {
@@ -1115,7 +1115,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar()) {
+                if (!duckChat.showInAddressBar.value) {
                     experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
             }
@@ -1136,7 +1136,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            if (!duckChat.showInAddressBar()) {
+            if (!duckChat.showInAddressBar.value) {
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = false
             }
         }
