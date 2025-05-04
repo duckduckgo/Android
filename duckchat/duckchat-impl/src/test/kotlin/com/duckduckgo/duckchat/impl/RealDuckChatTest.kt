@@ -208,11 +208,11 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.setShowInAddressBarUserSetting(true)
-        assertTrue(testee.showInAddressBar())
+        assertTrue(testee.showInAddressBar.value)
 
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         testee.setShowInAddressBarUserSetting(false)
-        assertFalse(testee.showInAddressBar())
+        assertFalse(testee.showInAddressBar.value)
     }
 
     @Test
