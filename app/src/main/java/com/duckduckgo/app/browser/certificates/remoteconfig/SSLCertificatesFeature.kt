@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -46,14 +47,14 @@ interface SSLCertificatesFeature {
      * @return `true` when the remote config has the global "sslCertificates" feature flag enabled
      * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
     /**
      * @return `true` when the remote config has the "allowBypass" flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun allowBypass(): Toggle
 }
 

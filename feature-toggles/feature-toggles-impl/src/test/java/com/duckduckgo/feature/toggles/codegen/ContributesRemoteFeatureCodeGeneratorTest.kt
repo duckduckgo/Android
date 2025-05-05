@@ -512,6 +512,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -519,6 +520,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        // the default value doesn't get re-evaluated, it's assigned when toggle is first created. That's why this returns FALSE
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -534,6 +537,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "state": "enabled"
                         }, 
                         "defaultFalse": {
+                            "state": "enabled"
+                        }, 
+                        "defaultValueInternal": {
                             "state": "enabled"
                         }
                     }
@@ -546,6 +552,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -553,6 +560,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -569,39 +577,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         }, 
                         "defaultFalse": {
                             "state": "disabled"
-                        }
-                    }
-                }
-        """.trimIndent()
-        whenever(appBuildConfig.flavor).thenReturn(PLAY)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertFalse(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertFalse(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertTrue(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertTrue(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        jsonString = """
-                {
-                    "state": "disabled",
-                    "features": {
-                        "internalDefaultTrue": {
-                            "state": "internal"
                         }, 
-                        "defaultTrue": {
-                            "state": "internal"
-                        },
-                        "internalDefaultFalse": {
-                            "state": "internal"
-                        }, 
-                        "defaultFalse": {
-                            "state": "internal"
+                        "defaultValueInternal": {
+                            "state": "disabled"
                         }
                     }
                 }
@@ -612,6 +590,45 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "internal"
+                        }, 
+                        "defaultTrue": {
+                            "state": "internal"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -619,6 +636,64 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+    }
+
+    @Test
+    fun `test default value set to internal`() {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // Order matters, we need to start with the config that does not have any features
+        var jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {}
+                }
+        """.trimIndent()
+
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
     }
 
     @Test

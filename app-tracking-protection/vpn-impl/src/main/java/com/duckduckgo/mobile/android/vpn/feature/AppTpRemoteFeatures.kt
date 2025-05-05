@@ -31,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
@@ -54,43 +55,43 @@ import kotlinx.coroutines.withContext
     settingsStore = ExceptionListsSettingStore::class,
 )
 interface AppTpRemoteFeatures {
-    @Toggle.DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun restartOnConnectivityLoss(): Toggle
 
-    @DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun setSearchDomains(): Toggle // kill switch
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment001(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment002(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment003(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment004(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment005(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment006(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment007(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment008(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment009(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment010(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {

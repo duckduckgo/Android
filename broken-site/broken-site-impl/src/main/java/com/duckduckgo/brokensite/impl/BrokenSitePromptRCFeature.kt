@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 )
 interface BrokenSitePromptRCFeature {
     @InternalAlwaysEnabled
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
 

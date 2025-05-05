@@ -16,6 +16,7 @@
 
 package com.duckduckgo.anvil.annotations
 
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlin.reflect.KClass
 
 /**
@@ -50,7 +51,7 @@ annotation class ContributesActivePlugin(
      * The default value of remote feature flag.
      * Default is true (ie. enabled)
      */
-    val defaultActiveValue: Boolean = true,
+    val defaultActiveValue: DefaultFeatureValue = DefaultFeatureValue.TRUE,
 
     /**
      * The priority for the plugin.

@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
@@ -73,6 +74,6 @@ class DownloadsNewTabShortcutPlugin @Inject constructor(
     featureName = "downloadsNewTabShortcutSetting",
 )
 interface DownloadsNewTabShortcutSetting {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
