@@ -616,7 +616,7 @@ class SyncActivityViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         testee.commands().test {
             awaitItem().also {
-                assertEquals("activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+                assertEquals("activated", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
             cancelAndIgnoreRemainingEvents()
         }
@@ -627,7 +627,7 @@ class SyncActivityViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         testee.commands().test {
             awaitItem().also {
-                assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+                assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
             cancelAndIgnoreRemainingEvents()
         }

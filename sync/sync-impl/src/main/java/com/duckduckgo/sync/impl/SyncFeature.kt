@@ -59,4 +59,10 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canScanUrlBasedSyncSetupBarcodes(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canInterceptSyncSetupUrls(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canOverrideThemeSyncSetup(): Toggle
 }

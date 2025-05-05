@@ -88,6 +88,7 @@ interface SyncPixels {
     fun fireUserSwitchedAccount()
     fun fireUserSwitchedLogoutError()
     fun fireUserSwitchedLoginError()
+    fun fireTimeoutOnDeepLinkSetup()
 }
 
 @ContributesBinding(AppScope::class)
@@ -282,6 +283,10 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR)
     }
 
+    override fun fireTimeoutOnDeepLinkSetup() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_DEEP_LINK_TIMEOUT)
+    }
+
     override fun fireUserSwitchedLogoutError() {
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
     }
@@ -339,6 +344,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SWITCHED_ACCOUNT("sync_user_switched_account"),
     SYNC_USER_SWITCHED_LOGOUT_ERROR("sync_user_switched_logout_error"),
     SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
+    SYNC_SETUP_DEEP_LINK_TIMEOUT("sync_setup_deep_link_timeout"),
 }
 
 object SyncPixelParameters {
