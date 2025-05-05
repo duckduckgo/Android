@@ -31,22 +31,22 @@ interface EmailManager {
     /**
      * Indicates if the user is signed in or not
      */
-    fun isSignedIn(): Boolean
+    suspend fun isSignedIn(): Boolean
 
     /**
      * Get the next available private duck address alias
      */
-    fun getAlias(): String?
+    suspend fun getAlias(): String?
 
     /**
      * Get the stored auth token
      */
-    fun getToken(): String?
+    suspend fun getToken(): String?
 
     /**
      * Store the credentials for the user's duck address
      */
-    fun storeCredentials(
+    suspend fun storeCredentials(
         token: String,
         username: String,
         cohort: String,
@@ -55,35 +55,35 @@ interface EmailManager {
     /**
      * Signs out of using duck addresses on this device
      */
-    fun signOut()
+    suspend fun signOut()
 
     /**
      * Get the user's full, personal duck address
      */
-    fun getEmailAddress(): String?
+    suspend fun getEmailAddress(): String?
 
     /**
      * Get the user's duck address data in a format that can be passed to JS
      */
-    fun getUserData(): String
+    suspend fun getUserData(): String
 
     /**
      * Get the cohort
      */
-    fun getCohort(): String
+    suspend fun getCohort(): String
 
     /**
      * Determines if duck address can be used on this device
      */
-    fun isEmailFeatureSupported(): Boolean
+    suspend fun isEmailFeatureSupported(): Boolean
 
     /**
      * Return last used date
      */
-    fun getLastUsedDate(): String
+    suspend fun getLastUsedDate(): String
 
     /**
      * Updates the last used date
      */
-    fun setNewLastUsedDate()
+    suspend fun setNewLastUsedDate()
 }

@@ -33,7 +33,7 @@ interface OmnibarPositionReporterPlugin
 class OmnibarPositionDetector @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : OmnibarPositionReporterPlugin, BrowserFeatureStateReporterPlugin {
-    override fun featureStateParams(): Map<String, String> {
+    override suspend fun featureStateParams(): Map<String, String> {
         return mapOf(PixelParameter.ADDRESS_BAR to settingsDataStore.omnibarPosition.name)
     }
 }

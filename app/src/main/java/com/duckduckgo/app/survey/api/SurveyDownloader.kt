@@ -30,6 +30,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import timber.log.Timber
 
@@ -87,9 +88,9 @@ class SurveyDownloader @Inject constructor(
             val newSurvey = when {
                 surveyOption != null ->
                     when {
-                        canSurveyBeScheduled(surveyOption) -> Survey(
+                        runBlocking { canSurveyBeScheduled(surveyOption) } -> Survey(
                             surveyGroup.id,
-                            calculateUrlWithParameters(surveyOption),
+                            runBlocking { calculateUrlWithParameters(surveyOption) },
                             surveyOption.installationDay,
                             SCHEDULED,
                         )
@@ -107,7 +108,7 @@ class SurveyDownloader @Inject constructor(
         }
     }
 
-    private fun calculateUrlWithParameters(surveyOption: SurveyOption): String {
+    private suspend fun calculateUrlWithParameters(surveyOption: SurveyOption): String {
         val uri = surveyOption.url.toUri()
 
         val builder = Uri.Builder()
@@ -128,7 +129,7 @@ class SurveyDownloader @Inject constructor(
         return builder.build().toString()
     }
 
-    private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
+    private suspend fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
         } else if (surveyOption.isNetPOnboardedRequired == true) {

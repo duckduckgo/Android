@@ -19,6 +19,7 @@ package com.duckduckgo.app.email
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.autofill.DefaultEmailProtectionJavascriptInjector
@@ -28,14 +29,19 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import java.io.BufferedReader
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
+@RunWith(AndroidJUnit4::class)
 class EmailInjectorJsTest {
 
     private val mockEmailManager: EmailManager = mock()
@@ -45,6 +51,9 @@ class EmailInjectorJsTest {
     private val javascriptInjector: EmailProtectionJavascriptInjector = DefaultEmailProtectionJavascriptInjector()
 
     lateinit var testee: EmailInjectorJs
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     @Before
     fun setup() {
@@ -56,6 +65,7 @@ class EmailInjectorJsTest {
                 autofillFeature,
                 javascriptInjector,
                 mockAutofill,
+                coroutineRule.testScope,
             )
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
@@ -107,7 +117,7 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenNotifyWebAppSignEventAndUrlIsNotFromDuckDuckGoAndEmailIsSignedInThenDoNotEvaluateJsCode() {
+    fun whenNotifyWebAppSignEventAndUrlIsNotFromDuckDuckGoAndEmailIsSignedInThenDoNotEvaluateJsCode() = runTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -120,7 +130,7 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenNotifyWebAppSignEventAndUrlIsNotFromDuckDuckGoAndEmailIsNotSignedInThenDoNotEvaluateJsCode() {
+    fun whenNotifyWebAppSignEventAndUrlIsNotFromDuckDuckGoAndEmailIsNotSignedInThenDoNotEvaluateJsCode() = runTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -134,7 +144,7 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsDisabledAndEmailIsNotSignedInThenDoNotEvaluateJsCode() {
+    fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsDisabledAndEmailIsNotSignedInThenDoNotEvaluateJsCode() = runTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         autofillFeature.self().setRawStoredState(Toggle.State(enable = false))
 
@@ -150,7 +160,7 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsEnabledAndEmailIsNotSignedInThenEvaluateJsCode() {
+    fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsEnabledAndEmailIsNotSignedInThenEvaluateJsCode() = runTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         autofillFeature.self().setRawStoredState(Toggle.State(enable = true))
 

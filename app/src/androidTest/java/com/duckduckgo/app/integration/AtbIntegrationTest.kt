@@ -31,6 +31,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -85,7 +86,7 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenNoStatisticsStoredThenAtbInitializationSuccessfullyStoresAtb() {
+    fun whenNoStatisticsStoredThenAtbInitializationSuccessfullyStoresAtb() = runTest {
         testee.initializeAtb()
         assertTrue(statisticsStore.hasInstallationStatistics)
         val atb = statisticsStore.atb
@@ -94,7 +95,7 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenStatisticsAlreadyStoredThenRefreshSearchSuccessfullyUpdatesSearchRetentionAtbOnly() {
+    fun whenStatisticsAlreadyStoredThenRefreshSearchSuccessfullyUpdatesSearchRetentionAtbOnly() = runTest {
         statisticsStore.saveAtb(Atb("v100-1"))
         assertTrue(statisticsStore.hasInstallationStatistics)
 
@@ -111,7 +112,7 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenStatisticsAlreadyStoredThenRefreshAppSuccessfullyUpdatesAppRetentionAtbOnly() {
+    fun whenStatisticsAlreadyStoredThenRefreshAppSuccessfullyUpdatesAppRetentionAtbOnly() = runTest {
         statisticsStore.saveAtb(Atb("v100-1"))
         assertTrue(statisticsStore.hasInstallationStatistics)
 

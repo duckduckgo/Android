@@ -23,6 +23,8 @@ import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
@@ -33,6 +35,7 @@ class EmailJavascriptInterface(
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val autofill: Autofill,
+    private val appCoroutineScope: CoroutineScope,
     private val showNativeTooltip: () -> Unit,
 ) {
 
@@ -52,7 +55,9 @@ class EmailJavascriptInterface(
     @JavascriptInterface
     fun isSignedIn(): String {
         return if (isUrlFromDuckDuckGoEmail()) {
-            emailManager.isSignedIn().toString()
+            runBlocking {
+                emailManager.isSignedIn().toString()
+            }
         } else {
             ""
         }
@@ -61,7 +66,9 @@ class EmailJavascriptInterface(
     @JavascriptInterface
     fun getUserData(): String {
         return if (isUrlFromDuckDuckGoEmail()) {
-            emailManager.getUserData()
+            runBlocking {
+                emailManager.getUserData()
+            }
         } else {
             ""
         }
@@ -87,14 +94,18 @@ class EmailJavascriptInterface(
         cohort: String,
     ) {
         if (isUrlFromDuckDuckGoEmail()) {
-            emailManager.storeCredentials(token, username, cohort)
+            appCoroutineScope.launch {
+                emailManager.storeCredentials(token, username, cohort)
+            }
         }
     }
 
     @JavascriptInterface
     fun removeCredentials() {
         if (isUrlFromDuckDuckGoEmail()) {
-            emailManager.signOut()
+            appCoroutineScope.launch {
+                emailManager.signOut()
+            }
         }
     }
 

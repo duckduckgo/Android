@@ -76,16 +76,16 @@ class AppEmailManagerTest {
 
     @Test
     fun whenFetchAliasFromServiceThenStoreAliasAddingDuckDomain() = runTest {
-        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.setEmailToken("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias("test"))
         testee.getAlias()
 
-        assertEquals("test$DUCK_EMAIL_DOMAIN", mockEmailDataStore.nextAlias)
+        assertEquals("test$DUCK_EMAIL_DOMAIN", mockEmailDataStore.getNextAlias())
     }
 
     @Test
     fun whenFetchAliasFromServiceAndTokenDoesNotExistThenDoNothing() = runTest {
-        mockEmailDataStore.emailToken = null
+        mockEmailDataStore.setEmailToken(null)
         testee.getAlias()
 
         verify(mockEmailService, never()).newAlias(any())
@@ -93,11 +93,11 @@ class AppEmailManagerTest {
 
     @Test
     fun whenFetchAliasFromServiceAndAddressIsBlankThenStoreNull() = runTest {
-        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.setEmailToken("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
         testee.getAlias()
 
-        assertNull(mockEmailDataStore.nextAlias)
+        assertNull(mockEmailDataStore.getNextAlias())
     }
 
     @Test
@@ -108,44 +108,44 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenGetAliasIfNextAliasDoesNotExistThenReturnNull() {
+    fun whenGetAliasIfNextAliasDoesNotExistThenReturnNull() = runTest {
         assertNull(testee.getAlias())
     }
 
     @Test
-    fun whenGetAliasThenClearNextAlias() {
+    fun whenGetAliasThenClearNextAlias() = runTest {
         testee.getAlias()
 
-        assertNull(mockEmailDataStore.nextAlias)
+        assertNull(mockEmailDataStore.getNextAlias())
     }
 
     @Test
-    fun whenIsSignedInAndTokenDoesNotExistThenReturnFalse() {
-        mockEmailDataStore.emailUsername = "username"
-        mockEmailDataStore.nextAlias = "alias"
+    fun whenIsSignedInAndTokenDoesNotExistThenReturnFalse() = runTest {
+        mockEmailDataStore.setEmailUsername("username")
+        mockEmailDataStore.setNextAlias("alias")
 
         assertFalse(testee.isSignedIn())
     }
 
     @Test
-    fun whenIsSignedInAndUsernameDoesNotExistThenReturnFalse() {
-        mockEmailDataStore.emailToken = "token"
-        mockEmailDataStore.nextAlias = "alias"
+    fun whenIsSignedInAndUsernameDoesNotExistThenReturnFalse() = runTest {
+        mockEmailDataStore.setEmailToken("token")
+        mockEmailDataStore.setNextAlias("alias")
 
         assertFalse(testee.isSignedIn())
     }
 
     @Test
-    fun whenIsSignedInAndTokenAndUsernameExistThenReturnTrue() {
-        mockEmailDataStore.emailToken = "token"
-        mockEmailDataStore.emailUsername = "username"
+    fun whenIsSignedInAndTokenAndUsernameExistThenReturnTrue() = runTest {
+        mockEmailDataStore.setEmailToken("token")
+        mockEmailDataStore.setEmailUsername("username")
 
         assertTrue(testee.isSignedIn())
     }
 
     @Test
     fun whenStoreCredentialsThenGenerateNewAlias() = runTest {
-        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.setEmailToken("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
 
         testee.storeCredentials("token", "username", "cohort")
@@ -155,7 +155,7 @@ class AppEmailManagerTest {
 
     @Test
     fun whenStoreCredentialsThenNotifySyncableSetting() = runTest {
-        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.setEmailToken("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
 
         testee.storeCredentials("token", "username", "cohort")
@@ -165,7 +165,7 @@ class AppEmailManagerTest {
 
     @Test
     fun whenStoreCredentialsThenSendPixel() = runTest {
-        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.setEmailToken("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
 
         testee.storeCredentials("token", "username", "cohort")
@@ -174,16 +174,20 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenStoreCredentialsThenCredentialsAreStoredInDataStore() {
+    fun whenStoreCredentialsThenCredentialsAreStoredInDataStore() = runTest {
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
         testee.storeCredentials("token", "username", "cohort")
 
-        assertEquals("username", mockEmailDataStore.emailUsername)
-        assertEquals("token", mockEmailDataStore.emailToken)
-        assertEquals("cohort", mockEmailDataStore.cohort)
+        assertEquals("username", mockEmailDataStore.getEmailUsername())
+        assertEquals("token", mockEmailDataStore.getEmailToken())
+        assertEquals("cohort", mockEmailDataStore.getCohort())
     }
 
     @Test
     fun whenStoreCredentialsIfCredentialsWereCorrectlyStoredThenIsSignedInChannelSendsTrue() = runTest {
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
         testee.storeCredentials("token", "username", "cohort")
 
         assertTrue(testee.signedInFlow().first())
@@ -191,31 +195,33 @@ class AppEmailManagerTest {
 
     @Test
     fun whenStoreCredentialsIfCredentialsAreBlankThenIsSignedInChannelSendsFalse() = runTest {
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
         testee.storeCredentials("", "", "cohort")
 
         assertFalse(testee.signedInFlow().first())
     }
 
     @Test
-    fun whenSignedOutThenClearEmailDataAndAliasIsNull() {
+    fun whenSignedOutThenClearEmailDataAndAliasIsNull() = runTest {
         testee.signOut()
 
-        assertNull(mockEmailDataStore.emailUsername)
-        assertNull(mockEmailDataStore.emailToken)
-        assertNull(mockEmailDataStore.nextAlias)
+        assertNull(mockEmailDataStore.getEmailUsername())
+        assertNull(mockEmailDataStore.getEmailToken())
+        assertNull(mockEmailDataStore.getNextAlias())
 
         assertNull(testee.getAlias())
     }
 
     @Test
-    fun whenSignedOutThenNotifySyncableSetting() {
+    fun whenSignedOutThenNotifySyncableSetting() = runTest {
         testee.signOut()
 
         verify(mockSyncSettingsListener).onSettingChanged(emailSyncableSetting.key)
     }
 
     @Test
-    fun whenSignedOutThenSendPixel() {
+    fun whenSignedOutThenSendPixel() = runTest {
         testee.signOut()
 
         verify(mockPixel).fire(EMAIL_DISABLED)
@@ -229,69 +235,69 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenGetEmailAddressThenDuckEmailDomainIsAppended() {
-        mockEmailDataStore.emailUsername = "username"
+    fun whenGetEmailAddressThenDuckEmailDomainIsAppended() = runTest {
+        mockEmailDataStore.setEmailUsername("username")
 
         assertEquals("username$DUCK_EMAIL_DOMAIN", testee.getEmailAddress())
     }
 
     @Test
-    fun whenGetCohortThenReturnCohort() {
-        mockEmailDataStore.cohort = "cohort"
+    fun whenGetCohortThenReturnCohort() = runTest {
+        mockEmailDataStore.setCohort("cohort")
 
         assertEquals("cohort", testee.getCohort())
     }
 
     @Test
-    fun whenGetCohortIfCohortIsNullThenReturnUnknown() {
-        mockEmailDataStore.cohort = null
+    fun whenGetCohortIfCohortIsNullThenReturnUnknown() = runTest {
+        mockEmailDataStore.setCohort(null)
 
         assertEquals(UNKNOWN_COHORT, testee.getCohort())
     }
 
     @Test
-    fun whenGetCohortIfCohortIsEmtpyThenReturnUnknown() {
-        mockEmailDataStore.cohort = ""
+    fun whenGetCohortIfCohortIsEmtpyThenReturnUnknown() = runTest {
+        mockEmailDataStore.setCohort("")
 
         assertEquals(UNKNOWN_COHORT, testee.getCohort())
     }
 
     @Test
-    fun whenIsEmailFeatureSupportedAndEncryptionCanBeUsedThenReturnTrue() {
+    fun whenIsEmailFeatureSupportedAndEncryptionCanBeUsedThenReturnTrue() = runTest {
         (mockEmailDataStore as FakeEmailDataStore).canUseEncryption = true
 
         assertTrue(testee.isEmailFeatureSupported())
     }
 
     @Test
-    fun whenGetLastUsedDateIfNullThenReturnEmpty() {
+    fun whenGetLastUsedDateIfNullThenReturnEmpty() = runTest {
         assertEquals("", testee.getLastUsedDate())
     }
 
     @Test
-    fun whenGetLastUsedDateIfNotNullThenReturnValueFromStore() {
-        mockEmailDataStore.lastUsedDate = "2021-01-01"
+    fun whenGetLastUsedDateIfNotNullThenReturnValueFromStore() = runTest {
+        mockEmailDataStore.setLastUsedDate("2021-01-01")
         assertEquals("2021-01-01", testee.getLastUsedDate())
     }
 
     @Test
-    fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() {
+    fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() = runTest {
         (mockEmailDataStore as FakeEmailDataStore).canUseEncryption = false
 
         assertFalse(testee.isEmailFeatureSupported())
     }
 
     @Test
-    fun whenGetUserDataThenDataReceivedCorrectly() {
+    fun whenGetUserDataThenDataReceivedCorrectly() = runTest {
         val expected = JSONObject().apply {
             put(AppEmailManager.TOKEN, "token")
             put(AppEmailManager.USERNAME, "user")
             put(AppEmailManager.NEXT_ALIAS, "nextAlias")
         }.toString()
 
-        mockEmailDataStore.emailToken = "token"
-        mockEmailDataStore.emailUsername = "user"
-        mockEmailDataStore.nextAlias = "nextAlias@duck.com"
+        mockEmailDataStore.setEmailToken("token")
+        mockEmailDataStore.setEmailUsername("user")
+        mockEmailDataStore.setNextAlias("nextAlias@duck.com")
 
         assertEquals(expected, testee.getUserData())
     }
@@ -306,8 +312,8 @@ class AppEmailManagerTest {
         }
     }
 
-    private fun givenNextAliasExists() {
-        mockEmailDataStore.nextAlias = "alias"
+    private fun givenNextAliasExists() = runTest {
+        mockEmailDataStore.setNextAlias("alias")
     }
 
     class TestEmailService : EmailService {
@@ -316,12 +322,37 @@ class AppEmailManagerTest {
 }
 
 class FakeEmailDataStore : EmailDataStore {
-    override var emailToken: String? = null
-    override var nextAlias: String? = null
-    override var emailUsername: String? = null
-    override var cohort: String? = null
-    override var lastUsedDate: String? = null
+
+    private var _emailToken: String? = null
+    override suspend fun setEmailToken(value: String?) {
+        _emailToken = value
+    }
+    override suspend fun getEmailToken(): String? = _emailToken
+
+    private var _nextAlias: String? = null
+    override suspend fun getNextAlias(): String? = _nextAlias
+    override suspend fun setNextAlias(value: String?) {
+        _nextAlias = value
+    }
+
+    private var _emailUsername: String? = null
+    override suspend fun getEmailUsername(): String? = _emailUsername
+    override suspend fun setEmailUsername(value: String?) {
+        _emailUsername = value
+    }
+
+    private var _cohort: String? = null
+    override suspend fun getCohort(): String? = _cohort
+    override suspend fun setCohort(value: String?) {
+        _cohort = value
+    }
+
+    private var _lastUsedDate: String? = null
+    override suspend fun getLastUsedDate(): String? = _lastUsedDate
+    override suspend fun setLastUsedDate(value: String?) {
+        _lastUsedDate = value
+    }
 
     var canUseEncryption: Boolean = false
-    override fun canUseEncryption(): Boolean = canUseEncryption
+    override suspend fun canUseEncryption(): Boolean = canUseEncryption
 }

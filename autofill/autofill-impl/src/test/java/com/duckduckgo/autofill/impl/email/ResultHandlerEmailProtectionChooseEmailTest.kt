@@ -69,7 +69,7 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     )
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(emailManager.getEmailAddress()).thenReturn("personal-example@duck.com")
         whenever(emailManager.getAlias()).thenReturn("private-example@duck.com")
         whenever(emailManager.getCohort()).thenReturn("cohort")

@@ -31,6 +31,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -131,7 +132,8 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `when Email pressed then pixel is fired`() {
+    fun `when Email pressed then pixel is fired`() = runTest {
+        whenever(emailManagerMock.isEmailFeatureSupported()).thenReturn(true)
         testee.onEmailProtectionSettingClicked()
 
         verify(settingsPixelDispatcherMock).fireEmailPressed()

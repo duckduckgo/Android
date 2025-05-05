@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.autofill.EmailProtectionJavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -29,6 +30,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 
 @ContributesBinding(AppScope::class)
 class EmailInjectorJs @Inject constructor(
@@ -38,6 +41,7 @@ class EmailInjectorJs @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val emailProtectionJavascriptInjector: EmailProtectionJavascriptInjector,
     private val autofill: Autofill,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : EmailInjector {
 
     override fun addJsInterface(
@@ -54,6 +58,7 @@ class EmailInjectorJs @Inject constructor(
                 dispatcherProvider,
                 autofillFeature,
                 autofill,
+                coroutineScope,
                 onSignedInEmailProtectionPromptShown,
             ),
             JAVASCRIPT_INTERFACE_NAME,
@@ -79,7 +84,7 @@ class EmailInjectorJs @Inject constructor(
         url: String?,
     ) {
         url?.let {
-            if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {
+            if (isFeatureEnabled() && isDuckDuckGoUrl(url) && runBlocking { !emailManager.isSignedIn() }) {
                 webView.evaluateJavascript("javascript:${emailProtectionJavascriptInjector.getSignOutFunctions(webView.context)}", null)
             }
         }

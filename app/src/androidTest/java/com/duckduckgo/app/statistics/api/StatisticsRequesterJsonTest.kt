@@ -35,6 +35,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -97,7 +98,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchRetentionCallWithUpdateVersionResponseUpdatesAtb() {
+    fun whenAlreadyInitializedRefreshSearchRetentionCallWithUpdateVersionResponseUpdatesAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
@@ -105,7 +106,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppRetentionCallWithUpdateVersionResponseUpdatesAtb() {
+    fun whenAlreadyInitializedRefreshAppRetentionCallWithUpdateVersionResponseUpdatesAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
@@ -113,7 +114,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAtbInitializationStoresAtbResponse() {
+    fun whenNotYetInitializedAtbInitializationStoresAtbResponse() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString(responseBody = "", responseCode = 200)
         testee.initializeAtb()
@@ -122,7 +123,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAtbInitializationResultsInStoredStats() {
+    fun whenNotYetInitializedAtbInitializationResultsInStoredStats() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString(responseBody = "", responseCode = 200)
         testee.initializeAtb()
@@ -131,7 +132,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAndAtbInitializationHasMissingRequiredJsonFieldThenNoStatsStored() {
+    fun whenNotYetInitializedAndAtbInitializationHasMissingRequiredJsonFieldThenNoStatsStored() = runTest {
         queueResponseFromFile(INVALID_JSON_MISSING_VERSION)
         testee.initializeAtb()
         assertFalse(statisticsStore.hasInstallationStatistics)
@@ -139,7 +140,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAndAtbInitializationResponseIsCorruptThenNoStatsStored() {
+    fun whenNotYetInitializedAndAtbInitializationResponseIsCorruptThenNoStatsStored() = runTest {
         queueResponseFromFile(INVALID_JSON_CORRUPT_JSON)
         queueResponseFromString(responseBody = "", responseCode = 200)
         testee.initializeAtb()
@@ -148,7 +149,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAndExtiCallErrorsThenNoStatsStored() {
+    fun whenNotYetInitializedAndExtiCallErrorsThenNoStatsStored() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueError()
         testee.initializeAtb()
@@ -157,14 +158,14 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedAtbInitializationDoesNotReInitialize() {
+    fun whenAlreadyInitializedAtbInitializationDoesNotReInitialize() = runTest {
         statisticsStore.saveAtb(Atb("123"))
         testee.initializeAtb()
         assertNumberRequestsMade(0)
     }
 
     @Test
-    fun whenNotYetInitializedAtbInitializationRetrievesFromCorrectEndpoint() {
+    fun whenNotYetInitializedAtbInitializationRetrievesFromCorrectEndpoint() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
@@ -173,7 +174,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedAtbInitializationSendsTestParameter() {
+    fun whenNotYetInitializedAtbInitializationSendsTestParameter() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
@@ -183,7 +184,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedExtiInitializationRetrievesFromCorrectEndpoint() {
+    fun whenNotYetInitializedExtiInitializationRetrievesFromCorrectEndpoint() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
@@ -193,7 +194,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedExtiInitializationSendsTestParameter() {
+    fun whenNotYetInitializedExtiInitializationSendsTestParameter() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
@@ -204,7 +205,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenNotYetInitializedExtiInitializationSendsCorrectAtb() {
+    fun whenNotYetInitializedExtiInitializationSendsCorrectAtb() = runTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
@@ -216,7 +217,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchCallGoesToCorrectEndpoint() {
+    fun whenAlreadyInitializedRefreshSearchCallGoesToCorrectEndpoint() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
@@ -226,7 +227,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppCallGoesToCorrectEndpoint() {
+    fun whenAlreadyInitializedRefreshAppCallGoesToCorrectEndpoint() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
@@ -236,7 +237,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchCallUpdatesSearchRetentionAtb() {
+    fun whenAlreadyInitializedRefreshSearchCallUpdatesSearchRetentionAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
@@ -244,7 +245,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppCallUpdatesAppRetentionAtb() {
+    fun whenAlreadyInitializedRefreshAppCallUpdatesAppRetentionAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
@@ -252,7 +253,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchCallSendsTestParameter() {
+    fun whenAlreadyInitializedRefreshSearchCallSendsTestParameter() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
@@ -262,7 +263,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppCallSendsTestParameter() {
+    fun whenAlreadyInitializedRefreshAppCallSendsTestParameter() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
@@ -272,7 +273,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchCallSendsCorrectAtb() {
+    fun whenAlreadyInitializedRefreshSearchCallSendsCorrectAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
@@ -282,7 +283,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppCallSendsCorrectAtb() {
+    fun whenAlreadyInitializedRefreshAppCallSendsCorrectAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
@@ -292,7 +293,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshSearchCallSendsCorrectRetentionAtb() {
+    fun whenAlreadyInitializedRefreshSearchCallSendsCorrectRetentionAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         statisticsStore.searchRetentionAtb = "101-3"
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
@@ -303,7 +304,7 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshAppCallSendsCorrectRetentionAtb() {
+    fun whenAlreadyInitializedRefreshAppCallSendsCorrectRetentionAtb() = runTest {
         statisticsStore.saveAtb(Atb("100-1"))
         statisticsStore.appRetentionAtb = "101-3"
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)

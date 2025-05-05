@@ -43,6 +43,7 @@ import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -84,7 +85,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenFeatureReadTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() {
+    fun whenFeatureReadTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(false)
         syncEngine.triggerSync(FEATURE_READ)
         verifyNoInteractions(syncApiClient)
@@ -93,7 +94,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenAppOpensAndSyncIsDisabledNoSyncOperationIsTriggered() {
+    fun whenAppOpensAndSyncIsDisabledNoSyncOperationIsTriggered() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(false)
         syncEngine.triggerSync(APP_OPEN)
         verifyNoInteractions(syncApiClient)
@@ -102,7 +103,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenBackgroundSyncOperationTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() {
+    fun whenBackgroundSyncOperationTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(false)
         syncEngine.triggerSync(BACKGROUND_SYNC)
         verifyNoInteractions(syncApiClient)
@@ -111,7 +112,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenDataChangesAndSyncIsDisabledNoSyncOperationIsTriggered() {
+    fun whenDataChangesAndSyncIsDisabledNoSyncOperationIsTriggered() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(false)
         syncEngine.triggerSync(DATA_CHANGE)
         verifyNoInteractions(syncApiClient)
@@ -120,14 +121,14 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenCreatingSyncAccountAndNoLocalChangesThenNothingIsSent() {
+    fun whenCreatingSyncAccountAndNoLocalChangesThenNothingIsSent() = runTest {
         syncEngine.triggerSync(ACCOUNT_CREATION)
 
         verifyNoInteractions(syncApiClient)
     }
 
     @Test
-    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithSuccess() {
+    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithSuccess() = runTest {
         givenLocalChanges()
         givenPatchSuccess()
 
@@ -139,7 +140,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenSyncingDataIsDisabledThenNoSyncOperationIsTriggered() {
+    fun whenSyncingDataIsDisabledThenNoSyncOperationIsTriggered() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(false)
 
@@ -155,7 +156,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithError() {
+    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithError() = runTest {
         givenLocalChanges()
         givenPatchError()
 
@@ -167,7 +168,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenAppOpenWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+    fun whenAppOpenWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
@@ -180,7 +181,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenAppOpenWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+    fun whenAppOpenWithoutChangesAndGetRemoteFailsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetError()
 
@@ -191,7 +192,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenAppOpenWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+    fun whenAppOpenWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchSuccess()
 
@@ -202,7 +203,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenAppOpenWithChangesAndFeatureFirstSyncThenPerformGetAndPatch() {
+    fun whenAppOpenWithChangesAndFeatureFirstSyncThenPerformGetAndPatch() = runTest {
         givenFirstSyncLocalChanges()
         givenGetSuccess()
         givenPatchSuccess()
@@ -217,7 +218,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenAppOpenWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+    fun whenAppOpenWithChangesAndPatchRemoteFailsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchError()
 
@@ -228,7 +229,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenFeatureReadWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+    fun whenFeatureReadWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
@@ -241,7 +242,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenFeatureReadWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+    fun whenFeatureReadWithoutChangesAndGetRemoteFailsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetError()
 
@@ -252,7 +253,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenFeatureReadWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+    fun whenFeatureReadWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchSuccess()
 
@@ -265,7 +266,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenFeatureReadWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+    fun whenFeatureReadWithChangesAndPatchRemoteFailsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchError()
 
@@ -276,7 +277,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenDataChangeWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+    fun whenDataChangeWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
@@ -289,7 +290,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenDataChangeWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+    fun whenDataChangeWithoutChangesAndGetRemoteFailsThenStateIsUpdated() = runTest {
         givenNoLocalChanges()
         givenGetError()
 
@@ -300,7 +301,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenDataChangeWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+    fun whenDataChangeWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchSuccess()
 
@@ -311,7 +312,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenDataChangeWithChangesForFirstSyncThenStateIsUpdated() {
+    fun whenDataChangeWithChangesForFirstSyncThenStateIsUpdated() = runTest {
         givenFirstSyncLocalChanges()
         givenPatchSuccess()
         givenGetSuccess()
@@ -326,7 +327,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenDataChangeWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+    fun whenDataChangeWithChangesAndPatchRemoteFailsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenPatchError()
 
@@ -337,7 +338,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenBackgroundSyncCantBeScheduledThenNothingHappens() {
+    fun whenBackgroundSyncCantBeScheduledThenNothingHappens() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(DISCARD)
 
         verifyNoInteractions(syncApiClient)
@@ -345,7 +346,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenBackgroundSyncWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+    fun whenBackgroundSyncWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
         givenNoLocalChanges()
         givenGetSuccess()
@@ -359,7 +360,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenBackgroundSyncWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+    fun whenBackgroundSyncWithoutChangesAndGetRemoteFailsThenStateIsUpdated() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
         givenNoLocalChanges()
         givenGetError()
@@ -371,7 +372,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenBackgroundSyncWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+    fun whenBackgroundSyncWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
         givenLocalChanges()
         givenPatchSuccess()
@@ -383,7 +384,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenFirstSyncBackgroundSyncWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+    fun whenFirstSyncBackgroundSyncWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
         givenFirstSyncLocalChanges()
         givenPatchSuccess()
@@ -399,7 +400,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenBackgroundSyncWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+    fun whenBackgroundSyncWithChangesAndPatchRemoteFailsThenStateIsUpdated() = runTest {
         whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
         givenLocalChanges()
         givenPatchError()
@@ -413,7 +414,7 @@ internal class SyncEngineTest {
     @Test
     @Ignore
     // https://app.asana.com/0/1204842202586359/1205158805627400/f
-    fun whenAccountLoginGetRemoteFailsThenStateIsUpdated() {
+    fun whenAccountLoginGetRemoteFailsThenStateIsUpdated() = runTest {
         givenLocalChanges()
         givenGetError()
 
@@ -424,7 +425,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenAccountLoginSucceedsThenStateIsUpdated() {
+    fun whenAccountLoginSucceedsThenStateIsUpdated() = runTest {
         givenFirstSyncLocalChanges()
         givenPatchSuccess()
         givenGetSuccess()
@@ -437,14 +438,14 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenTriggeringSyncAndSyncAlreadyInProgressThenSyncIsDismissed() {
+    fun whenTriggeringSyncAndSyncAlreadyInProgressThenSyncIsDismissed() = runTest {
         whenever(syncStateRepository.current()).thenReturn(SyncAttempt(state = IN_PROGRESS))
         syncEngine.triggerSync(DATA_CHANGE)
         verifyNoInteractions(syncApiClient)
     }
 
     @Test
-    fun whenPatchNewDataFailsBecauseCountLimitThenNotifyFeature() {
+    fun whenPatchNewDataFailsBecauseCountLimitThenNotifyFeature() = runTest {
         givenLocalChanges()
         givenPatchLimitError()
         val persisterPluginMock = mock<SyncableDataPersister>()
@@ -456,7 +457,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenPatchNewDataFailsBecauseContentTooLargeThenNotifyFeature() {
+    fun whenPatchNewDataFailsBecauseContentTooLargeThenNotifyFeature() = runTest {
         givenLocalChanges()
         givenPatchContentTooLargeError()
         val persisterPluginMock = mock<SyncableDataPersister>()
@@ -468,7 +469,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenPatchNewDataFailsBecauseNonFeatureErrorThenDoNotNotifyFeature() {
+    fun whenPatchNewDataFailsBecauseNonFeatureErrorThenDoNotNotifyFeature() = runTest {
         givenLocalChanges()
         givenPatchError()
         val persisterPluginMock = mock<SyncableDataPersister>()
@@ -480,7 +481,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenSyncTriggeredDailyPixelIsSent() {
+    fun whenSyncTriggeredDailyPixelIsSent() = runTest {
         givenLocalChanges()
         givenPatchSuccess()
 
@@ -493,7 +494,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithTimestampConflictThenStateIsUpdatedAndPixelIsFired() {
+    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithTimestampConflictThenStateIsUpdatedAndPixelIsFired() = runTest {
         givenLocalChangesWithTimestampConflict()
         givenPatchSuccess()
 
@@ -507,7 +508,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithOrphansThenStateIsUpdatedAndPixelIsFired() {
+    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithOrphansThenStateIsUpdatedAndPixelIsFired() = runTest {
         givenLocalChangesWithOrphansPresent()
         givenPatchSuccess()
 

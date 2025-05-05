@@ -60,7 +60,7 @@ class FeatureRetentionPixelSender @Inject constructor(
         }
     }
 
-    private fun tryToFireDailyPixel(
+    private suspend fun tryToFireDailyPixel(
         pixelName: String,
     ) {
         val now = getUtcIsoLocalDate()

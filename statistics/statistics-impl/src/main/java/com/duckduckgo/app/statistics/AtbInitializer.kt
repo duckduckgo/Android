@@ -55,7 +55,7 @@ class AtbInitializer @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) { refreshAppRetentionAtb() }
     }
 
-    private fun refreshAppRetentionAtb() {
+    private suspend fun refreshAppRetentionAtb() {
         if (statisticsDataStore.hasInstallationStatistics) {
             statisticsUpdater.refreshAppRetentionAtb()
         }

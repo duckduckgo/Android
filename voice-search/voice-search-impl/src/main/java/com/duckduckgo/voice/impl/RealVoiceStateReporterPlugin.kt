@@ -32,7 +32,7 @@ interface VoiceStateReporterPlugin
 class RealVoiceStateReporterPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceStateReporterPlugin, BrowserFeatureStateReporterPlugin {
-    override fun featureStateParams(): Map<String, String> {
+    override suspend fun featureStateParams(): Map<String, String> {
         return mapOf(PixelParameter.VOICE_SEARCH to voiceSearchAvailability.isVoiceSearchAvailable.toBinaryString())
     }
 }

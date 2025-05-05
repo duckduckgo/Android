@@ -52,9 +52,9 @@ interface SyncAccountRepository {
 
     fun getCodeType(stringCode: String): CodeType
     fun isSyncSupported(): Boolean
-    fun createAccount(): Result<Boolean>
+    suspend fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(stringCode: String): Result<Boolean>
+    suspend fun processCode(stringCode: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -68,7 +68,7 @@ interface SyncAccountRepository {
     fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
-    fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
+    suspend fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -103,7 +103,7 @@ class AppSyncAccountRepository @Inject constructor(
         return syncStore.isEncryptionSupported()
     }
 
-    override fun createAccount(): Result<Boolean> {
+    override suspend fun createAccount(): Result<Boolean> {
         if (isSignedIn()) {
             return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in")
                 .alsoFireAlreadySignedInErrorPixel()
@@ -114,7 +114,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(stringCode: String): Result<Boolean> {
+    override suspend fun processCode(stringCode: String): Result<Boolean> {
         val decodedCode: String? = kotlin.runCatching {
             return@runCatching stringCode.decodeB64()
         }.getOrNull()
@@ -347,7 +347,7 @@ class AppSyncAccountRepository @Inject constructor(
         return Success(linkingQRCode.encodeB64())
     }
 
-    private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
+    private suspend fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
         if (!isSignedIn()) {
             performCreateAccount().onFailure {
                 it.alsoFireSignUpErrorPixel()
@@ -587,7 +587,7 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun isSignedIn() = syncStore.isSignedIn()
 
-    override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
+    override suspend fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
         val thisDeviceId = syncStore.deviceId.orEmpty()
         return when (val result = logout(thisDeviceId)) {
             is Error -> {
@@ -637,7 +637,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun performCreateAccount(): Result<Boolean> {
+    private suspend fun performCreateAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
         val account: AccountKeys = kotlin.runCatching {
             nativeLib.generateAccountKeys(userId = userId).also {

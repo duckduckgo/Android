@@ -1537,7 +1537,7 @@ class TabSwitcherViewModelTest {
             TODO("Not yet implemented")
         }
 
-        override fun emailEnabled(): Boolean {
+        override suspend fun emailEnabled(): Boolean {
             TODO("Not yet implemented")
         }
 

@@ -58,6 +58,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -201,7 +202,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenFirstSyncAndUsersHasFavoritesThenFormFactorFolderPresent() {
+    fun whenFirstSyncAndUsersHasFavoritesThenFormFactorFolderPresent() = runTest {
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
@@ -221,7 +222,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNewBookmarksSinceLastSyncThenChangesContainData() {
+    fun whenNewBookmarksSinceLastSyncThenChangesContainData() = runTest {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
@@ -235,7 +236,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenOnFirstSyncBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() {
+    fun whenOnFirstSyncBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() = runTest {
         repository.insert(invalidBookmark)
 
         val syncChanges = parser.getChanges()
@@ -247,7 +248,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenOnFirstSyncFolderIsInvalidThenChangesContainDataFixed() {
+    fun whenOnFirstSyncFolderIsInvalidThenChangesContainDataFixed() = runTest {
         repository.insert(invalidBookmark)
         repository.insert(invalidFolder)
 
@@ -262,7 +263,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNewBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() {
+    fun whenNewBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() = runTest {
         setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
         repository.insert(invalidBookmark.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
 
@@ -275,7 +276,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNewFolderIsInvalidThenChangesContainDataFixed() {
+    fun whenNewFolderIsInvalidThenChangesContainDataFixed() = runTest {
         setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
         repository.insert(invalidBookmark.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
         repository.insert(invalidFolder.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
@@ -289,7 +290,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenInvalidBookmarkPresentAndValidBookmarkAddedThenOnlyValidBookmarkIncluded() {
+    fun whenInvalidBookmarkPresentAndValidBookmarkAddedThenOnlyValidBookmarkIncluded() = runTest {
         repository.insert(invalidBookmark)
         syncRepository.markSavedSitesAsInvalid(listOf(invalidBookmark.id))
         setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
@@ -306,7 +307,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNewFoldersAndBookmarksAndFavouritesSinceLastSyncThenChangesContainData() {
+    fun whenNewFoldersAndBookmarksAndFavouritesSinceLastSyncThenChangesContainData() = runTest {
         val modificationTimestamp = DatabaseDateFormatter.iso8601()
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         setLastSyncTime(lastSyncTimestamp)
@@ -365,7 +366,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNoChangesAfterLastSyncThenChangesAreEmpty() {
+    fun whenNoChangesAfterLastSyncThenChangesAreEmpty() = runTest {
         val modificationTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601()
         setLastSyncTime(lastSyncTimestamp)
@@ -496,7 +497,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenChangesNeedSyncThenChildrenRequestIsAddedToMetadata() {
+    fun whenChangesNeedSyncThenChildrenRequestIsAddedToMetadata() = runTest {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 

@@ -85,7 +85,7 @@ class AutofillBreakageReportSenderImpl @Inject constructor(
         return neverSavedSiteRepository.isInNeverSaveList(url).toString()
     }
 
-    private fun formatEmailProtectionStatus(): String {
+    private suspend fun formatEmailProtectionStatus(): String {
         return emailManager.isSignedIn().toString()
     }
 

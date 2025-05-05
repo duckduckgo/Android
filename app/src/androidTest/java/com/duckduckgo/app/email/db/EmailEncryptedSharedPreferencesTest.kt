@@ -17,8 +17,11 @@
 package com.duckduckgo.app.email.db
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -36,23 +39,31 @@ class EmailEncryptedSharedPreferencesTest {
 
     private val mockPixel: Pixel = mock()
     lateinit var testee: EmailEncryptedSharedPreferences
+    private val fakeFeatureToggle = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun before() {
-        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, mockPixel)
+        fakeFeatureToggle.createAsyncEmailPreferences().setRawStoredState(Toggle.State(true))
+        testee = EmailEncryptedSharedPreferences(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            mockPixel,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+            fakeFeatureToggle,
+        )
     }
 
     @Test
     fun whenNextAliasEqualsValueThenValueIsSentToNextAliasChannel() = runTest {
-        testee.nextAlias = "test"
+        testee.setNextAlias("test")
 
-        assertEquals("test", testee.nextAlias)
+        assertEquals("test", testee.getNextAlias())
     }
 
     @Test
     fun whenNextAliasEqualsNullThenNullIsSentToNextAliasChannel() = runTest {
-        testee.nextAlias = null
+        testee.setNextAlias(null)
 
-        assertNull(testee.nextAlias)
+        assertNull(testee.getNextAlias())
     }
 }

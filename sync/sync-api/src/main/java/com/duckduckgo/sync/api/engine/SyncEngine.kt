@@ -22,7 +22,7 @@ interface SyncEngine {
      * Entry point to the Sync Engine
      * See Tech Design: Sync Updating/Polling Strategy https://app.asana.com/0/481882893211075/1204040479708519/f
      */
-    fun triggerSync(trigger: SyncTrigger)
+    suspend fun triggerSync(trigger: SyncTrigger)
 
     /**
      * Sync Feature has been disabled / device has been removed

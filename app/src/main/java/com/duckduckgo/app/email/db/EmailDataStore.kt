@@ -22,10 +22,15 @@ package com.duckduckgo.app.email.db
  * Provides ability to store and retrieve data related to the duck address feature such as personal username, next alias etc...
  */
 interface EmailDataStore {
-    var emailToken: String?
-    var nextAlias: String?
-    var emailUsername: String?
-    var cohort: String?
-    var lastUsedDate: String?
-    fun canUseEncryption(): Boolean
+    suspend fun getEmailToken(): String?
+    suspend fun setEmailToken(value: String?)
+    suspend fun getNextAlias(): String?
+    suspend fun setNextAlias(value: String?)
+    suspend fun getEmailUsername(): String?
+    suspend fun setEmailUsername(value: String?)
+    suspend fun getCohort(): String?
+    suspend fun setCohort(value: String?)
+    suspend fun getLastUsedDate(): String?
+    suspend fun setLastUsedDate(value: String?)
+    suspend fun canUseEncryption(): Boolean
 }

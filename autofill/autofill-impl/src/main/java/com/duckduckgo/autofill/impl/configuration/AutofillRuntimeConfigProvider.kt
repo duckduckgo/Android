@@ -152,7 +152,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return emailProtectionInContextAvailabilityRules.permittedToShow(url)
     }
 
-    private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
+    private suspend fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
     companion object {
         private const val TAG_INJECT_CONTENT_SCOPE = "// INJECT contentScope HERE"

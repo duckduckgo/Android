@@ -42,9 +42,9 @@ class EmailSync @Inject constructor(
 
     override val key: String = DUCK_EMAIL_SETTING
 
-    override fun getValue(): String? {
-        val address = emailDataStore.emailUsername ?: return null
-        val token = emailDataStore.emailToken ?: return null
+    override suspend fun getValue(): String? {
+        val address = emailDataStore.getEmailUsername() ?: return null
+        val token = emailDataStore.getEmailToken() ?: return null
         DuckAddressSetting(
             username = address,
             personal_access_token = token,
@@ -53,7 +53,7 @@ class EmailSync @Inject constructor(
         }
     }
 
-    override fun save(value: String?): Boolean {
+    override suspend fun save(value: String?): Boolean {
         Timber.i("Sync-Settings: save($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
@@ -67,14 +67,14 @@ class EmailSync @Inject constructor(
         }
     }
 
-    override fun deduplicate(value: String?): Boolean {
+    override suspend fun deduplicate(value: String?): Boolean {
         Timber.i("Sync-Settings: mergeRemote($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
             val duckUsername = duckAddressSetting.username
             val personalAccessToken = duckAddressSetting.personal_access_token
-            if (!emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()) {
-                if (duckUsername != emailDataStore.emailUsername) {
+            if (!emailDataStore.getEmailToken().isNullOrBlank() && !emailDataStore.getEmailUsername().isNullOrBlank()) {
+                if (duckUsername != emailDataStore.getEmailUsername()) {
                     storeNewCredentials(duckUsername, personalAccessToken)
                     pixel.fire(AppPixelName.DUCK_EMAIL_OVERRIDE_PIXEL)
                     return true
@@ -87,10 +87,10 @@ class EmailSync @Inject constructor(
         return false
     }
 
-    private fun storeNewCredentials(username: String, token: String) {
+    private suspend fun storeNewCredentials(username: String, token: String) {
         Timber.i("Sync-Settings: storeNewCredentials($username, $token)")
-        emailDataStore.emailToken = token
-        emailDataStore.emailUsername = username
+        emailDataStore.setEmailToken(token)
+        emailDataStore.setEmailUsername(username)
         listener.invoke()
     }
 
