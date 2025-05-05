@@ -103,6 +103,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
+import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -176,6 +178,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var syncUrlIdentifier: SyncUrlIdentifier
 
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
@@ -521,6 +526,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
             logcat(VERBOSE) { "Verification link was consumed, so don't allow it to open in a new tab" }
             return
+        }
+
+        intent.intentText?.let {
+            if (syncUrlIdentifier.shouldDelegateToSyncSetup(it)) {
+                globalActivityStarter.start(this, SyncActivityFromSetupUrl(it))
+                Timber.v("Sync setup link was consumed, so don't allow it to open in a new tab")
+                return
+            }
         }
 
         // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true

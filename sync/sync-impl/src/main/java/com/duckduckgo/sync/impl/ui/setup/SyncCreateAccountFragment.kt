@@ -58,8 +58,8 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
         ViewModelProvider(this, viewModelFactory)[SyncCreateAccountViewModel::class.java]
     }
 
-    private val listener: SetupFlowListener?
-        get() = activity as? SetupFlowListener
+    private val listener: SyncSetupNavigationFlowListener?
+        get() = activity as? SyncSetupNavigationFlowListener
 
     override fun onViewCreated(
         view: View,
