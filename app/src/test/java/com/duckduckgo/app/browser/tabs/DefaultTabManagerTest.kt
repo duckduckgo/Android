@@ -203,7 +203,7 @@ class DefaultTabManagerTest {
         val tabId = "tabId"
 
         val flow = flow {
-            while(true) {
+            while (true) {
                 emit(emptyList<TabEntity>())
                 delay(300)
             }
