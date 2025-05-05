@@ -42,6 +42,8 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_USER_SWITCHED_ACCOUNT.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_SETUP_DEEP_LINK_TIMEOUT.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

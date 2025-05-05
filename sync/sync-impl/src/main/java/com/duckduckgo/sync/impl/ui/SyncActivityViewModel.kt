@@ -53,7 +53,9 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import java.io.File
+import java.net.URLDecoder
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -68,6 +70,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -173,6 +176,8 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         object SyncWithAnotherDevice : Command()
         object AddAnotherDevice : Command()
+        data class DeepLinkIntoSetup(val barcodeSyncUrl: String) : Command()
+        data class AskSetupSyncDeepLink(val barcodeSyncUrl: String, val deviceName: String?) : Command()
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
         object ShowRecoveryCode : Command()
@@ -430,6 +435,31 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
+
+    fun processSetupDeepLink(setupUrl: String) {
+        Timber.i("Sync-setup: got setup deep link $setupUrl")
+        viewModelScope.launch(dispatchers.io()) {
+            // parse here to test validity before asking user to use it
+            val parsed = SyncBarcodeUrl.parseUrl(setupUrl)
+
+            if (parsed == null) {
+                Timber.w("Sync-setup: failed to parse setup URL $setupUrl")
+            } else {
+                val deviceName = parsed.urlEncodedDeviceName?.let {
+                    URLDecoder.decode(it, "UTF-8")
+                }
+                command.send(Command.AskSetupSyncDeepLink(barcodeSyncUrl = setupUrl, deviceName = deviceName))
+            }
+        }
+    }
+
+    fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            requiresSetupAuthentication {
+                command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl))
+            }
+        }
+    }
 
     companion object {
         private const val SOURCE_SYNC_DISABLED = "not_activated"

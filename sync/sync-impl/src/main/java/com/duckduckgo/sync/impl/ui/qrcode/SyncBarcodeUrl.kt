@@ -16,12 +16,15 @@
 
 package com.duckduckgo.sync.impl.ui.qrcode
 
+import android.os.Parcelable
 import androidx.core.net.toUri
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class SyncBarcodeUrl(
     val webSafeB64EncodedCode: String,
     val urlEncodedDeviceName: String? = null,
-) {
+) : Parcelable {
 
     fun asUrl(): String {
         val sb = StringBuilder(URL_BASE)
