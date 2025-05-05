@@ -497,7 +497,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (viewState.leadingIconState == PRIVACY_SHIELD) {
-            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isNavigationBarEnabled)
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isVisualDesignExperimentEnabled)
         } else {
             lastSeenPrivacyShield = null
         }
@@ -566,7 +566,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                if (shouldShowUpdatedPrivacyShield(viewState.isNavigationBarEnabled)) {
+                if (shouldShowUpdatedPrivacyShield(viewState.isVisualDesignExperimentEnabled)) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()
                 } else {

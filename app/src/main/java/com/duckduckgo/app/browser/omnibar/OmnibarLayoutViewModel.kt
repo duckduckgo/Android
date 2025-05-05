@@ -95,13 +95,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentDataStore.experimentState,
-    ) { state, tabs, highlightOverflowMenu, navigationBarState ->
+    ) { state, tabs, highlightOverflowMenu, visualDesignExperiment ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isNavigationBarEnabled = navigationBarState.isEnabled,
+            isVisualDesignExperimentEnabled = visualDesignExperiment.isEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -134,7 +134,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val isNavigationBarEnabled: Boolean = false,
+        val isVisualDesignExperimentEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
     ) {
@@ -595,8 +595,8 @@ class OmnibarLayoutViewModel @Inject constructor(
 
             is LaunchTrackersAnimation -> {
                 if (!decoration.entities.isNullOrEmpty()) {
-                    val hasFocus = viewState.value.hasFocus
-                    val visualDesignExperiment = viewState.value.isNavigationBarEnabled
+                    val hasFocus = _viewState.value.hasFocus
+                    val visualDesignExperiment = viewState.value.isVisualDesignExperimentEnabled
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(

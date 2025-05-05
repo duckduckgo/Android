@@ -870,7 +870,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
         }
     }
 
