@@ -22,12 +22,12 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.IOException
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -40,7 +40,7 @@ class EmailEncryptedSharedPreferences(
     private val pixel: Pixel,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val createPreferencesAsyncProvider: Provider<Boolean>,
 ) : EmailDataStore {
 
     private val mutex: Mutex = Mutex()
@@ -51,10 +51,11 @@ class EmailEncryptedSharedPreferences(
     }
 
     private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+    private val createPreferencesAsync by lazy { createPreferencesAsyncProvider.get() }
 
     private suspend fun getEncryptedPreferences(): SharedPreferences? {
         return withContext(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.createAsyncEmailPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+            if (createPreferencesAsync) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
         }
     }
 

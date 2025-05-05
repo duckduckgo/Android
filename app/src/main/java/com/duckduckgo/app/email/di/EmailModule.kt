@@ -25,10 +25,18 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 
 @Module
 class EmailModule {
+
+    @Named("asyncEmailPreferencesToggle")
+    @Provides
+    fun provideIsAsyncEmailPreferencesToggleEnabled(
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    ): Boolean = androidBrowserConfigFeature.createAsyncEmailPreferences().isEnabled()
 
     @Provides
     fun providesEmailDataStore(
@@ -36,8 +44,8 @@ class EmailModule {
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        @Named("asyncEmailPreferencesToggle") isAsyncEmailPreferencesToggleEnabledProvider: Provider<Boolean>,
     ): EmailDataStore {
-        return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope, dispatcherProvider, androidBrowserConfigFeature)
+        return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope, dispatcherProvider, isAsyncEmailPreferencesToggleEnabledProvider)
     }
 }
