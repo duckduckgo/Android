@@ -268,7 +268,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    override fun onSyncDisabled() {
+    override suspend fun onSyncDisabled() {
         syncStateRepository.clearAll()
         persisterPlugins.getPlugins().map {
             it.onSyncDisabled()

@@ -18,68 +18,125 @@ package com.duckduckgo.sync.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 interface SyncUnavailableStore {
-    var isSyncUnavailable: Boolean
-    var syncUnavailableSince: String
-    var syncErrorCount: Int
-    var userNotifiedAt: String
-    fun clearError()
-    fun clearAll()
+    suspend fun isSyncUnavailable(): Boolean
+    suspend fun setSyncUnavailable(value: Boolean)
+    suspend fun getSyncUnavailableSince(): String
+    suspend fun setSyncUnavailableSince(value: String)
+    suspend fun getSyncErrorCount(): Int
+    suspend fun setSyncErrorCount(value: Int)
+    suspend fun getUserNotifiedAt(): String
+    suspend fun setUserNotifiedAt(value: String)
+    suspend fun clearError()
+    suspend fun clearAll()
 }
 
 class SyncUnavailableSharedPrefsStore
 constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val createAsyncPreferences: Boolean,
 ) : SyncUnavailableStore {
 
-    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
-
     @Synchronized
-    private fun encryptedPreferences(): SharedPreferences {
+    private fun encryptedPreferencesSync(): SharedPreferences {
         return sharedPrefsProv.getSharedPrefs(FILENAME)
     }
 
-    override var isSyncUnavailable: Boolean
-        get() = encryptedPreferences?.getBoolean(KEY_SYNC_UNAVAILABLE, false) ?: false
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    private suspend fun encryptedPreferencesAsync(): SharedPreferences {
+        return mutex.withLock {
+            sharedPrefsProv.getSharedPrefs(FILENAME)
+        }
+    }
+
+    private val mutex: Mutex = Mutex()
+    private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        appCoroutineScope.async(dispatcherProvider.io()) {
+            encryptedPreferencesAsync()
+        }
+    }
+
+    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+
+    private suspend fun getEncryptedPreferences(): SharedPreferences? {
+        return withContext(dispatcherProvider.io()) {
+            if (createAsyncPreferences) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        }
+    }
+
+    override suspend fun isSyncUnavailable(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getBoolean(KEY_SYNC_UNAVAILABLE, false) ?: false
+        }
+    }
+
+    override suspend fun setSyncUnavailable(value: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 putBoolean(KEY_SYNC_UNAVAILABLE, value)
             }
         }
+    }
 
-    override var syncUnavailableSince: String
-        get() = encryptedPreferences?.getString(KEY_SYNC_UNAVAILABLE_SINCE, "") ?: ""
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getSyncUnavailableSince(): String {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_SYNC_UNAVAILABLE_SINCE, "") ?: ""
+        }
+    }
+
+    override suspend fun setSyncUnavailableSince(value: String) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 putString(KEY_SYNC_UNAVAILABLE_SINCE, value)
             }
         }
+    }
 
-    override var syncErrorCount: Int
-        get() = encryptedPreferences?.getInt(KEY_SYNC_ERROR_COUNT, 0) ?: 0
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getSyncErrorCount(): Int {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getInt(KEY_SYNC_ERROR_COUNT, 0) ?: 0
+        }
+    }
+
+    override suspend fun setSyncErrorCount(value: Int) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 putInt(KEY_SYNC_ERROR_COUNT, value)
             }
         }
+    }
 
-    override var userNotifiedAt: String
-        get() = encryptedPreferences?.getString(KEY_SYNC_LAST_NOTIFICATION_AT, "") ?: ""
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getUserNotifiedAt(): String {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_SYNC_LAST_NOTIFICATION_AT, "") ?: ""
+        }
+    }
+
+    override suspend fun setUserNotifiedAt(value: String) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 putString(KEY_SYNC_LAST_NOTIFICATION_AT, value)
             }
         }
-
-    override fun clearError() {
-        isSyncUnavailable = false
-        syncErrorCount = 0
-        syncUnavailableSince = ""
     }
 
-    override fun clearAll() {
-        encryptedPreferences?.edit(commit = true) { clear() }
+    override suspend fun clearError() {
+        setSyncUnavailable(false)
+        setSyncErrorCount(0)
+        setSyncUnavailableSince("")
+    }
+
+    override suspend fun clearAll() {
+        getEncryptedPreferences()?.edit(commit = true) { clear() }
     }
 
     companion object {

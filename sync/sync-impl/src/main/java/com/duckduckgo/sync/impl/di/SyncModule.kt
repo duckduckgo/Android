@@ -156,8 +156,16 @@ object SyncStoreModule {
     @SingleInstanceIn(AppScope::class)
     fun provideSyncPausedStore(
         sharedPrefsProvider: SharedPrefsProvider,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        syncFeature: SyncFeature,
     ): SyncUnavailableStore {
-        return SyncUnavailableSharedPrefsStore(sharedPrefsProvider)
+        return SyncUnavailableSharedPrefsStore(
+            sharedPrefsProvider,
+            coroutineScope,
+            dispatcherProvider,
+            syncFeature.createAsyncPreferences().isEnabled(),
+        )
     }
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(

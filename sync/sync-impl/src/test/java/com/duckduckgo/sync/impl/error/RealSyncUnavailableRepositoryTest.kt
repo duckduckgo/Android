@@ -39,6 +39,7 @@ import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -60,6 +61,9 @@ class RealSyncUnavailableRepositoryTest {
     private val syncNotificationBuilder = FakeNotificationBuilder()
     private val syncUnavailableStore = SyncUnavailableSharedPrefsStore(
         sharedPrefsProv = TestSharedPrefsProvider(context),
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+        createAsyncPreferences = true,
     )
     private lateinit var workManager: WorkManager
     private lateinit var testee: RealSyncUnavailableRepository
@@ -74,6 +78,7 @@ class RealSyncUnavailableRepositoryTest {
             notificationManager,
             syncNotificationBuilder,
             workManager,
+            coroutineRule.testScope,
         )
     }
 
@@ -83,71 +88,71 @@ class RealSyncUnavailableRepositoryTest {
     }
 
     @Test
-    fun whenServerBecomesAvailableThenSyncAvailable() {
-        syncUnavailableStore.isSyncUnavailable = true
+    fun whenServerBecomesAvailableThenSyncAvailable() = runTest {
+        syncUnavailableStore.setSyncUnavailable(true)
         testee.onServerAvailable()
-        assertFalse(syncUnavailableStore.isSyncUnavailable)
-        assertEquals("", syncUnavailableStore.syncUnavailableSince)
+        assertFalse(syncUnavailableStore.isSyncUnavailable())
+        assertEquals("", syncUnavailableStore.getSyncUnavailableSince())
     }
 
     @Test
-    fun whenServerUnavailableThenSyncUnavailable() {
+    fun whenServerUnavailableThenSyncUnavailable() = runTest {
         testee.onServerUnavailable()
-        assertTrue(syncUnavailableStore.isSyncUnavailable)
+        assertTrue(syncUnavailableStore.isSyncUnavailable())
     }
 
     @Test
-    fun whenServerUnavailableThenUpdateTimestampOnce() {
+    fun whenServerUnavailableThenUpdateTimestampOnce() = runTest {
         testee.onServerUnavailable()
-        val unavailableSince = syncUnavailableStore.syncUnavailableSince
+        val unavailableSince = syncUnavailableStore.getSyncUnavailableSince()
         assertTrue(unavailableSince.isNotEmpty())
         testee.onServerUnavailable()
-        assertEquals(unavailableSince, syncUnavailableStore.syncUnavailableSince)
+        assertEquals(unavailableSince, syncUnavailableStore.getSyncUnavailableSince())
     }
 
     @Test
-    fun whenServerUnavailableThenUpdateCounter() {
+    fun whenServerUnavailableThenUpdateCounter() = runTest {
         testee.onServerUnavailable()
-        assertTrue(syncUnavailableStore.isSyncUnavailable)
-        assertEquals(1, syncUnavailableStore.syncErrorCount)
+        assertTrue(syncUnavailableStore.isSyncUnavailable())
+        assertEquals(1, syncUnavailableStore.getSyncErrorCount())
         testee.onServerUnavailable()
         testee.onServerUnavailable()
         testee.onServerUnavailable()
-        assertEquals(4, syncUnavailableStore.syncErrorCount)
+        assertEquals(4, syncUnavailableStore.getSyncErrorCount())
     }
 
     @Test
-    fun whenServerUnavailableThenScheduleNotification() {
+    fun whenServerUnavailableThenScheduleNotification() = runTest {
         testee.onServerUnavailable()
-        assertTrue(syncUnavailableStore.isSyncUnavailable)
+        assertTrue(syncUnavailableStore.isSyncUnavailable())
         val syncErrorNotification = workManager.getWorkInfosByTag(SYNC_ERROR_NOTIFICATION_TAG).get()
         assertEquals(1, syncErrorNotification.size)
     }
 
     @Test
-    fun whenErrorCounterReachesThresholdThenTriggerNotification() {
-        syncUnavailableStore.syncErrorCount = RealSyncUnavailableRepository.ERROR_THRESHOLD_NOTIFICATION_COUNT
+    fun whenErrorCounterReachesThresholdThenTriggerNotification() = runTest {
+        syncUnavailableStore.setSyncErrorCount(RealSyncUnavailableRepository.ERROR_THRESHOLD_NOTIFICATION_COUNT)
         testee.onServerUnavailable()
         notificationManager.activeNotifications
             .find { it.id == SYNC_ERROR_NOTIFICATION_ID } ?: fail("Notification not found")
     }
 
     @Test
-    fun whenUserNotifiedTodayThenDoNotTriggerNotification() {
-        syncUnavailableStore.userNotifiedAt = OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    fun whenUserNotifiedTodayThenDoNotTriggerNotification() = runTest {
+        syncUnavailableStore.setUserNotifiedAt(OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         testee.triggerNotification()
         assertNull(notificationManager.activeNotifications.find { it.id == SYNC_ERROR_NOTIFICATION_ID })
     }
 
     @Test
-    fun whenUserNotifiedYesterdayThenTriggerNotificationAndUpdateNotificationTimestamp() {
-        syncUnavailableStore.userNotifiedAt = OffsetDateTime.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    fun whenUserNotifiedYesterdayThenTriggerNotificationAndUpdateNotificationTimestamp() = runTest {
+        syncUnavailableStore.setUserNotifiedAt(OffsetDateTime.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         testee.triggerNotification()
         notificationManager.activeNotifications
             .find { it.id == SYNC_ERROR_NOTIFICATION_ID } ?: fail("Notification not found")
 
         val today = LocalDateTime.now().toLocalDate()
-        val lastNotification = LocalDateTime.parse(syncUnavailableStore.userNotifiedAt, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate()
+        val lastNotification = LocalDateTime.parse(syncUnavailableStore.getUserNotifiedAt(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate()
         assertEquals(today, lastNotification)
     }
 
@@ -162,8 +167,8 @@ class RealSyncUnavailableRepositoryTest {
     }
 
     @Test
-    fun whenServerAvailableThenClearNotification() {
-        syncUnavailableStore.syncErrorCount = RealSyncUnavailableRepository.ERROR_THRESHOLD_NOTIFICATION_COUNT
+    fun whenServerAvailableThenClearNotification() = runTest {
+        syncUnavailableStore.setSyncErrorCount(RealSyncUnavailableRepository.ERROR_THRESHOLD_NOTIFICATION_COUNT)
         testee.onServerUnavailable()
         notificationManager.activeNotifications
             .find { it.id == SYNC_ERROR_NOTIFICATION_ID } ?: fail("Notification not found")

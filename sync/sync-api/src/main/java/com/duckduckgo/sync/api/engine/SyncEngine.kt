@@ -28,7 +28,7 @@ interface SyncEngine {
      * Sync Feature has been disabled / device has been removed
      * This is an opportunity for Features to do some local cleanup if needed
      */
-    fun onSyncDisabled()
+    suspend fun onSyncDisabled()
 
     /**
      * Represent each possible trigger fo
