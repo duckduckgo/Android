@@ -468,9 +468,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     ): Int {
         val trackers = logos.size
         return when {
-            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
-            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
-            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
+            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
+            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
+            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
             else -> TODO()
         }
     }
