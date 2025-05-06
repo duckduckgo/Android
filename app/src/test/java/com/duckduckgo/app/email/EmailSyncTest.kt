@@ -7,6 +7,7 @@ import com.duckduckgo.app.statistics.pixels.*
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -21,9 +22,9 @@ class EmailSyncTest {
     private val testee = EmailSync(emailDataStoreMock, syncSettingsListenerMock, pixelMock)
 
     @Test
-    fun whenUserSignedInThenReturnAccountInfo() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
-        whenever(emailDataStoreMock.emailToken).thenReturn("token")
+    fun whenUserSignedInThenReturnAccountInfo() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn("username")
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn("token")
 
         val value = testee.getValue()
 
@@ -34,9 +35,9 @@ class EmailSyncTest {
     }
 
     @Test
-    fun whenUserSignedOutThenReturnNull() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn(null)
-        whenever(emailDataStoreMock.emailToken).thenReturn(null)
+    fun whenUserSignedOutThenReturnNull() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn(null)
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn(null)
 
         val value = testee.getValue()
 
@@ -44,47 +45,47 @@ class EmailSyncTest {
     }
 
     @Test
-    fun whenSaveValueThenStoreCredentials() {
+    fun whenSaveValueThenStoreCredentials() = runTest {
         testee.save("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailDataStoreMock).emailUsername = "email"
-        verify(emailDataStoreMock).emailToken = "token"
+        verify(emailDataStoreMock).setEmailUsername("email")
+        verify(emailDataStoreMock).setEmailToken("token")
     }
 
     @Test
-    fun whenSaveNullThenLogoutUser() {
+    fun whenSaveNullThenLogoutUser() = runTest {
         testee.save(null)
 
-        verify(emailDataStoreMock).emailUsername = ""
-        verify(emailDataStoreMock).emailToken = ""
+        verify(emailDataStoreMock).setEmailUsername("")
+        verify(emailDataStoreMock).setEmailToken("")
     }
 
     @Test
-    fun whenDeduplicateRemoteAddressWithSameLocalAddressThenDoNothing() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
-        whenever(emailDataStoreMock.emailToken).thenReturn("token")
+    fun whenDeduplicateRemoteAddressWithSameLocalAddressThenDoNothing() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn("username")
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn("token")
 
         testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailDataStoreMock).emailUsername = "email"
-        verify(emailDataStoreMock).emailToken = "token"
+        verify(emailDataStoreMock).setEmailUsername("email")
+        verify(emailDataStoreMock).setEmailToken("token")
     }
 
     @Test
-    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenRemoteWins() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn("username2")
-        whenever(emailDataStoreMock.emailToken).thenReturn("token2")
+    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenRemoteWins() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn("username2")
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn("token2")
 
         testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailDataStoreMock).emailUsername = "email"
-        verify(emailDataStoreMock).emailToken = "token"
+        verify(emailDataStoreMock).setEmailUsername("email")
+        verify(emailDataStoreMock).setEmailToken("token")
     }
 
     @Test
-    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenPixelEvent() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn("username2")
-        whenever(emailDataStoreMock.emailToken).thenReturn("token2")
+    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenPixelEvent() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn("username2")
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn("token2")
 
         testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
@@ -92,25 +93,25 @@ class EmailSyncTest {
     }
 
     @Test
-    fun whenDeduplicateRemoteAddressWithNoLocalAccountThenStoreRemote() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn(null)
-        whenever(emailDataStoreMock.emailToken).thenReturn(null)
+    fun whenDeduplicateRemoteAddressWithNoLocalAccountThenStoreRemote() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn(null)
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn(null)
 
         testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailDataStoreMock).emailUsername = "email"
-        verify(emailDataStoreMock).emailToken = "token"
+        verify(emailDataStoreMock).setEmailUsername("email")
+        verify(emailDataStoreMock).setEmailToken("token")
     }
 
     @Test
-    fun whenDeduplicateNullAddresThenDoNothing() {
-        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
-        whenever(emailDataStoreMock.emailToken).thenReturn("token")
+    fun whenDeduplicateNullAddresThenDoNothing() = runTest {
+        whenever(emailDataStoreMock.getEmailUsername()).thenReturn("username")
+        whenever(emailDataStoreMock.getEmailToken()).thenReturn("token")
 
         testee.deduplicate(null)
 
-        verify(emailDataStoreMock, times(0)).emailToken
-        verify(emailDataStoreMock, times(0)).emailUsername
+        verify(emailDataStoreMock, times(0)).getEmailToken()
+        verify(emailDataStoreMock, times(0)).getEmailUsername()
     }
 
     companion object {

@@ -31,7 +31,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class CredentialsSyncDataProvider @Inject constructor(
@@ -42,16 +42,16 @@ class CredentialsSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = CREDENTIALS
 
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
-        return runBlocking(dispatchers.io()) {
+        return withContext(dispatchers.io()) {
             if (credentialsSyncStore.serverModifiedSince == "0") {
                 credentialsSync.initMetadata()
             }
             val since = credentialsSyncStore.clientModifiedSince
             val updates = credentialsSync.getUpdatesSince(since)
             val request = formatUpdates(updates)
-            return@runBlocking request
+            return@withContext request
         }
     }
 

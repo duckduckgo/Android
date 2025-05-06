@@ -153,6 +153,6 @@ class RemoteDuckAddressStatusRepositoryTest {
         whenever(service.getActivationStatus(any(), any())).thenAnswer { throw IOException() }
     }
 
-    private fun configureEmailProtectionNotSignedIn() = whenever(emailManager.getToken()).thenReturn(null)
-    private fun configureEmailProtectionSignedIn() = whenever(emailManager.getToken()).thenReturn("abc123")
+    private suspend fun configureEmailProtectionNotSignedIn() = whenever(emailManager.getToken()).thenReturn(null)
+    private suspend fun configureEmailProtectionSignedIn() = whenever(emailManager.getToken()).thenReturn("abc123")
 }

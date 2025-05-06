@@ -1577,7 +1577,9 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshSearchRetentionAtb()
+            viewModelScope.launch {
+                statisticsUpdater.refreshSearchRetentionAtb()
+            }
         }
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
@@ -3122,22 +3124,26 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun showEmailProtectionChooseEmailPrompt() {
-        emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
+        viewModelScope.launch {
+            emailManager.getEmailAddress()?.let {
+                command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
+            }
         }
     }
 
     fun consumeAliasAndCopyToClipboard() {
-        emailManager.getAlias()?.let {
-            command.value = CopyAliasToClipboard(it)
-            pixel.enqueueFire(
-                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
-                mapOf(
-                    PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
-                ),
-            )
-            emailManager.setNewLastUsedDate()
+        viewModelScope.launch {
+            emailManager.getAlias()?.let {
+                command.value = CopyAliasToClipboard(it)
+                pixel.enqueueFire(
+                    AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
+                    mapOf(
+                        PixelParameter.COHORT to emailManager.getCohort(),
+                        PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
+                    ),
+                )
+                emailManager.setNewLastUsedDate()
+            }
         }
     }
 

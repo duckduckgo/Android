@@ -26,7 +26,7 @@ interface UserBrowserProperties {
     fun daysSinceInstalled(): Long
     suspend fun daysUsedSince(since: Date): Long
     fun defaultBrowser(): Boolean
-    fun emailEnabled(): Boolean
+    suspend fun emailEnabled(): Boolean
     fun searchCount(): Long
     fun widgetAdded(): Boolean
 }

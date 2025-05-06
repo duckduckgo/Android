@@ -1307,7 +1307,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckDuckGoUrlContainingQueryLoadedThenAtbRefreshed() {
+    fun whenDuckDuckGoUrlContainingQueryLoadedThenAtbRefreshed() = runTest {
         loadUrl("http://duckduckgo.com?q=test")
         verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
@@ -3489,7 +3489,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasAndCopyToClipboardThenCopyAliasToClipboardCommandSent() {
+    fun whenConsumeAliasAndCopyToClipboardThenCopyAliasToClipboardCommandSent() = runTest {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
         testee.consumeAliasAndCopyToClipboard()
@@ -3498,7 +3498,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasAndCopyToClipboardThenSetNewLastUsedDateCalled() {
+    fun whenConsumeAliasAndCopyToClipboardThenSetNewLastUsedDateCalled() = runTest {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
         testee.consumeAliasAndCopyToClipboard()
@@ -3507,7 +3507,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasAndCopyToClipboardThenPixelSent() {
+    fun whenConsumeAliasAndCopyToClipboardThenPixelSent() = runTest {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
@@ -3550,7 +3550,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasThenInjectAddressCommandSent() {
+    fun whenConsumeAliasThenInjectAddressCommandSent() = runTest {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
         testee.usePrivateDuckAddress("", "alias")
@@ -3561,7 +3561,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUseAddressThenInjectAddressCommandSent() {
+    fun whenUseAddressThenInjectAddressCommandSent() = runTest {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
         testee.usePersonalDuckAddress("", "address")
@@ -3572,7 +3572,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
+    fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() = runTest {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
         testee.showEmailProtectionChooseEmailPrompt()
@@ -3583,7 +3583,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
+    fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() = runTest {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
 
         testee.showEmailProtectionChooseEmailPrompt()

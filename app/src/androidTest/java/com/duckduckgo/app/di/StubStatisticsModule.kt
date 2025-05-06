@@ -58,13 +58,13 @@ class StubStatisticsModule {
     fun stubStatisticsUpdater(): StatisticsUpdater {
         return object : StatisticsUpdater {
 
-            override fun initializeAtb() {
+            override suspend fun initializeAtb() {
             }
 
-            override fun refreshAppRetentionAtb() {
+            override suspend fun refreshAppRetentionAtb() {
             }
 
-            override fun refreshSearchRetentionAtb() {
+            override suspend fun refreshSearchRetentionAtb() {
             }
         }
     }

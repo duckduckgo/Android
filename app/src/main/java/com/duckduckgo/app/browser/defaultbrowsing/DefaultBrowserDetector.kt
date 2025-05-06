@@ -67,7 +67,7 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return resolutionInfo?.activityInfo?.packageName
     }
 
-    override fun featureStateParams(): Map<String, String> {
+    override suspend fun featureStateParams(): Map<String, String> {
         return mapOf(PixelParameter.DEFAULT_BROWSER to isDefaultBrowser().toBinaryString())
     }
 

@@ -38,6 +38,7 @@ import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -56,7 +57,7 @@ class AppEmailManager @Inject constructor(
     private val isSignedInStateFlow = MutableStateFlow(false)
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
 
-    override fun getAlias(): String? = consumeAlias()
+    override suspend fun getAlias(): String? = consumeAlias()
 
     init {
         // first call to isSignedIn() can be expensive and cause ANRs if done on main thread, so we do it on a background thread
@@ -68,19 +69,19 @@ class AppEmailManager @Inject constructor(
         }
     }
 
-    override fun isSignedIn(): Boolean {
-        return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
+    override suspend fun isSignedIn(): Boolean {
+        return !emailDataStore.getEmailToken().isNullOrBlank() && !emailDataStore.getEmailUsername().isNullOrBlank()
     }
 
-    override fun storeCredentials(
+    override suspend fun storeCredentials(
         token: String,
         username: String,
         cohort: String,
     ) {
-        emailDataStore.cohort = cohort
-        emailDataStore.emailToken = token
-        emailDataStore.emailUsername = username
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        withContext(dispatcherProvider.io()) {
+            emailDataStore.setCohort(cohort)
+            emailDataStore.setEmailToken(token)
+            emailDataStore.setEmailUsername(username)
             isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
             pixel.fire(EMAIL_ENABLED)
@@ -88,8 +89,8 @@ class AppEmailManager @Inject constructor(
         }
     }
 
-    override fun signOut() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+    override suspend fun signOut() {
+        withContext(dispatcherProvider.io()) {
             emailDataStore.clearEmailData()
             isSignedInStateFlow.emit(false)
             pixel.fire(EMAIL_DISABLED)
@@ -97,38 +98,38 @@ class AppEmailManager @Inject constructor(
         }
     }
 
-    override fun getEmailAddress(): String? {
-        return emailDataStore.emailUsername?.let {
+    override suspend fun getEmailAddress(): String? {
+        return emailDataStore.getEmailUsername()?.let {
             "$it$DUCK_EMAIL_DOMAIN"
         }
     }
 
-    override fun getUserData(): String {
+    override suspend fun getUserData(): String {
         return JSONObject().apply {
-            put(TOKEN, emailDataStore.emailToken)
-            put(USERNAME, emailDataStore.emailUsername)
-            put(NEXT_ALIAS, emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
+            put(TOKEN, emailDataStore.getEmailToken())
+            put(USERNAME, emailDataStore.getEmailUsername())
+            put(NEXT_ALIAS, emailDataStore.getNextAlias()?.replace(DUCK_EMAIL_DOMAIN, ""))
         }.toString()
     }
 
-    override fun getCohort(): String {
-        val cohort = emailDataStore.cohort
+    override suspend fun getCohort(): String {
+        val cohort = emailDataStore.getCohort()
         return if (cohort.isNullOrBlank()) UNKNOWN_COHORT else cohort
     }
 
-    override fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
+    override suspend fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
 
-    override fun getLastUsedDate(): String = emailDataStore.lastUsedDate.orEmpty()
+    override suspend fun getLastUsedDate(): String = emailDataStore.getLastUsedDate().orEmpty()
 
-    override fun setNewLastUsedDate() {
+    override suspend fun setNewLastUsedDate() {
         val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("US/Eastern")
         }
         val date = formatter.format(Date())
-        emailDataStore.lastUsedDate = date
+        emailDataStore.setLastUsedDate(date)
     }
 
-    override fun getToken(): String? = emailDataStore.emailToken
+    override suspend fun getToken(): String? = emailDataStore.getEmailToken()
 
     private fun refreshEmailState() {
         Timber.i("Sync-Settings: refreshEmailState()")
@@ -142,8 +143,8 @@ class AppEmailManager @Inject constructor(
         }
     }
 
-    private fun consumeAlias(): String? {
-        val alias = emailDataStore.nextAlias
+    private suspend fun consumeAlias(): String? {
+        val alias = emailDataStore.getNextAlias()
         emailDataStore.clearNextAlias()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             generateNewAlias()
@@ -156,15 +157,17 @@ class AppEmailManager @Inject constructor(
     }
 
     private suspend fun fetchAliasFromService() {
-        emailDataStore.emailToken?.let { token ->
+        emailDataStore.getEmailToken()?.let { token ->
             runCatching {
                 emailService.newAlias("Bearer $token")
             }.onSuccess { alias ->
-                emailDataStore.nextAlias = if (alias.address.isBlank()) {
-                    null
-                } else {
-                    "${alias.address}$DUCK_EMAIL_DOMAIN"
-                }
+                emailDataStore.setNextAlias(
+                    if (alias.address.isBlank()) {
+                        null
+                    } else {
+                        "${alias.address}$DUCK_EMAIL_DOMAIN"
+                    },
+                )
             }.onFailure {
                 Timber.w(it, "Failed to fetch alias")
             }
@@ -179,17 +182,17 @@ class AppEmailManager @Inject constructor(
         const val NEXT_ALIAS = "nextAlias"
     }
 
-    private fun EmailDataStore.clearEmailData() {
-        emailToken = null
-        emailUsername = null
-        nextAlias = null
+    private suspend fun EmailDataStore.clearEmailData() {
+        setEmailToken(null)
+        setEmailUsername(null)
+        setNextAlias(null)
     }
 
-    private fun EmailDataStore.clearNextAlias() {
-        nextAlias = null
+    private suspend fun EmailDataStore.clearNextAlias() {
+        setNextAlias(null)
     }
 
-    override fun featureStateParams(): Map<String, String> {
+    override suspend fun featureStateParams(): Map<String, String> {
         return mapOf(PixelParameter.EMAIL to isSignedIn().toBinaryString())
     }
 }

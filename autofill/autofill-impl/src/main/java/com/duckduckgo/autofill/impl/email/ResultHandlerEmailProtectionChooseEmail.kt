@@ -80,7 +80,11 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
                 onSelectedToUsePrivateAlias(originalUrl, autofillCallback)
                 notifyAutofillListenersDuckAddressFilled()
             }
-            DoNotUseEmailProtection -> onSelectedNotToUseEmailProtection()
+            DoNotUseEmailProtection -> {
+                appCoroutineScope.launch(dispatchers.io()) {
+                    onSelectedNotToUseEmailProtection()
+                }
+            }
         }
     }
 
@@ -114,11 +118,11 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
         }
     }
 
-    private fun onSelectedNotToUseEmailProtection() {
+    private suspend fun onSelectedNotToUseEmailProtection() {
         enqueueEmailProtectionPixel(EMAIL_TOOLTIP_DISMISSED, includeLastUsedDay = false)
     }
 
-    private fun enqueueEmailProtectionPixel(
+    private suspend fun enqueueEmailProtectionPixel(
         pixelName: PixelName,
         includeLastUsedDay: Boolean,
     ) {

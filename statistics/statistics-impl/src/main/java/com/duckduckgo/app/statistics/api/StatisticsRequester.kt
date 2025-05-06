@@ -29,13 +29,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface StatisticsUpdater {
-    fun initializeAtb()
-    fun refreshSearchRetentionAtb()
-    fun refreshAppRetentionAtb()
+    suspend fun initializeAtb()
+    suspend fun refreshSearchRetentionAtb()
+    suspend fun refreshAppRetentionAtb()
 }
 
 @ContributesBinding(AppScope::class)
@@ -54,7 +54,7 @@ class StatisticsRequester @Inject constructor(
      * consume referer data
      */
     @SuppressLint("CheckResult")
-    override fun initializeAtb() {
+    override suspend fun initializeAtb() {
         Timber.i("Initializing ATB")
 
         if (store.hasInstallationStatistics) {
@@ -101,15 +101,15 @@ class StatisticsRequester @Inject constructor(
         storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
 
     @SuppressLint("CheckResult")
-    override fun refreshSearchRetentionAtb() {
-        val atb = store.atb
+    override suspend fun refreshSearchRetentionAtb() {
+        withContext(dispatchers.io()) {
+            val atb = store.atb
 
-        if (atb == null) {
-            initializeAtb()
-            return
-        }
+            if (atb == null) {
+                initializeAtb()
+                return@withContext
+            }
 
-        appCoroutineScope.launch(dispatchers.io()) {
             val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
             val oldSearchAtb = store.searchRetentionAtb ?: atb.version
 
@@ -133,7 +133,7 @@ class StatisticsRequester @Inject constructor(
     }
 
     @SuppressLint("CheckResult")
-    override fun refreshAppRetentionAtb() {
+    override suspend fun refreshAppRetentionAtb() {
         val atb = store.atb
 
         if (atb == null) {
@@ -162,7 +162,7 @@ class StatisticsRequester @Inject constructor(
             )
     }
 
-    private fun emailSignInState(): Int =
+    private suspend fun emailSignInState(): Int =
         kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {

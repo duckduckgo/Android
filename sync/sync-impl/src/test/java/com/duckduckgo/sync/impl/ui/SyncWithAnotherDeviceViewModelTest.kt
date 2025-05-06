@@ -386,7 +386,7 @@ class SyncWithAnotherDeviceViewModelTest {
         }
     }
 
-    private fun configureExchangeKeysSupported(): Pair<Bitmap, String> {
+    private suspend fun configureExchangeKeysSupported(): Pair<Bitmap, String> {
         syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
         whenever(syncRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Success(true))
         whenever(syncRepository.getCodeType(any())).thenReturn(EXCHANGE)

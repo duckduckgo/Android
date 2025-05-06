@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -61,6 +62,7 @@ class EmailJavascriptInterfaceTest {
             coroutineRule.testDispatcherProvider,
             autofillFeature,
             mockAutofill,
+            coroutineRule.testScope,
         ) { counter++ }
 
         autofillFeature.self().setRawStoredState(Toggle.State(enable = true))
@@ -68,8 +70,9 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenIsSignedInAndUrlIsDuckDuckGoEmailThenIsSignedInCalled() {
+    fun whenIsSignedInAndUrlIsDuckDuckGoEmailThenIsSignedInCalled() = runTest {
         whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
 
         testee.isSignedIn()
 
@@ -77,7 +80,7 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenIsSignedInAndUrlIsNotDuckDuckGoEmailThenIsSignedInNotCalled() {
+    fun whenIsSignedInAndUrlIsNotDuckDuckGoEmailThenIsSignedInNotCalled() = runTest {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
 
         testee.isSignedIn()
@@ -86,7 +89,7 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenStoreCredentialsAndUrlIsDuckDuckGoEmailThenStoreCredentialsCalledWithCorrectParameters() {
+    fun whenStoreCredentialsAndUrlIsDuckDuckGoEmailThenStoreCredentialsCalledWithCorrectParameters() = runTest {
         whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
 
         testee.storeCredentials("token", "username", "cohort")
@@ -95,7 +98,7 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenStoreCredentialsAndUrlIsNotDuckDuckGoEmailThenStoreCredentialsNotCalled() {
+    fun whenStoreCredentialsAndUrlIsNotDuckDuckGoEmailThenStoreCredentialsNotCalled() = runTest {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
 
         testee.storeCredentials("token", "username", "cohort")
@@ -104,7 +107,7 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenGetUserDataAndUrlIsDuckDuckGoEmailThenGetUserDataCalled() {
+    fun whenGetUserDataAndUrlIsDuckDuckGoEmailThenGetUserDataCalled() = runTest {
         whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
 
         testee.getUserData()
@@ -113,7 +116,7 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenGetUserDataAndUrlIsNotDuckDuckGoEmailThenGetUserDataIsNotCalled() {
+    fun whenGetUserDataAndUrlIsNotDuckDuckGoEmailThenGetUserDataIsNotCalled() = runTest {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
 
         testee.getUserData()

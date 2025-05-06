@@ -44,7 +44,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = BOOKMARKS
 
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             savedSitesFormFactorSyncMigration.onFormFactorFavouritesEnabled()

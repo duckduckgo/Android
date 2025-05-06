@@ -23,19 +23,54 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.IOException
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
+import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class EmailEncryptedSharedPreferences(
     private val context: Context,
     private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val createPreferencesAsyncProvider: Provider<Boolean>,
 ) : EmailDataStore {
 
-    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
+    private val mutex: Mutex = Mutex()
+    private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        appCoroutineScope.async(dispatcherProvider.io()) {
+            encryptedPreferencesAsync()
+        }
+    }
+
+    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+    private val createPreferencesAsync by lazy { createPreferencesAsyncProvider.get() }
+
+    private suspend fun getEncryptedPreferences(): SharedPreferences? {
+        return withContext(dispatcherProvider.io()) {
+            if (createPreferencesAsync) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        }
+    }
+
+    private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
+        return mutex.withLock {
+            innerEncryptedSharedPreferences()
+        }
+    }
 
     @Synchronized
-    private fun encryptedPreferences(): SharedPreferences? {
+    private fun encryptedPreferencesSync(): SharedPreferences? {
+        return innerEncryptedSharedPreferences()
+    }
+
+    private fun innerEncryptedSharedPreferences(): SharedPreferences? {
         try {
             return EncryptedSharedPreferences.create(
                 context,
@@ -64,10 +99,15 @@ class EmailEncryptedSharedPreferences(
         return null
     }
 
-    override var emailToken: String?
-        get() = encryptedPreferences?.getString(KEY_EMAIL_TOKEN, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getEmailToken(): String? {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_EMAIL_TOKEN, null)
+        }
+    }
+
+    override suspend fun setEmailToken(value: String?) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_EMAIL_TOKEN)
                 } else {
@@ -75,11 +115,17 @@ class EmailEncryptedSharedPreferences(
                 }
             }
         }
+    }
 
-    override var nextAlias: String?
-        get() = encryptedPreferences?.getString(KEY_NEXT_ALIAS, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getNextAlias(): String? {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_NEXT_ALIAS, null)
+        }
+    }
+
+    override suspend fun setNextAlias(value: String?) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_NEXT_ALIAS)
                 } else {
@@ -87,11 +133,17 @@ class EmailEncryptedSharedPreferences(
                 }
             }
         }
+    }
 
-    override var emailUsername: String?
-        get() = encryptedPreferences?.getString(KEY_EMAIL_USERNAME, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getEmailUsername(): String? {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_EMAIL_USERNAME, null)
+        }
+    }
+
+    override suspend fun setEmailUsername(value: String?) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_EMAIL_USERNAME)
                 } else {
@@ -99,11 +151,17 @@ class EmailEncryptedSharedPreferences(
                 }
             }
         }
+    }
 
-    override var cohort: String?
-        get() = encryptedPreferences?.getString(KEY_COHORT, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun getCohort(): String? {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_COHORT, null)
+        }
+    }
+
+    override suspend fun setCohort(value: String?) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_COHORT)
                 } else {
@@ -111,11 +169,16 @@ class EmailEncryptedSharedPreferences(
                 }
             }
         }
+    }
+    override suspend fun getLastUsedDate(): String? {
+        return withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.getString(KEY_LAST_USED_DATE, null)
+        }
+    }
 
-    override var lastUsedDate: String?
-        get() = encryptedPreferences?.getString(KEY_LAST_USED_DATE, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
+    override suspend fun setLastUsedDate(value: String?) {
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
                 if (value == null) {
                     remove(KEY_LAST_USED_DATE)
                 } else {
@@ -123,8 +186,9 @@ class EmailEncryptedSharedPreferences(
                 }
             }
         }
+    }
 
-    override fun canUseEncryption(): Boolean = encryptedPreferences != null
+    override suspend fun canUseEncryption(): Boolean = getEncryptedPreferences() != null
 
     private fun canInitialiseEncryptedPreferencesTestFile(): Boolean {
         return kotlin.runCatching {

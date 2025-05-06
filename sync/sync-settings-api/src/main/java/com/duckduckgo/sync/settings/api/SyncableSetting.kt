@@ -30,21 +30,21 @@ interface SyncableSetting {
      * Setting value represented as a string.
      * If the setting is not set or has no value, null should be returned.
      */
-    fun getValue(): String?
+    suspend fun getValue(): String?
 
     /**
      * Should save a new value for the setting.
      * @param value the new value to be stored in the local store. If value not present or deleted, will be null.
      * @return true if local value was changed, false otherwise.
      */
-    fun save(value: String?): Boolean
+    suspend fun save(value: String?): Boolean
 
     /**
      * Should provide a way to merge remote value with local value on First sync (Deduplication).
      * @param value the remote value to be merged with the local value. If remote value not present or deleted, will be null.
      * @return true if local value was changed, false otherwise.
      */
-    fun deduplicate(value: String?): Boolean
+    suspend fun deduplicate(value: String?): Boolean
 
     /**
      * Should provide a way to register to changes applied by Sync Service.

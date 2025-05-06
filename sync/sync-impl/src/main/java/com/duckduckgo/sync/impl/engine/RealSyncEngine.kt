@@ -67,7 +67,7 @@ class RealSyncEngine @Inject constructor(
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
-    override fun triggerSync(trigger: SyncTrigger) {
+    override suspend fun triggerSync(trigger: SyncTrigger) {
         Timber.i("Sync-Engine: petition to sync now trigger: $trigger")
         if (syncStore.isSignedIn() && syncStore.syncingDataEnabled) {
             Timber.d("Sync-Engine: sync enabled, triggering operation: $trigger")
@@ -90,7 +90,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun scheduleSync(trigger: SyncTrigger) {
+    private suspend fun scheduleSync(trigger: SyncTrigger) {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
                 Timber.d("Sync-Engine: petition to sync debounced")
@@ -103,7 +103,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun sendLocalData() {
+    private suspend fun sendLocalData() {
         Timber.d("Sync-Engine: initiating first sync")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
         getChanges().forEach {
@@ -119,7 +119,7 @@ class RealSyncEngine @Inject constructor(
         syncStateRepository.updateSyncState(SUCCESS)
     }
 
-    private fun performSync(trigger: SyncTrigger) {
+    private suspend fun performSync(trigger: SyncTrigger) {
         if (syncInProgress()) {
             Timber.d("Sync-Engine: sync already in progress, throttling")
         } else {
@@ -151,7 +151,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
+    private suspend fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
         val types = firstSyncChanges.map { it.type }
 
         firstSyncChanges.forEach { changes ->
@@ -219,7 +219,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getChanges(): List<SyncChangesRequest> {
+    private suspend fun getChanges(): List<SyncChangesRequest> {
         return providerPlugins.getPlugins().mapNotNull {
             Timber.d("Sync-Engine: asking for changes in ${it.javaClass}")
             kotlin.runCatching {

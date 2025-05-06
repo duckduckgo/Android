@@ -42,7 +42,7 @@ constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ShowOnAppLaunchReporterPlugin, BrowserFeatureStateReporterPlugin {
 
-    override fun featureStateParams(): Map<String, String> {
+    override suspend fun featureStateParams(): Map<String, String> {
         val option =
             runBlocking(dispatcherProvider.io()) {
                 showOnAppLaunchOptionDataStore.optionFlow.first()

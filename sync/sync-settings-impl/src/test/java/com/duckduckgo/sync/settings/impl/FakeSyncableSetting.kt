@@ -25,14 +25,14 @@ open class FakeSyncableSetting : SyncableSetting {
 
     private var value: String? = "fake_value"
 
-    override fun getValue(): String? = value
+    override suspend fun getValue(): String? = value
 
-    override fun save(value: String?): Boolean {
+    override suspend fun save(value: String?): Boolean {
         this.value = value
         return true
     }
 
-    override fun deduplicate(value: String?): Boolean {
+    override suspend fun deduplicate(value: String?): Boolean {
         this.value = value
         return true
     }

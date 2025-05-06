@@ -109,7 +109,7 @@ class SurveyDownloaderTest {
     }
 
     @Test
-    fun whenSurveyForEmailReceivedAndUserIsSignedInThenCreateSurveyWithCorrectCohort() {
+    fun whenSurveyForEmailReceivedAndUserIsSignedInThenCreateSurveyWithCorrectCohort() = runTest {
         val surveyWithCohort = Survey("abc", SURVEY_URL_WITH_COHORT, -1, SCHEDULED)
         whenever(mockSurveyRepository.isUserEligibleForSurvey(surveyWithCohort)).thenReturn(true)
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
@@ -121,7 +121,7 @@ class SurveyDownloaderTest {
     }
 
     @Test
-    fun whenSurveyForEmailReceivedAndUserIsNotSignedInThenDoNotCreateSurvey() {
+    fun whenSurveyForEmailReceivedAndUserIsNotSignedInThenDoNotCreateSurvey() = runTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
