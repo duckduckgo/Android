@@ -73,7 +73,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
@@ -115,6 +117,8 @@ class AppSyncAccountRepositoryTest {
 
     private lateinit var syncRepo: SyncAccountRepository
 
+    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper = mock()
+
     @Before
     fun before() {
         syncRepo = AppSyncAccountRepository(
@@ -128,7 +132,11 @@ class AppSyncAccountRepositoryTest {
             DefaultDispatcherProvider(),
             syncFeature,
             deviceKeyGenerator,
+            syncCodeUrlWrapper = syncCodeUrlWrapper,
         )
+
+        // passthrough by default (no modifications)
+        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenAnswer { it.arguments[0] as String }
     }
 
     @Test
@@ -601,7 +609,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.getRecoveryCode() as Success
 
-        assertEquals(jsonRecoveryKeyEncoded, result.data)
+        assertEquals(jsonRecoveryKeyEncoded, result.data.rawCode)
     }
 
     @Test
@@ -618,7 +626,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.getConnectQR() as Success
 
-        assertEquals(jsonConnectKeyEncoded, result.data)
+        assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
     }
 
     @Test
@@ -782,6 +790,74 @@ class AppSyncAccountRepositoryTest {
         assertFalse(result)
     }
 
+    @Test
+    fun whenConnectCodeRetrievedItRespectsUrlBasedFeatureFlag() {
+        whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
+        prepareToProvideDeviceIds()
+        val decoratedCode = "decorated"
+        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
+
+        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
+            val result = syncRepo.getConnectQR() as Success
+            assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
+            assertEquals(decoratedCode, result.data.qrCode)
+        }
+
+        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
+            val result = syncRepo.getConnectQR() as Success
+            assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
+            assertEquals(jsonConnectKeyEncoded, result.data.qrCode)
+        }
+    }
+
+    @Test
+    fun whenExchangeCodeRetrievedItRespectsUrlBasedFeatureFlag() {
+        prepareForExchangeSuccess()
+        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
+
+        val encodedJsonExchange = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey).encodeB64()
+        val decoratedCode = "decorated"
+        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
+
+        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
+            val result = syncRepo.generateExchangeInvitationCode() as Success
+            assertEquals(encodedJsonExchange, result.data.rawCode)
+            assertEquals(decoratedCode, result.data.qrCode)
+        }
+
+        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
+            val result = syncRepo.generateExchangeInvitationCode() as Success
+            assertEquals(encodedJsonExchange, result.data.rawCode)
+            assertEquals(encodedJsonExchange, result.data.qrCode)
+        }
+    }
+
+    @Test
+    fun whenRecoveryCodeRetrievedItRespectsUrlBasedFeatureFlag() {
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.userId).thenReturn(userId)
+
+        val decoratedCode = "decorated"
+        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
+
+        // even feature is enabled, recovery codes don't have their QR codes decorated
+        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
+            val result = syncRepo.getRecoveryCode() as Success
+            assertEquals(jsonRecoveryKeyEncoded, result.data.rawCode)
+            assertEquals(jsonRecoveryKeyEncoded, result.data.qrCode)
+        }
+
+        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
+            val result = syncRepo.getRecoveryCode() as Success
+            assertEquals(jsonRecoveryKeyEncoded, result.data.rawCode)
+            assertEquals(jsonRecoveryKeyEncoded, result.data.qrCode)
+        }
+    }
+
+    private fun configureUrlWrappedCodeFeatureFlagState(enabled: Boolean) {
+        syncFeature.syncSetupBarcodeIsUrlBased().setRawStoredState(State(enable = enabled))
+    }
+
     private fun prepareForLoginSuccess() {
         prepareForEncryption()
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
@@ -814,9 +890,9 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.sendEncryptedMessage(eq(otherDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Success(true))
     }
 
-    private fun parseInvitationCodeJson(resultJson: Result<String>): InvitationCodeWrapper {
+    private fun parseInvitationCodeJson(resultJson: Result<AuthCode>): InvitationCodeWrapper {
         assertTrue(resultJson is Success)
-        return invitationCodeWrapperAdapter.fromJson(resultJson.getOrNull()?.decodeB64()!!)!!
+        return invitationCodeWrapperAdapter.fromJson(resultJson.getOrNull()?.rawCode!!.decodeB64())!!
     }
 
     private fun givenAuthenticatedDevice() {

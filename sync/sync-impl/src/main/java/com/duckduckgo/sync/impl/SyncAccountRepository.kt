@@ -37,7 +37,9 @@ import com.duckduckgo.sync.impl.CodeType.UNKNOWN
 import com.duckduckgo.sync.impl.ExchangeResult.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
@@ -59,16 +61,28 @@ interface SyncAccountRepository {
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
-    fun getRecoveryCode(): Result<String>
+    fun getRecoveryCode(): Result<AuthCode>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<String>
+    fun getConnectQR(): Result<AuthCode>
     fun pollConnectionKeys(): Result<Boolean>
-    fun generateExchangeInvitationCode(): Result<String>
+    fun generateExchangeInvitationCode(): Result<AuthCode>
     fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
+
+    data class AuthCode(
+        /**
+         * A code that is suitable for displaying in a QR code.
+         */
+        val qrCode: String,
+
+        /**
+         * Just the code (b64-encoded)
+         */
+        val rawCode: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -85,6 +99,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
+    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
 ) : SyncAccountRepository {
 
     /**
@@ -300,13 +315,16 @@ class AppSyncAccountRepository @Inject constructor(
         )
     }
 
-    override fun getRecoveryCode(): Result<String> {
+    override fun getRecoveryCode(): Result<AuthCode> {
         val primaryKey = syncStore.primaryKey ?: return Error(reason = "Get Recovery Code: Not existing primary Key").alsoFireAccountErrorPixel()
         val userID = syncStore.userId ?: return Error(reason = "Get Recovery Code: Not existing userId").alsoFireAccountErrorPixel()
-        return Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
+        val b64Encoded = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64()
+
+        // no additional formatting on the QR code for recovery codes, so qrCode always identical to rawCode
+        return Success(AuthCode(qrCode = b64Encoded, rawCode = b64Encoded))
     }
 
-    override fun generateExchangeInvitationCode(): Result<String> {
+    override fun generateExchangeInvitationCode(): Result<AuthCode> {
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - A. Generating invitation code")
 
@@ -321,14 +339,19 @@ class AppSyncAccountRepository @Inject constructor(
         val invitationWrapper = InvitationCodeWrapper(invitationCode)
 
         return kotlin.runCatching {
-            val code = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
-            Success(code)
+            val b64Encoded = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
+            val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
+                syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
+            } else {
+                b64Encoded
+            }
+            Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
         }.getOrElse {
             Error(code = EXCHANGE_FAILED.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
         }
     }
 
-    override fun getConnectQR(): Result<String> {
+    override fun getConnectQR(): Result<AuthCode> {
         val prepareForConnect = kotlin.runCatching {
             nativeLib.prepareForConnect().also {
                 it.checkResult("Creating ConnectQR code failed")
@@ -344,7 +367,13 @@ class AppSyncAccountRepository @Inject constructor(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
         ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
 
-        return Success(linkingQRCode.encodeB64())
+        val b64Encoded = linkingQRCode.encodeB64()
+        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
+            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
+        } else {
+            b64Encoded
+        }
+        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
     }
 
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
@@ -465,7 +494,7 @@ class AppSyncAccountRepository @Inject constructor(
 
                 // recovery code comes b64 encoded, so we need to decode it, then encrypt, which automatically b64 encodes the encrypted form
                 return kotlin.runCatching {
-                    val json = recoveryCode.data.decodeB64()
+                    val json = recoveryCode.data.rawCode.decodeB64()
                     val encryptedJson = nativeLib.seal(json, publicKey)
                     syncApi.sendEncryptedMessage(keyId, encryptedJson)
                 }.getOrElse {

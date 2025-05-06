@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -49,12 +50,9 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator.CodeType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -80,7 +78,6 @@ class SyncWithAnotherDeviceViewModelTest {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
         this.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
     }
-    private val urlDecorator: SyncBarcodeDecorator = mock()
 
     private val testee = SyncWithAnotherActivityViewModel(
         syncRepository,
@@ -89,19 +86,14 @@ class SyncWithAnotherDeviceViewModelTest {
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
         syncFeature,
-        urlDecorator,
     )
-
-    @Before
-    fun setup() = runTest {
-        whenever(urlDecorator.decorateCode(any(), any())).thenAnswer { it.arguments[0] as String }
-    }
 
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {
         val bitmap = TestSyncFixtures.qrBitmap()
         whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
-        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         testee.viewState().test {
             val viewState = awaitItem()
             Assert.assertEquals(bitmap, viewState.qrCodeBitmap)
@@ -116,17 +108,6 @@ class SyncWithAnotherDeviceViewModelTest {
         testee.viewState().test {
             val viewState = awaitItem()
             Assert.assertEquals(expectedBitmap, viewState.qrCodeBitmap)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenScreenStartedWithExchangeCodeThenUrlDecoratorIsInvokedWithCorrectCodeType() = runTest {
-        configureExchangeKeysSupported()
-
-        testee.viewState().test {
-            val viewState = awaitItem()
-            verify(urlDecorator).decorateCode(any(), eq(CodeType.Exchange))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -164,7 +145,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenOnCopyCodeClickedThenShowMessage() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
 
         // need to ensure view state is started
         testee.viewState().test { cancelAndConsumeRemainingEvents() }
@@ -196,19 +178,20 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenOnCopyCodeClickedThenCopyCodeToClipboard() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
 
         // need to ensure view state is started
         testee.viewState().test { cancelAndConsumeRemainingEvents() }
 
         testee.onCopyCodeClicked()
 
-        verify(clipboard).copyToClipboard(jsonRecoveryKeyEncoded)
+        verify(clipboard).copyToClipboard(authCodeToUse.rawCode)
     }
 
     @Test
     fun whenOnCopyCodeClickedAndExchangingKeysEnabledThenCopyCodeToClipboard() = runTest {
-        val expectedJson = configureExchangeKeysSupported().second
+        val expectedJson = configureExchangeKeysSupported().second.rawCode
 
         // need to ensure view state is started
         testee.viewState().test { cancelAndConsumeRemainingEvents() }
@@ -286,7 +269,7 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserScansExchangeCodeAndExchangingKeysEnabledThenCommandIsLoginSuccess() = runTest {
-        val exchangeJson = configureExchangeKeysSupported().second
+        val exchangeJson = configureExchangeKeysSupported().second.qrCode
 
         // configure success response: logged in
         whenever(syncRepository.pollForRecoveryCodeAndLogin()).thenReturn(Success(LoggedIn))
@@ -301,7 +284,7 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserScansExchangeCodeAndExchangingKeysEnabledButAccountSwitchingRequiredThenCommandIsAskToSwitchAccount() = runTest {
-        val exchangeJson = configureExchangeKeysSupported().second
+        val exchangeJson = configureExchangeKeysSupported().second.qrCode
 
         // configure success response: account switching required
         whenever(syncRepository.pollForRecoveryCodeAndLogin()).thenReturn(Success(AccountSwitchingRequired(encryptedRecoveryCode)))
@@ -407,17 +390,17 @@ class SyncWithAnotherDeviceViewModelTest {
         }
     }
 
-    private fun configureExchangeKeysSupported(): Pair<Bitmap, String> {
+    private fun configureExchangeKeysSupported(): Pair<Bitmap, AuthCode> {
         syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
         whenever(syncRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Success(true))
         whenever(syncRepository.getCodeType(any())).thenReturn(EXCHANGE)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         val bitmap = TestSyncFixtures.qrBitmap()
-        val jsonExchangeKey = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey).also {
-            whenever(syncRepository.generateExchangeInvitationCode()).thenReturn(Success(it))
-            whenever(qrEncoder.encodeAsBitmap(eq(it), any(), any())).thenReturn(bitmap)
-        }
+        val jsonExchangeKey = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
+        val authCodeToUse = AuthCode(qrCode = jsonExchangeKey, rawCode = "something else")
+        whenever(syncRepository.generateExchangeInvitationCode()).thenReturn(Success(authCodeToUse))
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonExchangeKey), any(), any())).thenReturn(bitmap)
         whenever(syncRepository.processCode(any())).thenReturn(Success(true))
-        return Pair(bitmap, jsonExchangeKey)
+        return Pair(bitmap, authCodeToUse)
     }
 }
