@@ -28,6 +28,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -67,7 +68,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesDeduplicationWithdValueThenCallDeduplicateWithValue() {
+    fun whenPersistChangesDeduplicationWithdValueThenCallDeduplicateWithValue() = runTest {
         val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
@@ -81,7 +82,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesDeduplicationWithDeletedValueThenCallDeduplicateWithNull() {
+    fun whenPersistChangesDeduplicationWithDeletedValueThenCallDeduplicateWithNull() = runTest {
         val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
@@ -95,7 +96,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesTimestampAndNoRecentChangeThenCallMergeWithValue() {
+    fun whenPersistChangesTimestampAndNoRecentChangeThenCallMergeWithValue() = runTest {
         settingSyncStore.startTimeStamp = "2023-08-31T10:06:16.022Z"
         val result = testee.onSuccess(
             changes = SyncChangesResponse(
@@ -110,7 +111,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesTimestampWithDeletedValueThenCallSaveWithNull() {
+    fun whenPersistChangesTimestampWithDeletedValueThenCallSaveWithNull() = runTest {
         val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
@@ -124,7 +125,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesTimestampButRecentlyModifiedThenSkip() {
+    fun whenPersistChangesTimestampButRecentlyModifiedThenSkip() = runTest {
         settingSyncStore.startTimeStamp = "2023-08-31T10:06:16.022Z"
         metadataDao.addOrUpdate(
             SettingsSyncMetadataEntity(

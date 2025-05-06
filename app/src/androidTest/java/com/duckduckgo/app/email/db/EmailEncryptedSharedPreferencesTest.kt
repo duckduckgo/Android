@@ -17,11 +17,9 @@
 package com.duckduckgo.app.email.db
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
+import javax.inject.Provider
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,17 +37,20 @@ class EmailEncryptedSharedPreferencesTest {
 
     private val mockPixel: Pixel = mock()
     lateinit var testee: EmailEncryptedSharedPreferences
-    private val fakeFeatureToggle = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val createPreferencesAsyncProvider = object : Provider<Boolean> {
+        override fun get(): Boolean {
+            return true
+        }
+    }
 
     @Before
     fun before() {
-        fakeFeatureToggle.createAsyncEmailPreferences().setRawStoredState(Toggle.State(true))
         testee = EmailEncryptedSharedPreferences(
             InstrumentationRegistry.getInstrumentation().targetContext,
             mockPixel,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            fakeFeatureToggle,
+            createPreferencesAsyncProvider,
         )
     }
 
