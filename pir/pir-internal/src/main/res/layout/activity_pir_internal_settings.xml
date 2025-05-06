@@ -33,10 +33,17 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface"
+            android:background="?attr/daxColorToolbar"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/testerInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:primaryText="Tester ID" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -46,148 +53,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:orientation="vertical">
+            android:layout_margin="@dimen/keyline_4"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_4">
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirDebugScan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/pirDevProfileQueryHeader" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileFirstName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="First name"
-                app:editable="true"
-                app:type="single_line" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileMiddleName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="Middle name"
-                app:editable="true"
-                app:type="single_line" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileLastName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="Last name"
-                app:editable="true"
-                app:type="single_line" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileCity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="City"
-                app:editable="true"
-                app:type="single_line" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="State (two characters format)"
-                app:editable="true"
-                app:type="single_line" />
-
-
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/profileBirthYear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:hint="Birth Year"
-                app:editable="true"
-                app:type="single_line" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:orientation="horizontal">
-
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                    android:id="@+id/debugRunScan"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginRight="@dimen/keyline_4"
-                    android:layout_weight="0.5"
-                    android:text="@string/pirDevRunSimpleScan"
-                    app:editable="true"
-                    app:type="single_line" />
-
-
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                    android:id="@+id/debugForceKill"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="0.5"
-                    android:text="@string/pirDevForceKill"
-                    app:editable="true"
-                    app:type="single_line" />
-            </LinearLayout>
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/scheduleScan"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/pirDevSchedule" />
+                android:text="@string/pirDevSettingsScan" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/viewScanResults"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/pirDevViewScanResults" />
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/viewResults"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/pirDevViewResults" />
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/pirDebugOptOut"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/pirStatsStatusHeader" />
+                android:enabled="false"
+                android:text="@string/pirDevSettingsOptOut" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/statusSitesScanned"
-                android:layout_width="match_parent"
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/viewRunEvents"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/statusTotalRecords"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/statusTotalBrokersFound"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/statusTotalAllClear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4" />
+                android:text="@string/pirDevViewRunEvents" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

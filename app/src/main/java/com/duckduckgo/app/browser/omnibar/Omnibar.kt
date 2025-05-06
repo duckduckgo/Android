@@ -28,7 +28,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
@@ -50,6 +49,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
@@ -64,6 +64,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
@@ -118,11 +119,7 @@ class Omnibar(
                     }
                 }
 
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
         }
     }
@@ -136,6 +133,7 @@ class Omnibar(
         fun onCustomTabClosePressed()
         fun onCustomTabPrivacyDashboardPressed()
         fun onVoiceSearchPressed()
+        fun onDuckChatButtonPressed()
     }
 
     interface FindInPageListener {
@@ -161,6 +159,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
+        fun onTrackersCountFinished()
     }
 
     data class OmnibarTextState(
@@ -182,7 +181,7 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: OmnibarLayout by lazy {
+    val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 when (omnibarType) {
@@ -200,13 +199,28 @@ class Omnibar(
         }
     }
 
+    /**
+     * When bottom omnibar is used, this function removes the default top app bar behavior as most of the offsets are handled via [BottomAppBarBehavior].
+     *
+     * However, the browser (web view) content offset is managed via [BottomOmnibarBrowserContainerLayoutBehavior].
+     */
+    private fun adjustCoordinatorLayoutBehaviorForBottomOmnibar() {
+        removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+        removeAppBarBehavior(binding.focusedView)
+        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+
+        binding.browserLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = BottomOmnibarBrowserContainerLayoutBehavior()
+        }
+    }
+
     private fun removeAppBarBehavior(view: View) {
         view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = null
         }
     }
 
-    private val findInPage: IncludeFindInPageBinding by lazy {
+    private val findInPage: FindInPage by lazy {
         newOmnibar.findInPage
     }
 
@@ -226,11 +240,15 @@ class Omnibar(
         newOmnibar.shieldIcon
     }
 
+    val shieldIconExperiment: LottieAnimationView by lazy {
+        newOmnibar.shieldIconExperiment
+    }
+
     val textInputRootView: View by lazy {
         newOmnibar.omnibarTextInput.rootView
     }
 
-    val isInEditMode = newOmnibar.isEditingFlow
+    val isInEditMode = newOmnibar.isEditingFlow.distinctUntilChanged()
 
     var isScrollingEnabled: Boolean
         get() =
@@ -379,6 +397,10 @@ class Omnibar(
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
         newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+    }
+
+    fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 
     fun cancelTrackersAnimation() {

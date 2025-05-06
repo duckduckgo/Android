@@ -34,13 +34,13 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?daxColorSurface">
+            android:background="?attr/daxColorToolbar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbarSorting"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
+                android:background="?attr/daxColorToolbar"
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
@@ -80,7 +80,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_search_24" />
+                            android:src="@drawable/ic_find_search_24" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -148,13 +148,13 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface">
+            android:background="?attr/daxColorToolbar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
+                android:background="?attr/daxColorToolbar"
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 

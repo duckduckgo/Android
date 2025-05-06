@@ -512,6 +512,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -519,6 +520,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        // the default value doesn't get re-evaluated, it's assigned when toggle is first created. That's why this returns FALSE
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -534,6 +537,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "state": "enabled"
                         }, 
                         "defaultFalse": {
+                            "state": "enabled"
+                        }, 
+                        "defaultValueInternal": {
                             "state": "enabled"
                         }
                     }
@@ -546,6 +552,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -553,6 +560,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -569,39 +577,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         }, 
                         "defaultFalse": {
                             "state": "disabled"
-                        }
-                    }
-                }
-        """.trimIndent()
-        whenever(appBuildConfig.flavor).thenReturn(PLAY)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertFalse(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertFalse(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertTrue(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertTrue(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        jsonString = """
-                {
-                    "state": "disabled",
-                    "features": {
-                        "internalDefaultTrue": {
-                            "state": "internal"
                         }, 
-                        "defaultTrue": {
-                            "state": "internal"
-                        },
-                        "internalDefaultFalse": {
-                            "state": "internal"
-                        }, 
-                        "defaultFalse": {
-                            "state": "internal"
+                        "defaultValueInternal": {
+                            "state": "disabled"
                         }
                     }
                 }
@@ -612,6 +590,45 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "internal"
+                        }, 
+                        "defaultTrue": {
+                            "state": "internal"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -619,6 +636,64 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+    }
+
+    @Test
+    fun `test default value set to internal`() {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // Order matters, we need to start with the config that does not have any features
+        var jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {}
+                }
+        """.trimIndent()
+
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
     }
 
     @Test
@@ -2814,6 +2889,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         var rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // we call isEnabled() without cohort, cohort should not be assigned either
         testFeature.fooFeature().isEnabled()
@@ -2821,6 +2899,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNull(rawState?.assignedCohort)
         assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // we call isEnabled(cohort), then we should assign cohort
         testFeature.fooFeature().isEnabled(BLUE)
@@ -2829,6 +2910,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertNotNull(rawState?.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
@@ -2875,6 +2958,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
         assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // remove blue cohort
         assertTrue(
@@ -2940,6 +3026,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
         assertNull(testFeature.fooFeature().getCohort())
         assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
@@ -2950,6 +3039,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         assertTrue(
             privacyPlugin.store(
@@ -2987,6 +3079,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         assertTrue(
             privacyPlugin.store(
@@ -3097,6 +3192,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
@@ -3332,6 +3430,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // changing cohort targets should not change cohort assignment
         assertTrue(
@@ -3374,6 +3475,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // changing cohort weight should not change current assignment
         assertTrue(
@@ -3518,6 +3622,54 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test calling is enrolled and enabled does not enroll`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+    }
+
+    @Test
     fun `test rollback cohort experiments`() {
         val feature = generatedFeatureNewInstance()
 
@@ -3560,6 +3712,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         assertTrue(
             privacyPlugin.store(
@@ -3597,6 +3752,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test

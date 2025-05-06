@@ -291,7 +291,7 @@ class RealSecureStorage @Inject constructor(
         }
     }
 
-    private fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
+    private suspend fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
         val encryptedPassword = encryptData(password)
         val encryptedNotes = encryptData(notes)
         return WebsiteLoginCredentialsEntity(
@@ -308,7 +308,7 @@ class RealSecureStorage @Inject constructor(
         )
     }
 
-    private fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginDetailsWithCredentials =
+    private suspend fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginDetailsWithCredentials =
         WebsiteLoginDetailsWithCredentials(
             details = toDetails(),
             password = decryptData(password, passwordIv),
@@ -326,9 +326,9 @@ class RealSecureStorage @Inject constructor(
         )
 
     // only encrypt when there's data
-    private fun encryptData(data: String?): EncryptedString? = data?.let { l2DataTransformer.encrypt(it) }
+    private suspend fun encryptData(data: String?): EncryptedString? = data?.let { l2DataTransformer.encrypt(it) }
 
-    private fun decryptData(
+    private suspend fun decryptData(
         data: String?,
         iv: String?,
     ): String? {

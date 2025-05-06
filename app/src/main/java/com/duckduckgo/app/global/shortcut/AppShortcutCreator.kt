@@ -164,7 +164,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcuts_duck_ai))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

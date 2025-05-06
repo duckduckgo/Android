@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy attivata per %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy disattivata per %1$s</string>
     <string name="undoSnackbarAction">Annulla</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sistema di tracciamento bloccato</item>
+        <item quantity="other">Sistemi di tracciamento bloccati</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Scarica immagine</string>
@@ -84,7 +89,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifica query prima di iniziare la ricerca</string>
-    <string name="settingsAutocompleteEnabled">Mostra suggerimenti di completamento automatico</string>
     <string name="autocompleteRemoveItemTitle">Rimuovere il suggerimento di ricerca?</string>
     <string name="autocompleteRemoveItemCancel">Annulla</string>
     <string name="autocompleteRemoveItemRemove">Rimuovi</string>
@@ -128,18 +132,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Impostazioni</string>
     <string name="settingsMenuItemTitle">Impostazioni</string>
-    <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsHeadingProtections">Protezioni</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
-    <string name="settingsHeadingCustomize">Personalizza</string>
     <string name="settingsHeadingAbout">Informazioni</string>
     <string name="settingsAboutDuckduckgo">Informazioni su DuckDuckGo</string>
     <string name="settingsVersion">Versione</string>
     <string name="leaveFeedback">Condividi feedback</string>
     <string name="leaveFeedbackNew">Invia feedback</string>
     <string name="settingsEmailProtectionTitle">Protezione email</string>
-    <string name="settingsEmailProtectionSubtitle">Blocca i sistemi di tracciamento delle email e nascondi il tuo indirizzo</string>
-    <string name="settingsHeadingMore">Ulteriori informazioni su DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Passaggi successivi</string>
     <string name="settingsLightTheme">Chiaro</string>
     <string name="settingsTheme">Tema</string>
@@ -155,18 +155,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Disattivato</string>
     <string name="settingsSubtitleNotificationsEnabled">Attivato</string>
     <string name="settingsDefaultBrowserTitle">Browser predefinito</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo è il tuo browser predefinito</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Imposta DuckDuckGo come browser predefinito</string>
     <string name="settingsPrivateSearchTitle">Ricerca privata</string>
     <string name="settingsGeneral" instruction="List item for general settings">Generale</string>
-    <string name="settingsPrivateSearchDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
-    <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
-    <string name="settingsHeadingSettings">Impostazioni</string>
     <string name="settingsHeadingMainSettings">Altre impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Cancellazione dati</string>
     <string name="settingsAddWidget">Aggiungi widget alla schermata iniziale</string>
     <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
@@ -175,9 +169,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Ricerca privata</string>
-    <string name="privateSearchTitle">Private Search è abilitato</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato.</string>
-    <string name="privateSearchHeadingSearchSettings">Impostazioni di ricerca</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Altre impostazioni di ricerca</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizza la lingua di ricerca, la regione e altro ancora</string>
     <string name="privateSearchMoreSearchSettingsTitle">Altre impostazioni di ricerca</string>
@@ -195,15 +187,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
-    <string name="webTrackingProtectionIsEnabledTitle">La protezione dal tracciamento Web è abilitata</string>
     <string name="webTrackingProtectionTitle">Protezione dal tracciamento web</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protezione pop-up dei cookie</string>
-    <string name="cookiePopupProtectionDescription">Elimina questi pop-up e riduci al minimo i cookie</string>
-    <string name="cookiePopupProtectionEnabled">Attivato</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +206,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
 
-    <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearData">Cancellazione automatica dei dati…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nessuno</string>
@@ -606,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Aggiungi %1$s widget alla schermata iniziale</string>
-    <string name="settingsAddHomeScreenWidget">Widget della schermata iniziale</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Naviga in privato con la nostra app per Mac</string>
-    <string name="macos_settings_title">Browser DuckDuckGo per Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
@@ -646,7 +630,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">No, me ne occupo io</string>
 
-    <string name="autoconsentSetting">Gestione dei popup dei cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup nascosto</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookie gestiti</string>
 
@@ -655,10 +638,6 @@
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Browser DuckDuckGo per Windows</string>
-    <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
-    <string name="windows_settings_description_ready">Download disponibile</string>
-    <string name="windows_settings_description_list">Sei sulla lista.</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trascina verso il basso dall\'alto e tocca il pulsante Indietro per uscire dall\'intero schermo</string>
@@ -732,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d scheda privata</item>
-        <item quantity="other">%1$d schede private</item>
+        <item quantity="one">1 scheda</item>
+        <item quantity="other">%1$d schede</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -751,7 +730,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annulla</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Password</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Password e compilazione automatica</string>
     <string name="autofillLoginSavedSnackbarMessage">Password salvata</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password aggiornata</string>
@@ -845,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Batti cinque!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Sono già stato qui prima</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Ho capito! Salterò gli altri suggerimenti.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ricorda: puoi eliminare tutte le schede, la cronologia e i dati di navigazione con due tocchi sul <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Mostra il tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
@@ -878,6 +860,7 @@
     <string name="maliciousSiteTitle">Attenzione: questo sito potrebbe essere un rischio per la sicurezza</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe distribuire malware progettato per compromettere il tuo dispositivo o rubare le tue informazioni personali.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Questo sito web potrebbe imitare un sito legittimo per ingannarti e indurti a rivelare informazioni personali, come password o numeri di carta di credito.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe tentare di ingannare o manipolarti per far trasferire denaro, acquistare beni contraffatti o installare malware con falsi pretesti.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Esci da questo sito</string>
     <string name="maliciousSiteAdvancedCTA">Avanzate</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Se ritieni che questo sito web sia sicuro, puoi <a href=\"\">segnalare un errore</a>. Puoi comunque visitare il sito web a tuo rischio e pericolo.]]></string>

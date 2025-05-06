@@ -56,6 +56,7 @@
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="checkboxStyle">@style/Widget.DuckDuckGo.CheckBox</item>
         <item name="extendedFloatingActionButtonStyle">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.DuckDuckGo.FloatingActionButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
         <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
@@ -87,9 +88,6 @@
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
 
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
-
-        <!-- CheckListItem Component -->
-        <item name="checkListItemStyle">@style/Widget.DuckDuckGo.CheckListItem</item>
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
@@ -129,10 +127,13 @@
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
-        <item name="daxColorOmnibarStroke">?attr/daxColorSurface</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
+
+        <item name="tabItemSelectionCircleWidth">2dp</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@color/webViewScrollbarTrackColor</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -154,7 +155,6 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
-        <item name="daxColorSurfaceTransparent">@color/gray90</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/gray85</item>
         <item name="daxColorPrimaryText">@color/white84</item>
@@ -195,6 +195,17 @@
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
 
+        <!-- Fab -->
+        <item name="daxColorFabPrimaryContainer">@color/blue20</item>
+        <item name="daxColorFabPrimaryText">@color/black</item>
+        <item name="daxColorFabPrimaryIcon">@color/black</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue20</item>
+        <item name="daxColorFabSecondaryText">@color/black</item>
+        <item name="daxColorFabSecondaryIcon">@color/black</item>
+
+        <!-- Tab -->
+        <item name="daxColorTabHighlight">@color/gray50</item>
+
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
@@ -225,10 +236,6 @@
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
 
-        <!-- Browser Navigation Bar colors -->
-        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray50</item>
-        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray70</item>
-
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -249,7 +256,6 @@
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
-        <item name="daxColorSurfaceTransparent">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/white</item>
         <item name="daxColorPrimaryText">@color/black84</item>
@@ -290,6 +296,17 @@
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
 
+        <!-- Fab -->
+        <item name="daxColorFabPrimaryContainer">@color/blue50</item>
+        <item name="daxColorFabPrimaryText">@color/white</item>
+        <item name="daxColorFabPrimaryIcon">@color/white</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryText">@color/blue70</item>
+        <item name="daxColorFabSecondaryIcon">@color/blue70</item>
+
+        <!-- Tab -->
+        <item name="daxColorTabHighlight">@color/gray60</item>
+
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
@@ -319,10 +336,6 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
-
-        <!-- Browser Navigation Bar colors -->
-        <item name="daxColorNavigationBarIconEnabled">@color/warm_gray70</item>
-        <item name="daxColorNavigationBarIconDisabled">@color/warm_gray50</item>
 
     </style>
 

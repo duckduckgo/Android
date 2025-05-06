@@ -1,25 +1,9 @@
-<!--
-  ~ Copyright (c) 2023 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M2,6a1,1 0,0 1,1 -1h3a1,1 0,0 1,0 2L3,7a1,1 0,0 1,-1 -1ZM2,14a1,1 0,0 1,1 -1h4a1,1 0,1 1,0 2L3,15a1,1 0,0 1,-1 -1ZM3,9a1,1 0,0 0,0 2h1a1,1 0,1 0,0 -2L3,9ZM2,18a1,1 0,0 1,1 -1h2a1,1 0,1 1,0 2L3,19a1,1 0,0 1,-1 -1ZM11,13a1,1 0,1 0,0 2h5a1,1 0,1 0,0 -2h-5ZM7,10a1,1 0,0 1,1 -1h3a1,1 0,1 1,0 2L8,11a1,1 0,0 1,-1 -1ZM15,9a1,1 0,1 0,0 2h1a1,1 0,1 0,0 -2h-1ZM17,18a1,1 0,0 1,1 -1h3a1,1 0,1 1,0 2h-3a1,1 0,0 1,-1 -1ZM20,9a1,1 0,1 0,0 2h1a1,1 0,1 0,0 -2h-1ZM8,18a1,1 0,0 1,1 -1h5a1,1 0,1 1,0 2L9,19a1,1 0,0 1,-1 -1ZM20,13a1,1 0,1 0,0 2h1a1,1 0,1 0,0 -2h-1ZM9,6a1,1 0,0 1,1 -1h1a1,1 0,1 1,0 2h-1a1,1 0,0 1,-1 -1ZM15,5a1,1 0,1 0,0 2h6a1,1 0,1 0,0 -2h-6Z"
+      android:pathData="M2,5.75A0.75,0.75 0,0 1,2.75 5h3.5a0.75,0.75 0,0 1,0 1.5h-3.5A0.75,0.75 0,0 1,2 5.75ZM2,13.75a0.75,0.75 0,0 1,0.75 -0.75h4.5a0.75,0.75 0,0 1,0 1.5h-4.5a0.75,0.75 0,0 1,-0.75 -0.75ZM2.75,9a0.75,0.75 0,0 0,0 1.5h1.5a0.75,0.75 0,0 0,0 -1.5h-1.5ZM2,17.75a0.75,0.75 0,0 1,0.75 -0.75h2.5a0.75,0.75 0,0 1,0 1.5h-2.5a0.75,0.75 0,0 1,-0.75 -0.75ZM10.75,13a0.75,0.75 0,0 0,0 1.5h5.5a0.75,0.75 0,1 0,0 -1.5h-5.5ZM7,9.75A0.75,0.75 0,0 1,7.75 9h3.5a0.75,0.75 0,1 1,0 1.5h-3.5A0.75,0.75 0,0 1,7 9.75ZM14.75,9a0.75,0.75 0,0 0,0 1.5h1.5a0.75,0.75 0,1 0,0 -1.5h-1.5ZM17,17.75a0.75,0.75 0,0 1,0.75 -0.75h3.5a0.75,0.75 0,1 1,0 1.5h-3.5a0.75,0.75 0,0 1,-0.75 -0.75ZM19.75,9a0.75,0.75 0,0 0,0 1.5h1.5a0.75,0.75 0,1 0,0 -1.5h-1.5ZM8,17.75a0.75,0.75 0,0 1,0.75 -0.75h5.5a0.75,0.75 0,1 1,0 1.5h-5.5a0.75,0.75 0,0 1,-0.75 -0.75ZM19.75,13a0.75,0.75 0,0 0,0 1.5h1.5a0.75,0.75 0,1 0,0 -1.5h-1.5ZM9,5.75A0.75,0.75 0,0 1,9.75 5h1a0.75,0.75 0,1 1,0 1.5h-1A0.75,0.75 0,0 1,9 5.75ZM14.75,5a0.75,0.75 0,0 0,0 1.5h6.5a0.75,0.75 0,1 0,0 -1.5h-6.5Z"
       android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>

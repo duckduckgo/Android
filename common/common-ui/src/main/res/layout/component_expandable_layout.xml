@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="Sync"
-            app:leadingIcon="@drawable/ic_globe_gray_16dp"
+            app:leadingIcon="@drawable/ic_globe_16"
             app:leadingIconSize="small"
             app:expandedLayout="@layout/view_expandable_menu_item_expanded_layout_demo" />
 
@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="Sync Custom Layout"
-            app:leadingIcon="@drawable/ic_globe_gray_16dp"
+            app:leadingIcon="@drawable/ic_globe_16"
             app:leadingIconSize="small" />
 
     </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>

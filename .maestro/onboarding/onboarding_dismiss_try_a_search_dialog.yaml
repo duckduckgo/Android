@@ -1,0 +1,19 @@
+appId: com.duckduckgo.mobile.android
+name: "Onboarding: Ensuring we can navigate through pre-onboarding flow and dismissing the fire dialog"
+tags:
+  - onboardingTest
+---
+# Pre-requisite: None
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/pre_onboarding.yaml
+      - assertVisible:
+          id: daxDialogDismissButton
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertVisible:
+          id: ddgLogo

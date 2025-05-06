@@ -21,7 +21,15 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.lang.Exception
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
@@ -30,29 +38,61 @@ import okio.ByteString.Companion.toByteString
  */
 interface SecureStorageKeyStore {
 
-    fun updateKey(
+    suspend fun updateKey(
         keyName: String,
         keyValue: ByteArray?,
     )
 
-    fun getKey(keyName: String): ByteArray?
+    suspend fun getKey(keyName: String): ByteArray?
 
     /**
      * This method can be used to check if the keystore implementation has for support for encryption
      *
      * @return `true` if all the crypto dependencies needed by keystore is available and `false` otherwise
      */
-    fun canUseEncryption(): Boolean
+    suspend fun canUseEncryption(): Boolean
 }
 
 class RealSecureStorageKeyStore constructor(
     private val context: Context,
+    private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val autofillFeature: AutofillFeature,
 ) : SecureStorageKeyStore {
 
-    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
+    private val mutex: Mutex = Mutex()
+    private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        coroutineScope.async(dispatcherProvider.io()) {
+            encryptedPreferencesAsync()
+        }
+    }
+
+    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+
+    private suspend fun getEncryptedPreferences(): SharedPreferences? {
+        return if (autofillFeature.createAsyncPreferences().isEnabled()) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+    }
+
+    private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
+        return try {
+            mutex.withLock {
+                EncryptedSharedPreferences.create(
+                    context,
+                    FILENAME,
+                    MasterKey.Builder(context)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build(),
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                )
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     @Synchronized
-    private fun encryptedPreferences(): SharedPreferences? {
+    private fun encryptedPreferencesSync(): SharedPreferences? {
         return try {
             EncryptedSharedPreferences.create(
                 context,
@@ -68,24 +108,32 @@ class RealSecureStorageKeyStore constructor(
         }
     }
 
-    override fun updateKey(
+    override suspend fun updateKey(
         keyName: String,
         keyValue: ByteArray?,
     ) {
-        encryptedPreferences?.edit(commit = true) {
-            if (keyValue == null) {
-                remove(keyName)
-            } else {
-                putString(keyName, keyValue.toByteString().base64())
+        withContext(dispatcherProvider.io()) {
+            getEncryptedPreferences()?.edit(commit = true) {
+                if (keyValue == null) {
+                    remove(keyName)
+                } else {
+                    putString(keyName, keyValue.toByteString().base64())
+                }
             }
         }
     }
 
-    override fun getKey(keyName: String): ByteArray? = encryptedPreferences?.getString(keyName, null)?.run {
-        this.decodeBase64()?.toByteArray()
+    override suspend fun getKey(keyName: String): ByteArray? {
+        return withContext(dispatcherProvider.io()) {
+            return@withContext getEncryptedPreferences()?.getString(keyName, null)?.run {
+                this.decodeBase64()?.toByteArray()
+            }
+        }
     }
 
-    override fun canUseEncryption(): Boolean = encryptedPreferences != null
+    override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
+        getEncryptedPreferences() != null
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.securestorage.store"

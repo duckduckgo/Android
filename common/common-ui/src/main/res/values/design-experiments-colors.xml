@@ -16,55 +16,65 @@
 
 <resources>
 
-    <!-- New Gray Palette -->
-    <!-- https://app.asana.com/0/72649045549333/1209374776057934 -->
-    <color name="warm_gray100">#10161D</color>
-    <color name="warm_gray95">#191E25</color>
-    <color name="warm_gray90">#20262D</color>
-    <color name="warm_gray85">#30363D</color>
-    <color name="warm_gray85_84">#D630363D</color>
-    <color name="warm_gray85_50">#8030363D</color>
-    <color name="warm_gray80">#41464D</color>
-    <color name="warm_gray75">#51565E</color>
-    <color name="warm_gray70">#61666E</color>
-    <color name="warm_gray65">#72777E</color>
-    <color name="warm_gray60">#83878D</color>
-    <color name="warm_gray55">#93979D</color>
-    <color name="warm_gray50">#A3A8AD</color>
-    <color name="warm_gray45">#B4B8BE</color>
-    <color name="warm_gray40">#CACBCB</color>
-    <color name="warm_gray35">#D3D4D2</color>
-    <color name="warm_gray30">#DDDDDA</color>
-    <color name="warm_gray25">#E5E4E2</color>
-    <color name="warm_gray20">#EEEDEA</color>
-    <color name="warm_gray15">#F2F1EE</color>
-    <color name="warm_gray10">#F5F5F3</color>
-    <color name="warm_gray5">#F7F7F5</color>
-    <color name="warm_gray0">#FAFAF8</color>
-    <color name="dark_surface_tertiary">#404145</color>
-    <color name="light_surface_tertiary">#FFFFFF</color>
-    <color name="dark_controls_fill_primary">#1FF9F9F9</color>
-    <color name="light_controls_fill_primary">#171C1F21</color>
+    <!-- The new color system is defined by categories and sub-categories-->
+    <!-- Backgrounds / Text / Icons / Lines / Controls / Tone -->
+    <!-- Inside each category there are different colors, which define where are applied -->
 
-    <color name="gray87">#393E45</color>
-    <color name="white_70">#B3FFFFFF</color>
-    <color name="white_12">#1FFFFFFF</color>
+    <!-- Dark Palette -->
+    <!-- Backgrounds -->
+    <color name="background_background_dark">#27282A</color>
+    <color name="background_surface_dark">#333538</color>
+    <color name="background_window_dark">#404145</color>
+    <color name="background_container_dark">#404145</color>
+
+    <!-- Text -->
+    <color name="text_primary_dark">#E6FFFFFF</color>
+    <color name="text_secondary_dark">#99FFFFFF</color>
+    <color name="text_tertiary_dark">#66FFFFFF</color>
+
+    <!-- Icons -->
+    <color name="icon_primary_dark">#C7FFFFFF</color>
+    <color name="icon_secondary_dark">#7AFFFFFF</color>
+    <color name="icon_tertiary_dark">#3DFFFFFF</color>
+
+    <!-- Lines-->
+    <color name="lines_dark">#1FF9F9F9</color>
+
+    <!-- Controls -->
+    <color name="controls_fill_primary_dark">#1FF9F9F9</color>
+    <color name="controls_fill_secondary_dark">#2EF9F9F9</color>
+    <color name="controls_fill_tertiary_dark">#3DF9F9F9</color>
+    <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
+
+    <!-- Light Palette -->
+    <!-- Backgrounds -->
+    <color name="background_background_light">#E9EBEC</color>
+    <color name="background_surface_light">#F4F5F6</color>
+    <color name="background_window_light">#F9FAFA</color>
+    <color name="background_container_light">#F9FAFA</color>
+
+    <!-- Text -->
+    <color name="text_primary_light">#1C1F21</color>
+    <color name="text_secondary_light">#B81C1F21</color>
+    <color name="text_tertiary_light">#661C1F21</color>
+
+    <!-- Icons -->
+    <color name="icon_primary_light">#D61C1F21</color>
+    <color name="icon_secondary_light">#991C1F21</color>
+    <color name="icon_tertiary_light">#661C1F21</color>
+
+    <!-- Lines-->
+    <color name="lines_light">#171C1F21</color>
+
+    <!-- Controls -->
+    <color name="controls_fill_primary_light">#171C1F21</color>
+    <color name="controls_fill_secondary_light">#1F1C1F21</color>
+    <color name="controls_fill_tertiary_light">#2E1C1F21</color>
+    <color name="controls_decoration_tertiary_light">#991C1F21</color>
 
     <!-- Experimental Fire Button -->
     <attr name="daxColorFireButtonOne" format="color"/>
     <attr name="daxColorFireButtonTwo" format="color"/>
     <attr name="daxColorFireButtonThree" format="color"/>
-
-    <color name="daxColorFireButtonOne_Dark">#FFBB5C</color>
-    <color name="daxColorFireButtonTwo_Dark">#F68161</color>
-    <color name="daxColorFireButtonThree_Dark">#F14D1F</color>
-    <color name="daxColorFireButtonOne_Light">#FA8B38</color>
-    <color name="daxColorFireButtonTwo_Light">#E72A57</color>
-    <color name="daxColorFireButtonThree_Light">#CC165B</color>
-
-    <!-- Browser Navigation Bar colors -->
-    <attr name="daxColorNavigationBarIconEnabled" format="color"/>
-    <attr name="daxColorNavigationBarIconDisabled" format="color"/>
-
 
 </resources>

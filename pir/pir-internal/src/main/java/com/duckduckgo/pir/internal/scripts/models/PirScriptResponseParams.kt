@@ -81,7 +81,10 @@ sealed class PirSuccessResponse(
         val response: ResponseData? = null,
     ) : PirSuccessResponse(actionID, actionType) {
         data class ResponseData(
-            val callback: String,
+            val callback: CallbackData,
+        )
+        data class CallbackData(
+            val eval: String,
         )
     }
 

@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
@@ -40,6 +41,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+class WriteInProgressException : Exception("Write in progress")
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
@@ -70,6 +73,7 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
 
         val canonicalUri = urlCanonicalization.canonicalizeUrl(url)
+        val canonicalUriString = canonicalUri.toString()
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
@@ -78,48 +82,68 @@ class RealMaliciousSiteProtection @Inject constructor(
             return ConfirmedResult(Safe)
         }
 
-        val hash = messageDigest
-            .digest(hostname.toByteArray(Charsets.UTF_8))
-            .joinToString("") { "%02x".format(it) }
+        val hash = generateHash(hostname)
         val hashPrefix = hash.substring(0, 8)
 
-        if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
-            timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
-            return ConfirmedResult(Safe)
-        }
-        maliciousSiteRepository.getFilters(hash)?.forEach { filterSet ->
-            filterSet.filters.firstOrNull {
-                Pattern.compile(it.regex).matcher(canonicalUri.toString()).find()
-            }?.let {
-                timber.d("should block $canonicalUri")
-                return ConfirmedResult(Malicious(filterSet.feed))
+        try {
+            maliciousSiteRepository.getFeedForHashPrefix(hashPrefix).let {
+                if (it == null) {
+                    timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+                    return ConfirmedResult(Safe)
+                } else if (it == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
+                    timber.d("should not block (scam protection disabled) $canonicalUri")
+                    return ConfirmedResult(Ignored)
+                }
             }
+            maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
+                filterSet.filters.let {
+                    if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
+                        timber.d("should block $canonicalUriString")
+                        return ConfirmedResult(Malicious(filterSet.feed))
+                    }
+                }
+            }
+        } catch (e: WriteInProgressException) {
+            timber.d("Write in progress, ignoring")
+            return ConfirmedResult(Ignored)
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
                     is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(url.toString()).find() &&
+                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
                             (hostname == match.hostname) &&
                             (hash == match.hash)
                     }?.feed?.let { feed: Feed ->
-                        Malicious(feed)
+                        if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
+                        return@let Malicious(feed)
                     } ?: Safe
                     is MatchesResult.Ignored -> Ignored
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUri")
-                    is Safe -> timber.d("should not block (no match) $canonicalUri")
-                    is Ignored -> timber.d("should not block (ignored) $canonicalUri")
+                    is Malicious -> timber.d("should block (matches) $canonicalUriString, result: ${result.feed}")
+                    is Safe -> timber.d("should not block (no match) $canonicalUriString")
+                    is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
-                timber.e(e, "shouldBlock $canonicalUri")
+                timber.e(e, "shouldBlock $canonicalUriString")
                 confirmationCallback(Safe)
             }
         }
-        timber.d("wait for confirmation $canonicalUri")
+        timber.d("wait for confirmation $canonicalUriString")
         return IsMaliciousResult.WaitForConfirmation
+    }
+
+    private fun generateHash(hostname: String): String {
+        val digestBytes = messageDigest.digest(hostname.toByteArray(Charsets.UTF_8))
+        val sb = StringBuilder(digestBytes.size * 2)
+        for (byte in digestBytes) {
+            val value = byte.toInt() and 0xFF
+            sb.append(Character.forDigit(value shr 4, 16))
+            sb.append(Character.forDigit(value and 0x0F, 16))
+        }
+        return sb.toString()
     }
 }

@@ -117,6 +117,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -670,7 +671,7 @@ class AutofillSettingsViewModel @Inject constructor(
             Timber.v("Opened autofill management screen from from %s", launchSource)
 
             val source = launchSource.asString()
-            val hasCredentialsSaved = autofillStore.getCredentialCount().first() > 0
+            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
             pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
         }
     }

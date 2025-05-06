@@ -24,8 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="150dp"
-        android:paddingBottom="50dp"
-        android:paddingHorizontal="@dimen/keyline_5">
+        android:paddingBottom="50dp">
 
         <ImageView
             android:id="@+id/alertImage"
@@ -35,7 +34,8 @@
             android:src="@drawable/malware_site_128"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/errorTitle"
@@ -48,7 +48,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/alertImage"
-            app:typography="h2" />
+            app:typography="h2"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/errorHeadline"
@@ -60,7 +61,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/errorTitle"
             app:typography="body1"
-            android:text="@string/maliciousSiteMalwareHeadline" />
+            android:text="@string/maliciousSiteMalwareHeadline"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -72,7 +74,8 @@
             app:daxButtonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/errorHeadline"/>
+            app:layout_constraintTop_toBottomOf="@+id/errorHeadline"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/advancedCTA"
@@ -82,7 +85,8 @@
             app:daxButtonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/leaveSiteCTA" />
+            app:layout_constraintTop_toBottomOf="@+id/leaveSiteCTA"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/advancedGroup"
@@ -111,7 +115,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/advancedDivider"
             app:typography="body2"
-            android:text="@string/maliciousSiteExpandedHeadline" />
+            android:text="@string/maliciousSiteExpandedHeadline"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/expandedCTA"
@@ -123,7 +128,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/expandedHeadline"
             app:typography="body2"
-            android:text="@string/maliciousSiteExpandedCTA" />
+            android:text="@string/maliciousSiteExpandedCTA"
+            android:layout_marginHorizontal="@dimen/keyline_5"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

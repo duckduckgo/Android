@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M3.762,20.236c-0.659,0.765 -0.015,1.921 0.98,1.746 3.373,-0.594 8.771,-1.652 11.027,-2.695C19.424,17.95 22,14.732 22,10.973 22,6.017 17.523,2 12,2S2,6.017 2,10.973c0,2.422 1.07,4.62 2.81,6.235 0.466,0.433 0.557,1.164 0.141,1.647l-1.19,1.381Z"
+      android:fillColor="#C7B9EE"/>
+  <path
+      android:pathData="M20.75,10.973c0,3.151 -2.166,5.954 -5.41,7.14l-0.049,0.017 -0.047,0.022c-0.995,0.46 -2.79,0.962 -4.848,1.432 -1.82,0.416 -3.757,0.788 -5.348,1.074l0.85,-0.988 0.043,-0.05c0.85,-1.043 0.6,-2.472 -0.24,-3.289l-0.041,-0.039c-1.488,-1.38 -2.382,-3.22 -2.41,-5.224v-0.095C3.25,6.832 7.037,3.25 12,3.25V2h-0.13c-5.42,0.062 -9.8,3.993 -9.87,8.857v0.116c0,2.385 1.037,4.552 2.728,6.16l0.081,0.075c0.452,0.42 0.551,1.119 0.18,1.6l-0.038,0.047 -1.19,1.381c-0.658,0.766 -0.014,1.921 0.98,1.746 3.374,-0.594 8.772,-1.652 11.028,-2.695C19.424,17.95 22,14.732 22,10.973v-0.116C21.93,5.955 17.48,2 12,2v1.25c4.925,0 8.69,3.526 8.75,7.626v0.097Z">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="12"
+          android:startY="2"
+          android:endX="12"
+          android:endY="22"
+          android:type="linear">
+        <item android:offset="0" android:color="#FFA591DC"/>
+        <item android:offset="1" android:color="#FF5132A9"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M11.533,6.301c0.121,-0.486 0.813,-0.486 0.934,0l0.265,1.06a4.015,4.015 0,0 0,2.922 2.922l1.06,0.265c0.486,0.121 0.486,0.813 0,0.934l-1.06,0.265a4.015,4.015 0,0 0,-2.922 2.922l-0.265,1.06c-0.121,0.486 -0.813,0.486 -0.934,0l-0.265,-1.06a4.015,4.015 0,0 0,-2.922 -2.922l-1.06,-0.264c-0.486,-0.122 -0.486,-0.814 0,-0.935l1.06,-0.265a4.015,4.015 0,0 0,2.921 -2.922l0.266,-1.06Z"
+      android:fillColor="#5132A9"/>
+</vector>

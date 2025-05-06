@@ -79,6 +79,7 @@ android {
     namespace "com.duckduckgo.duckplayer.impl"
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     anvil {
         generateDaggerFactories = true // default is false

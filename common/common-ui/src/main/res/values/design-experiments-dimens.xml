@@ -17,6 +17,18 @@
 <resources>
     <!-- Experimental Toolbar -->
     <dimen name="toolbarIcon">40dp</dimen>
-    <dimen name="bottomNavIconContainer">48dp</dimen>
+    <dimen name="bottomNavIconContainer">44dp</dimen>
+    <dimen name="bottomNavFireIconContainerHeight">44dp</dimen>
+    <dimen name="bottomNavFireIconContainerWidth">80dp</dimen>
     <dimen name="bottomNavIcon">24dp</dimen>
+    <dimen name="experimentalToolbarSize">60dp</dimen>
+    <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginBottom">12dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">14dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginTop">2dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginBottom">10dp</dimen>
+    <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
+    <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
 </resources>

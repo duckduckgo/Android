@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd aktiverat för %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd inaktiverat för %1$s</string>
     <string name="undoSnackbarAction">Återställ</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Spårare har blockerats</item>
+        <item quantity="other">Spårare har blockerats</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Ladda ned bild</string>
@@ -84,7 +89,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
-    <string name="settingsAutocompleteEnabled">Visa Autoslutför förslag</string>
     <string name="autocompleteRemoveItemTitle">Ta bort sökförslag?</string>
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Ta bort</string>
@@ -128,18 +132,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
-    <string name="settingsHeadingPrivacy">Sekretess</string>
     <string name="settingsHeadingProtections">Skydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
-    <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
     <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
-    <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
-    <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Nästa steg</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
@@ -155,18 +155,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Inaktiverad</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiverad</string>
     <string name="settingsDefaultBrowserTitle">Standardwebbläsare</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo är din standardwebbläsare</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Gör DuckDuckGo till din standardwebbläsare</string>
     <string name="settingsPrivateSearchTitle">Privatsökning</string>
     <string name="settingsGeneral" instruction="List item for general settings">Allmänt</string>
-    <string name="settingsPrivateSearchDescription">Aktiverat som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
-    <string name="settingsHeadingSettings">Inställningar</string>
     <string name="settingsHeadingMainSettings">Andra inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarensning</string>
     <string name="settingsAddWidget">Lägg till widget på startsidan</string>
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
@@ -175,9 +169,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
-    <string name="privateSearchTitle">Private Search är aktiverad</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search är din standardsökmotor, så att du kan söka på webben utan att bli spårad.</string>
-    <string name="privateSearchHeadingSearchSettings">Sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Anpassa ditt sökspråk, din region och annat</string>
     <string name="privateSearchMoreSearchSettingsTitle">Fler sökinställningar</string>
@@ -195,15 +187,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Skydd för webbspårning är aktiverat</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
-    <string name="cookiePopupProtectionDescription">Blockera dessa popup-fönster och minimera cookies</string>
-    <string name="cookiePopupProtectionEnabled">Aktiverad</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +206,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
 
-    <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
     <string name="settingsAutomaticallyClearData">Rensa data automatiskt …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
@@ -606,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Widgeten %1$s har lagts till på startsidan</string>
-    <string name="settingsAddHomeScreenWidget">Widget på startsidan</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Surfa privat med vår app för Mac</string>
-    <string name="macos_settings_title">DuckDuckGo webbläsare för Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nerladdningar</string>
@@ -646,7 +630,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nej, jag hanterar dem själv</string>
 
-    <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
@@ -655,10 +638,6 @@
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo webbläsare för Windows</string>
-    <string name="windows_settings_description">Surfa privat med vår app för Windows</string>
-    <string name="windows_settings_description_ready">Nedladdning tillgänglig</string>
-    <string name="windows_settings_description_list">Du står på listan!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra nedåt från toppen och tryck på bakåtknappen för att lämna helskärmsläget</string>
@@ -732,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privat flik</item>
-        <item quantity="other">%1$d privata flikar</item>
+        <item quantity="one">1 flik</item>
+        <item quantity="other">%1$d flikar</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -751,7 +730,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Lösenord</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Lösenord och automatisk ifyllning</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
@@ -845,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High Five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jag förstår! Jag hoppar över de andra tipsen.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Kom ihåg att du kan radera alla dina flikar, din historik och dina surfdata med två tryck på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Visa handledning</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>
@@ -878,6 +860,7 @@
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan distribuera skadlig programvara avsedd att göra intrång på din enhet eller stjäla din personliga information.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Den här webbplatsen kan utge sig för att vara en legitim webbplats för att lura dig att lämna ut personlig information som lösenord eller kortnummer.\n<a href=\"\">Mer information</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan försöka lura eller manipulera dig att överföra pengar, köpa förfalskade varor eller installera skadlig programvara under falska förevändningar.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Lämna denna webbplats</string>
     <string name="maliciousSiteAdvancedCTA">Avancerat</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Om du tror att den här webbplatsen är säker kan du <a href=\"\">rapportera ett fel</a>. Du kan fortfarande besöka webbplatsen på egen risk.]]></string>

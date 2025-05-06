@@ -1,0 +1,28 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Fire button is dismissed"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/pre_onboarding.yaml
+
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*keep browsing.*"
+      - tapOn:
+          text: "got it"
+      - assertVisible:
+          text: ".*browsing activity with the fire button.*"
+      - tapOn:
+          id: daxDialogDismissButton
+      - assertNotVisible:
+          text: ".*browsing activity with the Fire Button.*"

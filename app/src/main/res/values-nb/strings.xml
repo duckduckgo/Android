@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Personvern aktivert for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Personvern deaktivert for %1$s</string>
     <string name="undoSnackbarAction">Angre</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Blokkert sporer</item>
+        <item quantity="other">Blokkerte sporere</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Last ned bilde</string>
@@ -84,7 +89,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
-    <string name="settingsAutocompleteEnabled">Vis forslag fra autofullføring</string>
     <string name="autocompleteRemoveItemTitle">Vil du fjerne søkeforslaget?</string>
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Fjern</string>
@@ -128,18 +132,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
-    <string name="settingsHeadingPrivacy">Personvern</string>
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">Utseende</string>
-    <string name="settingsHeadingCustomize">Tilpass</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
     <string name="leaveFeedback">Del tilbakemelding</string>
     <string name="leaveFeedbackNew">Send tilbakemelding</string>
     <string name="settingsEmailProtectionTitle">E-postbeskyttelse</string>
-    <string name="settingsEmailProtectionSubtitle">Blokker e-postsporere og skjul adressen din</string>
-    <string name="settingsHeadingMore">Mer fra DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Neste trinn</string>
     <string name="settingsLightTheme">Lyst</string>
     <string name="settingsTheme">Utseende</string>
@@ -155,18 +155,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Deaktivert</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktivert</string>
     <string name="settingsDefaultBrowserTitle">Standardnettleser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er standardnettleseren din</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Gjør DuckDuckGo til standardnettleser</string>
     <string name="settingsPrivateSearchTitle">Privat søk</string>
     <string name="settingsGeneral" instruction="List item for general settings">Generelt</string>
-    <string name="settingsPrivateSearchDescription">Aktivert som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
-    <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
-    <string name="settingsHeadingSettings">Innstillinger</string>
     <string name="settingsHeadingMainSettings">Andre innstillinger</string>
     <string name="settingsPermissionsSetting">Tillatelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhetskopiering</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Sletting av data</string>
     <string name="settingsAddWidget">Legg til widgeten på startskjermen</string>
     <string name="settingsAddressBarPosition">Angi plassering av adressefeltet</string>
@@ -175,9 +169,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søk</string>
-    <string name="privateSearchTitle">Private Search er aktivert</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search er standardsøkemotoren din, så du kan søke på nettet uten å bli sporet.</string>
-    <string name="privateSearchHeadingSearchSettings">Søkeinnstillinger</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere søkeinnstillinger</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpass søkespråk, region med mer</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere søkeinnstillinger</string>
@@ -195,15 +187,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Nettsporingsbeskyttelse er aktivert</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer deg aldri, og vi er opptatt av å beskytte personvernet ditt så godt som mulig. Vi vedlikeholder og utvikler kontinuerlig beskyttelseslag for å holde tritt med nye sporingsmetoder og tilbyr mange beskyttelsestiltak som andre nettlesere ikke har som standard. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkerer automatisk skjulte sporere når du surfer på nettet.\n<a href=\"\">Finn ut mer</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
-    <string name="cookiePopupProtectionDescription">Fjern disse popup-vinduene og minimer informasjonskapsler</string>
-    <string name="cookiePopupProtectionEnabled">Aktivert</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +206,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
 
-    <string name="settingsAutomaticallyClearWhat">Tøm automatisk …</string>
     <string name="settingsAutomaticallyClearData">Slett data automatisk …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tøm automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
@@ -606,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget er lagt til på startskjermen</string>
-    <string name="settingsAddHomeScreenWidget">Startskjerm-widget</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Surf privat med vår app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo-nettleser for Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nedlastinger</string>
@@ -646,7 +630,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nei, jeg tar meg av dem selv</string>
 
-    <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-vindu skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Informasjonskapsler administrert</string>
 
@@ -655,10 +638,6 @@
     <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-nettleser for Windows</string>
-    <string name="windows_settings_description">Surf privat med vår app for Windows</string>
-    <string name="windows_settings_description_ready">Nedlasting tilgjengelig</string>
-    <string name="windows_settings_description_list">Du er satt på listen!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra ovenfra og nedover og trykk på tilbake-knappen for å gå ut av fullskjerm</string>
@@ -732,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privat fane</item>
-        <item quantity="other">%1$d private faner</item>
+        <item quantity="one">%1$d fane</item>
+        <item quantity="other">%1$d faner</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -751,7 +730,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Passord</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Passord og autofyll</string>
     <string name="autofillLoginSavedSnackbarMessage">Passordet er lagret</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Passordet er oppdatert</string>
@@ -845,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hopp over</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Skjønner! Jeg hopper over de andre tipsene.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle fanene, historikken og nettleserdataene dine på to trykk med <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis veiledning</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
@@ -878,6 +860,7 @@
     <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi det er mulig at den distribuerer skadelig programvare som er laget for å kompromittere enheten din eller stjele personopplysningene dine.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette nettstedet utgir seg muligens for å være et legitimt nettsted for å lure deg til å oppgi personopplysninger, som passord eller kredittkortnumre.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi den kan prøve å lure eller manipulere deg til å overføre penger, kjøpe falske varer eller installere skadelig programvare under falske forutsetninger.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Forlat dette nettstedet</string>
     <string name="maliciousSiteAdvancedCTA">Avansert</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener at dette nettstedet er trygt, kan du <a href=\"\">rapportere en feil</a>. Du kan besøke nettstedet på egen risiko.]]></string>

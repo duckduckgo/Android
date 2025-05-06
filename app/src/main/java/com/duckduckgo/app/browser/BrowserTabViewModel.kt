@@ -104,6 +104,7 @@ import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
+import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -111,6 +112,7 @@ import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
+import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
@@ -163,6 +165,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.StartTrackersExperimentShieldPopAnimation
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
@@ -176,8 +179,11 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
+import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -195,6 +201,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -246,7 +253,6 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -260,7 +266,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -273,6 +278,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -307,6 +313,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -383,7 +390,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -468,6 +474,10 @@ class BrowserTabViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
+    private val siteErrorHandler: StringSiteErrorHandler,
+    private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -542,7 +552,15 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     private var autoCompleteJob = ConflatedJob()
+
     private var site: Site? = null
+        set(value) {
+            field = value
+            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+                siteErrorHandler.assignErrorsAndClearCache(value)
+                siteHttpErrorHandler.assignErrorsAndClearCache(value)
+            }
+        }
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
@@ -553,6 +571,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var lastSubmittedUserQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -707,12 +726,6 @@ class BrowserTabViewModel @Inject constructor(
         defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
-            }
-            .launchIn(viewModelScope)
-
-        visualDesignExperimentDataStore.navigationBarState
-            .onEach { navigationBarState ->
-                browserViewState.value = currentBrowserViewState().copy(navigationButtonsVisible = !navigationBarState.isEnabled)
             }
             .launchIn(viewModelScope)
     }
@@ -1232,9 +1245,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewTab() {
+    private fun openNewTab() {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModelScope.launch {
+                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                if (emptyTab != null) {
+                    tabRepository.select(tabId = emptyTab)
+                } else {
+                    command.value = LaunchNewTab
+                }
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
+
+        onUserDismissedCta(ctaViewState.value?.cta)
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -1997,7 +2024,11 @@ class BrowserTabViewModel @Inject constructor(
             }
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
+                val previousPrivacyShieldState = currentPrivacyShieldState()
+                privacyShieldViewState.value = previousPrivacyShieldState.copy(
+                    privacyShield = privacyProtection,
+                    trackersBlocked = site?.trackerCount ?: 0,
+                )
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
@@ -2699,37 +2730,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onBrowserMenuClicked() {
+    fun onBrowserMenuClicked(isCustomTab: Boolean) {
         val menuHighlighted = currentBrowserViewState().showMenuButton.isHighlighted()
         if (menuHighlighted) {
             browserViewState.value = currentBrowserViewState().copy(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = visualDesignExperimentDataStore.navigationBarState.value.isEnabled)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && visualDesignExperimentDataStore.navigationBarState.value.isEnabled)
     }
 
     fun onPopupMenuLaunched() {
         defaultBrowserPromptsExperiment.onPopupMenuLaunched()
     }
 
-    fun userRequestedOpeningNewTab(
+    fun onNewTabMenuItemClicked(
         longPress: Boolean = false,
     ) {
-        command.value = GenerateWebViewPreviewImage
-
-        if (swipingTabsFeature.isEnabled) {
-            viewModelScope.launch {
-                val emptyTab = tabRepository.flowTabs.first().firstOrNull { it.url.isNullOrBlank() }?.tabId
-                if (emptyTab != null) {
-                    tabRepository.select(tabId = emptyTab)
-                } else {
-                    command.value = LaunchNewTab
-                }
-            }
-        } else {
-            command.value = LaunchNewTab
-        }
+        openNewTab()
 
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
@@ -2743,8 +2761,10 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
 
-        onUserDismissedCta(ctaViewState.value?.cta)
+    fun onNavigationBarNewTabButtonClicked() {
+        openNewTab()
     }
 
     fun onCtaShown() {
@@ -2759,20 +2779,23 @@ class BrowserTabViewModel @Inject constructor(
             val isBrowserShowing = currentBrowserViewState().browserShowing
             val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
+            val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshPatterns()
+            handleBreakageRefreshPatterns(detectedRefreshPatterns)
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
                     isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
+                    detectedRefreshPatterns,
                 )
             }
-            val isOnboardingComplete = withContext(dispatchers.io()) {
+            val contextDaxDialogsShown = withContext(dispatchers.io()) {
                 ctaViewModel.areBubbleDaxDialogsCompleted()
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
                 cta = cta,
-                daxOnboardingComplete = isOnboardingComplete,
+                isOnboardingCompleteInNewTabPage = contextDaxDialogsShown,
                 isBrowserShowing = isBrowserShowing,
                 isErrorShowing = isErrorShowing,
             )
@@ -2809,16 +2832,25 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
-                val updatedCta = refreshCta()
-                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-            } else if (cta is BrokenSitePromptDialogCta) {
+            if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
-            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-                pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
-                val updatedCta = ctaViewModel.getEndStaticDialogCta()
-                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+        }
+    }
+
+    fun onUserClickCtaDismissButton(cta: Cta) {
+        viewModelScope.launch {
+            ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
+            if (cta is DaxBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(cta)
+            } else if (cta is OnboardingDaxDialogCta) {
+                command.value = HideOnboardingDaxDialog(cta)
+                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                    if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                        ctaViewModel.dismissPulseAnimation()
+                    }
+                }
             }
         }
     }
@@ -3221,6 +3253,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onWebViewRefreshed() {
+        resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
@@ -3307,6 +3340,7 @@ class BrowserTabViewModel @Inject constructor(
         val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
+            SCAM -> MaliciousSiteStatus.SCAM
         }
 
         buildSiteFactory(
@@ -3317,7 +3351,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!exempted) {
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
-                Timber.tag("Cris").d("maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}")
+                Timber.d("maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}")
             } else {
                 val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
@@ -3386,30 +3420,46 @@ class BrowserTabViewModel @Inject constructor(
         error: String,
         url: String,
     ) {
-        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-        // called triggering a buildSite.
-        if (url != site?.url) {
-            site = siteFactory.buildSite(url = url, tabId = tabId)
+        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
+        } else {
+            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+            // called triggering a buildSite.
+            if (url != site?.url) {
+                site = siteFactory.buildSite(url = url, tabId = tabId)
+            }
+            site?.onErrorDetected(error)
         }
         Timber.d("recordErrorCode $error in ${site?.url}")
-        site?.onErrorDetected(error)
     }
 
     override fun recordHttpErrorCode(
         statusCode: Int,
         url: String,
     ) {
-        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-        // called triggering a buildSite.
-        if (url != site?.url) {
-            site = siteFactory.buildSite(url = url, tabId = tabId)
+        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
+        } else {
+            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+            // called triggering a buildSite.
+            if (url != site?.url) {
+                site = siteFactory.buildSite(url = url, tabId = tabId)
+            }
+            site?.onHttpErrorDetected(statusCode)
         }
         Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
         updateHttpErrorCount(statusCode)
-        site?.onHttpErrorDetected(statusCode)
     }
 
     fun onAutofillMenuSelected() {
+        launchAutofillSettings()
+    }
+
+    fun onNavigationBarAutofillButtonClicked() {
+        launchAutofillSettings()
+    }
+
+    private fun launchAutofillSettings() {
         command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
     }
 
@@ -3962,6 +4012,10 @@ class BrowserTabViewModel @Inject constructor(
         refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
+    private fun handleBreakageRefreshPatterns(refreshPatterns: Set<RefreshPattern>) {
+        refreshPixelSender.onRefreshPatternDetected(refreshPatterns)
+    }
+
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
@@ -3987,6 +4041,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatOmnibarButtonClicked(query: String?) {
         openDuckChat(query = query)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
@@ -4015,6 +4070,51 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onTabSwipedAway() {
         command.value = GenerateWebViewPreviewImage
+    }
+
+    fun onBookmarksMenuItemClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+        launchBookmarksActivity()
+    }
+
+    fun onNavigationBarBookmarksButtonClicked() {
+        launchBookmarksActivity()
+    }
+
+    private fun launchBookmarksActivity() {
+        command.value = LaunchBookmarksActivity
+    }
+
+    fun onAnimationFinished() {
+        viewModelScope.launch {
+            if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
+                command.value = StartTrackersExperimentShieldPopAnimation
+            }
+        }
+    }
+
+    fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
+
+    fun resetTrackersCount() {
+        site?.resetTrackingEvents()
+    }
+
+    fun onOmnibarPrivacyShieldButtonPressed() {
+        senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
+    }
+
+    fun openDuckChat(query: String?) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+
+        query == lastSubmittedUserQuery ||
+            (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
+        -> duckChat.openDuckChat(query)
+
+        else -> duckChat.openDuckChatWithAutoPrompt(query)
+    }
+
+    fun setLastSubmittedUserQuery(query: String) {
+        lastSubmittedUserQuery = query
     }
 
     companion object {

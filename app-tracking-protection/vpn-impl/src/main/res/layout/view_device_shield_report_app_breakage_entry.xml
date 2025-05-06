@@ -39,7 +39,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_2"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_gray_16dp"
+        android:src="@drawable/ic_globe_16"
     />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView

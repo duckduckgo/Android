@@ -35,6 +35,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.mobile.android.vpn.databinding.ViewApptpSettingsItemBinding
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionNewTabSettingsViewModel.ViewState
@@ -119,6 +120,6 @@ class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor(
     featureName = "newTabAppTPSectionSetting",
 )
 interface NewTabAppTrackingProtectionSectionSetting {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

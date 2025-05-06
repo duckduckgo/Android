@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.webtrackingprotection
 
+import android.R.attr.text
 import android.app.ActivityOptions
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -24,8 +25,6 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -44,7 +43,6 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,9 +53,6 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
@@ -70,10 +65,8 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
-                ds.isUnderlineText = false
-            }
+            ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
+            ds.isUnderlineText = false
         }
     }
 
@@ -82,19 +75,6 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            with(binding) {
-                webTrackingProtectionHeaderImage.isGone = true
-                webTrackingProtectionTitle.isGone = true
-                webTrackingProtectionDescription.isGone = true
-
-                webTrackingProtectionHeaderImageNew.isVisible = true
-                webTrackingProtectionTitleNew.isVisible = true
-                statusIndicator.isVisible = true
-                webTrackingProtectionDescriptionNew.isVisible = true
-            }
-        }
 
         configureUiEventHandlers()
         configureClickableLink()
@@ -108,19 +88,13 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlGPCText = getString(
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                R.string.webTrackingProtectionDescriptionNew
-            } else {
-                R.string.webTrackingProtectionDescription
-            },
+            R.string.webTrackingProtectionDescriptionNew,
         ).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
             gpcSpannableString.apply {
-                if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                    insert(getSpanStart(it), "\n")
-                }
+                insert(getSpanStart(it), "\n")
                 setSpan(
                     clickableSpan,
                     gpcSpannableString.getSpanStart(it),
@@ -131,16 +105,9 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            binding.webTrackingProtectionDescriptionNew.apply {
-                text = gpcSpannableString
-                movementMethod = LinkMovementMethod.getInstance()
-            }
-        } else {
-            binding.webTrackingProtectionDescription.apply {
-                text = gpcSpannableString
-                movementMethod = LinkMovementMethod.getInstance()
-            }
+        binding.webTrackingProtectionDescription.apply {
+            text = gpcSpannableString
+            movementMethod = LinkMovementMethod.getInstance()
         }
     }
 

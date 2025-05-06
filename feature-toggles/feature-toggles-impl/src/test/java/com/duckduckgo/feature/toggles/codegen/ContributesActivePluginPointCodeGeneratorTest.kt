@@ -33,7 +33,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -76,8 +75,12 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "pluginBarActivePlugin" }!!.annotations
                 .firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
-        assertTrue(
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
             clazz.kotlin.java.methods.find { it.name == "pluginBarActivePlugin" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
 
@@ -93,6 +96,8 @@ class ContributesActivePluginPointCodeGeneratorTest {
     fun `test generated foo remote features`() {
         val clazz = Class
             .forName("com.duckduckgo.feature.toggles.codegen.FooActivePlugin_ActivePlugin_RemoteFeature")
+        val clazzInternal = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.FooActiveInternalPlugin_ActivePlugin_RemoteFeature")
 
         assertNotNull(clazz.methods.find { it.name == "self" && it.returnType.kotlin == Toggle::class })
         assertNotNull(clazz.methods.find { it.name == "pluginFooActivePlugin" && it.returnType.kotlin == Toggle::class })
@@ -104,9 +109,19 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "pluginFooActivePlugin" }!!.annotations
                 .firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
-        assertFalse(
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.FALSE,
             clazz.kotlin.java.methods.find { it.name == "pluginFooActivePlugin" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.INTERNAL,
+            clazzInternal.kotlin.java.methods.find {
+                it.name == "pluginFooActiveInternalPlugin"
+            }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
@@ -147,8 +162,12 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "pluginExperimentActivePlugin" }!!.annotations
                 .firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
-        assertTrue(
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
             clazz.kotlin.java.methods.find { it.name == "pluginExperimentActivePlugin" }!!
                 .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
@@ -191,8 +210,12 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.annotations
                 .firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
-        assertTrue(
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
             clazz.kotlin.java.methods.find { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!
                 .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
@@ -225,7 +248,10 @@ class ContributesActivePluginPointCodeGeneratorTest {
         assertNotNull(
             clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
         assertEquals(AppScope::class, featureAnnotation.scope)
@@ -255,7 +281,10 @@ class ContributesActivePluginPointCodeGeneratorTest {
         assertNotNull(
             clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
         assertEquals(AppScope::class, featureAnnotation.scope)
@@ -277,8 +306,12 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "pluginFooActiveTriggeredMyPlugin" }!!.annotations
                 .firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
         )
-        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
-        assertFalse(
+        assertEquals(
+            Toggle.DefaultFeatureValue.TRUE,
+            clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+        assertEquals(
+            Toggle.DefaultFeatureValue.FALSE,
             clazz.kotlin.java.methods.find { it.name == "pluginFooActiveTriggeredMyPlugin" }!!
                 .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )

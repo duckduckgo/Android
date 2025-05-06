@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου απενεργοποιήθηκε για %1$s</string>
     <string name="undoSnackbarAction">Αναίρεση</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Αποκλεισμένη εφαρμογή παρακολούθησης</item>
+        <item quantity="other">Αποκλεισμένες εφαρμογές παρακολούθησης</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Λήψη εικόνας</string>
@@ -84,7 +89,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
-    <string name="settingsAutocompleteEnabled">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
     <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
@@ -128,18 +132,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
-    <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
     <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
-    <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
     <string name="leaveFeedbackNew">Αποστολή σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
-    <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
-    <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Επόμενα βήματα</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
@@ -155,18 +155,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Απενεργοποιήθηκε</string>
     <string name="settingsSubtitleNotificationsEnabled">Ενεργοποιήθηκε</string>
     <string name="settingsDefaultBrowserTitle">Προεπιλεγμένο πρόγραμμα περιήγησης</string>
-    <string name="settingsDefaultBrowserSetDescription">Το DuckDuckGo αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsPrivateSearchTitle">ιδιωτική αναζήτηση</string>
     <string name="settingsGeneral" instruction="List item for general settings">Γενικά</string>
-    <string name="settingsPrivateSearchDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
-    <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsHeadingMainSettings">Άλλες Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
-    <string name="settingsFireButton">Κουμπί Φωτιά</string>
     <string name="settingsDataClearing">Διαγραφή δεδομένων</string>
     <string name="settingsAddWidget">Προσθήκη μικροεφαρμογής στην Αρχική οθόνη</string>
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
@@ -175,9 +169,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
-    <string name="privateSearchTitle">Η λειτουργία Private Search είναι ενεργοποιημένη</string>
     <string name="privateSearchDescription">Το DuckDuckGo Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
-    <string name="privateSearchHeadingSearchSettings">Ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
@@ -195,15 +187,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Η προστασία παρακολούθησης ιστού είναι ενεργοποιημένη</string>
     <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[Το DuckDuckGo δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
-    <string name="cookiePopupProtectionDescription">Εξαλείψτε αυτά τα αναδυόμενα παράθυρα και ελαχιστοποιήστε τα cookies</string>
-    <string name="cookiePopupProtectionEnabled">Ενεργοποιήθηκε</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
@@ -218,7 +206,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
 
-    <string name="settingsAutomaticallyClearWhat">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearData">Αυτόματη απαλοιφή δεδομένων...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
@@ -606,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
-    <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
@@ -646,7 +630,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Όχι, θα τα διαχειρίζομαι εγώ προσωπικά</string>
 
-    <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
@@ -655,10 +638,6 @@
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Windows</string>
-    <string name="windows_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Windows</string>
-    <string name="windows_settings_description_ready">Διαθέσιμη λήψη</string>
-    <string name="windows_settings_description_list">Είστε στη λίστα!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
@@ -732,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d ιδιωτική καρτέλα</item>
-        <item quantity="other">%1$d ιδιωτικές καρτέλες</item>
+        <item quantity="one">1 Καρτέλα</item>
+        <item quantity="other">%1$d Καρτέλες</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -751,7 +730,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Κωδικοί πρόσβασης</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
@@ -845,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
@@ -878,6 +860,7 @@
     <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ο ιστότοπος αυτός μπορεί να υποδύεται έναν νόμιμο ιστότοπο προκειμένου να σας εξαπατήσει ώστε να παράσχετε προσωπικές πληροφορίες, όπως κωδικούς πρόσβασης ή αριθμούς πιστωτικών καρτών.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Το DuckDuckGo απέκλεισε αυτήν τη σελίδα επειδή μπορεί να προσπαθεί να σας εξαπατήσει ή να σας χειραγωγήσει για να μεταφέρετε χρήματα, να αγοράσετε παραποιημένα προϊόντα ή να εγκαταστήσετε κακόβουλο λογισμικό με ψευδείς προφάσεις.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Αποχωρήστε από τον ιστότοπο αυτόν</string>
     <string name="maliciousSiteAdvancedCTA">Προχωρημένο</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Εάν πιστεύετε ότι αυτός ο ιστότοπος είναι ασφαλής, μπορείτε να <a href=\"\">αναφέρετε ένα σφάλμα</a>. Μπορείτε ακόμα να επισκεφθείτε τον ιστότοπο, με δική σας ευθύνη.]]></string>

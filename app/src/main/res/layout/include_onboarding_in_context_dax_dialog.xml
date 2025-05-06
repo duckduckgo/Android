@@ -48,6 +48,21 @@
             app:layout_constraintTop_toTopOf="@+id/cardView"
             app:srcCompat="@drawable/ic_dax_icon" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/daxDialogDismissButton"
+            style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_0"
+            android:contentDescription="@null"
+            android:elevation="@dimen/keyline_2"
+            app:backgroundTint="?attr/daxColorSurface"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_24"
+            app:tint="?attr/daxColorPrimaryIcon" />
+
         <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
@@ -185,7 +200,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption1"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -196,7 +211,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption2"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -207,7 +222,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption3"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary

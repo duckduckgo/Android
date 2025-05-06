@@ -441,4 +441,11 @@
     <string name="appTrackingProtectionNotifyMeTitle">Bodite pozorni na blokirane sledilnike</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Posodobitve o blokiranih poskusih sledenja prejemajte v predal za obvestila.</string>
 
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Ne morete uporabljati aplikacije za zaščito App Tracking Protection zaradi vašega VPN-ja? Preklopite na VPN DuckDuckGo –edini združljivi VPN. <annotation type="ppro_upsell_link">Več o tem</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>Zaščita App Tracking Protection je onemogočena</b>\nAli je vaš VPN onemogočil App Tracking Protection? Z zgornjim stikalom ga lahko znova omogočite.\n\nPridobitev VPN DuckDuckGo – edini VPN, ki deluje z zaščito App Tracking Protection. <annotation type="ppro_upsell_link">Več o tem</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Dvignite svojo zasebnost na naslednjo raven</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo ima edini VPN, ki je združljiv z zaščito App Tracking Protection. Aktiviraj s plačljivo naročnino na Privacy Pro.</string>
+    <string name="apptp_PproUpsellBannerAction">Več</string>
+
 </resources>

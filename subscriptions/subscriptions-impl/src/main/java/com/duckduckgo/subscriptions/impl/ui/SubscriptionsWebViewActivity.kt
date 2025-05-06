@@ -417,7 +417,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
-            is SubscriptionSelected -> selectSubscription(command.id, command.offerId)
+            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -517,8 +517,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun selectSubscription(id: String, offerId: String?) {
-        viewModel.purchaseSubscription(this, id, offerId)
+    private fun selectSubscription(
+        id: String,
+        offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
+    ) {
+        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort)
     }
 
     private fun sendResponseToJs(data: JsCallbackData) {

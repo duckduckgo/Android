@@ -874,6 +874,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
+        override suspend fun getTabs(): List<TabEntity> {
+            TODO("Not yet implemented")
+        }
+
         override fun getOpenTabCount(): Int {
             TODO("Not yet implemented")
         }

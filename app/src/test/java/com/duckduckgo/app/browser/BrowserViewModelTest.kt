@@ -42,7 +42,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -111,7 +110,7 @@ class BrowserViewModelTest {
 
         configureSkipUrlConversionInNewTabState(enabled = true)
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
-        swipingTabsFeature.onForInternalUsers().setRawStoredState(State(enable = true))
+        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
         whenever(mockDefaultBrowserPromptsExperiment.commands).thenReturn(defaultBrowserPromptsExperimentCommandsFlow.receiveAsFlow())
 
@@ -269,7 +268,7 @@ class BrowserViewModelTest {
         val bookmarkUrl = "https://www.example.com"
         val tab = TabEntity("123", url = bookmarkUrl)
 
-        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(tab))
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
@@ -284,7 +283,7 @@ class BrowserViewModelTest {
         val bookmarkUrl = "https://www.example.com"
         val tab = TabEntity("123", url = "https://cnn.com")
 
-        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(tab))
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
@@ -431,6 +430,14 @@ class BrowserViewModelTest {
         testee.onSystemDefaultAppsActivityClosed()
 
         verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityClosed(trigger)
+    }
+
+    @Test
+    fun whenOnTabsDeletedInTabSwitcherCalledThenUndoSnackbarCommandTriggered() {
+        val tabIds = listOf("tab1", "tab2")
+        testee.onTabsDeletedInTabSwitcher(tabIds)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowUndoDeleteTabsMessage(tabIds), commandCaptor.lastValue)
     }
 
     @Test

@@ -9,7 +9,7 @@ on:
         default: 'PLACEHOLDER'
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -18,4 +18,5 @@
 
     <attr name="cardViewStyle" format="reference"/>
     <attr name="daxSwitchStyle" format="reference"/>
+    <attr name="tabItemSelectionCircleWidth" format="dimension"/>
 </resources>

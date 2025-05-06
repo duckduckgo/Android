@@ -1,0 +1,33 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Launch Privacy Pro from special URL is working"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://duckduckgo.com/pro"
+      - pressKey: Enter
+      - runFlow:
+          when:
+            visible:
+              text: "Privacy Pro"
+          commands:
+            - assertVisible:
+                text: "Subscribe to Privacy Pro"
+      - runFlow:
+          when:
+            visible:
+              id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+          commands:
+            - copyTextFrom:
+                id: "omnibarTextInput"
+            - assertTrue: ${maestro.copiedText == "https://duckduckgo.com/pro"}
+

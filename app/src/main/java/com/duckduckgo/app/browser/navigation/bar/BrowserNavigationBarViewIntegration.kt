@@ -20,14 +20,16 @@ import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
@@ -66,13 +68,20 @@ class BrowserNavigationBarViewIntegration(
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
     }
 
-    fun renderBrowserViewState(viewState: BrowserViewState) {
-        navigationBarView.setCanGoBack(viewState.canGoBack)
-        navigationBarView.setCanGoForward(viewState.canGoForward)
-    }
-
     fun configureCustomTab() {
         navigationBarView.setCustomTab(isCustomTab = true)
+    }
+
+    fun configureBrowserViewMode() {
+        navigationBarView.setViewMode(Browser)
+    }
+
+    fun configureNewTabViewMode() {
+        navigationBarView.setViewMode(NewTab)
+    }
+
+    fun configureFireButtonHighlight(highlighted: Boolean) {
+        navigationBarView.setFireButtonHighlight(highlighted)
     }
 
     fun onDestroyView() {
@@ -84,11 +93,14 @@ class BrowserNavigationBarViewIntegration(
         // we're hiding the navigation bar when keyboard is shown,
         // to prevent it from being "pushed up" within the coordinator layout
         keyboardVisibilityJob = lifecycleScope.launch {
-            omnibar.textInputRootView.keyboardVisibilityFlow().collect { keyboardVisible ->
+            omnibar.textInputRootView.keyboardVisibilityFlow().distinctUntilChanged().collect { keyboardVisible ->
                 if (keyboardVisible) {
                     navigationBarView.gone()
                 } else {
-                    navigationBarView.show()
+                    navigationBarView.postDelayed(
+                        { navigationBarView.show() },
+                        BrowserTabFragment.KEYBOARD_DELAY,
+                    )
                 }
             }
         }

@@ -74,6 +74,7 @@ interface Cta {
     val shownPixel: Pixel.PixelName?
     val okPixel: Pixel.PixelName?
     val cancelPixel: Pixel.PixelName?
+    val closePixel: Pixel.PixelName?
 
     fun pixelShownParameters(): Map<String, String>
     fun pixelCancelParameters(): Map<String, String>
@@ -87,6 +88,7 @@ interface OnboardingDaxCta {
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit,
         onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
+        onDismissCtaClicked: () -> Unit,
     )
 
     fun hideOnboardingCta(
@@ -101,6 +103,7 @@ sealed class OnboardingDaxDialogCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
+    override val closePixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -125,6 +128,7 @@ sealed class OnboardingDaxDialogCta(
         onPrimaryCtaClicked: () -> Unit,
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit = {},
+        onDismissCtaClicked: () -> Unit,
     ) {
         val daxDialog = binding.includeOnboardingInContextDaxDialog
 
@@ -157,6 +161,7 @@ sealed class OnboardingDaxDialogCta(
             secondaryCtaText?.let { daxDialog.secondaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
             binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
+            binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
             onTypingAnimationFinished.invoke()
         }
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
@@ -175,6 +180,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_SERP_CTA,
         onboardingStore,
         appInstallStore,
@@ -185,6 +191,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -194,6 +201,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -210,6 +218,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
         onboardingStore,
         appInstallStore,
@@ -220,6 +229,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -229,6 +239,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
 
@@ -268,6 +279,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_NETWORK_CTA_1,
         onboardingStore,
         appInstallStore,
@@ -278,6 +290,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -287,6 +300,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
 
@@ -322,6 +336,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
         onboardingStore,
         appInstallStore,
@@ -332,6 +347,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -341,6 +357,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -355,6 +372,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         DAX_FIRE_DIALOG_CTA,
         onboardingStore,
         appInstallStore,
@@ -365,16 +383,17 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = description?.let { context.getString(it) }.orEmpty(),
                 primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                secondaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton),
                 binding = binding,
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -389,6 +408,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
         onboardingStore,
         appInstallStore,
@@ -399,6 +419,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingInContextDaxDialog
@@ -448,6 +469,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
         Pixel.PixelValues.DAX_ONBOARDING_END_CTA,
         onboardingStore,
         appInstallStore,
@@ -460,6 +482,7 @@ sealed class OnboardingDaxDialogCta(
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -469,6 +492,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
             )
         }
     }
@@ -497,6 +521,7 @@ sealed class DaxBubbleCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName? = null,
+    override val closePixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -611,6 +636,12 @@ sealed class DaxBubbleCta(
         }
     }
 
+    fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.daxDialogDismissButton)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
+    }
+
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
         options?.forEachIndexed { index, option ->
             val optionView = when (index) {
@@ -621,6 +652,10 @@ sealed class DaxBubbleCta(
             }
             option.let { ctaView?.findViewById<DaxButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
         }
+    }
+
+    fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
+        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxCtaContainer.gone()
     }
 
     override val markAsReadOnShow: Boolean = true
@@ -687,10 +722,8 @@ sealed class DaxBubbleCta(
         description = descriptionRes,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
         primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
-        secondaryCta = R.string.onboardingPrivacyProDaxDialogCancelButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        cancelPixel = AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
@@ -720,6 +753,7 @@ sealed class HomePanelCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
+    override val closePixel: Pixel.PixelName? = null,
 ) : Cta, ViewCta {
 
     override fun showCta(
@@ -767,6 +801,7 @@ class BrokenSitePromptDialogCta : Cta {
     override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN
     override val okPixel: Pixel.PixelName = SITE_NOT_WORKING_WEBSITE_BROKEN
     override val cancelPixel: Pixel.PixelName? = null
+    override val closePixel: Pixel.PixelName? = null
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf()
 

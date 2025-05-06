@@ -36,16 +36,20 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
+import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
+import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandlerImpl
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
+import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
-import com.duckduckgo.app.browser.refreshpixels.RefreshDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -179,6 +183,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
         duckChat: DuckChat,
+        aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -187,6 +192,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature,
         duckPlayer,
         duckChat,
+        aiChatQueryDetectionFeature,
     )
 
     @Provides
@@ -360,9 +366,13 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideRefreshDao(appDatabase: AppDatabase): RefreshDao {
-        return appDatabase.refreshDao()
+    fun provideSiteErrorStringHandler(): StringSiteErrorHandler {
+        return StringSiteErrorHandlerImpl()
+    }
+
+    @Provides
+    fun provideSiteErrorCodeHandler(): HttpCodeSiteErrorHandler {
+        return HttpCodeSiteErrorHandlerImpl()
     }
 }
 

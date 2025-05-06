@@ -218,9 +218,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Omogućeno</string>
-    <string name="netpSubscriptionSettingsConnecting">Povezivanje u tijeku...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Onemogućeno</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

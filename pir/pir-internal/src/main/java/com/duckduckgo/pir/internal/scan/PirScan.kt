@@ -18,20 +18,28 @@ package com.duckduckgo.pir.internal.scan
 
 import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.component.PirActionsRunner
-import com.duckduckgo.pir.internal.component.PirActionsRunnerFactory
+import com.duckduckgo.pir.internal.callbacks.PirCallbacks
+import com.duckduckgo.pir.internal.common.BrokerStepsParser
+import com.duckduckgo.pir.internal.common.PirActionsRunner
+import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
+import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.PirJob
+import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.scan.PirScan.RunType
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.internal.scripts.models.Address
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.db.PirScanLog
-import com.duckduckgo.pir.internal.store.db.ScanEventType
+import com.duckduckgo.pir.internal.store.db.EventType
+import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.File
+import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -52,6 +60,7 @@ interface PirScan {
         brokers: List<String>,
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -62,17 +71,13 @@ interface PirScan {
     suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
      * This method takes care of stopping the scan and cleaning up resources used.
      */
     fun stop()
-
-    enum class RunType {
-        MANUAL,
-        SCHEDULED,
-    }
 }
 
 @ContributesBinding(
@@ -87,17 +92,23 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
     private val pixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
-) : PirScan {
+    callbacks: PluginPoint<PirCallbacks>,
+) : PirScan, PirJob(callbacks) {
 
     private var profileQuery: ProfileQuery = ProfileQuery(
         firstName = "William",
         lastName = "Smith",
         city = "Chicago",
         state = "IL",
-        addresses = listOf(),
+        addresses = listOf(
+            Address(
+                city = "Chicago",
+                state = "IL",
+            ),
+        ),
         birthYear = 1993,
         fullName = "William Smith",
-        age = 34,
+        age = 32,
         deprecated = false,
     )
 
@@ -108,16 +119,20 @@ class RealPirScan @Inject constructor(
         brokers: List<String>,
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
+        onJobStarted(coroutineScope)
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
         emitScanStartPixel(runType)
         // Clean up previous run's results
         runBlocking {
             if (runners.isNotEmpty()) {
-                stop()
+                runners.forEach {
+                    it.stop()
+                }
                 runners.clear()
             }
-            repository.deleteAllResults()
+            repository.deleteAllScanResults()
             repository.getUserProfiles().also {
                 if (it.isNotEmpty()) {
                     // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
@@ -127,13 +142,18 @@ class RealPirScan @Inject constructor(
                         lastName = storedProfile.userName.lastName,
                         city = storedProfile.addresses.city,
                         state = storedProfile.addresses.state,
-                        addresses = listOf(),
+                        addresses = listOf(
+                            Address(
+                                city = storedProfile.addresses.city,
+                                state = storedProfile.addresses.state,
+                            ),
+                        ),
                         birthYear = storedProfile.birthYear,
                         fullName = storedProfile.userName.middleName?.run {
                             "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
                         }
                             ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                        age = storedProfile.age,
+                        age = LocalDate.now().year - storedProfile.birthYear,
                         deprecated = false,
                     )
                 }
@@ -145,7 +165,11 @@ class RealPirScan @Inject constructor(
             pirCssScriptLoader.getScript()
         }
 
-        maxWebViewCount = getMaximumParallelRunners()
+        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
+            brokers.size
+        } else {
+            MAX_DETACHED_WEBVIEW_COUNT
+        }
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
@@ -177,63 +201,47 @@ class RealPirScan @Inject constructor(
             logcat { "PIR-SCAN: Scan completed for all runners" }
             emitScanCompletedPixel(
                 runType,
-                startTimeMillis - currentTimeProvider.currentTimeMillis(),
+                currentTimeProvider.currentTimeMillis() - startTimeMillis,
                 maxWebViewCount,
             )
+            onJobCompleted()
             Result.success(Unit)
         }
-    }
-
-    private fun getMaximumParallelRunners(): Int {
-        return try {
-            // Get the directory containing CPU info
-            val cpuDir = File("/sys/devices/system/cpu/")
-            // Filter folders matching the pattern "cpu[0-9]+"
-            val cpuFiles = cpuDir.listFiles { file -> file.name.matches(Regex("cpu[0-9]+")) }
-            cpuFiles?.size ?: Runtime.getRuntime().availableProcessors()
-        } catch (e: Exception) {
-            // In case of an error, fall back to availableProcessors
-            Runtime.getRuntime().availableProcessors()
-        }
-    }
-
-    private fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
-        val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
-        return this.chunked(chunkSize)
     }
 
     override suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
+        coroutineScope: CoroutineScope,
     ): Result<Unit> {
-        val brokers = runBlocking {
-            repository.getAllBrokersForScan()
-        }
-        return execute(brokers, context, runType)
+        val brokers = repository.getAllBrokersForScan()
+        return execute(brokers, context, runType, coroutineScope)
     }
 
     override fun stop() {
         logcat { "PIR-SCAN: Stopping all runners" }
         runners.forEach {
-            runBlocking { it.stop() }
+            it.stop()
         }
+        runners.clear()
+        onJobStopped()
     }
 
     private suspend fun emitScanStartPixel(runType: RunType) {
         if (runType == RunType.MANUAL) {
             pixelSender.reportManualScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_STARTED,
+                    eventType = EventType.MANUAL_SCAN_STARTED,
                 ),
             )
         } else {
             pixelSender.reportScheduledScanStarted()
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_STARTED,
+                    eventType = EventType.SCHEDULED_SCAN_STARTED,
                 ),
             )
         }
@@ -252,9 +260,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.MANUAL_SCAN_COMPLETED,
+                    eventType = EventType.MANUAL_SCAN_COMPLETED,
                 ),
             )
         } else {
@@ -265,9 +273,9 @@ class RealPirScan @Inject constructor(
                 totalBrokerFailed = repository.getErrorResultsCount(),
             )
             repository.saveScanLog(
-                PirScanLog(
+                PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = ScanEventType.SCHEDULED_SCAN_COMPLETED,
+                    eventType = EventType.SCHEDULED_SCAN_COMPLETED,
                 ),
             )
         }

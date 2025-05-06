@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.google.auto.service.AutoService
@@ -143,6 +144,10 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         }
 
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassFileName) {
+            addImport(DefaultFeatureValue::class.fqName.parent().asString(), DefaultFeatureValue::class.fqName.shortName().asString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.TRUE.toString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.FALSE.toString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.INTERNAL.toString())
             // This is the normal plugin point
             addType(
                 TypeSpec.interfaceBuilder(pluginPointClassName)
@@ -176,7 +181,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                             .addModifiers(ABSTRACT)
                             .addAnnotation(
                                 AnnotationSpec.builder(Toggle.DefaultValue::class)
-                                    .addMember("defaultValue = %L", true)
+                                    .addMember("defaultValue = %L", "DefaultFeatureValue.TRUE")
                                     .build(),
                             )
                             .returns(Toggle::class)
@@ -313,7 +318,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val boundType = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.boundTypeOrNull()!!
         val featureDefaultValue = vmClass.annotations.firstOrNull {
             it.fqName == ContributesActivePlugin::class.fqName
-        }?.defaultActiveValueOrNull() ?: true
+        }?.defaultActiveValueOrNull() ?: DefaultFeatureValue.TRUE
         // the parent feature name is taken from the plugin interface name implemented by this class
         val parentFeatureName = "pluginPoint${boundType.shortName}"
         val featureName = "plugin${vmClass.shortName}"
@@ -346,6 +351,10 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         }
 
         val content = FileSpec.buildFile(generatedPackage, pluginClassName) {
+            addImport(DefaultFeatureValue::class.fqName.parent().asString(), DefaultFeatureValue::class.fqName.shortName().asString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.TRUE.toString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.FALSE.toString())
+            addImport(DefaultFeatureValue::class.fqName.asString(), DefaultFeatureValue.INTERNAL.toString())
             // First create the class that will contribute the active plugin.
             // We do expect that the plugins are define using the "ContributesActivePlugin" annotation but are also injected
             // using @Inject in the constructor, as the concrete plugin type is use as delegate.
@@ -416,7 +425,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                             .addAnnotation(
                                 AnnotationSpec.builder(Toggle.DefaultValue::class)
                                     // The parent feature toggle is the one guarding the plugin point, for convention is default enabled.
-                                    .addMember("defaultValue = %L", true)
+                                    .addMember("defaultValue = %L", "DefaultFeatureValue.TRUE")
                                     .build(),
                             )
                             .returns(Toggle::class)
@@ -604,7 +613,15 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     }
 
     @OptIn(ExperimentalAnvilApi::class)
-    private fun AnnotationReference.defaultActiveValueOrNull(): Boolean? = argumentAt("defaultActiveValue", 2)?.value()
+    private fun AnnotationReference.defaultActiveValueOrNull(): DefaultFeatureValue? {
+        val rawValue = argumentAt("defaultActiveValue", 2)?.value() as FqName? ?: return null
+
+        return if (rawValue.parent() == DefaultFeatureValue::class.fqName) {
+            DefaultFeatureValue.valueOf(rawValue.shortName().toString())
+        } else {
+            null
+        }
+    }
 
     @OptIn(ExperimentalAnvilApi::class)
     private fun AnnotationReference.priorityOrNull(): Int? = argumentAt("priority", 3)?.value()
