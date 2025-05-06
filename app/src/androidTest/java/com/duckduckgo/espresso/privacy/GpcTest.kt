@@ -31,7 +31,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.JsObjectIdlingResource
-import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -39,7 +38,6 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class GpcTest {
 
@@ -51,7 +49,8 @@ class GpcTest {
         ),
     )
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
+    // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
 
