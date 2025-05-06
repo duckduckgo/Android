@@ -31,6 +31,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.JsObjectIdlingResource
+import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -38,6 +39,7 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
+import org.junit.Test
 
 class GpcTest {
 
@@ -49,7 +51,7 @@ class GpcTest {
         ),
     )
 
-    // @Test @PrivacyTest
+    @Test @PrivacyTest
     // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
@@ -70,8 +72,10 @@ class GpcTest {
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val idlingResourceForScript = WebViewIdlingResource(webView!!)
+        val idlingResourceForScript = JsObjectIdlingResource(webView, "window.results")
         IdlingRegistry.getInstance().register(idlingResourceForScript)
+        val completedIdlingResource = JsObjectIdlingResource(webView, "window.results.completed")
+        IdlingRegistry.getInstance().register(completedIdlingResource)
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -83,7 +87,13 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource)
+        if (IdlingRegistry.getInstance().resources.contains(idlingResourceForScript)) {
+            IdlingRegistry.getInstance().unregister(idlingResourceForScript)
+        }
+        if (IdlingRegistry.getInstance().resources.contains(completedIdlingResource)) {
+            IdlingRegistry.getInstance().unregister(completedIdlingResource)
+        }
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
