@@ -192,6 +192,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.bookmarksButton.isVisible = viewState.bookmarksButtonVisible
         binding.fireButton.isVisible = viewState.fireButtonVisible
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
+        binding.tabsButton.count = viewState.tabsCount
+        binding.tabsButton.hasUnread = viewState.hasUnreadTabs
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
