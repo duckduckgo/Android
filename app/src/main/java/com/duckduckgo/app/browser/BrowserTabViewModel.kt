@@ -1713,11 +1713,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun notifyPermanentLocationPermission(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val hasPermanentLocationPermission = sitePermissionsManager.hasSitePermanentPermission(
-                domain,
-                LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION,
-            )
-            if (hasPermanentLocationPermission) {
+            if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
                 Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
                 if (!locationPermissionMessages.containsKey(domain)) {
                     Timber.d("Location Permission: We haven't shown message for $domain this session")
