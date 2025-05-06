@@ -1601,7 +1601,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
-        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
+        permissionOrigin?.let { notifyPermanentLocationPermission(permissionOrigin) }
 
         registerSiteVisit()
 
@@ -1711,17 +1711,25 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
-            Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
-            if (!locationPermissionMessages.containsKey(domain)) {
-                setDomainHasLocationPermissionShown(domain)
-                if (shouldShowLocationPermissionMessage()) {
-                    Timber.d("Show location permission for $domain")
-                    command.postValue(ShowDomainHasPermissionMessage(domain))
+    private fun notifyPermanentLocationPermission(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val hasPermanentLocationPermission = sitePermissionsManager.hasSitePermanentPermission(
+                domain,
+                LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION,
+            )
+            if (hasPermanentLocationPermission) {
+                Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+                if (!locationPermissionMessages.containsKey(domain)) {
+                    Timber.d("Location Permission: We haven't shown message for $domain this session")
+                    setDomainHasLocationPermissionShown(domain)
+                    if (shouldShowLocationPermissionMessage()) {
+                        Timber.d("Location Permission: Show location permission for $domain")
+                        withContext(dispatchers.main()) {
+                            command.postValue(ShowDomainHasPermissionMessage(domain))
+                        }
+                    }
                 }
             }
-            command.postValue(ShowDomainHasPermissionMessage(domain))
         }
     }
 
