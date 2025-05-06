@@ -1714,8 +1714,24 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun notifyPermanentLocationPermission(domain: String) {
         if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
             Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+            if (!locationPermissionMessages.containsKey(domain)) {
+                setDomainHasLocationPermissionShown(domain)
+                if (shouldShowLocationPermissionMessage()) {
+                    Timber.d("Show location permission for $domain")
+                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                }
+            }
             command.postValue(ShowDomainHasPermissionMessage(domain))
         }
+    }
+
+    private fun setDomainHasLocationPermissionShown(domain: String) {
+        locationPermissionMessages[domain] = true
+    }
+
+    private fun shouldShowLocationPermissionMessage(): Boolean {
+        val url = site?.url ?: return true
+        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
     }
 
     private fun urlUpdated(url: String) {
