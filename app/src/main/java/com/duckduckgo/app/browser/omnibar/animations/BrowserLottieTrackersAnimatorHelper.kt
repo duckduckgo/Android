@@ -471,7 +471,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
             trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
             trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
-            else -> TODO()
+            // we shouldn't be here but we also don't want to crash so we'll show the default
+            else -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
         }
     }
 
