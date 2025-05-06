@@ -94,14 +94,14 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentDataStore.navigationBarState,
-    ) { state, tabs, highlightOverflowMenu, navigationBarState ->
+        visualDesignExperimentDataStore.experimentState,
+    ) { state, tabs, highlightOverflowMenu, visualDesignExperiment ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isNavigationBarEnabled = navigationBarState.isEnabled,
+            isVisualDesignExperimentEnabled = visualDesignExperiment.isEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -134,7 +134,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val isNavigationBarEnabled: Boolean = false,
+        val isVisualDesignExperimentEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
     ) {
@@ -146,6 +146,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelAnimations : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object StartExperimentVariant1Animation : Command()
         data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
@@ -593,9 +594,9 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             is LaunchTrackersAnimation -> {
-                Timber.d("Omnibar: LaunchTrackersAnimation")
                 if (!decoration.entities.isNullOrEmpty()) {
                     val hasFocus = _viewState.value.hasFocus
+                    val visualDesignExperiment = viewState.value.isVisualDesignExperimentEnabled
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
@@ -611,6 +612,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
                                     command.send(
                                         Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
+                                    )
+                                }
+
+                                visualDesignExperiment -> {
+                                    command.send(
+                                        Command.StartVisualDesignTrackersAnimation(decoration.entities),
                                     )
                                 }
 
