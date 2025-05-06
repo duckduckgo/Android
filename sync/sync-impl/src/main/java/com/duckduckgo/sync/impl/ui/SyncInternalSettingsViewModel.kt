@@ -33,7 +33,6 @@ import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadCon
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
 import com.duckduckgo.sync.store.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -55,7 +54,6 @@ constructor(
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
-    private val urlDecorator: SyncBarcodeDecorator,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -206,7 +204,7 @@ constructor(
     fun onShowQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
-            command.send(ShowQR(recoveryCode))
+            command.send(ShowQR(recoveryCode.qrCode))
         }
     }
 
@@ -245,7 +243,7 @@ constructor(
                 }
 
                 is Success -> {
-                    urlDecorator.decorateCode(qrCodeResult.data, SyncBarcodeDecorator.CodeType.Connect)
+                    qrCodeResult.data.qrCode
                 }
             }
             updateViewState()

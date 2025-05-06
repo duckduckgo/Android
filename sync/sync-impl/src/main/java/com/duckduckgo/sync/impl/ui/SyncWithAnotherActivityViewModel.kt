@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -52,9 +53,6 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Read
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator.CodeType.Exchange
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeDecorator.CodeType.Recovery
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -76,12 +74,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
     private val syncFeature: SyncFeature,
-    private val urlDecorator: SyncBarcodeDecorator,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var barcodeContents: BarcodeContents? = null
+    private var barcodeContents: AuthCode? = null
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
@@ -113,20 +110,17 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     private suspend fun showQRCode() {
         // get the code as a Result, and pair it with the type of code we're dealing with
-        val (result, codeType) = if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
-            Pair(syncAccountRepository.getRecoveryCode(), Recovery)
+        val result = if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
+            syncAccountRepository.getRecoveryCode()
         } else {
-            Pair(syncAccountRepository.generateExchangeInvitationCode(), Exchange)
+            syncAccountRepository.generateExchangeInvitationCode()
         }
 
-        result.onSuccess { code ->
-            // wrap the code inside a URL if feature flag allows it
-            val barcodeString = urlDecorator.decorateCode(code, codeType)
-
-            barcodeContents = BarcodeContents(underlyingCode = code, barcodeString = barcodeString)
+        result.onSuccess { authCode ->
+            barcodeContents = authCode
 
             val qrBitmap = withContext(dispatchers.io()) {
-                qrEncoder.encodeAsBitmap(barcodeString, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                qrEncoder.encodeAsBitmap(authCode.qrCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
             }
 
             viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
@@ -144,7 +138,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             barcodeContents?.let { contents ->
-                clipboard.copyToClipboard(contents.underlyingCode)
+                clipboard.copyToClipboard(contents.rawCode)
                 command.send(ShowMessage(string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
         }
@@ -309,17 +303,4 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onUserAskedToSwitchAccount() {
         syncPixels.fireAskUserToSwitchAccount()
     }
-
-    private data class BarcodeContents(
-        /**
-         * The underlying code that was encoded in the barcode.
-         * It's possible this is different from the barcode string which might contain extra data
-         */
-        val underlyingCode: String,
-
-        /**
-         * The string that was encoded in the barcode.
-         */
-        val barcodeString: String,
-    )
 }
