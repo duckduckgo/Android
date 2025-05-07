@@ -170,7 +170,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
-        assertTrue(testee.showInBrowserMenu())
+        assertTrue(testee.showInBrowserMenu.value)
     }
 
     @Test
@@ -179,7 +179,7 @@ class RealDuckChatTest {
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInBrowserMenu())
+        assertFalse(testee.showInBrowserMenu.value)
     }
 
     @Test

@@ -217,6 +217,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -606,6 +608,7 @@ class BrowserTabViewModelTest {
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -862,7 +865,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
-        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
@@ -870,7 +873,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
-        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(true))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)
@@ -6250,6 +6253,51 @@ class BrowserTabViewModelTest {
 
         verify(mockDuckChat).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChat() = runTest {
+        val url = "https://example.com"
+        loadUrl(url)
+
+        testee.openDuckChat(url)
+
+        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery(query)
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasTextThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery("foo")
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     private fun aCredential(): LoginCredentials {

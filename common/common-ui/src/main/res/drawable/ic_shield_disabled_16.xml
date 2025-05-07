@@ -11,7 +11,7 @@
         android:fillColor="?attr/daxColorPrimaryIcon"/>
     <path
         android:pathData="M12.5,12.5m-3.5,0a3.5,3.5 0,1 1,7 0a3.5,3.5 0,1 1,-7 0"
-        android:fillColor="?attr/daxColorFabPrimaryIcon"/>
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
     <path
         android:pathData="M12.5,16a3.5,3.5 0,1 0,0 -7,3.5 3.5,0 0,0 0,7ZM15,12h-5v1h5v-1Z"
         android:fillColor="?attr/daxColorPrimaryIcon"

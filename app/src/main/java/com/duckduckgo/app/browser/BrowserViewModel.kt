@@ -60,11 +60,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -463,6 +465,6 @@ class BrowserViewModel @Inject constructor(
     featureName = "androidSkipUrlConversionOnNewTab",
 )
 interface SkipUrlConversionOnNewTabFeature {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
