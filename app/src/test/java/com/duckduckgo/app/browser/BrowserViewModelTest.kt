@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
@@ -62,6 +63,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class BrowserViewModelTest {
 
     @get:Rule

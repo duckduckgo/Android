@@ -18,6 +18,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -105,6 +106,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {
 
