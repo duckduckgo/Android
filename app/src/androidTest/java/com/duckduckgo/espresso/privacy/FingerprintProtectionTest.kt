@@ -29,11 +29,13 @@ import androidx.test.espresso.web.webdriver.Locator.ID
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -45,10 +47,11 @@ class FingerprintProtectionTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
     @Test @PrivacyTest
-    fun whenProtectionsAreFingerprintProtected() {
+    fun whenProtectionsAreFingerprintProtected() = runTest {
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
+        var webViewClient: BrowserWebViewClient? = null
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
@@ -57,10 +60,13 @@ class FingerprintProtectionTest {
         )
         scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
+            webViewClient = webView?.webViewClient as? BrowserWebViewClient
         }
 
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+
+        webViewClient?.awaitScriptInjection()
 
         onWebView()
             .withElement(findElement(ID, "start"))

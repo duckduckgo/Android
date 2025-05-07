@@ -85,6 +85,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
@@ -436,9 +437,27 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, webViewClientListener?.getSite())
+            it.onPageStarted(
+                webView,
+                url,
+                webViewClientListener?.getSite(),
+            ) { value: String ->
+                Timber.tag("Cris").d("Script value: $value")
+                scriptInjectedChannel.trySend(Unit)
+            }
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    private val scriptInjectedChannel = Channel<Unit>(Channel.CONFLATED)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun awaitScriptInjection(timeout: Long = 10_000) {
+        withContext(Dispatchers.Default.limitedParallelism(1)) {
+            withTimeout(timeout) {
+                scriptInjectedChannel.receive()
+            }
+        }
     }
 
     private fun handleMediaPlayback(

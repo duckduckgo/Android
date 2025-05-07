@@ -29,12 +29,14 @@ import androidx.test.espresso.web.webdriver.Locator.ID
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -51,17 +53,21 @@ class GpcTest {
     )
 
     @Test @PrivacyTest
-    fun whenProtectionsAreEnableGpcSetCorrectly() {
+    fun whenProtectionsAreEnableGpcSetCorrectly() = runTest {
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
+        var webViewClient: BrowserWebViewClient? = null
 
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
+            webViewClient = webView?.webViewClient as? BrowserWebViewClient
         }
 
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+
+        webViewClient?.awaitScriptInjection()
 
         onWebView()
             .withElement(findElement(ID, "start"))

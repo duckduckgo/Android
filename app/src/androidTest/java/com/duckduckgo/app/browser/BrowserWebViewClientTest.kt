@@ -27,6 +27,7 @@ import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
+import android.webkit.ValueCallback
 import android.webkit.WebBackForwardList
 import android.webkit.WebHistoryItem
 import android.webkit.WebResourceError
@@ -1184,7 +1185,7 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+        override fun onPageStarted(webView: WebView, url: String?, site: Site?, callback: ValueCallback<String>?) {
             countStarted++
         }
 

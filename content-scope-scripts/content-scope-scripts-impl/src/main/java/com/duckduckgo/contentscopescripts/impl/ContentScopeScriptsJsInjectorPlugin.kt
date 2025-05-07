@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
@@ -27,9 +28,9 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
-    override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+    override fun onPageStarted(webView: WebView, url: String?, site: Site?, callback: ValueCallback<String>?) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
+            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", callback)
         }
     }
 

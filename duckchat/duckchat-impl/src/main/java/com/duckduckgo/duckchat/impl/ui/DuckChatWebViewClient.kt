@@ -35,7 +35,7 @@ class DuckChatWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, null)
+            it.onPageStarted(webView, url, null, null)
         }
     }
 }
