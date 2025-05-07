@@ -20,8 +20,10 @@ import android.annotation.SuppressLint
 import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +31,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
 import dagger.android.DaggerActivity
@@ -105,5 +108,19 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
         ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
+
+    open fun toggleFullScreen() {
+        if (isFullScreen()) {
+            // If we are exiting full screen, reset the orientation
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+
+        val newUiOptions = window.decorView.systemUiVisibility
+            .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
+            .xor(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
+        window.decorView.systemUiVisibility = newUiOptions
     }
 }

@@ -18,9 +18,13 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">„Duck.ai“ yra pasirenkama funkcija, leidžianti anonimiškai kalbėtis su populiariais trečiųjų šalių DI pokalbių modeliais. Tavo pokalbiai nenaudojami dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinok daugiau</annotation></string>
-    <string name="duck_chat_visibility_setting">Rodyti „Duck.ai“ naršyklės meniu</string>
-    <string name="duck_chat_address_bar_visibility_setting">Rodyti „Duck.ai“ adresų juostoje</string>
     <string name="duck_chat_download_finished_action_name">Atviras</string>
     <string name="duck_chat_cannot_open_file_error_message">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">„Duck.ai“ yra pasirenkama funkcija, leidžianti anonimiškai kalbėtis su populiariais trečiųjų šalių DI pokalbių modeliais. Tavo pokalbiai nenaudojami dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinok daugiau</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Įjungti „Duck.ai“</string>
+    <string name="duck_chat_show_in_heading">Šaukiniai</string>
+    <string name="duck_chat_visibility_setting">Naršyklės meniu</string>
+    <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
 </resources>

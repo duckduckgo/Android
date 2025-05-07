@@ -92,7 +92,7 @@ class AppIconModifier @Inject constructor(
         disable(context, newIcon)
         enable(context, newIcon)
 
-        appShortcutCreator.configureAppShortcuts()
+        appShortcutCreator.refreshAppShortcuts()
     }
 
     private fun enable(

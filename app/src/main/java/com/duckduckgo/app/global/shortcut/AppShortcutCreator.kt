@@ -44,6 +44,9 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -65,7 +68,7 @@ class AppShortcutCreatorLifecycleObserver(
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
         Timber.i("Configure app shortcuts")
-        appShortcutCreator.configureAppShortcuts()
+        appShortcutCreator.refreshAppShortcuts()
     }
 }
 
@@ -78,7 +81,14 @@ class AppShortcutCreator @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) {
 
-    fun configureAppShortcuts() {
+    init {
+        duckChat.showInBrowserMenu
+            .onEach { refreshAppShortcuts() }
+            .flowOn(dispatchers.io())
+            .launchIn(appCoroutineScope)
+    }
+
+    fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
             val shortcutList = mutableListOf<ShortcutInfo>()
 
@@ -86,7 +96,7 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
 
-            if (duckChat.isEnabled()) {
+            if (duckChat.showInBrowserMenu.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
             }
 

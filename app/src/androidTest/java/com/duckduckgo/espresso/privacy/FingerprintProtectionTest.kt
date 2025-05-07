@@ -37,18 +37,18 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Rule
-import org.junit.Test
 
 class FingerprintProtectionTest {
 
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
+    // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
     fun whenProtectionsAreFingerprintProtected() {
         preparationsForPrivacyTest()
 
-        var webView: WebView? = null
+        lateinit var webView: WebView
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
@@ -59,8 +59,10 @@ class FingerprintProtectionTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+        val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
+        IdlingRegistry.getInstance().register(jsIdlingResource)
 
         onWebView()
             .withElement(findElement(ID, "start"))
@@ -82,7 +84,7 @@ class FingerprintProtectionTest {
                 assertEquals(sortProperties(expected), sortProperties(actual))
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {

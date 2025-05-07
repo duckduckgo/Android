@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -46,7 +47,7 @@ interface AutofillSurveysFeature {
      */
 
     @InternalAlwaysEnabled
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
 

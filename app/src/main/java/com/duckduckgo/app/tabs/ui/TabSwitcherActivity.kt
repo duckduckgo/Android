@@ -671,7 +671,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
+        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu.value
 
         return super.onPrepareOptionsMenu(menu)
     }

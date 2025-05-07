@@ -284,6 +284,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
@@ -571,6 +572,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var lastSubmittedUserQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -875,7 +877,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         browserViewState.value = currentBrowserViewState().copy(
-            showDuckChatOption = duckChat.showInBrowserMenu(),
+            showDuckChatOption = duckChat.showInBrowserMenu.value,
         )
 
         viewModelScope.launch {
@@ -1599,7 +1601,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
-        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
+        permissionOrigin?.let { notifyPermanentLocationPermission(permissionOrigin) }
 
         registerSiteVisit()
 
@@ -1709,11 +1711,31 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
-            Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
-            command.postValue(ShowDomainHasPermissionMessage(domain))
+    private fun notifyPermanentLocationPermission(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
+                Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+                if (!locationPermissionMessages.containsKey(domain)) {
+                    Timber.d("Location Permission: We haven't shown message for $domain this session")
+                    setDomainHasLocationPermissionShown(domain)
+                    if (shouldShowLocationPermissionMessage()) {
+                        Timber.d("Location Permission: Show location permission for $domain")
+                        withContext(dispatchers.main()) {
+                            command.postValue(ShowDomainHasPermissionMessage(domain))
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    private fun setDomainHasLocationPermissionShown(domain: String) {
+        locationPermissionMessages[domain] = true
+    }
+
+    private fun shouldShowLocationPermissionMessage(): Boolean {
+        val url = site?.url ?: return true
+        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
     }
 
     private fun urlUpdated(url: String) {
@@ -1996,9 +2018,9 @@ class BrowserTabViewModel @Inject constructor(
                 loadingViewState.value = currentLoadingViewState().copy(
                     isLoading = true,
                     trackersAnimationEnabled = true,
-                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                    * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                    * showing in case the URL was blocked locally and therefore never started to show*/
+                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                        * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                        * showing in case the URL was blocked locally and therefore never started to show*/
                     progress = 20,
                     url = documentUrlString,
                 )
@@ -2155,7 +2177,8 @@ class BrowserTabViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
-            val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query))
+            val urlFocused =
+                hasFocus && query.isNotBlank() && !hasQueryChanged && (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query))
             val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
             val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
             hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
@@ -2613,7 +2636,7 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
-            val showDuckChat = duckChat.showInBrowserMenu()
+            val showDuckChat = duckChat.showInBrowserMenu.value
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
@@ -2846,7 +2869,8 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
-                        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                        browserViewState.value =
+                            currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                         ctaViewModel.dismissPulseAnimation()
                     }
                 }
@@ -4102,12 +4126,18 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) {
-        if (query?.isNotEmpty() == true) {
-            duckChat.openDuckChatWithAutoPrompt(query)
-        } else {
-            duckChat.openDuckChat()
-        }
+    fun openDuckChat(query: String?) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+
+        query == lastSubmittedUserQuery ||
+            (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
+        -> duckChat.openDuckChat(query)
+
+        else -> duckChat.openDuckChatWithAutoPrompt(query)
+    }
+
+    fun setLastSubmittedUserQuery(query: String) {
+        lastSubmittedUserQuery = query
     }
 
     companion object {

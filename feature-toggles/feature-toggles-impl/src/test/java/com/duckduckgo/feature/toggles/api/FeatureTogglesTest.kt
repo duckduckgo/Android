@@ -19,6 +19,7 @@ package com.duckduckgo.feature.toggles.api
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.feature.toggles.api.Cohorts.CONTROL
 import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
@@ -33,7 +34,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.times
 
 class FeatureTogglesTest {
 
@@ -67,6 +67,29 @@ class FeatureTogglesTest {
     @Test
     fun assertSubFeatureName() {
         assertEquals(FeatureName(parentName = "test", name = "disableByDefault"), feature.disableByDefault().featureName())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndInternalBuildReturnTrue() {
+        provider.flavorName = BuildFlavor.INTERNAL.name
+        assertTrue(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndPlayBuildReturnFalse() {
+        provider.flavorName = BuildFlavor.PLAY.name
+        assertFalse(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndFdroidBuildReturnFalse() {
+        provider.flavorName = BuildFlavor.FDROID.name
+        assertFalse(feature.internalByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenInternalByDefaultAndNoFlavourBuildReturnFalse() {
+        assertFalse(feature.internalByDefault().isEnabled())
     }
 
     @Test
@@ -558,34 +581,37 @@ class FeatureTogglesTest {
 }
 
 interface TestFeature {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun internalByDefault(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun disableByDefault(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enabledByDefault(): Toggle
     fun noDefaultValue(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun wrongReturnValue(): Boolean
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun methodWithArguments(arg: String)
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     suspend fun suspendFun(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun internal(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.Experiment
     fun experimentDisabledByDefault(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Toggle.Experiment
     fun experimentEnabledByDefault(): Toggle
 }

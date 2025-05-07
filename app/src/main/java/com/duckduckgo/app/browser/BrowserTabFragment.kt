@@ -187,11 +187,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.isFullScreen
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -236,9 +233,11 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -250,6 +249,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.isFullScreen
+import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -891,16 +892,28 @@ class BrowserTabFragment :
         Timber.d("Resuming webview: $tabId")
         webView?.let { webView ->
             if (webView.isShown) {
+                webView.ensureVisible()
                 webView.onResume()
             } else if (swipingTabsFeature.isEnabled) {
-                // Sometimes the tab is brought back from the background but the WebView is not visible yet due to
-                // ViewPager page change delay; this fixes an issue when a tab was blank.
+                // Sometimes a tab is brought back from the background but the WebView is not shown yet due to
+                // ViewPager page change delay; this makes sure the WebView is resumed when it is shown.
                 webView.post {
                     if (webView.isShown) {
+                        webView.ensureVisible()
                         webView.onResume()
                     }
                 }
+            } else {
+                Timber.d("WebView is not shown, not resuming")
             }
+        }
+    }
+
+    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    private fun DuckDuckGoWebView.ensureVisible() = postDelayed(100) {
+        if (swipingTabsFeature.isEnabled) {
+            scrollBy(0, 1)
+            scrollBy(0, -1)
         }
     }
 
@@ -967,7 +980,7 @@ class BrowserTabFragment :
     private fun disableSwipingOutsideTheOmnibar() {
         newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
-            false
+            true
         }
         binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
@@ -1994,6 +2007,7 @@ class BrowserTabFragment :
                 it.isMainFrame,
                 it.onMaliciousWarningShown,
             )
+
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.canGoBack)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
@@ -2049,6 +2063,7 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
+
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
@@ -2800,6 +2815,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
+        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -4364,7 +4380,7 @@ class BrowserTabFragment :
         private fun goFullScreen() {
             omnibar.hide()
             binding.webViewFullScreenContainer.show()
-            activity?.toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
@@ -4372,7 +4388,7 @@ class BrowserTabFragment :
             omnibar.show()
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
-            activity?.toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
     }
