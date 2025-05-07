@@ -425,7 +425,13 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
-
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            )
+        )
+        testee.onPrivacyConfigDownloaded()
         testee.setEnableDuckChatUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(false)
@@ -438,7 +444,13 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
-
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            )
+        )
+        testee.onPrivacyConfigDownloaded()
         testee.setEnableDuckChatUserSetting(true)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(true)
@@ -451,7 +463,12 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
-
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            )
+        )
         testee.setEnableDuckChatUserSetting(true)
 
         assertFalse(testee.showInBrowserMenu.value)
