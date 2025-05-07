@@ -297,7 +297,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        initializeTabs()
+        initializeTabs(savedInstanceState)
 
         // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
         // flows only once, so a separate initialization is necessary
@@ -313,6 +313,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        if (swipingTabsFeature.isEnabled) {
+            outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
+        }
     }
 
     private fun configureFlowCollectors() {
@@ -813,6 +821,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
+        private const val KEY_TAB_PAGER_STATE = "tabPagerState"
     }
 
     inner class BrowserStateRenderer {
@@ -856,7 +865,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun initializeTabs() {
+    private fun initializeTabs(savedInstanceState: Bundle?) {
         if (swipingTabsFeature.isEnabled) {
             tabManager.registerCallbacks(
                 onTabsUpdated = ::onTabsUpdated,
@@ -865,6 +874,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.adapter = tabPagerAdapter
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
+
+            savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
+                tabPagerAdapter.restoreState(it)
+            }
         }
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
