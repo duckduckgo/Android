@@ -152,6 +152,7 @@
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:scaleType="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_2"
                                 android:src="@drawable/ic_find_search_small_24" />
@@ -165,6 +166,7 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
+                                android:scaleType="center"
                                 android:src="@drawable/ic_arrow_left_small_24"
                                 android:visibility="gone" />
 
