@@ -29,14 +29,14 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType.Connect
-import com.duckduckgo.sync.impl.CodeType.Recovery
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode.Connect
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
@@ -173,7 +173,7 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
-        whenever(syncRepository.getCodeType(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
+        whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
         whenever(syncRepository.processCode(any())).thenReturn(Result.Success(true))
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
@@ -186,7 +186,7 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
-        whenever(syncRepository.getCodeType(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
         whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
@@ -199,7 +199,7 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
-        whenever(syncRepository.getCodeType(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
+        whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
         whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = CONNECT_FAILED.code))
 
         testee.commands().test {
