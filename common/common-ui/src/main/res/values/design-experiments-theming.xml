@@ -49,7 +49,7 @@
 
         <item name="autocompleteListItemHorizontalPadding">26dp</item>
         <item name="autocompleteListItemStartPadding">26dp</item>
-        <item name="autocompleteListItemEndPadding">18dp</item>
+        <item name="autocompleteListItemEndPadding">22dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
     </style>
 
@@ -86,7 +86,7 @@
 
         <item name="autocompleteListItemHorizontalPadding">26dp</item>
         <item name="autocompleteListItemStartPadding">26dp</item>
-        <item name="autocompleteListItemEndPadding">18dp</item>
+        <item name="autocompleteListItemEndPadding">22dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
     </style>
 
