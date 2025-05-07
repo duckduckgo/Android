@@ -18,6 +18,8 @@ package com.duckduckgo.espresso
 
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import android.webkit.WebView
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
@@ -34,6 +36,8 @@ class JsObjectIdlingResource(
 
     private val handler = Handler(Looper.getMainLooper())
     private val checkInterval = 100L // milliseconds
+    private val timeoutMillis = 10_000L // 10 seconds
+    private val startTime = SystemClock.elapsedRealtime()
 
     override fun getName(): String = "JsObjectIdlingResource for $objectName"
 
@@ -45,6 +49,13 @@ class JsObjectIdlingResource(
     }
 
     private fun pollForJsObject() {
+        if (SystemClock.elapsedRealtime() - startTime > timeoutMillis) {
+            Log.w("JsObjectIdlingResource", "Timeout waiting for JS object: $objectName")
+            isIdle = true
+            callback?.onTransitionToIdle()
+            throw AssertionError("JS object '$objectName' did not appear within timeout.")
+        }
+
         webView.evaluateJavascript(
             "(typeof $objectName !== 'undefined')",
         ) { result ->
