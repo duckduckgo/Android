@@ -42,7 +42,7 @@
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
-    <color name="controls_fill_secondary_dark">#B8F9F9F9</color>
+    <color name="controls_fill_secondary_dark">#2EF9F9F9</color>
     <color name="controls_fill_tertiary_dark">#3DF9F9F9</color>
     <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
 
