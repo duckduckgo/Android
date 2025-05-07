@@ -414,7 +414,7 @@ class RealDuckChatTest {
 
         testee.setEnableDuckChatUserSetting(false)
 
-        assertFalse(testee.showInBrowserMenu())
+        assertFalse(testee.showInBrowserMenu.value)
     }
 
     companion object {
