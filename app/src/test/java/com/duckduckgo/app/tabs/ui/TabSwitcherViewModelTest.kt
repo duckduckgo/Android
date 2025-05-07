@@ -21,6 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -196,6 +197,7 @@ class TabSwitcherViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
             defaultVisualExperimentStateFlow,
         )
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -1479,6 +1481,33 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
+    }
+
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+
+        initializeViewModel()
+
+        testee.selectionViewState.test {
+            assertFalse(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+
+        initializeViewModel()
+
+        testee.selectionViewState.test {
+            assertTrue(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
