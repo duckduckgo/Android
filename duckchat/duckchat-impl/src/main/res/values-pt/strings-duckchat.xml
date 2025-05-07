@@ -18,9 +18,13 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat de IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
-    <string name="duck_chat_visibility_setting">Mostrar Duck.ai no menu do navegador</string>
-    <string name="duck_chat_address_bar_visibility_setting">Mostrar Duck.ai na barra de endereço</string>
     <string name="duck_chat_download_finished_action_name">Abrir</string>
     <string name="duck_chat_cannot_open_file_error_message">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat de IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Ativar Duck.ai</string>
+    <string name="duck_chat_show_in_heading">Mostrar em</string>
+    <string name="duck_chat_visibility_setting">Menu do navegador</string>
+    <string name="duck_chat_address_bar_visibility_setting">Barra de endereço</string>
 </resources>
