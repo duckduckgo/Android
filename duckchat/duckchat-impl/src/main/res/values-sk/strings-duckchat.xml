@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai je voliteľná funkcia, ktorá ti umožňuje anonymne chatovať s obľúbenými modelmi chatu s umelou inteligenciou tretích strán. Tvoje chaty sa nepoužívajú na trénovanie AI.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Povoliť Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Zobraziť v</string>
+    <string name="duck_chat_show_in_heading">Skratky</string>
     <string name="duck_chat_visibility_setting">Ponuka prehliadača</string>
     <string name="duck_chat_address_bar_visibility_setting">Riadok adresy</string>
 </resources>

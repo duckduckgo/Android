@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai — дополнительная функция, позволяющая анонимно беседовать с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Включить Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Отображать в</string>
+    <string name="duck_chat_show_in_heading">Ярлыки</string>
     <string name="duck_chat_visibility_setting">Меню браузера</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресная строка</string>
 </resources>

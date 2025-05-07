@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat de IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Ativar Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Mostrar em</string>
+    <string name="duck_chat_show_in_heading">Atalhos</string>
     <string name="duck_chat_visibility_setting">Menu do navegador</string>
     <string name="duck_chat_address_bar_visibility_setting">Barra de endereço</string>
 </resources>

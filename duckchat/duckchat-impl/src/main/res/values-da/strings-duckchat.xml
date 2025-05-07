@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai er en valgfri funktion, der giver dig mulighed for at chatte anonymt med populære tredjeparts AI-chatmodeller. Dine chats bruges ikke til at træne AI.\n<annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Aktiver Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Vis i</string>
+    <string name="duck_chat_show_in_heading">Genveje</string>
     <string name="duck_chat_visibility_setting">Browsermenu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresselinje</string>
 </resources>

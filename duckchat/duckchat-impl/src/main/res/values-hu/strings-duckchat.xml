@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">A Duck.ai egy opcionális funkció, amely lehetővé teszi a harmadik féltől származó népszerű AI-csevegési modellekkel való névtelen csevegést. A csevegéseidet nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Duck.ai engedélyezése</string>
-    <string name="duck_chat_show_in_heading">Megjelenítés itt:</string>
+    <string name="duck_chat_show_in_heading">Gyorsparancsok</string>
     <string name="duck_chat_visibility_setting">Böngészési menü</string>
     <string name="duck_chat_address_bar_visibility_setting">Címsor</string>
 </resources>

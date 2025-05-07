@@ -24,7 +24,7 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai izborna je značajka koja ti omogućuje anonimno čavrljanje s popularnim AI modelima \'chata\' trećih strana. Tvoja čavrljanja se ne koriste za obuku AI-a.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Omogući Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Prikaži u</string>
+    <string name="duck_chat_show_in_heading">Prečaci</string>
     <string name="duck_chat_visibility_setting">Izbornik preglednika</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
 </resources>
