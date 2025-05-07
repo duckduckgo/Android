@@ -26,8 +26,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
