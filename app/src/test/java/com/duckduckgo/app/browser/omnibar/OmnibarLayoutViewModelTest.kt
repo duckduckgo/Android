@@ -31,6 +31,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -71,6 +72,8 @@ class OmnibarLayoutViewModelTest {
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
 
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+    private val duckChat: DuckChat = mock()
+    private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -87,6 +90,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(defaultVisualExperimentNavBarStateFlow)
+        whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
 
         initializeViewModel()
     }
@@ -125,6 +129,7 @@ class OmnibarLayoutViewModelTest {
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
+            duckChat = duckChat,
         )
     }
 
@@ -1018,7 +1023,17 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModelAttachedThenShowChatMenuTrue() = runTest {
+    fun whenViewModelAttachedThenShowChatMenuFalse() = runTest {
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenViewModeIsNewTabThenShowChatMenuTrue() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showChatMenu)
@@ -1026,8 +1041,20 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarFocusedAndQueryNotBlankThenShowChatMenuTrue() = runTest {
-        testee.onOmnibarFocusChanged(true, QUERY)
+    fun whenViewModeIsNewTabAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
+        duckChatShowInAddressBarFlow.value = false
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenNavigationBarExperimentEnabledThenShowChatMenuTrue() = runTest {
+        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showChatMenu)
@@ -1035,8 +1062,10 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarFocusedAndQueryBlankThenShowChatMenuFalse() = runTest {
-        testee.onOmnibarFocusChanged(true, "")
+    fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
+        duckChatShowInAddressBarFlow.value = false
+        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+
         testee.viewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.showChatMenu)

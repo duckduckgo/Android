@@ -40,11 +40,10 @@ interface DuckChat {
 
     /**
      * Checks whether DuckChat should be shown in address bar based on user settings.
-     * Uses cached values - does not perform disk I/O.
      *
      * @return true if DuckChat should be shown, false otherwise.
      */
-    fun showInAddressBar(): Boolean
+    val showInAddressBar: StateFlow<Boolean>
 
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.

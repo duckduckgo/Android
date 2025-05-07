@@ -56,6 +56,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -87,23 +88,31 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val duckChat: DuckChat,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow(ViewState())
+    private val _viewState = MutableStateFlow(
+        ViewState(
+            showChatMenu = duckChat.showInAddressBar.value,
+        ),
+    )
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentDataStore.experimentState,
-    ) { state, tabs, highlightOverflowMenu, visualDesignExperiment ->
+        duckChat.showInAddressBar,
+    ) { state, tabs, highlightOverflowMenu, visualDesignExperiment, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = visualDesignExperiment.isEnabled,
+            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
+                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || visualDesignExperiment.isEnabled),
         )
-    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -188,7 +197,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -222,7 +230,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
-                    showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -319,7 +326,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
-                            showChatMenu = false,
                         )
                     }
                 }
@@ -382,7 +388,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showChatMenu = false,
             )
         }
     }
@@ -462,7 +467,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showChatMenu = !showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,

@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.ui
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLearnMore
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -42,9 +44,22 @@ class DuckChatSettingsViewModelTest {
 
     @Before
     fun setUp() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
         testee = DuckChatSettingsViewModel(duckChat)
+    }
+
+    @Test
+    fun whenDuckChatUserEnabledToggledDisabledThenSetUserSetting() = runTest {
+        testee.onDuckChatUserEnabledToggled(false)
+        verify(duckChat).setEnableDuckChatUserSetting(false)
+    }
+
+    @Test
+    fun whenDuckChatUserEnabledToggledEnabledThenSetUserSetting() = runTest {
+        testee.onDuckChatUserEnabledToggled(true)
+        verify(duckChat).setEnableDuckChatUserSetting(true)
     }
 
     @Test
@@ -108,6 +123,62 @@ class DuckChatSettingsViewModelTest {
 
         testee.viewState.test {
             assertFalse(awaitItem().showInAddressBar)
+        }
+    }
+
+    @Test
+    fun whenDuckChatEnabledAndAddressBarEntryPointEnabledThenBothSubTogglesShown() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+        whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
+        testee = DuckChatSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShowBrowserMenuToggle)
+            assertTrue(state.shouldShowAddressBarToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatEnabledAndAddressBarEntryPointDisabledThenOnlyBrowserToggleShown() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+        whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(false)
+        testee = DuckChatSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShowBrowserMenuToggle)
+            assertFalse(state.shouldShowAddressBarToggle)
+        }
+    }
+
+    @Test
+    fun whenDuckChatDisabledThenNoSubTogglesShown() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+        whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
+        testee = DuckChatSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.shouldShowBrowserMenuToggle)
+            assertFalse(state.shouldShowAddressBarToggle)
+        }
+    }
+
+    @Test
+    fun whenDuckChatLearnMoreClickedThenOpenLearnMoreCommandEmitted() = runTest {
+        testee.duckChatLearnMoreClicked()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is OpenLearnMore)
+            command as OpenLearnMore
+            assertEquals(
+                "https://duckduckgo.com/duckduckgo-help-pages/aichat/",
+                command.learnMoreLink,
+            )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
