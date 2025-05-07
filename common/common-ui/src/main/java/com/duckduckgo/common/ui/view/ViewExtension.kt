@@ -18,13 +18,11 @@ package com.duckduckgo.common.ui.view
 
 import android.content.Context
 import android.content.res.Resources
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.children
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
@@ -151,27 +149,6 @@ fun CompoundButton.quietlySetIsChecked(
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState
     setOnCheckedChangeListener(changeListener)
-}
-
-fun View.makeSnackbarBottomNavigationAware(
-    text: CharSequence,
-    anchorId: Int,
-    @Duration duration: Int,
-): Snackbar {
-    val snackbar = Snackbar.make(this, text, duration)
-    val snackBarView: View = snackbar.getView()
-    val params = snackBarView.layoutParams as CoordinatorLayout.LayoutParams
-
-    params.anchorId = anchorId
-    params.anchorGravity = Gravity.TOP
-    params.gravity = Gravity.TOP
-    snackBarView.layoutParams = params
-
-    // add a padding to the snackbar to avoid it touching the anchor view
-    if (snackBarView.translationY == 0f) {
-        snackBarView.translationY -= resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-    }
-    return snackbar
 }
 
 fun View.makeSnackbarWithNoBottomInset(
