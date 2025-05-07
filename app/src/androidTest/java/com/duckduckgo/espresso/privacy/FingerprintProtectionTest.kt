@@ -18,7 +18,11 @@ package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
 import androidx.test.core.app.*
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.pressImeActionButton
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -37,54 +41,61 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Rule
+import org.junit.Test
 
 class FingerprintProtectionTest {
 
     @get:Rule
-    var activityScenarioRule = activityScenarioRule<BrowserActivity>()
+    var activityScenarioRule = activityScenarioRule<BrowserActivity>(
+        BrowserActivity.intent(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            "https://privacy-test-pages.site/privacy-protections/",
+        ),
+    )
 
-    // @Test @PrivacyTest
+    @Test @PrivacyTest
     // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
     fun whenProtectionsAreFingerprintProtected() {
+
         preparationsForPrivacyTest()
 
-        lateinit var webView: WebView
-        val scenario = ActivityScenario.launch<BrowserActivity>(
-            BrowserActivity.intent(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.site/privacy-protections/fingerprinting/?disable_tests=navigator.requestMediaKeySystemAccess",
-            ),
-        )
-        scenario.onActivity {
+        var webView: WebView? = null
+        activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
-        IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
-        val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
-        IdlingRegistry.getInstance().register(jsIdlingResource)
-
-        onWebView()
-            .withElement(findElement(ID, "start"))
-            .check(webMatches(getText(), containsString("Start the test")))
-            .perform(webClick())
-
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val jsIdlingResource = JsObjectIdlingResource(webView!!, "window.navigator.duckduckgo")
         val idlingResourceForScript = WebViewIdlingResource(webView!!)
-        IdlingRegistry.getInstance().register(idlingResourceForScript)
 
-        val results = onWebView()
-            .perform(script(SCRIPT))
-            .get()
+        try {
+            onView(withId(R.id.omnibarTextInput))
+                .perform(typeText("https://privacy-test-pages.site/privacy-protections/fingerprinting/?disable_tests=navigator.requestMediaKeySystemAccess"), pressImeActionButton())
+            IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+            IdlingRegistry.getInstance().register(jsIdlingResource)
 
-        val testJson: TestJson? = getTestJson(results.toJSONString())
-        testJson?.value?.map {
-            if (compatibleIds.contains(it.id)) {
-                val expected = compatibleIds[it.id]!!
-                val actual = it.value.toString()
-                assertEquals(sortProperties(expected), sortProperties(actual))
+            onWebView()
+                .withElement(findElement(ID, "start"))
+                .check(webMatches(getText(), containsString("Start the test")))
+                .perform(webClick())
+
+            IdlingRegistry.getInstance().register(idlingResourceForScript)
+
+            val results = onWebView()
+                .perform(script(SCRIPT))
+                .get()
+
+            val testJson: TestJson? = getTestJson(results.toJSONString())
+            testJson?.value?.map {
+                if (compatibleIds.contains(it.id)) {
+                    val expected = compatibleIds[it.id]!!
+                    val actual = it.value.toString()
+                    assertEquals(sortProperties(expected), sortProperties(actual))
+                }
             }
+        } finally {
+            IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
@@ -118,6 +129,13 @@ class FingerprintProtectionTest {
         )
     }
 
-    data class TestJson(val status: Int, val value: List<FingerProtectionTest>)
-    data class FingerProtectionTest(val id: String, val value: Any)
+    data class TestJson(
+        val status: Int,
+        val value: List<FingerProtectionTest>
+    )
+
+    data class FingerProtectionTest(
+        val id: String,
+        val value: Any
+    )
 }
