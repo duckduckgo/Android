@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Vue grille</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt; au cours des 7 derniers jours</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt; au cours des 7 derniers jours</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s traqueurs bloqués &lt;/b&gt;</string>
     <string name="inTheLast7Days">au cours des 7 derniers jours</string>
 
