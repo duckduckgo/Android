@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.store
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,7 +37,7 @@ class BrowserAppTheme @Inject constructor(
 ) : AppTheme {
 
     override fun isLightModeEnabled(): Boolean {
-        return when (themeDataStore.theme) {
+        val lightModeEnabled = when (themeDataStore.theme) {
             DuckDuckGoTheme.LIGHT -> true
             DuckDuckGoTheme.EXPERIMENT_LIGHT -> true
             DuckDuckGoTheme.DARK -> false
@@ -45,6 +46,8 @@ class BrowserAppTheme @Inject constructor(
                 !isNightMode(context)
             }
         }
+        Log.d("Trackers", "isLightModeEnabled for ${themeDataStore.theme} $lightModeEnabled")
+        return lightModeEnabled
     }
 
     private fun isNightMode(context: Context): Boolean {

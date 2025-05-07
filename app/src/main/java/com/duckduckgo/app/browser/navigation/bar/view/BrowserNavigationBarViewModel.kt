@@ -68,7 +68,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         state.copy(
             isVisible = navigationBarState.isEnabled && !isCustomTab,
             tabsCount = tabs.size,
-            shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
+            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -160,6 +160,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val fireButtonHighlighted: Boolean = false,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
-        val shouldUpdateTabsCount: Boolean = false,
+        val hasUnreadTabs: Boolean = false,
     )
 }

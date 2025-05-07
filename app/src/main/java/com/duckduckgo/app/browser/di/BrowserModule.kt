@@ -68,6 +68,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -256,8 +257,9 @@ class BrowserModule {
         context: Context,
         fileDeleter: FileDeleter,
         dispatcherProvider: DispatcherProvider,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): FaviconPersister {
-        return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
+        return FileBasedFaviconPersister(context, fileDeleter, androidBrowserConfigFeature, dispatcherProvider)
     }
 
     @Provides

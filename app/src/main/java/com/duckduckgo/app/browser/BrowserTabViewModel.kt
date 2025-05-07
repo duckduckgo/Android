@@ -572,6 +572,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var lastSubmittedUserQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -876,7 +877,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         browserViewState.value = currentBrowserViewState().copy(
-            showDuckChatOption = duckChat.showInBrowserMenu(),
+            showDuckChatOption = duckChat.showInBrowserMenu.value,
         )
 
         viewModelScope.launch {
@@ -2614,7 +2615,7 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
-            val showDuckChat = duckChat.showInBrowserMenu()
+            val showDuckChat = duckChat.showInBrowserMenu.value
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
@@ -4103,12 +4104,18 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) {
-        if (query?.isNotEmpty() == true) {
-            duckChat.openDuckChatWithAutoPrompt(query)
-        } else {
-            duckChat.openDuckChat()
-        }
+    fun openDuckChat(query: String?) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+
+        query == lastSubmittedUserQuery ||
+            (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
+        -> duckChat.openDuckChat(query)
+
+        else -> duckChat.openDuckChatWithAutoPrompt(query)
+    }
+
+    fun setLastSubmittedUserQuery(query: String) {
+        lastSubmittedUserQuery = query
     }
 
     companion object {

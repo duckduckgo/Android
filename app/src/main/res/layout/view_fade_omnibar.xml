@@ -84,6 +84,7 @@
                             android:id="@+id/trackersAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
+                            android:layout_marginStart="4dp"
                             android:importantForAccessibility="no"
                             android:paddingStart="@dimen/keyline_4"
                             android:saveEnabled="false"
@@ -96,6 +97,15 @@
 
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/shieldIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/shieldIconExperiment"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:importantForAccessibility="no"
@@ -142,6 +152,7 @@
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:scaleType="center"
                                 android:importantForAccessibility="no"
                                 android:padding="@dimen/keyline_2"
                                 android:src="@drawable/ic_find_search_small_24" />
@@ -155,7 +166,8 @@
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/back"
                                 android:gravity="center"
-                                android:src="@drawable/ic_arrow_left_24"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_arrow_left_small_24"
                                 android:visibility="gone" />
 
                             <ImageView
@@ -424,16 +436,6 @@
                     android:contentDescription="@string/browserPopupMenu"
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/shieldIconExperiment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView

@@ -65,7 +65,7 @@ class OmnibarLayoutViewModelTest {
     private val userBrowserProperties: UserBrowserProperties = mock()
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
-    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = false, isEnabled = false))
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -86,7 +86,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(defaultVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(defaultVisualExperimentNavBarStateFlow)
 
         initializeViewModel()
     }
@@ -865,6 +865,7 @@ class OmnibarLayoutViewModelTest {
     fun whenTrackersAnimationStartedAndOmnibarFocusedThenCommandAndViewStateCorrect() = runTest {
         testee.onOmnibarFocusChanged(true, SERP_URL)
         val trackers = givenSomeTrackers()
+
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
 
         testee.viewState.test {

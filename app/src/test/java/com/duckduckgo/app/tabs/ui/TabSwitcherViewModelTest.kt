@@ -21,8 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperimentImpl
@@ -64,6 +63,8 @@ import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.fakes.FakePixel
@@ -196,6 +197,7 @@ class TabSwitcherViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
             defaultVisualExperimentStateFlow,
         )
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -1479,6 +1481,33 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
+    }
+
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+
+        initializeViewModel()
+
+        testee.selectionViewState.test {
+            assertFalse(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+
+        initializeViewModel()
+
+        testee.selectionViewState.test {
+            assertTrue(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {

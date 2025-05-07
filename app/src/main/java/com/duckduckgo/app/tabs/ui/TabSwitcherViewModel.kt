@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
@@ -57,6 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.N
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -129,12 +129,13 @@ class TabSwitcherViewModel @Inject constructor(
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
         visualDesignExperimentDataStore.experimentState,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, experimentState ->
+        duckChat.showInBrowserMenu,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, experimentState, showInBrowserMenu ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
             isNewVisualDesignEnabled = experimentState.isEnabled,
-            isDuckChatEnabled = duckChat.isEnabled() && duckChat.showInBrowserMenu(),
+            isDuckChatEnabled = duckChat.isEnabled() && showInBrowserMenu,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
