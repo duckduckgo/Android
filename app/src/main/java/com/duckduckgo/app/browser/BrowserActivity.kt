@@ -88,6 +88,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -757,6 +758,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             },
             300,
         )
+    }
+
+    override fun toggleFullScreen() {
+        super.toggleFullScreen()
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModel.onFullScreenModeChanged(isFullScreen())
+        }
     }
 
     companion object {
