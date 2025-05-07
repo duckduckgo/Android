@@ -1023,10 +1023,10 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModelAttachedThenShowChatMenutrue() = runTest {
+    fun whenViewModelAttachedThenShowChatMenuFalse() = runTest {
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
+            assertFalse(viewState.showChatMenu)
         }
     }
 
@@ -1073,11 +1073,11 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarNotFocusedThenShowChatMenuTrue() = runTest {
+    fun whenOmnibarNotFocusedThenShowChatMenuFalse() = runTest {
         testee.onOmnibarFocusChanged(false, QUERY)
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.showChatMenu)
+            assertFalse(viewState.showChatMenu)
         }
     }
 
@@ -1091,20 +1091,20 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenClearTextButtonPressedThenShowChatMenuTrue() = runTest {
+    fun whenClearTextButtonPressedThenShowChatMenuFalse() = runTest {
         testee.onClearTextButtonPressed()
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
+            assertFalse(viewState.showChatMenu)
         }
     }
 
     @Test
-    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuTrue() = runTest {
+    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuFalse() = runTest {
         testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
+            assertFalse(viewState.showChatMenu)
         }
     }
 
