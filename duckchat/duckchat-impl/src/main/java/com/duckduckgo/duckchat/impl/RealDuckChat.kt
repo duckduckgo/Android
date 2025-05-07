@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -200,7 +201,7 @@ class RealDuckChat @Inject constructor(
         return isAddressBarEntryPointEnabled
     }
 
-    override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu
+    override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
 
     override fun showInAddressBar(): Boolean {
         return showInAddressBar && isAddressBarEntryPointEnabled

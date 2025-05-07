@@ -21,6 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -81,6 +82,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -196,6 +198,7 @@ class TabSwitcherViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
             defaultVisualExperimentStateFlow,
         )
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -1485,11 +1488,13 @@ class TabSwitcherViewModelTest {
     fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
         defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
         whenever(duckChatMock.isEnabled()).thenReturn(true)
-        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         initializeViewModel()
 
-        assertFalse(testee.selectionViewState.value.dynamicInterface.isAIFabVisible)
+        testee.selectionViewState.test {
+            assertFalse(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -1500,7 +1505,10 @@ class TabSwitcherViewModelTest {
 
         initializeViewModel()
 
-        assertTrue(testee.selectionViewState.value.dynamicInterface.isAIFabVisible)
+        testee.selectionViewState.test {
+            assertTrue(awaitItem().dynamicInterface.isAIFabVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
