@@ -4364,7 +4364,7 @@ class BrowserTabFragment :
         private fun goFullScreen() {
             omnibar.hide()
             binding.webViewFullScreenContainer.show()
-            (activity as DuckDuckGoActivity).toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
