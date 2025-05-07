@@ -33,14 +33,14 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.CodeType.Connect
-import com.duckduckgo.sync.impl.CodeType.Exchange
-import com.duckduckgo.sync.impl.CodeType.Recovery
-import com.duckduckgo.sync.impl.CodeType.Unknown
 import com.duckduckgo.sync.impl.ExchangeResult.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode.Connect
+import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
@@ -56,11 +56,11 @@ import timber.log.Timber
 
 interface SyncAccountRepository {
 
-    fun getCodeType(stringCode: String): CodeType
+    fun parseSyncAuthCode(stringCode: String): SyncAuthCode
     fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(code: CodeType): Result<Boolean>
+    fun processCode(code: SyncAuthCode): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -133,23 +133,23 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(code: CodeType): Result<Boolean> {
+    override fun processCode(code: SyncAuthCode): Result<Boolean> {
         when (code) {
             is Recovery -> {
                 Timber.d("Sync: code is a recovery code")
-                return login(code.code)
+                return login(code.b64Code)
             }
 
             is Connect -> {
                 Timber.d("Sync: code is a connect code")
-                return connectDevice(code.code)
+                return connectDevice(code.b64Code)
             }
 
             is Exchange -> {
                 if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
                     Timber.w("Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled")
                 } else {
-                    return onInvitationCodeReceived(code.code)
+                    return onInvitationCodeReceived(code.b64Code)
                 }
             }
 
@@ -161,7 +161,7 @@ class AppSyncAccountRepository @Inject constructor(
         return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
     }
 
-    override fun getCodeType(stringCode: String): CodeType {
+    override fun parseSyncAuthCode(stringCode: String): SyncAuthCode {
         // check first if it's a URL which contains the code
         val (code, wasInUrl) = kotlin.runCatching {
             SyncBarcodeUrl.parseUrl(stringCode)?.webSafeB64EncodedCode?.removeUrlSafetyToRestoreB64()
@@ -643,7 +643,7 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Success -> {
-                val codeType = getCodeType(stringCode)
+                val codeType = parseSyncAuthCode(stringCode)
                 val loginResult = processCode(codeType)
                 if (loginResult is Error) {
                     syncPixels.fireUserSwitchedLoginError()
@@ -930,11 +930,11 @@ enum class AccountErrorCodes(val code: Int) {
     EXCHANGE_FAILED(56),
 }
 
-sealed interface CodeType {
-    data class Recovery(val code: RecoveryCode) : CodeType
-    data class Connect(val code: ConnectCode) : CodeType
-    data class Exchange(val code: InvitationCode) : CodeType
-    data class Unknown(val code: String) : CodeType
+sealed interface SyncAuthCode {
+    data class Recovery(val b64Code: RecoveryCode) : SyncAuthCode
+    data class Connect(val b64Code: ConnectCode) : SyncAuthCode
+    data class Exchange(val b64Code: InvitationCode) : SyncAuthCode
+    data class Unknown(val code: String) : SyncAuthCode
 }
 
 sealed class Result<out R> {

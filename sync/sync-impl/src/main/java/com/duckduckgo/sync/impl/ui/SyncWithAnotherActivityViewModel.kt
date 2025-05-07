@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -41,6 +40,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -171,7 +171,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            val codeType = syncAccountRepository.getCodeType(qrCode)
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
             when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     Timber.w("Sync: error processing code ${result.reason}")
@@ -179,7 +179,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 }
 
                 is Success -> {
-                    if (codeType is CodeType.Exchange) {
+                    if (codeType is SyncAuthCode.Exchange) {
                         pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
                         onLoginSuccess(previousPrimaryKey)

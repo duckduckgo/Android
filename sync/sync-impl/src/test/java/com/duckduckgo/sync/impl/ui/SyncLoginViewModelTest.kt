@@ -22,10 +22,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
-import com.duckduckgo.sync.impl.CodeType.Recovery
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import kotlinx.coroutines.test.runTest
@@ -65,7 +65,7 @@ class SyncLoginViewModelTest {
 
     @Test
     fun whenProcessRecoveryCodeThenPerformLoginAndEmitResult() = runTest {
-        whenever(syncRepostitory.getCodeType(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncRepostitory.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
         whenever(syncRepostitory.processCode(any())).thenReturn(Success(true))
 
         testee.commands().test {
