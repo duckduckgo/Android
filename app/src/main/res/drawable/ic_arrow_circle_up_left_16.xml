@@ -24,10 +24,10 @@
         android:pathData="M0,0h16v16H0z"/>
     <path
         android:pathData="M10.75,5.75a0.75,0.75 0,0 1,-0.75 0.75H7.56l3.22,3.22a0.75,0.75 0,1 1,-1.06 1.06L6.5,7.56V10A0.75,0.75 0,0 1,5 10V5.75A0.75,0.75 0,0 1,5.75 5H10a0.75,0.75 0,0 1,0.75 0.75"
-        android:fillColor="?attr/daxColorSecondaryText"/>
+        android:fillColor="?attr/daxColorSecondaryIcon"/>
     <path
         android:pathData="M8,0a8,8 0,1 0,0 16A8,8 0,0 0,8 0M1.5,8a6.5,6.5 0,1 1,13 0,6.5 6.5,0 0,1 -13,0"
-        android:fillColor="?attr/daxColorSecondaryText"
+        android:fillColor="?attr/daxColorSecondaryIcon"
         android:fillType="evenOdd"/>
   </group>
 </vector>
