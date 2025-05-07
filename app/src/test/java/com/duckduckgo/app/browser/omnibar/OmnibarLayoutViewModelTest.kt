@@ -1035,8 +1035,8 @@ class OmnibarLayoutViewModelTest {
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.showChatMenu)
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
         }
     }
 
@@ -1046,8 +1046,8 @@ class OmnibarLayoutViewModelTest {
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.showChatMenu)
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
         }
     }
 
@@ -1056,8 +1056,8 @@ class OmnibarLayoutViewModelTest {
         defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
 
         testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.showChatMenu)
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
         }
     }
 
@@ -1067,8 +1067,8 @@ class OmnibarLayoutViewModelTest {
         defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
 
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.showChatMenu)
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
         }
     }
 
