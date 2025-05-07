@@ -353,7 +353,9 @@ class RealDuckChat @Inject constructor(
 
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
-        val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
+
+        val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
+            isDuckChatEnabled && isDuckChatUserEnabled
         _showInBrowserMenu.emit(showInBrowserMenu)
 
         val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
