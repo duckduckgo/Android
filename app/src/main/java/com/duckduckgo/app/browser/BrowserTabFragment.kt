@@ -4372,7 +4372,7 @@ class BrowserTabFragment :
             omnibar.show()
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
-            (activity as DuckDuckGoActivity).toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
     }
