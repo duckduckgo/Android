@@ -429,7 +429,7 @@ class RealDuckChatTest {
             State(
                 enable = true,
                 settings = SETTINGS_JSON_ADDRESS_BAR,
-            )
+            ),
         )
         testee.onPrivacyConfigDownloaded()
         testee.setEnableDuckChatUserSetting(false)
@@ -448,7 +448,7 @@ class RealDuckChatTest {
             State(
                 enable = true,
                 settings = SETTINGS_JSON_ADDRESS_BAR,
-            )
+            ),
         )
         testee.onPrivacyConfigDownloaded()
         testee.setEnableDuckChatUserSetting(true)
@@ -467,7 +467,7 @@ class RealDuckChatTest {
             State(
                 enable = true,
                 settings = SETTINGS_JSON_ADDRESS_BAR,
-            )
+            ),
         )
         testee.setEnableDuckChatUserSetting(true)
 
