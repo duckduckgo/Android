@@ -47,7 +47,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.duckduckgo.app.browser.SwipingTabsFeatureProvider;
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 import com.duckduckgo.app.browser.tabs.TabManager;
 
 import java.util.ArrayDeque;

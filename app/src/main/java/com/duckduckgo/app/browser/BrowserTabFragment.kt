@@ -239,6 +239,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -979,7 +980,7 @@ class BrowserTabFragment :
     private fun disableSwipingOutsideTheOmnibar() {
         newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
-            false
+            true
         }
         binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)

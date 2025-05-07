@@ -18,12 +18,11 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.SwipingTabsFeature
-import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperimentImpl
@@ -65,6 +64,8 @@ import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.fakes.FakePixel
@@ -105,6 +106,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {
 
