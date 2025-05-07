@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.common.ui.tabs
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
@@ -27,20 +28,20 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 )
 interface SwipingTabsFeature {
     // The main kill switch for the feature
-    @Toggle.DefaultValue(false)
+    @DefaultValue(false)
     @InternalAlwaysEnabled
     fun self(): Toggle
 
     // The toggle used for staged rollout to external users
-    @Toggle.DefaultValue(false)
+    @DefaultValue(false)
     @InternalAlwaysEnabled
     fun enabledForUsers(): Toggle
 
     // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
-    @Toggle.DefaultValue(false)
+    @DefaultValue(false)
     fun tabSwipingFix1(): Toggle
 
     // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
-    @Toggle.DefaultValue(false)
+    @DefaultValue(false)
     fun tabSwipingFix2(): Toggle
 }
