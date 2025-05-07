@@ -1481,6 +1481,28 @@ class TabSwitcherViewModelTest {
         assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
     }
 
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+
+        initializeViewModel()
+
+        assertFalse(testee.selectionViewState.value.dynamicInterface.isAIFabVisible)
+    }
+
+    @Test
+    fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
+        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+
+        initializeViewModel()
+
+        assertTrue(testee.selectionViewState.value.dynamicInterface.isAIFabVisible)
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)

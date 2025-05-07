@@ -27,7 +27,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.AppShortcuts
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -48,6 +47,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -115,18 +116,16 @@ class RealDuckChat @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
-    private val appShortcuts: AppShortcuts,
-
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
+    private val _showInBrowserMenu = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
     }
 
     private var isDuckChatEnabled = false
-    private var showInBrowserMenu = false
     private var showInAddressBar = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
@@ -201,9 +200,7 @@ class RealDuckChat @Inject constructor(
         return isAddressBarEntryPointEnabled
     }
 
-    override fun showInBrowserMenu(): Boolean {
-        return showInBrowserMenu
-    }
+    override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu
 
     override fun showInAddressBar(): Boolean {
         return showInAddressBar && isAddressBarEntryPointEnabled
@@ -322,9 +319,10 @@ class RealDuckChat @Inject constructor(
     }
 
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
-        showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
+        val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
+        _showInBrowserMenu.emit(showInBrowserMenu)
+
         showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() && isDuckChatEnabled
-        appShortcuts.refreshAppShortcuts()
     }
 
     companion object {

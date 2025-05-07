@@ -32,21 +32,21 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.browser.api.AppShortcuts
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -73,16 +73,22 @@ class AppShortcutCreatorLifecycleObserver(
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
 class AppShortcutCreator @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val duckChatProvider: Provider<DuckChat>,
+    private val duckChat: DuckChat,
     private val dispatchers: DispatcherProvider,
-) : AppShortcuts {
+) {
 
-    override fun refreshAppShortcuts() {
+    init {
+        duckChat.showInBrowserMenu
+            .onEach { refreshAppShortcuts() }
+            .flowOn(dispatchers.io())
+            .launchIn(appCoroutineScope)
+    }
+
+    fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
             val shortcutList = mutableListOf<ShortcutInfo>()
 
@@ -90,7 +96,7 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
 
-            if (duckChatProvider.get().showInBrowserMenu()) {
+            if (duckChat.showInBrowserMenu.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
             }
 

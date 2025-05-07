@@ -25,7 +25,6 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.AppShortcuts
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -51,7 +50,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.reset
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -74,7 +72,6 @@ class RealDuckChatTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
-    private val mockAppShortcuts: AppShortcuts = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -96,7 +93,6 @@ class RealDuckChatTest {
                 true,
                 coroutineRule.testScope,
                 mockPixel,
-                mockAppShortcuts,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -174,7 +170,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
-        assertTrue(testee.showInBrowserMenu())
+        assertTrue(testee.showInBrowserMenu.value)
     }
 
     @Test
@@ -183,7 +179,7 @@ class RealDuckChatTest {
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInBrowserMenu())
+        assertFalse(testee.showInBrowserMenu.value)
     }
 
     @Test
@@ -376,18 +372,6 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertTrue(onCloseCalled)
-    }
-
-    @Test
-    fun whenDuckChatInitializedThenAppShortcutsAreRefreshed() = runTest {
-        verify(mockAppShortcuts).refreshAppShortcuts()
-    }
-
-    @Test
-    fun whenUserSettingChangedThenAppShortcutsAreRefreshed() = runTest {
-        reset(mockAppShortcuts)
-        testee.setShowInBrowserMenuUserSetting(true)
-        verify(mockAppShortcuts).refreshAppShortcuts()
     }
 
     companion object {
