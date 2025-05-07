@@ -38,7 +38,7 @@ import timber.log.Timber
 interface TabManager {
     companion object {
         const val MAX_ACTIVE_TABS = 20
-        const val NEW_TAB_CREATION_TIMEOUT_LIMIT = 1 // seconds
+        const val NEW_TAB_CREATION_TIMEOUT_LIMIT = 2 // seconds
     }
 
     fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit)
@@ -98,7 +98,7 @@ class DefaultTabManager @Inject constructor(
             .catch { e ->
                 if (e is TimeoutCancellationException) {
                     // timeout expired and the new tab was not found
-                    throw IllegalStateException("A new tab failed to be created within 1 second")
+                    throw IllegalStateException("A new tab failed to be created within $NEW_TAB_CREATION_TIMEOUT_LIMIT second")
                 } else {
                     throw e
                 }

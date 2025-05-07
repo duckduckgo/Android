@@ -3,6 +3,7 @@ package com.duckduckgo.app.browser.tabs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SkipUrlConversionOnNewTabFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.tabs.TabManager.Companion.NEW_TAB_CREATION_TIMEOUT_LIMIT
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -215,7 +216,7 @@ class DefaultTabManagerTest {
             testee.requestAndWaitForNewTab()
             fail("Expected IllegalStateException was not thrown")
         } catch (e: IllegalStateException) {
-            assertEquals("A new tab failed to be created within 1 second", e.message)
+            assertEquals("A new tab failed to be created within $NEW_TAB_CREATION_TIMEOUT_LIMIT second", e.message)
         }
     }
 
