@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -36,6 +37,7 @@ import logcat.logcat
 class DaxPromptBrowserComparisonViewModel @Inject constructor(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val daxPromptsRepository: DaxPromptsRepository,
+    private val reactivateUsersExperiment: ReactivateUsersExperiment,
     private val applicationContext: Context,
 ) : ViewModel() {
 
@@ -54,6 +56,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.CloseScreen())
+            reactivateUsersExperiment.fireCloseScreenIfInExperiment()
         }
     }
 
@@ -63,6 +66,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
                 val intent = defaultRoleBrowserDialog.createIntent(applicationContext)
                 if (intent != null) {
                     command.send(Command.BrowserComparisonChart(intent))
+                    reactivateUsersExperiment.fireChooseYourBrowserClickIfInExperiment()
                 } else {
                     logcat { "Default browser dialog not available" }
                     command.send(Command.CloseScreen())
@@ -78,6 +82,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         viewModelScope.launch {
             command.send(Command.CloseScreen(true))
+            reactivateUsersExperiment.fireSetBrowserAsDefaultIfInExperiment()
         }
     }
 

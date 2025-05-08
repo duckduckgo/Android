@@ -19,6 +19,7 @@ package com.duckduckgo.daxprompts.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -34,6 +35,7 @@ import kotlinx.coroutines.launch
 class DaxPromptDuckPlayerViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val daxPromptsRepository: DaxPromptsRepository,
+    private val reactivateUsersExperiment: ReactivateUsersExperiment,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -45,18 +47,21 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.CloseScreen)
+            reactivateUsersExperiment.fireCloseScreenIfInExperiment()
         }
     }
 
     fun onPrimaryButtonClicked() {
         viewModelScope.launch {
             command.send(Command.TryDuckPlayer(DUCK_PLAYER_DEMO_URL))
+            reactivateUsersExperiment.fireDuckPlayerClickIfInExperiment()
         }
     }
 
     fun onSecondaryButtonClicked() {
         viewModelScope.launch {
             command.send(Command.Dismiss)
+            reactivateUsersExperiment.fireDismissDuckPlayerIfInExperiment()
         }
     }
 
