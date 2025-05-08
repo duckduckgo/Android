@@ -57,26 +57,26 @@ import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.OfferUserUndoMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDeviceUnsupportedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListModeLegacy
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
@@ -110,7 +110,7 @@ import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class AutofillSettingsScreenViewModelTest {
+class AutofillSettingsActivityScreenViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -134,7 +134,7 @@ class AutofillSettingsScreenViewModelTest {
     private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
-    private val testee = AutofillSettingsViewModel(
+    private val testee = AutofillPasswordsManagementViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
         deviceAuthenticator = deviceAuthenticator,
@@ -169,6 +169,45 @@ class AutofillSettingsScreenViewModelTest {
             whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
+            autofillFeature.settingsScreen().setRawStoredState(State(enable = true))
+        }
+    }
+
+    @Test
+    fun whenViewCreatedThenDoesNotShowToggle() = runTest {
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertFalse(this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSettingsScreenDisabledThenViewStateShowsToggle() = runTest {
+        autofillFeature.settingsScreen().setRawStoredState(State(enable = false))
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertTrue(this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenListModeThenDoesNotShowToggle() = runTest {
+        testee.onInitialiseListMode()
+        testee.viewState.test {
+            assertFalse(this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSettingsScreenDisabledThenListModeShowsToggle() = runTest {
+        autofillFeature.settingsScreen().setRawStoredState(State(enable = false))
+        testee.onInitialiseListMode()
+        testee.viewState.test {
+            assertTrue(this.awaitItem().showAutofillEnabledToggle)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -688,7 +727,8 @@ class AutofillSettingsScreenViewModelTest {
     }
 
     @Test
-    fun whenSearchQueryChangesEmptyThenShouldShowEnableToggle() = runTest {
+    fun whenSearchQueryChangesEmptyThenShouldShowEnableToggleIfSettingsScreenDisabled() = runTest {
+        autofillFeature.settingsScreen().setRawStoredState(State(enable = false))
         testee.onSearchQueryChanged("")
 
         testee.onViewCreated()

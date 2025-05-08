@@ -5,11 +5,12 @@ import android.view.View
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.TestActivity
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,6 +33,7 @@ class DisableInSettingsSnackbarTest {
     private lateinit var context: Context
     private lateinit var view: View
     private lateinit var testee: DisableInSettingsSnackbar
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     @Before
     fun setUp() {
@@ -43,6 +45,7 @@ class DisableInSettingsSnackbarTest {
                 globalActivityStarter = globalActivityStarter,
                 context = context,
                 view = view,
+                autofillFeature = autofillFeature,
             )
         }
     }
