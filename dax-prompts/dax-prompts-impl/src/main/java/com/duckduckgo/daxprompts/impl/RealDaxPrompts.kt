@@ -45,7 +45,7 @@ class RealDaxPrompts @Inject constructor(
 
     override suspend fun evaluate(): ActionType {
         return withContext(dispatchers.io()) {
-            if (!reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolled() && !isEligible()) {
+            if (!isEligible()) {
                 return@withContext ActionType.NONE
             }
 
