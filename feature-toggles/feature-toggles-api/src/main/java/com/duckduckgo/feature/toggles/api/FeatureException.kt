@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.feature.toggles.api
 
-package com.duckduckgo.app.browser.mediaplayback.store
-
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        MediaPlaybackExceptionEntity::class,
-    ],
-)
-abstract class MediaPlaybackDatabase : RoomDatabase() {
-    abstract fun mediaPlaybackDao(): MediaPlaybackDao
-}
-
-val ALL_MIGRATIONS = emptyArray<Migration>()
+data class FeatureException(val domain: String, val reason: String?)

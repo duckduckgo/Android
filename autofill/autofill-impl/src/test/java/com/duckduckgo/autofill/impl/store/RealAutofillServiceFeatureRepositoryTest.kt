@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,57 +14,63 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.impl.remoteconfig
+package com.duckduckgo.autofill.impl.store
 
 import android.annotation.SuppressLint
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
+import com.duckduckgo.autofill.impl.service.store.RealAutofillServiceFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @SuppressLint("DenyListedApi") // setRawStoredState
-class RealAutoconsentExceptionsRepositoryTest {
-
+class RealAutofillServiceFeatureRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val autoconsentFeature: AutoconsentFeature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java).apply {
-        self().setRawStoredState(Toggle.State(exceptions = exceptions))
+    private val autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
+
+    @Before
+    fun setup() {
+        autofillServiceFeature.self().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
     }
 
     @Test
-    fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() = runTest {
-        val repository = RealAutoconsentExceptionsRepository(
-            TestScope(),
+    fun whenRepositoryIsCreatedThenExceptionsLoadIntoMemory() = runTest {
+        val repository = RealAutofillServiceFeatureRepository(
+            true,
+            "processName",
+            coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            autoconsentFeature,
-            isMainProcess = true,
+            autofillServiceFeature,
         )
 
-        assertEquals(exceptions, repository.exceptions)
+        assertEquals(listOf(exception.domain), repository.exceptions)
     }
 
     @Test
     fun whenRemoteConfigUpdateThenExceptionsUpdated() = runTest {
-        val repository = RealAutoconsentExceptionsRepository(
-            TestScope(),
+        val repository = RealAutofillServiceFeatureRepository(
+            true,
+            "processName",
+            coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            autoconsentFeature,
-            isMainProcess = true,
+            autofillServiceFeature,
         )
 
-        assertEquals(exceptions, repository.exceptions)
-        autoconsentFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
+        assertEquals(listOf(exception.domain), repository.exceptions)
+        autofillServiceFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
         repository.onPrivacyConfigDownloaded()
         assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }
 
     companion object {
-        val exceptions = listOf(FeatureException("example.com", "reason"))
+        val exception = FeatureException("example.com", "reason")
     }
 }

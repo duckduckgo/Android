@@ -19,7 +19,7 @@ package com.duckduckgo.request.filterer.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 @Entity(tableName = "settings_entity")
 data class SettingsEntity(

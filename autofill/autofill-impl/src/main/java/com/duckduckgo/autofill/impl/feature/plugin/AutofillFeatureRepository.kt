@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.impl.remoteconfig
+package com.duckduckgo.autofill.impl.feature.plugin
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
@@ -30,25 +31,25 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface AutoconsentExceptionsRepository {
+interface AutofillFeatureRepository {
     val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = AutoconsentExceptionsRepository::class,
-)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
 )
-class RealAutoconsentExceptionsRepository @Inject constructor(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutofillFeatureRepository::class,
+)
+@SingleInstanceIn(AppScope::class)
+class RealAutofillFeatureRepository @Inject constructor(
+    private val feature: AutofillFeature,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val autoconsentFeature: AutoconsentFeature,
     @IsMainProcess private val isMainProcess: Boolean,
-) : AutoconsentExceptionsRepository, PrivacyConfigCallbackPlugin {
+) : AutofillFeatureRepository, PrivacyConfigCallbackPlugin {
 
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
@@ -56,16 +57,16 @@ class RealAutoconsentExceptionsRepository @Inject constructor(
         loadToMemory()
     }
 
+    override fun onPrivacyConfigDownloaded() {
+        loadToMemory()
+    }
+
     private fun loadToMemory() {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
                 exceptions.clear()
-                exceptions.addAll(autoconsentFeature.self().getExceptions())
+                exceptions.addAll(feature.self().getExceptions())
             }
         }
-    }
-
-    override fun onPrivacyConfigDownloaded() {
-        loadToMemory()
     }
 }

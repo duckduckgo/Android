@@ -1,51 +1,50 @@
-package com.duckduckgo.app.browser.mediaplayback.store
+package com.duckduckgo.site.permissions.impl.drmblock
 
-import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class RealMediaPlaybackRepositoryTest {
+@SuppressLint("DenyListedApi") // setRawStoredState
+class RealDrmBlockRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val mediaPlaybackFeature = FakeFeatureToggleFactory.create(MediaPlaybackFeature::class.java)
+    private val drmBlockFeature = FakeFeatureToggleFactory.create(DrmBlockFeature::class.java)
 
     @Before
-    fun before() {
-        mediaPlaybackFeature.self().setRawStoredState(Toggle.State(exceptions = exceptions))
+    fun setup() {
+        drmBlockFeature.self().setRawStoredState(Toggle.State(exceptions = exceptions))
     }
 
     @Test
-    fun whenRepositoryIsCreatedThenValuesLoadedIntoMemory() {
-        val repository = RealMediaPlaybackRepository(
-            mediaPlaybackFeature,
-            TestScope(),
+    fun whenRepositoryIsCreatedThenExceptionsLoadIntoMemory() = runTest {
+        val repository = RealDrmBlockRepository(
+            drmBlockFeature,
+            coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            isMainProcess = true,
+            true,
         )
-
         assertEquals(exceptions, repository.exceptions)
     }
 
     @Test
     fun whenRemoteConfigUpdateThenExceptionsUpdated() = runTest {
-        val repository = RealMediaPlaybackRepository(
-            mediaPlaybackFeature,
-            TestScope(),
+        val repository = RealDrmBlockRepository(
+            drmBlockFeature,
+            coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            isMainProcess = true,
+            true,
         )
 
         assertEquals(exceptions, repository.exceptions)
-        mediaPlaybackFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
+        drmBlockFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
         repository.onPrivacyConfigDownloaded()
         assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }

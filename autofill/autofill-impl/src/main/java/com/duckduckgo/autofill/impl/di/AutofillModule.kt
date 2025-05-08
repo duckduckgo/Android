@@ -19,8 +19,6 @@ package com.duckduckgo.autofill.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -39,24 +37,16 @@ import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
-import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
-import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
-import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as EmailInContextMigrations
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
-import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
-import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -101,37 +91,6 @@ class AutofillModule {
             .fallbackToDestructiveMigration()
             .addMigrations(*AutofillMigrations)
             .build()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideEmailInContextDatabase(context: Context): EmailProtectionInContextDatabase {
-        return Room.databaseBuilder(context, EmailProtectionInContextDatabase::class.java, "emailInContext.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*EmailInContextMigrations)
-            .build()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAutofillRepository(
-        database: AutofillDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): AutofillFeatureRepository {
-        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideEmailInContextRepository(
-        database: EmailProtectionInContextDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): EmailProtectionInContextFeatureRepository {
-        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @Provides

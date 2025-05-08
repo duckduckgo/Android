@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
     scope = AppScope::class,
     boundType = AutofillFeature::class,
     featureName = "autofill",
-    exceptionsStore = AutofillFeatureExceptionStore::class,
 )
 @Suppress("unused")
 private interface UnusedAutofillRemoteFeatureCodegenTrigger
