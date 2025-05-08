@@ -67,8 +67,9 @@ class GpcTest {
 
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+        val duckDuckGoIdlingResource = JsObjectIdlingResource(webView!!, "window.navigator.duckduckgo")
         val gpcIdlingResource = JsObjectIdlingResource(webView!!, "window.navigator.globalPrivacyControl")
-        IdlingRegistry.getInstance().register(gpcIdlingResource)
+        IdlingRegistry.getInstance().register(gpcIdlingResource, duckDuckGoIdlingResource)
 
         // webViewClient?.awaitScriptInjection()
 
@@ -90,7 +91,12 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript, gpcIdlingResource)
+        IdlingRegistry.getInstance().unregister(
+            idlingResourceForDisableProtections,
+            idlingResourceForScript,
+            gpcIdlingResource,
+            duckDuckGoIdlingResource,
+        )
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
@@ -133,7 +139,7 @@ class GpcTest {
             webView.evaluateJavascript(
                 "(typeof $objectName !== 'undefined')",
             ) { result ->
-                System.out.println("Result of $objectName check: $result")
+                println("Result of $objectName check: $result")
                 if (result == "true") {
                     isIdle = true
                     callback?.onTransitionToIdle()
