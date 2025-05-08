@@ -13,88 +13,28 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fadeScrollbars="false"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:scrollbars="vertical">
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:measureAllChildren="false">
 
         <include
-            android:id="@+id/includeToolbar"
-            layout="@layout/include_default_toolbar" />
+            android:id="@+id/autofill_available"
+            layout="@layout/view_autofill_settings" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/passwordsListItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            app:leadingIcon="@drawable/ic_key_24"
-            app:leadingIconBackground="circular"
-            app:primaryText="@string/autofillSettingsPasswordsEntry"
-            app:secondaryText="123" />
+        <include
+            android:id="@+id/autofill_unsupported"
+            layout="@layout/view_autofill_unsupported" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/autofillEnabledToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/autofillSettingsAutofillToggleLabel"
-            app:showSwitch="true" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/autofillInfoText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_4"
-            android:layout_marginVertical="14dp"
-            android:text=""
-            app:textType="secondary"
-            app:typography="body2" />
-
-        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-            android:id="@+id/topDivider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/autofillSettingsImportSectionLabel" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/importPasswordsOption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/autofillSettingsImportFromGoogleLabel" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/syncDesktopPasswordsOption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/autofillSettingsImportFromDesktopSync" />
-
-        <LinearLayout
-            android:id="@+id/excludedSitesSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/excludedSitesOption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/autofillSettingsResetExcludedSitesTitle"/>
-        </LinearLayout>
-    </LinearLayout>
-
-</ScrollView>
+    </ViewSwitcher>
+</LinearLayout>
