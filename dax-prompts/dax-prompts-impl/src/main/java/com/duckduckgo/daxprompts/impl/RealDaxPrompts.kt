@@ -49,9 +49,9 @@ class RealDaxPrompts @Inject constructor(
             if (reactivateUsersExperiment.isControl()) {
                 ActionType.SHOW_CONTROL
             } else if (reactivateUsersExperiment.isDuckPlayerPrompt()) {
-                if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_1 else ActionType.NONE
+                if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_DUCKPLAYER else ActionType.NONE
             } else if (reactivateUsersExperiment.isBrowserComparisonPrompt()) {
-                if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_2 else ActionType.NONE
+                if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_BROWSER_COMPARISON else ActionType.NONE
             } else {
                 ActionType.NONE
             }

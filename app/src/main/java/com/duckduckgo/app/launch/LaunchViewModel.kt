@@ -27,8 +27,8 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_CONTROL
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_1
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_2
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAYER
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.withTimeoutOrNull
@@ -63,13 +63,13 @@ class LaunchViewModel @Inject constructor(
                 showOnboardingOrHome()
             }
 
-            SHOW_VARIANT_1 -> {
-                Timber.d("Variant 1 action")
+            SHOW_VARIANT_DUCKPLAYER -> {
+                Timber.d("Variant Duck Player action")
                 command.value = Command.DaxPromptDuckPlayer
             }
 
-            SHOW_VARIANT_2 -> {
-                Timber.d("Variant 2 action")
+            SHOW_VARIANT_BROWSER_COMPARISON -> {
+                Timber.d("Variant Browser Comparison action")
                 command.value = Command.DaxPromptBrowserComparison
             }
         }

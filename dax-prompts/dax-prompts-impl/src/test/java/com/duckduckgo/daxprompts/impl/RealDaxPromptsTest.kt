@@ -76,7 +76,7 @@ class RealDaxPromptsTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ActionType.SHOW_VARIANT_1, result)
+        assertEquals(ActionType.SHOW_VARIANT_DUCKPLAYER, result)
     }
 
     @Test
@@ -101,7 +101,7 @@ class RealDaxPromptsTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ActionType.SHOW_VARIANT_2, result)
+        assertEquals(ActionType.SHOW_VARIANT_BROWSER_COMPARISON, result)
     }
 
     @Test
