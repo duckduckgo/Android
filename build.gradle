@@ -180,7 +180,7 @@ fladle {
                     "notAnnotation com.duckduckgo.espresso.UserJourney",
             ])
             devices.set([
-                    ["model": "MediumPhone.arm", "version": "30"],
+                    ["model": "MediumPhone.arm", "version": "34"],
                     ["model": "Pixel2.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
