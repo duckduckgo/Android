@@ -24,8 +24,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor.*
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -321,14 +320,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             return Class
                 .forName("com.duckduckgo.feature.toggles.codegen.AnotherTestTriggerFeature_RemoteFeature")
                 .getConstructor(
-                    FeatureExceptions.Store::class.java,
                     FeatureSettings.Store::class.java,
                     dagger.Lazy::class.java as Class<*>,
                     AppBuildConfig::class.java,
                     VariantManager::class.java,
                     Context::class.java,
                 ).newInstance(
-                    FeatureExceptions.EMPTY_STORE,
                     FeatureSettings.EMPTY_STORE,
                     Lazy { anotherTestFeature },
                     appBuildConfig,
@@ -4206,14 +4203,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
-                FeatureExceptions.Store::class.java,
                 FeatureSettings.Store::class.java,
                 dagger.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
-                FeatureExceptions.EMPTY_STORE,
                 FeatureSettings.EMPTY_STORE,
                 Lazy { testFeature },
                 appBuildConfig,
