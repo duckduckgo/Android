@@ -43,7 +43,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(FeedbackActivityWithEmptyParams::class)
+@ContributeToActivityStarter(FeedbackActivityWithEmptyParams::class, screenName = "feedback")
 class FeedbackActivity :
     DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
