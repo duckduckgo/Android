@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.scan
 
 import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
@@ -42,7 +43,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 /**
@@ -52,6 +53,7 @@ interface PirScan {
 
     /**
      * This method can be used to execute pir scan for a given list of [brokers] names.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
      * @param brokers List of broker names
      * @param context Context in which we want to create the detached WebView from
@@ -65,6 +67,7 @@ interface PirScan {
 
     /**
      * This method can be used to execute pir scan for all active brokers (from json).
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
      * @param context Context in which we want to create the detached WebView from
      */
@@ -92,6 +95,7 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: PirActionsRunnerFactory,
     private val pixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val dispatcherProvider: DispatcherProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -120,51 +124,15 @@ class RealPirScan @Inject constructor(
         context: Context,
         runType: RunType,
         coroutineScope: CoroutineScope,
-    ): Result<Unit> {
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
         onJobStarted(coroutineScope)
+
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
+
         emitScanStartPixel(runType)
-        // Clean up previous run's results
-        runBlocking {
-            if (runners.isNotEmpty()) {
-                runners.forEach {
-                    it.stop()
-                }
-                runners.clear()
-            }
-            repository.deleteAllScanResults()
-            repository.getUserProfiles().also {
-                if (it.isNotEmpty()) {
-                    // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
-                    val storedProfile = it[0]
-                    profileQuery = ProfileQuery(
-                        firstName = storedProfile.userName.firstName,
-                        lastName = storedProfile.userName.lastName,
-                        city = storedProfile.addresses.city,
-                        state = storedProfile.addresses.state,
-                        addresses = listOf(
-                            Address(
-                                city = storedProfile.addresses.city,
-                                state = storedProfile.addresses.state,
-                            ),
-                        ),
-                        birthYear = storedProfile.birthYear,
-                        fullName = storedProfile.userName.middleName?.run {
-                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                        }
-                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                        age = LocalDate.now().year - storedProfile.birthYear,
-                        deprecated = false,
-                    )
-                }
-            }
-        }
-        logcat { "PIR-SCAN: Running scan on profile: $profileQuery on ${Thread.currentThread().name}" }
+        cleanPreviousRun()
 
-        val script = runBlocking {
-            pirCssScriptLoader.getScript()
-        }
-
+        val script = pirCssScriptLoader.getScript()
         maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
             brokers.size
         } else {
@@ -185,37 +153,73 @@ class RealPirScan @Inject constructor(
             createCount++
         }
 
-        // Start each runner on a subset of the broker steps
-        return runBlocking {
-            brokers.mapNotNull { broker ->
-                repository.getBrokerScanSteps(broker)?.run {
-                    brokerStepsParser.parseStep(broker, this)
+        // Start each runner on a subset of the broker steps.
+        brokers.mapNotNull { broker ->
+            repository.getBrokerScanSteps(broker)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.splitIntoParts(maxWebViewCount)
+            .mapIndexed { index, part ->
+                // We want to run the runners in parallel but wait for everything complete before we proceed
+                async {
+                    runners[index].start(profileQuery, part)
                 }
-            }.splitIntoParts(maxWebViewCount)
-                .mapIndexed { index, part ->
-                    async {
-                        runners[index].start(profileQuery, part)
-                    }
-                }.awaitAll()
+            }.awaitAll()
 
-            logcat { "PIR-SCAN: Scan completed for all runners" }
-            emitScanCompletedPixel(
-                runType,
-                currentTimeProvider.currentTimeMillis() - startTimeMillis,
-                maxWebViewCount,
-            )
-            onJobCompleted()
-            Result.success(Unit)
+        logcat { "PIR-SCAN: Scan completed for all runners" }
+        emitScanCompletedPixel(
+            runType,
+            currentTimeProvider.currentTimeMillis() - startTimeMillis,
+            maxWebViewCount,
+        )
+        onJobCompleted()
+        return@withContext Result.success(Unit)
+    }
+
+    private suspend fun cleanPreviousRun() {
+        if (runners.isNotEmpty()) {
+            runners.forEach {
+                it.stop()
+            }
+            runners.clear()
         }
+        repository.deleteAllScanResults()
+        repository.getUserProfiles().also {
+            if (it.isNotEmpty()) {
+                // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
+                val storedProfile = it[0]
+                profileQuery = ProfileQuery(
+                    firstName = storedProfile.userName.firstName,
+                    lastName = storedProfile.userName.lastName,
+                    city = storedProfile.addresses.city,
+                    state = storedProfile.addresses.state,
+                    addresses = listOf(
+                        Address(
+                            city = storedProfile.addresses.city,
+                            state = storedProfile.addresses.state,
+                        ),
+                    ),
+                    birthYear = storedProfile.birthYear,
+                    fullName = storedProfile.userName.middleName?.run {
+                        "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
+                    }
+                        ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                    age = LocalDate.now().year - storedProfile.birthYear,
+                    deprecated = false,
+                )
+            }
+        }
+
+        logcat { "PIR-SCAN: Running scan on profile: $profileQuery on ${Thread.currentThread().name}" }
     }
 
     override suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
         coroutineScope: CoroutineScope,
-    ): Result<Unit> {
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val brokers = repository.getAllBrokersForScan()
-        return execute(brokers, context, runType, coroutineScope)
+        return@withContext execute(brokers, context, runType, coroutineScope)
     }
 
     override fun stop() {
