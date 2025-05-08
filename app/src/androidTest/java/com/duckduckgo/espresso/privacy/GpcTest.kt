@@ -16,8 +16,10 @@
 
 package com.duckduckgo.espresso.privacy
 
+import android.util.Log
 import android.webkit.WebView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
@@ -38,6 +40,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.containsString
+import org.json.JSONObject
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -66,6 +69,8 @@ class GpcTest {
 
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+        val gpcIdlingResource = GlobalPrivacyControlIdlingResource(webView!!)
+        IdlingRegistry.getInstance().register(gpcIdlingResource)
 
         webViewClient?.awaitScriptInjection()
 
@@ -87,7 +92,7 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript, gpcIdlingResource)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
@@ -103,4 +108,41 @@ class GpcTest {
 
     data class TestJson(val status: Int, val value: List<GpcTest>)
     data class GpcTest(val id: String, val value: Any)
+
+    class GlobalPrivacyControlIdlingResource(private val webView: WebView) : IdlingResource {
+        private var resourceCallback: IdlingResource.ResourceCallback? = null
+        private var isIdle = false
+
+        override fun getName(): String = "GlobalPrivacyControl Script Execution"
+
+        override fun isIdleNow(): Boolean {
+            if (isIdle) return true
+
+            // Check if the script has executed
+            webView.post {
+                webView.evaluateJavascript(
+                    "JSON.stringify({ exists: typeof navigator.globalPrivacyControl !== 'undefined', value: navigator.globalPrivacyControl });",
+                    { result ->
+                        try {
+                            val jsonResult = JSONObject(result)
+                            val scriptExecuted = jsonResult.getBoolean("exists")
+
+                            if (scriptExecuted) {
+                                isIdle = true
+                                resourceCallback?.onTransitionToIdle()
+                            }
+                        } catch (e: Exception) {
+                            Log.e("GPCIdlingResource", "Error checking script status", e)
+                        }
+                    },
+                )
+            }
+
+            return isIdle
+        }
+
+        override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback) {
+            this.resourceCallback = callback
+        }
+    }
 }
