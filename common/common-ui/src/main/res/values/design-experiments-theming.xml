@@ -87,6 +87,7 @@
         <item name="autocompleteListItemHorizontalPadding">26dp</item>
         <item name="autocompleteListItemStartPadding">26dp</item>
         <item name="autocompleteListItemEndPadding">22dp</item>
+        <item name="autocompleteListItemWithoutTrailIconEndPadding">46dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
     </style>
 

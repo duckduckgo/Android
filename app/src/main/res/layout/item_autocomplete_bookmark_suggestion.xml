@@ -24,7 +24,8 @@
     android:layout_marginTop="6dp"
     android:background="?attr/selectableItemBackground"
     android:paddingVertical="@dimen/keyline_2"
-    android:paddingHorizontal="?attr/autocompleteListItemHorizontalPadding">
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding">
 
     <ImageView
         android:id="@+id/bookmarkIndicator"
