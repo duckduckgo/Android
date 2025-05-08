@@ -455,7 +455,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
             val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
             Timber.v("Can import from Google Password Manager: $canImport")
-            _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
+            _viewState.value = _viewState.value.copy(
+                canImportFromGooglePasswords = canImport,
+                showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
+            )
         }
     }
 

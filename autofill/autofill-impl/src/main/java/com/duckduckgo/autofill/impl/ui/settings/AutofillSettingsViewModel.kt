@@ -52,7 +52,6 @@ class AutofillSettingsViewModel @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
-    private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
