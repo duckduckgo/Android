@@ -21,9 +21,9 @@
     android:viewportHeight="24">
   <path
       android:pathData="M8.72,8.72a0.75,0.75 0,0 1,1.06 0L12,10.94l2.22,-2.22a0.75,0.75 0,0 1,1.06 1.06L13.06,12l2.22,2.22a0.75,0.75 0,1 1,-1.06 1.06L12,13.06l-2.22,2.22a0.75,0.75 0,0 1,-1.06 -1.06L10.94,12 8.72,9.78a0.75,0.75 0,0 1,0 -1.06Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+      android:fillColor="?attr/daxColorSecondaryIcon"/>
   <path
       android:pathData="M12,3a9,9 0,1 0,0 18,9 9,0 0,0 0,-18ZM4.5,12a7.5,7.5 0,1 1,15 0,7.5 7.5,0 0,1 -15,0Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillColor="?attr/daxColorSecondaryIcon"
       android:fillType="evenOdd"/>
 </vector>
