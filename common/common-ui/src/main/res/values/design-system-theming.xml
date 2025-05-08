@@ -200,11 +200,13 @@
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
         <item name="daxColorFabPrimaryText">@color/black</item>
         <item name="daxColorFabPrimaryIcon">@color/black</item>
-        <item name="daxColorFabSecondaryContainer">@color/blue20</item>
-        <item name="daxColorFabSecondaryText">@color/black</item>
-        <item name="daxColorFabSecondaryIcon">@color/black</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
+        <item name="daxColorFabSecondaryText">@color/blue70</item>
+        <item name="daxColorFabSecondaryIcon">@color/blue70</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -301,9 +303,11 @@
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue50</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
         <item name="daxColorFabPrimaryText">@color/white</item>
         <item name="daxColorFabPrimaryIcon">@color/white</item>
         <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryText">@color/blue70</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
 
