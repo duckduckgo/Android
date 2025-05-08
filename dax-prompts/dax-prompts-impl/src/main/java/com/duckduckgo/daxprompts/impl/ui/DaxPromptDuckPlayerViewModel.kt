@@ -47,21 +47,21 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.CloseScreen)
-            reactivateUsersExperiment.fireCloseScreenIfInExperiment()
+            reactivateUsersExperiment.fireCloseScreen()
         }
     }
 
     fun onPrimaryButtonClicked() {
         viewModelScope.launch {
             command.send(Command.TryDuckPlayer(DUCK_PLAYER_DEMO_URL))
-            reactivateUsersExperiment.fireDuckPlayerClickIfInExperiment()
+            reactivateUsersExperiment.fireDuckPlayerClick()
         }
     }
 
     fun onSecondaryButtonClicked() {
         viewModelScope.launch {
             command.send(Command.Dismiss)
-            reactivateUsersExperiment.fireDismissDuckPlayerIfInExperiment()
+            reactivateUsersExperiment.fireDismissDuckPlayer()
         }
     }
 

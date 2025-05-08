@@ -21,8 +21,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.CONTROL
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
 import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_BROWSER_PROMPT
+import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding

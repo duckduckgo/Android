@@ -19,7 +19,6 @@ package com.duckduckgo.daxprompts.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_BROWSER_PROMPT
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,11 +29,11 @@ import kotlinx.coroutines.withContext
 interface ReactivateUsersExperiment {
 
     suspend fun fireDuckPlayerUseIfInExperiment()
-    suspend fun fireSetBrowserAsDefaultIfInExperiment()
-    suspend fun fireDuckPlayerClickIfInExperiment()
-    suspend fun fireChooseYourBrowserClickIfInExperiment()
-    suspend fun fireCloseScreenIfInExperiment()
-    suspend fun fireDismissDuckPlayerIfInExperiment()
+    suspend fun fireSetBrowserAsDefault()
+    suspend fun fireDuckPlayerClick()
+    suspend fun fireChooseYourBrowserClick()
+    suspend fun fireCloseScreen()
+    suspend fun fireDismissDuckPlayer()
 }
 
 @ContributesBinding(
@@ -57,43 +56,33 @@ class ReactivateUsersExperimentImpl @Inject constructor(
         }
     }
 
-    override suspend fun fireSetBrowserAsDefaultIfInExperiment() {
+    override suspend fun fireSetBrowserAsDefault() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_BROWSER_PROMPT)) {
-                reactivateUsersPixelsPlugin.getSetBrowserAsDefaultMetric()?.fire()
-            }
+            reactivateUsersPixelsPlugin.getSetBrowserAsDefaultMetric()?.fire()
         }
     }
 
-    override suspend fun fireDuckPlayerClickIfInExperiment() {
+    override suspend fun fireDuckPlayerClick() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
-                reactivateUsersPixelsPlugin.getDuckPlayerClickMetric()?.fire()
-            }
+            reactivateUsersPixelsPlugin.getDuckPlayerClickMetric()?.fire()
         }
     }
 
-    override suspend fun fireChooseYourBrowserClickIfInExperiment() {
+    override suspend fun fireChooseYourBrowserClick() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_BROWSER_PROMPT)) {
-                reactivateUsersPixelsPlugin.getChooseYourBrowserClickMetric()?.fire()
-            }
+            reactivateUsersPixelsPlugin.getChooseYourBrowserClickMetric()?.fire()
         }
     }
 
-    override suspend fun fireCloseScreenIfInExperiment() {
+    override suspend fun fireCloseScreen() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
-                reactivateUsersPixelsPlugin.getCloseScreenMetric()?.fire()
-            }
+            reactivateUsersPixelsPlugin.getCloseScreenMetric()?.fire()
         }
     }
 
-    override suspend fun fireDismissDuckPlayerIfInExperiment() {
+    override suspend fun fireDismissDuckPlayer() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
-                reactivateUsersPixelsPlugin.getDismissDuckPlayerMetric()?.fire()
-            }
+            reactivateUsersPixelsPlugin.getDismissDuckPlayerMetric()?.fire()
         }
     }
 

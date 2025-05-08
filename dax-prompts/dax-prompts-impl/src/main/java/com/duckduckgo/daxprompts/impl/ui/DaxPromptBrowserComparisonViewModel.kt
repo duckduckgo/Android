@@ -56,7 +56,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.CloseScreen())
-            reactivateUsersExperiment.fireCloseScreenIfInExperiment()
+            reactivateUsersExperiment.fireCloseScreen()
         }
     }
 
@@ -66,7 +66,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
                 val intent = defaultRoleBrowserDialog.createIntent(applicationContext)
                 if (intent != null) {
                     command.send(Command.BrowserComparisonChart(intent))
-                    reactivateUsersExperiment.fireChooseYourBrowserClickIfInExperiment()
+                    reactivateUsersExperiment.fireChooseYourBrowserClick()
                 } else {
                     logcat { "Default browser dialog not available" }
                     command.send(Command.CloseScreen())
@@ -82,7 +82,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         viewModelScope.launch {
             command.send(Command.CloseScreen(true))
-            reactivateUsersExperiment.fireSetBrowserAsDefaultIfInExperiment()
+            reactivateUsersExperiment.fireSetBrowserAsDefault()
         }
     }
 

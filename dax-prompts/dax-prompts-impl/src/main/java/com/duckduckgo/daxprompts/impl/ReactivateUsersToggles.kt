@@ -54,7 +54,7 @@ interface ReactivateUsersToggles {
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class ReactivateUsersPixelsPlugin @Inject constructor(
-    private val toggles: ReactivateUsersToggles
+    private val toggles: ReactivateUsersToggles,
 ) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
