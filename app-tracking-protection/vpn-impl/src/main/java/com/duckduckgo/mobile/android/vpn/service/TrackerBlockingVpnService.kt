@@ -75,6 +75,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -82,6 +83,8 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+
+private const val DDG_VPN_SESSION = "DuckDuckGo"
 
 @InjectWith(
     scope = VpnScope::class,
@@ -237,6 +240,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 if (notifyVpnStart()) {
                     synchronized(this) {
                         launch(serviceDispatcher) {
+                            // Give Android a moment to complete foreground transition
+                            // You might think this is a hack (and it kind of is)
+                            // but it’s a workaround to avoid early establish() binding failures
+                            delay(100)
                             async {
                                 startVpn(intent.alwaysOnTriggered())
                             }.await()
@@ -422,16 +429,33 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return runCatching {
             Builder().run {
                 allowFamily(AF_INET6)
-                addAddress(InetAddress.getByName("10.0.100.100"), 32)
-                addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 128)
+                try {
+                    addAddress(InetAddress.getByName("10.0.100.100"), 32)
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add IPv4 address 10.0.100.100/32", e)
+                }
+                try {
+                    addAddress(InetAddress.getByName("fd00::1"), 128)
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add IPv6 address fd00::1/128", e)
+                }
                 // nobody will be listening here we just want to make sure no app has connection
-                addDnsServer("10.0.100.1")
+                try {
+                    addDnsServer("10.0.100.1")
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add DNS server 10.0.100.1", e)
+                }
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
                 safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
+                setSession(DDG_VPN_SESSION)
                 setMtu(1280)
-                prepare(this@TrackerBlockingVpnService)
+                try {
+                    prepare(this@TrackerBlockingVpnService)
+                } catch (e: Exception) {
+                    throw IllegalStateException("VPN service not prepared", e)
+                }
                 establish()
             }.also {
                 logcat { "VPN log: Hole TUN created ${it?.fd}" }
@@ -506,6 +530,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
 
             setBlocking(true)
+            // optional in docs but apparently some OEMs may expect to have a session
+            setSession(DDG_VPN_SESSION)
+
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
             setMtu(tunnelConfig.mtu)
