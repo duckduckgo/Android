@@ -109,7 +109,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -325,7 +324,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             return
         }
 
-        if (autofillStore.getCredentialCount().first() == 0) {
+        val credentialCount = autofillStore.getCredentialCount().firstOrNull()
+        val shouldAskAuth = credentialCount == null || credentialCount == 0
+        if (shouldAskAuth) {
             Timber.d("No credentials; can skip showing device auth")
             unlock()
         } else {
