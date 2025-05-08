@@ -17,7 +17,11 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.action.ViewActions.pressImeActionButton
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
@@ -37,6 +41,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -47,33 +52,38 @@ class GpcTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.site/privacy-protections/gpc/",
+            queryExtra = "https://privacy-test-pages.site/privacy-protections",
         ),
     )
 
-    // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
+    private val registeredResources = mutableListOf<IdlingResource>()
+
     @Test @PrivacyTest
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
 
-        lateinit var webView: WebView
+        var webView: WebView? = null
 
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
-        IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
-        val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
-        IdlingRegistry.getInstance().register(jsIdlingResource)
+        WebViewIdlingResource(webView!!).track()
+        onView(withId(R.id.omnibarTextInput)).perform(
+            typeText("https://privacy-test-pages.site/privacy-protections/gpc/"),
+            pressImeActionButton(),
+        )
+        WebViewIdlingResource(webView!!).track()
+
+        // asserts we have injected css by querying the duckduckgo object
+        JsObjectIdlingResource(webView!!, "window.navigator.duckduckgo").track()
 
         onWebView()
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val idlingResourceForScript = WebViewIdlingResource(webView!!)
-        IdlingRegistry.getInstance().register(idlingResourceForScript)
+        WebViewIdlingResource(webView!!).track()
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -85,13 +95,22 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
+    }
+
+    @After
+    fun unregisterIdlingResources() {
+        registeredResources.forEach { IdlingRegistry.getInstance().unregister(it) }
     }
 
     private fun getTestJson(jsonString: String): TestJson? {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val jsonAdapter: JsonAdapter<TestJson> = moshi.adapter(TestJson::class.java)
         return jsonAdapter.fromJson(jsonString)
+    }
+
+    private fun IdlingResource.track() = apply {
+        registeredResources += this
+        IdlingRegistry.getInstance().register(this)
     }
 
     companion object {
