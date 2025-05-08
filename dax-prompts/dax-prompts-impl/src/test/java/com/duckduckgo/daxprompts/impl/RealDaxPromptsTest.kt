@@ -16,16 +16,19 @@
 
 package com.duckduckgo.daxprompts.impl
 
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -37,49 +40,121 @@ class RealDaxPromptsTest {
     private lateinit var testee: RealDaxPrompts
 
     private val mockRepository: DaxPromptsRepository = mock()
+    private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     @Before
     fun setup() {
-        testee = RealDaxPrompts(mockRepository, coroutineTestRule.testDispatcherProvider)
+        testee = RealDaxPrompts(mockRepository, mockReactivateUsersExperiment, mockUserBrowserProperties, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenShouldShowDuckPlayerPromptCalledThenReturnValueFromRepository() = runTest {
+    fun whenUserIsNotEligibleThenReturnNone() = runTest {
+        mockUserIsNotEligible()
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenUserIsEligibleAndInControlGroupThenReturnShowControl() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(true)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.SHOW_CONTROL, result)
+    }
+
+    @Test
+    fun whenUserIsEligibleAndInDuckPlayerGroupAndShouldShowPromptThenReturnShowVariant1() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(true)
         whenever(mockRepository.getDaxPromptsShowDuckPlayer()).thenReturn(true)
 
-        val result = testee.shouldShowDuckPlayerPrompt()
+        val result = testee.evaluate()
 
-        assertEquals(true, result)
-        verify(mockRepository).getDaxPromptsShowDuckPlayer()
+        assertEquals(ActionType.SHOW_VARIANT_1, result)
     }
 
     @Test
-    fun whenShouldShowDuckPlayerPromptCalledWithFalseValueThenReturnFalse() = runTest {
+    fun whenUserIsEligibleAndInDuckPlayerGroupAndShouldNotShowPromptThenReturnNone() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(true)
         whenever(mockRepository.getDaxPromptsShowDuckPlayer()).thenReturn(false)
 
-        val result = testee.shouldShowDuckPlayerPrompt()
+        val result = testee.evaluate()
 
-        assertEquals(false, result)
-        verify(mockRepository).getDaxPromptsShowDuckPlayer()
+        assertEquals(ActionType.NONE, result)
     }
 
     @Test
-    fun whenShouldShowBrowserComparisonPromptCalledThenReturnValueFromRepository() = runTest {
+    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldShowPromptThenReturnShowVariant2() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
         whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
 
-        val result = testee.shouldShowBrowserComparisonPrompt()
+        val result = testee.evaluate()
 
-        assertEquals(true, result)
-        verify(mockRepository).getDaxPromptsShowBrowserComparison()
+        assertEquals(ActionType.SHOW_VARIANT_2, result)
     }
 
     @Test
-    fun whenShouldShowBrowserComparisonPromptCalledWithFalseValueThenReturnFalse() = runTest {
+    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldNotShowPromptThenReturnNone() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
         whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(false)
 
-        val result = testee.shouldShowBrowserComparisonPrompt()
+        val result = testee.evaluate()
 
-        assertEquals(false, result)
-        verify(mockRepository).getDaxPromptsShowBrowserComparison()
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenUserIsEligibleButNotInAnyExperimentGroupThenReturnNone() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenDaysSinceInstalledLessThanThresholdThenUserIsNotEligible() = runTest {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(27)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenUserHasUsedAppInLast7DaysThenUserIsNotEligible() = runTest {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(1)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    private fun mockUserIsEligible() = runBlocking {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+    }
+
+    private fun mockUserIsNotEligible() {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(27)
     }
 }

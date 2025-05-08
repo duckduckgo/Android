@@ -20,9 +20,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.CONTROL
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_BROWSER_PROMPT
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,7 +35,7 @@ private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000 /
 @ContributesBinding(AppScope::class, boundType = DaxPrompts::class)
 class RealDaxPrompts @Inject constructor(
     private val daxPromptsRepository: DaxPromptsRepository,
-    private val reactivateUsersToggles: ReactivateUsersToggles,
+    private val reactivateUsersExperiment: ReactivateUsersExperiment,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
@@ -49,11 +46,11 @@ class RealDaxPrompts @Inject constructor(
                 return@withContext ActionType.NONE
             }
 
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(CONTROL)) {
+            if (reactivateUsersExperiment.isControl()) {
                 ActionType.SHOW_CONTROL
-            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
+            } else if (reactivateUsersExperiment.isDuckPlayerPrompt()) {
                 if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_1 else ActionType.NONE
-            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_BROWSER_PROMPT)) {
+            } else if (reactivateUsersExperiment.isBrowserComparisonPrompt()) {
                 if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_2 else ActionType.NONE
             } else {
                 ActionType.NONE
@@ -73,7 +70,6 @@ class RealDaxPrompts @Inject constructor(
     }
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
-        // TODO ANA: add here a check that the browser is not default already
         daxPromptsRepository.getDaxPromptsShowBrowserComparison()
     }
 }
