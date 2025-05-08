@@ -21,8 +21,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.CONTROL
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_1
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_2
+import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
+import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_BROWSER_PROMPT
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,9 +51,9 @@ class RealDaxPrompts @Inject constructor(
 
             if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(CONTROL)) {
                 ActionType.SHOW_CONTROL
-            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_1)) {
+            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
                 if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_1 else ActionType.NONE
-            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_2)) {
+            } else if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_BROWSER_PROMPT)) {
                 if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_2 else ActionType.NONE
             } else {
                 ActionType.NONE

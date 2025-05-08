@@ -18,8 +18,8 @@ package com.duckduckgo.daxprompts.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_1
-import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_2
+import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_DUCKPLAYER_PROMPT
+import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Cohorts.VARIANT_BROWSER_PROMPT
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,7 +51,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireDuckPlayerUseIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_1)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getDuckPlayerUseMetric()?.fire()
             }
         }
@@ -59,7 +59,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireSetBrowserAsDefaultIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_2)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_BROWSER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getSetBrowserAsDefaultMetric()?.fire()
             }
         }
@@ -67,7 +67,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireDuckPlayerClickIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_1)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getDuckPlayerClickMetric()?.fire()
             }
         }
@@ -75,7 +75,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireChooseYourBrowserClickIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_2)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_BROWSER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getChooseYourBrowserClickMetric()?.fire()
             }
         }
@@ -83,7 +83,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireCloseScreenIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_1)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getCloseScreenMetric()?.fire()
             }
         }
@@ -91,7 +91,7 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 
     override suspend fun fireDismissDuckPlayerIfInExperiment() {
         withContext(dispatcherProvider.io()) {
-            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_1)) {
+            if (reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)) {
                 reactivateUsersPixelsPlugin.getDismissDuckPlayerMetric()?.fire()
             }
         }
