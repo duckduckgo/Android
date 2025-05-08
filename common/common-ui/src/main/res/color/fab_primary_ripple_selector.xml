@@ -17,10 +17,10 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:color="?attr/daxColorButtonPrimaryContainerPressed" android:state_pressed="true"/>
-    <item android:color="?attr/daxColorButtonPrimaryContainerPressed" android:state_focused="true" android:state_hovered="true"/>
-    <item android:color="?attr/daxColorButtonPrimaryContainerPressed" android:state_focused="true"/>
-    <item android:color="?attr/daxColorButtonPrimaryContainerPressed" android:state_hovered="true"/>
-    <item android:color="?attr/daxColorButtonPrimaryContainer"/>
+    <item android:color="?attr/daxColorFabPrimaryContainerPressed" android:state_pressed="true"/>
+    <item android:color="?attr/daxColorFabPrimaryContainerPressed" android:state_focused="true" android:state_hovered="true"/>
+    <item android:color="?attr/daxColorFabPrimaryContainerPressed" android:state_focused="true"/>
+    <item android:color="?attr/daxColorFabPrimaryContainerPressed" android:state_hovered="true"/>
+    <item android:color="?attr/daxColorFabPrimaryContainer"/>
 
 </selector>
