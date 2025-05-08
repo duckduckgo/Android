@@ -211,7 +211,7 @@ fladle {
                     "annotation com.duckduckgo.espresso.PrivacyTest"
             ])
             devices.set([
-                    ["model": "redfin", "version": "30"]
+                    ["model": "MediumPhone.arm", "version": "30"],
             ])
             localResultsDir.set("fladleResults")
             flakyTestAttempts.set(2)
