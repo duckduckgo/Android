@@ -56,7 +56,7 @@ import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillSettingsScreen::class)
-class AutofillSettings : DuckDuckGoActivity() {
+class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -113,7 +113,7 @@ class AutofillSettings : DuckDuckGoActivity() {
                 when (it) {
                     is NavigatePasswordList -> {
                         globalActivityStarter.start(
-                            this@AutofillSettings,
+                            this@AutofillSettingsActivity,
                             AutofillPasswordsManagementScreen(source = AutofillSettings),
                         )
                     }

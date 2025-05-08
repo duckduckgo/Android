@@ -26,7 +26,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".ui.settings.AutofillSettings"
+            android:name=".ui.settings.AutofillSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
