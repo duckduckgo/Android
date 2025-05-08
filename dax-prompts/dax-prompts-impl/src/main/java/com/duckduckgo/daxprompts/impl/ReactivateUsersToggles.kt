@@ -20,7 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.daxprompts.impl.ReactivateUsersToggles.Companion.BASE_EXPERIMENT_NAME
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -55,17 +54,15 @@ interface ReactivateUsersToggles {
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class ReactivateUsersPixelsPlugin @Inject constructor(
-    private val inventory: FeatureTogglesInventory,
+    private val toggles: ReactivateUsersToggles
 ) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
-        val activeToggle = inventory.reactivateUsersFlag() ?: return emptyList()
-
         return listOf(
             MetricsPixel(
                 metric = METRIC_DUCK_PLAYER_USE,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                     ConversionWindow(lowerWindow = 0, upperWindow = 5),
@@ -78,7 +75,7 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = METRIC_SET_BROWSER_AS_DEFAULT,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                     ConversionWindow(lowerWindow = 0, upperWindow = 7),
@@ -89,7 +86,7 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = METRIC_DUCK_PLAYER_CLICK,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                 ),
@@ -97,7 +94,7 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = METRIC_CHOOSE_YOUR_BROWSER_CLICK,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                 ),
@@ -105,7 +102,7 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = METRIC_CLOSE_SCREEN,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                 ),
@@ -113,7 +110,7 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
             MetricsPixel(
                 metric = METRIC_DISMISS_DUCK_PLAYER,
                 value = "1",
-                toggle = activeToggle,
+                toggle = toggles.reactivateUsersExperimentMay25(),
                 conversionWindow = listOf(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                 ),
@@ -152,11 +149,5 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
         internal const val METRIC_CHOOSE_YOUR_BROWSER_CLICK = "chooseYourBrowserClick"
         internal const val METRIC_CLOSE_SCREEN = "closeScreen"
         internal const val METRIC_DISMISS_DUCK_PLAYER = "dismissDuckPlayer"
-    }
-}
-
-suspend fun FeatureTogglesInventory.reactivateUsersFlag(): Toggle? {
-    return this.getAllTogglesForParent(BASE_EXPERIMENT_NAME).firstOrNull {
-        it.featureName().name.startsWith(BASE_EXPERIMENT_NAME) && it.isEnrolled() && it.isEnabled()
     }
 }
