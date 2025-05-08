@@ -97,14 +97,17 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
-                    Timber.i("CRIS: AutofillSettingsViewModel state: $state")
-                    binding.autofillEnabledToggle.quietlySetIsChecked(
-                        state.autofillEnabled,
-                        globalAutofillToggleListener,
-                    )
-                    binding.passwordsListItem.setSecondaryText(state.loginsCount.toString())
-                    binding.excludedSitesSection.isVisible = state.canResetExcludedSites
-                    binding.importPasswordsOption.isVisible = state.canImportFromGooglePasswords
+                    binding.viewSwitcher.displayedChild = if (state.autofillAvailable) 0 else 1
+                    if (state.autofillAvailable) {
+                        Timber.i("CRIS: AutofillSettingsViewModel state: $state")
+                        binding.autofillAvailable.autofillEnabledToggle.quietlySetIsChecked(
+                            state.autofillEnabled,
+                            globalAutofillToggleListener,
+                        )
+                        binding.autofillAvailable.passwordsListItem.setSecondaryText(state.loginsCount.toString())
+                        binding.autofillAvailable.excludedSitesSection.isVisible = state.canResetExcludedSites
+                        binding.autofillAvailable.importPasswordsOption.isVisible = state.canImportFromGooglePasswords
+                    }
                 }
         }
 
@@ -135,23 +138,23 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureViewListeners() {
-        binding.autofillEnabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
-        binding.passwordsListItem.setOnClickListener {
+        binding.autofillAvailable.autofillEnabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
+        binding.autofillAvailable.passwordsListItem.setOnClickListener {
             viewModel.onPasswordListClicked()
         }
-        binding.importPasswordsOption.setOnClickListener {
+        binding.autofillAvailable.importPasswordsOption.setOnClickListener {
             viewModel.onImportPasswordsClicked()
         }
-        binding.syncDesktopPasswordsOption.setOnClickListener {
+        binding.autofillAvailable.syncDesktopPasswordsOption.setOnClickListener {
             viewModel.onImportFromDesktopWithSyncClicked()
         }
-        binding.excludedSitesOption.setOnClickListener {
+        binding.autofillAvailable.excludedSitesOption.setOnClickListener {
             viewModel.onResetExcludedSitesClicked()
         }
     }
 
     private fun configureInfoText() {
-        binding.autofillInfoText.addClickableLink(
+        binding.autofillAvailable.autofillInfoText.addClickableLink(
             annotation = "learn_more_link",
             textSequence = binding.root.context.prependIconToText(
                 R.string.autofillSettingsAutofillSubtitle,

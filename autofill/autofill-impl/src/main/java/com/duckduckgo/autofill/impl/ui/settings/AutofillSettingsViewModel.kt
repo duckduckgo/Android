@@ -35,7 +35,6 @@ import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Comman
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.api.engine.SyncEngine
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +57,7 @@ class AutofillSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
+        val autofillAvailable: Boolean = false,
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
         val loginsCount: Int = 0,
@@ -78,6 +78,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: Flow<ViewState> = _viewState.onStart {
         _viewState.value = ViewState(
+            autofillAvailable = autofillStore.autofillAvailable(),
             autofillEnabled = autofillStore.autofillEnabled,
         )
         onViewStateFlowStart()
@@ -111,9 +112,6 @@ class AutofillSettingsViewModel @Inject constructor(
             }.getOrDefault(false)
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
         }
-    }
-
-    fun onViewCreated() {
     }
 
     fun onEnableAutofill() {
