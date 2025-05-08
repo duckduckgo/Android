@@ -35,10 +35,10 @@ import javax.inject.Inject
 )
 interface ReactivateUsersToggles {
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun reactivateUsersExperimentMay25(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {
