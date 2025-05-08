@@ -21,11 +21,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -88,6 +90,8 @@ class SettingsViewModelTest {
 
     private lateinit var testee: SettingsViewModel
 
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -107,6 +111,7 @@ class SettingsViewModelTest {
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
+            autofillFeature = autofillFeature,
         )
     }
 
