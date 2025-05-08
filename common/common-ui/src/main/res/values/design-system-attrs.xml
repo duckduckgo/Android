@@ -23,4 +23,5 @@
     <attr name="autocompleteListItemStartPadding" format="dimension"/>
     <attr name="autocompleteListItemEndPadding" format="dimension"/>
     <attr name="autocompleteListItemIconMargin" format="dimension"/>
+    <attr name="autocompleteListItemWithoutTrailIconEndPadding" format="dimension"/>
 </resources>

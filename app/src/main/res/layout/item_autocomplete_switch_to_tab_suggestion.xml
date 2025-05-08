@@ -22,7 +22,8 @@
     android:layout_marginTop="6dp"
     android:layout_marginBottom="8dp"
     android:background="?attr/selectableItemBackground"
-    android:paddingHorizontal="?attr/autocompleteListItemHorizontalPadding"
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding"
     android:paddingVertical="@dimen/keyline_2">
 
     <ImageView

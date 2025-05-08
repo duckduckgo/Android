@@ -137,6 +137,7 @@
         <item name="autocompleteListItemStartPadding">18dp</item>
         <item name="autocompleteListItemEndPadding">@dimen/keyline_2</item>
         <item name="autocompleteListItemIconMargin">10dp</item>
+        <item name="autocompleteListItemWithoutTrailIconEndPadding">@dimen/keyline_4</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
