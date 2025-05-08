@@ -133,6 +133,7 @@ class GpcTest {
             webView.evaluateJavascript(
                 "(typeof $objectName !== 'undefined')",
             ) { result ->
+                System.out.println("Result of $objectName check: $result")
                 if (result == "true") {
                     isIdle = true
                     callback?.onTransitionToIdle()
