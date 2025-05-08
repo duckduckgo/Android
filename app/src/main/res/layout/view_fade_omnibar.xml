@@ -256,7 +256,7 @@
                                 android:layout_height="@dimen/toolbarIcon"
                                 android:background="@drawable/selectable_item_experimental_background"
                                 android:contentDescription="@string/clearButtonContentDescription"
-                                android:src="@drawable/ic_close_24_secondary"
+                                android:src="@drawable/ic_close_circle_small_secondary_24"
                                 android:scaleType="center"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
