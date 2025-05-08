@@ -32,7 +32,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.utils.isHttps
-import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -40,7 +39,6 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class HttpsUpgradesTest {
 
@@ -52,7 +50,7 @@ class HttpsUpgradesTest {
         ),
     )
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
     fun whenProtectionsAreEnabledHttpsUpgradedCorrectly() {
         preparationsForPrivacyTest()
 

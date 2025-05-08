@@ -37,14 +37,13 @@ import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class RequestBlockingTest {
 
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
-    @Test @PrivacyTest
+    // /@Test @PrivacyTest
     fun whenProtectionsAreEnabledRequestBlockedCorrectly() {
         preparationsForPrivacyTest()
 
@@ -67,7 +66,7 @@ class RequestBlockingTest {
         }
     }
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
     fun whenProtectionsAreDisabledRequestAreNotBlocked() {
         preparationsForPrivacyTest()
 

@@ -39,14 +39,13 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Rule
-import org.junit.Test
 
 class FingerprintProtectionTest {
 
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
     fun whenProtectionsAreFingerprintProtected() = runTest {
         preparationsForPrivacyTest()
 

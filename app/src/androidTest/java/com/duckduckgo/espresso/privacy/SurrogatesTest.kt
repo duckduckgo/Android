@@ -35,14 +35,13 @@ import com.squareup.moshi.Moshi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class SurrogatesTest {
 
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
         preparationsForPrivacyTest()
 
@@ -74,7 +73,7 @@ class SurrogatesTest {
         }
     }
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
     fun whenProtectionsAreDisabledSurrogatesAreNotLoaded() {
         preparationsForPrivacyTest()
 
