@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            app:leadingIcon="@drawable/ic_key_24e"
+            app:leadingIcon="@drawable/ic_key_24"
             app:leadingIconBackground="circular"
             app:primaryText="@string/autofillSettingsPasswordsEntry"
             app:secondaryText="123" />
