@@ -234,9 +234,15 @@ class NgVpnNetworkStack @Inject constructor(
 
             tunnelThread = Thread {
                 logcat { "Running tunnel in context $jniContext" }
-                vpnNetwork.run(jniContext, tunfd)
-                logcat(LogPriority.WARN) { "Tunnel exited" }
-                tunnelThread = null
+                try {
+                    vpnNetwork.run(jniContext, tunfd)
+                } catch (t: Throwable) {
+                    logcat(LogPriority.ERROR) { "Tunnel thread crashed: ${t.asLog()}" }
+                    deviceShieldPixels.reportTunnelThreadAbnormalCrash()
+                } finally {
+                    tunnelThread = null
+                    logcat(LogPriority.WARN) { "Tunnel exited" }
+                }
             }.also { it.start() }
 
             logcat { "Started tunnel thread" }
