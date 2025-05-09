@@ -29,7 +29,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenKeyIsNotBillingPeriodThenMappersMapsToNull() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = "annual")
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = "Yearly")
         val result = matcher.map("somethingelse", jsonMatchingAttribute)
 
         assertNull(result)
@@ -37,7 +37,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenKeyIsBillingPeriodWithInvalidValueTypeThenMappersMapsToNull() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf("annual"))
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf("Yearly"))
         val result = matcher.map("privacyProBillingPeriod", jsonMatchingAttribute)
 
         assertNull(result)
@@ -54,17 +54,17 @@ class RMFPProBillingPeriodMatchingAttributeTest {
     @Test
     fun whenKeyIsBillingPeriodWithNullValueThenMappersMapsToNull() {
         val jsonMatchingAttribute = JsonMatchingAttribute(value = null)
-        val result = matcher.map("privacyProBillingPeriod", jsonMatchingAttribute)
+        val result = matcher.map("pproBillingPeriod", jsonMatchingAttribute)
 
         assertNull(result)
     }
 
     @Test
     fun whenKeyIsBillingPeriodValidThenMappersMapsToAttribute() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = "annual")
-        val result = matcher.map("privacyProBillingPeriod", jsonMatchingAttribute)
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = "Yearly")
+        val result = matcher.map("pproBillingPeriod", jsonMatchingAttribute)
 
-        assertEquals(PProBillingPeriodMatchingAttribute("annual"), result)
+        assertEquals(PProBillingPeriodMatchingAttribute(YEARLY), result)
     }
 
     @Test
@@ -80,7 +80,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
                 activeOffers = listOf(),
             ),
         )
-        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("yearly"))
+        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("Yearly"))
 
         assertNotNull(result)
         result?.let {
@@ -101,7 +101,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
                 activeOffers = listOf(),
             ),
         )
-        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("monthly"))
+        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("Monthly"))
 
         assertNotNull(result)
         result?.let {
