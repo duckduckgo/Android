@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.experiments.visual.store
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -50,6 +51,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         updateFeatureState()
     }
 
+    @SuppressLint("DenyListedApi")
     override fun changeExperimentFlagPreference(enabled: Boolean) {
         experimentalUIThemingFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         updateFeatureState()

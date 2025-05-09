@@ -65,7 +65,6 @@ class VisualDesignExperimentViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("DenyListedApi")
     fun onExperimentalUIModeChanged(checked: Boolean) {
         visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
     }
