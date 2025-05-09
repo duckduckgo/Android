@@ -2649,8 +2649,9 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
-            if (omnibar.isOutlineShown()) {
+        newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            Timber.d("Visual: new tab scrolling scrollX $scrollX scrollY $scrollY oldScrollX $oldScrollX oldScrollY $oldScrollY")
+            if (omnibar.isEditing()) {
                 hideKeyboard()
             }
         }
