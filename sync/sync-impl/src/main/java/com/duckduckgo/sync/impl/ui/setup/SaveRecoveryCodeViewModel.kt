@@ -66,7 +66,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
         if (syncAccountRepository.isSignedIn()) {
             syncAccountRepository.getRecoveryCode().getOrNull()?.let { recoveryCode ->
                 val newState = SignedIn(
-                    b64RecoveryCode = recoveryCode,
+                    b64RecoveryCode = recoveryCode.rawCode,
                 )
                 viewState.emit(ViewState(newState))
             } ?: command.send(Command.FinishWithError)
@@ -77,7 +77,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
             }.onSuccess {
                 syncAccountRepository.getRecoveryCode().getOrNull()?.let { recoveryCode ->
                     val newState = SignedIn(
-                        b64RecoveryCode = recoveryCode,
+                        b64RecoveryCode = recoveryCode.rawCode,
                     )
                     viewState.emit(ViewState(newState))
                 } ?: command.send(Command.FinishWithError)
@@ -115,8 +115,8 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
-            clipboard.copyToClipboard(recoveryCodeB64)
+            val authCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
+            clipboard.copyToClipboard(authCode.rawCode)
             command.send(ShowMessage(R.string.sync_code_copied_message))
         }
     }
@@ -130,9 +130,9 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     fun generateRecoveryCode(viewContext: Context) {
         viewModelScope.launch(dispatchers.io()) {
             syncAccountRepository.getRecoveryCode()
-                .onSuccess { recoveryCodeB64 ->
+                .onSuccess { authCode ->
                     kotlin.runCatching {
-                        recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+                        recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, authCode.rawCode)
                     }.onSuccess { generateRecoveryCodePDF ->
                         command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
                     }.onFailure {

@@ -48,7 +48,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import javax.inject.*
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -127,9 +127,9 @@ class SyncConnectViewModel @Inject constructor(
 
     private suspend fun showQRCode() {
         syncAccountRepository.getConnectQR()
-            .onSuccess { connectQR ->
+            .onSuccess { code ->
                 val qrBitmap = withContext(dispatchers.io()) {
-                    qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                    qrEncoder.encodeAsBitmap(code.qrCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
                 }
                 viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
             }.onFailure {
@@ -146,8 +146,8 @@ class SyncConnectViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             syncAccountRepository.getConnectQR().getOrNull()?.let { code ->
-                Timber.d("Sync: recovery available for sharing manually: $code")
-                clipboard.copyToClipboard(code)
+                Timber.d("Sync: code available for sharing manually: $code")
+                clipboard.copyToClipboard(code.rawCode)
                 command.send(ShowMessage(R.string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
         }
