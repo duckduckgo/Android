@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.feature.toggles.impl
+package com.duckduckgo.feature.toggles.impl.rmf
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -35,17 +35,17 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFExperimentMatchingAttributePlugin @Inject constructor(
+class RMFToggleMatchingAttributePlugin @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
 
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute
-    ): MatchingAttribute? = if (key == ExperimentMatchingAttribute.KEY) {
+    ): MatchingAttribute? = if (key == ToggleMatchingAttribute.KEY) {
         val value = jsonMatchingAttribute.value as? List<String>
         value.takeUnless { it.isNullOrEmpty() }?.let { featureFlags ->
-            ExperimentMatchingAttribute(featureFlags)
+            ToggleMatchingAttribute(featureFlags)
         }
     } else {
         null
@@ -53,10 +53,18 @@ class RMFExperimentMatchingAttributePlugin @Inject constructor(
 
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
-            is ExperimentMatchingAttribute -> {
+            is ToggleMatchingAttribute -> {
                 assert(matchingAttribute.values.isNotEmpty())
-                val activeExperimentName = featureTogglesInventory.getAllActiveExperimentToggles().map { it.featureName().name }
-                return matchingAttribute.values.any { activeExperimentName.contains(it) }
+                val flags = featureTogglesInventory.getAll()
+                return matchingAttribute.values.map { attribute ->
+                    val foundFlag = flags.find { it.featureName().name == attribute }
+                    if (foundFlag == null) {
+                        return false
+                    }
+                    foundFlag
+                }.all {
+                    it.isEnabled()
+                }
             }
 
             else -> null
@@ -64,11 +72,11 @@ class RMFExperimentMatchingAttributePlugin @Inject constructor(
     }
 }
 
-data class ExperimentMatchingAttribute(
+data class ToggleMatchingAttribute(
     val values: List<String>,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "isUserInAnyActiveExperiment"
+        const val KEY = "allFeatureFlagsEnabled"
     }
 }
 
