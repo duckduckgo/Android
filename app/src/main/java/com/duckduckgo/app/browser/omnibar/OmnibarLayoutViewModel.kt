@@ -87,7 +87,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
-    visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
 ) : ViewModel() {
