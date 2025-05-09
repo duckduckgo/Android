@@ -120,7 +120,7 @@
     <string name="tabSwitcherGridViewMenu">Režģa skats</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">Pēdējo 7 dienu laikā &lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">Pēdējo 7 dienu laikā &lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;bloķēti %1$s izsekotāji &lt;/b&gt;</string>
     <string name="inTheLast7Days">pēdējo 7 dienu laikā</string>
 
@@ -860,7 +860,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
+    <string name="duckChatMenuItem">Jauna Duck.ai tērzēšana</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>

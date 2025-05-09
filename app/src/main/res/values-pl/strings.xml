@@ -121,7 +121,7 @@
     <string name="tabSwitcherGridViewMenu">Widok siatki</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt; w ciągu ostatnich 7 dni</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt; w ciągu ostatnich 7 dni</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt;</string>
     <string name="inTheLast7Days">w ciągu ostatnich 7 dni</string>
 
@@ -876,7 +876,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nowy AI Chat</string>
+    <string name="duckChatMenuItem">Nowy czat Duck.ai</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Skorzystaj z DuckDuckGo, aby chronić swoją aktywność w Internecie</string>
