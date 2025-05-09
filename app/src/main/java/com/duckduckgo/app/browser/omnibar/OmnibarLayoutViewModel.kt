@@ -146,6 +146,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isVisualDesignExperimentEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
+        val showShadows: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
@@ -326,6 +327,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
+                            showShadows = true,
                         )
                     }
                 }
@@ -354,6 +356,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
+                            showShadows = false,
                         )
                     }
                 }
@@ -695,6 +698,17 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState.update {
                 it.copy(
                     viewMode = customTabMode.copy(title = decoration.title),
+                )
+            }
+        }
+    }
+
+    fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
+        val viewMode = viewState.value.viewMode
+        if (viewMode is NewTab) {
+            _viewState.update {
+                it.copy(
+                    showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
                 )
             }
         }
