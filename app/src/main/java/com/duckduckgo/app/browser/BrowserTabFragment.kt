@@ -1131,7 +1131,7 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isExperimentEnabled.value) {
             // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {

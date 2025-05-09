@@ -57,8 +57,8 @@ class BrowserNavigationBarViewIntegration(
 
     init {
         stateObserverJob = lifecycleScope.launch {
-            visualDesignExperimentDataStore.navigationBarState.collect { navigationBarState ->
-                if (navigationBarState.isEnabled) {
+            visualDesignExperimentDataStore.isExperimentEnabled.collect { isExperimentEnabled ->
+                if (isExperimentEnabled) {
                     onEnabled()
                 } else {
                     onDisabled()
