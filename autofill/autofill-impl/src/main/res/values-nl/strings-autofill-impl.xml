@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Je kunt opgeslagen wachtwoorden uit een andere browser importeren in DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Wachtwoorden importeren</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Wachtwoorden bureaublad synchroniseren</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Wachtwoorden importeren</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Synchroniseren van desktopwachtwoorden</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importeer wachtwoorden in de desktopversie van de DuckDuckGo-browser en synchroniseer ze vervolgens tussen apparaten.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Download de desktopbrowser</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link gekopieerd</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Wachtwoorden importeren van Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Wachtwoorden importeren van Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-wachtwoorden synchroniseren</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-wachtwoorden synchroniseren</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Wachtwoorden bureaublad synchroniseren</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Wachtwoorden bureaublad synchroniseren</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importeer je Google-wachtwoorden</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Wachtwoord importeren mislukt</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Overgeslagen (duplicaat of ongeldig): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Wachtwoorden geïmporteerd: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Wachtwoorden openen</string>
+    <string name="autofill_service_select_password_activity">Selecteer een opgeslagen wachtwoord</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Wachtwoorden en automatisch invullen</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Uitgesloten sites opnieuw instellen?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Als je uitgesloten sites opnieuw instelt, zie je de volgende keer dat je bij een van deze sites inlogt een melding om je wachtwoord op te slaan.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Herstel</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Annuleren</string>
+    <string name="autofillSettingsPasswordsEntry">Wachtwoorden</string>
+    <string name="autofillSettingsAutofillToggleLabel">Vragen om op te slaan en automatisch in te vullen</string>
+    <string name="autofillSettingsAutofillSubtitle">Wachtwoorden worden versleuteld. Niemand anders dan jij kunt ze zien, zelfs wij niet. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Wachtwoorden importeren</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Wachtwoorden importeren van Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Wachtwoorden bureaublad synchroniseren</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Uitgesloten sites opnieuw instellen</string>
 
 </resources>
