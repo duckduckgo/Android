@@ -1442,8 +1442,10 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
+
         omnibar.setViewMode(ViewMode.NewTab)
-        browserNavigationBarIntegration.configureNewTabViewMode()
+        configureBrowserNavigationForNewTab()
+
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1543,6 +1545,26 @@ class BrowserTabFragment :
             renderer.showNewTab()
             maliciousWarningView.gone()
         }
+    }
+
+    private fun configureBrowserNavigationForNewTab() {
+        newBrowserTab.newTabContainerScrollView.postDelayed(
+            500,
+            {
+                // Get the height of the content within the NestedScrollView
+                val contentHeight = newBrowserTab.newTabContainerScrollView.getChildAt(0)?.height ?: 0
+                Timber.d("Visual: contentHeight $contentHeight")
+
+                // Get the height of the NestedScrollView itself
+                val scrollViewHeight = newBrowserTab.newTabContainerScrollView.height
+                Timber.d("Visual: scrollViewHeight $scrollViewHeight")
+
+                // Content is scrollable if its height is greater than the NestedScrollView's height
+                val hasContentToScroll = contentHeight > scrollViewHeight
+                Timber.d("Visual: configureNewTabViewMode hasContentToScroll $hasContentToScroll")
+                browserNavigationBarIntegration.configureNewTabViewMode(hasContentToScroll)
+            },
+        )
     }
 
     private fun onEscapeMaliciousSite() {
@@ -4273,7 +4295,8 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
-            browserNavigationBarIntegration.configureNewTabViewMode()
+
+            configureBrowserNavigationForNewTab()
 
             viewModel.onNewTabShown()
         }
