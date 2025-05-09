@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -44,6 +45,7 @@ class IntentDispatcherViewModelTest {
     private val mockIntent: Intent = mock()
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val syncUrlIdentifier: SyncUrlIdentifier = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
 
@@ -54,7 +56,10 @@ class IntentDispatcherViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             emailProtectionLinkVerifier = emailProtectionLinkVerifier,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+            syncUrlIdentifier = syncUrlIdentifier,
         )
+
+        whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)
     }
 
     @Test

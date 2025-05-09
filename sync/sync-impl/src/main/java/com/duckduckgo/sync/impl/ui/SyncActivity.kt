@@ -51,8 +51,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevic
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -83,6 +85,7 @@ import timber.log.Timber
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 @ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -158,7 +161,13 @@ class SyncActivity : DuckDuckGoActivity() {
 
         setupClickListeners()
         setupRecyclerView()
+
+        syncSetupUrl()?.let { setupUrl ->
+            viewModel.processSetupDeepLink(setupUrl)
+        }
     }
+
+    private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
@@ -299,7 +308,37 @@ class SyncActivity : DuckDuckGoActivity() {
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
+            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(it.barcodeSyncUrl, it.deviceName)
+            is DeepLinkIntoSetup -> deepLinkIntoSetup(it.barcodeSyncUrl)
         }
+    }
+
+    private fun deepLinkIntoSetup(barcodeSyncUrl: String) {
+        Timber.i("cdr launching sync with another device flow with deep link")
+        syncWithAnotherDeviceFlow.launch(barcodeSyncUrl)
+    }
+
+    private fun askSetupSyncDeepLink(
+        barcodeSyncUrl: String,
+        deviceName: String?,
+    ) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.autofill_sync_setup_deep_link_dialog_title)
+            .setMessage(getString(R.string.autofill_sync_setup_deep_link_dialog_message, deviceName))
+            .setPositiveButton(R.string.autofill_sync_setup_deep_link_dialog_button_positive)
+            .setNegativeButton(R.string.autofill_sync_setup_deep_link_dialog_button_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        Timber.e("cdr on positive button clicked. will now deep link sync setup using $barcodeSyncUrl")
+                        viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        Timber.i("cdr on negative button clicked. will not deep link sync setup")
+                    }
+                },
+            ).show()
     }
 
     private fun launchSyncGetOnOtherPlatforms(source: String) {

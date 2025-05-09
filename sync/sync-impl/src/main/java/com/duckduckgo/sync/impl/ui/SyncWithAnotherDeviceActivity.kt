@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,14 +43,21 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Show
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.SetupFlowListener
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkConnectedActivity
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
+class SyncWithAnotherDeviceActivity : DuckDuckGoActivity(), SetupFlowListener {
+
     private val binding: ActivityConnectSyncBinding by viewBinding()
     private val viewModel: SyncWithAnotherActivityViewModel by bindViewModel()
+
+    private var deepLinkSetupFragment: Fragment? = null
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
@@ -60,8 +69,19 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-
         observeUiEvents()
+        extractDeepLinkCode()?.let {
+            // remove barcode reader; not needed when deep linking and don't want it prompting for camera permissions
+            binding.readerContainer.removeView(binding.qrCodeReader)
+
+            supportFragmentManager.commitNow {
+                deepLinkSetupFragment = SyncSetupDeepLinkFragment.instance().also { fragment ->
+                    replace(R.id.fragment_container_view, fragment, FRAGMENT_TAG_DEVICE_CONNECTING)
+                }
+            }
+
+            viewModel.onDeepLinkCodeReceived(it)
+        }
         configureListeners()
     }
 
@@ -99,6 +119,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: Command) {
+        Timber.i("cdr processCommand $it")
         when (it) {
             ReadTextCode -> {
                 enterCodeLauncher.launch(RECOVERY_CODE)
@@ -106,6 +127,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             is LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
+
+                if (isDeepLinkSetup()) {
+                    startActivity(SyncSetupDeepLinkConnectedActivity.intent(this))
+                }
             }
             FinishWithError -> {
                 setResult(RESULT_CANCELED)
@@ -125,11 +150,19 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.qrCodeReader.apply {
-            decodeSingle { result -> viewModel.onQRCodeScanned(result) }
+            // we don't want to initialise barcode scanner when deep linking
+            if (!isDeepLinkSetup()) {
+                decodeSingle { result -> viewModel.onQRCodeScanned(result) }
+            }
+
             onCtaClicked {
                 viewModel.onReadTextCodeClicked()
             }
         }
+    }
+
+    private fun extractDeepLinkCode(): String? {
+        return intent.getStringExtra(EXTRA_DEEP_LINK_CODE)
     }
 
     private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
@@ -168,9 +201,19 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     companion object {
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
+        private const val EXTRA_DEEP_LINK_CODE = "deepLinkCode"
+        private const val FRAGMENT_TAG_DEVICE_CONNECTING = "device-connecting"
 
         internal fun intent(context: Context): Intent {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java)
         }
+
+        internal fun intentForDeepLink(context: Context, syncBarcodeUrl: String): Intent {
+            return Intent(context, SyncWithAnotherDeviceActivity::class.java).apply {
+                putExtra(EXTRA_DEEP_LINK_CODE, syncBarcodeUrl)
+            }
+        }
     }
+
+    private fun isDeepLinkSetup() = deepLinkSetupFragment != null
 }

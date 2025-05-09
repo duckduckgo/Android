@@ -168,6 +168,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
+    fun onDeepLinkCodeReceived(syncBarcodeUrl: String) {
+        Timber.i("cdr onDeepLinkCodeReceived $syncBarcodeUrl")
+        onQRCodeScanned(syncBarcodeUrl)
+    }
+
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey

@@ -24,12 +24,24 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity.Companion.EXTRA_USER_SWITCHED_ACCOUNT
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput
 
-internal class SyncWithAnotherDeviceContract : ActivityResultContract<Void?, SyncWithAnotherDeviceContractOutput>() {
+/**
+ * Input can be null if not required
+ * Or, input can be a sync setup URL which includes the pairing code
+ */
+internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, SyncWithAnotherDeviceContractOutput>() {
+
+    /**
+     * @param input can be null if not required. or, input can be a sync setup URL which includes the pairing code
+     */
     override fun createIntent(
         context: Context,
-        input: Void?,
+        input: String?,
     ): Intent {
-        return SyncWithAnotherDeviceActivity.intent(context)
+        return if (input == null) {
+            SyncWithAnotherDeviceActivity.intent(context)
+        } else {
+            SyncWithAnotherDeviceActivity.intentForDeepLink(context, input)
+        }
     }
 
     override fun parseResult(

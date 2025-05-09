@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui.setup
+package com.duckduckgo.sync.api.setup
 
-interface SetupFlowListener {
-    fun launchRecoveryCodeScreen() {}
-    fun launchCreateAccountScreen() {}
-    fun launchRecoverAccountScreen() {}
-    fun launchDeviceConnectedScreen() {}
-    fun launchGetAppOnOtherPlatformsScreen() {}
-    fun finishSetup() {}
+/**
+ * Used to determine if the app was launched with an intent that should be delegated to sync setup flow
+ */
+interface SyncUrlIdentifier {
+
+    fun shouldDelegateToSyncSetup(intentText: String?): Boolean
 }
