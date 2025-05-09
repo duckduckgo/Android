@@ -57,6 +57,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -405,11 +406,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         }
-
-        pixel.fire(
-            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
-        )
+        if (!_viewState.value.isVisualDesignExperimentEnabled) {
+            pixel.fire(
+                AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
+            )
+        }
     }
 
     fun onPrivacyShieldButtonPressed() {
@@ -706,6 +708,15 @@ class OmnibarLayoutViewModel @Inject constructor(
                     viewMode = customTabMode.copy(title = decoration.title),
                 )
             }
+        }
+    }
+
+    fun onDuckChatButtonPressed() {
+        val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
+        if (experimentEnabled) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
+        } else {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
         }
     }
 }

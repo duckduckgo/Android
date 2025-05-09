@@ -461,6 +461,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
         aiChatMenu?.setOnClickListener {
+            viewModel.onDuckChatButtonPressed()
             omnibarItemPressedListener?.onDuckChatButtonPressed()
         }
         shieldIcon.setOnClickListener {
