@@ -163,13 +163,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override fun render(viewState: ViewState) {
         super.render(viewState)
-        outlineProvider = if (viewState.viewMode is ViewMode.CustomTab) {
-            // adds a drop shadow for the AppBarLayout, in case it was removed at any point
-            ViewOutlineProvider.BACKGROUND
-        } else {
-            // removes the drop shadow from the AppBarLayout to make it appear flat in the view hierarchy
-            null
-        }
+
+        renderShadows(viewState.showShadows)
 
         if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
@@ -335,6 +330,14 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         backIcon.setOnClickListener {
             viewModel.onBackButtonPressed()
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
+        }
+    }
+
+    private fun renderShadows(showShadows: Boolean) {
+        outlineProvider = if (showShadows) {
+            ViewOutlineProvider.BACKGROUND
+        } else {
+            null
         }
     }
 

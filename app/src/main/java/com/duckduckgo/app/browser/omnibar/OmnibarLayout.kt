@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.NewTabScrollingState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -135,6 +136,11 @@ open class OmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class DisableVoiceSearch(val url: String) : Decoration()
+        data class NewTabScrollingState(
+            val canScrollUp: Boolean,
+            val canScrollDown: Boolean,
+            val topOfPage: Boolean,
+        ) : Decoration()
     }
 
     sealed class StateChange {
@@ -762,6 +768,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
+            }
+
+            is NewTabScrollingState -> {
+                viewModel.onNewTabScrollingStateChanged(decoration)
             }
         }
     }
