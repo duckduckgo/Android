@@ -28,7 +28,6 @@ interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
     var firstPopupHandled: Boolean
     fun invalidateCache()
-    fun getConfigSettings(): String?
 }
 
 class RealAutoconsentSettingsDataStore constructor(
@@ -83,10 +82,6 @@ class RealAutoconsentSettingsDataStore constructor(
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
             cachedInternalUserSetting = null // invalidate cache
         }
-    }
-
-    override fun getConfigSettings(): String? {
-        return autoconsentFeature.self().getSettings()
     }
 
     companion object {
