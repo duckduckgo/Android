@@ -77,13 +77,8 @@ class BrowserNavigationBarViewIntegration(
         navigationBarView.setViewMode(Browser)
     }
 
-    fun configureNewTabViewMode(hasContentToScroll: Boolean) {
+    fun configureNewTabViewMode() {
         navigationBarView.setViewMode(NewTab)
-        if (hasContentToScroll) {
-            navigationBarView.showShadow(true)
-        } else {
-            navigationBarView.showShadow(false)
-        }
     }
 
     fun configureFireButtonHighlight(highlighted: Boolean) {
