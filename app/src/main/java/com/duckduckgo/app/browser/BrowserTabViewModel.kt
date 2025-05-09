@@ -2759,7 +2759,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && visualDesignExperimentDataStore.navigationBarState.value.isEnabled)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && visualDesignExperimentDataStore.isExperimentEnabled.value)
     }
 
     fun onPopupMenuLaunched() {
@@ -2830,7 +2830,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         // we also don't want to automatically show keyboard when bottom nav bar is enabled because it overlaps and hides the navigation/tabs buttons
-        val isBottomNavigationBar = visualDesignExperimentDataStore.navigationBarState.value.isEnabled
+        val isBottomNavigationBar = visualDesignExperimentDataStore.isExperimentEnabled.value
         val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBottomNavigationBar
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }

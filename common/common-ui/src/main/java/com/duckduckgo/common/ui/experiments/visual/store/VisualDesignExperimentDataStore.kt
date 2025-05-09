@@ -20,17 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface VisualDesignExperimentDataStore {
 
-    val experimentState: StateFlow<FeatureState>
-    val navigationBarState: StateFlow<FeatureState>
+    val isExperimentEnabled: StateFlow<Boolean>
 
-    fun setExperimentStateUserPreference(enabled: Boolean)
-
-    /**
-     * @param isAvailable returns `true` if the flag for this feature is enabled in the config.
-     * @param isEnabled returns `true` if both [isAvailable] is `true` and user has the feature enabled in the preferences screen.
-     */
-    data class FeatureState(
-        val isAvailable: Boolean,
-        val isEnabled: Boolean,
-    )
+    fun changeExperimentFlagPreference(enabled: Boolean)
 }
