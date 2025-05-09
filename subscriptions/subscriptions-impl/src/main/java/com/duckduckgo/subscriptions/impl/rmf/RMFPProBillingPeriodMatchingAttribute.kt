@@ -40,8 +40,7 @@ class RMFPProBillingPeriodMatchingAttribute @Inject constructor(
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         if (matchingAttribute is PProBillingPeriodMatchingAttribute) {
-            val subscription = subscriptionsManager.getSubscription()
-            return subscription?.productId != null && matchingAttribute.value == subscription.billingPeriod
+            return matchingAttribute.value == subscriptionsManager.getSubscription()?.billingPeriod
         }
         return null
     }
@@ -64,6 +63,6 @@ internal data class PProBillingPeriodMatchingAttribute(
     val value: String,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "privacyProBillingPeriod"
+        const val KEY = "pproBillingPeriod"
     }
 }
