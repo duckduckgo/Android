@@ -38,6 +38,9 @@ interface VpnAppTrackerBlockingDao {
     @Insert
     fun setTrackerBlocklistMetadata(appTrackerMetadata: AppTrackerMetadata)
 
+    @Query("DELETE from vpn_app_tracker_blocking_list_metadata")
+    fun deleteTrackerBlocklistMetadata()
+
     @Query("DELETE from vpn_app_tracker_blocking_list")
     fun deleteTrackerBlockList()
 
@@ -63,6 +66,7 @@ interface VpnAppTrackerBlockingDao {
         metadata: AppTrackerMetadata,
         entities: List<AppTrackerEntity>,
     ) {
+        deleteTrackerBlocklistMetadata()
         setTrackerBlocklistMetadata(metadata)
 
         deleteTrackerBlockList()
