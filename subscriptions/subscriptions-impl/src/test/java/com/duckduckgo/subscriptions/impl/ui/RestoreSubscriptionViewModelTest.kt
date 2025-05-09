@@ -193,6 +193,7 @@ class RestoreSubscriptionViewModelTest {
     private fun subscriptionActive(): Subscription {
         return Subscription(
             productId = "productId",
+            billingPeriod = "Monthly",
             startedAt = 10000L,
             expiresOrRenewsAt = 10000L,
             status = AUTO_RENEWABLE,

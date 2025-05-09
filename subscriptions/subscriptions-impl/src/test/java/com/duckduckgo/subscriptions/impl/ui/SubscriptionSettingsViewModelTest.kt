@@ -62,6 +62,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -90,6 +91,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -118,6 +120,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -146,6 +149,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,

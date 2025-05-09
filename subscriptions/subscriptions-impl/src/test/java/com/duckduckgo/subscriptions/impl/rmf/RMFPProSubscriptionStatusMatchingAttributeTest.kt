@@ -26,6 +26,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     private lateinit var matcher: RMFPProSubscriptionStatusMatchingAttribute
     private val testSubscription = Subscription(
         productId = SubscriptionsConstants.YEARLY_PLAN_US,
+        billingPeriod = "Monthly",
         startedAt = 10000L,
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,
