@@ -9,6 +9,12 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SETTINGS_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -24,6 +30,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -66,6 +74,13 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenSendLaunchPixelThenPixelIsSent() = runTest {
+        testee.sendLaunchPixel(AutofillScreenLaunchSource.SettingsActivity)
+        val expectedParams = mapOf("source" to "settings")
+        verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
+    }
+
+    @Test
     fun whenViewCreatedThenDoesShowToggle() = runTest {
         testee.viewState.test {
             assertTrue(this.awaitItem().showAutofillEnabledToggle)
@@ -95,9 +110,11 @@ class AutofillSettingsViewModelTest {
     fun whenUserEnablesAutofillThenUpdateStateAndStore() = runTest {
         testee.viewState.test {
             awaitItem()
-            testee.onEnableAutofill()
+            testee.onEnableAutofill(AutofillScreenLaunchSource.SettingsActivity)
             assertTrue(awaitItem().autofillEnabled)
             verify(mockStore).autofillEnabled = true
+            val expectedParams = mapOf("source" to "settings")
+            verify(pixel).fire(eq(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED), parameters = eq(expectedParams), any(), any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -108,6 +125,8 @@ class AutofillSettingsViewModelTest {
             testee.onDisableAutofill(AutofillScreenLaunchSource.SettingsActivity)
             assertFalse(awaitItem().autofillEnabled)
             verify(mockStore).autofillEnabled = false
+            val expectedParams = mapOf("source" to "settings")
+            verify(pixel).fire(pixel = eq(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED), parameters = eq(expectedParams), any(), any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -123,9 +142,11 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserClicksOnImportFromDesktopThenCommandIsSent() = runTest {
-        testee.onImportFromDesktopWithSyncClicked()
+        testee.onImportFromDesktopWithSyncClicked(AutofillScreenLaunchSource.SettingsActivity)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop, awaitItem())
+            val expectedParams = mapOf("source" to "settings")
+            verify(pixel).fire(pixel = eq(AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON), parameters = eq(expectedParams), any(), any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -167,9 +188,16 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserClickOnImportGooglePasswordsThenCommandIsSent() = runTest {
-        testee.onImportPasswordsClicked()
+        testee.onImportPasswordsClicked(AutofillScreenLaunchSource.SettingsActivity)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle, awaitItem())
+            val expectedParams = mapOf("source" to "settings")
+            verify(pixel).fire(
+                pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED),
+                parameters = eq(expectedParams),
+                any(),
+                any(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -194,9 +222,16 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserCliksOnResetExcludedSitesThenCommandIsSent() = runTest {
-        testee.onResetExcludedSitesClicked()
+        testee.onResetExcludedSitesClicked(AutofillScreenLaunchSource.SettingsActivity)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.AskToConfirmResetExcludedSites, awaitItem())
+            val expectedParams = mapOf("source" to "settings")
+            verify(pixel).fire(
+                pixel = eq(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED),
+                parameters = eq(expectedParams),
+                any(),
+                any(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
