@@ -85,16 +85,17 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateRes
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -224,11 +225,17 @@ internal class RealPirActionsRunner(
     }
 
     private suspend fun awaitResult(): Result<Unit> {
-        return suspendCoroutine { continuation ->
-            commandsJob += coroutineScope.launch {
-                commandsFlow.asStateFlow().collect {
-                    handleCommand(it, continuation)
+        return suspendCancellableCoroutine { continuation ->
+            commandsJob += commandsFlow.asStateFlow().onEach { state ->
+                if (state is CompleteExecution) {
+                    continuation.resume(Result.success(Unit))
+                } else {
+                    handleCommand(state)
                 }
+            }.launchIn(coroutineScope)
+
+            continuation.invokeOnCancellation {
+                commandsJob.cancel()
             }
         }
     }
@@ -281,25 +288,17 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun handleCommand(
-        command: Command,
-        continuationResult: Continuation<Result<Unit>>,
-    ) {
+    private suspend fun handleCommand(command: Command) {
         logcat { "PIR-RUNNER ($this): Handle command: $command" }
         when (command) {
-            Idle -> {} // Do nothing
+            Idle, CompleteExecution -> {} // Do nothing
             is HandleBroker -> handleBrokerAction(command.state)
             is ExecuteBrokerAction -> executeBrokerAction(command.state, command.actionRequestData)
-            is CompleteExecution -> {
-                continuationResult.resume(Result.success(Unit))
-                cleanUpRunner()
-            }
-            // TODO add loading timeout
-            is LoadUrl -> coroutineScope.launch(dispatcherProvider.main()) {
+            is LoadUrl -> withContext(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
 
-            is Command.RecoverFromFailedUrlLoad -> coroutineScope.launch(dispatcherProvider.main()) {
+            is Command.RecoverFromFailedUrlLoad -> withContext(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(RECOVERY_URL)
             }
 

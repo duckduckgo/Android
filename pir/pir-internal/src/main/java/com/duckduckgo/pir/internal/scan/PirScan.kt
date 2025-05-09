@@ -159,6 +159,7 @@ class RealPirScan @Inject constructor(
                 // We want to run the runners in parallel but wait for everything complete before we proceed
                 async {
                     runners[index].start(profileQuery, part)
+                    runners[index].stop()
                 }
             }.awaitAll()
 

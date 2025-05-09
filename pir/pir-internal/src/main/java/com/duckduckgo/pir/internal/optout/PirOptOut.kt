@@ -154,6 +154,7 @@ class RealPirOptOut @Inject constructor(
             (it as OptOutStep).profilesToOptOut.isNotEmpty()
         }.also { list ->
             runners[0].startOn(webView, profileQuery, list)
+            runners[0].stop()
         }
 
         logcat { "PIR-OPT-OUT: Optout completed for all runners" }
@@ -209,6 +210,7 @@ class RealPirOptOut @Inject constructor(
             .mapIndexed { index, part ->
                 async {
                     runners[index].start(profileQuery, part)
+                    runners[index].stop()
                 }
             }.awaitAll()
 
