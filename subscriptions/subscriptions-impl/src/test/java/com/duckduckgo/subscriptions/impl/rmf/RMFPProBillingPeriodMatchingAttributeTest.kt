@@ -3,6 +3,8 @@ package com.duckduckgo.subscriptions.impl.rmf
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
@@ -18,15 +20,6 @@ class RMFPProBillingPeriodMatchingAttributeTest {
     private lateinit var subscriptionsManager: SubscriptionsManager
 
     private lateinit var matcher: RMFPProBillingPeriodMatchingAttribute
-    private val testSubscription = Subscription(
-        productId = SubscriptionsConstants.YEARLY_PLAN_US,
-        billingPeriod = "Monthly",
-        startedAt = 10000L,
-        expiresOrRenewsAt = 10000L,
-        status = AUTO_RENEWABLE,
-        platform = "Google",
-        activeOffers = listOf(),
-    )
 
     @Before
     fun setUp() {
@@ -76,8 +69,18 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenMatchingAttributeHasAnnualValueAndSubscriptionIsAnnualThenEvaluateToTrue() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
-        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("annual"))
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = YEARLY,
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "Google",
+                activeOffers = listOf(),
+            ),
+        )
+        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("yearly"))
 
         assertNotNull(result)
         result?.let {
@@ -87,7 +90,17 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenMatchingAttributeHasMonthlyValueAndSubscriptionIsMonthlyThenEvaluateToTrue() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(productId = SubscriptionsConstants.MONTHLY_PLAN_US))
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = MONTHLY,
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "Google",
+                activeOffers = listOf(),
+            ),
+        )
         val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("monthly"))
 
         assertNotNull(result)
@@ -98,7 +111,17 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenMatchingAttributeHasMonthlyValueButSubscriptionIsAnnualThenEvaluateToFalse() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = YEARLY,
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "Google",
+                activeOffers = listOf(),
+            ),
+        )
         val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("monthly"))
 
         assertNotNull(result)
@@ -108,9 +131,9 @@ class RMFPProBillingPeriodMatchingAttributeTest {
     }
 
     @Test
-    fun whenSubscriptionIsNullAnnualThenEvaluateToFalse() = runTest {
+    fun whenSubscriptionIsNullThenAnnualEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
-        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("monthly"))
+        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("yearly"))
 
         assertNotNull(result)
         result?.let {
@@ -120,7 +143,17 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenMatchingAttributeIsUnsupportedValueThenEvaluateToFalse() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = MONTHLY,
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "Google",
+                activeOffers = listOf(),
+            ),
+        )
         val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("quarterly"))
 
         assertNotNull(result)
@@ -130,19 +163,18 @@ class RMFPProBillingPeriodMatchingAttributeTest {
     }
 
     @Test
-    fun whenSubscriptionHasInvalidProductIdThenEvaluateToFalse() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(productId = "invalid"))
-        val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("annual"))
-
-        assertNotNull(result)
-        result?.let {
-            assertFalse(it)
-        }
-    }
-
-    @Test
     fun whenMatcherHasEmptyValueThenEvaluateToFalse() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                billingPeriod = MONTHLY,
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "Google",
+                activeOffers = listOf(),
+            ),
+        )
         val result = matcher.evaluate(PProBillingPeriodMatchingAttribute(value = ""))
 
         assertNotNull(result)
