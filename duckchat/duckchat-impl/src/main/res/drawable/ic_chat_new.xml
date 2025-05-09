@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <group>
+        <clip-path android:pathData="M0,0h16v16h-16z" />
+        <path
+            android:fillColor="?attr/daxColorPrimaryIcon"
+            android:pathData="M7.728,13.996C7.643,13.725 7.368,13.548 7.091,13.613C6.875,13.664 6.654,13.714 6.429,13.764C5.309,14.014 4.145,14.242 3.105,14.434L3.402,14.091C4.183,13.19 3.956,11.922 3.187,11.241C1.968,10.16 1.25,8.702 1.25,7.125C1.25,4.013 4.132,1.25 8,1.25C11.868,1.25 14.75,4.013 14.75,7.125C14.75,7.292 14.742,7.459 14.726,7.624C14.704,7.846 14.815,8.061 15.008,8.173C15.054,8.2 15.099,8.227 15.144,8.256C15.46,8.453 15.901,8.312 15.948,7.943C15.982,7.675 16,7.402 16,7.125C16,3.19 12.418,0 8,0C3.582,0 0,3.19 0,7.125C0,9.099 0.902,10.886 2.358,12.176C2.677,12.459 2.737,12.95 2.458,13.272L1.164,14.763C0.723,15.273 1.15,16.047 1.814,15.933C3.322,15.674 5.475,15.277 7.399,14.824C7.709,14.752 7.867,14.41 7.765,14.109C7.752,14.072 7.74,14.034 7.728,13.996Z" />
+        <path
+            android:fillColor="?attr/daxColorPrimaryIcon"
+            android:fillType="evenOdd"
+            android:pathData="M16,12.5C16,14.433 14.433,16 12.5,16C10.567,16 9,14.433 9,12.5C9,10.567 10.567,9 12.5,9C14.433,9 16,10.567 16,12.5ZM13,12H15V13H13V15H12V13H10V12H12V10H13V12Z" />
+    </group>
+</vector>
