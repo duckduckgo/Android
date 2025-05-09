@@ -46,8 +46,8 @@ object SubscriptionsConstants {
     const val PLATFORM = "android"
 
     // Recurrence
-    const val MONTHLY = "monthly"
-    const val YEARLY = "yearly"
+    const val MONTHLY = "Monthly"
+    const val YEARLY = "Yearly"
 
     // URLs
     const val BUY_URL = "https://duckduckgo.com/subscriptions"
