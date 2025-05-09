@@ -450,6 +450,7 @@ class RealSubscriptionsManager @Inject constructor(
 
             val subscription = Subscription(
                 productId = confirmationResponse.subscription.productId,
+                billingPeriod = confirmationResponse.subscription.billingPeriod,
                 startedAt = confirmationResponse.subscription.startedAt,
                 expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
                 status = confirmationResponse.subscription.status.toStatus(),
@@ -560,6 +561,7 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.setSubscription(
                 Subscription(
                     productId = subscription.productId,
+                    billingPeriod = subscription.billingPeriod,
                     startedAt = subscription.startedAt,
                     expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                     status = subscription.status.toStatus(),
@@ -635,6 +637,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,
+                billingPeriod = subscription.billingPeriod,
                 startedAt = subscription.startedAt,
                 expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                 status = subscription.status.toStatus(),

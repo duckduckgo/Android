@@ -68,6 +68,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -88,6 +89,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -119,6 +121,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,

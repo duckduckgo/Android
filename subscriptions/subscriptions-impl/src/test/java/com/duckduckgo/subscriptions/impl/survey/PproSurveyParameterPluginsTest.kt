@@ -25,6 +25,7 @@ class PproSurveyParameterPluginTest {
 
     private val testSubscription = Subscription(
         productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+        billingPeriod = "Monthly",
         startedAt = 1717797600000, // June 07 UTC
         expiresOrRenewsAt = 1719525600000, // June 27 UTC
         status = AUTO_RENEWABLE,
