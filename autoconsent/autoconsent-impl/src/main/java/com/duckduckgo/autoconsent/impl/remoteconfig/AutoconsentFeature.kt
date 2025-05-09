@@ -24,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "autoconsent",
-    settingsStore = AutoconsentFeatureSettingsStore::class,
 )
 /**
  * This is the class that represents the autoconsent feature flags

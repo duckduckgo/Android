@@ -23,7 +23,6 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -43,7 +42,6 @@ class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
-    private val repository: AutoconsentFeatureSettingsRepository = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
 

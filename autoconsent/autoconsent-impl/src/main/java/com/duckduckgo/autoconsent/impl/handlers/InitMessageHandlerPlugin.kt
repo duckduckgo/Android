@@ -22,8 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
@@ -42,7 +42,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
-    private val autoconsentFeatureSettingsRepository: AutoconsentFeatureSettingsRepository,
+    private val autoconsentFeature: AutoconsentFeature
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -70,7 +70,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
                     val settingsAdapter = moshi.adapter(AutoconsentSettings::class.java)
-                    val settingsJson = settingsRepository.getConfigSettings() ?: return@launch
+                    val settingsJson = autoconsentFeature.self().getSettings() ?: return@launch
                     val settings = settingsAdapter.fromJson(settingsJson) ?: return@launch
 
                     val autoAction = getAutoAction()
