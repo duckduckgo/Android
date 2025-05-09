@@ -1375,6 +1375,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
                 platform = "android",
@@ -1457,6 +1458,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
                 platform = "android",
@@ -1471,6 +1473,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
                 platform = "android",
@@ -1532,6 +1535,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.productId = "productId"
         authDataStore.entitlements = """[{"product":"Network Protection", "name":"subscriber"}]"""
         authDataStore.status = status.statusName
+        authDataStore.billingPeriod = "Monthly"
         authDataStore.startedAt = 1000L
         authDataStore.expiresOrRenewsAt = 1000L
     }
@@ -1675,6 +1679,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 ),
                 subscription = SubscriptionResponse(
                     productId = "id",
+                    billingPeriod = "Monthly",
                     platform = "google",
                     status = "Auto-Renewable",
                     startedAt = 1000000L,

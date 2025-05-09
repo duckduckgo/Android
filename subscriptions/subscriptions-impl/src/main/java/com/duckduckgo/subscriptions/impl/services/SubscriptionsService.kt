@@ -59,6 +59,7 @@ data class PortalResponse(val customerPortalUrl: String)
 
 data class SubscriptionResponse(
     val productId: String,
+    val billingPeriod: String,
     val startedAt: Long,
     val expiresOrRenewsAt: Long,
     val platform: String,
