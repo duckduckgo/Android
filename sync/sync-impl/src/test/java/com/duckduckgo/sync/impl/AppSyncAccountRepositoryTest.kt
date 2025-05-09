@@ -75,6 +75,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
@@ -254,7 +255,7 @@ class AppSyncAccountRepositoryTest {
     fun whenProcessJsonRecoveryCodeSucceedsThenAccountPersisted() {
         prepareForLoginSuccess()
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
 
         assertEquals(Success(true), result)
         verify(syncStore).storeCredentials(
@@ -274,7 +275,7 @@ class AppSyncAccountRepositoryTest {
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
 
-        val result = syncRepo.processCode(exchangeCode.encodeB64())
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
         assertTrue(result is Error)
     }
 
@@ -285,7 +286,7 @@ class AppSyncAccountRepositoryTest {
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
 
-        val result = syncRepo.processCode(exchangeCode.encodeB64())
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         assertTrue(result is Success)
         verify(syncApi).sendEncryptedMessage(eq(primaryDeviceKeyId), eq(encryptedExchangeCode))
@@ -300,7 +301,7 @@ class AppSyncAccountRepositoryTest {
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
-        val result = syncRepo.processCode(exchangeCode.encodeB64())
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         assertTrue(result is Error)
     }
@@ -344,7 +345,7 @@ class AppSyncAccountRepositoryTest {
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
-        syncRepo.processCode(exchangeCode.encodeB64())
+        syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         whenever(syncApi.getEncryptedMessage(otherDeviceKeyId)).thenReturn(Success("encryptedExchangeResponse"))
         whenever(nativeLib.sealOpen("encryptedExchangeResponse", primaryKey, secretKey)).thenReturn("invalid response")
@@ -358,7 +359,7 @@ class AppSyncAccountRepositoryTest {
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
-        syncRepo.processCode(exchangeCode.encodeB64())
+        syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         configureExchangeResultRecoveryReceived()
 
@@ -373,7 +374,7 @@ class AppSyncAccountRepositoryTest {
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
-        syncRepo.processCode(exchangeCode.encodeB64())
+        syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         configureExchangeResultRecoveryReceived()
         prepareForLoginSuccess()
@@ -389,7 +390,7 @@ class AppSyncAccountRepositoryTest {
 
         val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
         whenever(deviceKeyGenerator.generate()).thenReturn(otherDeviceKeyId)
-        syncRepo.processCode(exchangeCode.encodeB64())
+        syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         configureExchangeResultRecoveryReceived()
         prepareForLoginSuccess()
@@ -421,30 +422,58 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenCodeIsEmptyThenCodeTypeIsUnknown() {
-        val type = syncRepo.getCodeType("")
-        assertTrue(type == CodeType.UNKNOWN)
+        val type = syncRepo.parseSyncAuthCode("")
+        assertTrue(type is SyncAuthCode.Unknown)
     }
 
     @Test
     fun whenCodeIsRecoveryThenCodeTypeIsIdentified() {
         val code = recoveryCodeAdapter.toJson((LinkCode(recovery = RecoveryCode(primaryKey, "userId"))))
-        val type = syncRepo.getCodeType(code.encodeB64())
-        assertTrue(type == CodeType.RECOVERY)
+        val type = syncRepo.parseSyncAuthCode(code.encodeB64())
+        assertTrue(type is SyncAuthCode.Recovery)
     }
 
     @Test
     fun whenCodeIsConnectThenCodeTypeIsIdentified() {
         val code = recoveryCodeAdapter.toJson((LinkCode(connect = ConnectCode(deviceId, secretKey))))
-        val type = syncRepo.getCodeType(code.encodeB64())
-        assertTrue(type == CodeType.CONNECT)
+        val type = syncRepo.parseSyncAuthCode(code.encodeB64())
+        assertTrue(type is SyncAuthCode.Connect)
     }
 
     @Test
     fun whenCodeIsExchangeThenCodeTypeIsIdentified() {
         val invitationCode = InvitationCode(keyId = primaryDeviceKeyId, publicKey = validLoginKeys.primaryKey)
         val code = invitationCodeWrapperAdapter.toJson(InvitationCodeWrapper(exchangeKey = invitationCode))
-        val type = syncRepo.getCodeType(code.encodeB64())
-        assertTrue(type == CodeType.EXCHANGE)
+        val type = syncRepo.parseSyncAuthCode(code.encodeB64())
+        assertTrue(type is SyncAuthCode.Exchange)
+    }
+
+    @Test
+    fun whenCodeIsUrlWithConnectInsideThenCodeTypeIsIdentified() {
+        val code = recoveryCodeAdapter.toJson((LinkCode(connect = ConnectCode(deviceId, secretKey))))
+        val webSafeCode = code.encodeB64().applyUrlSafetyFromB64()
+        val url = SyncBarcodeUrl(webSafeCode).asUrl()
+        val type = syncRepo.parseSyncAuthCode(url)
+        assertTrue(type is SyncAuthCode.Connect)
+    }
+
+    @Test
+    fun whenCodeIsUrlWithExchangeInsideThenCodeTypeIsIdentified() {
+        val invitationCode = InvitationCode(keyId = primaryDeviceKeyId, publicKey = validLoginKeys.primaryKey)
+        val code = invitationCodeWrapperAdapter.toJson(InvitationCodeWrapper(exchangeKey = invitationCode))
+        val webSafeCode = code.encodeB64().applyUrlSafetyFromB64()
+        val url = SyncBarcodeUrl(webSafeCode).asUrl()
+        val type = syncRepo.parseSyncAuthCode(url)
+        assertTrue(type is SyncAuthCode.Exchange)
+    }
+
+    @Test
+    fun whenCodeIsUrlWithRecoveryInsideThenCodeTypeIsNotIdentified() {
+        val code = recoveryCodeAdapter.toJson((LinkCode(recovery = RecoveryCode(deviceId, secretKey))))
+        val webSafeCode = code.encodeB64().applyUrlSafetyFromB64()
+        val url = SyncBarcodeUrl(webSafeCode).asUrl()
+        val type = syncRepo.parseSyncAuthCode(url)
+        assertTrue(type is SyncAuthCode.Unknown)
     }
 
     @Test
@@ -457,7 +486,7 @@ class AppSyncAccountRepositoryTest {
         }.`when`(syncApi).logout(token, deviceId)
         prepareForLoginSuccess()
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
 
         verify(syncApi).logout(token, deviceId)
         verify(syncApi).login(userId, hashedPassword, deviceId, deviceName, deviceFactor)
@@ -475,7 +504,7 @@ class AppSyncAccountRepositoryTest {
         }.`when`(syncApi).logout(token, deviceId)
         prepareForLoginSuccess()
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
 
         assertEquals((result as Error).code, ALREADY_SIGNED_IN.code)
     }
@@ -508,7 +537,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded) as Error
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded)) as Error
 
         assertEquals(LOGIN_FAILED.code, result.code)
     }
@@ -520,7 +549,7 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded) as Error
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded)) as Error
 
         assertEquals(LOGIN_FAILED.code, result.code)
     }
@@ -533,14 +562,14 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginSuccess)
 
-        val result = syncRepo.processCode(jsonRecoveryKeyEncoded) as Error
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded)) as Error
 
         assertEquals(LOGIN_FAILED.code, result.code)
     }
 
     @Test
     fun whenProcessInvalidCodeThenReturnInvalidCodeError() {
-        val result = syncRepo.processCode("invalidCode") as Error
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode("invalidCode")) as Error
 
         assertEquals(INVALID_CODE.code, result.code)
     }
@@ -635,7 +664,7 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Success(true))
 
-        val result = syncRepo.processCode(jsonConnectKeyEncoded)
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonConnectKeyEncoded))
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)
@@ -653,7 +682,7 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Success(true))
 
-        val result = syncRepo.processCode(jsonConnectKeyEncoded)
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonConnectKeyEncoded))
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)

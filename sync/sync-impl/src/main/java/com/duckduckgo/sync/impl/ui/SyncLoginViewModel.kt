@@ -27,7 +27,6 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.CodeType.EXCHANGE
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -35,6 +34,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -87,14 +87,14 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.getCodeType(qrCode)
-            when (val result = syncAccountRepository.processCode(qrCode)) {
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
+            when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     processError(result)
                 }
 
                 is Success -> {
-                    if (codeType == EXCHANGE) {
+                    if (codeType is SyncAuthCode.Exchange) {
                         pollForRecoveryKey()
                     } else {
                         syncPixels.fireLoginPixel()
