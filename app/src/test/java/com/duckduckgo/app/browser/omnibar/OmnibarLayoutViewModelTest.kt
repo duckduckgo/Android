@@ -32,6 +32,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -1115,6 +1116,24 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.showChatMenu)
         }
+    }
+
+    @Test
+    fun whenDuckChatButtonPressedAndExperimentEnabledThenPixelSent() = runTest {
+        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+
+        testee.onDuckChatButtonPressed()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
+    }
+
+    @Test
+    fun whenDuckChatButtonPressedAndExperimentDisabledThenPixelSent() = runTest {
+        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = false, isEnabled = false)
+
+        testee.onDuckChatButtonPressed()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {
