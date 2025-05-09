@@ -50,7 +50,7 @@ class PirWebViewActivity : DuckDuckGoActivity() {
         val brokersToOptOut = params?.brokers
         lifecycleScope.launch {
             if (!brokersToOptOut.isNullOrEmpty()) {
-                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView, this).also {
+                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView).also {
                     finish()
                 }
             } else {

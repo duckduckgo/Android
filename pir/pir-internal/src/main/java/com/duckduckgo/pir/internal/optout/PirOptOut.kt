@@ -41,7 +41,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
@@ -58,7 +57,6 @@ interface PirOptOut {
     suspend fun execute(
         brokers: List<String>,
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -69,7 +67,6 @@ interface PirOptOut {
      */
     suspend fun executeForBrokersWithRecords(
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -83,7 +80,6 @@ interface PirOptOut {
     suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -129,9 +125,8 @@ class RealPirOptOut @Inject constructor(
     override suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
-        coroutineScope: CoroutineScope,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
-        onJobStarted(coroutineScope)
+        onJobStarted()
         emitStartPixel()
         if (runners.isNotEmpty()) {
             cleanRunners()
@@ -170,9 +165,8 @@ class RealPirOptOut @Inject constructor(
     override suspend fun execute(
         brokers: List<String>,
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
-        onJobStarted(coroutineScope)
+        onJobStarted()
         emitStartPixel()
         if (runners.isNotEmpty()) {
             cleanRunners()
@@ -254,10 +248,9 @@ class RealPirOptOut @Inject constructor(
 
     override suspend fun executeForBrokersWithRecords(
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val brokers = repository.getBrokersForOptOut(formOptOutOnly = true)
-        return@withContext execute(brokers, context, coroutineScope)
+        return@withContext execute(brokers, context)
     }
 
     private fun cleanRunners() {
