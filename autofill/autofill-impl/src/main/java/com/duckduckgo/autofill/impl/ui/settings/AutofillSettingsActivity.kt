@@ -70,7 +70,9 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
             if (isChecked) {
-                viewModel.onEnableAutofill()
+                viewModel.onEnableAutofill(
+                    getAutofillSettingsLaunchSource(),
+                )
             } else {
                 viewModel.onDisableAutofill(
                     getAutofillSettingsLaunchSource(),
@@ -92,6 +94,22 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
         configureViewListeners()
         configureInfoText()
+        sendLaunchPixel(savedInstanceState)
+    }
+
+    private fun sendLaunchPixel(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            viewModel.sendLaunchPixel(extractLaunchSource())
+        }
+    }
+
+    private fun extractLaunchSource(): AutofillScreenLaunchSource {
+        intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
+            return it.source
+        }
+
+        // default if nothing else matches
+        return AutofillScreenLaunchSource.Unknown
     }
 
     private fun observeViewModel() {
@@ -156,13 +174,13 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
             viewModel.onPasswordListClicked()
         }
         binding.autofillAvailable.importPasswordsOption.setOnClickListener {
-            viewModel.onImportPasswordsClicked()
+            viewModel.onImportPasswordsClicked(getAutofillSettingsLaunchSource())
         }
         binding.autofillAvailable.syncDesktopPasswordsOption.setOnClickListener {
-            viewModel.onImportFromDesktopWithSyncClicked()
+            viewModel.onImportFromDesktopWithSyncClicked(getAutofillSettingsLaunchSource())
         }
         binding.autofillAvailable.excludedSitesOption.setOnClickListener {
-            viewModel.onResetExcludedSitesClicked()
+            viewModel.onResetExcludedSitesClicked(getAutofillSettingsLaunchSource())
         }
     }
 

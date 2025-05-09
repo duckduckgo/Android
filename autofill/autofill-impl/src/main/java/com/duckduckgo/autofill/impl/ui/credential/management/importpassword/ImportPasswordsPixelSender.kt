@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_ERROR_PARSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_USER_CANCELLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.di.scopes.FragmentScope
@@ -44,6 +45,7 @@ interface ImportPasswordsPixelSender {
     fun onImportPasswordsOverflowMenuTapped()
     fun onImportPasswordsViaDesktopSyncButtonTapped()
     fun onImportPasswordsViaDesktopSyncOverflowMenuTapped()
+    fun onResetExcludedSitesOverflowMenuTapped()
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -93,6 +95,10 @@ class ImportPasswordsPixelSenderImpl @Inject constructor(
 
     override fun onImportPasswordsOverflowMenuTapped() {
         pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU)
+    }
+
+    override fun onResetExcludedSitesOverflowMenuTapped() {
+        pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU)
     }
 
     override fun onImportPasswordsViaDesktopSyncButtonTapped() {

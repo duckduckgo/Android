@@ -222,6 +222,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.resetNeverSavedSites -> {
                             viewModel.onResetNeverSavedSitesInitialSelection()
+                            importPasswordsPixelSender.onResetExcludedSitesOverflowMenuTapped()
                             true
                         }
 
