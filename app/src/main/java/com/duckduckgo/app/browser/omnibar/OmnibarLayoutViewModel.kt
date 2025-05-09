@@ -580,6 +580,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    fun onBackButtonPressed() {
+        Timber.d("Omnibar: onBackButtonPressed")
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLOSED,
+            AppPixelName.ADDRESS_BAR_SERP_CLOSED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_CLOSED,
+        )
+    }
+
     fun onEnterKeyPressed() {
         Timber.d("Omnibar: onEnterKeyPressed")
         firePixelBasedOnCurrentUrl(
