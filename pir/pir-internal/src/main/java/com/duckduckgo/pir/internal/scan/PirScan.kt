@@ -40,7 +40,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
@@ -62,7 +61,6 @@ interface PirScan {
         brokers: List<String>,
         context: Context,
         runType: RunType,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -74,7 +72,6 @@ interface PirScan {
     suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -123,9 +120,8 @@ class RealPirScan @Inject constructor(
         brokers: List<String>,
         context: Context,
         runType: RunType,
-        coroutineScope: CoroutineScope,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
-        onJobStarted(coroutineScope)
+        onJobStarted()
 
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
 
@@ -216,10 +212,9 @@ class RealPirScan @Inject constructor(
     override suspend fun executeAllBrokers(
         context: Context,
         runType: RunType,
-        coroutineScope: CoroutineScope,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val brokers = repository.getAllBrokersForScan()
-        return@withContext execute(brokers, context, runType, coroutineScope)
+        return@withContext execute(brokers, context, runType)
     }
 
     override fun stop() {

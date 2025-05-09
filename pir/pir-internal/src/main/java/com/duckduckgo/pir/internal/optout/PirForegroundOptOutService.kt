@@ -74,9 +74,9 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
 
             val result = if (!brokers.isNullOrEmpty()) {
-                pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService, this)
+                pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService)
             } else {
-                pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService, this)
+                pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService)
             }
 
             if (result.isSuccess) {
