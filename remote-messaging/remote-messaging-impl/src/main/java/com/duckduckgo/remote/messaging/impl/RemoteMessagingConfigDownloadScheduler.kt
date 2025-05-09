@@ -27,10 +27,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -80,7 +80,7 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         appCoroutineScope.launch(context = dispatcherProvider.io()) {
-            Timber.d("RMF; onPrivacyConfigDownloaded")
+            Timber.d("RMF: onPrivacyConfigDownloaded, invalidating and re-downloading")
             remoteMessagingConfigRepository.invalidate()
             downloader.download()
         }
