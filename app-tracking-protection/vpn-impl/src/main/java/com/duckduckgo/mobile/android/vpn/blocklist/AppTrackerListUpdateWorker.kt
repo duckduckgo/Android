@@ -73,7 +73,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                     vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag
                 val updatedEtag = blocklist.etag.value
 
-                logcat { "Updating the app tracker blocklist, previous/new eTag: $currentEtag / $updatedEtag}" }
+                logcat { "Updating the app tracker blocklist, previous/new eTag: $currentEtag / $updatedEtag" }
 
                 vpnDatabase
                     .vpnAppTrackerBlockingDao()
