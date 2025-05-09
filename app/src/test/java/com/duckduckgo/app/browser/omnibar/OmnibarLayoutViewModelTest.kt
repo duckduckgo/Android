@@ -32,6 +32,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -66,7 +67,8 @@ class OmnibarLayoutViewModelTest {
     private val userBrowserProperties: UserBrowserProperties = mock()
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
-    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = false, isEnabled = false))
+    private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = false, isEnabled = false))
+    private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = true))
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -89,7 +91,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(defaultVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
 
         initializeViewModel()
@@ -1053,7 +1055,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenNavigationBarExperimentEnabledThenShowChatMenuTrue() = runTest {
-        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        disabledVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1064,7 +1066,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
         duckChatShowInAddressBarFlow.value = false
-        defaultVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        disabledVisualExperimentNavBarStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1115,6 +1117,26 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.showChatMenu)
         }
+    }
+
+    @Test
+    fun whenDuckChatButtonPressedAndExperimentEnabledThenPixelSent() = runTest {
+        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVisualDesignExperimentEnabled)
+            testee.onDuckChatButtonPressed()
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
+        }
+    }
+
+    @Test
+    fun whenDuckChatButtonPressedAndExperimentDisabledThenPixelSent() = runTest {
+        testee.onDuckChatButtonPressed()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {

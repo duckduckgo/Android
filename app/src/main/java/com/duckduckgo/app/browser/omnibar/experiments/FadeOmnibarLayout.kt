@@ -333,6 +333,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
         fadeOmnibarItemPressedListener = itemPressedListener
         backIcon.setOnClickListener {
+            viewModel.onBackButtonPressed()
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
     }
