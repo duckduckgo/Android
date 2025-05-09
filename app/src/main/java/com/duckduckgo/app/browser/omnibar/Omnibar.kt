@@ -448,6 +448,14 @@ class Omnibar(
             null
         }
     }
+
+    fun setContentCanScroll(
+        canScrollUp: Boolean,
+        canScrollDown: Boolean,
+        topOfPage: Boolean,
+    ) {
+        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
+    }
 }
 
 fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {

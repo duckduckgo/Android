@@ -127,6 +127,10 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun showShadow(show: Boolean) {
+        binding.shadowView.isVisible = show
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()

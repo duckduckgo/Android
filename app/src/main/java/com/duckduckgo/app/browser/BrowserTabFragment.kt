@@ -349,50 +349,35 @@ class BrowserTabFragment :
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
 
-    @Inject
-    lateinit var dispatchers: DispatcherProvider
+    @Inject lateinit var dispatchers: DispatcherProvider
 
-    @Inject
-    lateinit var webViewClient: BrowserWebViewClient
+    @Inject lateinit var webViewClient: BrowserWebViewClient
 
-    @Inject
-    lateinit var webChromeClient: BrowserChromeClient
+    @Inject lateinit var webChromeClient: BrowserChromeClient
 
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
+    @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
-    @Inject
-    lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
+    @Inject lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
 
-    @Inject
-    lateinit var fileDownloader: FileDownloader
+    @Inject lateinit var fileDownloader: FileDownloader
 
-    @Inject
-    lateinit var webViewSessionStorage: WebViewSessionStorage
+    @Inject lateinit var webViewSessionStorage: WebViewSessionStorage
 
-    @Inject
-    lateinit var shortcutBuilder: ShortcutBuilder
+    @Inject lateinit var shortcutBuilder: ShortcutBuilder
 
-    @Inject
-    lateinit var clipboardManager: ClipboardManager
+    @Inject lateinit var clipboardManager: ClipboardManager
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
+    @Inject lateinit var ctaViewModel: CtaViewModel
 
-    @Inject
-    lateinit var previewGenerator: WebViewPreviewGenerator
+    @Inject lateinit var previewGenerator: WebViewPreviewGenerator
 
-    @Inject
-    lateinit var previewPersister: WebViewPreviewPersister
+    @Inject lateinit var previewPersister: WebViewPreviewPersister
 
-    @Inject
-    lateinit var loginDetector: DOMLoginDetector
+    @Inject lateinit var loginDetector: DOMLoginDetector
 
-    @Inject
-    lateinit var blobConverterInjector: BlobConverterInjector
+    @Inject lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
@@ -400,84 +385,58 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    @Inject
-    lateinit var userAgentProvider: UserAgentProvider
+    @Inject lateinit var userAgentProvider: UserAgentProvider
 
-    @Inject
-    lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
+    @Inject lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
 
-    @Inject
-    lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
+    @Inject lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
 
-    @Inject
-    lateinit var emailInjector: EmailInjector
+    @Inject lateinit var emailInjector: EmailInjector
 
-    @Inject
-    lateinit var browserAutofill: BrowserAutofill
+    @Inject lateinit var browserAutofill: BrowserAutofill
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+    @Inject lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
-    @Inject
-    lateinit var appTheme: BrowserAppTheme
+    @Inject lateinit var appTheme: BrowserAppTheme
 
-    @Inject
-    lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+    @Inject lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
-    @Inject
-    lateinit var playStoreUtils: PlayStoreUtils
+    @Inject lateinit var playStoreUtils: PlayStoreUtils
 
-    @Inject
-    @AppCoroutineScope
+    @Inject @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var addWidgetLauncher: AddWidgetLauncher
+    @Inject lateinit var addWidgetLauncher: AddWidgetLauncher
 
-    @Inject
-    lateinit var downloadsFileActions: DownloadsFileActions
+    @Inject lateinit var downloadsFileActions: DownloadsFileActions
 
-    @Inject
-    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+    @Inject lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
 
-    @Inject
-    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+    @Inject lateinit var urlExtractor: Provider<DOMUrlExtractor>
 
-    @Inject
-    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+    @Inject lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
 
-    @Inject
-    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+    @Inject lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
-    @Inject
-    lateinit var printInjector: PrintInjector
+    @Inject lateinit var printInjector: PrintInjector
 
-    @Inject
-    lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
+    @Inject lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
-    @Inject
-    lateinit var duckAddressInjectedResultHandler: DuckAddressLoginCreator
+    @Inject lateinit var duckAddressInjectedResultHandler: DuckAddressLoginCreator
 
-    @Inject
-    lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
+    @Inject lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
-    @Inject
-    lateinit var autoconsent: Autoconsent
+    @Inject lateinit var autoconsent: Autoconsent
 
-    @Inject
-    lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
+    @Inject lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
-    @Inject
-    lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
+    @Inject lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
 
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     @Named("ContentScopeScripts")
@@ -487,65 +446,45 @@ class BrowserTabFragment :
     @Named("DuckPlayer")
     lateinit var duckPlayerScripts: JsMessaging
 
-    @Inject
-    lateinit var webContentDebugging: WebContentDebugging
+    @Inject lateinit var webContentDebugging: WebContentDebugging
 
-    @Inject
-    lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
+    @Inject lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
 
-    @Inject
-    lateinit var downloadConfirmation: DownloadConfirmation
+    @Inject lateinit var downloadConfirmation: DownloadConfirmation
 
-    @Inject
-    lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
+    @Inject lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
-    @Inject
-    lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
+    @Inject lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
 
-    @Inject
-    lateinit var appLinksLauncher: AppLinksLauncher
+    @Inject lateinit var appLinksLauncher: AppLinksLauncher
 
-    @Inject
-    lateinit var clientBrandHintProvider: ClientBrandHintProvider
+    @Inject lateinit var clientBrandHintProvider: ClientBrandHintProvider
 
-    @Inject
-    lateinit var subscriptions: Subscriptions
+    @Inject lateinit var subscriptions: Subscriptions
 
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var webViewVersionProvider: WebViewVersionProvider
+    @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
 
-    @Inject
-    lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
+    @Inject lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
 
-    @Inject
-    lateinit var newTabPageProvider: NewTabPageProvider
+    @Inject lateinit var newTabPageProvider: NewTabPageProvider
 
-    @Inject
-    lateinit var safeWebViewFeature: SafeWebViewFeature
+    @Inject lateinit var safeWebViewFeature: SafeWebViewFeature
 
-    @Inject
-    lateinit var duckPlayer: DuckPlayer
+    @Inject lateinit var duckPlayer: DuckPlayer
 
-    @Inject
-    lateinit var duckChat: DuckChat
+    @Inject lateinit var duckChat: DuckChat
 
-    @Inject
-    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+    @Inject lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
-    @Inject
-    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+    @Inject lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
-    @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+    @Inject lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
-    @Inject
-    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
+    @Inject lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
-    @Inject
-    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
+    @Inject lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -574,8 +513,7 @@ class BrowserTabFragment :
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
-    @Inject
-    lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+    @Inject lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
 
     private var isActiveTab: Boolean = false
 
@@ -679,9 +617,7 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
-                        viewModel.trackersCount().isNotEmpty()
-                    ) {
+                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() && viewModel.trackersCount().isNotEmpty()) {
                         if (isCosmetic) {
                             delay(COOKIES_ANIMATION_DELAY)
                         }
@@ -783,9 +719,7 @@ class BrowserTabFragment :
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
         ) {
-            if (triggerType == LoginTriggerType.AUTOPROMPT &&
-                !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow()) && omnibar.isEditing()
-            ) {
+            if (triggerType == LoginTriggerType.AUTOPROMPT && !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow()) && omnibar.isEditing()) {
                 Timber.d("AutoPrompt is disabled, not showing dialog")
                 return
             }
@@ -811,10 +745,9 @@ class BrowserTabFragment :
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
-    private var webShareRequest =
-        registerForActivityResult(WebShareChooser()) {
-            contentScopeScripts.onResponse(it)
-        }
+    private var webShareRequest = registerForActivityResult(WebShareChooser()) {
+        contentScopeScripts.onResponse(it)
+    }
 
     // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
@@ -1281,9 +1214,7 @@ class BrowserTabFragment :
                 omnibar.shieldIcon
             },
         )
-        privacyProtectionsPopup.events
-            .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
-            .launchIn(lifecycleScope)
+        privacyProtectionsPopup.events.onEach(viewModel::onPrivacyProtectionsPopupUiEvent).launchIn(lifecycleScope)
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -1463,8 +1394,8 @@ class BrowserTabFragment :
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
-            ?.apply {
+        val downloadSucceededSnackbar =
+            view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
                     val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
                     if (!result) {
@@ -2105,8 +2036,7 @@ class BrowserTabFragment :
         storeAutocompletePosition()
         hideKeyboardRetainFocus()
 
-        TextAlertDialogBuilder(requireContext())
-            .setTitle(R.string.autocompleteRemoveItemTitle)
+        TextAlertDialogBuilder(requireContext()).setTitle(R.string.autocompleteRemoveItemTitle)
             .setCancellable(true)
             .setPositiveButton(R.string.autocompleteRemoveItemRemove)
             .setNegativeButton(R.string.autocompleteRemoveItemCancel)
@@ -2253,8 +2183,7 @@ class BrowserTabFragment :
         } else {
             PrivacyDashboardPrimaryScreen(tabId)
         }
-        globalActivityStarter.startIntent(requireContext(), params)
-            ?.let { activityResultPrivacyDashboard.launch(it) }
+        globalActivityStarter.startIntent(requireContext(), params)?.let { activityResultPrivacyDashboard.launch(it) }
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -2269,8 +2198,7 @@ class BrowserTabFragment :
     }
 
     private fun launchToggleReportFeedback(opener: DashboardOpener) {
-        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
-            ?.let { startActivity(it) }
+        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))?.let { startActivity(it) }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
@@ -2282,11 +2210,10 @@ class BrowserTabFragment :
     }
 
     private fun showDomainHasLocationPermission(domain: String) {
-        val snackbar =
-            binding.rootView.makeSnackbarWithNoBottomInset(
-                getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
-                Snackbar.LENGTH_SHORT,
-            )
+        val snackbar = binding.rootView.makeSnackbarWithNoBottomInset(
+            getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
+            Snackbar.LENGTH_SHORT,
+        )
         snackbar.view.setOnClickListener {
             browserActivity?.launchSitePermissionsSettings()
         }
@@ -2413,26 +2340,27 @@ class BrowserTabFragment :
         val isShowing = loginDetectionDialog?.isShowing()
 
         if (isShowing != true) {
-            loginDetectionDialog = TextAlertDialogBuilder(context)
-                .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
-                .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
-                .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive).setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
-                        }
+            loginDetectionDialog =
+                TextAlertDialogBuilder(context).setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
+                    .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
+                    .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive)
+                    .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
+                            }
 
-                        override fun onNegativeButtonClicked() {
-                            viewModel.onUserDismissedFireproofLoginDialog()
-                        }
+                            override fun onNegativeButtonClicked() {
+                                viewModel.onUserDismissedFireproofLoginDialog()
+                            }
 
-                        override fun onDialogShown() {
-                            viewModel.onFireproofLoginDialogShown()
-                        }
-                    },
-                )
-                .build()
+                            override fun onDialogShown() {
+                                viewModel.onFireproofLoginDialogShown()
+                            }
+                        },
+                    )
+                    .build()
             loginDetectionDialog!!.show()
         }
     }
@@ -2449,8 +2377,7 @@ class BrowserTabFragment :
         val isShowing = automaticFireproofDialog?.isShowing()
 
         if (isShowing != true) {
-            automaticFireproofDialog = StackedAlertDialogBuilder(context)
-                .setTitle(R.string.automaticFireproofWebsiteLoginDialogTitle)
+            automaticFireproofDialog = StackedAlertDialogBuilder(context).setTitle(R.string.automaticFireproofWebsiteLoginDialogTitle)
                 .setMessage(getString(R.string.automaticFireproofWebsiteLoginDialogDescription))
                 .setStackedButtons(AutomaticFireproofDialogOptions.asOptions())
                 .addEventListener(
@@ -2482,8 +2409,7 @@ class BrowserTabFragment :
     }
 
     private fun askToDisableLoginDetection(context: Context) {
-        TextAlertDialogBuilder(context)
-            .setTitle(getString(R.string.disableLoginDetectionDialogTitle))
+        TextAlertDialogBuilder(context).setTitle(getString(R.string.disableLoginDetectionDialogTitle))
             .setMessage(R.string.disableLoginDetectionDialogDescription)
             .setPositiveButton(R.string.disableLoginDetectionDialogPositive)
             .setNegativeButton(R.string.disableLoginDetectionDialogNegative)
@@ -2512,8 +2438,7 @@ class BrowserTabFragment :
         val isShowing = alertDialog?.isShowing()
 
         if (isShowing != true) {
-            alertDialog = StackedAlertDialogBuilder(context)
-                .setTitle(R.string.launchingExternalApp)
+            alertDialog = StackedAlertDialogBuilder(context).setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setStackedButtons(LaunchInExternalAppOptions.asOptions())
                 .addEventListener(
@@ -2577,8 +2502,7 @@ class BrowserTabFragment :
 
         val authDialogBinding = HttpAuthenticationBinding.inflate(layoutInflater)
         authDialogBinding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, request.site)
-        CustomAlertDialogBuilder(requireActivity())
-            .setPositiveButton(R.string.authenticationDialogPositiveButton)
+        CustomAlertDialogBuilder(requireActivity()).setPositiveButton(R.string.authenticationDialogPositiveButton)
             .setNegativeButton(R.string.authenticationDialogNegativeButton)
             .setView(authDialogBinding)
             .addEventListener(
@@ -2650,10 +2574,18 @@ class BrowserTabFragment :
 
     private fun configureNewTab() {
         newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            Timber.d("Visual: new tab scrolling scrollX $scrollX scrollY $scrollY oldScrollX $oldScrollX oldScrollY $oldScrollY")
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+
+            // Check if it can scroll up
+            val canScrollUp = v.canScrollVertically(-1)
+            val canScrollDown = v.canScrollVertically(1)
+            val topOfPage = scrollY == 0
+
+            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
+            browserNavigationBarIntegration.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
+            Timber.d("Visual: new tab can scroll up $canScrollUp can scroll down $canScrollDown top of page $topOfPage")
         }
     }
 
@@ -3075,9 +3007,9 @@ class BrowserTabFragment :
     }
 
     private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
-        return withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
-            webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
-            webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
+        return withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } && webViewCapabilityChecker.isSupported(
+            WebViewCapability.WebMessageListener,
+        ) && webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3416,9 +3348,10 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.undoDelete(savedSite)
-        }
+        )
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.undoDelete(savedSite)
+            }
             .addCallback(
                 object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                     override fun onDismissed(
@@ -3681,8 +3614,7 @@ class BrowserTabFragment :
         }
     }
 
-    @AnyThread
-    private fun downloadFile(requestUserConfirmation: Boolean) {
+    @AnyThread private fun downloadFile(requestUserConfirmation: Boolean) {
         val pendingDownload = pendingFileDownload ?: return
 
         pendingFileDownload = null
@@ -3767,8 +3699,10 @@ class BrowserTabFragment :
 
     @Suppress("NewApi") // we use appBuildConfig
     private fun hasWriteStoragePermission(): Boolean {
-        return minSdk30() ||
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return minSdk30() || ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestWriteStoragePermission() {
@@ -3831,8 +3765,7 @@ class BrowserTabFragment :
         webView?.goBackOrForward(stepsToMove)
     }
 
-    fun onLongPressBackButton() {
-        /*
+    fun onLongPressBackButton() { /*
          It is possible that this can be invoked before Fragment is attached
          If viewModelFactory isn't initialized, ignore long press
          */
@@ -4057,20 +3990,14 @@ class BrowserTabFragment :
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (isHidden) {
                     return@launch
-                }
-                /*
+                } /*
                  * Since we introduce a delay on trackers animation, we need to make sure the conditions
                  * haven't changed between the time trackers animation was emitted, and the time it'll
                  * be started
                  */
-                val privacyProtectionsPopupVisible = lastSeenBrowserViewState
-                    ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
-                if (
-                    lastSeenOmnibarViewState?.isEditing != true &&
-                    !privacyProtectionsPopupVisible &&
-                    lastSeenBrowserViewState?.browserShowing == true &&
-                    lastSeenBrowserViewState?.maliciousSiteBlocked == false
-                ) {
+                val privacyProtectionsPopupVisible =
+                    lastSeenBrowserViewState?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible && lastSeenBrowserViewState?.browserShowing == true && lastSeenBrowserViewState?.maliciousSiteBlocked == false) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
@@ -4081,9 +4008,7 @@ class BrowserTabFragment :
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
-            if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
-                viewState is GlobalLayoutViewState.Browser
-            ) {
+            if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated && viewState is GlobalLayoutViewState.Browser) {
                 throw IllegalStateException("Invalid state transition")
             }
 
@@ -4173,8 +4098,7 @@ class BrowserTabFragment :
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
                 Timber.v(
-                    "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
-                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}",
+                    "Accessibility: UpdateAccessibilitySetting fontSizeChanged " + "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}",
                 )
 
                 webView.settings.textZoom = viewState.fontSize.toInt()
@@ -4262,12 +4186,11 @@ class BrowserTabFragment :
             } else {
                 {}
             }
-            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
-                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
-                } else {
-                    null
-                }
+            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? = if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+            } else {
+                null
+            }
             configuration.showOnboardingCta(
                 binding,
                 { viewModel.onUserClickCtaOkButton(configuration) },
@@ -4344,8 +4267,7 @@ class BrowserTabFragment :
                         ),
                     )
                 }
-            }
-                .launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
 
