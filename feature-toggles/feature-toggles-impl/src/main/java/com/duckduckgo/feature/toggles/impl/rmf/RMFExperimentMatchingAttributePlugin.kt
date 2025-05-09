@@ -41,7 +41,7 @@ class RMFExperimentMatchingAttributePlugin @Inject constructor(
 
     override fun map(
         key: String,
-        jsonMatchingAttribute: JsonMatchingAttribute
+        jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? = if (key == ExperimentMatchingAttribute.KEY) {
         val value = jsonMatchingAttribute.value as? List<String>
         value.takeUnless { it.isNullOrEmpty() }?.let { featureFlags ->
@@ -71,4 +71,3 @@ data class ExperimentMatchingAttribute(
         const val KEY = "isUserInAnyActiveExperiment"
     }
 }
-

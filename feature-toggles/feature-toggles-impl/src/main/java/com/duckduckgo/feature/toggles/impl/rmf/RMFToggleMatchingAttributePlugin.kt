@@ -41,7 +41,7 @@ class RMFToggleMatchingAttributePlugin @Inject constructor(
 
     override fun map(
         key: String,
-        jsonMatchingAttribute: JsonMatchingAttribute
+        jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? = if (key == ToggleMatchingAttribute.KEY) {
         val value = jsonMatchingAttribute.value as? List<String>
         value.takeUnless { it.isNullOrEmpty() }?.let { featureFlags ->
@@ -79,4 +79,3 @@ data class ToggleMatchingAttribute(
         const val KEY = "allFeatureFlagsEnabled"
     }
 }
-
