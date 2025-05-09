@@ -451,7 +451,7 @@ class Omnibar(
 }
 
 fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {
-    return if (experimentState.value.isEnabled) {
+    return if (isExperimentEnabled.value) {
         FADE
     } else {
         SCROLLING

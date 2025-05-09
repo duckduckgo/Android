@@ -1112,7 +1112,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+        if (visualDesignExperimentDataStore.isExperimentEnabled.value) {
             if (settingsDataStore.omnibarPosition == TOP) {
                 experimentalToolbarMockupBinding = binding.topMockupExperimentalToolbar
                 binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
