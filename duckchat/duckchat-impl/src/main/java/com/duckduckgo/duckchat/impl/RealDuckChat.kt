@@ -108,6 +108,28 @@ interface DuckChatInternal : DuckChat {
      * Returns whether DuckChat is user enabled or not.
      */
     fun isDuckChatUserEnabled(): Boolean
+
+    fun processChatState(state: ChatState)
+
+    val chatState: StateFlow<ChatState>
+}
+
+enum class ChatState(val value: String) {
+    START_STREAM_NEW_PROMPT("start_stream:new_prompt"),
+    LOADING("loading"),
+    STREAMING("streaming"),
+    ERROR("error"),
+    READY("ready"),
+    BLOCKED("blocked"),
+    HIDE("hide"),
+    SHOW("show"),
+
+    ;
+
+    companion object {
+        fun fromValue(v: String?): ChatState? =
+            entries.firstOrNull { it.value == v }
+    }
 }
 
 data class DuckChatSettingJson(
@@ -137,6 +159,7 @@ class RealDuckChat @Inject constructor(
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
+    private val _chatState = MutableStateFlow(ChatState.HIDE)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -235,9 +258,15 @@ class RealDuckChat @Inject constructor(
         return isDuckChatUserEnabled
     }
 
+    override fun processChatState(state: ChatState) {
+        _chatState.value = state
+    }
+
     override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
 
     override val showInAddressBar: StateFlow<Boolean> get() = _showInAddressBar.asStateFlow()
+
+    override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->

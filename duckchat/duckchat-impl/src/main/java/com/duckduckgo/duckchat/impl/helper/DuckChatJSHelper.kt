@@ -16,7 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.ChatState
+import com.duckduckgo.duckchat.impl.ChatState.HIDE
+import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -38,6 +42,7 @@ interface DuckChatJSHelper {
 class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val dataStore: DuckChatDataStore,
+    private val experimentDataStore: VisualDesignExperimentDataStore,
 ) : DuckChatJSHelper {
 
     override suspend fun processJsCallbackMessage(
@@ -66,6 +71,20 @@ class RealDuckChatJSHelper @Inject constructor(
             duckChat.openDuckChatSettings()
             null
         }
+        METHOD_RESPONSE_STATE -> {
+            ChatState
+                .fromValue(data?.optString("status"))
+                ?.let { status -> duckChat.processChatState(status) }
+            null
+        }
+        METHOD_HIDE_CHAT_INPUT -> {
+            duckChat.processChatState(HIDE)
+            null
+        }
+        METHOD_SHOW_CHAT_INPUT -> {
+            duckChat.processChatState(SHOW)
+            null
+        }
         else -> null
     }
 
@@ -84,6 +103,7 @@ class RealDuckChatJSHelper @Inject constructor(
             put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
             put(SUPPORTS_CLOSING_AI_CHAT, true)
             put(SUPPORTS_OPENING_SETTINGS, true)
+            put(SUPPORTS_NATIVE_CHAT_INPUT, experimentDataStore.isExperimentEnabled.value && experimentDataStore.isDuckAIPoCEnabled.value)
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -101,10 +121,14 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         private const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
+        private const val METHOD_RESPONSE_STATE = "responseState"
+        private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
+        private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
+        private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
     }
