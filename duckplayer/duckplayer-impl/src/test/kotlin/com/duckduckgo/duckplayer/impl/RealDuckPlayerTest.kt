@@ -27,6 +27,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -40,7 +41,10 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
@@ -244,6 +248,7 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
@@ -253,44 +258,64 @@ class RealDuckPlayerTest {
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS_UNIQUE, emptyMap(), emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayUse_firesPixelWithCorrectNameAndData() = runTest {
         val pixelName = "play.use"
         val pixelData = mapOf("key" to "value")
+        val uniquePixelData = mapOf("choice" to "use")
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayUse_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
         val pixelName = "play.use"
+        val uniquePixelData = mapOf("choice" to "use")
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayDoNotUse_firesPixelWithCorrectNameAndData() = runTest {
         val pixelName = "play.do_not_use"
         val pixelData = mapOf("key" to "value")
+        val uniquePixelData = mapOf("choice" to "do_not_use")
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     @Test
     fun sendDuckPlayerPixelWithPlayDoNotUse_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
         val pixelName = "play.do_not_use"
+        val uniquePixelData = mapOf("choice" to "do_not_use")
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
         verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
+    }
+
+    @Test
+    fun sendDuckPlayerPixelWithPlayDoNotUseDismiss_firesPixelWithEmptyDataWhenNoDataProvided() = runTest {
+        val pixelName = "play.do_not_use.dismiss"
+        val uniquePixelData = mapOf("choice" to "dismiss")
+
+        testee.sendDuckPlayerPixel(pixelName, emptyMap())
+
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_DISMISS, emptyMap(), emptyMap(), Count)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_CHOICE_UNIQUE, uniquePixelData, emptyMap(), Unique())
     }
 
     // endregion
