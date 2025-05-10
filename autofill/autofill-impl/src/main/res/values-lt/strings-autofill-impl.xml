@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Galite importuoti išsaugotus slaptažodžius iš kitos naršyklės į „DuckDuckGo“.</string>
 
     <string name="autofillManagementImportPasswords">Importuoti slaptažodžius</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sinchronizuoti darbalaukio slaptažodžius</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kaip importuoti slaptažodžius</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kaip sinchronizuoti darbalaukio slaptažodžius</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importuokite slaptažodžius „DuckDuckGo“ naršyklės versijoje kompiuteriui, tada sinchronizuokite juos visuose įrenginiuose.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Gaukite kompiuterio naršyklę</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Nuoroda nukopijuota</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importuok slaptažodžius iš „Google“</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importuok slaptažodžius iš „Google“</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinchronizuoti darbalaukio slaptažodžius</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinchronizuoti darbalaukio slaptažodžius</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuok savo slaptažodžius iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Nepavyko importuoti slaptažodžio</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Praleista (dublikatas arba netinkamas): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importuoti slaptažodžiai: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Atidaryk slaptažodžius</string>
+    <string name="autofill_service_select_password_activity">Pasirink išsaugotą slaptažodį</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Slaptažodžiai ir automatinis užpildymas</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Iš naujo nustatyti neįtrauktas svetaines?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Jei iš naujo nustatysite neįtrauktas svetaines, kitą kartą, kai prisijungsite prie bet kurios iš šių svetainių, būsite paraginti išsaugoti savo slaptažodį.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Nustatyti iš naujo</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Atšaukti</string>
+    <string name="autofillSettingsPasswordsEntry">Slaptažodžiai</string>
+    <string name="autofillSettingsAutofillToggleLabel">Prašyk išsaugoti ir automatiškai užpildyti</string>
+    <string name="autofillSettingsAutofillSubtitle">Slaptažodžiai yra užšifruoti. Niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importuoti slaptažodžius</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importuok slaptažodžius iš „Google“</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sinchronizuoti darbalaukio slaptažodžius</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Iš naujo nustatyti neįtrauktas svetaines</string>
 
 </resources>

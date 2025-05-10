@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Vous pouvez importer les mots de passe enregistrés d\'un autre navigateur dans DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importer les mots de passe</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Synchroniser les mots de passe de bureau</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Comment importer des mots de passe</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Comment synchroniser les mots de passe de bureau</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importez les mots de passe dans la version de bureau du navigateur DuckDuckGo, puis synchronisez-les sur tous les appareils.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Télécharger le navigateur de bureau</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lien copié</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importer des mots de passe depuis Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importer des mots de passe depuis Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchroniser les mots de passe DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchroniser les mots de passe DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchroniser les mots de passe de bureau</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchroniser les mots de passe de bureau</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importez vos mots de passe Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Échec de l\'importation des mots de passe</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorés (doublons ou non valides) : <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Mots de passe importés : <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Ouvrir les mots de passe</string>
+    <string name="autofill_service_select_password_activity">Sélectionner un mot de passe enregistré</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Mots de passe et saisie automatique</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Réinitialiser les sites exclus ?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Réinitialiser</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Annuler</string>
+    <string name="autofillSettingsPasswordsEntry">Mots de passe</string>
+    <string name="autofillSettingsAutofillToggleLabel">Demander l\'enregistrement et la saisie automatique</string>
+    <string name="autofillSettingsAutofillSubtitle">Les mots de passe sont cryptés. Personne d\'autre que vous ne peut les voir, pas même nous. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importer les mots de passe</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importer des mots de passe depuis Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Synchroniser les mots de passe de bureau</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Réinitialiser les sites exclus</string>
 
 </resources>
