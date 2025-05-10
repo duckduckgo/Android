@@ -21,17 +21,12 @@ package com.duckduckgo.daxprompts.api
  */
 interface DaxPrompts {
 
-    /**
-     * Determines if the Duck Player prompt should be shown to the user.
-     *
-     * @return true if the Duck Player prompt should be displayed, false otherwise.
-     */
-    suspend fun shouldShowDuckPlayerPrompt(): Boolean
+    suspend fun evaluate(): ActionType
 
-    /**
-     * Determines if the Browser Comparison prompt should be shown to the user.
-     *
-     * @return true if the Browser Comparison prompt should be displayed, false otherwise.
-     */
-    suspend fun shouldShowBrowserComparisonPrompt(): Boolean
+    enum class ActionType {
+        SHOW_CONTROL,
+        SHOW_VARIANT_DUCKPLAYER,
+        SHOW_VARIANT_BROWSER_COMPARISON,
+        NONE,
+    }
 }
