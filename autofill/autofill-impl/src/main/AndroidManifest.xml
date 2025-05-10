@@ -5,7 +5,7 @@
     <application>
         <activity
             android:name=".ui.credential.management.importpassword.ImportPasswordsActivity"
-            android:label="@string/autofillManagementImportPasswords"
+            android:label="@string/autofillManagementHowToSyncDesktopPasswords"
             android:exported="false" />
         <activity
             android:name=".ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppActivity"
@@ -21,6 +21,12 @@
             android:exported="false" />
         <activity
             android:name=".ui.credential.management.AutofillManagementActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.settings.AutofillSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

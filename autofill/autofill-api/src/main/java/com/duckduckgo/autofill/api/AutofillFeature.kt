@@ -140,5 +140,8 @@ interface AutofillFeature {
     fun siteSpecificFixes(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun settingsScreen(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun createAsyncPreferences(): Toggle
 }

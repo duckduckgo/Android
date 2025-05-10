@@ -29,7 +29,6 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Comm
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ForceFinish
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.RequestAuthentication
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject

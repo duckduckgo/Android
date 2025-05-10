@@ -48,6 +48,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
@@ -69,8 +70,9 @@ import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoPar
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
@@ -325,7 +327,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is LaunchDefaultBrowser -> launchDefaultAppScreen()
-            is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
+            is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillScreenLaunchSource.SettingsActivity))
+            is LaunchAutofillPasswordsManagement -> launchScreen(
+                AutofillPasswordsManagementScreen(source = AutofillScreenLaunchSource.SettingsActivity),
+            )
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)

@@ -29,7 +29,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
@@ -46,15 +46,15 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loaded
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loading
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ViewState
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.ReevalutePromotions
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.ShowUserReportSentMessage
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
@@ -126,7 +126,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     lateinit var grouper: CredentialGrouper
 
     val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
+        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillPasswordsManagementViewModel::class.java]
     }
 
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
@@ -272,8 +272,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun getCurrentSiteUrl() = arguments?.getString(ARG_CURRENT_URL, null)
     private fun getPrivacyProtectionEnabled() = arguments?.getBoolean(ARG_PRIVACY_PROTECTION_STATUS)
-    private fun getAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource? =
-        arguments?.getSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE) as AutofillSettingsLaunchSource?
+    private fun getAutofillSettingsLaunchSource(): AutofillScreenLaunchSource? =
+        arguments?.getSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE) as AutofillScreenLaunchSource?
 
     private fun parentBinding() = parentActivity()?.binding
     private fun parentActivity() = (activity as AutofillManagementActivity?)
@@ -332,7 +332,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
-    private fun processCommand(command: AutofillSettingsViewModel.ListModeCommand) {
+    private fun processCommand(command: AutofillPasswordsManagementViewModel.ListModeCommand) {
         when (command) {
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
@@ -647,7 +647,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         fun instance(
             currentUrl: String? = null,
             privacyProtectionEnabled: Boolean?,
-            source: AutofillSettingsLaunchSource? = null,
+            source: AutofillScreenLaunchSource? = null,
         ) =
             AutofillManagementListMode().apply {
                 arguments = Bundle().apply {
