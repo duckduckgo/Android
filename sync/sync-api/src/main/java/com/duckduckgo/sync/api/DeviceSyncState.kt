@@ -26,12 +26,12 @@ interface DeviceSyncState {
     /**
      * Checks if user is signed in on this device.
      */
-    fun isUserSignedInOnDevice(): Boolean
+    suspend fun isUserSignedInOnDevice(): Boolean
 
     /**
      * Returns the sync account state
      */
-    fun getAccountState(): SyncAccountState
+    suspend fun getAccountState(): SyncAccountState
 
     /**
      * Representation of the current sync account state, including whether signed in or not.

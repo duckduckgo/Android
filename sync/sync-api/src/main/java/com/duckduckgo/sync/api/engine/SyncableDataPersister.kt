@@ -27,7 +27,7 @@ interface SyncableDataPersister {
      * Changes from Sync Client have been received
      * Each feature is responsible for merging and solving conflicts
      */
-    fun onSuccess(
+    suspend fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult

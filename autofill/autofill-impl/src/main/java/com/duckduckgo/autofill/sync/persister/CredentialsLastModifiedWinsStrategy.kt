@@ -97,7 +97,7 @@ class CredentialsLastModifiedWinsStrategy(
         credentialsSync.updateCredentials(remoteCredentials, remoteEntry.id)
     }
 
-    private fun mapRemoteToLocalLoginCredential(
+    private suspend fun mapRemoteToLocalLoginCredential(
         remoteEntry: CredentialsSyncEntryResponse,
         localId: Long,
         clientModifiedSince: String,

@@ -24,12 +24,12 @@ interface SyncCrypto {
      * @param text to encrypt
      * @return text encrypted
      */
-    fun encrypt(text: String): String
+    suspend fun encrypt(text: String): String
 
     /**
      * Decrypts a blob of text
      * @param text to decrypt
      * @return text decrypted
      */
-    fun decrypt(data: String): String
+    suspend fun decrypt(data: String): String
 }

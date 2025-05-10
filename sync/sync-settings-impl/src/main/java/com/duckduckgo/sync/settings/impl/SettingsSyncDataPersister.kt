@@ -49,7 +49,7 @@ class SettingsSyncDataPersister @Inject constructor(
         }
     }
 
-    override fun onSuccess(
+    override suspend fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -107,7 +107,7 @@ class SettingsSyncDataPersister @Inject constructor(
         return result
     }
 
-    private fun processEntries(
+    private suspend fun processEntries(
         settings: SettingsSyncEntries,
         syncableSettings: Collection<SyncableSetting>,
         conflictResolution: SyncConflictResolution,
@@ -141,7 +141,7 @@ class SettingsSyncDataPersister @Inject constructor(
         return Success()
     }
 
-    private fun applyChanges(syncableFeature: SyncableSetting, entry: SettingEntryResponse): SyncMergeResult {
+    private suspend fun applyChanges(syncableFeature: SyncableSetting, entry: SettingEntryResponse): SyncMergeResult {
         val localCredential = settingsSyncMetadataDao.get(entry.key)
         val clientModifiedSinceMillis =
             runCatching { DatabaseDateFormatter.parseIso8601ToMillis(syncSettingsSyncStore.startTimeStamp) }.getOrDefault(0)

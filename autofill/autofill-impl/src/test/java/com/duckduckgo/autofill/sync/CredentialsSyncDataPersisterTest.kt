@@ -38,6 +38,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -74,6 +75,7 @@ internal class CredentialsSyncDataPersisterTest {
         strategies = strategies,
         appBuildConfig = appBuildConfig,
         credentialsSyncFeatureListener = credentialsSyncFeatureListener,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @After
@@ -82,7 +84,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenValidatingCorruptedDataThenResultIsError() {
+    fun whenValidatingCorruptedDataThenResultIsError() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_invalid_data.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
@@ -91,7 +93,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenValidatingNullEntriesThenResultIsError() {
+    fun whenValidatingNullEntriesThenResultIsError() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_null_entries.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
@@ -100,7 +102,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
+    fun whenProcessingDataInEmptyDBThenResultIsSuccess() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
         val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.onSuccess(validChanges, DEDUPLICATION)
@@ -109,7 +111,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenMergingEmptyEntriesThenResultIsSuccess() {
+    fun whenMergingEmptyEntriesThenResultIsSuccess() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_empty_entries.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
@@ -118,7 +120,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenMergingWithDeletedDataThenResultIsSuccess() {
+    fun whenMergingWithDeletedDataThenResultIsSuccess() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_deleted_entries.json")
         val deletedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.onSuccess(deletedChanges, TIMESTAMP)
@@ -127,7 +129,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistWithAnotherTypeThenReturnFalse() {
+    fun whenPersistWithAnotherTypeThenReturnFalse() = runTest {
         val result = syncPersister.onSuccess(
             SyncChangesResponse(BOOKMARKS, ""),
             DEDUPLICATION,
@@ -137,7 +139,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistFinishesThenPruneLocalDeletedEntities() {
+    fun whenPersistFinishesThenPruneLocalDeletedEntities() = runTest {
         autofillStore.startTimeStamp = "2022-08-30T00:01:00Z"
         dao.insert(CredentialsSyncMetadataEntity("123", 1L, "2022-08-30T00:00:00Z", null))
 
@@ -150,7 +152,7 @@ internal class CredentialsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenOnSuccessThenNotifyListener() {
+    fun whenOnSuccessThenNotifyListener() = runTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
         val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
 

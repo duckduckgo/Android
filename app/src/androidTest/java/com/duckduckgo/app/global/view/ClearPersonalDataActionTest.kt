@@ -69,7 +69,7 @@ class ClearPersonalDataActionTest {
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         testee = ClearPersonalDataAction(
             context = InstrumentationRegistry.getInstrumentation().targetContext,
             dataManager = mockDataManager,

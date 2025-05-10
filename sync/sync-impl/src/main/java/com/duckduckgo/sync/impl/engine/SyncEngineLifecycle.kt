@@ -22,5 +22,5 @@ import com.duckduckgo.di.scopes.AppScope
 @ContributesPluginPoint(AppScope::class)
 interface SyncEngineLifecycle {
     fun onSyncEnabled()
-    fun onSyncDisabled()
+    suspend fun onSyncDisabled()
 }

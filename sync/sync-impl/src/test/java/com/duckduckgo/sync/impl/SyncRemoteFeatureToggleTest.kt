@@ -52,8 +52,14 @@ class SyncRemoteFeatureToggleTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val notificationManager = NotificationManagerCompat.from(context)
     private val sharedPrefsProvider = TestSharedPrefsProvider(context)
-    private val store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope(), coroutinesTestRule.testDispatcherProvider)
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java, appVersionProvider = { appBuildConfig.versionCode })
+
+    private val store = SyncSharedPrefsStore(
+        sharedPrefsProvider,
+        TestScope(),
+        coroutinesTestRule.testDispatcherProvider,
+        syncFeature.createAsyncPreferences().isEnabled(),
+    )
 
     private lateinit var testee: SyncRemoteFeatureToggle
 

@@ -115,7 +115,7 @@ class CredentialsDedupStrategy(
 
         return comparison
     }
-    private fun mapRemoteToLocalLoginCredential(
+    private suspend fun mapRemoteToLocalLoginCredential(
         remoteEntry: CredentialsSyncEntryResponse,
         clientModifiedSince: String,
     ): LoginCredentials {

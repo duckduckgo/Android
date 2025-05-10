@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,7 +30,7 @@ internal class AppDeviceSyncStateTest {
     private val appDeviceSyncState = AppDeviceSyncState(syncFeatureToggle, syncAccountRepository)
 
     @Test
-    fun whenUserSignedInThenDeviceSyncEnabled() {
+    fun whenUserSignedInThenDeviceSyncEnabled() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         assertTrue(appDeviceSyncState.isUserSignedInOnDevice())

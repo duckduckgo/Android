@@ -85,17 +85,17 @@ class ImportPasswordsUserJourneyLifecycleObserverTest {
         whenever(dataStore.getUserJourneyStartTime()).thenReturn(System.currentTimeMillis() - 10)
     }
 
-    private fun configureSignedInWithDesktopDevice() {
+    private suspend fun configureSignedInWithDesktopDevice() {
         val syncState = SignedIn(listOf(aDevice(DESKTOP)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 
-    private fun configureSignedInWithMobileDevice() {
+    private suspend fun configureSignedInWithMobileDevice() {
         val syncState = SignedIn(listOf(aDevice(MOBILE)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 
-    private fun configureSignedOut() {
+    private suspend fun configureSignedOut() {
         whenever(deviceSyncState.getAccountState()).thenReturn(SignedOut)
     }
 

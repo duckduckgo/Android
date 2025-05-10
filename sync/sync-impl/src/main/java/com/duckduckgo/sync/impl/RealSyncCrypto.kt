@@ -31,9 +31,9 @@ class RealSyncCrypto @Inject constructor(
     private val syncStore: SyncStore,
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
 ) : SyncCrypto {
-    override fun encrypt(text: String): String {
+    override suspend fun encrypt(text: String): String {
         val encryptResult = kotlin.runCatching {
-            nativeLib.encryptData(text, syncStore.secretKey.orEmpty())
+            nativeLib.encryptData(text, syncStore.getSecretKey().orEmpty())
         }.getOrElse {
             syncOperationErrorRecorder.record(SyncOperationErrorType.DATA_ENCRYPT)
             throw it
@@ -47,10 +47,10 @@ class RealSyncCrypto @Inject constructor(
         }
     }
 
-    override fun decrypt(data: String): String {
+    override suspend fun decrypt(data: String): String {
         if (data.isEmpty()) return data
         val decryptResult = kotlin.runCatching {
-            nativeLib.decryptData(data, syncStore.secretKey.orEmpty())
+            nativeLib.decryptData(data, syncStore.getSecretKey().orEmpty())
         }.getOrElse {
             syncOperationErrorRecorder.record(SyncOperationErrorType.DATA_DECRYPT)
             throw it

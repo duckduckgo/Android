@@ -58,7 +58,7 @@ class SyncErrorViewModel @Inject constructor(
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 
-    private fun getMessage(state: SyncState): Int? {
+    private suspend fun getMessage(state: SyncState): Int? {
         if (state == SyncState.OFF) return null
 
         if (syncErrorRepository.isSyncUnavailable()) {

@@ -54,4 +54,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun automaticallyUpdateSyncSettings(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun createAsyncPreferences(): Toggle
 }

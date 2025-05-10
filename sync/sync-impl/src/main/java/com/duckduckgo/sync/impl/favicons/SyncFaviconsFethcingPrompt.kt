@@ -38,7 +38,7 @@ class SyncFaviconsFetchingPrompt(
     // Have at least 1 bookmark without favicon loaded on current screen.
     // https://app.asana.com/0/1157893581871903/1206440765317539
     @WorkerThread
-    override fun shouldShow(): Boolean {
+    override suspend fun shouldShow(): Boolean {
         if (faviconsFetchingStore.promptShown) {
             return false
         }

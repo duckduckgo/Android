@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -99,8 +100,10 @@ internal class EnterCodeViewModelTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
-            Success(true)
+            runBlocking {
+                whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
+                Success(true)
+            }
         }
 
         testee.onPasteCodeClicked()
@@ -117,8 +120,10 @@ internal class EnterCodeViewModelTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
         whenever(syncAccountRepository.processCode(jsonConnectKeyEncoded)).thenAnswer {
-            whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
-            Success(true)
+            runBlocking {
+                whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
+                Success(true)
+            }
         }
 
         testee.onPasteCodeClicked()
@@ -180,8 +185,10 @@ internal class EnterCodeViewModelTest {
     fun whenUserAcceptsToSwitchAccountThenPerformAction() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncAccountRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
 
         testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
@@ -197,8 +204,10 @@ internal class EnterCodeViewModelTest {
     fun whenSignedInUserProcessCodeSucceedsAndAccountChangedThenReturnSwitchAccount() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountB)
-            Success(true)
+            runBlocking {
+                whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountB)
+                Success(true)
+            }
         }
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
 
@@ -214,8 +223,10 @@ internal class EnterCodeViewModelTest {
     fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
-            whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
-            Success(true)
+            runBlocking {
+                whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
+                Success(true)
+            }
         }
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
 

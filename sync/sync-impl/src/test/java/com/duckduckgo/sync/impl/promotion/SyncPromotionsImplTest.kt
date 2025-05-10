@@ -119,7 +119,7 @@ class SyncPromotionsImplTest {
         verify(dataStore).recordBookmarksPromoDismissed()
     }
 
-    private fun configureUserHasEnabledSync(enabled: Boolean) {
+    private suspend fun configureUserHasEnabledSync(enabled: Boolean) {
         whenever(syncState.isUserSignedInOnDevice()).thenReturn(enabled)
     }
 

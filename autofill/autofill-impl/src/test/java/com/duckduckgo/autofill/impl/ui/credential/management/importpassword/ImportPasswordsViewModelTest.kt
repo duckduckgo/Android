@@ -158,17 +158,17 @@ class ImportPasswordsViewModelTest {
         testee.onUserClickedGetDesktopAppButton()
     }
 
-    private fun configureSignedInWithMobileDevice() {
+    private suspend fun configureSignedInWithMobileDevice() {
         val syncState = SignedIn(listOf(aDevice(MOBILE)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 
-    private fun configureSignedInWithDesktopDevice() {
+    private suspend fun configureSignedInWithDesktopDevice() {
         val syncState = SignedIn(listOf(aDevice(DESKTOP)))
         whenever(deviceSyncState.getAccountState()).thenReturn(syncState)
     }
 
-    private fun configureSignedOut() {
+    private suspend fun configureSignedOut() {
         whenever(deviceSyncState.getAccountState()).thenReturn(SignedOut)
     }
 

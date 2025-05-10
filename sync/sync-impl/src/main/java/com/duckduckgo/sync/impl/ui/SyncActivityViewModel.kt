@@ -133,7 +133,7 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private fun signedInState(): ViewState {
+    private suspend fun signedInState(): ViewState {
         val connectedDevices = viewState.value.syncedDevices
         val syncedDevices = connectedDevices.ifEmpty {
             val thisDevice = syncAccountRepository.getThisConnectedDevice() ?: return signedOutState()

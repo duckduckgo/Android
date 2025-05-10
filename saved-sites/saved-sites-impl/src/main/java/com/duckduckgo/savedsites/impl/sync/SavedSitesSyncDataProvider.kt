@@ -44,7 +44,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = BOOKMARKS
 
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             savedSitesFormFactorSyncMigration.onFormFactorFavouritesEnabled()
@@ -64,7 +64,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     @VisibleForTesting
-    fun changesSince(since: String): List<SyncSavedSitesRequestEntry> {
+    suspend fun changesSince(since: String): List<SyncSavedSitesRequestEntry> {
         Timber.i("Sync-Bookmarks: generating changes since $since")
         val updates = mutableListOf<SyncSavedSitesRequestEntry>()
 
@@ -105,7 +105,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     @VisibleForTesting
-    fun allContent(): List<SyncSavedSitesRequestEntry> {
+    suspend fun allContent(): List<SyncSavedSitesRequestEntry> {
         Timber.i("Sync-Bookmarks: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
@@ -130,7 +130,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return getRequestEntriesFor(SavedSitesNames.BOOKMARKS_ROOT, favouriteEntries).distinct()
     }
 
-    private fun getRequestEntriesFor(
+    private suspend fun getRequestEntriesFor(
         folderId: String,
         requestEntries: MutableList<SyncSavedSitesRequestEntry>,
     ): List<SyncSavedSitesRequestEntry> {
@@ -166,7 +166,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return requestEntries
     }
 
-    private fun encryptedSavedSite(
+    private suspend fun encryptedSavedSite(
         savedSite: SavedSite,
     ): SyncSavedSitesRequestEntry {
         return SyncSavedSitesRequestEntry(
@@ -179,7 +179,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         )
     }
 
-    private fun encryptedFolder(bookmarkFolder: BookmarkFolder): SyncSavedSitesRequestEntry {
+    private suspend fun encryptedFolder(bookmarkFolder: BookmarkFolder): SyncSavedSitesRequestEntry {
         val folderChildren = syncSavedSitesRepository.getFolderDiff(bookmarkFolder.id)
         Timber.d("Sync-Bookmarks-Metadata: folder diff for ${bookmarkFolder.id} $folderChildren")
         return SyncSavedSitesRequestEntry(

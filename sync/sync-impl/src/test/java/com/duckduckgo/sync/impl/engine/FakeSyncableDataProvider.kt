@@ -27,7 +27,7 @@ class FakeSyncableDataProvider(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = syncableType
 
-    override fun getChanges(): SyncChangesRequest {
+    override suspend fun getChanges(): SyncChangesRequest {
         return fakeChanges
     }
 }

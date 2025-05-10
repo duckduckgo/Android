@@ -51,24 +51,24 @@ import timber.log.Timber
 interface SyncAccountRepository {
 
     fun getCodeType(stringCode: String): CodeType
-    fun isSyncSupported(): Boolean
-    fun createAccount(): Result<Boolean>
-    fun isSignedIn(): Boolean
-    fun processCode(stringCode: String): Result<Boolean>
-    fun getAccountInfo(): AccountInfo
-    fun logout(deviceId: String): Result<Boolean>
-    fun deleteAccount(): Result<Boolean>
-    fun latestToken(): String
-    fun getRecoveryCode(): Result<String>
-    fun getThisConnectedDevice(): ConnectedDevice?
-    fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<String>
-    fun pollConnectionKeys(): Result<Boolean>
-    fun generateExchangeInvitationCode(): Result<String>
-    fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
-    fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
-    fun renameDevice(device: ConnectedDevice): Result<Boolean>
-    fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
+    suspend fun isSyncSupported(): Boolean
+    suspend fun createAccount(): Result<Boolean>
+    suspend fun isSignedIn(): Boolean
+    suspend fun processCode(stringCode: String): Result<Boolean>
+    suspend fun getAccountInfo(): AccountInfo
+    suspend fun logout(deviceId: String): Result<Boolean>
+    suspend fun deleteAccount(): Result<Boolean>
+    suspend fun latestToken(): String
+    suspend fun getRecoveryCode(): Result<String>
+    suspend fun getThisConnectedDevice(): ConnectedDevice?
+    suspend fun getConnectedDevices(): Result<List<ConnectedDevice>>
+    suspend fun getConnectQR(): Result<String>
+    suspend fun pollConnectionKeys(): Result<Boolean>
+    suspend fun generateExchangeInvitationCode(): Result<String>
+    suspend fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
+    suspend fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
+    suspend fun renameDevice(device: ConnectedDevice): Result<Boolean>
+    suspend fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -99,11 +99,11 @@ class AppSyncAccountRepository @Inject constructor(
 
     private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
-    override fun isSyncSupported(): Boolean {
+    override suspend fun isSyncSupported(): Boolean {
         return syncStore.isEncryptionSupported()
     }
 
-    override fun createAccount(): Result<Boolean> {
+    override suspend fun createAccount(): Result<Boolean> {
         if (isSignedIn()) {
             return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in")
                 .alsoFireAlreadySignedInErrorPixel()
@@ -114,7 +114,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(stringCode: String): Result<Boolean> {
+    override suspend fun processCode(stringCode: String): Result<Boolean> {
         val decodedCode: String? = kotlin.runCatching {
             return@runCatching stringCode.decodeB64()
         }.getOrNull()
@@ -166,7 +166,7 @@ class AppSyncAccountRepository @Inject constructor(
         }.getOrDefault(UNKNOWN)
     }
 
-    private fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
+    private suspend fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
         // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - B. code is an exchange code $invitationCode")
 
@@ -193,7 +193,7 @@ class AppSyncAccountRepository @Inject constructor(
         return syncApi.sendEncryptedMessage(invitationCode.keyId, encryptedPayload)
     }
 
-    override fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult> {
+    override suspend fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult> {
         // Sync: InviteFlow - E (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - E")
 
@@ -247,13 +247,13 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+    private suspend fun login(recoveryCode: RecoveryCode): Result<Boolean> {
         var wasUserLogout = false
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
             if (allowSwitchAccount && connectedDevicesCached.size == 1) {
-                val thisDeviceId = syncStore.deviceId.orEmpty()
+                val thisDeviceId = syncStore.getDeviceId().orEmpty()
                 val result = logout(thisDeviceId)
                 if (result is Error) {
                     return result
@@ -278,35 +278,35 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun renameDevice(device: ConnectedDevice): Result<Boolean> {
-        val userId = syncStore.userId ?: return Error(reason = "Rename Device: Not existing userId").alsoFireUpdateDeviceErrorPixel()
-        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Rename Device: Not existing primaryKey").alsoFireUpdateDeviceErrorPixel()
+    override suspend fun renameDevice(device: ConnectedDevice): Result<Boolean> {
+        val userId = syncStore.getUserId() ?: return Error(reason = "Rename Device: Not existing userId").alsoFireUpdateDeviceErrorPixel()
+        val primaryKey = syncStore.getPrimaryKey() ?: return Error(reason = "Rename Device: Not existing primaryKey").alsoFireUpdateDeviceErrorPixel()
         return performLogin(userId, device.deviceId, device.deviceName, primaryKey).onFailure {
             it.alsoFireUpdateDeviceErrorPixel()
             return it.copy(code = LOGIN_FAILED.code)
         }
     }
 
-    override fun getAccountInfo(): AccountInfo {
+    override suspend fun getAccountInfo(): AccountInfo {
         if (!isSignedIn()) return AccountInfo()
 
         return AccountInfo(
-            userId = syncStore.userId.orEmpty(),
-            deviceName = syncStore.deviceName.orEmpty(),
-            deviceId = syncStore.deviceId.orEmpty(),
+            userId = syncStore.getUserId().orEmpty(),
+            deviceName = syncStore.getDeviceName().orEmpty(),
+            deviceId = syncStore.getDeviceId().orEmpty(),
             isSignedIn = isSignedIn(),
-            primaryKey = syncStore.primaryKey.orEmpty(),
-            secretKey = syncStore.secretKey.orEmpty(),
+            primaryKey = syncStore.getPrimaryKey().orEmpty(),
+            secretKey = syncStore.getSecretKey().orEmpty(),
         )
     }
 
-    override fun getRecoveryCode(): Result<String> {
-        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Get Recovery Code: Not existing primary Key").alsoFireAccountErrorPixel()
-        val userID = syncStore.userId ?: return Error(reason = "Get Recovery Code: Not existing userId").alsoFireAccountErrorPixel()
+    override suspend fun getRecoveryCode(): Result<String> {
+        val primaryKey = syncStore.getPrimaryKey() ?: return Error(reason = "Get Recovery Code: Not existing primary Key").alsoFireAccountErrorPixel()
+        val userID = syncStore.getUserId() ?: return Error(reason = "Get Recovery Code: Not existing userId").alsoFireAccountErrorPixel()
         return Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
     }
 
-    override fun generateExchangeInvitationCode(): Result<String> {
+    override suspend fun generateExchangeInvitationCode(): Result<String> {
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - A. Generating invitation code")
 
@@ -328,7 +328,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun getConnectQR(): Result<String> {
+    override suspend fun getConnectQR(): Result<String> {
         val prepareForConnect = kotlin.runCatching {
             nativeLib.prepareForConnect().also {
                 it.checkResult("Creating ConnectQR code failed")
@@ -336,9 +336,9 @@ class AppSyncAccountRepository @Inject constructor(
         }.getOrElse { return it.asErrorResult().alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code) }
 
         val deviceId = syncDeviceIds.deviceId()
-        syncStore.deviceId = deviceId
-        syncStore.primaryKey = prepareForConnect.publicKey
-        syncStore.secretKey = prepareForConnect.secretKey
+        syncStore.setDeviceId(deviceId)
+        syncStore.setPrimaryKey(prepareForConnect.publicKey)
+        syncStore.setSecretKey(prepareForConnect.secretKey)
 
         val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
@@ -347,7 +347,7 @@ class AppSyncAccountRepository @Inject constructor(
         return Success(linkingQRCode.encodeB64())
     }
 
-    private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
+    private suspend fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
         if (!isSignedIn()) {
             performCreateAccount().onFailure {
                 it.alsoFireSignUpErrorPixel()
@@ -361,7 +361,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun pollConnectionKeys(): Result<Boolean> {
+    override suspend fun pollConnectionKeys(): Result<Boolean> {
         val deviceId = syncDeviceIds.deviceId()
 
         return when (val result = syncApi.connectDevice(deviceId)) {
@@ -376,7 +376,7 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 val sealOpen = kotlin.runCatching {
-                    nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
+                    nativeLib.sealOpen(result.data, syncStore.getPrimaryKey()!!, syncStore.getSecretKey()!!)
                 }.getOrElse { throwable ->
                     throwable.asErrorResult().alsoFireAccountErrorPixel()
                     return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
@@ -387,8 +387,8 @@ class AppSyncAccountRepository @Inject constructor(
                     code = CONNECT_FAILED.code,
                     reason = "Connect: Error reading received recovery code",
                 ).alsoFireAccountErrorPixel()
-                syncStore.userId = recoveryCode.userId
-                syncStore.primaryKey = recoveryCode.primaryKey
+                syncStore.setUserId(recoveryCode.userId)
+                syncStore.setPrimaryKey(recoveryCode.primaryKey)
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
                     return it.copy(code = LOGIN_FAILED.code)
                 }
@@ -396,7 +396,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
+    override suspend fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
         // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - C")
 
@@ -451,7 +451,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
+    private suspend fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
         // Sync: InviteFlow - D (https://app.asana.com/0/72649045549333/1209571867429615)
         Timber.d("Sync-exchange: InviteFlow - D")
 
@@ -475,14 +475,14 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun logout(deviceId: String): Result<Boolean> {
-        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+    override suspend fun logout(deviceId: String): Result<Boolean> {
+        val token = syncStore.getToken().takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Logout: Token Empty").alsoFireLogoutErrorPixel()
 
-        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
+        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.getDeviceId()
 
         val deviceId = if (logoutThisDevice) {
-            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            syncStore.getDeviceId().takeUnless { it.isNullOrEmpty() }
                 ?: return Error(reason = "Logout: Device Id Empty").alsoFireLogoutErrorPixel()
         } else {
             deviceId
@@ -507,8 +507,8 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun deleteAccount(): Result<Boolean> {
-        val token = syncStore.token.takeUnless {
+    override suspend fun deleteAccount(): Result<Boolean> {
+        val token = syncStore.getToken().takeUnless {
             it.isNullOrEmpty()
         } ?: return Error(reason = "Delete account: Token Empty").alsoFireDeleteAccountErrorPixel()
 
@@ -524,24 +524,24 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun latestToken(): String {
-        return syncStore.token ?: ""
+    override suspend fun latestToken(): String {
+        return syncStore.getToken() ?: ""
     }
 
-    override fun getThisConnectedDevice(): ConnectedDevice? {
+    override suspend fun getThisConnectedDevice(): ConnectedDevice? {
         if (!isSignedIn()) return null
         return ConnectedDevice(
             thisDevice = true,
-            deviceName = syncStore.deviceName.orEmpty(),
+            deviceName = syncStore.getDeviceName().orEmpty(),
             deviceType = syncDeviceIds.deviceType(),
-            deviceId = syncStore.deviceId.orEmpty(),
+            deviceId = syncStore.getDeviceId().orEmpty(),
         )
     }
 
-    override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
-        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
+    override suspend fun getConnectedDevices(): Result<List<ConnectedDevice>> {
+        val token = syncStore.getToken().takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Token Empty")
-        val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
+        val primaryKey = syncStore.getPrimaryKey().takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "PrimaryKey not found")
 
         return when (val result = syncApi.getDevices(token)) {
@@ -560,14 +560,14 @@ class AppSyncAccountRepository @Inject constructor(
                             } ?: DeviceType()
 
                             ConnectedDevice(
-                                thisDevice = syncStore.deviceId == device.deviceId,
+                                thisDevice = syncStore.getDeviceId() == device.deviceId,
                                 deviceName = decryptedDeviceName,
                                 deviceId = device.deviceId,
                                 deviceType = decryptedDeviceType,
                             )
                         } catch (throwable: Throwable) {
                             throwable.asErrorResult().alsoFireAccountErrorPixel()
-                            if (syncStore.deviceId != device.deviceId) {
+                            if (syncStore.getDeviceId() != device.deviceId) {
                                 logout(device.deviceId)
                             }
                             null
@@ -585,10 +585,10 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun isSignedIn() = syncStore.isSignedIn()
+    override suspend fun isSignedIn() = syncStore.isSignedIn()
 
-    override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
-        val thisDeviceId = syncStore.deviceId.orEmpty()
+    override suspend fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
+        val thisDeviceId = syncStore.getDeviceId().orEmpty()
         return when (val result = logout(thisDeviceId)) {
             is Error -> {
                 syncPixels.fireUserSwitchedLogoutError()
@@ -637,7 +637,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun performCreateAccount(): Result<Boolean> {
+    private suspend fun performCreateAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
         val account: AccountKeys = kotlin.runCatching {
             nativeLib.generateAccountKeys(userId = userId).also {
@@ -690,7 +690,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun performLogin(
+    private suspend fun performLogin(
         userId: String,
         deviceId: String,
         deviceName: String,
@@ -743,10 +743,10 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun performConnect(connectKeys: ConnectCode): Result<Boolean> {
-        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Connect Device: Error reading PK")
-        val userId = syncStore.userId ?: return Error(reason = "Connect Device: Error reading UserId")
-        val token = syncStore.token ?: return Error(reason = "Connect Device: Error token")
+    private suspend fun performConnect(connectKeys: ConnectCode): Result<Boolean> {
+        val primaryKey = syncStore.getPrimaryKey() ?: return Error(reason = "Connect Device: Error reading PK")
+        val userId = syncStore.getUserId() ?: return Error(reason = "Connect Device: Error reading UserId")
+        val token = syncStore.getToken() ?: return Error(reason = "Connect Device: Error token")
         val recoverKey = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey = primaryKey, userId = userId)))
         val seal = kotlin.runCatching {
             nativeLib.seal(recoverKey, connectKeys.secretKey)

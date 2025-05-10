@@ -30,9 +30,9 @@ import java.util.*
 import javax.inject.Inject
 
 interface SyncDeviceIds {
-    fun userId(): String
-    fun deviceName(): String
-    fun deviceId(): String
+    suspend fun userId(): String
+    suspend fun deviceName(): String
+    suspend fun deviceId(): String
     fun deviceType(): DeviceType
 }
 
@@ -43,8 +43,8 @@ constructor(
     private val syncStore: SyncStore,
     private val deviceInfo: DeviceInfo,
 ) : SyncDeviceIds {
-    override fun userId(): String {
-        var userId = syncStore.userId
+    override suspend fun userId(): String {
+        var userId = syncStore.getUserId()
         if (userId != null) return userId
 
         userId = UUID.randomUUID().toString()
@@ -52,8 +52,8 @@ constructor(
         return userId
     }
 
-    override fun deviceName(): String {
-        var deviceName = syncStore.deviceName
+    override suspend fun deviceName(): String {
+        var deviceName = syncStore.getDeviceName()
         if (deviceName != null) return deviceName
 
         deviceName = "${Build.BRAND} ${Build.MODEL}"
@@ -61,8 +61,8 @@ constructor(
     }
 
     @SuppressLint("HardwareIds")
-    override fun deviceId(): String {
-        var deviceId = syncStore.deviceId
+    override suspend fun deviceId(): String {
+        var deviceId = syncStore.getDeviceId()
         if (deviceId != null) return deviceId
 
         deviceId = UUID.randomUUID().toString()

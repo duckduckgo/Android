@@ -34,8 +34,8 @@ import timber.log.Timber
 
 interface SyncApiClient {
 
-    fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse>
-    fun get(
+    suspend fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse>
+    suspend fun get(
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse>
@@ -48,9 +48,9 @@ class AppSyncApiClient @Inject constructor(
     private val syncApiErrorRecorder: SyncApiErrorRecorder,
 ) : SyncApiClient {
 
-    override fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
+    override suspend fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
         val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
+            syncStore.getToken().takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
         if (changes.isEmpty()) {
@@ -76,18 +76,18 @@ class AppSyncApiClient @Inject constructor(
         }
     }
 
-    override fun get(
+    override suspend fun get(
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse> {
         val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
+            syncStore.getToken().takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
         return get(type, token, since)
     }
 
-    private fun get(
+    private suspend fun get(
         type: SyncableType,
         token: String,
         since: String,

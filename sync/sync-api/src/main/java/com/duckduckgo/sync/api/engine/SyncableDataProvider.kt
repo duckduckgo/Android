@@ -24,5 +24,5 @@ interface SyncableDataProvider {
      * since a specific time
      * This data that will be sent to the Sync API
      */
-    fun getChanges(): SyncChangesRequest
+    suspend fun getChanges(): SyncChangesRequest
 }

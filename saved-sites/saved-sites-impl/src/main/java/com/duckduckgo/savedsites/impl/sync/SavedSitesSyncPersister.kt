@@ -48,7 +48,7 @@ class SavedSitesSyncPersister @Inject constructor(
         }
     }
 
-    override fun onSuccess(
+    override suspend fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -80,7 +80,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncRepository.markSavedSitesAsInvalid(emptyList())
     }
 
-    fun process(
+    suspend fun process(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -120,7 +120,7 @@ class SavedSitesSyncPersister @Inject constructor(
         return SyncDataValidationResult.Success(response.bookmarks)
     }
 
-    private fun processEntries(
+    private suspend fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {

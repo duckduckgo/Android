@@ -67,7 +67,7 @@ class AutofillManagementStringBuilderImplTest {
         assertEquals("$DELETE_DIALOG_MESSAGE_1_SYNC_DISABLED_PLURAL $DELETE_DIALOG_MESSAGE_2_PLURAL", str)
     }
 
-    private fun configureSyncState(enabled: Boolean) {
+    private suspend fun configureSyncState(enabled: Boolean) {
         whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(enabled)
     }
 

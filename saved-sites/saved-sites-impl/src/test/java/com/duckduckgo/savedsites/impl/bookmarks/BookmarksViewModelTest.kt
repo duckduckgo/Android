@@ -111,6 +111,7 @@ class BookmarksViewModelTest {
     @Before
     fun before() = runTest {
         whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite)))
+        whenever(faviconsFetchingPrompt.shouldShow()).thenReturn(false)
 
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(

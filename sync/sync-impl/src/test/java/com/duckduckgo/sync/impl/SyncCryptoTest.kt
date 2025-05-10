@@ -26,6 +26,7 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_DECRYPT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_ENCRYPT
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -48,7 +49,7 @@ class SyncCryptoTest {
     }
 
     @Test(expected = java.lang.Exception::class)
-    fun whenEncryptFailsThenResultIsEmpty() {
+    fun whenEncryptFailsThenResultIsEmpty() = runTest {
         whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(1, "not encrypted"))
 
         val result = syncCrypto.encrypt("something")
@@ -59,7 +60,7 @@ class SyncCryptoTest {
     }
 
     @Test
-    fun whenEncryptSucceedsThenResultIsEncrypted() {
+    fun whenEncryptSucceedsThenResultIsEncrypted() = runTest {
         whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(0, "not encrypted"))
 
         val result = syncCrypto.encrypt("something")
@@ -70,7 +71,7 @@ class SyncCryptoTest {
     }
 
     @Test(expected = java.lang.Exception::class)
-    fun whenDecryptFailsThenResultIsEmpty() {
+    fun whenDecryptFailsThenResultIsEmpty() = runTest {
         whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(1, "not decrypted"))
 
         val result = syncCrypto.decrypt("something")
@@ -81,7 +82,7 @@ class SyncCryptoTest {
     }
 
     @Test
-    fun whenDecryptSucceedsThenResultIsDecrypted() {
+    fun whenDecryptSucceedsThenResultIsDecrypted() = runTest {
         whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(0, "not decrypted"))
 
         val result = syncCrypto.decrypt("something")
@@ -92,7 +93,7 @@ class SyncCryptoTest {
     }
 
     @Test
-    fun whenDataToDecryptIsEmptyThenResultIsEmpty() {
+    fun whenDataToDecryptIsEmptyThenResultIsEmpty() = runTest {
         val result = syncCrypto.decrypt("")
 
         verifyNoInteractions(recorder)
