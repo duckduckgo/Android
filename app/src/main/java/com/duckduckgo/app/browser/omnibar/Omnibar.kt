@@ -207,9 +207,12 @@ class Omnibar(
     private fun adjustCoordinatorLayoutBehaviorForBottomOmnibar() {
         removeAppBarBehavior(binding.autoCompleteSuggestionsList)
         removeAppBarBehavior(binding.focusedView)
-        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
 
         binding.browserLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = BottomOmnibarBrowserContainerLayoutBehavior()
+        }
+
+        binding.includeNewBrowserTab.newTabLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = BottomOmnibarBrowserContainerLayoutBehavior()
         }
     }
