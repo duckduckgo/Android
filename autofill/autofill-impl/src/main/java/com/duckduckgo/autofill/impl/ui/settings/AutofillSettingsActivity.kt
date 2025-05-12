@@ -214,30 +214,28 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun askToConfirmResetExcludedSites() {
-        this?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(R.string.autofillSettingsClearNeverForThisSiteDialogTitle)
-                .setMessage(R.string.autofillSettingsInstructionNeverForThisSite)
-                .setPositiveButton(R.string.autofillSettingsClearNeverForThisSiteDialogPositiveButton, DESTRUCTIVE)
-                .setNegativeButton(R.string.autofillSettingsClearNeverForThisSiteDialogNegativeButton, GHOST_ALT)
-                .setCancellable(true)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onResetExcludedSitesConfirmed()
-                        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.autofillSettingsClearNeverForThisSiteDialogTitle)
+            .setMessage(R.string.autofillSettingsInstructionNeverForThisSite)
+            .setPositiveButton(R.string.autofillSettingsClearNeverForThisSiteDialogPositiveButton, DESTRUCTIVE)
+            .setNegativeButton(R.string.autofillSettingsClearNeverForThisSiteDialogNegativeButton, GHOST_ALT)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onResetExcludedSitesConfirmed()
+                    }
 
-                        override fun onNegativeButtonClicked() {
-                            viewModel.onResetExcludedSitesCancelled()
-                        }
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onResetExcludedSitesCancelled()
+                    }
 
-                        override fun onDialogCancelled() {
-                            viewModel.onResetExcludedSitesCancelled()
-                        }
-                    },
-                )
-                .show()
-        }
+                    override fun onDialogCancelled() {
+                        viewModel.onResetExcludedSitesCancelled()
+                    }
+                },
+            )
+            .show()
     }
 
     companion object {
