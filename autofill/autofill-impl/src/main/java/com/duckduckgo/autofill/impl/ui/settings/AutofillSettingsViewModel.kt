@@ -90,18 +90,14 @@ class AutofillSettingsViewModel @Inject constructor(
 
     private fun onViewStateFlowStart() {
         viewModelScope.launch(dispatchers.io()) {
-            Timber.i("CRIS: startCredentialCountObserver")
             autofillStore.getCredentialCount().collect { count ->
-                Timber.i("CRIS: credential count collected $count")
                 _viewState.value = _viewState.value.copy(loginsCount = count)
             }
         }
 
         viewModelScope.launch(dispatchers.io()) {
-            Timber.i("CRIS: startNeverSavedSiteCountObserver")
             neverSavedSiteRepository.neverSaveListCount().map { count -> count > 0 }
                 .distinctUntilChanged().collect { canResetExcludedSites ->
-                    Timber.i("CRIS: canResetExcludedSites collected $canResetExcludedSites")
                     _viewState.value =
                         _viewState.value.copy(canResetExcludedSites = canResetExcludedSites)
                 }

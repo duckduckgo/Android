@@ -103,7 +103,6 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
                     val isAutofillAvailable = state.autofillUnsupported.not() && state.autofillDisabled.not()
                     binding.viewSwitcher.displayedChild = if (isAutofillAvailable) 0 else 1
                     if (isAutofillAvailable) {
-                        Timber.i("CRIS: AutofillSettingsViewModel state: $state")
                         binding.autofillAvailable.autofillEnabledToggle.quietlySetIsChecked(
                             state.autofillEnabled,
                             globalAutofillToggleListener,
