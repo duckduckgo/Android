@@ -29,7 +29,6 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Rule
@@ -37,7 +36,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
@@ -107,7 +105,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
-        feature.self().setRawStoredState(Toggle.State(settings="{\"disabledCMPs\": [\"MyCmp\"]}"))
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [\"MyCmp\"]}"))
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
@@ -122,7 +120,7 @@ class InitMessageHandlerPluginTest {
     fun whenProcessMessageResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
-        feature.self().setRawStoredState(Toggle.State(settings="{\"disabledCMPs\": []}"))
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -132,6 +130,7 @@ class InitMessageHandlerPluginTest {
         assertEquals("optOut", initResp!!.config.autoAction)
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
+        assertNotNull(initResp.rules.compact)
         assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
     }
