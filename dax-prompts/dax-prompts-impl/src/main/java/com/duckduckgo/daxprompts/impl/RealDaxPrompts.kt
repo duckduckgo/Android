@@ -17,6 +17,7 @@
 package com.duckduckgo.daxprompts.impl
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPrompts
@@ -39,6 +40,7 @@ class RealDaxPrompts @Inject constructor(
     private val reactivateUsersExperiment: ReactivateUsersExperiment,
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
 
@@ -73,6 +75,7 @@ class RealDaxPrompts @Inject constructor(
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
         val defaultBrowserAlready = defaultBrowserDetector.isDefaultBrowser()
-        !defaultBrowserAlready && daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+        val shouldShowDialog = defaultRoleBrowserDialog.shouldShowDialog()
+        !defaultBrowserAlready && shouldShowDialog && daxPromptsRepository.getDaxPromptsShowBrowserComparison()
     }
 }
