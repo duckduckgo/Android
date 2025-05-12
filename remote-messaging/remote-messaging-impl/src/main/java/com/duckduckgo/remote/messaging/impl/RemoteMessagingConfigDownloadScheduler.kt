@@ -72,6 +72,7 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
+    private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -79,10 +80,12 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     }
 
     override fun onPrivacyConfigDownloaded() {
-        appCoroutineScope.launch(context = dispatcherProvider.io()) {
-            Timber.d("RMF: onPrivacyConfigDownloaded, invalidating and re-downloading")
-            remoteMessagingConfigRepository.invalidate()
-            downloader.download()
+        if (remoteMessagingFeatureToggles.invalidateRMFAfterPrivacyConfigDownloaded().isEnabled()) {
+            appCoroutineScope.launch(context = dispatcherProvider.io()) {
+                Timber.d("RMF: onPrivacyConfigDownloaded, invalidating and re-downloading")
+                remoteMessagingConfigRepository.invalidate()
+                downloader.download()
+            }
         }
     }
 
