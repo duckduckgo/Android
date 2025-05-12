@@ -54,7 +54,7 @@ class BottomAppBarBehavior<V : View>(
     private val viewIDsExemptedFromForceOffset = setOf(
         R.id.webViewFullScreenContainer,
         R.id.browserLayout,
-        R.id.newTabLayout,
+        R.id.includeNewBrowserTab,
     )
 
     @SuppressLint("RestrictedApi")
