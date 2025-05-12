@@ -32,5 +32,5 @@ interface RemoteMessageModel {
 
     suspend fun onSecondaryActionClicked(remoteMessage: RemoteMessage): Action?
 
-    fun onActionClicked(remoteMessage: RemoteMessage): Action?
+    suspend fun onActionClicked(remoteMessage: RemoteMessage): Action?
 }

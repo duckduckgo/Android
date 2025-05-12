@@ -80,10 +80,11 @@ class RemoteMessagingModelTests {
     }
 
     @Test
-    fun onActionClickedThenPixelFired() = runTest {
+    fun onActionClickedThenPixelFiredAndMessageDismissed() = runTest {
         val action = testee.onActionClicked(remoteMessage)
 
         verify(remoteMessagingPixels).fireRemoteMessageActionClickedPixel(remoteMessage)
+        verify(remoteMessagingRepository).dismissMessage(remoteMessage.id)
         assertEquals(action, null)
     }
 }
