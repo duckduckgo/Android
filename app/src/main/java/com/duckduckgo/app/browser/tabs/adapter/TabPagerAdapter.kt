@@ -51,10 +51,6 @@ class TabPagerAdapter(
         }
     }
 
-    val currentFragment: BrowserTabFragment?
-        get() = fragmentManager.fragments
-            .filterIsInstance<BrowserTabFragment>()
-            .firstOrNull { it.tabId == getSelectedTabId() }
     override fun containsItem(itemId: Long) = tabs.any { it.tabId.hashCode().toLong() == itemId }
 
     override fun createFragment(position: Int): Fragment {

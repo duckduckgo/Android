@@ -179,7 +179,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
-                tabPagerAdapter.currentFragment
+                val selectedTabId = tabManager.getSelectedTabId()
+                supportFragmentManager.fragments
+                    .filterIsInstance<BrowserTabFragment>()
+                    .firstOrNull { it.tabId == selectedTabId }
             } else {
                 _currentTab
             }
