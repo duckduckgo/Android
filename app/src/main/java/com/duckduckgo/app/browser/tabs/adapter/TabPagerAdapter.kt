@@ -26,40 +26,39 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import timber.log.Timber
+import timber.log.Timber.Forest
 
 class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
-    private val fragmentManager: FragmentManager,
+    fragmentManager: FragmentManager,
     private val activityIntent: Intent?,
-    private val getTabById: (String) -> TabEntity?,
-    private val requestAndWaitForNewTab: () -> TabEntity,
-    private val getSelectedTabId: () -> String?,
     swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle, swipingTabsFeature) {
-    private val tabIds = mutableListOf<String>()
+    private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
 
-    override fun getItemCount() = tabIds.size
+    override fun getItemCount() = tabs.size
 
     override fun getItemId(position: Int): Long {
-        return if (position >= 0 && position < tabIds.size) {
-            tabIds[position].hashCode().toLong()
+        return if (position >= 0 && position < tabs.size) {
+            tabs[position].tabId.hashCode().toLong()
         } else {
             RecyclerView.NO_ID
         }
     }
 
-    override fun containsItem(itemId: Long) = tabIds.any { it.hashCode().toLong() == itemId }
-
     val currentFragment: BrowserTabFragment?
         get() = fragmentManager.fragments
             .filterIsInstance<BrowserTabFragment>()
             .firstOrNull { it.tabId == getSelectedTabId() }
+    override fun containsItem(itemId: Long) = tabs.any { it.tabId.hashCode().toLong() == itemId }
 
     override fun createFragment(position: Int): Fragment {
-        val tab = getTabById(tabIds[position]) ?: requestAndWaitForNewTab()
+        val tab = tabs[position]
         val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         return if (messageForNewFragment != null) {
@@ -69,6 +68,7 @@ class TabPagerAdapter(
                 this.messageFromPreviousTab = message
             }
         } else {
+            Timber.d("$$$ TABS creating fragment for ${tab.tabId} with url ${tab.url}")
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
         }
     }
@@ -78,16 +78,23 @@ class TabPagerAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun onTabsUpdated(newTabs: List<String>) {
-        val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabIds, newTabs))
-        diff.dispatchUpdatesTo(this)
-        tabIds.clear()
-        tabIds.addAll(newTabs)
+    fun onTabsUpdated(newTabs: List<TabModel>) {
+        if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
+            val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabs, newTabs))
+            Timber.d("$$$ TABS updated\nOLD: ${tabs.joinToString { it.tabId }}\nNEW: ${newTabs.joinToString { it.tabId }}")
+            tabs.clear()
+            tabs.addAll(newTabs)
+            diff.dispatchUpdatesTo(this)
+        } else {
+            Timber.d("$$$ TABS content updated\nOLD: ${tabs.joinToString { it.url.toString() }}\nNEW: ${newTabs.joinToString { it.url.toString() }}")
+            tabs.clear()
+            tabs.addAll(newTabs)
+        }
     }
 
     fun getTabIdAtPosition(position: Int): String? {
-        return if (position < tabIds.size) {
-            tabIds[position]
+        return if (position < tabs.size) {
+            tabs[position].tabId
         } else {
             null
         }

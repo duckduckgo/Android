@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -206,9 +207,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             fragmentManager = supportFragmentManager,
             lifecycleOwner = this,
             activityIntent = intent,
-            getSelectedTabId = tabManager::getSelectedTabId,
-            getTabById = ::getTabById,
-            requestAndWaitForNewTab = ::requestAndWaitForNewTab,
             swipingTabsFeature = swipingTabsFeature,
         )
     }
@@ -1004,14 +1002,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
-    }
-
-    private fun getTabById(tabId: String): TabEntity? = runBlocking {
-        return@runBlocking tabManager.getTabById(tabId)
-    }
-
-    private fun requestAndWaitForNewTab(): TabEntity = runBlocking {
-        return@runBlocking tabManager.requestAndWaitForNewTab()
     }
 
     fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
