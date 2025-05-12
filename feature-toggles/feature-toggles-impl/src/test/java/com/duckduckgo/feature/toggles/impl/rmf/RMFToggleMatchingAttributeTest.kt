@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.impl.rmf
 
+import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -38,6 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@SuppressLint("DenyListedApi")
 class RMFToggleMatchingAttributeTest {
 
     private lateinit var matcher: RMFToggleMatchingAttributePlugin
