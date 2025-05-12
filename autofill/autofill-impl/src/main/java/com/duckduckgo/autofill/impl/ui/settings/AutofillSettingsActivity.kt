@@ -55,7 +55,6 @@ import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillSettingsScreen::class)
