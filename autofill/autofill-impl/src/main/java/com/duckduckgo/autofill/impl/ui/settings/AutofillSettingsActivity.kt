@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.text.toSpanned
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -34,6 +35,8 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.AskToConfirmResetExcludedSites
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigatePasswordList
@@ -97,8 +100,9 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
-                    binding.viewSwitcher.displayedChild = if (state.autofillAvailable) 0 else 1
-                    if (state.autofillAvailable) {
+                    val isAutofillAvailable = state.autofillUnsupported.not() && state.autofillDisabled.not()
+                    binding.viewSwitcher.displayedChild = if (isAutofillAvailable) 0 else 1
+                    if (isAutofillAvailable) {
                         Timber.i("CRIS: AutofillSettingsViewModel state: $state")
                         binding.autofillAvailable.autofillEnabledToggle.quietlySetIsChecked(
                             state.autofillEnabled,
@@ -107,6 +111,12 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
                         binding.autofillAvailable.passwordsListItem.setSecondaryText(state.loginsCount.toString())
                         binding.autofillAvailable.excludedSitesSection.isVisible = state.canResetExcludedSites
                         binding.autofillAvailable.importPasswordsOption.isVisible = state.canImportFromGooglePasswords
+                    } else {
+                        if (state.autofillUnsupported) {
+                            showDeviceUnsupportedMode()
+                        } else if (state.autofillDisabled) {
+                            showDisabledMode()
+                        }
                     }
                 }
         }
@@ -137,6 +147,11 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.checkDeviceRequirements()
+    }
+
     private fun configureViewListeners() {
         binding.autofillAvailable.autofillEnabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
         binding.autofillAvailable.passwordsListItem.setOnClickListener {
@@ -150,6 +165,21 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         }
         binding.autofillAvailable.excludedSitesOption.setOnClickListener {
             viewModel.onResetExcludedSitesClicked()
+        }
+    }
+
+    private fun showDeviceUnsupportedMode() {
+        supportFragmentManager.commit {
+            supportFragmentManager.findFragmentByTag(TAG_UNSUPPORTED)?.let { remove(it) }
+            replace(binding.autofillUnsupported.fragmentContainerView.id, AutofillManagementDeviceUnsupportedMode.instance(), TAG_UNSUPPORTED)
+        }
+    }
+
+    private fun showDisabledMode() {
+        supportFragmentManager.commit {
+            supportFragmentManager.findFragmentByTag(TAG_DISABLED)?.let { remove(it) }
+
+            replace(binding.autofillUnsupported.fragmentContainerView.id, AutofillManagementDisabledMode.instance(), TAG_DISABLED)
         }
     }
 
@@ -216,5 +246,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         private const val LEARN_MORE_LINK =
             "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/"
         private const val IMPORT_FROM_GPM_DIALOG_TAG = "IMPORT_FROM_GPM_DIALOG_TAG"
+        private const val TAG_DISABLED = "tag_fragment_disabled"
+        private const val TAG_UNSUPPORTED = "tag_fragment_unsupported"
     }
 }
