@@ -394,6 +394,9 @@
     <!-- The color of the cursor comes from the theme, not the widget itself -->
     <style name="Widget.DuckDuckGo.TextInputCursor">
         <item name="android:colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="android:colorPrimary">?attr/daxColorAccentBlue</item>
+        <item name="colorPrimary">?attr/daxColorAccentBlue</item>
     </style>
 
     <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
