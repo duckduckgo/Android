@@ -45,7 +45,7 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            visualDesignExperimentDataStore.experimentState.value.isEnabled,
+            visualDesignExperimentDataStore.isExperimentEnabled.value,
         )
     }
 

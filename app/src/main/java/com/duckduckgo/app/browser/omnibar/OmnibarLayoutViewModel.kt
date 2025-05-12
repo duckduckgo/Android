@@ -101,17 +101,17 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentDataStore.experimentState,
+        visualDesignExperimentDataStore.isExperimentEnabled,
         duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, visualDesignExperiment, showInAddressBar ->
+    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isVisualDesignExperimentEnabled = visualDesignExperiment.isEnabled,
+            isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || visualDesignExperiment.isEnabled),
+                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || isVisualDesignExperimentEnabled),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
 

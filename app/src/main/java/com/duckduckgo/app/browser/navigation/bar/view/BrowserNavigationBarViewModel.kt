@@ -66,10 +66,10 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _viewState.asStateFlow(),
         isCustomTab,
         tabRepository.flowTabs,
-        visualDesignExperimentDataStore.navigationBarState,
-    ) { state, isCustomTab, tabs, navigationBarState ->
+        visualDesignExperimentDataStore.isExperimentEnabled,
+    ) { state, isCustomTab, tabs, isExperimentEnabled ->
         state.copy(
-            isVisible = navigationBarState.isEnabled && !isCustomTab,
+            isVisible = isExperimentEnabled && !isCustomTab,
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
         )
