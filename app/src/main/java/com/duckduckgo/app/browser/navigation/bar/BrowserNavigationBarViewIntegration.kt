@@ -116,13 +116,8 @@ class BrowserNavigationBarViewIntegration(
         canScrollDown: Boolean,
         topOfPage: Boolean,
     ) {
-        val shouldShowShadows = (canScrollUp || canScrollDown) && !topOfPage
         if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-            if (shouldShowShadows) {
-                navigationBarView.showShadow(true)
-            } else {
-                navigationBarView.showShadow(false)
-            }
+            navigationBarView.showShadow(canScrollDown)
         }
     }
 }
