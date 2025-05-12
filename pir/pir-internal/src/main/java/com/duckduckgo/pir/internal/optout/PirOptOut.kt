@@ -27,8 +27,8 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJob
+import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
@@ -137,7 +137,7 @@ class RealPirOptOut @Inject constructor(
         logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
 
         runners.add(
-            pirActionsRunnerFactory.createInstance(
+            pirActionsRunnerFactory.create(
                 webView.context,
                 pirCssScriptLoader.getScript(),
                 OPTOUT,
@@ -190,7 +190,7 @@ class RealPirOptOut @Inject constructor(
         var createCount = 0
         while (createCount != maxWebViewCount) {
             runners.add(
-                pirActionsRunnerFactory.createInstance(
+                pirActionsRunnerFactory.create(
                     context,
                     script,
                     OPTOUT,

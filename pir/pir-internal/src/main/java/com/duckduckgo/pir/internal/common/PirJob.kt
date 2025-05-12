@@ -41,4 +41,10 @@ abstract class PirJob(private val callbacks: PluginPoint<PirCallbacks>) {
             it.onPirJobStopped()
         }
     }
+
+    enum class RunType {
+        MANUAL,
+        SCHEDULED,
+        OPTOUT,
+    }
 }
