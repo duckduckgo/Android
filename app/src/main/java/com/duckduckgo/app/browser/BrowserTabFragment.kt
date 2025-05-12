@@ -2649,10 +2649,18 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
-            if (omnibar.isOutlineShown()) {
+        newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+
+            // Check if it can scroll up
+            val canScrollUp = v.canScrollVertically(-1)
+            val canScrollDown = v.canScrollVertically(1)
+            val topOfPage = scrollY == 0
+
+            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
+            browserNavigationBarIntegration.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 
