@@ -18,6 +18,7 @@ package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -26,6 +27,7 @@ import com.duckduckgo.common.utils.sha256
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CoroutineScope
@@ -52,21 +54,20 @@ interface BrokenSiteReportRepository {
     suspend fun setNextShownDate(nextShownDate: LocalDateTime?)
     suspend fun getNextShownDate(): LocalDateTime?
 
-    suspend fun incrementDismissStreak()
-    suspend fun getDismissStreak(): Int
-    suspend fun resetDismissStreak()
+    suspend fun addDismissal(dismissal: LocalDateTime)
+    suspend fun clearAllDismissals()
+    suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 
-    fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
-    fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
+    fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern>
 }
 
 class RealBrokenSiteReportRepository(
     private val database: BrokenSiteDatabase,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val brokenSitePromptDataStore: BrokenSitePomptDataStore,
-    private val brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
+    private val brokenSitePromptDataStore: BrokenSitePromptDataStore,
+    private val brokenSiteRefreshesInMemoryStore: BrokenSiteRefreshesInMemoryStore,
 ) : BrokenSiteReportRepository {
 
     override suspend fun getLastSentDay(hostname: String): String? {
@@ -96,6 +97,7 @@ class RealBrokenSiteReportRepository(
         coroutineScope.launch(dispatcherProvider.io()) {
             val expiryTime = getUTCDate30DaysAgo()
             database.brokenSiteDao().deleteAllExpiredReports(expiryTime)
+            brokenSitePromptDataStore.deleteAllExpiredDismissals(expiryTime, ZoneId.systemDefault())
         }
     }
 
@@ -130,37 +132,32 @@ class RealBrokenSiteReportRepository(
         setCoolDownDays(coolDownDays.toLong())
     }
 
-    override suspend fun resetDismissStreak() {
-        brokenSitePromptDataStore.setDismissStreak(0)
-    }
-
     override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
-    }
-
-    override suspend fun getDismissStreak(): Int {
-        return brokenSitePromptDataStore.getDismissStreak()
     }
 
     override suspend fun getNextShownDate(): LocalDateTime? {
         return brokenSitePromptDataStore.getNextShownDate()
     }
 
-    override suspend fun incrementDismissStreak() {
-        val dismissCount = getDismissStreak()
-        brokenSitePromptDataStore.setDismissStreak(dismissCount + 1)
+    override suspend fun addDismissal(dismissal: LocalDateTime) {
+        brokenSitePromptDataStore.addDismissal(dismissal)
     }
 
-    override fun resetRefreshCount() {
-        brokenSitePromptInMemoryStore.resetRefreshCount()
+    override suspend fun clearAllDismissals() {
+        brokenSitePromptDataStore.clearAllDismissals()
+    }
+
+    override suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
+        return brokenSitePromptDataStore.getDismissalCountBetween(t1, t2)
     }
 
     override fun addRefresh(url: Uri, localDateTime: LocalDateTime) {
-        brokenSitePromptInMemoryStore.addRefresh(url, localDateTime)
+        brokenSiteRefreshesInMemoryStore.addRefresh(url, localDateTime)
     }
 
-    override fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
-        return brokenSitePromptInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)
+    override fun getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
+        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime)
     }
 
     private fun convertToShortDate(dateString: String): String {

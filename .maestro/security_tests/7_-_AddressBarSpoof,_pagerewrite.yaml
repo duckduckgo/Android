@@ -7,13 +7,13 @@ tags:
       commands:
             - launchApp:
                 clearState: true
-            - runFlow: ../shared/pre_onboarding.yaml
+            - runFlow: ../shared/skip_all_onboarding.yaml
             # Test 1
             - doubleTapOn:
                 id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"
             - pressKey: Enter
-            - tapOn: "Got It"
+
             - tapOn: "Start"
             # Now check the address bar hasn't been updated too early resulting in spoofed content
             - copyTextFrom:

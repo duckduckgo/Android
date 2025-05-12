@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s включена</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s выключена</string>
     <string name="undoSnackbarAction">Отменить</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">трекер заблокирован</item>
+        <item quantity="few">трекера заблокировано</item>
+        <item quantity="many">трекеров заблокировано</item>
+        <item quantity="other">трекера заблокировано</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Загрузить изображение</string>
@@ -84,7 +91,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактировать запрос перед поиском</string>
-    <string name="settingsAutocompleteEnabled">Показать предложения автозаполнения</string>
     <string name="autocompleteRemoveItemTitle">Удалить поисковую рекомендацию?</string>
     <string name="autocompleteRemoveItemCancel">Отменить</string>
     <string name="autocompleteRemoveItemRemove">Удалить</string>
@@ -114,6 +120,11 @@
     <string name="tabSwitcherListViewMenu">В виде списка</string>
     <string name="tabSwitcherGridViewMenu">В виде сетки</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Заблокировано трекеров: %1$s&lt;/b&gt; (за последние 7 дней)</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Заблокировано трекеров: %1$s &lt;/b&gt;</string>
+    <string name="inTheLast7Days">за последние 7 дней</string>
+
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
@@ -123,18 +134,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
-    <string name="settingsHeadingPrivacy">Конфиденциальность</string>
     <string name="settingsHeadingProtections">Средства защиты</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
-    <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
     <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
-    <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
-    <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>
     <string name="settingsHeadingNextSteps">Дальнейшие шаги</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
@@ -150,18 +157,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Отключено</string>
     <string name="settingsSubtitleNotificationsEnabled">Включено</string>
     <string name="settingsDefaultBrowserTitle">Браузер по умолчанию</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
     <string name="settingsPrivateSearchTitle">Частный поиск</string>
     <string name="settingsGeneral" instruction="List item for general settings">Общие настройки</string>
-    <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
-    <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsHeadingMainSettings">Прочие настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
-    <string name="settingsFireButton">Кнопка «Тревога»</string>
     <string name="settingsDataClearing">Очистка данных</string>
     <string name="settingsAddWidget">Добавьте виджет на домашний экран</string>
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
@@ -170,9 +171,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
-    <string name="privateSearchTitle">Включена система Private Search</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки.</string>
-    <string name="privateSearchHeadingSearchSettings">Настройки поиска</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
     <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
@@ -190,15 +189,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Включена защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
-    <string name="cookiePopupProtectionDescription">Избавьтесь от надоедливых окон и принимайте только минимум куки-файлов</string>
-    <string name="cookiePopupProtectionEnabled">Включено</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
@@ -213,7 +208,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
 
-    <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearData">Автоудаление данных...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
@@ -601,11 +595,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Виджет %1$s добавлен на главный экран</string>
-    <string name="settingsAddHomeScreenWidget">Виджет для главного экрана</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Mac</string>
-    <string name="macos_settings_title">Браузер DuckDuckGo для Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Загрузки</string>
@@ -641,7 +632,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Нет, я буду управлять ими самостоятельно</string>
 
-    <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
@@ -650,19 +640,108 @@
     <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Браузер DuckDuckGo для Windows</string>
-    <string name="windows_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Windows</string>
-    <string name="windows_settings_description_ready">Готово к загрузке</string>
-    <string name="windows_settings_description_list">Теперь вы в списке!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Закрыть все вкладки?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Вы точно хотите закрыть все вкладки?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
     <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
+
+    <string name="selectTabsMenuItem">Выберите вкладки</string>
+    <string name="selectAllTabsMenuItem">Выбрать все</string>
+    <string name="deselectAllTabsMenuItem">Снять выделение всех элементов</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Выбрано: %1$d</string>
+    <string name="tabSelectedIndicator">Указатель выбранной вкладки</string>
+    <string name="tabNotSelectedIndicator">Указатель невыбранной вкладки</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Ссылок из DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Поделиться ссылкой</item>
+        <item quantity="few">Поделиться %1$d ссылками</item>
+        <item quantity="many">Поделиться %1$d ссылками</item>
+        <item quantity="other">Поделиться ссылками (%1$d)</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Добавить выбранную вкладку в закладки?</item>
+        <item quantity="few">Добавить %1$d вкладки в закладки?</item>
+        <item quantity="many">Добавить %1$d вкладок в закладки?</item>
+        <item quantity="other">Добавить вкладки в закладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закладка добавлена</item>
+        <item quantity="few">Добавлено %1$d закладки</item>
+        <item quantity="many">Добавлено %1$d закладок</item>
+        <item quantity="other">Закладки добавлены (%1$d)</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Добавить в закладки</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Сохранить вкладку</item>
+        <item quantity="few">Сохранить %1$d вкладки</item>
+        <item quantity="many">Сохранить %1$d вкладок</item>
+        <item quantity="other">Сохранить вкладки (%1$d)</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Существующие закладки дублироваться не будут.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку?</item>
+        <item quantity="few">Закрыть все %1$d вкладки?</item>
+        <item quantity="many">Закрыть все %1$d вкладок?</item>
+        <item quantity="other">Закрыть все вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть другую вкладку?</item>
+        <item quantity="few">Закрыть еще %1$d вкладки?</item>
+        <item quantity="many">Закрыть еще %1$d вкладок?</item>
+        <item quantity="other">Закрыть остальные вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку?</item>
+        <item quantity="few">Закрыть %1$d вкладки?</item>
+        <item quantity="many">Закрыть %1$d вкладок?</item>
+        <item quantity="other">Закрыть вкладки (%1$d)?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Вы точно хотите закрыть эту вкладку?</item>
+        <item quantity="few">Вы точно хотите закрыть все вкладки?</item>
+        <item quantity="many">Вы точно хотите закрыть все вкладки?</item>
+        <item quantity="other">Вы точно хотите закрыть все вкладки?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Действительно закрыть эту вкладку?</item>
+        <item quantity="few">Действительно закрыть эти вкладки?</item>
+        <item quantity="many">Действительно закрыть эти вкладки?</item>
+        <item quantity="other">Действительно закрыть эти вкладки?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку</item>
+        <item quantity="few">Закрыть вкладки</item>
+        <item quantity="many">Закрыть вкладки</item>
+        <item quantity="other">Закрыть вкладки</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Закрыть вкладку</item>
+        <item quantity="few">Закрыть %1$d вкладки</item>
+        <item quantity="many">Закрыть %1$d вкладок</item>
+        <item quantity="other">Закрыть вкладки (%1$d)</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Закрыть остальные вкладки</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Вкладка закрыта</item>
+        <item quantity="few">Закрыто %1$d вкладки</item>
+        <item quantity="many">Закрыто %1$d вкладок</item>
+        <item quantity="other">Вкладки закрыты (%1$d)</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 вкладка</item>
+        <item quantity="few">%1$d вкладки</item>
+        <item quantity="many">%1$d вкладок</item>
+        <item quantity="other">Вкладок: %1$d</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавить опцию «Частный голосовой поиск» в адресную строку. Ваш голосовой запрос не сохраняется и никуда не передается, даже в DuckDuckGo.</string>
@@ -679,7 +758,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отменить</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автозаполнение</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
@@ -777,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Дай пять!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Попробовать</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропустить</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Мы уже это проходили</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Понятно. Тогда мы пропустим остальные советы.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Напоминаем: с помощью кнопки <b>Fire Button</b> 🔥 можно за пару нажатий закрыть все вкладки, а также стереть историю и скопившиеся в браузере данные.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Показать руководство</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
@@ -800,5 +882,26 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Оставайтесь под защитой DuckDuckGo большую часть времени, проводимого в Интернете</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Сделайте его браузером по умолчанию, чтобы все ссылки на сайты открывались в DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Не сейчас</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Для безопасности просмотра DuckDuckGo блокирует трекеры</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">В результате закрытия вкладок и очистки данных также будет удалена история блокировки трекеров, а их счетчик будет сброшен до нуля.\n\nЭтот баннер на вкладках можно при желании скрыть.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скрыть баннер</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу: возможно, она распространяет вредоносное ПО для взлома устройств или кражи личной информации.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Возможно, это лишь имитация настоящего сайта, созданная с целью собрать ваши данные (например, пароли и номера платежных карт) обманным путем.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу. Есть подозрение, она работает с целью убедить посетителей перевести деньги, купить поддельные товары или установить вредоносное ПО под ложным предлогом.\n<a href=\"\">Подробнее...</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Покинуть сайт</string>
+    <string name="maliciousSiteAdvancedCTA">Дополнительно</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Если вы уверены в безопасности этого сайта, можете <a href=\"\">сообщить нам об ошибке</a>. Решив посетить его, вы принимаете на себя все связанные с этим риски.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Принять риск и перейти на сайт</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Сайт не вредоносный</string>
+    <string name="maliciousSiteLearnMoreTitle">Подробнее</string>
+    <string name="maliciousSiteSettingTitle">Предупреждения о безопасности на сайте</string>
+    <string name="maliciousSiteToggleHint">Предупреждать о вредоносных и фишинговых сайтах</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Отключение этой функции может поставить ваши данные под угрозу.</string>
 
 </resources>

@@ -25,7 +25,7 @@ import okio.ByteString.Companion.decodeBase64
 
 class DataUriParser @Inject constructor() {
 
-    fun generate(url: String): ParseResult {
+    fun generate(url: String, fileName: String? = null): ParseResult {
         val offset = url.indexOf(',')
         if (offset == -1) {
             return ParseResult.Invalid
@@ -47,17 +47,19 @@ class DataUriParser @Inject constructor() {
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
 
         val suffix = parseSuffix(mimeType, url, data)
-        val filename = UUID.randomUUID().toString()
+        val filename = fileName ?: UUID.randomUUID().toString()
         val generatedFilename = GeneratedFilename(name = filename, fileType = suffix)
 
         return ParsedDataUri(fileTypeGeneral, fileTypeSpecific, data, mimeType, generatedFilename)
     }
 
     private fun parseSuffix(mimeType: String, url: String, data: String): String {
-        // MimeTypeMap returns the wrong value for "jpeg" types on some OS versions.
-        if (mimeType == "image/jpeg") return "jpg"
+        val baseMimeType = mimeType.substringBefore(';')
 
-        if ((mimeType == "text/plain" || mimeType == "application/octet-stream") && url.contains("base64", ignoreCase = true)) {
+        // MimeTypeMap returns the wrong value for "jpeg" types on some OS versions.
+        if (baseMimeType == "image/jpeg") return "jpg"
+
+        if ((baseMimeType == "text/plain" || baseMimeType == "application/octet-stream") && url.contains("base64", ignoreCase = true)) {
             val dataPart = data.take(if (data.length > MAX_LENGTH_FOR_MIME_TYPE_DETECTION) MAX_LENGTH_FOR_MIME_TYPE_DETECTION else data.length)
             val suffix = determineSuffixFromUrlPart(dataPart)
             if (suffix != null) {
@@ -65,7 +67,7 @@ class DataUriParser @Inject constructor() {
             }
         }
 
-        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(baseMimeType) ?: ""
     }
 
     private fun determineSuffixFromUrlPart(dataPart: String): String? {

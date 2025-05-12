@@ -16,14 +16,16 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.snackbar.Snackbar
 
 /*
  * This custom behavior prevents the top omnibar from hiding everywhere except for the browser view (i.e. the autocomplete suggestions)
@@ -33,8 +35,20 @@ class TopAppBarBehavior(
     private val omnibar: OmnibarBehaviour,
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
+
+    private companion object {
+        private val viewsExemptedFromOffset = setOf(
+            R.id.browserLayout,
+            R.id.webViewFullScreenContainer,
+            R.id.navigationBar,
+        )
+    }
+
+    @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(parent: CoordinatorLayout, child: AppBarLayout, dependency: View): Boolean {
-        if (dependency.id != R.id.browserLayout && dependency.id != R.id.webViewFullScreenContainer) {
+        if (dependency is Snackbar.SnackbarLayout) {
+            updateSnackbar(child, dependency)
+        } else if (!viewsExemptedFromOffset.contains(dependency.id)) {
             offsetBottomByToolbar(dependency)
         }
 
@@ -57,12 +71,33 @@ class TopAppBarBehavior(
         }
     }
 
-    private fun offsetBottomByToolbar(view: View?) {
-        if (view?.layoutParams is MarginLayoutParams) {
-            view.updateLayoutParams<MarginLayoutParams> {
-                this.bottomMargin = omnibar.measuredHeight()
+    @SuppressLint("RestrictedApi")
+    private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
+        if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
+            val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
+
+            params.anchorId = R.id.navigationBar
+            params.anchorGravity = Gravity.TOP
+            params.gravity = Gravity.TOP
+            snackbarLayout.layoutParams = params
+
+            // add a padding to the snackbar to avoid it touching the anchor view
+            if (snackbarLayout.translationY == 0f) {
+                snackbarLayout.translationY -= child.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
             }
-            view.requestLayout()
+        }
+    }
+
+    private fun offsetBottomByToolbar(view: View?) {
+        val omnibarHeight = omnibar.measuredHeight()
+        if (omnibarHeight > 0 && view is View && view.layoutParams is MarginLayoutParams) {
+            val layoutParams = view.layoutParams as MarginLayoutParams
+            if (layoutParams.bottomMargin != omnibarHeight) {
+                layoutParams.bottomMargin = omnibarHeight
+                view.postOnAnimation {
+                    view.requestLayout()
+                }
+            }
         }
     }
 }

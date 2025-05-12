@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:text="Secondary Large"
             app:daxButtonSize="large"
-            app:icon="@drawable/ic_arrow_down_24" />
+            app:icon="@drawable/ic_arrow_left_24" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/dax_button_secondary_disabled"
@@ -118,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Destructive Small"
-            app:icon="@drawable/ic_library_16" />
+            app:icon="@drawable/ic_bookmarks_16" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
             android:id="@+id/dax_button_destructive_large"
@@ -167,7 +167,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ghost Large"
-            app:icon="@drawable/ic_globe_gray_16dp"
+            app:icon="@drawable/ic_globe_16"
             app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost

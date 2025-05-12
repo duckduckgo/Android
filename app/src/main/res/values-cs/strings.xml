@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí vypnutá pro %1$s</string>
     <string name="undoSnackbarAction">Vrátit</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tracker je zablokovaný</item>
+        <item quantity="few">Trackery jsou zablokované</item>
+        <item quantity="many">Trackery jsou zablokované</item>
+        <item quantity="other">Trackery jsou zablokované</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
@@ -84,7 +91,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
-    <string name="settingsAutocompleteEnabled">Zobrazit návrhy automatického doplňování</string>
     <string name="autocompleteRemoveItemTitle">Odebrat návrh vyhledávání?</string>
     <string name="autocompleteRemoveItemCancel">Zrušit</string>
     <string name="autocompleteRemoveItemRemove">Odstranit</string>
@@ -114,6 +120,11 @@
     <string name="tabSwitcherListViewMenu">Zobrazení seznamu</string>
     <string name="tabSwitcherGridViewMenu">Zobrazení mřížky</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Zablokovaných trackerů: %1$s&lt;/b&gt; za posledních 7 dní</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Zablokovaných trackerů: %1$s&lt;/b&gt;</string>
+    <string name="inTheLast7Days">za posledních 7 dní</string>
+
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Vymazat všechny karty a data</string>
@@ -123,18 +134,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
-    <string name="settingsHeadingPrivacy">Soukromí</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
-    <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
     <string name="leaveFeedbackNew">Odeslat zpětnou vazbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
-    <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
-    <string name="settingsHeadingMore">Další od DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Další kroky</string>
     <string name="settingsLightTheme">Světlo</string>
     <string name="settingsTheme">Barevný motiv</string>
@@ -150,18 +157,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Zakázáno</string>
     <string name="settingsSubtitleNotificationsEnabled">Povoleno</string>
     <string name="settingsDefaultBrowserTitle">Výchozí prohlížeč</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvůj výchozí prohlížeč</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nastav si DuckDuckGo jako výchozí prohlížeč</string>
     <string name="settingsPrivateSearchTitle">Soukromé vyhledávání</string>
     <string name="settingsGeneral" instruction="List item for general settings">Obecné</string>
-    <string name="settingsPrivateSearchDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
-    <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
-    <string name="settingsHeadingSettings">Nastavení</string>
     <string name="settingsHeadingMainSettings">Další nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Vymazání dat</string>
     <string name="settingsAddWidget">Přidat widget na domovskou obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
@@ -170,9 +171,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Soukromé vyhledávání</string>
-    <string name="privateSearchTitle">Soukromé vyhledávání je povolené</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je tvůj výchozí vyhledávač, takže můžeš hledat na webu, aniž by tě někdo sledoval.</string>
-    <string name="privateSearchHeadingSearchSettings">Nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
@@ -190,15 +189,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Ochrana před sledováním na webu je povolená</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
-    <string name="cookiePopupProtectionDescription">Zakaž tato vyskakovací okna a omez soubory cookie na nezbytné minimum</string>
-    <string name="cookiePopupProtectionEnabled">Povoleno</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -213,16 +208,15 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearData">Automaticky vymazat data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat dne…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Pouze ukončení aplikace</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihned po ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
@@ -601,11 +595,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Na plochu se přidal widget %1$s</string>
-    <string name="settingsAddHomeScreenWidget">Widget na plochu</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Zajisti si soukromí při prohlížení webu – v naší aplikaci pro Mac</string>
-    <string name="macos_settings_title">Prohlížeč DuckDuckGo pro Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stahování</string>
@@ -641,7 +632,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, já se o ně postarám</string>
 
-    <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>
     <string name="autoconsentManagedNoticeAnimationText">O cookies je postaráno!</string>
 
@@ -650,19 +640,108 @@
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Prohlížeč DuckDuckGo pro Windows</string>
-    <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
-    <string name="windows_settings_description_ready">Ke stažení</string>
-    <string name="windows_settings_description_list">Jsi na seznamu!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Přetažením dolů z horní části a klepnutím na tlačítko zpět ukončíš zobrazení na celou obrazovku</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zavřít všechny karty?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Opravdu chceš zavřít všechny karty?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Zrušit</string>
     <string name="closeAppTabsConfirmationDialogClose">Zavřít</string>
+
+    <string name="selectTabsMenuItem">Vybrat karty</string>
+    <string name="selectAllTabsMenuItem">Vybrat vše</string>
+    <string name="deselectAllTabsMenuItem">Zrušit výběr všeho</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">Vybráno: %1$d</string>
+    <string name="tabSelectedIndicator">Indikátor vybrané karty</string>
+    <string name="tabNotSelectedIndicator">Indikátor nevybrané karty</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">Odkazů z DuckDuckGo: %1$d</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sdílet odkaz</item>
+        <item quantity="few">Sdílet %1$d odkazy</item>
+        <item quantity="many">Sdílet %1$d odkazu</item>
+        <item quantity="other">Sdílet %1$d odkazů</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Přidat vybranou kartu do záložek?</item>
+        <item quantity="few">Přidat %1$d karty do záložek?</item>
+        <item quantity="many">Přidat %1$d karty do záložek?</item>
+        <item quantity="other">Přidat %1$d karet do záložek?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Záložku jsme přidali</item>
+        <item quantity="few">Přidali jsme %1$d záložky</item>
+        <item quantity="many">Přidali jsme %1$d záložky</item>
+        <item quantity="other">Přidali jsme %1$d záložek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Záložka</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Přidat kartu do záložek</item>
+        <item quantity="few">Přidat %1$d karty do záložek</item>
+        <item quantity="many">Přidat %1$d karty do záložek</item>
+        <item quantity="other">Přidat %1$d karet do záložek</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Existující záložky nebudou duplikovány.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu?</item>
+        <item quantity="few">Zavřít %1$d karty?</item>
+        <item quantity="many">Zavřít všech %1$d karet?</item>
+        <item quantity="other">Zavřít všech %1$d karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít další kartu?</item>
+        <item quantity="few">Zavřít %1$d další karty?</item>
+        <item quantity="many">Zavřít %1$d další karty?</item>
+        <item quantity="other">Zavřít %1$d dalších karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu?</item>
+        <item quantity="few">Zavřít %1$d karty?</item>
+        <item quantity="many">Zavřít %1$d karty?</item>
+        <item quantity="other">Zavřít %1$d karet?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Opravdu chceš zavřít tuhle kartu?</item>
+        <item quantity="few">Opravdu chceš zavřít všechny karty?</item>
+        <item quantity="many">Opravdu chceš zavřít všechny karty?</item>
+        <item quantity="other">Opravdu chceš zavřít všechny karty?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Opravdu chceš tuhle kartu zavřít?</item>
+        <item quantity="few">Opravdu chceš tyhle karty zavřít?</item>
+        <item quantity="many">Opravdu chceš tyhle karty zavřít?</item>
+        <item quantity="other">Opravdu chceš tyhle karty zavřít?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu</item>
+        <item quantity="few">Zavřít karty</item>
+        <item quantity="many">Zavřít karty</item>
+        <item quantity="other">Zavřít karty</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Zavřít kartu</item>
+        <item quantity="few">Zavřít %1$d karty</item>
+        <item quantity="many">Zavřít %1$d karty</item>
+        <item quantity="other">Zavřít %1$d karet</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Zavřít další karty</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Karta zavřena</item>
+        <item quantity="few">%1$d karty zavřeny</item>
+        <item quantity="many">%1$d karty zavřeno</item>
+        <item quantity="other">%1$d karet zavřeno</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 karta</item>
+        <item quantity="few">%1$d karty</item>
+        <item quantity="many">%1$d karty</item>
+        <item quantity="other">%1$d karet</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>
@@ -679,7 +758,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Zrušit</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Hesla</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Hesla a automatické vyplňování</string>
     <string name="autofillLoginSavedSnackbarMessage">Heslo je uložené</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Heslo je aktualizované</string>
@@ -777,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Plácnutí!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
@@ -800,5 +882,26 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Používej DuckDuckGo a získej větší ochranu při prohlížení internetu</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás jako výchozí prohlížeč, aby se všechny odkazy na stránky otevíraly v DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Teď ne</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Služba DuckDuckGo blokuje trackery, aby tě chránila při prohlížení</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazáním panelů a dat smažeš historii blokování trackerů a resetuješ údaj o nich na nulu.\n\nPokud tenhle banner v zobrazení panelů už nechceš vidět, můžeš ho skrýt.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrýt banner</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Pozor: Tahle stránka může představovat bezpečnostní riziko</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[Služba DuckDuckGo tuhle stránku zablokovala, protože může šířit malware, jehož cílem je narušit zabezpečení zařízení nebo odcizit osobní údaje.\n<a href=\"\">Přečti si víc</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Tahle webová stránka se může vydávat za legitimní web, aby tě přiměla k poskytnutí osobních údajů, jako jsou hesla nebo čísla kreditních karet.\n<a href=\"\">Přečti si víc</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Služba DuckDuckGo zablokovala tuto stránku, protože se tě může pokoušet pod falešnými záminkami přimět k převodu peněz, nákupu padělaného zboží nebo instalaci malwaru.\n<a href=\"\">Přečti si víc</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Opustit tuhle stránku</string>
+    <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Pokud věříš, že je tahle stránka bezpečná, můžeš <a href=\"\">nahlásit chybu</a>. Můžeš taky stránku navštívit na vlastní nebezpečí.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Přijmout riziko a přejít na stránku</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Nahlásit web, který byl nesprávně označený jako škodlivý.</string>
+    <string name="maliciousSiteLearnMoreTitle">Více informací</string>
+    <string name="maliciousSiteSettingTitle">Upozornění na nebezpečný web</string>
+    <string name="maliciousSiteToggleHint">Chci upozornit na weby nahlášené kvůli phishingu nebo malwaru</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Vypnutím téhle funkce můžeš svoje údaje vystavit riziku.</string>
 
 </resources>

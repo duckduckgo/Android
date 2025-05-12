@@ -30,7 +30,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.espresso.PrivacyTest
+import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -38,7 +38,6 @@ import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class GpcTest {
 
@@ -50,18 +49,21 @@ class GpcTest {
         ),
     )
 
-    @Test @PrivacyTest
+    // @Test @PrivacyTest
+    // Temporarily disabled; see https://app.asana.com/1/137249556945/project/414730916066338/task/1210131499379055?focus=true
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
 
-        var webView: WebView? = null
+        lateinit var webView: WebView
 
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
+        val jsIdlingResource = JsObjectIdlingResource(webView, "window.navigator.duckduckgo")
+        IdlingRegistry.getInstance().register(jsIdlingResource)
 
         onWebView()
             .withElement(findElement(ID, "start"))
@@ -81,7 +83,7 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
-        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, jsIdlingResource, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {

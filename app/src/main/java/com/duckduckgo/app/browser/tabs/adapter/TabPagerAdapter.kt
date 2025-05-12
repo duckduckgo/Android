@@ -23,9 +23,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
@@ -34,13 +36,20 @@ class TabPagerAdapter(
     private val getTabById: (String) -> TabEntity?,
     private val requestAndWaitForNewTab: () -> TabEntity,
     private val getSelectedTabId: () -> String?,
-) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle) {
+    swipingTabsFeature: SwipingTabsFeatureProvider,
+) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle, swipingTabsFeature) {
     private val tabIds = mutableListOf<String>()
     private var messageForNewFragment: Message? = null
 
     override fun getItemCount() = tabIds.size
 
-    override fun getItemId(position: Int) = tabIds[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long {
+        return if (position >= 0 && position < tabIds.size) {
+            tabIds[position].hashCode().toLong()
+        } else {
+            RecyclerView.NO_ID
+        }
+    }
 
     override fun containsItem(itemId: Long) = tabIds.any { it.hashCode().toLong() == itemId }
 

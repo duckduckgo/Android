@@ -63,6 +63,13 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga įjungta dėl %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga išjungta dėl %1$s</string>
     <string name="undoSnackbarAction">Anuliuoti</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sekimo priemonė užblokuota</item>
+        <item quantity="few">Sekimo priemonės užblokuotos</item>
+        <item quantity="many">Sekimo priemonės užblokuotos</item>
+        <item quantity="other">Sekimo priemonių užblokuota</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
@@ -84,7 +91,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
-    <string name="settingsAutocompleteEnabled">Rodyti automatinio užbaigimo pasiūlymus</string>
     <string name="autocompleteRemoveItemTitle">Pašalinti paieškos pasiūlymą?</string>
     <string name="autocompleteRemoveItemCancel">Atšaukti</string>
     <string name="autocompleteRemoveItemRemove">Pašalinti</string>
@@ -114,6 +120,11 @@
     <string name="tabSwitcherListViewMenu">Sąrašo rodinys</string>
     <string name="tabSwitcherGridViewMenu">Tinklelio vaizdas</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt;</string>
+    <string name="inTheLast7Days">per paskutines 7 dienas</string>
+
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
     <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
@@ -123,18 +134,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nustatymai</string>
     <string name="settingsMenuItemTitle">Nustatymai</string>
-    <string name="settingsHeadingPrivacy">Privatumas</string>
     <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
-    <string name="settingsHeadingCustomize">Tinkinti</string>
     <string name="settingsHeadingAbout">Apie</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
-    <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
-    <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
     <string name="settingsHeadingNextSteps">Tolesni veiksmai</string>
     <string name="settingsLightTheme">Šviesi</string>
     <string name="settingsTheme">Tema</string>
@@ -150,18 +157,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Išjungta</string>
     <string name="settingsSubtitleNotificationsEnabled">Įjungta</string>
     <string name="settingsDefaultBrowserTitle">Numatytoji naršyklė</string>
-    <string name="settingsDefaultBrowserSetDescription">„DuckDuckGo“ yra jūsų numatytoji naršyklė</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „DuckDuckGo“ kaip savo numatytąją naršyklę</string>
     <string name="settingsPrivateSearchTitle">privati paieška</string>
     <string name="settingsGeneral" instruction="List item for general settings">Bendrieji</string>
-    <string name="settingsPrivateSearchDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
-    <string name="settingsHeadingSettings">Nustatymai</string>
     <string name="settingsHeadingMainSettings">Kiti parametrai</string>
     <string name="settingsPermissionsSetting">Leidimai</string>
     <string name="settingsSyncSetting">Sinchronizuoti ir kurti atsarginę kopiją</string>
-    <string name="settingsFireButton">Mygtukas „Fire“</string>
     <string name="settingsDataClearing">Duomenų valymas</string>
     <string name="settingsAddWidget">Įtraukti valdiklį į pagrindinį ekraną</string>
     <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
@@ -170,9 +171,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privati paieška</string>
-    <string name="privateSearchTitle">„Private Search“ įjungta</string>
     <string name="privateSearchDescription">„DuckDuckGo Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
-    <string name="privateSearchHeadingSearchSettings">Paieškos nustatymai</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
@@ -190,15 +189,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Žiniatinklio sekimo apsauga įjungta</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[„DuckDuckGo“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
-    <string name="cookiePopupProtectionDescription">Panaikinkite šiuos iškylančiuosius langus ir sumažinkite slapukų skaičių</string>
-    <string name="cookiePopupProtectionEnabled">Įjungta</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
@@ -213,7 +208,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
 
-    <string name="settingsAutomaticallyClearWhat">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearData">Automatiškai išvalyti duomenis…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
@@ -601,11 +595,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
-    <string name="settingsAddHomeScreenWidget">Pagrindinio ekrano valdiklis</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
-    <string name="macos_settings_title">„DuckDuckGo“ naršyklė, skirta „Mac“</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Atsisiuntimai</string>
@@ -641,7 +632,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, aš juos susitvarkysiu pats</string>
 
-    <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>
     <string name="autoconsentManagedNoticeAnimationText">Slapukai valdomi</string>
 
@@ -650,19 +640,108 @@
     <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">„DuckDuckGo“ naršyklė, skirta „Windows“</string>
-    <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
-    <string name="windows_settings_description_ready">Galima atsisiųsti</string>
-    <string name="windows_settings_description_list">Jūs jau sąraše!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vilkite žemyn iš viršaus ir bakstelėkite grįžties mygtuką, kad išeitumėte iš viso ekrano režimo</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Uždaryti visus skirtukus?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Ar tikrai norite uždaryti visus skirtukus?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
     <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
+
+    <string name="selectTabsMenuItem">Pasirinkite skirtukus</string>
+    <string name="selectAllTabsMenuItem">Pasirinkti viską</string>
+    <string name="deselectAllTabsMenuItem">Atžymėti visus</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d pasirinkta</string>
+    <string name="tabSelectedIndicator">Pasirinkto skirtuko indikatorius</string>
+    <string name="tabNotSelectedIndicator">Nepasirinkto skirtuko indikatorius</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d nuorodų iš „DuckDuckGo“</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Bendrinti nuorodą</item>
+        <item quantity="few">Bendrinti %1$d nuorodas</item>
+        <item quantity="many">Bendrinti %1$d nuorodas</item>
+        <item quantity="other">Bendrinti %1$d nuorodų</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pažymėti pasirinktą skirtuką?</item>
+        <item quantity="few">Pažymėti %1$d skirtukus?</item>
+        <item quantity="many">Pažymėti %1$d skirtukus?</item>
+        <item quantity="other">Pažymėti %1$d skirtukus?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Žymė pridėtos</item>
+        <item quantity="few">%1$d žymės pridėtos</item>
+        <item quantity="many">%1$d žymės pridėtos</item>
+        <item quantity="other">%1$d žymių pridėta</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Žymė</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Pažymėti skirtuką</item>
+        <item quantity="few">Pažymėti %1$d skirtukus</item>
+        <item quantity="many">Pažymėti %1$d skirtukus</item>
+        <item quantity="other">Pažymėti %1$d skirtukų</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Esamos žymės nebus kopijuojamos.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką?</item>
+        <item quantity="few">Uždaryti visus %1$d skirtukus?</item>
+        <item quantity="many">Uždaryti visus %1$d skirtukus?</item>
+        <item quantity="other">Uždaryti visus %1$d skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti kitą skirtuką?</item>
+        <item quantity="few">Uždaryti %1$d kitus skirtukus?</item>
+        <item quantity="many">Uždaryti %1$d kitus skirtukus?</item>
+        <item quantity="other">Uždaryti %1$d kitų skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką?</item>
+        <item quantity="few">Uždaryti %1$d skirtukus?</item>
+        <item quantity="many">Uždaryti %1$d skirtukus?</item>
+        <item quantity="other">Uždaryti %1$d skirtukų?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ar tikrai norite uždaryti šį skirtuką?</item>
+        <item quantity="few">Ar tikrai norite uždaryti visus skirtukus?</item>
+        <item quantity="many">Ar tikrai norite uždaryti visus skirtukus?</item>
+        <item quantity="other">Ar tikrai norite uždaryti visus skirtukus?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Ar tikrai norite uždaryti šį skirtuką?</item>
+        <item quantity="few">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+        <item quantity="many">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+        <item quantity="other">Ar tikrai norite uždaryti šiuos skirtukus?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti skirtukus</item>
+        <item quantity="many">Uždaryti skirtukus</item>
+        <item quantity="other">Uždaryti skirtukus</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Uždaryti skirtuką</item>
+        <item quantity="few">Uždaryti %1$d skirtukus</item>
+        <item quantity="many">Uždaryti %1$d skirtuko</item>
+        <item quantity="other">Uždaryti %1$d skirtukų</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Uždaryti kitus skirtukus</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Skirtukas uždarytas</item>
+        <item quantity="few">%1$d skirtukai uždaryti</item>
+        <item quantity="many">%1$d skirtuko uždaryta</item>
+        <item quantity="other">%1$d skirtukų uždaryti</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 skirtukas</item>
+        <item quantity="few">%1$d skirtukai</item>
+        <item quantity="many">%1$d skirtuko</item>
+        <item quantity="other">%1$d skirtukų</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
@@ -679,7 +758,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Slaptažodžiai</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Slaptažodžiai ir automatinis užpildymas</string>
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
@@ -777,6 +855,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Duok penkis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
@@ -800,5 +882,26 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Ne dabar</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">„DuckDuckGo“ blokuoja stebėjimo priemones, kad apsaugotų tavo naršymą</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jis gali bandyti apgauti ar manipuliuoti tavimi, siekdamas, kad pervestum pinigus, pirktum padirbtas prekes arba įdiegtum kenkėjiškas programas prisidengiant melagingais pretekstais.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Išeiti iš šios svetainės</string>
+    <string name="maliciousSiteAdvancedCTA">Išplėstinė</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Jei manote, kad ši svetainė yra saugi, galite <a href=\"\">pranešti apie klaidą</a>. Vis dar galite apsilankyti svetainėje savo rizika.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Priimti riziką ir apsilankyti svetainėje</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Praneškite apie svetainę, kuri neteisingai pažymėta kaip kenkėjiška.</string>
+    <string name="maliciousSiteLearnMoreTitle">Sužinoti daugiau</string>
+    <string name="maliciousSiteSettingTitle">Svetainės saugos įspėjimai</string>
+    <string name="maliciousSiteToggleHint">Gauti saugos įspėjimą svetainėse, pažymėtose dėl sukčiavimo ar kenkėjiškų programų</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Išjungus šią funkciją, gali kilti pavojus jūsų informacijai.</string>
 
 </resources>

@@ -1,5 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertTrue(metadataDao.getAllObservable().first().isEmpty())"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/settings/impl/SettingsSyncDataProviderTest.kt"
+            line="72"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertNotNull(metadataDao.getAllObservable().first().find { it.key == duckAddressSetting.key })"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/settings/impl/SettingsSyncDataProviderTest.kt"
+            line="76"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertTrue(metadataDao.getAllObservable().first().size == 1)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/settings/impl/SettingsSyncDataProviderTest.kt"
+            line="89"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        assertTrue(metadataDao.getAllObservable().first().size == 2)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/settings/impl/SettingsSyncDataProviderTest.kt"
+            line="93"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val duckAddressMetadata = metadataDao.getAllObservable().first().find { it.key == duckAddressSetting.key }"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/settings/impl/SettingsSyncDataProviderTest.kt"
+            line="94"
+            column="35"/>
+    </issue>
 
     <issue
         id="DenyListedApi"

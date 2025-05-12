@@ -101,22 +101,22 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
-                R.drawable.ic_location_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_location_24,
                 R.string.sitePermissionsSettingsLocation,
                 locationSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_video_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_video_24,
                 R.string.sitePermissionsSettingsCamera,
                 cameraSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_microphone_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_microphone_24,
                 R.string.sitePermissionsSettingsMicrophone,
                 micSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_video_player_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_video_player_24,
                 R.string.sitePermissionsSettingsDRM,
                 drmSetting,
             ),

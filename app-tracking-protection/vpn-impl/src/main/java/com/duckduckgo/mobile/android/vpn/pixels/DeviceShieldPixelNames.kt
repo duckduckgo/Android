@@ -202,6 +202,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_UNPROTECTED_APPS_BUCKET("m_atp_unprotected_apps_bucket_%d_c"),
     ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY("m_atp_unprotected_apps_bucket_%d_d"),
 
+    ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED("m_atp_tds_experiment_download_failed"),
+
     ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON("m_atp_ev_apptp_enabled_cta_button_press"),
 
     ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR("m_atp_ev_apptp_create_network_stack_error_c"),
@@ -209,6 +211,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT("m_atp_ev_apptp_tunnel_thread_stop_timeout_c", enqueue = true),
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY("m_atp_ev_apptp_tunnel_thread_stop_timeout_d", enqueue = true),
+
+    ATP_REPORT_TUNNEL_THREAD_STOP_CRASH("m_atp_ev_apptp_tunnel_thread_crash_c", enqueue = true),
+    ATP_REPORT_TUNNEL_THREAD_CRASH_DAILY("m_atp_ev_apptp_tunnel_thread_crash_d", enqueue = true),
 
     REPORT_VPN_ALWAYS_ON_TRIGGERED("m_vpn_ev_always_on_triggered_c"),
     REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY("m_vpn_ev_always_on_triggered_d"),

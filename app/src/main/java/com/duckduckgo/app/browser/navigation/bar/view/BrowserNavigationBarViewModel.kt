@@ -21,13 +21,18 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -49,70 +54,98 @@ import kotlinx.coroutines.flow.update
 class BrowserNavigationBarViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val tabRepository: TabRepository,
+    private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    private val isCustomTab = MutableStateFlow(false)
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = combine(
         _viewState.asStateFlow(),
+        isCustomTab,
         tabRepository.flowTabs,
         visualDesignExperimentDataStore.navigationBarState,
-    ) { state, tabs, navigationBarState ->
+    ) { state, isCustomTab, tabs, navigationBarState ->
         state.copy(
-            isVisible = navigationBarState.isEnabled,
+            isVisible = navigationBarState.isEnabled && !isCustomTab,
             tabsCount = tabs.size,
-            shouldUpdateTabsCount = tabs.size != state.tabsCount && tabs.isNotEmpty(),
+            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     fun onFireButtonClicked() {
-        _commands.trySend(NotifyFireButtonClicked)
+        pixel.fire(
+            AppPixelName.BROWSER_NAV_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to _viewState.value.fireButtonHighlighted.toString()),
+        )
     }
 
     fun onTabsButtonClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_TABS_PRESSED.pixelName)
         _commands.trySend(NotifyTabsButtonClicked)
     }
 
     fun onTabsButtonLongClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_TABS_LONG_PRESSED.pixelName)
         _commands.trySend(NotifyTabsButtonLongClicked)
     }
 
     fun onMenuButtonClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_MENU_PRESSED.pixelName)
         _commands.trySend(NotifyMenuButtonClicked)
     }
 
-    fun onBackButtonClicked() {
-        _commands.trySend(NotifyBackButtonClicked)
+    fun onNewTabButtonClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_NEW_TAB_PRESSED.pixelName)
+        _commands.trySend(NotifyNewTabButtonClicked)
     }
 
-    fun onBackButtonLongClicked() {
-        _commands.trySend(NotifyBackButtonLongClicked)
+    fun onAutofillButtonClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_PASSWORDS_PRESSED.pixelName)
+        _commands.trySend(NotifyAutofillButtonClicked)
     }
 
-    fun onForwardButtonClicked() {
-        _commands.trySend(NotifyForwardButtonClicked)
-    }
-
-    fun setCanGoBack(canGoBack: Boolean) {
-        _viewState.update {
-            it.copy(backArrowButtonEnabled = canGoBack)
-        }
-    }
-
-    fun setCanGoForward(canGoForward: Boolean) {
-        _viewState.update {
-            it.copy(forwardArrowButtonEnabled = canGoForward)
-        }
+    fun onBookmarksButtonClicked() {
+        pixel.fire(AppPixelName.BROWSER_NAV_BOOKMARKS_PRESSED.pixelName)
+        _commands.trySend(NotifyBookmarksButtonClicked)
     }
 
     fun setCustomTab(customTab: Boolean) {
+        isCustomTab.update { customTab }
+    }
+
+    fun setViewMode(viewMode: ViewMode) {
+        when (viewMode) {
+            NewTab -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = false,
+                        autofillButtonVisible = true,
+                        fireButtonVisible = true,
+                        tabsButtonVisible = true,
+                    )
+                }
+            }
+
+            Browser -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        fireButtonVisible = true,
+                        tabsButtonVisible = true,
+                    )
+                }
+            }
+        }
+    }
+
+    fun setFireButtonHighlight(highlighted: Boolean) {
         _viewState.update {
             it.copy(
-                fireButtonVisible = !customTab,
-                tabsButtonVisible = !customTab,
+                fireButtonHighlighted = highlighted,
             )
         }
     }
@@ -125,15 +158,20 @@ class BrowserNavigationBarViewModel @Inject constructor(
         data object NotifyBackButtonClicked : Command()
         data object NotifyBackButtonLongClicked : Command()
         data object NotifyForwardButtonClicked : Command()
+        data object NotifyNewTabButtonClicked : Command()
+        data object NotifyAutofillButtonClicked : Command()
+        data object NotifyBookmarksButtonClicked : Command()
     }
 
     data class ViewState(
         val isVisible: Boolean = false,
-        val backArrowButtonEnabled: Boolean = false,
-        val forwardArrowButtonEnabled: Boolean = false,
+        val newTabButtonVisible: Boolean = false,
+        val autofillButtonVisible: Boolean = true,
+        val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
+        val fireButtonHighlighted: Boolean = false,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
-        val shouldUpdateTabsCount: Boolean = false,
+        val hasUnreadTabs: Boolean = false,
     )
 }

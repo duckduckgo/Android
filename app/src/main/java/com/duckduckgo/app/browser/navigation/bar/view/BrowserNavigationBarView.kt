@@ -20,39 +20,67 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.doOnAttach
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
 class BrowserNavigationBarView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
+    private val context: Context,
+    private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
+
+    override fun setVisibility(visibility: Int) {
+        val isVisibilityUpdated = this.visibility != visibility
+
+        super.setVisibility(visibility)
+
+        /**
+         * This notifies all view behaviors that depend on the [BrowserNavigationBarView] to recalculate whenever the bar's visibility changes,
+         * for example, we require that in [TopOmnibarBrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
+         * The base coordinator behavior doesn't notify dependent views when visibility changes, so we need to do that manually.
+         */
+        val parent = parent
+        if (isVisibilityUpdated && parent is CoordinatorLayout) {
+            parent.dispatchDependentViewsChanged(this)
+        }
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -69,25 +97,33 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
+    private val lifecycleOwner: LifecycleOwner by lazy {
+        requireNotNull(findViewTreeLifecycleOwner())
+    }
+
+    private val pulseAnimation: PulseAnimation by lazy {
+        PulseAnimation(lifecycleOwner)
+    }
+
     val popupMenuAnchor: View = binding.menuButton
 
     var browserNavigationBarObserver: BrowserNavigationBarObserver? = null
 
-    fun setCanGoBack(canGoBack: Boolean) {
-        doOnAttach {
-            viewModel.setCanGoBack(canGoBack)
-        }
-    }
-
-    fun setCanGoForward(canGoForward: Boolean) {
-        doOnAttach {
-            viewModel.setCanGoForward(canGoForward)
-        }
-    }
-
     fun setCustomTab(isCustomTab: Boolean) {
         doOnAttach {
             viewModel.setCustomTab(isCustomTab)
+        }
+    }
+
+    fun setViewMode(viewMode: ViewMode) {
+        doOnAttach {
+            viewModel.setViewMode(viewMode)
+        }
+    }
+
+    fun setFireButtonHighlight(highlighted: Boolean) {
+        doOnAttach {
+            viewModel.setFireButtonHighlight(highlighted)
         }
     }
 
@@ -107,17 +143,16 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             .onEach(::renderView)
             .launchIn(coroutineScope)
 
-        binding.backArrowButton.setOnClickListener {
-            viewModel.onBackButtonClicked()
+        binding.newTabButton.setOnClickListener {
+            viewModel.onNewTabButtonClicked()
         }
 
-        binding.backArrowButton.setOnLongClickListener {
-            viewModel.onBackButtonLongClicked()
-            true
+        binding.autofillButton.setOnClickListener {
+            viewModel.onAutofillButtonClicked()
         }
 
-        binding.forwardArrowButton.setOnClickListener {
-            viewModel.onForwardButtonClicked()
+        binding.bookmarksButton.setOnClickListener {
+            viewModel.onBookmarksButtonClicked()
         }
 
         binding.fireButton.setOnClickListener {
@@ -145,32 +180,22 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         conflatedStateJob.cancel()
     }
 
+    override fun getBehavior(): Behavior<*> {
+        return BottomViewBehavior(context, attrs)
+    }
+
     private fun renderView(viewState: ViewState) {
         binding.root.isVisible = viewState.isVisible
 
-        binding.backArrowIconImageView.setImageResource(
-            if (viewState.backArrowButtonEnabled) {
-                R.drawable.ic_arrow_left_24e
-            } else {
-                R.drawable.ic_arrow_left_24e_disabled
-            },
-        )
-        binding.backArrowButton.isEnabled = viewState.backArrowButtonEnabled
-
-        binding.forwardArrowIconImageView.setImageResource(
-            if (viewState.forwardArrowButtonEnabled) {
-                R.drawable.ic_arrow_right_24e
-            } else {
-                R.drawable.ic_arrow_right_24e_disabled
-            },
-        )
-        binding.forwardArrowButton.isEnabled = viewState.forwardArrowButtonEnabled
-
+        binding.newTabButton.isVisible = viewState.newTabButtonVisible
+        binding.autofillButton.isVisible = viewState.autofillButtonVisible
+        binding.bookmarksButton.isVisible = viewState.bookmarksButtonVisible
         binding.fireButton.isVisible = viewState.fireButtonVisible
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
-        if (viewState.shouldUpdateTabsCount) {
-            binding.tabsButton.count = viewState.tabsCount
-        }
+        binding.tabsButton.count = viewState.tabsCount
+        binding.tabsButton.hasUnread = viewState.hasUnreadTabs
+
+        renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
 
     private fun processCommands(command: Command) {
@@ -182,6 +207,61 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyBackButtonClicked -> browserNavigationBarObserver?.onBackButtonClicked()
             NotifyBackButtonLongClicked -> browserNavigationBarObserver?.onBackButtonLongClicked()
             NotifyForwardButtonClicked -> browserNavigationBarObserver?.onForwardButtonClicked()
+            NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
+            NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
+            NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
+        }
+    }
+
+    private fun renderFireButtonPulseAnimation(enabled: Boolean) {
+        if (enabled) {
+            if (!pulseAnimation.isActive) {
+                doOnLayout {
+                    pulseAnimation.playOn(binding.fireIconImageView, isExperimentAndShieldView = false)
+                }
+            }
+        } else {
+            pulseAnimation.stop()
+        }
+    }
+
+    enum class ViewMode {
+        NewTab,
+        Browser,
+    }
+
+    /**
+     * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
+     *
+     * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
+     */
+    private class BottomViewBehavior(
+        context: Context,
+        attrs: AttributeSet?,
+    ) : Behavior<View>(context, attrs) {
+
+        override fun layoutDependsOn(
+            parent: CoordinatorLayout,
+            child: View,
+            dependency: View,
+        ): Boolean {
+            return dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP
+        }
+
+        override fun onDependentViewChanged(
+            parent: CoordinatorLayout,
+            child: View,
+            dependency: View,
+        ): Boolean {
+            if (dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP) {
+                val dependencyOffset = abs(dependency.top)
+                val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
+                val childHeight = child.measuredHeight
+                val childOffset = childHeight * offsetPercentage
+                child.translationY = childOffset
+                return true
+            }
+            return false
         }
     }
 }

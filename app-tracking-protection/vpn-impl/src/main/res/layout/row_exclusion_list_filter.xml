@@ -24,6 +24,6 @@
     android:layout_marginTop="@dimen/keyline_2"
     android:drawablePadding="@dimen/keyline_2"
     android:padding="@dimen/keyline_4"
-    app:drawableEndCompat="@drawable/ic_arrow_down"
+    app:drawableEndCompat="@drawable/ic_chevron_down_24_small"
     app:typography="body2"
     tools:text="Protection Enabled (11)" />

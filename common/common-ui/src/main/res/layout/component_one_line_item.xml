@@ -169,7 +169,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIconTinted"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
@@ -193,7 +193,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemSwitch"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:leadingIconBackground="rounded"
         app:primaryText="Item With Switch and Leading Icon"
         app:showSwitch="true" />

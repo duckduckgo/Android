@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val result = testee.observeUserPreferences().first()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
+            line="218"
+            column="22"/>
+    </issue>
 
     <issue
         id="DenyListedApi"
@@ -8,7 +19,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="743"
+            line="823"
             column="9"/>
     </issue>
 
@@ -19,7 +30,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="744"
+            line="824"
             column="9"/>
     </issue>
 

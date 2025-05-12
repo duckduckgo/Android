@@ -24,7 +24,7 @@
         android:id="@+id/sync_settings_option_favourites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_sync_device_all_24"
+        app:leadingIcon="@drawable/ic_device_all_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_enable_option_favorites_title"
         app:secondaryText="@string/sync_enable_option_favorites_subtitle"

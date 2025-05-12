@@ -27,7 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.common.utils.store.BinaryDataStore
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader

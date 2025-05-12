@@ -63,6 +63,11 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks lubatud</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks keelatud</string>
     <string name="undoSnackbarAction">Võta tagasi</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jälgija blokeeritud</item>
+        <item quantity="other">Jälgijat blokeeritud</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Laadi pilt alla</string>
@@ -84,7 +89,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
-    <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
     <string name="autocompleteRemoveItemTitle">Kas eemaldada otsingusoovitus?</string>
     <string name="autocompleteRemoveItemCancel">Loobu</string>
     <string name="autocompleteRemoveItemRemove">Eemaldage</string>
@@ -114,6 +118,11 @@
     <string name="tabSwitcherListViewMenu">Loendivaade</string>
     <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt;</string>
+    <string name="inTheLast7Days">viimase 7 päeva jooksul</string>
+
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
@@ -123,18 +132,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
-    <string name="settingsHeadingPrivacy">Privaatsus</string>
     <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
-    <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
     <string name="leaveFeedbackNew">Saada tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
-    <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
-    <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>
     <string name="settingsHeadingNextSteps">Järgmised sammud</string>
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
@@ -150,18 +155,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Keelatud</string>
     <string name="settingsSubtitleNotificationsEnabled">Lubatud</string>
     <string name="settingsDefaultBrowserTitle">Vaikebrauser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on sinu vaikebrauser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo oma vaikebrauseriks</string>
     <string name="settingsPrivateSearchTitle">Privaatne otsing</string>
     <string name="settingsGeneral" instruction="List item for general settings">Üldine</string>
-    <string name="settingsPrivateSearchDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
-    <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
-    <string name="settingsHeadingSettings">Sätted</string>
     <string name="settingsHeadingMainSettings">Teised seaded</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Andmete kustutamine</string>
     <string name="settingsAddWidget">Lisa vidin avakuvale</string>
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
@@ -170,9 +169,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privaatne otsing</string>
-    <string name="privateSearchTitle">Private Search on lubatud</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
-    <string name="privateSearchHeadingSearchSettings">Otsingu seaded</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
@@ -190,15 +187,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Veebijälgimise kaitse on lubatud</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
-    <string name="cookiePopupProtectionDescription">Keelusta need hüpikaknad ja minimeeri küpsised</string>
-    <string name="cookiePopupProtectionEnabled">Lubatud</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -213,7 +206,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
 
-    <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearData">Kustuta andmed automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
@@ -601,11 +593,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Vidin %1$s lisati avakuvale</string>
-    <string name="settingsAddHomeScreenWidget">Avakuva vidin</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Sirvi privaatselt meie Maci rakendusega</string>
-    <string name="macos_settings_title">DuckDuckGo Maci brauser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Allalaadimised</string>
@@ -641,7 +630,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ei, ma haldan neid ise</string>
 
-    <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
@@ -650,19 +638,82 @@
     <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windowsi brauser</string>
-    <string name="windows_settings_description">Sirvi privaatselt meie Windowsi rakendusega</string>
-    <string name="windows_settings_description_ready">Saadaval on allalaadimine</string>
-    <string name="windows_settings_description_list">Oled nimekirjas!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Lohista ülevalt alla ja puuduta nuppu Tagasi, et täisekraanvaatest väljuda</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Kas sulgeda kõik vahekaardid?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Kas soovite kindlasti kõik vahekaardid sulgeda?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Loobu</string>
     <string name="closeAppTabsConfirmationDialogClose">Sulge</string>
+
+    <string name="selectTabsMenuItem">Vali vahekaardid</string>
+    <string name="selectAllTabsMenuItem">Vali kõik</string>
+    <string name="deselectAllTabsMenuItem">Tühista kogu valik</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d valitud</string>
+    <string name="tabSelectedIndicator">Valitud vahekaardi indikaator</string>
+    <string name="tabNotSelectedIndicator">Indikaator, et vahekaart pole valitud</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linki DuckDuckGo\'st</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Jaga linki</item>
+        <item quantity="other">Jaga linke %1$d</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas lisada valitud vahekaardile järjehoidja?</item>
+        <item quantity="other">Kas lisada %1$d vahekaardile järjehoidja?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Järjehoidja lisatud</item>
+        <item quantity="other">%1$d järjehoidjat lisatud</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Järjehoidja</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Lisa vahekaardile järjehoidja</item>
+        <item quantity="other">Lisa %1$d vahekaardile järjehoidjad</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Olemasolevaid järjehoidjaid ei dubleerita.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas sulgeda vahekaart?</item>
+        <item quantity="other">Kas sulgeda kõik %1$d vahekaarti?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas sulgeda muu vahekaarti?</item>
+        <item quantity="other">Kas sulgeda %1$d muud vahekaarti?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas sulgeda vahekaart?</item>
+        <item quantity="other">Kas sulgeda %1$d vahekaarti?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas soovite kindlasti selle vahekaardi sulgeda?</item>
+        <item quantity="other">Kas soovite kindlasti kõik vahekaardid sulgeda?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Kas soovite kindlasti selle vahekaardi sulgeda?</item>
+        <item quantity="other">Kas soovite kindlasti need vahekaardid sulgeda?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sule vahekaart</item>
+        <item quantity="other">Sule vahekaardid</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sule vahekaart</item>
+        <item quantity="other">Sule %1$d vahekaarti</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Sulge muud vahekaardid</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Vahekaart suletud</item>
+        <item quantity="other">%1$d vahekaarti suletud</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 vahekaart</item>
+        <item quantity="other">%1$d vahekaarti</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
@@ -679,7 +730,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Paroolid</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Paroolid ja automaatne täitmine</string>
     <string name="autofillLoginSavedSnackbarMessage">Parool salvestatud</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parool uuendatud</string>
@@ -773,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Viska viis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
@@ -796,5 +850,26 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Mitte praegu</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokeerib jälgurid, et kaitsta sinu sirvimist</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokeeris selle lehe, kuna see võib püüda teid petta või manipuleerida tegema rahaülekandeid, ostma võltsitud kaupu või installima pahavara valel ettekäändel.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Lahku sellelt saidilt</string>
+    <string name="maliciousSiteAdvancedCTA">Täiustatud</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Kui arvate, et see veebisait on turvaline, võite <a href=\"\">teatada veast</a>. Võite siiski külastada veebisaiti omal vastutusel.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Nõustu riskiga ja külasta saiti</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Teatage saidist, mis on valesti pahatahtlikuks märgitud</string>
+    <string name="maliciousSiteLearnMoreTitle">Loe edasi</string>
+    <string name="maliciousSiteSettingTitle">Saidi ohutuse hoiatused</string>
+    <string name="maliciousSiteToggleHint">Hoiata mind andmepüügi või pahavara tõttu märgistatud saitidel</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Selle funktsiooni keelamine võib teie andmed ohtu seada.</string>
 
 </resources>

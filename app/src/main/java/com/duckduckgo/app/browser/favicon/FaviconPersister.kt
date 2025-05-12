@@ -20,11 +20,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sha256
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -61,8 +64,11 @@ interface FaviconPersister {
 class FileBasedFaviconPersister(
     val context: Context,
     private val fileDeleter: FileDeleter,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : FaviconPersister {
+
+    val mutex = Mutex()
 
     override suspend fun deleteAll(directory: String) {
         fileDeleter.deleteDirectory(faviconDirectory(directory))
@@ -100,7 +106,11 @@ class FileBasedFaviconPersister(
         domain: String,
     ): File? {
         return withContext(dispatcherProvider.io() + NonCancellable) {
-            writeToDisk(directory, subFolder, bitmap, domain)
+            if (androidBrowserConfigFeature.storeFaviconSuspend().isEnabled()) {
+                writeToDiskAsync(directory, subFolder, bitmap, domain)
+            } else {
+                writeToDisk(directory, subFolder, bitmap, domain)
+            }
         }
     }
 
@@ -178,6 +188,42 @@ class FileBasedFaviconPersister(
             faviconFile
         } else {
             null
+        }
+    }
+
+    private suspend fun writeToDiskAsync(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String,
+    ): File? {
+        mutex.withLock {
+            val existingFile = fileForFavicon(directory, subFolder, domain)
+
+            if (existingFile.exists()) {
+                Timber.i("Favicon favicon exists for $domain in $subFolder")
+                val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
+
+                existingFavicon?.let {
+                    if (it.width > bitmap.width) {
+                        return null // Stored file has better quality
+                    }
+                }
+            }
+
+            val faviconFile = prepareDestinationFile(directory, subFolder, domain)
+            runCatching {
+                FileOutputStream(faviconFile).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
+                }
+            }
+
+            return if (faviconFile.exists()) {
+                faviconFile
+            } else {
+                null
+            }
         }
     }
 

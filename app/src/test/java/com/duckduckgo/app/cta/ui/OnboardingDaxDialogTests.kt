@@ -18,6 +18,8 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_OTHER
@@ -38,9 +40,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -76,13 +80,19 @@ class OnboardingDaxDialogTests {
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockRefreshPixelSender: RefreshPixelSender = mock()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
+    private val mockSubscriptions: Subscriptions = mock()
+    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -97,9 +107,11 @@ class OnboardingDaxDialogTests {
             coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector,
             extendedOnboardingFeatureToggles,
-            subscriptions = mock(),
+            mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
+            mockUserBrowserProperties,
+            mockSenseOfProtectionExperiment,
         )
     }
 
@@ -175,6 +187,19 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
+    fun whenOnboardingCompleteThenAreBubbleDaxDialogsCompletedIsTrue() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_DIALOG_SERP)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_FIRE_BUTTON)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
+
+        val inContextDaxDialogsComplete = testee.areBubbleDaxDialogsCompleted()
+        assertTrue(inContextDaxDialogsComplete)
+    }
+
+    @Test
     fun whenAllInContextDialogsShownThenAreInContextDialogsCompletedIsTrue() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
@@ -213,6 +238,19 @@ class OnboardingDaxDialogTests {
         whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+
+        val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
+        assertTrue(inContextDaxDialogsComplete)
+    }
+
+    @Test
+    fun whenOnboardingCompleteThenAreInContextDialogsCompletedIsTrue() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_DIALOG_SERP)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_FIRE_BUTTON)).thenReturn(false)
+        whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
         assertTrue(inContextDaxDialogsComplete)

@@ -21,7 +21,7 @@ import com.squareup.moshi.Json
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-private const val BASE_URL = "$API/api/protection/v1/android"
+private const val BASE_URL = "$API/api/protection/v2/android"
 
 interface MaliciousSiteService {
 

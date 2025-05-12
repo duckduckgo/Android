@@ -63,6 +63,12 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protecția confidențialității activată pentru %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Protecția confidențialității dezactivată pentru %1$s</string>
     <string name="undoSnackbarAction">Anulează</string>
+    <!-- Trackers blocked animation-->
+    <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Instrument de urmărire blocat</item>
+        <item quantity="few">Instrumente de urmărire blocate</item>
+        <item quantity="other">Instrumente de urmărire blocate</item>
+    </plurals>
 
     <!-- Downloading files -->
     <string name="downloadImage">Descarcă imaginea</string>
@@ -84,7 +90,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
-    <string name="settingsAutocompleteEnabled">Afișează sugestiile de completare automată</string>
     <string name="autocompleteRemoveItemTitle">Dorești să elimini sugestia de căutare?</string>
     <string name="autocompleteRemoveItemCancel">Anulare</string>
     <string name="autocompleteRemoveItemRemove">Elimină</string>
@@ -114,6 +119,11 @@
     <string name="tabSwitcherListViewMenu">Vizualizare listă</string>
     <string name="tabSwitcherGridViewMenu">Vizualizare grilă</string>
 
+    <!--Tab Switcher Animation-->
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s tehnologii de urmărire blocate &lt;/b&gt; în ultimele 7 zile</string>
+    <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s tehnologii de urmărire blocate &lt;/b&gt;</string>
+    <string name="inTheLast7Days">în ultimele 7 zile</string>
+
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge toate filele și datele</string>
@@ -123,18 +133,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Setări</string>
     <string name="settingsMenuItemTitle">Setări</string>
-    <string name="settingsHeadingPrivacy">Confidențialitate</string>
     <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
-    <string name="settingsHeadingCustomize">Personalizare</string>
     <string name="settingsHeadingAbout">Despre</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Trimite feedback</string>
     <string name="leaveFeedbackNew">Trimite feedback</string>
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
-    <string name="settingsEmailProtectionSubtitle">Blochează tehnologiile de urmărire prin e-mail și ascunde-ți adresa</string>
-    <string name="settingsHeadingMore">Mai multe de la DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Pașii următori</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
@@ -150,18 +156,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Dezactivat</string>
     <string name="settingsSubtitleNotificationsEnabled">Activat</string>
     <string name="settingsDefaultBrowserTitle">Browser implicit</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo este browserul tău implicit</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Setează DuckDuckGo ca browser implicit</string>
     <string name="settingsPrivateSearchTitle">Căutare Confidențială</string>
     <string name="settingsGeneral" instruction="List item for general settings">Generalități</string>
-    <string name="settingsPrivateSearchDescription">Activat în mod implicit</string>
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
-    <string name="settingsHeadingSettings">Setări</string>
     <string name="settingsHeadingMainSettings">Alte Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
-    <string name="settingsFireButton">Butonul Foc</string>
     <string name="settingsDataClearing">Ștergerea datelor</string>
     <string name="settingsAddWidget">Adaugă un widget la ecranul de întâmpinare</string>
     <string name="settingsAddressBarPosition">Setează poziția barei de adrese</string>
@@ -170,9 +170,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Căutare Confidențială</string>
-    <string name="privateSearchTitle">Private Search este activată</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
-    <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
@@ -190,15 +188,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Protecția împotriva urmăririi pe web este activată</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
-    <string name="cookiePopupProtectionDescription">Elimină aceste ferestre pop-up și minimizează modulele cookie</string>
-    <string name="cookiePopupProtectionEnabled">Activat</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
@@ -213,7 +207,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
 
-    <string name="settingsAutomaticallyClearWhat">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearData">Șterge automat datele…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
@@ -601,11 +594,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget adăugat la ecranul de pornire</string>
-    <string name="settingsAddHomeScreenWidget">Widget pe ecranul de pornire</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Browserul DuckDuckGo pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -641,7 +631,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nu, le voi gestiona personal</string>
 
-    <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
     <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 
@@ -650,19 +639,95 @@
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Browserul DuckDuckGo pentru Windows</string>
-    <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
-    <string name="windows_settings_description_ready">Descărcare disponibilă</string>
-    <string name="windows_settings_description_list">Ești pe listă!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trage în jos din partea superioară și atinge butonul înapoi pentru a ieși din ecranul complet</string>
 
-    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <!-- Tab Switcher -->
     <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Dorești să închizi toate filele?</string>
     <string name="closeAppTabsConfirmationDialogDescription">Sigur dorești să închizi toate filele?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Anulare</string>
     <string name="closeAppTabsConfirmationDialogClose">Închidere</string>
+
+    <string name="selectTabsMenuItem">Selectează filele</string>
+    <string name="selectAllTabsMenuItem">Selectează tot</string>
+    <string name="deselectAllTabsMenuItem">Deselectează tot</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d selectate</string>
+    <string name="tabSelectedIndicator">Indicator de filă selectată</string>
+    <string name="tabNotSelectedIndicator">Indicator de filă neselectată</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d linkuri de la DuckDuckGo</string>
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Distribuie linkul</item>
+        <item quantity="few">Distribuie %1$d linkuri</item>
+        <item quantity="other">Distribuie %1$d de linkuri</item>
+    </plurals>
+
+    <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marchezi fila selectată?</item>
+        <item quantity="few">Dorești să marchezi %1$d file?</item>
+        <item quantity="other">Dorești să marchezi %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marcaj adăugat</item>
+        <item quantity="few">%1$d marcaje adăugate</item>
+        <item quantity="other">%1$d de marcaje adăugate</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogPositiveButton">Marchează</string>
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Marchează fila</item>
+        <item quantity="few">Marchează %1$d file</item>
+        <item quantity="other">Marchează %1$d de file</item>
+    </plurals>
+    <string name="tabSwitcherBookmarkDialogDescription">Marcajele existente nu vor fi duplicate.</string>
+
+    <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi fila?</item>
+        <item quantity="few">Dorești să închizi toate cele %1$d file?</item>
+        <item quantity="other">Dorești să închizi toate cele %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi altă filă?</item>
+        <item quantity="few">Închizi alte %1$d file?</item>
+        <item quantity="other">Închizi alte %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închizi fila?</item>
+        <item quantity="few">Închizi %1$d file?</item>
+        <item quantity="other">Închizi %1$d de file?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sigur dorești să închizi această filă?</item>
+        <item quantity="few">Sigur dorești să închizi toate filele?</item>
+        <item quantity="other">Sigur dorești să închizi toate filele?</item>
+    </plurals>
+    <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Sigur dorești să închizi fila?</item>
+        <item quantity="few">Sigur dorești să închizi aceste file?</item>
+        <item quantity="other">Sigur dorești să închizi aceste file?</item>
+    </plurals>
+    <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide filele</item>
+        <item quantity="other">Închide filele</item>
+    </plurals>
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide %1$d file</item>
+        <item quantity="other">Închide %1$d de file</item>
+    </plurals>
+    <string name="closeOtherTabsMenuItem">Închide alte file</string>
+    <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">Filă închisă</item>
+        <item quantity="few">%1$d file închise</item>
+        <item quantity="other">%1$d de file închise</item>
+    </plurals>
+
+    <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
+        <item quantity="one">1 filă</item>
+        <item quantity="few">%1$d file</item>
+        <item quantity="other">%1$d de file</item>
+    </plurals>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
@@ -679,7 +744,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Parole</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Parole și completare automată</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
@@ -775,6 +839,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Bate palma!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Afișează tutorialul</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
@@ -798,5 +866,26 @@
     <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Nu acum</string>
+
+    <!--TabSwitcher Animation Tile Dialog-->
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blochează tehnologiile de urmărire pentru a-ți proteja navigarea</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody">Ștergerea filelor și a datelor tale va șterge istoricul blocării tehnologiilor de urmărire și va reseta acest număr la zero.\n\nAscunde acest banner dacă preferi să nu-l vezi în vizualizarea filelor.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ascunde bannerul</string>
+
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[Acest site poate imita un site legitim pentru a te induce în eroare să furnizezi informații personale, cum ar fi parole sau numere de carduri de credit.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece ar putea încerca să te înșele sau să te manipuleze pentru a transfera bani, a cumpăra bunuri contrafăcute sau a instala programe rău intenționate (malware) sub pretexte false.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="maliciousSiteLeaveCTA">Părăsește acest site</string>
+    <string name="maliciousSiteAdvancedCTA">Avansat</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[Dacă crezi că acest site este sigur, poți <a href=\"\">să raportezi o eroare</a>. Poți vizita în continuare site-ul pe propriul risc.]]></string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Raportează un site marcat incorect ca fiind rău intenționat</string>
+    <string name="maliciousSiteLearnMoreTitle">Află mai multe</string>
+    <string name="maliciousSiteSettingTitle">Avertizări de siguranță privind site-urile</string>
+    <string name="maliciousSiteToggleHint">Avertizează-mă cu privire la site-urile marcate pentru phishing sau programe rău intenționate.</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Dezactivarea acestei funcții poate genera riscuri privind informațiile tale.</string>
 
 </resources>

@@ -1,0 +1,23 @@
+appId: com.duckduckgo.mobile.android
+---
+- runScript: onboarding_scripts/setup.js
+
+- extendedWaitUntil:
+    visible: "Skip Onboarding"
+    timeout: 10000
+    optional: true
+
+- runFlow:
+    when:
+      visible: "Skip Onboarding"
+    commands:
+      - tapOn: "Skip Onboarding"
+      - runScript: onboarding_scripts/skipped_onboarding.js
+
+- runFlow:
+    when:
+      true: ${output.onboarding.runFullOnboarding}
+    commands:
+      - runFlow: pre_onboarding.yaml
+
+

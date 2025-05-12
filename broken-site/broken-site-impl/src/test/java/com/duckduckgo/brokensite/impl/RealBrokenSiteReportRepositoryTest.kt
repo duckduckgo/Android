@@ -40,8 +40,8 @@ class RealBrokenSiteReportRepositoryTest {
 
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
-    private val mockDataStore: BrokenSitePomptDataStore = mock()
-    private val mockInMemoryStore: BrokenSitePromptInMemoryStore = mock()
+    private val mockDataStore: BrokenSitePromptDataStore = mock()
+    private val mockInMemoryStore: BrokenSiteRefreshesInMemoryStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
     @Before
@@ -53,7 +53,7 @@ class RealBrokenSiteReportRepositoryTest {
             coroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSitePromptDataStore = mockDataStore,
-            brokenSitePromptInMemoryStore = mockInMemoryStore,
+            brokenSiteRefreshesInMemoryStore = mockInMemoryStore,
         )
     }
 
@@ -114,6 +114,7 @@ class RealBrokenSiteReportRepositoryTest {
         testee.cleanupOldEntries()
 
         verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
+        verify(mockDataStore).deleteAllExpiredDismissals(any(), any())
     }
 
     @Test
@@ -144,29 +145,12 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenResetDismissStreakCalledThenDismissStreakIsSetToZero() = runTest {
-        testee.resetDismissStreak()
-
-        verify(mockDataStore).setDismissStreak(0)
-    }
-
-    @Test
     fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
         val nextShownDate = LocalDateTime.now()
 
         testee.setNextShownDate(nextShownDate)
 
         verify(mockDataStore).setNextShownDate(nextShownDate)
-    }
-
-    @Test
-    fun whenGetDismissStreakCalledThenReturnDismissStreak() = runTest {
-        val dismissStreak = 5
-        whenever(mockDataStore.getDismissStreak()).thenReturn(dismissStreak)
-
-        val result = testee.getDismissStreak()
-
-        assertEquals(dismissStreak, result)
     }
 
     @Test
@@ -180,10 +164,32 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenResetRefreshCountCalledThenResetRefreshCountIsCalled() = runTest {
-        testee.resetRefreshCount()
+    fun whenAddDismissalCalledThenNewDismissalEventIsAdded() = runTest {
+        val newDismissal = LocalDateTime.now()
 
-        verify(mockInMemoryStore).resetRefreshCount()
+        testee.addDismissal(newDismissal)
+
+        verify(mockDataStore).addDismissal(newDismissal)
+    }
+
+    @Test
+    fun whenClearAllDismissalsCalledThenAllDismissalEventsRemoved() = runTest {
+        testee.clearAllDismissals()
+
+        verify(mockDataStore).clearAllDismissals()
+    }
+
+    @Test
+    fun whenGetDismissalCountBetweenCalledThenDismissalCountBetweenDatesReturned() = runTest {
+        val dismissalCount = 2
+        whenever(mockDataStore.getDismissalCountBetween(any(), any())).thenReturn(dismissalCount)
+
+        val result = testee.getDismissalCountBetween(
+            LocalDateTime.now().minusDays(3),
+            LocalDateTime.now(),
+        )
+
+        assertEquals(dismissalCount, result)
     }
 
     @Test
@@ -194,17 +200,5 @@ class RealBrokenSiteReportRepositoryTest {
         testee.addRefresh(url, localDateTime)
 
         verify(mockInMemoryStore).addRefresh(url, localDateTime)
-    }
-
-    @Test
-    fun whenGetAndUpdateUserRefreshesBetweenCalledThenReturnRefreshCount() = runTest {
-        val t1 = LocalDateTime.now().minusDays(1)
-        val t2 = LocalDateTime.now()
-        val refreshCount = 5
-        whenever(mockInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)).thenReturn(refreshCount)
-
-        val result = testee.getAndUpdateUserRefreshesBetween(t1, t2)
-
-        assertEquals(refreshCount, result)
     }
 }

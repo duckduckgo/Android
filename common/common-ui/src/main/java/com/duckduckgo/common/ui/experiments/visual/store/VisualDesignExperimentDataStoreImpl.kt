@@ -21,7 +21,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.di.scopes.AppScope
@@ -36,7 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -51,13 +50,14 @@ import kotlinx.coroutines.runBlocking
 class VisualDesignExperimentDataStoreImpl @Inject constructor(
     @VisualDesignExperiment private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    appBuildConfig: AppBuildConfig,
     experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
     private companion object {
 
         private const val KEY_EXPERIMENT_ENABLED = "KEY_EXPERIMENT_ENABLED"
         private const val KEY_NAVIGATION_BAR_ENABLED = "KEY_NAVIGATION_BAR_ENABLED"
+
+        private const val EXPERIMENT_ENABLED_BY_DEFAULT = false
 
         private val NO_PARENT_FEATURE = flowOf(FeatureState(isAvailable = true, isEnabled = true))
     }
@@ -67,7 +67,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         coroutineScope = appCoroutineScope,
         targetToggle = experimentalUIThemingFeature.self(),
         prefsKey = KEY_EXPERIMENT_ENABLED,
-        prefsDefault = appBuildConfig.visualDesignExperimentEnabledByDefault,
+        prefsDefault = EXPERIMENT_ENABLED_BY_DEFAULT,
     )
     override val experimentState: StateFlow<FeatureState> = _experimentState.state
 
@@ -77,7 +77,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         parentStateFlow = experimentState,
         targetToggle = experimentalUIThemingFeature.browserNavigationBar(),
         prefsKey = KEY_NAVIGATION_BAR_ENABLED,
-        prefsDefault = appBuildConfig.visualDesignExperimentEnabledByDefault,
+        prefsDefault = true, // for now, navigation bar always enabled when the whole experiment enabled
     )
     override val navigationBarState: StateFlow<FeatureState> = _navigationBarState.state
 
@@ -91,10 +91,6 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
 
     override fun setExperimentStateUserPreference(enabled: Boolean) {
         _experimentState.setUserPreference(enabled)
-    }
-
-    override fun setNavigationBarStateUserPreference(enabled: Boolean) {
-        _navigationBarState.setUserPreference(enabled)
     }
 
     private fun updateFeatureState() {
@@ -139,7 +135,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
                 //  because the omnibar implementation that relies on this value can't recreate itself dynamically,
                 //  it requires the whole activity to be recreated. To avoid that recreation right after initial launch,
                 //  we need the initial value to actually use the valid persisted state.
-                isEnabled = _available.value && runBlocking { _enabled.first() },
+                isEnabled = _available.value && runBlocking { _enabled.firstOrNull() == true },
             ),
         )
 

@@ -20,7 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.EXPERIMENT_PREFIX
-import com.duckduckgo.app.trackerdetection.blocklist.ExperimentTestAA.Cohorts.CONTROL
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
@@ -28,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -43,41 +43,35 @@ import timber.log.Timber
     featureName = "blockList",
 )
 interface BlockList {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaseline(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentBaselineBackup6(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaselineBackup(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentBaselineBackup7(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaselineBackup2(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentBaselineBackup8(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaselineBackup3(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentBaselineBackup9(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaselineBackup4(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentBaselineBackup10(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaselineBackup5(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentNov24(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentDec24(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentJan25(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentFeb25(): Toggle
-
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun tdsNextExperimentMar25(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentApr25(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentMay25(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun tdsNextExperimentJun25(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
@@ -123,12 +117,10 @@ class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val trackerDataDownloader: TrackerDataDownloader,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val experimentAA: ExperimentTestAA,
     private val dispatcherProvider: DispatcherProvider,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            experimentAA.experimentTestAA().isEnabled(CONTROL)
             if (inventory.activeTdsFlag() != null) {
                 trackerDataDownloader.downloadTds()
                     .subscribeOn(Schedulers.io())
@@ -154,22 +146,5 @@ suspend fun BlockListPixelsPlugin.getPrivacyToggleUsed(): MetricsPixel? {
 suspend fun FeatureTogglesInventory.activeTdsFlag(): Toggle? {
     return this.getAllTogglesForParent("blockList").firstOrNull {
         it.featureName().name.startsWith(EXPERIMENT_PREFIX) && it.isEnabled()
-    }
-}
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "experimentTest",
-)
-interface ExperimentTestAA {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun experimentTestAA(): Toggle
-
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        TREATMENT("treatment"),
     }
 }

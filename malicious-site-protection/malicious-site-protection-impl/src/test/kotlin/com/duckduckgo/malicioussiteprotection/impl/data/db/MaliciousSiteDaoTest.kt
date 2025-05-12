@@ -28,7 +28,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,8 +62,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateFilters(filterSet)
 
-        assertTrue(dao.getFilter("hash2")?.isEmpty() == false)
-        assertTrue(dao.getFilter("hash1")?.isEmpty() == true)
+        assertNotNull(dao.getFilter("hash2"))
+        assertNull(dao.getFilter("hash1"))
     }
 
     @Test
@@ -79,8 +78,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateFilters(filterSet)
 
-        assertTrue(dao.getFilter("hash2")?.isEmpty() == false)
-        assertTrue(dao.getFilter("hash1")?.isEmpty() == false)
+        assertNotNull(dao.getFilter("hash2"))
+        assertNotNull(dao.getFilter("hash1"))
     }
 
     @Test
@@ -128,8 +127,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateFilters(filterSet)
 
-        assertTrue(dao.getFilter("hash1")?.isEmpty() == false)
-        assertTrue(dao.getFilter("hash2")?.isEmpty() == true)
+        assertNotNull(dao.getFilter("hash1"))
+        assertNull(dao.getFilter("hash2"))
     }
 
     @Test
@@ -145,8 +144,8 @@ class MaliciousSiteDaoTest {
 
         dao.updateFilters(filterSet)
 
-        assertTrue(dao.getFilter("hash1")?.isEmpty() == true)
-        assertTrue(dao.getFilter("hash2")?.isEmpty() == false)
+        assertNull(dao.getFilter("hash1"))
+        assertNotNull(dao.getFilter("hash2"))
     }
 
     @Test

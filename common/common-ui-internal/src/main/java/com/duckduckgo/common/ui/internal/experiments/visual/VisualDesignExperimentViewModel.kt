@@ -78,11 +78,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     fun onExperimentalUIModeChanged(checked: Boolean) {
         visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
-    }
-
-    fun onNavigationBarPrefChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.setNavigationBarStateUserPreference(checked)
     }
 }

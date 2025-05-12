@@ -21,7 +21,7 @@ import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Extract
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.FillForm
-import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchInfo
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Navigate
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.internal.scripts.models.DataSource.USER_PROFILE
@@ -47,41 +47,18 @@ sealed class BrokerAction(
         val selector: String,
         val noResultsSelector: String?,
         val profile: ExtractProfileSelectors,
-    ) : BrokerAction(id) {
-        data class ExtractProfileSelectors(
-            val name: ProfileSelector?,
-            val alternativeNamesList: ProfileSelector?,
-            val age: ProfileSelector?,
-            val addressFull: ProfileSelector?,
-            val addressFullList: ProfileSelector?,
-            val addressCityState: ProfileSelector?,
-            val addressCityStateList: ProfileSelector?,
-            val phone: ProfileSelector?,
-            val phoneList: ProfileSelector?,
-            val relativesList: ProfileSelector?,
-            val profileUrl: ProfileSelector?,
-            val reportedId: ProfileSelector?,
-        )
-
-        data class ProfileSelector(
-            val selector: String?,
-            val findElements: Boolean?,
-            val beforeText: String?,
-            val afterText: String?,
-            val separator: String?,
-            val identifierType: String?,
-            val identifier: String?,
-        )
-    }
+    ) : BrokerAction(id)
 
     data class FillForm(
         override val id: String,
-        override val needsEmail: Boolean = false,
+        override val dataSource: DataSource? = DataSource.EXTRACTED_PROFILE,
         val elements: List<ElementSelector>,
         val selector: String,
-    ) : BrokerAction(id)
+    ) : BrokerAction(id) {
+        override val needsEmail: Boolean = elements.any { it.type == "email" }
+    }
 
-    data class GetCaptchInfo(
+    data class GetCaptchaInfo(
         override val id: String,
         val selector: String,
     ) : BrokerAction(id)
@@ -95,7 +72,19 @@ sealed class BrokerAction(
         override val id: String,
         val elements: List<ElementSelector>,
         val selector: String?,
-    ) : BrokerAction(id)
+        val choice: List<Choice> = emptyList(),
+    ) : BrokerAction(id) {
+        data class Choice(
+            val condition: Condition,
+            val elements: List<ElementSelector>,
+        )
+
+        data class Condition(
+            val left: String,
+            val operation: String,
+            val right: String,
+        )
+    }
 
     data class Expectation(
         override val id: String,
@@ -104,7 +93,9 @@ sealed class BrokerAction(
         data class ExpectationSelector(
             val type: String,
             val selector: String,
-            val expect: String,
+            val expect: String?,
+            val parent: String?,
+            val failSilently: Boolean?,
         )
     }
 
@@ -114,13 +105,48 @@ sealed class BrokerAction(
     ) : BrokerAction(id)
 }
 
+data class ExtractProfileSelectors(
+    val name: ProfileSelector?,
+    val alternativeNamesList: ProfileSelector?,
+    val age: ProfileSelector?,
+    val addressFull: ProfileSelector?,
+    val addressFullList: ProfileSelector?,
+    val addressCityState: ProfileSelector?,
+    val addressCityStateList: ProfileSelector?,
+    val phone: ProfileSelector?,
+    val phoneList: ProfileSelector?,
+    val relativesList: ProfileSelector?,
+    val profileUrl: ProfileSelector?,
+    val reportedId: ProfileSelector?,
+)
+
+data class ProfileSelector(
+    val selector: String?,
+    val findElements: Boolean?,
+    val beforeText: String?,
+    val afterText: String?,
+    val separator: String?,
+    val identifierType: String?,
+    val identifier: String?,
+)
+
 data class ElementSelector(
     val type: String,
     val selector: String,
+    val parent: ParentElement?,
+    val multiple: Boolean?,
     val min: String?,
     val max: String?,
     val failSilently: Boolean?,
-    val multiple: Boolean?,
+)
+
+data class ParentElement(
+    val profileMatch: ProfileMatch,
+)
+
+data class ProfileMatch(
+    val selector: String,
+    val profile: ExtractProfileSelectors,
 )
 
 enum class DataSource {
@@ -140,7 +166,7 @@ fun BrokerAction.asActionType(): String {
         is Expectation -> "expectation"
         is Click -> "click"
         is FillForm -> "fillForm"
-        is GetCaptchInfo -> "getCaptchaInfo"
+        is GetCaptchaInfo -> "getCaptchaInfo"
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
     }

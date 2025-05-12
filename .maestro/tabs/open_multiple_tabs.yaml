@@ -10,23 +10,19 @@ tags:
                   clearState: true
                   stopApp: true
 
-            - runFlow: ../shared/pre_onboarding.yaml
+            - runFlow: ../shared/skip_all_onboarding.yaml
 
             - tapOn:
-                text: "search or type URL"
+                id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site"
             - pressKey: Enter
-            - assertVisible:
-                text: ".*keep browsing.*"
-            - tapOn:
-                text: "got it"
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/tabCount"
             - assertVisible:
                 text: "Privacy Test Pages - Home"
             - tapOn: "New Tab"
             - assertVisible:
-                text: "Search or type URL"
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site"
             - pressKey: Enter
             - assertVisible:

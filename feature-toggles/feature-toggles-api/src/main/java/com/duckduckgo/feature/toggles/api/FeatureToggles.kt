@@ -108,6 +108,12 @@ class FeatureToggles private constructor(
             } catch (t: Throwable) {
                 throw IllegalStateException("Feature toggle methods shall have annotated default value")
             }
+            val resolvedDefaultValue = when (val value = defaultValue.toValue()) {
+                is Boolean -> value
+                is String -> value.lowercase() == flavorNameProvider.invoke().lowercase()
+                else -> throw IllegalStateException("Unsupported default value type")
+            }
+
             val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
                 method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
             }.getOrNull() != null
@@ -118,7 +124,7 @@ class FeatureToggles private constructor(
             return ToggleImpl(
                 store = store,
                 key = getToggleNameForMethod(method),
-                defaultValue = defaultValue,
+                defaultValue = resolvedDefaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
                 isExperiment = isExperiment,
                 appVersionProvider = appVersionProvider,
@@ -161,7 +167,9 @@ interface Toggle {
     fun featureName(): FeatureName
 
     /**
-     * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
+     * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that.
+     * WARNING: Calling this method with a cohort different from [ANY_COHORT] WILL ALWAYS try to enroll the user into an experiment.
+     * This method enrolls users as long as they match the targets, even if the feature is disabled or the min version does not match.
      * @return `true` if the feature should be enabled, `false` otherwise
      */
     fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
@@ -192,6 +200,23 @@ interface Toggle {
     fun getSettings(): String?
 
     /**
+     * WARNING: This method does not check if the experiment is still enabled or not.
+     * @return `true` if the user is enrolled in the experiment and `false` otherwise
+     */
+    fun isEnrolled(): Boolean
+
+    /**
+     * @return `true` if the user is enrolled in the given cohort and the experiment is enabled or `false` otherwise
+     */
+    fun isEnrolledAndEnabled(cohort: CohortName): Boolean
+
+    /**
+     * @return the list of domain exceptions`exceptions` of the feature or empty list if not present in the remote config
+     */
+    fun getExceptions(): List<FeatureException>
+
+    /**
+     * WARNING: This method always returns the cohort assigned regardless it the experiment is still enabled or not.
      * @return a [Cohort] if one has been assigned or `null` otherwise.
      */
     fun getCohort(): Cohort?
@@ -218,6 +243,7 @@ interface Toggle {
         val cohorts: List<Cohort> = emptyList(),
         val assignedCohort: Cohort? = null,
         val settings: String? = null,
+        val exceptions: List<FeatureException> = emptyList(),
     ) {
         data class Target(
             val variantKey: String?,
@@ -225,6 +251,7 @@ interface Toggle {
             val localeLanguage: String?,
             val isReturningUser: Boolean?,
             val isPrivacyProEligible: Boolean?,
+            val minSdkVersion: Int?,
         )
         data class Cohort(
             val name: String,
@@ -283,8 +310,23 @@ interface Toggle {
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(
-        val defaultValue: Boolean,
+        val defaultValue: DefaultFeatureValue,
     )
+
+    enum class DefaultFeatureValue {
+        FALSE,
+        TRUE,
+        INTERNAL,
+        ;
+
+        fun toValue(): Any {
+            return when (this) {
+                FALSE -> false
+                TRUE -> true
+                INTERNAL -> "internal"
+            }
+        }
+    }
 
     /**
      * This annotation is optional.
@@ -516,7 +558,15 @@ internal class ToggleImpl constructor(
 
     override fun getSettings(): String? = store.get(key)?.settings
 
+    override fun getExceptions(): List<FeatureException> {
+        return store.get(key)?.exceptions.orEmpty()
+    }
+
     override fun getCohort(): Cohort? {
         return store.get(key)?.assignedCohort
     }
+
+    override fun isEnrolled(): Boolean = getCohort() != null
+
+    override fun isEnrolledAndEnabled(cohort: CohortName): Boolean = isEnrolled() && isEnabled(cohort)
 }

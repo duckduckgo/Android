@@ -67,11 +67,6 @@ android {
         } else {
             buildConfigField "long", "BUILD_DATE_MILLIS", "0"
         }
-        if (project.hasProperty('disable-visual-design-experiment')) {
-            buildConfigField "boolean", "VISUAL_DESIGN_EXPERIMENT_ENABLED_BY_DEFAULT", "false"
-        } else {
-            buildConfigField "boolean", "VISUAL_DESIGN_EXPERIMENT_ENABLED_BY_DEFAULT", "true"
-        }
 
         namespace 'com.duckduckgo.app.browser'
     }
@@ -179,6 +174,7 @@ android {
         abortOnError true
         ignoreTestSources false
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests.returnDefaultValues = true
@@ -405,6 +401,9 @@ dependencies {
     implementation project(':survey-impl')
 
     implementation project(':breakage-reporting-impl')
+
+    implementation project(':dax-prompts-api')
+    implementation project(':dax-prompts-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

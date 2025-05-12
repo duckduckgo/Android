@@ -33,31 +33,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface"
+            android:background="?attr/daxColorToolbar"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <ListView
+        android:id="@+id/scanLogList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
-            android:orientation="vertical">
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/pirDevSimpleScanHeader" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/simpleScanResults"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/keyline_4" />
 </LinearLayout>

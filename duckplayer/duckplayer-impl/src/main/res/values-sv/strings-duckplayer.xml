@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Med Duck Player kan du titta på YouTube utan riktade annonser i DuckDuckGo, och dina rekommendationer påverkas inte av vad du tittar på.</string>
     <string name="duck_player_info_modal_button">Jag förstår!</string>
     <string name="duck_player_unavailable">Duck Player är inte tillgänglig</string>
-    <string name="duck_player_unavailable_description">De senaste ändringarna på YouTube har påverkat funktionaliteten hos Duck Player. Vi arbetar för att åtgärda problemen och tackar för din förståelse.</string>
     <string name="duck_player_unavailable_learn_more">Läs mer</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Öppna YouTube-videor i Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Öppna Duck Player på en ny flik</string>

@@ -162,6 +162,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             "getAIChatNativeHandoffData",
             "getAIChatNativeConfigValues",
             "openAIChat",
+            "closeAIChat",
+            "openAIChatSettings",
         )
     }
 }

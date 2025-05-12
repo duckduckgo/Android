@@ -112,6 +112,16 @@
                         android:textColor="?attr/daxColorPrimaryText" />
                 </FrameLayout>
 
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/descriptionCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:visibility="invisible"
+                    app:typography="body1"
+                    tools:text="Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button 🔥"
+                    tools:visibility="visible" />
+
                 <ImageView
                     android:id="@+id/daxDialogContentImage"
                     android:layout_width="wrap_content"
@@ -138,6 +148,16 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:alpha="0"
                     android:text="@string/onboardingLetsDoItButton"
+                    app:daxButtonSize="large"
+                    tools:alpha="1" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/secondaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_0"
+                    android:alpha="0"
+                    android:text="@string/preOnboardingDaxDialog1SecondaryButton"
                     app:daxButtonSize="large"
                     tools:alpha="1" />
 

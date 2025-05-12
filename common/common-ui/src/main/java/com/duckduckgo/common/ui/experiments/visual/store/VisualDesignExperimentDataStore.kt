@@ -24,7 +24,6 @@ interface VisualDesignExperimentDataStore {
     val navigationBarState: StateFlow<FeatureState>
 
     fun setExperimentStateUserPreference(enabled: Boolean)
-    fun setNavigationBarStateUserPreference(enabled: Boolean)
 
     /**
      * @param isAvailable returns `true` if the flag for this feature is enabled in the config.

@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_sync_device_all_24"
+        app:leadingIcon="@drawable/ic_device_all_24"
         app:primaryText="@string/sync_setup_with_another_device_cta_title"
         app:secondaryText="@string/sync_setup_with_another_device_cta_subtitle"/>
 

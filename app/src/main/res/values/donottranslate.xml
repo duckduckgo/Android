@@ -19,36 +19,11 @@
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
-    <!-- Network Protection -->
-    <string name="netpSettingsTitle">VPN</string>
-    <string name="netpSettingsNeverEnabled">Secure your network connection</string>
-    <string name="netpSettingsConnected">Enabled</string>
-    <string name="netpSettingsConnecting">Connecting…</string>
-    <string name="netpSettingsDisconnected">Disabled</string>
-    <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
-    <string name="netpUnlockedSnackbarAction">Open</string>
-
     <!-- Sasquatch -->
     <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
-
-    <!-- Malicious Site -->
-    <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
-    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
-    <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
-    <string name="maliciousSiteLeaveCTA">Leave This Site</string>
-    <string name="maliciousSiteAdvancedCTA">Advanced</string>
-    <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
-    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
-    <string name="maliciousSiteReportErrorTitle">Report a site incorrectly flagged as malicious</string>
-    <string name="maliciousSiteLearnMoreTitle">Learn more</string>
-    <string name="maliciousSiteSettingTitle">Site Safety Warnings</string>
-    <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
-    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
-    <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
-
 
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
@@ -79,7 +54,6 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
-    <!--    Bottom Navigation Bar Experiment-->
-    <string name="refreshPage">Refresh Page</string>
-
+    <!-- Trackers blocked animation-->
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
 </resources>

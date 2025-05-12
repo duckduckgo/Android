@@ -17,7 +17,7 @@
 package com.duckduckgo.user.agent.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

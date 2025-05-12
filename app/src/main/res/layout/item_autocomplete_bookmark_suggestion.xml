@@ -23,18 +23,16 @@
     android:layout_marginBottom="8dp"
     android:layout_marginTop="6dp"
     android:background="?attr/selectableItemBackground"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingVertical="@dimen/keyline_2"
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding">
 
     <ImageView
         android:id="@+id/bookmarkIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
-        android:layout_margin="@dimen/keyline_0"
-        android:src="@drawable/ic_bookmark_20"
+        android:src="@drawable/ic_bookmark_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -43,7 +41,7 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="?attr/autocompleteListItemIconMargin"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:gravity="center_vertical|start"
@@ -59,7 +57,7 @@
         android:layout_height="wrap_content"
         app:typography="body2"
         app:textType="secondary"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="?attr/autocompleteListItemIconMargin"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:maxLines="1"

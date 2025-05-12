@@ -106,12 +106,14 @@ interface SubscriptionsManager {
     suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
     /**
-     * Launches the purchase flow for a given combination of plan id and offer id
+     * Launches the purchase flow for a given combination of plan id, offer id and front-end experiment details
      */
     suspend fun purchase(
         activity: Activity,
         planId: String,
         offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
     )
 
     /**
@@ -269,6 +271,10 @@ class RealSubscriptionsManager @Inject constructor(
     private var purchaseStateJob: Job? = null
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
+    private var purchaseFlowStartedUsingRestoredAccount: Boolean = false
+
+    // Indicates whether the user is part of any FE experiment at the time of purchase
+    private var experimentAssigned: Experiment? = null
 
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
@@ -423,9 +429,14 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): Boolean {
         var experimentName: String? = null
-        val cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
-        if (cohort != null) {
+        var cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
+        if (cohort != null) { // Android experiment
             experimentName = "privacyProFreeTrialJan25"
+        } else {
+            experimentAssigned?.let { // FE experiment details
+                cohort = it.cohort
+                experimentName = it.name
+            }
         }
         return try {
             val confirmationResponse = subscriptionsService.confirm(
@@ -469,6 +480,11 @@ class RealSubscriptionsManager @Inject constructor(
                 }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
+                if (purchaseFlowStartedUsingRestoredAccount) {
+                    purchaseFlowStartedUsingRestoredAccount = false
+                    val hasEmail = !authRepository.getAccount()?.email.isNullOrBlank()
+                    pixelSender.reportPurchaseWithRestoredAccount(hasEmail)
+                }
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
             } else {
@@ -484,6 +500,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
+        purchaseFlowStartedUsingRestoredAccount = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -575,6 +592,15 @@ class RealSubscriptionsManager @Inject constructor(
             validateTokens(tokens, jwks)
         } catch (e: HttpException) {
             if (e.code() == 400) {
+                if (parseError(e)?.error == "unknown_account") {
+                    /*
+                        Refresh token appears to be valid, but the related account doesn't exist in BE.
+                        After the subscription expires, BE eventually deletes the account, so this is expected.
+                     */
+                    signOut()
+                    throw e
+                }
+
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
@@ -791,6 +817,8 @@ class RealSubscriptionsManager @Inject constructor(
         activity: Activity,
         planId: String,
         offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
@@ -810,16 +838,20 @@ class RealSubscriptionsManager @Inject constructor(
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 
+            var restoredAccount = false
+
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
+                restoredAccount = isSignedIn()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
                         recoverSubscriptionFromStore()
-                        removeExpiredSubscriptionOnCancelledPurchase =
-                            accountId != null && accountId != authRepository.getAccount()?.externalId
+                        val accountIdChanged = accountId != null && accountId != authRepository.getAccount()?.externalId
+                        removeExpiredSubscriptionOnCancelledPurchase = accountIdChanged
+                        restoredAccount = accountIdChanged
                     }
                 }
             }
@@ -840,6 +872,14 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
 
+            experimentAssigned = if (experimentCohort.isNullOrEmpty() || experimentName.isNullOrEmpty()) {
+                null
+            } else {
+                Experiment(experimentName, experimentCohort)
+            }
+
+            purchaseFlowStartedUsingRestoredAccount = restoredAccount
+
             logcat(LogPriority.DEBUG) { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
             playBillingManager.launchBillingFlow(
@@ -853,6 +893,7 @@ class RealSubscriptionsManager @Inject constructor(
             logcat(LogPriority.ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
+            purchaseFlowStartedUsingRestoredAccount = false
         }
     }
 
@@ -1096,4 +1137,9 @@ data class ValidatedTokenPair(
     val accessTokenClaims: AccessTokenClaims,
     val refreshToken: String,
     val refreshTokenClaims: RefreshTokenClaims,
+)
+
+data class Experiment(
+    val name: String,
+    val cohort: String,
 )

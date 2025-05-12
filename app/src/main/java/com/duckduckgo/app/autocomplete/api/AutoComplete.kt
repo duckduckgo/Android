@@ -288,9 +288,12 @@ class AutoCompleteApi @Inject constructor(
     private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
         runCatching {
             if (autocompleteTabsEnabled) {
-                tabRepository.flowTabs
-                    .map { rankTabs(query, it) }
-                    .distinctUntilChanged()
+                combine(
+                    tabRepository.flowTabs,
+                    tabRepository.flowSelectedTab,
+                ) { tabs, selectedTab ->
+                    rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
+                }.distinctUntilChanged()
             } else {
                 flowOf(emptyList())
             }
