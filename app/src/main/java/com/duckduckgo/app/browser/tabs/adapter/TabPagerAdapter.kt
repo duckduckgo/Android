@@ -94,15 +94,15 @@ class TabPagerAdapter(
     }
 
     inner class PagerDiffUtil(
-        private val oldList: List<String>,
-        private val newList: List<String>,
+        private val oldList: List<TabModel>,
+        private val newList: List<TabModel>,
     ) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] == newList[newItemPosition]
+            return oldList[oldItemPosition].tabId == newList[newItemPosition].tabId
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

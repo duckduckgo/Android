@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
@@ -71,13 +72,19 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -145,12 +152,12 @@ class BrowserViewModel @Inject constructor(
         .distinctUntilChanged()
         .debounce(100)
 
-    val tabsFlow: Flow<List<String>> = tabRepository.flowTabs
-        .map { tabs -> tabs.map { tab -> tab.tabId } }
+    val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
+        .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome) } }
         .distinctUntilChanged()
 
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
-        tabs.indexOf(selectedTab)
+        tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->

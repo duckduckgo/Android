@@ -1002,7 +1002,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<String>) {
+    private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
 

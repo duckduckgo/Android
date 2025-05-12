@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.tabs
 import com.duckduckgo.app.browser.SkipUrlConversionOnNewTabFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.Companion.NEW_TAB_CREATION_TIMEOUT_LIMIT
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -41,15 +42,21 @@ interface TabManager {
         const val NEW_TAB_CREATION_TIMEOUT_LIMIT = 2 // seconds
     }
 
-    fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit)
+    fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)
     fun getSelectedTabId(): String?
     fun onSelectedTabChanged(tabId: String)
 
-    suspend fun onTabsChanged(updatedTabIds: List<String>)
+    suspend fun onTabsChanged(updatedTabIds: List<TabModel>)
     suspend fun switchToTab(tabId: String)
     suspend fun requestAndWaitForNewTab(): TabEntity
     suspend fun openNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false): String
     suspend fun getTabById(tabId: String): TabEntity?
+
+    data class TabModel(
+        val tabId: String,
+        val url: String?,
+        val skipHome: Boolean,
+    )
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -59,10 +66,10 @@ class DefaultTabManager @Inject constructor(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : TabManager {
-    private lateinit var onTabsUpdated: (List<String>) -> Unit
+    private lateinit var onTabsUpdated: (List<TabModel>) -> Unit
     private var selectedTabId: String? = null
 
-    override fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit) {
+    override fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit) {
         this.onTabsUpdated = onTabsUpdated
     }
 
@@ -72,7 +79,7 @@ class DefaultTabManager @Inject constructor(
         selectedTabId = tabId
     }
 
-    override suspend fun onTabsChanged(updatedTabIds: List<String>) {
+    override suspend fun onTabsChanged(updatedTabIds: List<TabModel>) {
         onTabsUpdated(updatedTabIds)
 
         if (updatedTabIds.isEmpty()) {
