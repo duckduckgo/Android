@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.V
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
@@ -80,6 +81,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
             AppPixelName.BROWSER_NAV_FIRE_PRESSED.pixelName,
             mapOf(FIRE_BUTTON_STATE to _viewState.value.fireButtonHighlighted.toString()),
         )
+        _commands.trySend(NotifyFireButtonClicked)
     }
 
     fun onTabsButtonClicked() {
