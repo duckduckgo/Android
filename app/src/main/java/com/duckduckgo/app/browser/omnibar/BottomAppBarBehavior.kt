@@ -46,18 +46,24 @@ class BottomAppBarBehavior<V : View>(
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
 
+    /**
+     * We don't want any offset when in full screen.
+     *
+     * The browser, new tab page, etc padding management, to avoid omnibar overlapping with the content, is handled in [BottomOmnibarBrowserContainerLayoutBehavior].
+     */
+    private val viewIDsExemptedFromForceOffset = setOf(
+        R.id.webViewFullScreenContainer,
+        R.id.browserLayout,
+        R.id.newTabLayout,
+    )
+
     @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
 
-        /**
-         * We don't want any offset when in full screen.
-         *
-         * The browser padding management, to avoid omnibar overlapping with the browser content, is handled in [BottomOmnibarBrowserContainerLayoutBehavior].
-         */
-        if (dependency.id != R.id.webViewFullScreenContainer && dependency.id != R.id.browserLayout) {
+        if (!viewIDsExemptedFromForceOffset.contains(dependency.id)) {
             offsetBottomByToolbar(dependency)
         }
 
