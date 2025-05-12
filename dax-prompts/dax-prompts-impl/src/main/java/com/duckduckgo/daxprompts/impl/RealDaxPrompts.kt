@@ -16,6 +16,7 @@
 
 package com.duckduckgo.daxprompts.impl
 
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPrompts
@@ -37,6 +38,7 @@ class RealDaxPrompts @Inject constructor(
     private val daxPromptsRepository: DaxPromptsRepository,
     private val reactivateUsersExperiment: ReactivateUsersExperiment,
     private val userBrowserProperties: UserBrowserProperties,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
 
@@ -70,6 +72,7 @@ class RealDaxPrompts @Inject constructor(
     }
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
-        daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+        val defaultBrowserAlready = defaultBrowserDetector.isDefaultBrowser()
+        !defaultBrowserAlready && daxPromptsRepository.getDaxPromptsShowBrowserComparison()
     }
 }

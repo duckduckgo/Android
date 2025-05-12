@@ -16,6 +16,7 @@
 
 package com.duckduckgo.daxprompts.impl
 
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
@@ -42,10 +43,17 @@ class RealDaxPromptsTest {
     private val mockRepository: DaxPromptsRepository = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
+    private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
 
     @Before
     fun setup() {
-        testee = RealDaxPrompts(mockRepository, mockReactivateUsersExperiment, mockUserBrowserProperties, coroutineTestRule.testDispatcherProvider)
+        testee = RealDaxPrompts(
+            mockRepository,
+            mockReactivateUsersExperiment,
+            mockUserBrowserProperties,
+            mockDefaultBrowserDetector,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
@@ -97,11 +105,26 @@ class RealDaxPromptsTest {
         whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
         whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
         whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
 
         val result = testee.evaluate()
 
         assertEquals(ActionType.SHOW_VARIANT_BROWSER_COMPARISON, result)
+    }
+
+    @Test
+    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldShowPromptButDefaultBorwserAlreadyThenReturnNone() = runTest {
+        mockUserIsEligible()
+        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
+        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
     }
 
     @Test
