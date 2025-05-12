@@ -23,7 +23,7 @@ import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.SCHEDULED
+import com.duckduckgo.pir.internal.common.PirJob.RunType.SCHEDULED
 import javax.inject.Inject
 import logcat.logcat
 

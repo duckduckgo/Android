@@ -22,6 +22,12 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.CaptchaResolver
+import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler
+import com.duckduckgo.pir.internal.common.RealNativeBrokerActionHandler
+import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
+import com.duckduckgo.pir.internal.scripts.PirMessagingInterface
+import com.duckduckgo.pir.internal.scripts.RealBrokerActionProcessor
 import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.store.PirDatabase
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -116,4 +122,26 @@ class PirModule {
         dbpService,
         outResultsDao,
     )
+
+    @Provides
+    fun providesBrokerActionProcessor(
+        pirMessagingInterface: PirMessagingInterface,
+    ): BrokerActionProcessor {
+        // Creates a new instance everytime is BrokerActionProcessor injected
+        return RealBrokerActionProcessor(pirMessagingInterface)
+    }
+
+    @Provides
+    fun provideNativeBrokerActionHandler(
+        repository: PirRepository,
+        dispatcherProvider: DispatcherProvider,
+        captchaResolver: CaptchaResolver,
+    ): NativeBrokerActionHandler {
+        // Creates a new instance everytime is NativeBrokerActionHandler injected
+        return RealNativeBrokerActionHandler(
+            repository,
+            dispatcherProvider,
+            captchaResolver,
+        )
+    }
 }

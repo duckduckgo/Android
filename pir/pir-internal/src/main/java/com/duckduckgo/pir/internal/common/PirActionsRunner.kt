@@ -33,7 +33,7 @@ import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus.CaptchaStatus.Ready
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
 import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
@@ -85,6 +85,8 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateRes
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -131,16 +133,16 @@ interface PirActionsRunner {
     fun stop()
 }
 
-internal class RealPirActionsRunner(
+class RealPirActionsRunner @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
     private val brokerActionProcessor: BrokerActionProcessor,
-    private val context: Context,
-    private val pirScriptToLoad: String,
-    private val runType: RunType,
     private val currentTimeProvider: CurrentTimeProvider,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
     private val pirRunStateHandler: PirRunStateHandler,
+    @Assisted private val runType: RunType,
+    @Assisted private val context: Context,
+    @Assisted private val pirScriptToLoad: String,
 ) : PirActionsRunner, ActionResultListener {
     private val coroutineScope: CoroutineScope
         get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())

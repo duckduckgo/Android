@@ -25,8 +25,8 @@ import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
 import com.duckduckgo.pir.internal.common.PirJob
+import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
@@ -140,7 +140,7 @@ class RealPirScan @Inject constructor(
         var createCount = 0
         while (createCount != maxWebViewCount) {
             runners.add(
-                pirActionsRunnerFactory.createInstance(
+                pirActionsRunnerFactory.create(
                     context,
                     script,
                     runType,
