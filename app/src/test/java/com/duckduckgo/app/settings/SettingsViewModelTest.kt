@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
@@ -46,6 +47,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
+@SuppressLint("DenyListedApi")
 class SettingsViewModelTest {
 
     @get:Rule
