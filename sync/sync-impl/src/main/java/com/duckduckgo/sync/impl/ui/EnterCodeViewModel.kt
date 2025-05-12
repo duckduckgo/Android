@@ -177,6 +177,7 @@ class EnterCodeViewModel @Inject constructor(
                 INVALID_CODE.code -> R.string.sync_invalid_code_error
                 else -> null
             }?.let { message ->
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 command.send(
                     ShowError(
                         message = message,
@@ -204,6 +205,7 @@ class EnterCodeViewModel @Inject constructor(
                         ShowError(message = message, reason = result.reason),
                     )
                 }
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
             } else {
                 syncPixels.fireUserSwitchedAccount()
                 command.send(SwitchAccountSuccess)
@@ -212,7 +214,10 @@ class EnterCodeViewModel @Inject constructor(
     }
 
     fun onUserCancelledJoiningNewAccount() {
-        syncPixels.fireUserCancelledSwitchingAccount()
+        viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserCancelledSwitchingAccount()
+            viewState.value = viewState.value.copy(authState = AuthState.Idle)
+        }
     }
 
     fun onUserAskedToSwitchAccount() {
