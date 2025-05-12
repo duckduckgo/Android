@@ -68,8 +68,11 @@ class RealRemoteMessageModel @Inject constructor(
         return remoteMessage.content.getSecondaryAction()
     }
 
-    override fun onActionClicked(remoteMessage: RemoteMessage): Action? {
+    override suspend fun onActionClicked(remoteMessage: RemoteMessage): Action? {
         remoteMessagingPixels.fireRemoteMessageActionClickedPixel(remoteMessage)
+        withContext(dispatchers.io()) {
+            remoteMessagingRepository.dismissMessage(remoteMessage.id)
+        }
         return remoteMessage.content.getAction()
     }
 
