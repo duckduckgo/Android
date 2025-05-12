@@ -19,7 +19,6 @@ package com.duckduckgo.autoconsent.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository

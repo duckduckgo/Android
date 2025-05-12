@@ -23,7 +23,10 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.CopyOnWriteArrayList
@@ -44,12 +47,13 @@ class InitMessageHandlerPluginTest {
     private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
+    private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
 
     private val initHandlerPlugin = InitMessageHandlerPlugin(
         TestScope(),
         coroutineRule.testDispatcherProvider,
         settingsRepository,
-        repository,
+        feature,
     )
 
     @Test
@@ -103,7 +107,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
-        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList<String>().apply { add("MyCmp") })
+        feature.self().setRawStoredState(Toggle.State(settings="{\"disabledCMPs\": [\"MyCmp\"]}"))
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
@@ -118,7 +122,7 @@ class InitMessageHandlerPluginTest {
     fun whenProcessMessageResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
-        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
+        feature.self().setRawStoredState(Toggle.State(settings="{\"disabledCMPs\": []}"))
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
