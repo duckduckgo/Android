@@ -20,12 +20,17 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -56,12 +61,32 @@ class RemoteMessagingConfigDownloadWorker(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+
+@ContributesMultibinding(
+    AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     private val workManager: WorkManager,
-) : MainProcessLifecycleObserver {
+    private val downloader: RemoteMessagingConfigDownloader,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
+    private val remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
+) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onCreate(owner: LifecycleOwner) {
         scheduleDownload()
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        if (remoteMessagingFeatureToggles.invalidateRMFAfterPrivacyConfigDownloaded().isEnabled()) {
+            appCoroutineScope.launch(context = dispatcherProvider.io()) {
+                Timber.d("RMF: onPrivacyConfigDownloaded, invalidating and re-downloading")
+                remoteMessagingConfigRepository.invalidate()
+                downloader.download()
+            }
+        }
     }
 
     private fun scheduleDownload() {

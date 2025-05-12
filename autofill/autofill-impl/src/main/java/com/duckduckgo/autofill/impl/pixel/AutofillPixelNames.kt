@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.pixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
@@ -145,6 +146,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
         "m_autofill_device_capability_secure_storage_unavailable_and_device_auth_disabled",
     ),
     AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR("m_autofill_device_capability_unknown"),
+    AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE("autofill_device_auth_error_hardware_unavailable"),
 
     AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED("m_autofill_management_screen_visit_survey_available"),
 
@@ -256,6 +258,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_SERVICE_PASSWORDS_SEARCH.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SERVICE_CRASH.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

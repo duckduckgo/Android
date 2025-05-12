@@ -216,7 +216,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -546,8 +545,7 @@ class BrowserTabViewModelTest {
     val mockStack: WebBackForwardList = mock()
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
-    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
-    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
@@ -668,11 +666,8 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
-        )
-        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(
-            defaultVisualExperimentNavBarStateFlow,
         )
 
         whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
@@ -5996,10 +5991,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChatAndSendPixel() {
+    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked("example")
         verify(mockDuckChat).openDuckChatWithAutoPrompt("example")
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     @Test

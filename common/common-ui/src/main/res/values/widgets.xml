@@ -213,6 +213,7 @@
         <item name="android:textColor">?attr/daxColorFabPrimaryText</item>
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay</item>
         <item name="android:height">@dimen/fabHeight</item>
+        <item name="rippleColor">@color/fab_primary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay">
@@ -226,6 +227,7 @@
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.FloatingActionButton.Overlay</item>
         <item name="fabSize">mini</item>
         <item name="elevation">9dp</item>
+        <item name="rippleColor">@color/fab_secondary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.FloatingActionButton.Overlay">

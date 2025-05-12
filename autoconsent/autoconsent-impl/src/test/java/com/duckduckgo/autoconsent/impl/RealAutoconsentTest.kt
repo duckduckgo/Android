@@ -21,7 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*

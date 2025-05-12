@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -86,6 +87,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -209,7 +213,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
-            binding.messageCta.setMessage(message.asMessage())
+            binding.messageCta.setMessage(message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled()))
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }

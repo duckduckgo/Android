@@ -63,7 +63,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -166,7 +165,7 @@ class TabSwitcherViewModelTest {
     )
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
-    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -196,7 +195,7 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
         whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
@@ -1487,7 +1486,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
-        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        defaultVisualExperimentStateFlow.value = true
         whenever(duckChatMock.isEnabled()).thenReturn(true)
 
         initializeViewModel()
@@ -1500,7 +1499,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
-        defaultVisualExperimentStateFlow.value = FeatureState(isAvailable = true, isEnabled = true)
+        defaultVisualExperimentStateFlow.value = true
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
 
