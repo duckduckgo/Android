@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout android:layout_height="wrap_content"
+<LinearLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -24,7 +24,7 @@
 
     <ViewSwitcher
         android:id="@+id/viewSwitcher"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:measureAllChildren="false">
 
@@ -34,7 +34,7 @@
 
         <include
             android:id="@+id/autofill_unsupported"
-            layout="@layout/view_autofill_unsupported" />
+            layout="@layout/view_autofill_unsupported_fragment" />
 
     </ViewSwitcher>
 </LinearLayout>

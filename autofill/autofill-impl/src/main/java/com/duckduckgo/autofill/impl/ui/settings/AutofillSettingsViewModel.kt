@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.impl.asString
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -54,10 +55,12 @@ class AutofillSettingsViewModel @Inject constructor(
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val deviceAuthenticator: DeviceAuthenticator,
 ) : ViewModel() {
 
     data class ViewState(
-        val autofillAvailable: Boolean = false,
+        val autofillUnsupported: Boolean = false,
+        val autofillDisabled: Boolean = false,
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
         val loginsCount: Int = 0,
@@ -78,7 +81,8 @@ class AutofillSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: Flow<ViewState> = _viewState.onStart {
         _viewState.value = ViewState(
-            autofillAvailable = autofillStore.autofillAvailable(),
+            autofillUnsupported = autofillStore.autofillAvailable().not(),
+            autofillDisabled = deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication(),
             autofillEnabled = autofillStore.autofillEnabled,
         )
         onViewStateFlowStart()
@@ -111,6 +115,15 @@ class AutofillSettingsViewModel @Inject constructor(
                 return@runCatching gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
             }.getOrDefault(false)
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
+        }
+    }
+
+    fun checkDeviceRequirements() {
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = ViewState(
+                autofillUnsupported = autofillStore.autofillAvailable().not(),
+                autofillDisabled = deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication(),
+            )
         }
     }
 

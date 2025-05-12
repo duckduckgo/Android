@@ -9,6 +9,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -40,6 +41,7 @@ class AutofillSettingsViewModelTest {
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
@@ -48,6 +50,7 @@ class AutofillSettingsViewModelTest {
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
         webViewCapabilityChecker = webViewCapabilityChecker,
+        deviceAuthenticator = deviceAuthenticator,
     )
 
     @Before
@@ -56,6 +59,7 @@ class AutofillSettingsViewModelTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
             whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
+            whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
             whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
             whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
             whenever(mockStore.autofillAvailable()).thenReturn(true)
@@ -74,10 +78,38 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenAutofillNotAvailableThenUpdateState() = runTest {
+    fun whenAutofillNotAvailableThenUpdateStateToUnsupported() = runTest {
         whenever(mockStore.autofillAvailable()).thenReturn(false)
         testee.viewState.test {
-            assertFalse(awaitItem().autofillAvailable)
+            assertTrue(awaitItem().autofillUnsupported)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeviceMissingValidAuthenticationThenUpdateStateToDisabled() = runTest {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        testee.viewState.test {
+            assertTrue(awaitItem().autofillDisabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckDeviceRequirementsThenUpdateStateUpdates() = runTest {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        testee.viewState.test {
+            awaitItem().let {
+                assertFalse(it.autofillDisabled)
+                assertFalse(it.autofillUnsupported)
+            }
+            whenever(mockStore.autofillAvailable()).thenReturn(false)
+            whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+            testee.checkDeviceRequirements()
+            awaitItem().let {
+                assertTrue(it.autofillDisabled)
+                assertTrue(it.autofillUnsupported)
+            }
             cancelAndIgnoreRemainingEvents()
         }
     }
