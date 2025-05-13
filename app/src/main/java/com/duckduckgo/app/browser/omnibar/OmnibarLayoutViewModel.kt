@@ -623,6 +623,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             when {
+                                visualDesignExperiment -> {
+                                    command.send(
+                                        Command.StartVisualDesignTrackersAnimation(decoration.entities),
+                                    )
+                                }
+
                                 senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
                                     command.send(Command.StartExperimentVariant1Animation)
                                 }
@@ -630,12 +636,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
                                     command.send(
                                         Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
-                                    )
-                                }
-
-                                visualDesignExperiment -> {
-                                    command.send(
-                                        Command.StartVisualDesignTrackersAnimation(decoration.entities),
                                     )
                                 }
 
