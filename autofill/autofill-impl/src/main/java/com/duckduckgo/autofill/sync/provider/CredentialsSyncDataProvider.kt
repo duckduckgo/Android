@@ -17,12 +17,10 @@
 package com.duckduckgo.autofill.sync.provider
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncStore
 import com.duckduckgo.autofill.sync.SyncDateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
@@ -31,7 +29,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class CredentialsSyncDataProvider @Inject constructor(
@@ -42,16 +40,15 @@ class CredentialsSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = CREDENTIALS
 
-    override fun getChanges(): SyncChangesRequest {
-        if (appBuildConfig.isInternalBuild()) checkMainThread()
-        return runBlocking(dispatchers.io()) {
+    override suspend fun getChanges(): SyncChangesRequest {
+        return withContext(dispatchers.io()) {
             if (credentialsSyncStore.serverModifiedSince == "0") {
                 credentialsSync.initMetadata()
             }
             val since = credentialsSyncStore.clientModifiedSince
             val updates = credentialsSync.getUpdatesSince(since)
             val request = formatUpdates(updates)
-            return@runBlocking request
+            return@withContext request
         }
     }
 

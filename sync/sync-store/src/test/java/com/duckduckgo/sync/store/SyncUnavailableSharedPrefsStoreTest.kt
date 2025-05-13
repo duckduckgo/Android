@@ -18,53 +18,64 @@ package com.duckduckgo.sync.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SyncUnavailableSharedPrefsStoreTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val store = SyncUnavailableSharedPrefsStore(TestSharedPrefsProvider(context))
+    private val store = SyncUnavailableSharedPrefsStore(
+        TestSharedPrefsProvider(context),
+        coroutineRule.testScope,
+        coroutineRule.testDispatcherProvider,
+        true,
+    )
 
     @Test
-    fun whenIsSyncUnavailableIsSetThenItIsStored() {
-        store.isSyncUnavailable = true
-        assertTrue(store.isSyncUnavailable)
+    fun whenIsSyncUnavailableIsSetThenItIsStored() = runTest {
+        store.setSyncUnavailable(true)
+        assertTrue(store.isSyncUnavailable())
     }
 
     @Test
-    fun whenClearErrorIsCalledThenErrorIsClearedExceptNotifiedAt() {
+    fun whenClearErrorIsCalledThenErrorIsClearedExceptNotifiedAt() = runTest {
         val timestamp = OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        store.isSyncUnavailable = true
-        store.syncErrorCount = 100
-        store.syncUnavailableSince = timestamp
-        store.userNotifiedAt = timestamp
+        store.setSyncUnavailable(true)
+        store.setSyncErrorCount(100)
+        store.setSyncUnavailableSince(timestamp)
+        store.setUserNotifiedAt(timestamp)
 
         store.clearError()
 
-        assertFalse(store.isSyncUnavailable)
-        assertEquals(0, store.syncErrorCount)
-        assertEquals("", store.syncUnavailableSince)
-        assertEquals(timestamp, store.userNotifiedAt)
+        assertFalse(store.isSyncUnavailable())
+        assertEquals(0, store.getSyncErrorCount())
+        assertEquals("", store.getSyncUnavailableSince())
+        assertEquals(timestamp, store.getUserNotifiedAt())
     }
 
     @Test
-    fun whenClearAllThenStoreEmpty() {
+    fun whenClearAllThenStoreEmpty() = runTest {
         val timestamp = OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        store.isSyncUnavailable = true
-        store.syncErrorCount = 100
-        store.syncUnavailableSince = timestamp
-        store.userNotifiedAt = timestamp
+        store.setSyncUnavailable(true)
+        store.setSyncErrorCount(100)
+        store.setSyncUnavailableSince(timestamp)
+        store.setUserNotifiedAt(timestamp)
 
         store.clearAll()
 
-        assertFalse(store.isSyncUnavailable)
-        assertEquals(0, store.syncErrorCount)
-        assertEquals("", store.syncUnavailableSince)
-        assertEquals("", store.userNotifiedAt)
+        assertFalse(store.isSyncUnavailable())
+        assertEquals(0, store.getSyncErrorCount())
+        assertEquals("", store.getSyncUnavailableSince())
+        assertEquals("", store.getUserNotifiedAt())
     }
 }

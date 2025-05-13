@@ -24,6 +24,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
@@ -39,14 +40,16 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface SyncUnavailableRepository {
     fun onServerAvailable()
     fun onServerUnavailable()
-    fun isSyncUnavailable(): Boolean
-    fun triggerNotification()
+    suspend fun isSyncUnavailable(): Boolean
+    suspend fun triggerNotification()
 }
 
 @Suppress("SameParameterValue")
@@ -65,47 +68,52 @@ class RealSyncUnavailableRepository @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val syncNotificationBuilder: SyncNotificationBuilder,
     private val workManager: WorkManager,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SyncUnavailableRepository, SyncEngineLifecycle {
 
-    override fun isSyncUnavailable(): Boolean {
-        return syncUnavailableStore.isSyncUnavailable
+    override suspend fun isSyncUnavailable(): Boolean {
+        return syncUnavailableStore.isSyncUnavailable()
     }
 
     override fun onServerAvailable() {
-        if (syncUnavailableStore.isSyncUnavailable) {
-            Timber.d("Sync-Engine: Sync is back online - clearing data and canceling notif")
-            syncUnavailableStore.clearError()
-            cancelNotification()
+        appCoroutineScope.launch {
+            if (syncUnavailableStore.isSyncUnavailable()) {
+                Timber.d("Sync-Engine: Sync is back online - clearing data and canceling notif")
+                syncUnavailableStore.clearError()
+                cancelNotification()
+            }
         }
     }
 
     override fun onServerUnavailable() {
-        if (!syncUnavailableStore.isSyncUnavailable) {
-            syncUnavailableStore.syncUnavailableSince = getUtcIsoLocalDate()
-        }
-        syncUnavailableStore.isSyncUnavailable = true
-        syncUnavailableStore.syncErrorCount = syncUnavailableStore.syncErrorCount + 1
+        appCoroutineScope.launch {
+            if (!syncUnavailableStore.isSyncUnavailable()) {
+                syncUnavailableStore.setSyncUnavailableSince(getUtcIsoLocalDate())
+            }
+            syncUnavailableStore.setSyncUnavailable(true)
+            syncUnavailableStore.setSyncErrorCount(syncUnavailableStore.getSyncErrorCount() + 1)
 
-        Timber.d(
-            "Sync-Engine: server unavailable count: ${syncUnavailableStore.syncErrorCount} " +
-                "pausedAt: ${syncUnavailableStore.syncUnavailableSince} lastNotifiedAt: ${syncUnavailableStore.userNotifiedAt}",
-        )
-        if (syncUnavailableStore.syncErrorCount >= ERROR_THRESHOLD_NOTIFICATION_COUNT) {
-            Timber.d("Sync-Engine: Sync error count reached threshold")
-            triggerNotification()
-        } else {
-            scheduleNotification(
-                OneTimeWorkRequest.Builder(SchedulableErrorNotificationWorker::class.java),
-                SYNC_ERROR_NOTIFICATION_DELAY,
-                TimeUnit.HOURS,
-                SYNC_ERROR_NOTIFICATION_TAG,
+            Timber.d(
+                "Sync-Engine: server unavailable count: ${syncUnavailableStore.getSyncErrorCount()} " +
+                    "pausedAt: ${syncUnavailableStore.getSyncUnavailableSince()} lastNotifiedAt: ${syncUnavailableStore.getUserNotifiedAt()}",
             )
+            if (syncUnavailableStore.getSyncErrorCount() >= ERROR_THRESHOLD_NOTIFICATION_COUNT) {
+                Timber.d("Sync-Engine: Sync error count reached threshold")
+                triggerNotification()
+            } else {
+                scheduleNotification(
+                    OneTimeWorkRequest.Builder(SchedulableErrorNotificationWorker::class.java),
+                    SYNC_ERROR_NOTIFICATION_DELAY,
+                    TimeUnit.HOURS,
+                    SYNC_ERROR_NOTIFICATION_TAG,
+                )
+            }
         }
     }
 
-    override fun triggerNotification() {
+    override suspend fun triggerNotification() {
         val today = LocalDateTime.now().toLocalDate()
-        val lastNotification = syncUnavailableStore.userNotifiedAt.takeUnless { it.isEmpty() }?.let {
+        val lastNotification = syncUnavailableStore.getUserNotifiedAt().takeUnless { it.isEmpty() }?.let {
             LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate()
         } ?: ""
         val userNotifiedToday = today == lastNotification
@@ -117,7 +125,7 @@ class RealSyncUnavailableRepository @Inject constructor(
                 SYNC_ERROR_NOTIFICATION_ID,
                 syncNotificationBuilder.buildSyncErrorNotification(context),
             )
-            syncUnavailableStore.userNotifiedAt = getUtcIsoLocalDate()
+            syncUnavailableStore.setUserNotifiedAt(getUtcIsoLocalDate())
         }
     }
 
@@ -147,7 +155,7 @@ class RealSyncUnavailableRepository @Inject constructor(
         // no-op
     }
 
-    override fun onSyncDisabled() {
+    override suspend fun onSyncDisabled() {
         Timber.d("Sync-Engine: Sync disabled, clearing unavailable store data")
         syncUnavailableStore.clearAll()
         cancelNotification()

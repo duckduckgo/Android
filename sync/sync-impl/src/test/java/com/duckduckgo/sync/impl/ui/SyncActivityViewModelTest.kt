@@ -87,7 +87,7 @@ class SyncActivityViewModelTest {
     private lateinit var testee: SyncActivityViewModel
 
     @Before
-    fun before() {
+    fun before() = runTest {
         testee = SyncActivityViewModel(
             syncAccountRepository = syncAccountRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -575,6 +575,7 @@ class SyncActivityViewModelTest {
     fun whenSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.viewState().test {
             val viewState = expectMostRecentItem()
@@ -588,6 +589,7 @@ class SyncActivityViewModelTest {
     fun whenCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.viewState().test {
             val viewState = expectMostRecentItem()
@@ -633,7 +635,7 @@ class SyncActivityViewModelTest {
         assertTrue(format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }
 
-    private fun givenAuthenticatedUser() {
+    private suspend fun givenAuthenticatedUser() {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))

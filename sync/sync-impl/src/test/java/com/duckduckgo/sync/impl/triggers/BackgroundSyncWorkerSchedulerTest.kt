@@ -22,6 +22,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +50,7 @@ class BackgroundSyncWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOnCreateAndSyncEnabledThenWorkerEnqueued() {
+    fun whenOnCreateAndSyncEnabledThenWorkerEnqueued() = runTest {
         whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
         syncBackgroundWorkerScheduler.onCreate(mockOwner)
 
@@ -57,7 +58,7 @@ class BackgroundSyncWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOnCreateAndSyncDisabledThenWorkerIsNotEnqueued() {
+    fun whenOnCreateAndSyncDisabledThenWorkerIsNotEnqueued() = runTest {
         whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(false)
         syncBackgroundWorkerScheduler.onCreate(mockOwner)
 

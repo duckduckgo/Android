@@ -128,15 +128,15 @@ class SyncRemoteFeatureToggle @Inject constructor(
         appCoroutineScope.launch(coroutineDispatcher.io()) {
             val canSyncData = allowDataSyncing()
 
-            if (!canSyncData && syncStore.syncingDataEnabled && syncStore.isSignedIn()) {
+            if (!canSyncData && syncStore.getSyncingDataEnabled() && syncStore.isSignedIn()) {
                 triggerNotification()
             }
 
-            if (canSyncData && !syncStore.syncingDataEnabled) {
+            if (canSyncData && !syncStore.getSyncingDataEnabled()) {
                 cancelNotification()
             }
 
-            syncStore.syncingDataEnabled = canSyncData
+            syncStore.setSyncingDataEnabled(canSyncData)
         }
     }
 

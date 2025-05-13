@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -39,77 +40,82 @@ class SyncSharedPrefsStoreTest {
 
     @Before
     fun setUp() {
-        store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope(), coroutineRule.testDispatcherProvider)
+        store = SyncSharedPrefsStore(
+            sharedPrefsProvider,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            createAsyncPreferences = true,
+        )
     }
 
     @Test
-    fun whenUserIdStoredThenValueUpdatedInPrefsStore() {
-        assertNull(store.userId)
-        store.userId = "test_user"
-        assertEquals("test_user", store.userId)
-        store.userId = null
-        assertNull(store.userId)
+    fun whenUserIdStoredThenValueUpdatedInPrefsStore() = runTest {
+        assertNull(store.getUserId())
+        store.setUserId("test_user")
+        assertEquals("test_user", store.getUserId())
+        store.setUserId(null)
+        assertNull(store.getUserId())
     }
 
     @Test
-    fun whenDeviceNameStoredThenValueUpdatedInPrefsStore() {
-        assertNull(store.deviceName)
-        store.deviceName = "test_device"
-        assertEquals("test_device", store.deviceName)
-        store.deviceName = null
-        assertNull(store.deviceName)
+    fun whenDeviceNameStoredThenValueUpdatedInPrefsStore() = runTest {
+        assertNull(store.getDeviceName())
+        store.setDeviceName("test_device")
+        assertEquals("test_device", store.getDeviceName())
+        store.setDeviceName(null)
+        assertNull(store.getDeviceName())
     }
 
     @Test
-    fun whenDeviceIdStoredThenValueUpdatedInPrefsStore() {
-        assertNull(store.deviceId)
-        store.deviceId = "test_device_id"
-        assertEquals("test_device_id", store.deviceId)
-        store.deviceId = null
-        assertNull(store.deviceId)
+    fun whenDeviceIdStoredThenValueUpdatedInPrefsStore() = runTest {
+        assertNull(store.getDeviceId())
+        store.setDeviceId("test_device_id")
+        assertEquals("test_device_id", store.getDeviceId())
+        store.setDeviceId(null)
+        assertNull(store.getDeviceId())
     }
 
     @Test
-    fun whenStoreCredentialsThenValuesUpdatedInPrefsStore() {
-        assertNull(store.userId)
-        assertNull(store.deviceName)
-        assertNull(store.deviceId)
-        assertNull(store.primaryKey)
-        assertNull(store.secretKey)
-        assertNull(store.token)
+    fun whenStoreCredentialsThenValuesUpdatedInPrefsStore() = runTest {
+        assertNull(store.getUserId())
+        assertNull(store.getDeviceName())
+        assertNull(store.getDeviceId())
+        assertNull(store.getPrimaryKey())
+        assertNull(store.getSecretKey())
+        assertNull(store.getToken())
         store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
-        assertEquals("userId", store.userId)
-        assertEquals("deviceName", store.deviceName)
-        assertEquals("deviceId", store.deviceId)
-        assertEquals("primaryKey", store.primaryKey)
-        assertEquals("secretKey", store.secretKey)
-        assertEquals("token", store.token)
+        assertEquals("userId", store.getUserId())
+        assertEquals("deviceName", store.getDeviceName())
+        assertEquals("deviceId", store.getDeviceId())
+        assertEquals("primaryKey", store.getPrimaryKey())
+        assertEquals("secretKey", store.getSecretKey())
+        assertEquals("token", store.getToken())
     }
 
     @Test
-    fun whenIsSignedInThenReturnTrueIfUserHasAuthKeys() {
+    fun whenIsSignedInThenReturnTrueIfUserHasAuthKeys() = runTest {
         store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
 
         assertTrue(store.isSignedIn())
     }
 
     @Test
-    fun whenClearAllThenReturnRemoveAllKeys() {
+    fun whenClearAllThenReturnRemoveAllKeys() = runTest {
         store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
-        assertEquals("userId", store.userId)
-        assertEquals("deviceName", store.deviceName)
-        assertEquals("deviceId", store.deviceId)
-        assertEquals("primaryKey", store.primaryKey)
-        assertEquals("secretKey", store.secretKey)
-        assertEquals("token", store.token)
+        assertEquals("userId", store.getUserId())
+        assertEquals("deviceName", store.getDeviceName())
+        assertEquals("deviceId", store.getDeviceId())
+        assertEquals("primaryKey", store.getPrimaryKey())
+        assertEquals("secretKey", store.getSecretKey())
+        assertEquals("token", store.getToken())
 
         store.clearAll()
 
-        assertNull(store.userId)
-        assertNull(store.deviceName)
-        assertNull(store.deviceId)
-        assertNull(store.primaryKey)
-        assertNull(store.secretKey)
-        assertNull(store.token)
+        assertNull(store.getUserId())
+        assertNull(store.getDeviceName())
+        assertNull(store.getDeviceId())
+        assertNull(store.getPrimaryKey())
+        assertNull(store.getSecretKey())
+        assertNull(store.getToken())
     }
 }

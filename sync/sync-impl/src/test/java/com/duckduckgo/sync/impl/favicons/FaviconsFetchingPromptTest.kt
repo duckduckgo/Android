@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -44,7 +45,7 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenPromptAlreadyShownThenShouldNotShowAgain() {
+    fun whenPromptAlreadyShownThenShouldNotShowAgain() = runTest {
         whenever(faviconsFetchingStore.promptShown).thenReturn(true)
 
         val shouldShow = faviconsFetchingPrompt.shouldShow()
@@ -53,7 +54,7 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenFaviconsFetchingEnabledThenShouldNotShow() {
+    fun whenFaviconsFetchingEnabledThenShouldNotShow() = runTest {
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(true)
 
@@ -63,7 +64,7 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenSyncNotEnabledThenShouldNotShow() {
+    fun whenSyncNotEnabledThenShouldNotShow() = runTest {
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
@@ -74,7 +75,7 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenSyncOnlyHasOnceDeviceConnectedThenShouldNotShow() {
+    fun whenSyncOnlyHasOnceDeviceConnectedThenShouldNotShow() = runTest {
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
@@ -87,7 +88,7 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenSyncHasMoreThenOnceDevicesConnectedThenShouldShow() {
+    fun whenSyncHasMoreThenOnceDevicesConnectedThenShouldShow() = runTest {
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
@@ -100,7 +101,8 @@ class FaviconsFetchingPromptTest {
     }
 
     @Test
-    fun whenPromptNotShownThenShouldShow() {
+    fun whenPromptNotShownThenShouldShow() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
 
         val shouldShow = faviconsFetchingPrompt.shouldShow()

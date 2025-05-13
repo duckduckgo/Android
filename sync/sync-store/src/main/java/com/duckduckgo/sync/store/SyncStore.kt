@@ -4,23 +4,35 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 interface SyncStore {
-    var syncingDataEnabled: Boolean
-    var userId: String?
-    var deviceName: String?
-    var deviceId: String?
-    var token: String?
-    var primaryKey: String?
-    var secretKey: String?
-    fun isEncryptionSupported(): Boolean
+    suspend fun getSyncingDataEnabled(): Boolean
+    suspend fun setSyncingDataEnabled(enabled: Boolean)
+    suspend fun getUserId(): String?
+    suspend fun setUserId(userId: String?)
+    suspend fun getDeviceName(): String?
+    suspend fun setDeviceName(deviceName: String?)
+    suspend fun getDeviceId(): String?
+    suspend fun setDeviceId(deviceId: String?)
+    suspend fun getToken(): String?
+    suspend fun setToken(token: String?)
+    suspend fun getPrimaryKey(): String?
+    suspend fun setPrimaryKey(primaryKey: String?)
+    suspend fun getSecretKey(): String?
+    suspend fun setSecretKey(secretKey: String?)
+    suspend fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
-    fun isSignedIn(): Boolean
-    fun storeCredentials(
+    suspend fun isSignedIn(): Boolean
+    suspend fun storeCredentials(
         userId: String,
         deviceId: String,
         deviceName: String,
@@ -29,17 +41,41 @@ interface SyncStore {
         token: String,
     )
 
-    fun clearAll()
+    suspend fun clearAll()
 }
 
-class SyncSharedPrefsStore
-constructor(
+class SyncSharedPrefsStore(
     private val sharedPrefsProv: SharedPrefsProvider,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val createAsyncPreferences: Boolean,
 ) : SyncStore {
 
-    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
+    private val mutex: Mutex = Mutex()
+    private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
+        appCoroutineScope.async(dispatcherProvider.io()) {
+            encryptedPreferencesAsync()
+        }
+    }
+
+    private val encryptedPreferencesSync: SharedPreferences? by lazy { encryptedPreferencesSync() }
+
+    private suspend fun getEncryptedPreferences(): SharedPreferences? {
+        return withContext(dispatcherProvider.io()) {
+            if (createAsyncPreferences) encryptedPreferencesDeferred.await() else encryptedPreferencesSync
+        }
+    }
+
+    private suspend fun encryptedPreferencesAsync(): SharedPreferences? {
+        return mutex.withLock {
+            sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
+        }
+    }
+
+    @Synchronized
+    private fun encryptedPreferencesSync(): SharedPreferences? {
+        return sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
+    }
 
     private val isSignedInStateFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
@@ -49,98 +85,107 @@ constructor(
         }
     }
 
-    @Synchronized
-    private fun encryptedPreferences(): SharedPreferences? {
-        return sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
+    override suspend fun getUserId(): String? {
+        return getEncryptedPreferences()?.getString(KEY_USER_ID, null)
     }
 
-    override var userId: String?
-        get() = encryptedPreferences?.getString(KEY_USER_ID, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_USER_ID)
-                } else {
-                    putString(KEY_USER_ID, value)
-                }
+    override suspend fun setUserId(userId: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (userId == null) {
+                remove(KEY_USER_ID)
+            } else {
+                putString(KEY_USER_ID, userId)
             }
         }
+    }
 
-    override var deviceName: String?
-        get() = encryptedPreferences?.getString(KEY_DEVICE_NAME, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_DEVICE_NAME)
-                } else {
-                    putString(KEY_DEVICE_NAME, value)
-                }
+    override suspend fun getDeviceName(): String? {
+        return getEncryptedPreferences()?.getString(KEY_DEVICE_NAME, null)
+    }
+
+    override suspend fun setDeviceName(deviceName: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (deviceName == null) {
+                remove(KEY_DEVICE_NAME)
+            } else {
+                putString(KEY_DEVICE_NAME, deviceName)
             }
         }
+    }
 
-    override var deviceId: String?
-        get() = encryptedPreferences?.getString(KEY_DEVICE_ID, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_DEVICE_ID)
-                } else {
-                    putString(KEY_DEVICE_ID, value)
-                }
+    override suspend fun getDeviceId(): String? {
+        return getEncryptedPreferences()?.getString(KEY_DEVICE_ID, null)
+    }
+
+    override suspend fun setDeviceId(deviceId: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (deviceId == null) {
+                remove(KEY_DEVICE_ID)
+            } else {
+                putString(KEY_DEVICE_ID, deviceId)
             }
         }
+    }
 
-    override var token: String?
-        get() = encryptedPreferences?.getString(KEY_TOKEN, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_TOKEN)
-                } else {
-                    putString(KEY_TOKEN, value)
-                }
+    override suspend fun getToken(): String? {
+        return getEncryptedPreferences()?.getString(KEY_TOKEN, null)
+    }
+
+    override suspend fun setToken(token: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (token == null) {
+                remove(KEY_TOKEN)
+            } else {
+                putString(KEY_TOKEN, token)
             }
         }
+    }
 
-    override var primaryKey: String?
-        get() = encryptedPreferences?.getString(KEY_PK, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_PK)
-                } else {
-                    putString(KEY_PK, value)
-                }
+    override suspend fun getPrimaryKey(): String? {
+        return getEncryptedPreferences()?.getString(KEY_PK, null)
+    }
+
+    override suspend fun setPrimaryKey(primaryKey: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (primaryKey == null) {
+                remove(KEY_PK)
+            } else {
+                putString(KEY_PK, primaryKey)
             }
         }
+    }
 
-    override var syncingDataEnabled: Boolean
-        get() = encryptedPreferences?.getBoolean(KEY_SYNCING_DATA_ENABLED, true) ?: true
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                putBoolean(KEY_SYNCING_DATA_ENABLED, value)
+    override suspend fun getSyncingDataEnabled(): Boolean {
+        return getEncryptedPreferences()?.getBoolean(KEY_SYNCING_DATA_ENABLED, true) ?: true
+    }
+
+    override suspend fun setSyncingDataEnabled(enabled: Boolean) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            putBoolean(KEY_SYNCING_DATA_ENABLED, enabled)
+        }
+    }
+
+    override suspend fun getSecretKey(): String? {
+        return getEncryptedPreferences()?.getString(KEY_SK, null)
+    }
+
+    override suspend fun setSecretKey(secretKey: String?) {
+        getEncryptedPreferences()?.edit(commit = true) {
+            if (secretKey == null) {
+                remove(KEY_SK)
+            } else {
+                putString(KEY_SK, secretKey)
             }
         }
+    }
 
-    override var secretKey: String?
-        get() = encryptedPreferences?.getString(KEY_SK, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_SK)
-                } else {
-                    putString(KEY_SK, value)
-                }
-            }
-        }
-
-    override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
+    override suspend fun isEncryptionSupported(): Boolean = getEncryptedPreferences() != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
 
-    override fun isSignedIn() = !primaryKey.isNullOrEmpty() && !userId.isNullOrEmpty()
+    override suspend fun isSignedIn(): Boolean = !getPrimaryKey().isNullOrEmpty() && !getUserId().isNullOrEmpty()
 
-    override fun storeCredentials(
+    override suspend fun storeCredentials(
         userId: String,
         deviceId: String,
         deviceName: String,
@@ -148,21 +193,21 @@ constructor(
         secretKey: String,
         token: String,
     ) {
-        this.userId = userId
-        this.deviceId = deviceId
-        this.deviceName = deviceName
-        this.token = token
-        this.primaryKey = primaryKey
-        this.secretKey = secretKey
+        setUserId(userId)
+        setDeviceId(deviceId)
+        setDeviceName(deviceName)
+        setToken(token)
+        setPrimaryKey(primaryKey)
+        setSecretKey(secretKey)
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        withContext(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(true)
         }
     }
 
-    override fun clearAll() {
-        encryptedPreferences?.edit(commit = true) { clear() }
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+    override suspend fun clearAll() {
+        getEncryptedPreferences()?.edit(commit = true) { clear() }
+        withContext(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(false)
         }
     }

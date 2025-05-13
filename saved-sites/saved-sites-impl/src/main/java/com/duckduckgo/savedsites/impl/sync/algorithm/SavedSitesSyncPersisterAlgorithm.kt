@@ -35,7 +35,7 @@ import javax.inject.*
 import timber.log.*
 
 interface SavedSitesSyncPersisterAlgorithm {
-    fun processEntries(
+    suspend fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
         clientModifiedSince: String,
@@ -52,7 +52,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     @Named("remoteWinsStrategy") private val remoteWinsStrategy: SavedSitesSyncPersisterStrategy,
     @Named("localWinsStrategy") private val localWinsStrategy: SavedSitesSyncPersisterStrategy,
 ) : SavedSitesSyncPersisterAlgorithm {
-    override fun processEntries(
+    override suspend fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
         clientModifiedSince: String,
@@ -158,7 +158,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         return SyncMergeResult.Success(orphans = orphans, timestampConflict = timestampConflict)
     }
 
-    private fun processFolder(
+    private suspend fun processFolder(
         folderId: String,
         parentId: String,
         remoteEntries: List<SyncSavedSitesResponseEntry>,
@@ -179,7 +179,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
     }
 
-    private fun processBookmarkFolder(
+    private suspend fun processBookmarkFolder(
         conflictResolution: SyncConflictResolution,
         remoteFolder: SyncSavedSitesResponseEntry,
         parentId: String,
@@ -197,7 +197,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
     }
 
-    private fun processChild(
+    private suspend fun processChild(
         conflictResolution: SyncConflictResolution,
         child: String,
         processIds: MutableList<String>,
@@ -223,7 +223,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
     }
 
-    private fun processBookmark(
+    private suspend fun processBookmark(
         childEntry: SyncSavedSitesResponseEntry,
         conflictResolution: SyncConflictResolution,
         folderId: String,
@@ -289,7 +289,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
     }
 
-    private fun decryptFolder(
+    private suspend fun decryptFolder(
         remoteEntry: SyncSavedSitesResponseEntry,
         parentId: String,
         lastModified: String,
@@ -305,7 +305,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         return folder
     }
 
-    private fun decryptBookmark(
+    private suspend fun decryptBookmark(
         remoteEntry: SyncSavedSitesResponseEntry,
         parentId: String,
         lastModified: String,
@@ -322,7 +322,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         return bookmark
     }
 
-    private fun decryptFavourite(
+    private suspend fun decryptFavourite(
         remoteEntry: SyncSavedSitesResponseEntry,
         position: Int,
         lastModified: String,

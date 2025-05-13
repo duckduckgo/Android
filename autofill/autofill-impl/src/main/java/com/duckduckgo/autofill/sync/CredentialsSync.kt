@@ -186,13 +186,13 @@ class CredentialsSync @Inject constructor(
         } ?: emptyList()
     }
 
-    private fun String?.encrypt(): String? {
+    private suspend fun String?.encrypt(): String? {
         if (this == null) return null
         if (this.isEmpty()) return ""
         return syncCrypto.encrypt(this)
     }
 
-    private fun List<WebsiteLoginDetailsWithCredentials>?.mapToLoginCredentialEntry(): List<LoginCredentialEntry> {
+    private suspend fun List<WebsiteLoginDetailsWithCredentials>?.mapToLoginCredentialEntry(): List<LoginCredentialEntry> {
         return this?.map {
             val loginId = it.details.id ?: return@map null
             val lastUpdatedMillis = it.details.lastUpdatedMillis ?: 0L
