@@ -86,7 +86,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
             .filter {
                 // IndexedDB folders have this format: <scheme>_<host>_<port>.indexeddb.leveldb
                 val host = it.name.split("_").getOrNull(1) ?: return@filter false
-                allowedDomains.any { domain -> sameOrSubdomain(domain, host) }
+                allowedDomains.any { domain -> sameOrSubdomain(host, domain) }
             }
             .map { it.name }
     }

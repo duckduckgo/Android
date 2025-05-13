@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -120,12 +121,12 @@ class IndexedDBManagerTest {
         verify(mockFireproofRepository).fireproofWebsitesSync()
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
-            eq(
-                listOf(
+            argThat { list ->
+                list.toSet() == setOf(
                     "https_example.com_0.indexeddb.leveldb",
                     "https_foo.com_0.indexeddb.leveldb",
-                ),
-            ),
+                )
+            },
         )
     }
 
@@ -172,12 +173,12 @@ class IndexedDBManagerTest {
 
         verify(mockFileDeleter).deleteContents(
             eq(rootFolder),
-            eq(
-                listOf(
+            argThat { list ->
+                list.toSet() == setOf(
                     "https_subdomain.example.com_0.indexeddb.leveldb",
                     "https_example.com_0.indexeddb.leveldb",
-                ),
-            ),
+                )
+            },
         )
     }
 
