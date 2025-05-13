@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -45,14 +44,14 @@ internal class VpnDatabaseCallback(
         super.onCreate(db)
         coroutineScope.launch(dispatcherProvider.io()) {
             mutex.withLock {
-                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag == null) {
-                    logcat { "VPN db onCreate: pre-populating db" }
+                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                    logcat { "VPN-db onCreate: pre-populating db" }
                     // only pre-populate when there's no blocklist
                     prepopulateAppTrackerBlockingList()
                     prepopulateAppTrackerExclusionList()
                     prepopulateAppTrackerExceptionRules()
                 } else {
-                    logcat { "VPN db onCreate: SKIP pre-populating db" }
+                    logcat { "VPN-db onCreate: SKIP pre-populating db" }
                 }
             }
         }
@@ -61,7 +60,8 @@ internal class VpnDatabaseCallback(
     override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
         coroutineScope.launch(dispatcherProvider.io()) {
             mutex.withLock {
-                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag == null) {
+                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                    logcat { "VPN-db onDestructiveMigration: pre-populating db" }
                     // only pre-populate when there's no blocklist
                     prepopulateAppTrackerBlockingList()
                     prepopulateAppTrackerExclusionList()
@@ -71,8 +71,7 @@ internal class VpnDatabaseCallback(
         }
     }
 
-    @VisibleForTesting
-    internal fun prepopulateAppTrackerBlockingList() {
+    private fun prepopulateAppTrackerBlockingList() {
         context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
             .use { it.readText() }
             .also {

@@ -46,7 +46,8 @@ class AppTrackerRepositoryTest {
             context,
             VpnDatabase::class.java,
         ).allowMainThreadQueries().build().apply {
-            VpnDatabaseCallback(context, { this }, coroutineRule.testDispatcherProvider, coroutineRule.testScope, Mutex()).prepopulateAppTrackerBlockingList()
+            VpnDatabaseCallback(context, { this }, coroutineRule.testDispatcherProvider, coroutineRule.testScope, Mutex())
+                .onCreate(this.openHelper.writableDatabase)
         }
         appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
