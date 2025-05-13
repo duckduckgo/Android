@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -77,7 +78,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var barcodeContents: String? = null
+    private var barcodeContents: AuthCode? = null
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
@@ -108,17 +109,20 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     private suspend fun showQRCode() {
-        val shouldExchangeKeysToSyncAnotherDevice = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
-
-        if (!shouldExchangeKeysToSyncAnotherDevice) {
+        // get the code as a Result, and pair it with the type of code we're dealing with
+        val result = if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
             syncAccountRepository.getRecoveryCode()
         } else {
             syncAccountRepository.generateExchangeInvitationCode()
-        }.onSuccess { connectQR ->
-            barcodeContents = connectQR
+        }
+
+        result.onSuccess { authCode ->
+            barcodeContents = authCode
+
             val qrBitmap = withContext(dispatchers.io()) {
-                qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                qrEncoder.encodeAsBitmap(authCode.qrCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
             }
+
             viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
         }.onFailure {
             command.send(Command.FinishWithError)
@@ -133,8 +137,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            barcodeContents?.let { code ->
-                clipboard.copyToClipboard(code)
+            barcodeContents?.let { contents ->
+                clipboard.copyToClipboard(contents.rawCode)
                 command.send(ShowMessage(string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
         }

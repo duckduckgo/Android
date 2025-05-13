@@ -204,7 +204,7 @@ constructor(
     fun onShowQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
-            command.send(ShowQR(recoveryCode))
+            command.send(ShowQR(recoveryCode.qrCode))
         }
     }
 
@@ -242,7 +242,9 @@ constructor(
                     return@launch
                 }
 
-                is Success -> qrCodeResult.data
+                is Success -> {
+                    qrCodeResult.data.qrCode
+                }
             }
             updateViewState()
             command.send(ShowQR(qrCode))
