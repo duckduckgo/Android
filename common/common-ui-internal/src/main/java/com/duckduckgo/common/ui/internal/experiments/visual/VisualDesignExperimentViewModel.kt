@@ -40,8 +40,10 @@ class VisualDesignExperimentViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val isBrowserThemingFeatureAvailable: Boolean = false,
+        val isBrowserThemingFeatureAvailable: Boolean = true,
+        val isBrowserThemingFeatureChangeable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
+        val experimentConflictAlertVisible: Boolean = false,
         val selectedTheme: String = "",
     )
 
@@ -56,9 +58,16 @@ class VisualDesignExperimentViewModel @Inject constructor(
         viewModelScope.launch {
             visualDesignExperimentDataStore.isExperimentEnabled.collect { isExperimentEnabled ->
                 _viewState.update {
+                    it.copy(isBrowserThemingFeatureEnabled = isExperimentEnabled)
+                }
+            }
+        }
+        viewModelScope.launch {
+            visualDesignExperimentDataStore.anyConflictingExperimentEnabled.collect { conflicts ->
+                _viewState.update {
                     it.copy(
-                        isBrowserThemingFeatureAvailable = true,
-                        isBrowserThemingFeatureEnabled = isExperimentEnabled,
+                        isBrowserThemingFeatureChangeable = !conflicts,
+                        experimentConflictAlertVisible = conflicts,
                     )
                 }
             }
@@ -66,6 +75,6 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }
 
     fun onExperimentalUIModeChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
+        visualDesignExperimentDataStore.changeRawExperimentFlag(checked)
     }
 }
