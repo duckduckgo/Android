@@ -342,6 +342,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.messaging.RealDuckChatJSHelper.Companion.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.impl.messaging.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
@@ -479,6 +481,7 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val subscriptionsJSHelper: SubscriptionsJSHelper,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3571,6 +3574,7 @@ class BrowserTabViewModel @Inject constructor(
         isActiveCustomTab: Boolean = false,
         getWebViewUrl: () -> String?,
     ) {
+        Timber.e("NOELIA processJsCallbackMessage(), featureName: $featureName, method: $method, id: $id")
         when (method) {
             "webShare" -> if (id != null && data != null) {
                 webShare(featureName, method, id, data)
@@ -3611,6 +3615,17 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_CHAT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    withContext(dispatchers.main()) {
+                        response?.let {
+                            command.value = SendResponseToJs(it)
+                        }
+                    }
+                }
+            }
+
+            SUBSCRIPTIONS_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
