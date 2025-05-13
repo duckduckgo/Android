@@ -63,7 +63,9 @@ class PirCpuMonitor @Inject constructor(
                     delay(60_000)
                 } catch (e: Exception) {
                     logcat(LogPriority.ERROR) { e.asLog() }
-                    monitorJob.cancel()
+                    if (monitorJob.isActive) {
+                        monitorJob.cancel()
+                    }
                 }
             }
         }
@@ -71,11 +73,15 @@ class PirCpuMonitor @Inject constructor(
 
     override fun onPirJobCompleted() {
         logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobCompleted" }
-        monitorJob.cancel()
+        if (monitorJob.isActive) {
+            monitorJob.cancel()
+        }
     }
 
     override fun onPirJobStopped() {
         logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobStopped" }
-        monitorJob.cancel()
+        if (monitorJob.isActive) {
+            monitorJob.cancel()
+        }
     }
 }
