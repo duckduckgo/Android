@@ -21,6 +21,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import org.json.JSONArray
 import org.json.JSONObject
 
 interface SubscriptionsJSHelper {
@@ -45,7 +46,7 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData? = when (method) {
         METHOD_HANDSHAKE -> id?.let {
             val jsonPayload = JSONObject().apply {
-                put(AVAILABLE_MESSAGES, arrayOf(SUBSCRIPTION_DETAILS))
+                put(AVAILABLE_MESSAGES, JSONArray().put(SUBSCRIPTION_DETAILS))
                 put(PLATFORM, ANDROID)
             }
             return JsCallbackData(jsonPayload, featureName, method, id)
@@ -61,7 +62,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private suspend fun getSubscriptionDetailsData(featureName: String, method: String, id: String): JsCallbackData {
         val jsonPayload = subscriptionsManager.getSubscription()?.let { userSubscription ->
             JSONObject().apply {
-                put(IS_SUBSCRIBED, true)
+                put(IS_SUBSCRIBED, userSubscription.isActive())
                 put(BILLING_PERIOD, userSubscription.billingPeriod)
                 put(STARTED_AT, userSubscription.startedAt)
                 put(EXPIRES_OR_RENEWS_AT, userSubscription.expiresOrRenewsAt)
