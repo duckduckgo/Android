@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -59,6 +60,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class ContributesRemoteFeatureCodeGeneratorTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
@@ -2845,7 +2847,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
-        whenever(appBuildConfig.versionCode).thenReturn(1)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
 
         assertTrue(
             privacyPlugin.store(
@@ -2906,9 +2908,336 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNotNull(rawState?.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+    }
+
+    @Test
+    fun `test cohort not assigned when remote feature is enabled and minSupportedVersion not matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort not assigned when remote feature is disabled and minSupportedVersion is matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when remote feature is enabled and minSupportedVersion is matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is not assigned when flavor not matching is enabled and minSupportedVersion is matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "internal",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when flavor is matching is enabled and minSupportedVersion is matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "internal",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnabled())
     }
 
     @Test
