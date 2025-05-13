@@ -27,10 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import timber.log.Timber
-import timber.log.Timber.Forest
 
 class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
