@@ -259,6 +259,10 @@
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped">Skipped (duplicate or invalid): <![CDATA[<b>%d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported">Passwords imported: <![CDATA[<b>%d</b>]]></string>
 
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Open Passwords</string>
+    <string name="autofill_service_select_password_activity">Select a Saved Password</string>
+
     <!-- New autofill Settings screen -->
     <string name="autofillSettingsActivityTitle">Passwords &amp; Autofill</string>
     <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Reset Excluded Sites?</string>
