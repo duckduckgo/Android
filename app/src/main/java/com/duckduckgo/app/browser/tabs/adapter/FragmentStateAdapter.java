@@ -535,7 +535,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
         if (!fragment.isAdded()) {
             mFragments.remove(itemId);
-            Timber.d("$$$ Fragment (not added) removed: %s", itemId);
             return;
         }
 
@@ -557,7 +556,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         try {
             mFragmentManager.beginTransaction().remove(fragment).commitNow();
             mFragments.remove(itemId);
-            Timber.d("$$$ Fragment removed (after transaction): %s", itemId);
         } finally {
             mFragmentEventDispatcher.dispatchPostEvents(onPost);
         }

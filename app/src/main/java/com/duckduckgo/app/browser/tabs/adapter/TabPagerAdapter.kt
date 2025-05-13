@@ -64,7 +64,6 @@ class TabPagerAdapter(
                 this.messageFromPreviousTab = message
             }
         } else {
-            Timber.d("$$$ TABS creating fragment for ${tab.tabId} with url ${tab.url}")
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
         }
     }
@@ -76,13 +75,13 @@ class TabPagerAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<TabModel>) {
         if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
+            // we only want to notify the adapter if the tab IDs change
             val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabs, newTabs))
-            Timber.d("$$$ TABS updated\nOLD: ${tabs.joinToString { it.tabId }}\nNEW: ${newTabs.joinToString { it.tabId }}")
             tabs.clear()
             tabs.addAll(newTabs)
             diff.dispatchUpdatesTo(this)
         } else {
-            Timber.d("$$$ TABS content updated\nOLD: ${tabs.joinToString { it.url.toString() }}\nNEW: ${newTabs.joinToString { it.url.toString() }}")
+            // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments
             tabs.clear()
             tabs.addAll(newTabs)
         }
