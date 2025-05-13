@@ -29,6 +29,12 @@ import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SETTINGS_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle
@@ -87,6 +93,13 @@ class AutofillSettingsViewModel @Inject constructor(
         onViewStateFlowStart()
     }
 
+    fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
+        pixel.fire(
+            AUTOFILL_SETTINGS_OPENED,
+            parameters = mapOf("source" to autofillScreenLaunchSource.asString()),
+        )
+    }
+
     private fun onViewStateFlowStart() {
         viewModelScope.launch(dispatchers.io()) {
             autofillStore.getCredentialCount().collect { count ->
@@ -122,11 +135,11 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onEnableAutofill() {
+    fun onEnableAutofill(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         autofillStore.autofillEnabled = true
         _viewState.value = _viewState.value.copy(autofillEnabled = true)
 
-        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED, mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()))
     }
 
     fun onDisableAutofill(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
@@ -142,31 +155,45 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onImportFromDesktopWithSyncClicked() {
+    fun onImportFromDesktopWithSyncClicked(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         viewModelScope.launch {
             _commands.send(NavigateToHowToSyncWithDesktop)
+            // we use AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON for consistency with iOS
+            pixel.fire(AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON, mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()))
         }
     }
 
-    fun onImportPasswordsClicked() {
+    fun onImportPasswordsClicked(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         viewModelScope.launch {
             _commands.send(ImportPasswordsFromGoogle)
+            // we use AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED for consistency with iOS
+            pixel.fire(
+                AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED,
+                mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()),
+            )
         }
     }
 
-    fun onResetExcludedSitesClicked() {
+    fun onResetExcludedSitesClicked(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         viewModelScope.launch {
             _commands.send(Command.AskToConfirmResetExcludedSites)
+            pixel.fire(
+                AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED,
+                mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()),
+            )
         }
     }
 
     fun onResetExcludedSitesConfirmed() {
         viewModelScope.launch {
             neverSavedSiteRepository.clearNeverSaveList()
+            pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED)
         }
     }
 
     fun onResetExcludedSitesCancelled() {
-        // No action needed
+        viewModelScope.launch {
+            pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED)
+        }
     }
 }
