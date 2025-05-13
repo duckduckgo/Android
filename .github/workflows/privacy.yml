@@ -1,9 +1,6 @@
 name: Privacy Tests
 
 on:
-  pull_request_target:
-    types: [ labeled ]
-
   pull_request:
     types:
       - opened
@@ -23,7 +20,7 @@ concurrency:
 
 jobs:
   privacy_tests:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'content scope scripts')) || github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'pull_request' }}
     name: Privacy Tests
     runs-on: ubuntu-latest
 
