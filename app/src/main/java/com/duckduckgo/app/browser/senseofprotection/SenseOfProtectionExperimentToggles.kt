@@ -40,7 +40,7 @@ interface SenseOfProtectionToggles {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun senseOfProtectionNewUserExperimentApr25(): Toggle
+    fun senseOfProtectionNewUserExperimentMay25(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun senseOfProtectionExistingUserExperimentMay25(): Toggle

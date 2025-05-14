@@ -28,9 +28,9 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -132,7 +132,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun enrollInNewUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().isEnabled(cohortName)
     }
 
     private fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
@@ -172,16 +172,16 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun isNewUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().isEnrolledAndEnabled(cohortName)
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
         senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().isEnrolledAndEnabled(cohortName)
 
     private fun getNewUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().getCohort()?.name
 
     private fun getNewUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().featureName().name
 
     private fun getExistingUserExperimentCohortName(): String? =
         senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().getCohort()?.name
