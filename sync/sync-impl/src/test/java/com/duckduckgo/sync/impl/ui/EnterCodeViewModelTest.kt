@@ -241,7 +241,7 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
-    fun whenProcessCodeAndLoginFailsThenShowError() = runTest {
+    fun whenProcessCodeAndLoginFailsThenShowErrorAndUpdateState() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
@@ -252,6 +252,20 @@ internal class EnterCodeViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessCodeAndLoginFailsThenUpdateStateToIdle() = runTest {
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = LOGIN_FAILED.code))
+
+        testee.onPasteCodeClicked()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().authState == Idle)
             cancelAndIgnoreRemainingEvents()
         }
     }
