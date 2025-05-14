@@ -70,10 +70,13 @@ class RealRemoteMessageModel @Inject constructor(
 
     override suspend fun onActionClicked(remoteMessage: RemoteMessage): Action? {
         remoteMessagingPixels.fireRemoteMessageActionClickedPixel(remoteMessage)
-        withContext(dispatchers.io()) {
-            remoteMessagingRepository.dismissMessage(remoteMessage.id)
+        val action = remoteMessage.content.getAction()
+        if (action !is Action.Share) {
+            withContext(dispatchers.io()) {
+                remoteMessagingRepository.dismissMessage(remoteMessage.id)
+            }
         }
-        return remoteMessage.content.getAction()
+        return action
     }
 
     private fun Content.getPrimaryAction(): Action? {
