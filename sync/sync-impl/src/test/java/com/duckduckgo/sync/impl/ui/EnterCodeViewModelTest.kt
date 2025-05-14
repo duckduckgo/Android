@@ -260,7 +260,7 @@ internal class EnterCodeViewModelTest {
     fun whenProcessCodeAndLoginFailsThenUpdateStateToIdle() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))enter-
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
         whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = LOGIN_FAILED.code))
 
         testee.onPasteCodeClicked()
