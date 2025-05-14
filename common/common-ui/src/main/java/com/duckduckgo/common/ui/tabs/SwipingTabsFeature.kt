@@ -32,6 +32,10 @@ interface SwipingTabsFeature {
     @InternalAlwaysEnabled
     fun self(): Toggle
 
+    // The toggle used to enable saving the tab state to DataStore to avoid TransactionTooLargeException
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun saveStateToDataStore(): Toggle
+
     // The toggle used for staged rollout to external users
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
