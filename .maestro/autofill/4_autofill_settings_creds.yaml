@@ -30,9 +30,6 @@ tags:
           text: "Ask to Save and Autofill"
 
       - assertVisible:
-          id: importPasswordsOption
-
-      - assertVisible:
           id: syncDesktopPasswordsOption
 
       - tapOn:
