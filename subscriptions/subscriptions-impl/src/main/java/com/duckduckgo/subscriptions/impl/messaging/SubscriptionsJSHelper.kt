@@ -34,7 +34,7 @@ interface SubscriptionsJSHelper {
 }
 
 @ContributesBinding(AppScope::class)
-class RealDuckChatJSHelper @Inject constructor(
+class RealSubscriptionsJSHelper @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SubscriptionsJSHelper {
 

@@ -278,6 +278,76 @@ class ContentScopeScriptsJsMessagingTest {
         assertEquals(0, callback.counter)
     }
 
+    @Test
+    fun whenProcessSubscriptionsMessageWithHandshakeMethodThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"handshake"}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessSubscriptionsMessageWithSubscriptionDetailsMethodThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"subscriptionDetails"}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessSubscriptionsMessageWithUnknownMethodThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"unknownMethod"}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessSubscriptionsMessageWithInvalidFeatureNameThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"invalidFeature","id":"myId","method":"handshake"}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessSubscriptionsMessageWithInvalidDomainThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://invalid-domain.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"subscriptionDetails"}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
     private val callback = object : JsMessageCallback() {
         var counter = 0
         override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
