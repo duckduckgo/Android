@@ -1400,7 +1400,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1417,7 +1417,7 @@ class TabSwitcherViewModelTest {
             pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED,
             parameters = mapOf(
                 "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().featureName().name,
             ),
         )
     }
@@ -1450,7 +1450,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when user is in modified control of sense of protection experiment then animated tile is not shown`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,

@@ -136,7 +136,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().isEnabled(cohortName)
     }
 
     private fun isUserEnrolledInNewUserExperimentModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -175,7 +175,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnrolledAndEnabled(cohortName)
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().isEnrolledAndEnabled(cohortName)
 
     private fun getNewUserExperimentCohortName(): String? =
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
@@ -184,10 +184,10 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name
 
     private fun getExistingUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().getCohort()?.name
 
     private fun getExistingUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().featureName().name
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
