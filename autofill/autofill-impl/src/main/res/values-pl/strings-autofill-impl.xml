@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Możesz importować zapisane hasła z innej przeglądarki do DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importuj hasła</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Synchronizuj hasła na komputerze</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Jak zaimportować hasła</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Jak synchronizować hasła na komputerze</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Zaimportuj hasła w komputerowej wersji przeglądarki DuckDuckGo, a następnie zsynchronizuj je na różnych urządzeniach.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Pobierz przeglądarkę komputerową</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Skopiowano łącze</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importuj hasła z Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importuj hasła z Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizuj hasła DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizuj hasła DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizuj hasła na komputerze</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizuj hasła na komputerze</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj swoje hasła Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Importowanie haseł nie powiodło się</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Pominięto (duplikat lub nieprawidłowy): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Zaimportowane hasła: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Otwórz hasła</string>
+    <string name="autofill_service_select_password_activity">Wybierz zapisane hasło</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Hasła i autouzupełnianie</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Zresetować wykluczone witryny?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Jeśli zresetujesz wykluczone witryny, przy następnym logowaniu do dowolnej z nich pojawi się monit o zapisanie hasła.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Resetowanie</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Anuluj</string>
+    <string name="autofillSettingsPasswordsEntry">Hasła</string>
+    <string name="autofillSettingsAutofillToggleLabel">Poproś o zapisywanie i autouzupełnianie</string>
+    <string name="autofillSettingsAutofillSubtitle">Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importuj hasła</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importuj hasła z Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Synchronizuj hasła na komputerze</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Resetowanie wykluczonych witryn</string>
 
 </resources>

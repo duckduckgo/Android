@@ -84,14 +84,17 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             AuthState.Error -> {
                 binding.loadingIndicatorContainer.hide()
                 binding.errorAuthStateHint.show()
+                binding.pasteCodeButton.isEnabled = true
             }
             Idle -> {
                 binding.loadingIndicatorContainer.hide()
                 binding.errorAuthStateHint.hide()
+                binding.pasteCodeButton.isEnabled = true
             }
             Loading -> {
                 binding.loadingIndicatorContainer.show()
                 binding.errorAuthStateHint.hide()
+                binding.pasteCodeButton.isEnabled = false
             }
         }
     }
