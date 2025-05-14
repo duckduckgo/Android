@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
@@ -66,7 +67,8 @@ class SaveRecoveryCodeViewModelTest {
     fun whenUserIsNotSignedInThenAccountCreatedAndViewStateUpdated() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -78,7 +80,8 @@ class SaveRecoveryCodeViewModelTest {
     @Test
     fun whenUserSignedInThenShowViewState() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -117,7 +120,8 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -128,8 +132,9 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
-        whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(pdfFile())
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+        whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(authCodeToUse.rawCode))).thenReturn(pdfFile())
 
         testee.commands().test {
             testee.generateRecoveryCode(mock())
@@ -141,11 +146,12 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenUserClicksCopyThenCopyToClipboard() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         testee.commands().test {
             testee.onCopyCodeClicked()
             val command = awaitItem()
-            verify(clipboard).copyToClipboard(eq(jsonRecoveryKeyEncoded))
+            verify(clipboard).copyToClipboard(eq("something else"))
             assertTrue(command is Command.ShowMessage)
             cancelAndIgnoreRemainingEvents()
         }

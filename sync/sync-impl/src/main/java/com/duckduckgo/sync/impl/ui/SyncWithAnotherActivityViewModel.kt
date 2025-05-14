@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType.EXCHANGE
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -40,6 +39,8 @@ import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -77,7 +78,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var barcodeContents: String? = null
+    private var barcodeContents: AuthCode? = null
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
@@ -108,17 +109,20 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     private suspend fun showQRCode() {
-        val shouldExchangeKeysToSyncAnotherDevice = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
-
-        if (!shouldExchangeKeysToSyncAnotherDevice) {
+        // get the code as a Result, and pair it with the type of code we're dealing with
+        val result = if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
             syncAccountRepository.getRecoveryCode()
         } else {
             syncAccountRepository.generateExchangeInvitationCode()
-        }.onSuccess { connectQR ->
-            barcodeContents = connectQR
+        }
+
+        result.onSuccess { authCode ->
+            barcodeContents = authCode
+
             val qrBitmap = withContext(dispatchers.io()) {
-                qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                qrEncoder.encodeAsBitmap(authCode.qrCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
             }
+
             viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
         }.onFailure {
             command.send(Command.FinishWithError)
@@ -133,8 +137,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            barcodeContents?.let { code ->
-                clipboard.copyToClipboard(code)
+            barcodeContents?.let { contents ->
+                clipboard.copyToClipboard(contents.rawCode)
                 command.send(ShowMessage(string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
         }
@@ -167,15 +171,15 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            val codeType = syncAccountRepository.getCodeType(qrCode)
-            when (val result = syncAccountRepository.processCode(qrCode)) {
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
+            when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     Timber.w("Sync: error processing code ${result.reason}")
                     emitError(result, qrCode)
                 }
 
                 is Success -> {
-                    if (codeType == EXCHANGE) {
+                    if (codeType is SyncAuthCode.Exchange) {
                         pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
                         onLoginSuccess(previousPrimaryKey)

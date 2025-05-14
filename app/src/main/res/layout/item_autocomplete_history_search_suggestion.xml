@@ -22,18 +22,16 @@
     android:layout_marginTop="6dp"
     android:layout_marginBottom="8dp"
     android:background="?attr/selectableItemBackground"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingVertical="@dimen/keyline_2"
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_0"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_history_20"
+        android:src="@drawable/ic_history_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +40,7 @@
         android:id="@+id/phrase"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="?attr/autocompleteListItemIconMargin"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"

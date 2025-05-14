@@ -28,20 +28,11 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 )
 interface SwipingTabsFeature {
     // The main kill switch for the feature
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
     // The toggle used for staged rollout to external users
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
     fun enabledForUsers(): Toggle
-
-    // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun tabSwipingFix1(): Toggle
-
-    // The toggle used to enable a potential fix for https://app.asana.com/0/1207418217763355/1209914129786590/f
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun tabSwipingFix2(): Toggle
 }

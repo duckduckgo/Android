@@ -17,7 +17,9 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
@@ -27,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 class RemoteMessagingModelTests {
@@ -80,10 +83,36 @@ class RemoteMessagingModelTests {
     }
 
     @Test
-    fun onActionClickedThenPixelFired() = runTest {
+    fun onActionClickedThenPixelFiredAndMessageDismissed() = runTest {
         val action = testee.onActionClicked(remoteMessage)
 
         verify(remoteMessagingPixels).fireRemoteMessageActionClickedPixel(remoteMessage)
+        verify(remoteMessagingRepository).dismissMessage(remoteMessage.id)
         assertEquals(action, null)
+    }
+
+    @Test
+    fun onActionClickedThenPixelFiredAndMessageNotDismissedIfActionShare() = runTest {
+        val action = Action.Share(
+            value = "",
+            additionalParameters = null,
+        )
+        val remoteMessage = RemoteMessage(
+            id = "id1",
+            Content.PromoSingleAction(
+                titleText = "",
+                descriptionText = "",
+                placeholder = VISUAL_DESIGN_UPDATE,
+                actionText = "",
+                action = action,
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val result = testee.onActionClicked(remoteMessage)
+
+        verify(remoteMessagingPixels).fireRemoteMessageActionClickedPixel(remoteMessage)
+        verify(remoteMessagingRepository, never()).dismissMessage(remoteMessage.id)
+        assertEquals(action, result)
     }
 }

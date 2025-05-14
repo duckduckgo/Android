@@ -37,7 +37,7 @@ import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.toFeatureException
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter

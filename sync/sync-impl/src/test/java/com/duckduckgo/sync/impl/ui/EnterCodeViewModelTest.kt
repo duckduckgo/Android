@@ -24,8 +24,11 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.SyncAccountFixtures.accountA
 import com.duckduckgo.sync.SyncAccountFixtures.accountB
 import com.duckduckgo.sync.SyncAccountFixtures.noAccount
+import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
@@ -33,9 +36,12 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
@@ -49,8 +55,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -98,7 +104,8 @@ internal class EnterCodeViewModelTest {
     fun whenUserClicksOnPasteCodeWithRecoveryCodeThenProcessCode() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenAnswer {
             whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
             Success(true)
         }
@@ -116,7 +123,8 @@ internal class EnterCodeViewModelTest {
     fun whenUserClicksOnPasteCodeWithConnectCodeThenProcessCode() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonConnectKeyEncoded)).thenAnswer {
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonConnectKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenAnswer {
             whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
             Success(true)
         }
@@ -134,7 +142,8 @@ internal class EnterCodeViewModelTest {
     fun whenPastedInvalidCodeThenAuthStateError() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn("invalid code")
-        whenever(syncAccountRepository.processCode("invalid code")).thenReturn(Error(code = INVALID_CODE.code))
+        whenever(syncAccountRepository.parseSyncAuthCode("invalid code")).thenReturn(Unknown("invalid code"))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = INVALID_CODE.code))
 
         testee.onPasteCodeClicked()
 
@@ -150,7 +159,8 @@ internal class EnterCodeViewModelTest {
         syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
 
         testee.onPasteCodeClicked()
 
@@ -165,7 +175,8 @@ internal class EnterCodeViewModelTest {
     fun whenProcessCodeButUserSignedInThenOfferToSwitchAccount() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
 
         testee.onPasteCodeClicked()
 
@@ -196,7 +207,8 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenSignedInUserProcessCodeSucceedsAndAccountChangedThenReturnSwitchAccount() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenAnswer {
             whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountB)
             Success(true)
         }
@@ -213,7 +225,8 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenAnswer {
             whenever(syncAccountRepository.getAccountInfo()).thenReturn(accountA)
             Success(true)
         }
@@ -228,10 +241,11 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
-    fun whenProcessCodeAndLoginFailsThenShowError() = runTest {
+    fun whenProcessCodeAndLoginFailsThenShowErrorAndUpdateState() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = LOGIN_FAILED.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = LOGIN_FAILED.code))
 
         testee.onPasteCodeClicked()
 
@@ -243,10 +257,26 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
+    fun whenProcessCodeAndLoginFailsThenUpdateStateToIdle() = runTest {
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = LOGIN_FAILED.code))
+
+        testee.onPasteCodeClicked()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().authState == Idle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenProcessCodeAndConnectFailsThenShowError() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Error(code = CONNECT_FAILED.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonConnectKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = CONNECT_FAILED.code))
 
         testee.onPasteCodeClicked()
 
@@ -261,7 +291,8 @@ internal class EnterCodeViewModelTest {
     fun whenProcessCodeAndCreateAccountFailsThenShowError() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = CREATE_ACCOUNT_FAILED.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = CREATE_ACCOUNT_FAILED.code))
 
         testee.onPasteCodeClicked()
 
@@ -276,7 +307,8 @@ internal class EnterCodeViewModelTest {
     fun whenProcessCodeAndGenericErrorThenDoNothing() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = GENERIC_ERROR.code))
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncAccountRepository.processCode(any())).thenReturn(Error(code = GENERIC_ERROR.code))
 
         testee.onPasteCodeClicked()
 

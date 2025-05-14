@@ -30,11 +30,12 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
-fun RemoteMessage.asMessage(): Message {
+fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
@@ -42,14 +43,14 @@ fun RemoteMessage.asMessage(): Message {
             messageType = MessageType.REMOTE_MESSAGE,
         )
         is BigSingleAction -> Message(
-            topIllustration = content.placeholder.drawable(),
+            topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
         )
         is BigTwoActions -> Message(
-            topIllustration = content.placeholder.drawable(),
+            topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
@@ -57,13 +58,13 @@ fun RemoteMessage.asMessage(): Message {
             messageType = MessageType.REMOTE_MESSAGE,
         )
         is Medium -> Message(
-            topIllustration = content.placeholder.drawable(),
+            topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
         )
         is PromoSingleAction -> Message(
-            middleIllustration = content.placeholder.drawable(),
+            middleIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             promoAction = content.actionText,
@@ -72,7 +73,7 @@ fun RemoteMessage.asMessage(): Message {
     }
 }
 
-private fun Placeholder.drawable(): Int {
+private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
@@ -81,5 +82,10 @@ private fun Placeholder.drawable(): Int {
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
         PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
         DUCK_AI -> R.drawable.ic_duck_ai
+        VISUAL_DESIGN_UPDATE -> if (isLightModeEnabled) {
+            R.drawable.ic_visual_design_update_artwork_light
+        } else {
+            R.drawable.ic_visual_design_update_artwork_dark
+        }
     }
 }

@@ -24,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "emeBlock",
-    exceptionsStore = DrmBlockFeatureExceptionStore::class,
 )
 interface DrmBlockFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)

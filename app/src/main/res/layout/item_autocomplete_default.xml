@@ -23,18 +23,16 @@
     android:layout_marginBottom="8dp"
     android:layout_marginTop="6dp"
     android:background="?attr/selectableItemBackground"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingVertical="@dimen/keyline_2"
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemEndPadding">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_0"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_find_search_20"
+        android:src="@drawable/ic_find_search_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -43,7 +41,7 @@
         android:id="@+id/phrase"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="?attr/autocompleteListItemIconMargin"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
@@ -58,16 +56,13 @@
         android:id="@+id/editQueryImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
         android:contentDescription="@string/editQueryBeforeSubmitting"
-        android:paddingStart="5dp"
-        android:paddingTop="3dp"
-        android:paddingEnd="1dp"
-        android:paddingBottom="3dp"
-        android:src="@drawable/ic_autocomplete_20dp"
+        android:padding="@dimen/keyline_2"
+        android:src="@drawable/ic_arrow_circle_up_left_16"
+        android:background="@drawable/selectable_item_experimental_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

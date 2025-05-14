@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.CodeType.EXCHANGE
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -39,6 +38,7 @@ import com.duckduckgo.sync.impl.R.dimen
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -48,7 +48,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import javax.inject.*
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -127,9 +127,9 @@ class SyncConnectViewModel @Inject constructor(
 
     private suspend fun showQRCode() {
         syncAccountRepository.getConnectQR()
-            .onSuccess { connectQR ->
+            .onSuccess { code ->
                 val qrBitmap = withContext(dispatchers.io()) {
-                    qrEncoder.encodeAsBitmap(connectQR, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                    qrEncoder.encodeAsBitmap(code.qrCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
                 }
                 viewState.emit(viewState.value.copy(qrCodeBitmap = qrBitmap))
             }.onFailure {
@@ -146,8 +146,8 @@ class SyncConnectViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             syncAccountRepository.getConnectQR().getOrNull()?.let { code ->
-                Timber.d("Sync: recovery available for sharing manually: $code")
-                clipboard.copyToClipboard(code)
+                Timber.d("Sync: code available for sharing manually: $code")
+                clipboard.copyToClipboard(code.rawCode)
                 command.send(ShowMessage(R.string.sync_code_copied_message))
             } ?: command.send(FinishWithError)
         }
@@ -173,14 +173,14 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.getCodeType(qrCode)
-            when (val result = syncAccountRepository.processCode(qrCode)) {
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
+            when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     processError(result)
                 }
 
                 is Success -> {
-                    if (codeType == EXCHANGE) {
+                    if (codeType is Exchange) {
                         pollForRecoveryKey()
                     } else {
                         syncPixels.fireLoginPixel()

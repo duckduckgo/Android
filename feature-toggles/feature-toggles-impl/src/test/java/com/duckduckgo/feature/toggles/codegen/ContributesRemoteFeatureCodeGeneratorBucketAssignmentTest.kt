@@ -22,7 +22,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -125,14 +124,12 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
-                FeatureExceptions.Store::class.java,
                 FeatureSettings.Store::class.java,
                 dagger.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
-                FeatureExceptions.EMPTY_STORE,
                 FeatureSettings.EMPTY_STORE,
                 Lazy { testFeature },
                 appBuildConfig,

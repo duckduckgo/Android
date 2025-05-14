@@ -43,6 +43,7 @@ class FakeSubscriptionsDataStore(
     // Subscription
     override var expiresOrRenewsAt: Long? = 0L
     override var platform: String? = null
+    override var billingPeriod: String? = null
     override var startedAt: Long? = 0L
     override var status: String? = null
     override var entitlements: String? = null

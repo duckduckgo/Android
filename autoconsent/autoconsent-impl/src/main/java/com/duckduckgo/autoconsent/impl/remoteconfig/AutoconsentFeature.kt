@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "autoconsent",
     settingsStore = AutoconsentFeatureSettingsStore::class,
-    exceptionsStore = AutoconsentExceptionsStore::class,
 )
 /**
  * This is the class that represents the autoconsent feature flags

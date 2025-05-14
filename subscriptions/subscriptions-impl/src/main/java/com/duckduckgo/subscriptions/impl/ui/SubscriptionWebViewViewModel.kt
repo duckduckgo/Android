@@ -309,8 +309,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     ): SubscriptionOptionsJson {
         return SubscriptionOptionsJson(
             options = listOf(
-                createOptionsJson(yearlyOffer, YEARLY),
-                createOptionsJson(monthlyOffer, MONTHLY),
+                createOptionsJson(yearlyOffer, YEARLY.lowercase()),
+                createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
             ),
             features = monthlyOffer.features.map(::FeatureJson),
         )
