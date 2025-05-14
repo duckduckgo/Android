@@ -210,11 +210,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @NonNull
     @Override
     public final FragmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (mSwipingTabsFeature != null && mSwipingTabsFeature.isTabSwipingFix1Enabled()) {
-            return FragmentContainerViewHolder.create(parent);
-        } else {
-            return FrameLayoutViewHolder.create(parent);
-        }
+        return FrameLayoutViewHolder.create(parent);
     }
 
     @Override
@@ -470,13 +466,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     }
 
     private void throwDesignAssumptionViolatedException() {
-        throw new IllegalStateException(
-            String.format(
-                "Design assumption violated: Fix1 enabled: %s, Fix2 enabled: %s",
-                mSwipingTabsFeature.isTabSwipingFix1Enabled(),
-                mSwipingTabsFeature.isTabSwipingFix2Enabled()
-            )
-        );
+        throw new IllegalStateException("Design assumption violated");
     }
 
     @Override
@@ -562,11 +552,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     }
 
     private void hideFragment(long itemId) {
-        // do not attempt to hide fragments if the ViewPager is in a transient state
-        if (shouldDelayFragmentTransactions() && mSwipingTabsFeature.isTabSwipingFix2Enabled()) {
-            return;
-        }
-
         Fragment fragment = mFragments.get(itemId);
 
         if (fragment == null) {
