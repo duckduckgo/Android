@@ -342,7 +342,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.messaging.RealDuckChatJSHelper.Companion.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.impl.messaging.RealSubscriptionsJSHelper.Companion.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.impl.messaging.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import dagger.Lazy
