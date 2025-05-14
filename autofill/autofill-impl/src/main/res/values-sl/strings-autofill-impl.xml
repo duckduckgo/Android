@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Shranjena gesla lahko uvozite iz drugega brskalnika v DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Uvozi gesla</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sinhroniziraj gesla za namizje</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kako uvoziti gesla</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kako sinhronizirati gesla za namizje</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">V namizni različici brskalnika DuckDuckGo uvozite gesla in jih nato sinhronizirajte med napravami.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Namesti namizni brskalnik</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Povezava je kopirana</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Uvozi gesla iz Googla</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Uvozi gesla iz Googla</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhroniziraj gesla DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhroniziraj gesla DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhroniziraj gesla za namizje</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhroniziraj gesla za namizje</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Uvozite svoja gesla iz Googla</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Uvoz gesel ni uspel</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Preskočeno (podvojeno ali neveljavno): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Uvožena gesla: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Odprite gesla</string>
+    <string name="autofill_service_select_password_activity">Izberi shranjeno geslo</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Gesla in samodejno izpolnjevanje</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Želite ponastaviti izključena spletna mesta?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Če ponastavite izključena spletna mesta, boste ob naslednji prijavi na katero koli od teh spletnih mest pozvani, da shranite svojo prijavo.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Ponastavi</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Prekliči</string>
+    <string name="autofillSettingsPasswordsEntry">Gesla</string>
+    <string name="autofillSettingsAutofillToggleLabel">Vprašaj za shranjevanje in samodejno izpolnjevanje</string>
+    <string name="autofillSettingsAutofillSubtitle">Gesla so šifrirana. Nihče razen vas jih ne more videti, niti mi. <annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Uvozi gesla</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Uvozi gesla iz Googla</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sinhroniziraj gesla za namizje</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Ponastavi izključena spletna mesta</string>
 
 </resources>

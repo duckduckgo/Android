@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Kayıtlı parolaları başka bir tarayıcıdan DuckDuckGo\'ya aktarabilirsiniz.</string>
 
     <string name="autofillManagementImportPasswords">Şifreleri İçe Aktar</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Masaüstü Şifrelerini Senkronize Et</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Şifreler Nasıl Aktarılır</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Masaüstü Şifreleri Nasıl Senkronize Edilir</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">DuckDuckGo tarayıcısının masaüstü sürümünde şifreleri içe aktarın, ardından cihazlar arasında senkronize edin.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Masaüstü Tarayıcısını Edinin</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Bağlantı kopyalandı</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Google\'dan Şifreleri İçe Aktar</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Google\'dan Şifreleri İçe Aktar</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo Şifrelerini Senkronize Et</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo Şifrelerini Senkronize Et</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Masaüstü Şifrelerini Senkronize Et</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Masaüstü Şifrelerini Senkronize Et</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Google Şifrelerinizi İçe Aktarın</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Şifre içe aktarma başarısız</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Atlandı (yinelenen veya geçersiz): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[İçe aktarılan şifreler: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Şifreleri Aç</string>
+    <string name="autofill_service_select_password_activity">Kayıtlı bir şifre seç</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Şifreler ve Otomatik Doldurma</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Hariç Tutulan Siteler Sıfırlansın mı?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Hariç tutulan siteleri sıfırlarsanız, bu sitelerden herhangi birinde bir sonraki oturum açtığınızda şifrenizi kaydetmeniz istenecektir.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Sıfırla</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Vazgeç</string>
+    <string name="autofillSettingsPasswordsEntry">Şifreler</string>
+    <string name="autofillSettingsAutofillToggleLabel">Kaydetmek ve otomatik doldurmak için sor</string>
+    <string name="autofillSettingsAutofillSubtitle">Parolalar şifrelenir. Onları sizden başka kimse göremez. Biz bile. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Şifreleri İçe Aktar</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Google\'dan Şifreleri İçe Aktar</string>
+    <string name="autofillSettingsImportFromDesktopSync">Masaüstü Şifrelerini Senkronize Et</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Hariç Tutulan Siteleri Sıfırla</string>
 
 </resources>
