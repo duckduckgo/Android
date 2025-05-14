@@ -117,8 +117,7 @@
             android:id="@+id/fireButton"
             android:layout_width="@dimen/bottomNavFireIconContainerWidth"
             android:layout_height="@dimen/bottomNavFireIconContainerHeight"
-            android:background="@drawable/bottom_nav_fire_button_background"
-            android:foreground="@drawable/bottom_nav_fire_button_foreground">
+            android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
                 android:id="@+id/fireIconImageView"
