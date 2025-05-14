@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.tabs.store.TabsDataStore
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -165,6 +166,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var tabManager: TabManager
+
+    @Inject
+    lateinit var tabDataStore: TabsDataStore
 
     @Inject
     lateinit var duckChat: DuckChat
@@ -319,7 +323,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onSaveInstanceState(outState)
 
         if (swipingTabsFeature.isEnabled) {
-            outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
+            if (swipingTabsFeature.isSaveStateToDataStoreEnabled) {
+                runBlocking {
+                    tabDataStore.saveState(tabPagerAdapter.saveState())
+                }
+            } else {
+                outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
+            }
         }
     }
 
@@ -875,8 +885,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
 
-            savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
-                tabPagerAdapter.restoreState(it)
+            if (swipingTabsFeature.isSaveStateToDataStoreEnabled) {
+                tabDataStore.getState()?.let {
+                    tabPagerAdapter.restoreState(it)
+                }
+            } else {
+                savedInstanceState?.let {
+                    tabPagerAdapter.restoreState(it)
+                }
             }
         }
 
