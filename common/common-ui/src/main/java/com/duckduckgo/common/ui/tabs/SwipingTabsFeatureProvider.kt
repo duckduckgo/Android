@@ -28,6 +28,10 @@ class SwipingTabsFeatureProvider @Inject constructor(
         swipingTabsFeature.self().isEnabled() && swipingTabsFeature.enabledForUsers().isEnabled()
     }
 
+    val isSaveStateToDataStoreEnabled: Boolean by lazy {
+        swipingTabsFeature.self().isEnabled() && swipingTabsFeature.saveStateToDataStore().isEnabled()
+    }
+
     val isTabSwipingFix1Enabled by lazy {
         swipingTabsFeature.tabSwipingFix1().isEnabled()
     }
