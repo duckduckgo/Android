@@ -3574,7 +3574,6 @@ class BrowserTabViewModel @Inject constructor(
         isActiveCustomTab: Boolean = false,
         getWebViewUrl: () -> String?,
     ) {
-        Timber.e("NOELIA processJsCallbackMessage(), featureName: $featureName, method: $method, id: $id")
         when (method) {
             "webShare" -> if (id != null && data != null) {
                 webShare(featureName, method, id, data)
