@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Uložená hesla můžeš importovat z jiného prohlížeče do DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importovat hesla</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Synchronizovat hesla na počítači</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Jak importovat hesla</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Jak synchronizovat hesla na počítači</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importuj hesla do desktopové verze prohlížeče DuckDuckGo a potom je synchronizuj mezi zařízeními.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Nainstalovat prohlížeč pro počítač</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Odkaz se zkopíroval</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importovat hesla z Googlu</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Import hesel z Googlu</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovat hesla na DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovat hesla na DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovat hesla na počítači</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovat hesla na počítači</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj si hesla z Googlu</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Import hesel se nezdařil</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Přeskočeno (duplicitní nebo neplatné): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importovaných hesel: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Otevřít hesla</string>
+    <string name="autofill_service_select_password_activity">Vyber uložené heslo</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Hesla a automatické vyplňování</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Obnovit vyloučené stránky?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Pokud vyloučené weby resetuješ, při příštím přihlašování na některý z nich se ti zobrazí výzva k uložení hesla.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Obnovit</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Zrušit</string>
+    <string name="autofillSettingsPasswordsEntry">Hesla</string>
+    <string name="autofillSettingsAutofillToggleLabel">Žádat o uložení a automatické vyplnění</string>
+    <string name="autofillSettingsAutofillSubtitle">Hesla jsou šifrovaná. Nikdo kromě tebe je nevidí, dokonce ani my. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importovat hesla</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Import hesel z Googlu</string>
+    <string name="autofillSettingsImportFromDesktopSync">Synchronizovat hesla na počítači</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Obnovit vyloučené stránky</string>
 
 </resources>

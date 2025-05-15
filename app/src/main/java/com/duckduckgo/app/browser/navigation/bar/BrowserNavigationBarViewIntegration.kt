@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -57,8 +58,8 @@ class BrowserNavigationBarViewIntegration(
 
     init {
         stateObserverJob = lifecycleScope.launch {
-            visualDesignExperimentDataStore.navigationBarState.collect { navigationBarState ->
-                if (navigationBarState.isEnabled) {
+            visualDesignExperimentDataStore.isExperimentEnabled.collect { isExperimentEnabled ->
+                if (isExperimentEnabled) {
                     onEnabled()
                 } else {
                     onDisabled()
@@ -108,5 +109,15 @@ class BrowserNavigationBarViewIntegration(
 
     private fun onDisabled() {
         keyboardVisibilityJob?.cancel()
+    }
+
+    fun setContentCanScroll(
+        canScrollUp: Boolean,
+        canScrollDown: Boolean,
+        topOfPage: Boolean,
+    ) {
+        if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+            navigationBarView.showShadow(canScrollDown)
+        }
     }
 }

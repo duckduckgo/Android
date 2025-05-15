@@ -16,11 +16,6 @@
 
 package com.duckduckgo.subscriptions.impl
 
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
-
 object SubscriptionsConstants {
 
     // List of subscriptions
@@ -51,8 +46,8 @@ object SubscriptionsConstants {
     const val PLATFORM = "android"
 
     // Recurrence
-    const val MONTHLY = "monthly"
-    const val YEARLY = "yearly"
+    const val MONTHLY = "Monthly"
+    const val YEARLY = "Yearly"
 
     // URLs
     const val BUY_URL = "https://duckduckgo.com/subscriptions"
@@ -61,12 +56,4 @@ object SubscriptionsConstants {
     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
     const val PRIVACY_PRO_ETLD = "duckduckgo.com"
     const val PRIVACY_PRO_PATH = "pro"
-}
-
-internal fun String.productIdToBillingPeriod(): String? {
-    return when (this) {
-        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "monthly"
-        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "annual"
-        else -> null
-    }
 }

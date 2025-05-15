@@ -204,13 +204,14 @@ constructor(
     fun onShowQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
-            command.send(ShowQR(recoveryCode))
+            command.send(ShowQR(recoveryCode.qrCode))
         }
     }
 
     fun onQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.processCode(contents)
+            val codeType = syncAccountRepository.parseSyncAuthCode(contents)
+            val result = syncAccountRepository.processCode(codeType)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -220,7 +221,8 @@ constructor(
 
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.processCode(contents)
+            val codeType = syncAccountRepository.parseSyncAuthCode(contents)
+            val result = syncAccountRepository.processCode(codeType)
             when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
@@ -242,7 +244,9 @@ constructor(
                     return@launch
                 }
 
-                is Success -> qrCodeResult.data
+                is Success -> {
+                    qrCodeResult.data.qrCode
+                }
             }
             updateViewState()
             command.send(ShowQR(qrCode))
@@ -287,7 +291,8 @@ constructor(
     private suspend fun authFlow(
         pastedCode: String,
     ) {
-        val result = syncAccountRepository.processCode(pastedCode)
+        val codeType = syncAccountRepository.parseSyncAuthCode(pastedCode)
+        val result = syncAccountRepository.processCode(codeType)
         when (result) {
             is Result.Success -> command.send(Command.LoginSuccess)
             is Result.Error -> {

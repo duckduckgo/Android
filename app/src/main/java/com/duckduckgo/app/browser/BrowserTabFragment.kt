@@ -202,9 +202,9 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -978,11 +978,15 @@ class BrowserTabFragment :
 
     @SuppressLint("ClickableViewAccessibility")
     private fun disableSwipingOutsideTheOmnibar() {
-        newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
+        newBrowserTab.newTabLayout.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             true
         }
-        binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
+        binding.autoCompleteSuggestionsList.setOnTouchListener { v, _ ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            false
+        }
+        binding.includeErrorView.root.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
@@ -1131,7 +1135,7 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isExperimentEnabled.value) {
             // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
@@ -2649,10 +2653,18 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
-            if (omnibar.isOutlineShown()) {
+        newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+
+            // Check if it can scroll up
+            val canScrollUp = v.canScrollVertically(-1)
+            val canScrollDown = v.canScrollVertically(1)
+            val topOfPage = scrollY == 0
+
+            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
+            browserNavigationBarIntegration.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 
@@ -3170,9 +3182,9 @@ class BrowserTabFragment :
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let {
-                        val screen = AutofillSettingsScreenDirectlyViewCredentialsParams(
+                        val screen = AutofillPasswordsManagementViewCredential(
                             loginCredentials = loginCredentials,
-                            source = AutofillSettingsLaunchSource.BrowserSnackbar,
+                            source = AutofillScreenLaunchSource.BrowserSnackbar,
                         )
                         globalActivityStarter.start(it, screen)
                     }
@@ -3183,9 +3195,9 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen(privacyProtectionEnabled: Boolean) {
-        val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
+        val screen = AutofillPasswordsManagementScreenWithSuggestions(
             currentUrl = webView?.url,
-            source = AutofillSettingsLaunchSource.BrowserOverflow,
+            source = AutofillScreenLaunchSource.BrowserOverflow,
             privacyProtectionEnabled = privacyProtectionEnabled,
         )
         globalActivityStarter.start(requireContext(), screen)

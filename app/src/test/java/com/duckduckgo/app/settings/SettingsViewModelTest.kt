@@ -16,21 +16,29 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -39,6 +47,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
+@SuppressLint("DenyListedApi")
 class SettingsViewModelTest {
 
     @get:Rule
@@ -88,6 +97,8 @@ class SettingsViewModelTest {
 
     private lateinit var testee: SettingsViewModel
 
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -107,6 +118,7 @@ class SettingsViewModelTest {
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
+            autofillFeature = autofillFeature,
         )
     }
 
@@ -135,5 +147,25 @@ class SettingsViewModelTest {
         testee.onEmailProtectionSettingClicked()
 
         verify(settingsPixelDispatcherMock).fireEmailPressed()
+    }
+
+    @Test
+    fun whenAutofillPressedThenNavigateToSettingsIfAutofillSettingsEnabled() = runTest {
+        autofillFeature.settingsScreen().setRawStoredState(State(true))
+        testee.onAutofillSettingsClick()
+
+        testee.commands().test {
+            assertEquals(LaunchAutofillSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenAutofillPressedThenNavigateToManagementIfAutofillSettingsDisabled() = runTest {
+        autofillFeature.settingsScreen().setRawStoredState(State(false))
+        testee.onAutofillSettingsClick()
+
+        testee.commands().test {
+            assertEquals(LaunchAutofillPasswordsManagement, awaitItem())
+        }
     }
 }

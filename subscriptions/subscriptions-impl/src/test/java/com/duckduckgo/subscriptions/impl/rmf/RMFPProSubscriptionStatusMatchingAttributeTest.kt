@@ -9,6 +9,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
@@ -26,6 +27,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     private lateinit var matcher: RMFPProSubscriptionStatusMatchingAttribute
     private val testSubscription = Subscription(
         productId = SubscriptionsConstants.YEARLY_PLAN_US,
+        billingPeriod = MONTHLY,
         startedAt = 10000L,
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,

@@ -32,6 +32,7 @@ dependencies {
     implementation project(':feature-toggles-internal-api')
     implementation project(":statistics-api")
     implementation project(":data-store-api")
+    implementation project(':remote-messaging-api')
 
     implementation AndroidX.appCompat
     implementation Google.android.material

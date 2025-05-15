@@ -20,15 +20,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode.Connect
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
@@ -67,7 +75,8 @@ class SyncConnectViewModelTest {
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {
         val bitmap = TestSyncFixtures.qrBitmap()
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
         whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
         testee.viewState(source = null).test {
@@ -95,7 +104,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenConnectionKeysSuccessThenLoginSuccess() = runTest {
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
         testee.viewState(source = null).test {
             awaitItem()
@@ -112,7 +122,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenConnectionKeysSuccessWithSourceThenPixelContainsSource() = runTest {
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
         testee.viewState(source = "foo").test {
             awaitItem()
@@ -128,7 +139,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenOnCopyCodeClickedThenShowMessage() = runTest {
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
 
         testee.onCopyCodeClicked()
 
@@ -141,11 +153,12 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenOnCopyCodeClickedThenCopyCodeToClipboard() = runTest {
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
 
         testee.onCopyCodeClicked()
 
-        verify(clipboard).copyToClipboard(jsonConnectKeyEncoded)
+        verify(clipboard).copyToClipboard(authCodeToUse.rawCode)
     }
 
     @Test
@@ -160,7 +173,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
-        whenever(syncRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
+        whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
+        whenever(syncRepository.processCode(any())).thenReturn(Result.Success(true))
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
@@ -172,7 +186,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
-        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
+        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -184,7 +199,9 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
-        whenever(syncRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Error(code = CONNECT_FAILED.code))
+        whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
+        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = CONNECT_FAILED.code))
+
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
@@ -237,7 +254,8 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenPollingIfGenericErrorThenDoNothing() = runTest {
-        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "something else")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncRepository.pollConnectionKeys())
             .thenReturn(Result.Error())
             .thenReturn(Result.Success(true))

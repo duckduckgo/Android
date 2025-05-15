@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Du kannst gespeicherte Passwörter aus einem anderen Browser in DuckDuckGo importieren.</string>
 
     <string name="autofillManagementImportPasswords">Passwörter importieren</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Desktop-Passwörter synchronisieren</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Wie man Passwörter importiert</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">So synchronisierst du Desktop-Passwörter</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importiere Passwörter in der Desktop-Version des DuckDuckGo-Browsers und synchronisiere sie dann auf allen Geräten.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Desktop-Browser herunterladen</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopiert</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Passwörter von Google importieren</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Passwörter von Google importieren</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-Passwörter synchronisieren</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-Passwörter synchronisieren</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Desktop-Passwörter synchronisieren</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Desktop-Passwörter synchronisieren</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Google-Passwörter importieren</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Passwortimport fehlgeschlagen</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Übersprungen (doppelt oder ungültig): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passwörter importiert: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Passwörter öffnen</string>
+    <string name="autofill_service_select_password_activity">Gespeichertes Passwort auswählen</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Passwörter und Autovervollständigen</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Ausgeschlossene Websites zurücksetzen?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Wenn du die ausgeschlossenen Websites zurücksetzt, wirst du aufgefordert, dein Passwort zu speichern, wenn du dich das nächste Mal auf einer dieser Websites anmeldest.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Zurücksetzen</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Abbrechen</string>
+    <string name="autofillSettingsPasswordsEntry">Passwörter</string>
+    <string name="autofillSettingsAutofillToggleLabel">Zum Speichern und automatischen Ausfüllen auffordern</string>
+    <string name="autofillSettingsAutofillSubtitle">Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Passwörter importieren</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Passwörter von Google importieren</string>
+    <string name="autofillSettingsImportFromDesktopSync">Desktop-Passwörter synchronisieren</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Ausgeschlossene Websites zurücksetzen</string>
 
 </resources>
