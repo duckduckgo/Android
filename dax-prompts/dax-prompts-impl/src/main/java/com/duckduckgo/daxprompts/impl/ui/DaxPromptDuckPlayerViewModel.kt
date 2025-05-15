@@ -84,6 +84,6 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     }
 
     companion object {
-        internal const val DUCK_PLAYER_DEMO_URL = "duck://player/yKWIA-Pys4c"
+        internal const val DUCK_PLAYER_DEMO_URL = "https://www.youtube.com/watch?v=yKWIA-Pys4c"
     }
 }
