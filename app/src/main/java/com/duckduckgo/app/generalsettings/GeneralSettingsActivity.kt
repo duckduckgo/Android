@@ -170,7 +170,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                 globalActivityStarter.start(
                     this,
                     WebViewActivityWithParams(
-                        url = MALICIOUS_SITE_LEARN_MORE_URL,
+                        url = SCAM_PROTECTION_LEARN_MORE_URL,
                         screenTitle = getString(R.string.maliciousSiteLearnMoreTitle),
                     ),
                 )
@@ -179,6 +179,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
+        private const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/scam-blocker"
     }
 }

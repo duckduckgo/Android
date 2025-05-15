@@ -387,8 +387,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 
-private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
-private const val MALICIOUS_SITE_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
+private const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/scam-blocker"
+private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -2033,8 +2033,8 @@ class BrowserTabViewModel @Inject constructor(
                 )
             }
 
-            LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
-            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$siteUrl"))
+            LearnMore -> command.postValue(OpenBrokenSiteLearnMore(SCAM_PROTECTION_LEARN_MORE_URL))
+            ReportError -> command.postValue(ReportBrokenSiteError("$SCAM_PROTECTION_REPORT_ERROR_URL$siteUrl"))
         }
     }
 
