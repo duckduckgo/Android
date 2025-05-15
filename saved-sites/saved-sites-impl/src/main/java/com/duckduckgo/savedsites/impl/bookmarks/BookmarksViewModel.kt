@@ -264,8 +264,8 @@ class BookmarksViewModel @Inject constructor(
             val favorites = savedSitesRepository.getFavoritesSync()
             val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
                 .map { it.bookmarkFolder }
-                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
-            val bookmarks = savedSitesRepository.getBookmarksTree()
+                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIdsManager.contains(it.id) }
+            val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIdsManager.contains(it.id) }
             onSavedSitesItemsChanged(favorites, bookmarks + folders)
         }
     }
