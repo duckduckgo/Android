@@ -676,8 +676,13 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         for (String key : bundle.keySet()) {
             if (isValidKey(key, KEY_PREFIX_FRAGMENT)) {
                 long itemId = parseIdFromKey(key, KEY_PREFIX_FRAGMENT);
-                Fragment fragment = mFragmentManager.getFragment(bundle, key);
-                mFragments.put(itemId, fragment);
+                try {
+                    Fragment fragment = mFragmentManager.getFragment(bundle, key);
+                    mFragments.put(itemId, fragment);
+                } catch (IllegalStateException e) {
+                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d", itemId);
+                    continue;
+                }
                 continue;
             }
 
