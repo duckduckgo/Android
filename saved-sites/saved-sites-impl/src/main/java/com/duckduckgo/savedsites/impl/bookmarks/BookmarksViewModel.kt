@@ -291,7 +291,7 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
-        if (bookmarkFolder.numFolders + bookmarkFolder.numBookmarks == 0) {
+        if (bookmarkFolder.isEmpty()) {
             hide(bookmarkFolder)
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)

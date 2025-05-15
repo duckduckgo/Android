@@ -676,7 +676,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun getMessageString(bookmarkFolder: BookmarkFolder): String {
-        val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
+        val totalItems = bookmarkFolder.getTotalItems()
         return resources.getQuantityString(
             R.plurals.bookmarkFolderDeleteMessage,
             totalItems,

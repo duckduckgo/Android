@@ -180,12 +180,14 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
             listItem.setPrimaryText(bookmarkFolder.name)
 
-            val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
-            if (totalItems == 0) {
-                listItem.setSecondaryText(context.getString(R.string.bookmarkFolderEmpty))
+            val text: String
+            if (bookmarkFolder.isEmpty()) {
+                text = context.getString(R.string.bookmarkFolderEmpty)
             } else {
-                listItem.setSecondaryText(context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems))
+                val totalItems = bookmarkFolder.getTotalItems()
+                text = context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
+            listItem.setSecondaryText(text)
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 
             listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)

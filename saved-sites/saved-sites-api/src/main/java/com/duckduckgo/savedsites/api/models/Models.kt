@@ -81,11 +81,14 @@ data class BookmarkFolder(
     override val id: String = UUID.randomUUID().toString(),
     val name: String,
     val parentId: String,
-    val numBookmarks: Int = 0,
-    val numFolders: Int = 0,
+    private val numBookmarks: Int = 0,
+    private val numFolders: Int = 0,
     val lastModified: String? = null,
     val deleted: String? = null,
-) : Serializable, BookmarkEntry
+) : Serializable, BookmarkEntry {
+    fun isEmpty(): Boolean = getTotalItems() == 0
+    fun getTotalItems(): Int = numFolders + numBookmarks
+}
 
 object SavedSitesNames {
     const val FAVORITES_ROOT = "favorites_root"
