@@ -30,11 +30,9 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
-    lifecycleOwner: LifecycleOwner,
-    fragmentManager: FragmentManager,
-    private val activityIntent: Intent?,
+    private val activity: BrowserActivity,
     swipingTabsFeature: SwipingTabsFeatureProvider,
-) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle, swipingTabsFeature) {
+) : FragmentStateAdapter(activity, swipingTabsFeature) {
     private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
 
@@ -52,7 +50,7 @@ class TabPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         val tab = tabs[position]
-        val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
+        val isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         return if (messageForNewFragment != null) {
             val message = messageForNewFragment

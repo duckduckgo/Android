@@ -130,42 +130,18 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     /**
      * @param fragmentActivity if the {@link ViewPager2} lives directly in a {@link
      *     FragmentActivity} subclass.
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentManager, Lifecycle)
-     */
-    public FragmentStateAdapter(@NonNull FragmentActivity fragmentActivity) {
-        this(fragmentActivity.getSupportFragmentManager(), fragmentActivity.getLifecycle());
-    }
-
-    /**
-     * @param fragment if the {@link ViewPager2} lives directly in a {@link Fragment} subclass.
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentManager, Lifecycle)
-     */
-    public FragmentStateAdapter(@NonNull Fragment fragment) {
-        this(fragment.getChildFragmentManager(), fragment.getLifecycle());
-    }
-
-    /**
-     * @param fragmentManager of {@link ViewPager2}'s host
-     * @param lifecycle of {@link ViewPager2}'s host
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
+     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
-            @NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
-        mFragmentManager = fragmentManager;
-        mLifecycle = lifecycle;
-        mSwipingTabsFeature = null;
-        super.setHasStableIds(true);
+            @NonNull FragmentActivity fragmentActivity,
+            SwipingTabsFeatureProvider swipingTabsFeature) {
+        this(fragmentActivity.getSupportFragmentManager(), fragmentActivity.getLifecycle(), swipingTabsFeature);
     }
 
     /**
      * @param fragmentManager of {@link ViewPager2}'s host
      * @param lifecycle of {@link ViewPager2}'s host
      * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
      */
     public FragmentStateAdapter(
             @NonNull FragmentManager fragmentManager,
