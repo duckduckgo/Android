@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,8 +48,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 import com.duckduckgo.app.browser.tabs.TabManager;
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import timber.log.Timber;
 
 /**
@@ -133,7 +135,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     public FragmentStateAdapter(
             @NonNull FragmentActivity fragmentActivity,
             SwipingTabsFeatureProvider swipingTabsFeature) {
-        this(fragmentActivity.getSupportFragmentManager(), fragmentActivity.getLifecycle(), swipingTabsFeature);
+        this(fragmentActivity.getSupportFragmentManager(),
+                fragmentActivity.getLifecycle(),
+                swipingTabsFeature);
     }
 
     /**
@@ -637,7 +641,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                     Fragment fragment = mFragmentManager.getFragment(bundle, key);
                     mFragments.put(itemId, fragment);
                 } catch (IllegalStateException e) {
-                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d", itemId);
+                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d",
+                            itemId);
                 }
             }
         }
