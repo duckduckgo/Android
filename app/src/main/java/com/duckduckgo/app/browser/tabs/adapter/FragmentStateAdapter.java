@@ -638,12 +638,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                     mFragments.put(itemId, fragment);
                 } catch (IllegalStateException e) {
                     Timber.w("FragmentManager is in a bad state, unable to restore fragment %d", itemId);
-                    continue;
                 }
-                continue;
             }
-
-            throw new IllegalArgumentException("Unexpected key in savedState: " + key);
         }
 
         if (!mFragments.isEmpty()) {
