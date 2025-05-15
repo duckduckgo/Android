@@ -39,3 +39,5 @@ interface ProSettingsPlugin : SettingsPlugin
  * This is the plugin for Duck Player settings
  */
 interface DuckPlayerSettingsPlugin : SettingsPlugin
+
+interface ThreatProtectionSettingsPlugin : SettingsPlugin
