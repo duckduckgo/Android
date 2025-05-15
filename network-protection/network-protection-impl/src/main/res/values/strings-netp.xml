@@ -221,7 +221,7 @@
     <string name="netpCustomDnsSettingText">DNS Server</string>
     <string name="netpPrivateDns">Private DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Block risky domains)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Scam Blocker)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
@@ -233,7 +233,7 @@
 
     <!-- Block malware DNS -->
     <string name="netpDnsBlockMalwareHeader">Content Blocking and Filtering</string>
-    <string name="netpDnsBlockMalwarePrimary">Block risky domains</string>
+    <string name="netpDnsBlockMalwarePrimary">Scam Blocker</string>
     <string name="netpDnsBlockMalwareByline">Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS Blocklists</string>
 

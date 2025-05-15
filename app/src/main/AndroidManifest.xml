@@ -448,6 +448,12 @@
             android:exported="false"
             android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
+        <activity
+            android:name=".threatprotection.ThreatProtectionSettingsActivity"
+            android:exported="false"
+            android:label="Threat protection"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            />
 
         <service
             android:name="com.duckduckgo.widget.FavoritesWidgetService"

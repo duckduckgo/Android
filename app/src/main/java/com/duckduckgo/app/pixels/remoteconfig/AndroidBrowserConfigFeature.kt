@@ -146,4 +146,7 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun checkMaliciousAfterHttpsUpgrade(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun newThreatProtectionSettings(): Toggle
 }

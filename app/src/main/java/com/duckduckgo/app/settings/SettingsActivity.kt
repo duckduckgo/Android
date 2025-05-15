@@ -90,6 +90,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
@@ -136,6 +137,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         _duckPlayerSettingsPlugin.getPlugins()
     }
 
+    @Inject
+    lateinit var _threatProtectionSettingsPlugin: PluginPoint<ThreatProtectionSettingsPlugin>
+    private val threatProtectionSettingsPlugin by lazy {
+        _threatProtectionSettingsPlugin.getPlugins()
+    }
+
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
         if (resultOk) {
             Snackbar.make(
@@ -172,13 +179,17 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureInternalFeatures()
-        configureSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        configureSettings()
     }
 
     private fun configureUiEventHandlers() {
@@ -217,6 +228,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
+        viewsPro.removeAllViews()
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
@@ -225,11 +237,23 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        viewsMain.settingsSectionDuckPlayer.removeAllViews()
         if (duckPlayerSettingsPlugin.isEmpty()) {
             viewsMain.settingsSectionDuckPlayer.gone()
         } else {
             duckPlayerSettingsPlugin.forEach { plugin ->
                 viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
+            }
+        }
+
+        viewsPrivacy.settingsSectionThreatProtection.removeAllViews()
+        if (threatProtectionSettingsPlugin.isEmpty()) {
+            viewsPrivacy.settingsSectionThreatProtection.gone()
+        } else {
+            threatProtectionSettingsPlugin.forEach { plugin ->
+                plugin.getView(this).let {
+                    viewsPrivacy.settingsSectionThreatProtection.addView(it)
+                }
             }
         }
     }
@@ -263,6 +287,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                 }
@@ -288,6 +313,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsMain.settingsSectionDuckPlayer.show()
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
+        }
+    }
+
+    private fun updateThreatProtection(newThreatProtectionSettingsEnabled: Boolean) {
+        if (newThreatProtectionSettingsEnabled) {
+            viewsPrivacy.settingsSectionThreatProtection.show()
+        } else {
+            viewsPrivacy.settingsSectionThreatProtection.gone()
         }
     }
 
