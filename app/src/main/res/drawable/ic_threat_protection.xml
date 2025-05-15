@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <group>
+    <clip-path
+        android:pathData="M0,0h16v16H0z"/>
+    <path
+        android:pathData="M10.061,0.88a3,3 0,0 0,-4.2 -0.02l-0.99,0.962a1,1 0,0 1,-0.988 0.239l-0.275,-0.084a2.75,2.75 0,0 0,-3.55 2.564L0.009,6.553a9.125,9.125 0,0 0,5.264 8.49l1.406,0.655a3.124,3.124 0,0 0,2.643 0l1.405,-0.656a9.125,9.125 0,0 0,5.264 -8.489l-0.05,-2.038a2.75,2.75 0,0 0,-3.525 -2.572l-0.42,0.124a1,1 0,0 1,-0.987 -0.248L10.061,0.88ZM8.625,1.397c0.202,0.085 0.392,0.208 0.557,0.372l0.948,0.938a2.25,2.25 0,0 0,2.218 0.56l0.42,-0.125a1.5,1.5 0,0 1,1.924 1.403l0.05,2.038a7.875,7.875 0,0 1,-4.543 7.326l-1.406,0.656a1.83,1.83 0,0 1,-0.168 0.07L8.625,1.396ZM7.375,1.36a1.744,1.744 0,0 0,-0.643 0.397l-0.991,0.962a2.25,2.25 0,0 1,-2.222 0.537l-0.275,-0.083a1.5,1.5 0,0 0,-1.937 1.399L1.26,6.583A7.875,7.875 0,0 0,5.8 13.91l1.406,0.656c0.055,0.026 0.111,0.05 0.168,0.07L7.374,1.36Z"
+        android:fillColor="@color/green80"
+        android:fillType="evenOdd"/>
+  </group>
+</vector>

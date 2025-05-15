@@ -56,4 +56,13 @@
 
     <!-- Trackers blocked animation-->
     <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
+
+    <!-- Threat protection -->
+    <string name="scamProtectionSettingInfo"><![CDATA[Disabling this feature can put your information at risk. <a href="">Learn More</a>.]]></string>
+    <string name="threatProtectionTitle">Threat Protection</string>
+    <string name="threatProtectionDescription">Some general blurb about how DuckDuckGo protects you from threats</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription">Automatically upgrades links to HTTPS whenever possible</string>
+    <string name="scamBlockerTitle">Scam Blocker</string>
+    <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware</string>
 </resources>

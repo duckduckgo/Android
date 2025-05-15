@@ -98,5 +98,11 @@ class SettingsListItem @JvmOverloads constructor(
     /** Sets the leading icon image resource */
     fun setLeadingIconResource(@DrawableRes idRes: Int) {
         leadingIcon.setImageResource(idRes)
+        leadingIcon.show()
+    }
+
+    /** Sets the primary text */
+    fun setPrimaryText(text: String) {
+        primaryText.text = text
     }
 }
