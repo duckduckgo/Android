@@ -20,15 +20,22 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
@@ -36,18 +43,27 @@ class ThreatProtectionSettingsTitle @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val settingsDataStore: SettingsDataStore,
     private val toggle: FeatureToggle,
+    private val maliciousSiteProtection: MaliciousSiteProtection,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : ThreatProtectionSettingsPlugin {
     override fun getView(context: Context): View {
         return SettingsListItem(context).apply {
             setLeadingIconResource(R.drawable.ic_threat_protection)
-
             setPrimaryText(context.getString(R.string.threatProtectionTitle))
-            setStatus(
-                settingsDataStore.maliciousSiteProtectionEnabled &&
-                    toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value),
-            )
             setOnClickListener {
                 globalActivityStarter.start(this.context, ThreatProtectionSettingsNoParams, null)
+            }
+            setStatus(false)
+            coroutineScope.launch(dispatcherProvider.io()) {
+                val scamBlockerEnabled = maliciousSiteProtection.isFeatureEnabled() &&
+                    settingsDataStore.maliciousSiteProtectionEnabled &&
+                    androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled()
+                val smarterEncryptionEnabled = toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)
+                withContext(dispatcherProvider.main()) {
+                    setStatus(scamBlockerEnabled && smarterEncryptionEnabled)
+                }
             }
         }
     }
