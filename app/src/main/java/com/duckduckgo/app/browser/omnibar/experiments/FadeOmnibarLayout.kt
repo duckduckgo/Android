@@ -21,7 +21,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
@@ -334,11 +333,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderShadows(showShadows: Boolean) {
-        outlineProvider = if (showShadows) {
-            ViewOutlineProvider.BACKGROUND
-        } else {
-            null
-        }
+        // outlineProvider = if (showShadows) {
+        //     ViewOutlineProvider.BACKGROUND
+        // } else {
+        //     null
+        // }
     }
 
     companion object {

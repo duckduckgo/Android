@@ -441,6 +441,7 @@
             android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:showShadows="false"
             android:layout_gravity="bottom" />
 
     </LinearLayout>
