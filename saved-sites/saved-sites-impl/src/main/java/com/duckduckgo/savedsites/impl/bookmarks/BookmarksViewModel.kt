@@ -260,7 +260,14 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun fetchAllBookmarksAndFolders() {
-        fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val favorites = savedSitesRepository.getFavoritesSync()
+            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                .map { it.bookmarkFolder }
+                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
+            val bookmarks = savedSitesRepository.getBookmarksTree()
+            onSavedSitesItemsChanged(favorites, bookmarks + folders)
+        }
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
