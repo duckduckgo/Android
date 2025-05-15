@@ -20,11 +20,15 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.CaptchaResolver
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler
 import com.duckduckgo.pir.internal.common.RealNativeBrokerActionHandler
+import com.duckduckgo.pir.internal.common.actions.EventHandler
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngineFactory
+import com.duckduckgo.pir.internal.common.actions.RealPirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.PirMessagingInterface
 import com.duckduckgo.pir.internal.scripts.RealBrokerActionProcessor
@@ -142,6 +146,17 @@ class PirModule {
             repository,
             dispatcherProvider,
             captchaResolver,
+        )
+    }
+
+    @Provides
+    fun providePirActionsRunnerStateEngineFactory(
+        eventHandlers: PluginPoint<EventHandler>,
+        dispatcherProvider: DispatcherProvider,
+    ): PirActionsRunnerStateEngineFactory {
+        return RealPirActionsRunnerStateEngineFactory(
+            eventHandlers,
+            dispatcherProvider,
         )
     }
 }
