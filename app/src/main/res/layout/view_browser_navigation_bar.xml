@@ -158,8 +158,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/browserPopupMenu"
                 android:scaleType="center"
-                android:src="@drawable/ic_menu_vertical_24"
-                app:tint="?daxColorPrimaryIcon" />
+                android:src="@drawable/ic_menu_vertical_24" />
         </FrameLayout>
 
     </LinearLayout>
