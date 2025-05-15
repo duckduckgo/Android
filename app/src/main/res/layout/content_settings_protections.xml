@@ -71,4 +71,11 @@
         app:leadingIcon="@drawable/ic_email_protection_color_24"
         app:primaryText="@string/settingsEmailProtectionTitle" />
 
+    <LinearLayout
+        android:id="@+id/settingsSectionThreatProtection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
 </LinearLayout>
