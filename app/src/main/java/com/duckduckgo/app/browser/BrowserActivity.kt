@@ -874,10 +874,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
 
             savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
-                // state is only useful when there are fragments to restore (also avoids a crash)
-                if (supportFragmentManager.fragments.isNotEmpty()) {
-                    tabPagerAdapter.restoreState(it)
-                }
+                tabPagerAdapter.restore(it)
             }
         }
 
