@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 33,
+    version = 34,
     entities = [
         VpnTracker::class,
         VpnServiceStateStats::class,
@@ -214,6 +214,12 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_33_TO_34: Migration = object : Migration(33, 34) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DELETE FROM `vpn_app_tracker_blocking_list_metadata`")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -231,6 +237,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_30_TO_31,
                 MIGRATION_31_TO_32,
                 MIGRATION_32_TO_33,
+                MIGRATION_33_TO_34,
             )
     }
 }

@@ -278,6 +278,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.messaging.RealSubscriptionsJSHelper.Companion.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.impl.messaging.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -551,6 +553,7 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
+    private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
 
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
@@ -751,6 +754,7 @@ class BrowserTabViewModelTest {
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
+            subscriptionsJSHelper = mockSubscriptionsJSHelper,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6301,6 +6305,33 @@ class BrowserTabViewModelTest {
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
         verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() = runTest {
+        val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
+        whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
+        testee.processJsCallbackMessage(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            method = "method",
+            id = "id",
+            data = null,
+        ) { "someUrl" }
+        verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() = runTest {
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+        testee.processJsCallbackMessage(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            method = "method",
+            id = "id",
+            data = null,
+        ) { "someUrl" }
+        verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+        assertCommandNotIssued<Command.SendResponseToJs>()
     }
 
     private fun aCredential(): LoginCredentials {

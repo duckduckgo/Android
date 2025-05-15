@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Voit tuoda tallennetut salasanat toisesta selaimesta DuckDuckGohon.</string>
 
     <string name="autofillManagementImportPasswords">Tuo salasanat</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Synkronoi työpöytäsalasanat</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Näin tuot salasanat</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Tietokoneen salasanojen synkronointi</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Tuo DuckDuckGo-selaimen pöytäkoneversiossa olevat salasanat ja synkronoi eri laitteiden kanssa.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hanki pöytäkoneselain</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Linkki kopioitu</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Tuo salasanat Googlesta</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Tuo salasanat Googlesta</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronoi DuckDuckGo-salasanat</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronoi DuckDuckGo-salasanat</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronoi työpöytäsalasanat</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronoi työpöytäsalasanat</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Tuo Google-salasanasi</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Salasanojen tuonti epäonnistui</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ohitettu (kaksoiskappale tai virheellinen): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Tuodut salasanat: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Avaa salasanat</string>
+    <string name="autofill_service_select_password_activity">Valitse tallennettu salasana</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Salasanat ja automaattinen täyttö</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Nollataanko poissuljetut sivustot?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Nollaa</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Peruuta</string>
+    <string name="autofillSettingsPasswordsEntry">Salasanat</string>
+    <string name="autofillSettingsAutofillToggleLabel">Pyydä tallentamaan ja täyttämään automaattisesti</string>
+    <string name="autofillSettingsAutofillSubtitle">Salasanat salataan. Kukaan muu kuin sinä ei näe niitä, emme edes me. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Tuo salasanat</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Tuo salasanat Googlesta</string>
+    <string name="autofillSettingsImportFromDesktopSync">Synkronoi työpöytäsalasanat</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Nollaa poissuljetut sivustot</string>
 
 </resources>

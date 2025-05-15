@@ -31,6 +31,7 @@ class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
 
     private val testSubscription = Subscription(
         productId = "productId",
+        billingPeriod = "Monthly",
         startedAt = DAYS.toMillis(1),
         expiresOrRenewsAt = DAYS.toMillis(10),
         status = AUTO_RENEWABLE,

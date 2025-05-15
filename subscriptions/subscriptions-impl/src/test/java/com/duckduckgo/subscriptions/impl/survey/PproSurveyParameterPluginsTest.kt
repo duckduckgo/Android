@@ -6,6 +6,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
@@ -25,6 +27,7 @@ class PproSurveyParameterPluginTest {
 
     private val testSubscription = Subscription(
         productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+        billingPeriod = MONTHLY,
         startedAt = 1717797600000, // June 07 UTC
         expiresOrRenewsAt = 1719525600000, // June 27 UTC
         status = AUTO_RENEWABLE,
@@ -61,33 +64,26 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
-        assertEquals("monthly", plugin.evaluate())
+        assertEquals("Monthly", plugin.evaluate())
     }
 
     @Test
     fun whenSubscriptionIsYearlyThenBillingParamEvaluatesToSubscriptionBilling() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
-            testSubscription.copy(
-                productId = SubscriptionsConstants.YEARLY_PLAN_US,
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = YEARLY,
+                startedAt = 1717797600000, // June 07 UTC
+                expiresOrRenewsAt = 1719525600000, // June 27 UTC
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = listOf(),
             ),
         )
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
-        assertEquals("annual", plugin.evaluate())
-    }
-
-    @Test
-    fun whenSubscriptionHasInvalidProductIdThenBillingParamEvaluatesToEmpty() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            testSubscription.copy(
-                productId = "some invalid product id",
-            ),
-        )
-
-        val plugin = PproBillingParameterPlugin(subscriptionsManager)
-
-        assertEquals("", plugin.evaluate())
+        assertEquals("Yearly", plugin.evaluate())
     }
 
     @Test

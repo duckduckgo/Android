@@ -310,9 +310,9 @@ class SyncActivityViewModel @Inject constructor(
 
     fun generateRecoveryCode(viewContext: Context) {
         viewModelScope.launch(dispatchers.io()) {
-            syncAccountRepository.getRecoveryCode().onSuccess { recoveryCodeB64 ->
+            syncAccountRepository.getRecoveryCode().onSuccess { authCode ->
                 kotlin.runCatching {
-                    recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+                    recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, authCode.rawCode)
                 }.onSuccess { generateRecoveryCodePDF ->
                     command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
                 }.onFailure {

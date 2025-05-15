@@ -189,7 +189,7 @@
                         android:id="@+id/omnibarTextInput"
                         style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
                         android:background="@null"
                         android:fontFamily="sans-serif"
                         android:hint="@string/omnibarInputHint"

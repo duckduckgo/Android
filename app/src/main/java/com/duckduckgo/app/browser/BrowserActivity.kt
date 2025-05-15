@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -105,7 +106,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 // open class so that we can test BrowserApplicationStateInfo
@@ -178,7 +178,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
-                tabPagerAdapter.currentFragment
+                val selectedTabId = tabManager.getSelectedTabId()
+                supportFragmentManager.fragments
+                    .filterIsInstance<BrowserTabFragment>()
+                    .firstOrNull { it.tabId == selectedTabId }
             } else {
                 _currentTab
             }
@@ -206,9 +209,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             fragmentManager = supportFragmentManager,
             lifecycleOwner = this,
             activityIntent = intent,
-            getSelectedTabId = tabManager::getSelectedTabId,
-            getTabById = ::getTabById,
-            requestAndWaitForNewTab = ::requestAndWaitForNewTab,
             swipingTabsFeature = swipingTabsFeature,
         )
     }
@@ -1002,16 +1002,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<String>) {
+    private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
-    }
-
-    private fun getTabById(tabId: String): TabEntity? = runBlocking {
-        return@runBlocking tabManager.getTabById(tabId)
-    }
-
-    private fun requestAndWaitForNewTab(): TabEntity = runBlocking {
-        return@runBlocking tabManager.requestAndWaitForNewTab()
     }
 
     fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
