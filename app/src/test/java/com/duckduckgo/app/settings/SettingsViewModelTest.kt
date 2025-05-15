@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,13 +39,12 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 @SuppressLint("DenyListedApi")
@@ -53,55 +53,45 @@ class SettingsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var defaultWebBrowserCapabilityMock: DefaultBrowserDetector
+    private val defaultWebBrowserCapabilityMock: DefaultBrowserDetector = mock()
 
-    @Mock
-    private lateinit var appTrackingProtectionMock: AppTrackingProtection
+    private val appTrackingProtectionMock: AppTrackingProtection = mock()
 
-    @Mock
-    private lateinit var pixelMock: Pixel
+    private val pixelMock: Pixel = mock()
 
-    @Mock
-    private lateinit var emailManagerMock: EmailManager
+    private val emailManagerMock: EmailManager = mock()
 
-    @Mock
-    private lateinit var autofillCapabilityCheckerMock: AutofillCapabilityChecker
+    private val autofillCapabilityCheckerMock: AutofillCapabilityChecker = mock()
 
-    @Mock
-    private lateinit var deviceSyncStateMock: DeviceSyncState
+    private val deviceSyncStateMock: DeviceSyncState = mock()
 
-    @Mock
-    private lateinit var dispatcherProviderMock: DispatcherProvider
+    private val dispatcherProviderMock: DispatcherProvider = mock()
 
-    @Mock
-    private lateinit var autoconsentMock: Autoconsent
+    private val autoconsentMock: Autoconsent = mock()
 
-    @Mock
-    private lateinit var subscriptionsMock: Subscriptions
+    private val subscriptionsMock: Subscriptions = mock()
 
-    @Mock
-    private lateinit var duckPlayerMock: DuckPlayer
+    private val duckPlayerMock: DuckPlayer = mock()
 
-    @Mock
-    private lateinit var duckChatMock: DuckChat
+    private val duckChatMock: DuckChat = mock()
 
-    @Mock
-    private lateinit var voiceSearchAvailabilityMock: VoiceSearchAvailability
+    private val voiceSearchAvailabilityMock: VoiceSearchAvailability = mock()
 
-    @Mock
-    private lateinit var privacyProUnifiedFeedbackMock: PrivacyProUnifiedFeedback
+    private val privacyProUnifiedFeedbackMock: PrivacyProUnifiedFeedback = mock()
 
-    @Mock
-    private lateinit var settingsPixelDispatcherMock: SettingsPixelDispatcher
+    private val settingsPixelDispatcherMock: SettingsPixelDispatcher = mock()
 
     private lateinit var testee: SettingsViewModel
 
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
+    fun before() = runTest {
+        whenever(appTrackingProtectionMock.isRunning()).thenReturn(true)
+        whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
+        whenever(subscriptionsMock.isEligible()).thenReturn(true)
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -119,6 +109,7 @@ class SettingsViewModelTest {
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
         )
     }
 
@@ -167,5 +158,12 @@ class SettingsViewModelTest {
         testee.commands().test {
             assertEquals(LaunchAutofillPasswordsManagement, awaitItem())
         }
+    }
+
+    @Test
+    fun `when new threat protection settings is available then show threat protection settings`() = runTest {
+        fakeAndroidBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(State(true))
+        testee.start()
+        assertTrue(testee.viewState().first().isNewThreatProtectionSettingsEnabled)
     }
 }
