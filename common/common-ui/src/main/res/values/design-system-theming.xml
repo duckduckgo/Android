@@ -140,6 +140,7 @@
         <item name="autocompleteListItemWithoutTrailIconEndPadding">@dimen/keyline_4</item>
 
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->

@@ -52,7 +52,8 @@
         <item name="autocompleteListItemEndPadding">22dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
@@ -92,7 +93,8 @@
         <item name="autocompleteListItemWithoutTrailIconEndPadding">46dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
     </style>
 
 </resources>

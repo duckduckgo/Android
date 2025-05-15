@@ -26,5 +26,6 @@
     <attr name="autocompleteListItemWithoutTrailIconEndPadding" format="dimension"/>
 
     <attr name="cookiesAnimationRadius" format="dimension"/>
+    <attr name="cookiesAnimationHeight" format="dimension"/>
 
 </resources>

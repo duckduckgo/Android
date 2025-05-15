@@ -197,9 +197,9 @@
                         <View
                             android:id="@+id/cookieDummyView"
                             android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
-                            android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+                            android:layout_height="?attr/cookiesAnimationHeight"
                             android:layout_gravity="start|center_vertical"
-                            android:layout_marginStart="2dp"
+                            android:layout_marginStart="@dimen/keyline_1"
                             android:alpha="0"
                             android:background="@drawable/cookies_dummy_background"
                             app:layout_constraintBottom_toBottomOf="parent"
