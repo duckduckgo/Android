@@ -21,9 +21,13 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import java.io.Serializable
 import java.util.*
 
+interface BookmarkEntry {
+    val id: String
+}
+
 data class SavedSites(
     val favorites: List<Favorite>,
-    val bookmarks: List<Any>,
+    val bookmarks: List<BookmarkEntry>,
 )
 
 sealed class SavedSite(
@@ -50,7 +54,7 @@ sealed class SavedSite(
         override val lastModified: String?,
         override val deleted: String? = null,
         val isFavorite: Boolean = false,
-    ) : SavedSite(id, title, url, lastModified)
+    ) : SavedSite(id, title, url, lastModified), BookmarkEntry
 }
 
 /**
@@ -74,14 +78,14 @@ data class BookmarkFolderItem(
  * UI model used in the Bookmarks Management screen to represent a [BookmarkFolder]
  */
 data class BookmarkFolder(
-    val id: String = UUID.randomUUID().toString(),
+    override val id: String = UUID.randomUUID().toString(),
     val name: String,
     val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
     val lastModified: String? = null,
     val deleted: String? = null,
-) : Serializable
+) : Serializable, BookmarkEntry
 
 object SavedSitesNames {
     const val FAVORITES_ROOT = "favorites_root"

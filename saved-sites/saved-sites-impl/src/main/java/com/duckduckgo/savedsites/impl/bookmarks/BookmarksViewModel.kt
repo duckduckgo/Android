@@ -246,14 +246,7 @@ class BookmarksViewModel @Inject constructor(
 
             savedSitesRepository.getSavedSites(parentId)
                 .combine(hiddenIdsManager.getFlow()) { savedSites, hiddenIds ->
-                    val filteredBookmarks = savedSites.bookmarks.filter {
-                        when (it) {
-                            is Bookmark -> !hiddenIds.contains(it.id)
-                            is BookmarkFolder -> !hiddenIds.contains(it.id)
-                            else -> false
-                        }
-                    }
-
+                    val filteredBookmarks = savedSites.bookmarks.filter { !hiddenIds.contains(it.id) }
                     val filteredFavorites = savedSites.favorites.filter { !hiddenIds.contains(it.id) }
 
                     savedSites.copy(
