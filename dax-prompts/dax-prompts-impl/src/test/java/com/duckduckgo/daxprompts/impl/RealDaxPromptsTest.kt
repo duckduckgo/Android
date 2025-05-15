@@ -118,36 +118,6 @@ class RealDaxPromptsTest {
     }
 
     @Test
-    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldShowPromptButDefaultBrowserAlreadyThenReturnNone() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
-    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldShowPromptButShouldNotShowDialogThenReturnNone() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
     fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldNotShowPromptThenReturnNone() = runTest {
         mockUserIsEligible()
         whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
@@ -176,6 +146,8 @@ class RealDaxPromptsTest {
     fun whenDaysSinceInstalledLessThanThresholdThenUserIsNotEligible() = runTest {
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(27)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
 
         val result = testee.evaluate()
 
@@ -186,6 +158,32 @@ class RealDaxPromptsTest {
     fun whenUserHasUsedAppInLast7DaysThenUserIsNotEligible() = runTest {
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(1)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenIsDefaultBrowserThenUserIsNotEligible() = runTest {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenShouldShowDialogIsFalseThenUserIsNotEligible() = runTest {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
         val result = testee.evaluate()
 
@@ -195,6 +193,8 @@ class RealDaxPromptsTest {
     private fun mockUserIsEligible() = runBlocking {
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
     }
 
     private fun mockUserIsNotEligible() {

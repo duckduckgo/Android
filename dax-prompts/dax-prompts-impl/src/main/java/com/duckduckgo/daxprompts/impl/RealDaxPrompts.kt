@@ -64,8 +64,20 @@ class RealDaxPrompts @Inject constructor(
 
     private suspend fun isEligible(): Boolean {
         return withContext(dispatchers.io()) {
+            if (userBrowserProperties.daysSinceInstalled() < EXISTING_USER_DAY_COUNT_THRESHOLD) {
+                return@withContext false
+            }
+
             val sevenDaysAgo = Date(Date().time - EXISTING_USER_DAYS_INACTIVE_MILLIS)
-            userBrowserProperties.daysSinceInstalled() >= EXISTING_USER_DAY_COUNT_THRESHOLD && userBrowserProperties.daysUsedSince(sevenDaysAgo) == 0L
+            if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 0L) {
+                return@withContext false
+            }
+
+            if (defaultBrowserDetector.isDefaultBrowser()) {
+                return@withContext false
+            }
+
+            defaultRoleBrowserDialog.shouldShowDialog()
         }
     }
 
@@ -74,8 +86,6 @@ class RealDaxPrompts @Inject constructor(
     }
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
-        val defaultBrowserAlready = defaultBrowserDetector.isDefaultBrowser()
-        val shouldShowDialog = defaultRoleBrowserDialog.shouldShowDialog()
-        !defaultBrowserAlready && shouldShowDialog && daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+        daxPromptsRepository.getDaxPromptsShowBrowserComparison()
     }
 }
