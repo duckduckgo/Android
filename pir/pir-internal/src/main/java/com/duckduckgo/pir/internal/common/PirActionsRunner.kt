@@ -270,7 +270,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
     }
 
-    private fun pushJsAction(effect: PushJsAction) {
+    private suspend fun pushJsAction(effect: PushJsAction) {
         timerJob += coroutineScope.launch(dispatcherProvider.io()) {
             delay(60000) // 1 minute
             // IF this timer completes, then timeout was reached
@@ -282,6 +282,10 @@ class RealPirActionsRunner @AssistedInject constructor(
                     ),
                 )
             }
+        }
+
+        if (effect.pushDelay != 0L) {
+            delay(effect.pushDelay)
         }
 
         brokerActionProcessor.pushAction(

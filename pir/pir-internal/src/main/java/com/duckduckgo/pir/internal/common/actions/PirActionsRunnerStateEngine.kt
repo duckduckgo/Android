@@ -125,6 +125,7 @@ interface PirActionsRunnerStateEngine {
         data class PushJsAction(
             override val actionId: String,
             val action: BrokerAction,
+            val pushDelay: Long = 0L,
             val requestParamsData: PirScriptRequestData,
         ) : SideEffect(), BrokerActionSideEffect
 

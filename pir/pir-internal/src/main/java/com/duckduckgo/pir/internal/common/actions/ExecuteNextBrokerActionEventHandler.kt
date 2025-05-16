@@ -38,7 +38,6 @@ import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfi
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
-import kotlinx.coroutines.delay
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -85,11 +84,12 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
                     ),
                 )
             } else {
+                var pushDelay = 0L
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
-                    // Potentially move this out of the engine
-                    delay(10_000)
+                    pushDelay = 10_000
                 }
+
                 if (actionToExecute is EmailConfirmation) {
                     Next(
                         nextState = state,
@@ -116,6 +116,7 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
                         sideEffect = PushJsAction(
                             actionToExecute.id,
                             actionToExecute,
+                            pushDelay,
                             completeRequestData(state, actionToExecute, requestData),
                         ),
                     )
