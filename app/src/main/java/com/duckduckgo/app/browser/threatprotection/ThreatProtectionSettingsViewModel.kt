@@ -20,10 +20,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -38,11 +40,14 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val maliciousSiteProtection: MaliciousSiteProtection,
 ) : ViewModel() {
 
     data class ViewState(
         val smarterEncryptionEnabled: Boolean = true,
-        val scamProtectionEnabled: Boolean,
+        val scamProtectionUserEnabled: Boolean,
+        val scamProtectionRCEnabled: Boolean,
     )
 
     sealed class Command {
@@ -58,7 +63,8 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
             _viewState.value = ViewState(
-                scamProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
+                scamProtectionUserEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
+                scamProtectionRCEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
             )
         }
     }
@@ -72,7 +78,7 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
                 mapOf(NEW_STATE to enabled.toString()),
             )
             _viewState.value = _viewState.value?.copy(
-                scamProtectionEnabled = enabled,
+                scamProtectionUserEnabled = enabled,
             )
         }
     }
