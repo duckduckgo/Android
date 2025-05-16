@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLearnMore
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -62,7 +62,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLearnMore(val learnMoreLink: String) : Command()
+        data class OpenLink(val link: String) : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -85,7 +85,18 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
+            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK))
         }
+    }
+
+    fun duckChatSearchAISettingsClicked() {
+        viewModelScope.launch {
+            commandChannel.send(OpenLink(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+        }
+    }
+
+    companion object {
+        const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings#aifeatures"
     }
 }
