@@ -29,5 +29,5 @@ class SenseOfProtectionCohortSurveyParameterPlugin @Inject constructor(
 ) : SurveyParameterPlugin {
     override val surveyParamKey: String = "senseProtectionCohort"
 
-    override suspend fun evaluate(): String = senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name.orEmpty()
+    override suspend fun evaluate(): String = senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().getCohort()?.name.orEmpty()
 }
