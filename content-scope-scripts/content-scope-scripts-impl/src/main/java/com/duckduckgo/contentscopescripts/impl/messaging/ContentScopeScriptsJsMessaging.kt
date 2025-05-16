@@ -170,6 +170,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             "openAIChat",
             "closeAIChat",
             "openAIChatSettings",
+            "responseState",
+            "hideChatInput",
+            "showChatInput",
         )
     }
 
