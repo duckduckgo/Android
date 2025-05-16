@@ -4271,7 +4271,7 @@
      *    }
      * }
      * ```
-     * Where featureName "ContentScopeExperiments" has a subfeature "experimentName" and cohort "cohort-name"
+     * Where featureName "contentScopeExperiments" has a subfeature "experimentName" and cohort "cohort-name"
      * @param {ConditionBlock} conditionBlock
      * @returns {boolean}
      */
@@ -4282,7 +4282,7 @@
       const currentCohorts = this.args?.currentCohorts;
       if (!currentCohorts) return false;
       return currentCohorts.some((cohort) => {
-        return cohort.feature === "ContentScopeExperiments" && cohort.subfeature === experiment.experimentName && cohort.cohort === experiment.cohort;
+        return cohort.feature === "contentScopeExperiments" && cohort.subfeature === experiment.experimentName && cohort.cohort === experiment.cohort;
       });
     }
     /**
