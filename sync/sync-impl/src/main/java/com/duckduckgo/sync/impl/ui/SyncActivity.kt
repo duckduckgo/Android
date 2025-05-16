@@ -51,8 +51,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevic
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -83,6 +85,7 @@ import timber.log.Timber
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 @ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -158,7 +161,13 @@ class SyncActivity : DuckDuckGoActivity() {
 
         setupClickListeners()
         setupRecyclerView()
+
+        syncSetupUrl()?.let { setupUrl ->
+            viewModel.processSetupDeepLink(setupUrl)
+        }
     }
+
+    private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
@@ -299,7 +308,40 @@ class SyncActivity : DuckDuckGoActivity() {
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
+            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(it.barcodeSyncUrl, it.deviceName)
+            is DeepLinkIntoSetup -> {
+                val authConfig = AuthConfiguration(
+                    displayTitleResource = R.string.deep_link_auth_prompt_title,
+                    displayTextResource = R.string.deep_link_auth_prompt_message,
+                )
+                authenticate(config = authConfig) {
+                    deepLinkIntoSetup(it.barcodeSyncUrl)
+                }
+            }
         }
+    }
+
+    private fun deepLinkIntoSetup(barcodeSyncUrl: String) {
+        Timber.i("Sync-setup: launching sync with another device flow with deep link")
+        syncWithAnotherDeviceFlow.launch(barcodeSyncUrl)
+    }
+
+    private fun askSetupSyncDeepLink(
+        barcodeSyncUrl: String,
+        deviceName: String?,
+    ) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_setup_deep_link_confirmation_dialog_title)
+            .setMessage(getString(R.string.sync_setup_deep_link_confirmation_dialog_message, deviceName))
+            .setPositiveButton(R.string.sync_setup_deep_link_confirmation_dialog_button_positive)
+            .setNegativeButton(R.string.sync_setup_deep_link_confirmation_dialog_button_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+                },
+            ).show()
     }
 
     private fun launchSyncGetOnOtherPlatforms(source: String) {
@@ -416,9 +458,9 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun authenticate(onSuccess: () -> Unit) {
+    private fun authenticate(config: AuthConfiguration = AuthConfiguration(), onSuccess: () -> Unit) {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            deviceAuthenticator.authenticate(config = AuthConfiguration(), fragmentActivity = this) {
+            deviceAuthenticator.authenticate(config = config, fragmentActivity = this) {
                 when (it) {
                     Success -> onSuccess()
                     else -> { }
