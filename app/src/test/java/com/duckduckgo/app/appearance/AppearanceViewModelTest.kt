@@ -18,6 +18,7 @@ package com.duckduckgo.app.appearance
 
 import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
@@ -39,12 +40,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 internal class AppearanceViewModelTest {
     @get:Rule
     @Suppress("unused")
