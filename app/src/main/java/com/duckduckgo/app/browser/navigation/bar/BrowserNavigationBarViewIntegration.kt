@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -53,7 +54,8 @@ class BrowserNavigationBarViewIntegration(
     } ?: browserTabFragmentBinding.navigationBar
 
     private var stateObserverJob: Job? = null
-    private var keyboardVisibilityJob: Job? = null
+    private var keyboardVisibilityObserverJob: Job? = null
+    private var navigationBarVisibilityChangeJob: Job? = null
 
     init {
         stateObserverJob = lifecycleScope.launch {
@@ -92,21 +94,22 @@ class BrowserNavigationBarViewIntegration(
     private fun onEnabled() {
         // we're hiding the navigation bar when keyboard is shown,
         // to prevent it from being "pushed up" within the coordinator layout
-        keyboardVisibilityJob = lifecycleScope.launch {
+        keyboardVisibilityObserverJob = lifecycleScope.launch {
             omnibar.textInputRootView.keyboardVisibilityFlow().distinctUntilChanged().collect { keyboardVisible ->
+                navigationBarVisibilityChangeJob?.cancel()
                 if (keyboardVisible) {
                     navigationBarView.gone()
                 } else {
-                    navigationBarView.postDelayed(
-                        { navigationBarView.show() },
-                        BrowserTabFragment.KEYBOARD_DELAY,
-                    )
+                    navigationBarVisibilityChangeJob = launch {
+                        delay(BrowserTabFragment.KEYBOARD_DELAY)
+                        navigationBarView.show()
+                    }
                 }
             }
         }
     }
 
     private fun onDisabled() {
-        keyboardVisibilityJob?.cancel()
+        keyboardVisibilityObserverJob?.cancel()
     }
 }
