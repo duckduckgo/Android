@@ -24,6 +24,7 @@ import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -82,9 +83,12 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState?.let {
                     binding.scamBlockerToggle.quietlySetIsChecked(
-                        newCheckedState = it.scamProtectionEnabled,
+                        newCheckedState = it.scamProtectionUserEnabled,
                         changeListener = scamProtectionToggleListener,
                     )
+                    binding.scamBlockerToggle.isVisible = it.scamProtectionRCEnabled
+                    binding.scamProtectionSettingInfo.isVisible = it.scamProtectionRCEnabled
+
                     binding.smarterEncryptionItem.setStatus(it.smarterEncryptionEnabled)
                 }
             }.launchIn(lifecycleScope)
