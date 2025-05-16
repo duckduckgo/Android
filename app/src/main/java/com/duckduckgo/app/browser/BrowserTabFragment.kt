@@ -2664,7 +2664,6 @@ class BrowserTabFragment :
             val topOfPage = scrollY == 0
 
             omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
-            browserNavigationBarIntegration.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 

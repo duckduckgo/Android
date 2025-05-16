@@ -21,7 +21,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
@@ -91,6 +90,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val toolbarContainerPaddingTopWhenAtBottom by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingTopWhenAtBottom)
     }
+    private val toolbarContainerPaddingHorizontalWhenAtBottom by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingHorizontalWhenAtBottom)
+    }
     private val omnibarCardMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginHorizontal) }
     private val omnibarCardMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop) }
     private val omnibarCardMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom) }
@@ -127,9 +129,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             // When omnibar is at the bottom, we're adding an additional space at the top
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
+                right = toolbarContainerPaddingHorizontalWhenAtBottom,
+                left = toolbarContainerPaddingHorizontalWhenAtBottom,
             )
             // at the same time, we remove that space from the navigation bar which now sits below the omnibar
-            navBar.findViewById<LinearLayout>(R.id.rootView).updatePadding(
+            navBar.findViewById<LinearLayout>(R.id.barView).updatePadding(
                 top = 0,
             )
 
@@ -334,11 +338,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderShadows(showShadows: Boolean) {
-        outlineProvider = if (showShadows) {
-            ViewOutlineProvider.BACKGROUND
-        } else {
-            null
-        }
+        // outlineProvider = if (showShadows) {
+        //     ViewOutlineProvider.BACKGROUND
+        // } else {
+        //     null
+        // }
     }
 
     companion object {

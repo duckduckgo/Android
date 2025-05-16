@@ -28,11 +28,22 @@
         android:background="?attr/preferredNavigationBarColor"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/keyline_4"
         android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
         android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
         app:layout_constraintTop_toTopOf="parent"
         tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -148,6 +159,17 @@
                 android:scaleType="center"
                 android:src="@drawable/ic_menu_vertical_24" />
         </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
 
     </LinearLayout>
 

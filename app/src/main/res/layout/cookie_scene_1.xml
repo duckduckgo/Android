@@ -16,7 +16,7 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="wrap_content"
-             android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+             android:layout_height="?attr/cookiesAnimationHeight"
              xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -24,6 +24,7 @@
         app:typography="body1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:maxLines="1"
