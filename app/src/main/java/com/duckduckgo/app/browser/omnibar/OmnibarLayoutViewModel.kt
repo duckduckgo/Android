@@ -708,7 +708,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (customTabMode is CustomTab) {
             _viewState.update {
                 it.copy(
-                    viewMode = customTabMode.copy(title = decoration.title),
+                    viewMode = customTabMode.copy(
+                        title = decoration.title,
+                        domain = decoration.domain,
+                        showDuckPlayerIcon = decoration.showDuckPlayerIcon,
+                    ),
                 )
             }
         }
