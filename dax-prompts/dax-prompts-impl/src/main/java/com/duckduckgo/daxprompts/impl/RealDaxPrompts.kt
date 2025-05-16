@@ -24,6 +24,8 @@ import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.Date
@@ -41,6 +43,7 @@ class RealDaxPrompts @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val duckPlayer: DuckPlayer,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
 
@@ -70,6 +73,14 @@ class RealDaxPrompts @Inject constructor(
 
             val sevenDaysAgo = Date(Date().time - EXISTING_USER_DAYS_INACTIVE_MILLIS)
             if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 0L) {
+                return@withContext false
+            }
+
+            if (duckPlayer.getDuckPlayerState() != DuckPlayer.DuckPlayerState.ENABLED) {
+                return@withContext false
+            }
+
+            if (duckPlayer.getUserPreferences().privatePlayerMode != AlwaysAsk) {
                 return@withContext false
             }
 
