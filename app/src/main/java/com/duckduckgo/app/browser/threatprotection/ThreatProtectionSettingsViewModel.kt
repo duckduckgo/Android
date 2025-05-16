@@ -24,8 +24,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -40,11 +38,10 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-    private val toggle: FeatureToggle,
 ) : ViewModel() {
 
     data class ViewState(
-        val smarterEncryptionEnabled: Boolean,
+        val smarterEncryptionEnabled: Boolean = true,
         val scamProtectionEnabled: Boolean,
     )
 
@@ -62,9 +59,6 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             _viewState.value = ViewState(
                 scamProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
-                smarterEncryptionEnabled = toggle.isFeatureEnabled(
-                    PrivacyFeatureName.HttpsFeatureName.value,
-                ),
             )
         }
     }
