@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,8 +48,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 import com.duckduckgo.app.browser.tabs.TabManager;
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import timber.log.Timber;
 
 /**
@@ -89,7 +91,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         implements StatefulAdapter {
     // State saving config
     private static final String KEY_PREFIX_FRAGMENT = "f#";
-    private static final String KEY_PREFIX_STATE = "s#";
 
     // Fragment GC config
     private static final long GRACE_WINDOW_TIME_MS = 10_000; // 10 seconds
@@ -107,7 +108,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final LongSparseArray<Fragment> mFragments = new LongSparseArray<>();
 
-    private final LongSparseArray<Fragment.SavedState> mSavedStates = new LongSparseArray<>();
     private final LongSparseArray<Integer> mItemIdToViewHolder = new LongSparseArray<>();
 
     private FragmentMaxLifecycleEnforcer mFragmentMaxLifecycleEnforcer;
@@ -130,42 +130,20 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     /**
      * @param fragmentActivity if the {@link ViewPager2} lives directly in a {@link
      *     FragmentActivity} subclass.
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentManager, Lifecycle)
-     */
-    public FragmentStateAdapter(@NonNull FragmentActivity fragmentActivity) {
-        this(fragmentActivity.getSupportFragmentManager(), fragmentActivity.getLifecycle());
-    }
-
-    /**
-     * @param fragment if the {@link ViewPager2} lives directly in a {@link Fragment} subclass.
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentManager, Lifecycle)
-     */
-    public FragmentStateAdapter(@NonNull Fragment fragment) {
-        this(fragment.getChildFragmentManager(), fragment.getLifecycle());
-    }
-
-    /**
-     * @param fragmentManager of {@link ViewPager2}'s host
-     * @param lifecycle of {@link ViewPager2}'s host
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
+     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
-            @NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
-        mFragmentManager = fragmentManager;
-        mLifecycle = lifecycle;
-        mSwipingTabsFeature = null;
-        super.setHasStableIds(true);
+            @NonNull FragmentActivity fragmentActivity,
+            SwipingTabsFeatureProvider swipingTabsFeature) {
+        this(fragmentActivity.getSupportFragmentManager(),
+                fragmentActivity.getLifecycle(),
+                swipingTabsFeature);
     }
 
     /**
      * @param fragmentManager of {@link ViewPager2}'s host
      * @param lifecycle of {@link ViewPager2}'s host
      * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
-     * @see FragmentStateAdapter#FragmentStateAdapter(FragmentActivity)
-     * @see FragmentStateAdapter#FragmentStateAdapter(Fragment)
      */
     public FragmentStateAdapter(
             @NonNull FragmentManager fragmentManager,
@@ -307,7 +285,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         if (!mFragments.containsKey(itemId)) {
             // TODO(133419201): check if a Fragment provided here is a new Fragment
             Fragment newFragment = createFragment(position);
-            newFragment.setInitialSavedState(mSavedStates.get(itemId));
             mFragments.put(itemId, newFragment);
         }
     }
@@ -519,10 +496,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
         }
 
-        if (!containsItem(itemId)) {
-            mSavedStates.remove(itemId);
-        }
-
         if (!fragment.isAdded()) {
             mFragments.remove(itemId);
             return;
@@ -538,8 +511,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                     mFragmentEventDispatcher.dispatchPreSavedInstanceState(fragment);
             Fragment.SavedState savedState = mFragmentManager.saveFragmentInstanceState(fragment);
             mFragmentEventDispatcher.dispatchPostEvents(onPost);
-
-            mSavedStates.put(itemId, savedState);
         }
         List<FragmentTransactionCallback.OnPostEventListener> onPost =
                 mFragmentEventDispatcher.dispatchPreRemoved(fragment);
@@ -635,7 +606,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @Override
     public final @NonNull Parcelable saveState() {
         /* TODO(b/122670461): use custom {@link Parcelable} instead of Bundle to save space */
-        Bundle savedState = new Bundle(mFragments.size() + mSavedStates.size());
+        Bundle savedState = new Bundle(mFragments.size());
 
         /* save references to active fragments */
         for (int ix = 0; ix < mFragments.size(); ix++) {
@@ -646,23 +617,13 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                 mFragmentManager.putFragment(savedState, key, fragment);
             }
         }
-
-        /* Write {@link mSavedStates) into a {@link Parcelable} */
-        for (int ix = 0; ix < mSavedStates.size(); ix++) {
-            long itemId = mSavedStates.keyAt(ix);
-            if (containsItem(itemId)) {
-                String key = createKey(KEY_PREFIX_STATE, itemId);
-                savedState.putParcelable(key, mSavedStates.get(itemId));
-            }
-        }
-
         return savedState;
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public final void restoreState(@NonNull Parcelable savedState) {
-        if (!mSavedStates.isEmpty() || !mFragments.isEmpty()) {
+        if (!mFragments.isEmpty()) {
             throw new IllegalStateException(
                     "Expected the adapter to be 'fresh' while restoring state.");
         }
@@ -676,21 +637,14 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         for (String key : bundle.keySet()) {
             if (isValidKey(key, KEY_PREFIX_FRAGMENT)) {
                 long itemId = parseIdFromKey(key, KEY_PREFIX_FRAGMENT);
-                Fragment fragment = mFragmentManager.getFragment(bundle, key);
-                mFragments.put(itemId, fragment);
-                continue;
-            }
-
-            if (isValidKey(key, KEY_PREFIX_STATE)) {
-                long itemId = parseIdFromKey(key, KEY_PREFIX_STATE);
-                Fragment.SavedState state = bundle.getParcelable(key);
-                if (containsItem(itemId)) {
-                    mSavedStates.put(itemId, state);
+                try {
+                    Fragment fragment = mFragmentManager.getFragment(bundle, key);
+                    mFragments.put(itemId, fragment);
+                } catch (IllegalStateException e) {
+                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d",
+                            itemId);
                 }
-                continue;
             }
-
-            throw new IllegalArgumentException("Unexpected key in savedState: " + key);
         }
 
         if (!mFragments.isEmpty()) {

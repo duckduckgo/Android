@@ -17,11 +17,9 @@
 package com.duckduckgo.app.browser.tabs.adapter
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.os.Bundle
 import android.os.Message
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
@@ -30,11 +28,9 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
-    lifecycleOwner: LifecycleOwner,
-    fragmentManager: FragmentManager,
-    private val activityIntent: Intent?,
+    private val activity: BrowserActivity,
     swipingTabsFeature: SwipingTabsFeatureProvider,
-) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle, swipingTabsFeature) {
+) : FragmentStateAdapter(activity, swipingTabsFeature) {
     private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
 
@@ -52,7 +48,7 @@ class TabPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         val tab = tabs[position]
-        val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
+        val isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         return if (messageForNewFragment != null) {
             val message = messageForNewFragment
@@ -62,6 +58,13 @@ class TabPagerAdapter(
             }
         } else {
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+        }
+    }
+
+    fun restore(state: Bundle) {
+        // state is only useful when there are fragments to restore (also avoids a crash)
+        if (activity.supportFragmentManager.fragments.isNotEmpty()) {
+            restoreState(state)
         }
     }
 

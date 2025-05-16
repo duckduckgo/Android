@@ -31,7 +31,6 @@ import timber.log.Timber
 interface TabManager {
     companion object {
         const val MAX_ACTIVE_TABS = 20
-        const val NEW_TAB_CREATION_TIMEOUT_LIMIT = 2 // seconds
     }
 
     fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)
