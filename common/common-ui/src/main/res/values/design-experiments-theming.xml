@@ -54,6 +54,8 @@
 
         <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
         <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+
+        <item name="daxColorRipple">?daxColorControlFillPrimary</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
