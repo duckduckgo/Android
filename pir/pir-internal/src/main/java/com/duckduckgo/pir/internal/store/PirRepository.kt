@@ -36,6 +36,8 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
+import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_ERROR
+import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
@@ -106,9 +108,9 @@ interface PirRepository {
 
     fun getAllScanResultsFlow(): Flow<List<ScanResult>>
 
-    suspend fun getErrorResultsCount(): Int
+    suspend fun getScanErrorResultsCount(): Int
 
-    suspend fun getSuccessResultsCount(): Int
+    suspend fun getScanSuccessResultsCount(): Int
 
     suspend fun deleteAllScanResults()
 
@@ -120,13 +122,11 @@ interface PirRepository {
 
     fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
 
-    fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
-
     suspend fun saveScanLog(pirScanLog: PirEventLog)
 
     suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
 
-    suspend fun deleteAllLogs()
+    suspend fun deleteEventLogs()
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -438,6 +438,7 @@ class RealPirRepository(
             scanResultsDao.deleteAllScanErrorResults()
             scanResultsDao.deleteAllExtractProfileResult()
             scanResultsDao.deleteAllScanCompletedBroker()
+            scanLogDao.deleteAllBrokerScanEvents()
         }
     }
 
@@ -445,12 +446,12 @@ class RealPirRepository(
         userProfileDao.getUserProfiles()
     }
 
-    override suspend fun getErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanResultsDao.getAllScanErrorResults().size
+    override suspend fun getScanErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_ERROR }.size
     }
 
-    override suspend fun getSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanResultsDao.getAllExtractProfileResult().size
+    override suspend fun getScanSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
+        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_SUCCESS }.size
     }
 
     override suspend fun deleteAllUserProfiles() {
@@ -470,10 +471,6 @@ class RealPirRepository(
         return scanLogDao.getAllEventLogsFlow()
     }
 
-    override fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>> {
-        return scanLogDao.getAllBrokerScanEventsFlow()
-    }
-
     override suspend fun saveScanLog(pirScanLog: PirEventLog) {
         withContext(dispatcherProvider.io()) {
             scanLogDao.insertEventLog(pirScanLog)
@@ -486,10 +483,9 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun deleteAllLogs() {
+    override suspend fun deleteEventLogs() {
         withContext(dispatcherProvider.io()) {
             scanLogDao.deleteAllEventLogs()
-            scanLogDao.deleteAllBrokerScanEvents()
         }
     }
 
