@@ -179,17 +179,13 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureInternalFeatures()
+        configureSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        configureSettings()
     }
 
     private fun configureUiEventHandlers() {
@@ -228,7 +224,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
-        viewsPro.removeAllViews()
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
@@ -237,7 +232,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        viewsMain.settingsSectionDuckPlayer.removeAllViews()
         if (duckPlayerSettingsPlugin.isEmpty()) {
             viewsMain.settingsSectionDuckPlayer.gone()
         } else {
@@ -246,14 +240,11 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        viewsPrivacy.settingsSectionThreatProtection.removeAllViews()
         if (threatProtectionSettingsPlugin.isEmpty()) {
             viewsPrivacy.settingsSectionThreatProtection.gone()
         } else {
             threatProtectionSettingsPlugin.forEach { plugin ->
-                plugin.getView(this).let {
-                    viewsPrivacy.settingsSectionThreatProtection.addView(it)
-                }
+                viewsPrivacy.settingsSectionThreatProtection.addView(plugin.getView(this))
             }
         }
     }

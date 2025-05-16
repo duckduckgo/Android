@@ -79,6 +79,7 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/smarterEncryptionTitle"
                 app:secondaryText="@string/smarterEncryptionDescription"
+                app:indicatorStatus="alwaysOn"
                 />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem

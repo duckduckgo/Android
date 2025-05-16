@@ -63,10 +63,6 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        with(binding) {
-            smarterEncryptionItem.setStatus(true)
-        }
-
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
