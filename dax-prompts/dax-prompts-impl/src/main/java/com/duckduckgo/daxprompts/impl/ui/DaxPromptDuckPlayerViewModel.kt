@@ -22,8 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -33,7 +31,6 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class DaxPromptDuckPlayerViewModel @Inject constructor(
-    private val duckPlayer: DuckPlayer,
     private val daxPromptsRepository: DaxPromptsRepository,
     private val reactivateUsersExperiment: ReactivateUsersExperiment,
 ) : ViewModel() {
@@ -62,12 +59,6 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
         viewModelScope.launch {
             command.send(Command.Dismiss)
             reactivateUsersExperiment.fireDismissDuckPlayer()
-        }
-    }
-
-    fun updateDuckPlayerSettings() {
-        viewModelScope.launch {
-            duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = PrivatePlayerMode.AlwaysAsk.value)
         }
     }
 

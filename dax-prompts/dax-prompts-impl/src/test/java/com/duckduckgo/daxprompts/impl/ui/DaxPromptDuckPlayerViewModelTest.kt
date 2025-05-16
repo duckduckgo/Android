@@ -20,8 +20,6 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,13 +36,12 @@ class DaxPromptDuckPlayerViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: DaxPromptDuckPlayerViewModel
-    private val mockDuckPlayer: DuckPlayer = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
     private val mockReactivationExperiment: ReactivateUsersExperiment = mock()
 
     @Before
     fun setup() {
-        testee = DaxPromptDuckPlayerViewModel(mockDuckPlayer, mockDaxPromptsRepository, mockReactivationExperiment)
+        testee = DaxPromptDuckPlayerViewModel(mockDaxPromptsRepository, mockReactivationExperiment)
     }
 
     @Test
@@ -79,15 +76,5 @@ class DaxPromptDuckPlayerViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(mockReactivationExperiment).fireDismissDuckPlayer()
-    }
-
-    @Test
-    fun whenUpdateDuckPlayerSettingsCalledThenSetUserPreferencesWithCorrectParameters() = runTest {
-        testee.updateDuckPlayerSettings()
-
-        verify(mockDuckPlayer).setUserPreferences(
-            overlayInteracted = false,
-            privatePlayerMode = PrivatePlayerMode.AlwaysAsk.value,
-        )
     }
 }
