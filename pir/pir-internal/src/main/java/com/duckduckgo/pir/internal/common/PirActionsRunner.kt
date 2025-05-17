@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.common
 
 import android.content.Context
 import android.webkit.WebView
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -33,7 +34,7 @@ import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus.CaptchaStatus.Ready
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType
+import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
 import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
@@ -85,16 +86,15 @@ import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateRes
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
-import kotlin.coroutines.Continuation
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -130,19 +130,18 @@ interface PirActionsRunner {
     fun stop()
 }
 
-internal class RealPirActionsRunner(
+class RealPirActionsRunner @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
     private val brokerActionProcessor: BrokerActionProcessor,
-    private val context: Context,
-    private val pirScriptToLoad: String,
-    private val runType: RunType,
     private val currentTimeProvider: CurrentTimeProvider,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
     private val pirRunStateHandler: PirRunStateHandler,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    @Assisted private val runType: RunType,
+    @Assisted private val context: Context,
+    @Assisted private val pirScriptToLoad: String,
 ) : PirActionsRunner, ActionResultListener {
-    private val coroutineScope: CoroutineScope
-        get() = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
 
     private var detachedWebView: WebView? = null
     private val brokersToExecute: MutableList<BrokerStep> = mutableListOf()
@@ -224,11 +223,19 @@ internal class RealPirActionsRunner(
     }
 
     private suspend fun awaitResult(): Result<Unit> {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             commandsJob += coroutineScope.launch {
-                commandsFlow.asStateFlow().collect {
-                    handleCommand(it, continuation)
+                commandsFlow.asStateFlow().collect { state ->
+                    if (state is CompleteExecution) {
+                        continuation.resume(Result.success(Unit))
+                    } else {
+                        handleCommand(state)
+                    }
                 }
+            }
+
+            continuation.invokeOnCancellation {
+                commandsJob.cancel()
             }
         }
     }
@@ -281,25 +288,17 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun handleCommand(
-        command: Command,
-        continuationResult: Continuation<Result<Unit>>,
-    ) {
+    private suspend fun handleCommand(command: Command) {
         logcat { "PIR-RUNNER ($this): Handle command: $command" }
         when (command) {
-            Idle -> {} // Do nothing
+            Idle, CompleteExecution -> {} // Do nothing
             is HandleBroker -> handleBrokerAction(command.state)
             is ExecuteBrokerAction -> executeBrokerAction(command.state, command.actionRequestData)
-            is CompleteExecution -> {
-                continuationResult.resume(Result.success(Unit))
-                cleanUpRunner()
-            }
-            // TODO add loading timeout
-            is LoadUrl -> coroutineScope.launch(dispatcherProvider.main()) {
+            is LoadUrl -> withContext(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(command.urlToLoad)
             }
 
-            is Command.RecoverFromFailedUrlLoad -> coroutineScope.launch(dispatcherProvider.main()) {
+            is Command.RecoverFromFailedUrlLoad -> withContext(dispatcherProvider.main()) {
                 detachedWebView!!.loadUrl(RECOVERY_URL)
             }
 
@@ -328,7 +327,7 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun handleNextProfileForBroker(state: State) {
+    private suspend fun handleNextProfileForBroker(state: State) = withContext(dispatcherProvider.io()) {
         // We reset action to 0 and update the profile state to the next profile
         val newState = state.copy(
             currentActionIndex = 0,
@@ -382,7 +381,7 @@ internal class RealPirActionsRunner(
         pollingIntervalSeconds: Int,
         retries: Int,
         attempt: Int,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         val broker = brokersToExecute[state.currentBrokerIndex]
 
         if (state.transactionID.isEmpty()) {
@@ -445,7 +444,7 @@ internal class RealPirActionsRunner(
         state: State,
         responseData: ResponseData,
         isRetry: Boolean,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         val broker = brokersToExecute[state.currentBrokerIndex]
         nativeBrokerActionHandler.pushAction(
             SubmitCaptchaInfo(
@@ -488,7 +487,7 @@ internal class RealPirActionsRunner(
     private suspend fun handleEmailConfirmation(
         state: State,
         pollingIntervalSeconds: Float,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         val broker = brokersToExecute[state.currentBrokerIndex]
         val extractedProfileState = state.extractedProfileState
         if (extractedProfileState.extractedProfile.isNotEmpty()) {
@@ -520,7 +519,7 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun handleGetEmail(state: State) {
+    private suspend fun handleGetEmail(state: State) = withContext(dispatcherProvider.io()) {
         val broker = brokersToExecute[state.currentBrokerIndex]
 
         nativeBrokerActionHandler.pushAction(
@@ -573,7 +572,7 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private suspend fun handleBrokerAction(state: State) {
+    private suspend fun handleBrokerAction(state: State) = withContext(dispatcherProvider.io()) {
         if (state.currentBrokerIndex >= brokersToExecute.size) {
             nextCommand(CompleteExecution)
         } else {
@@ -604,7 +603,7 @@ internal class RealPirActionsRunner(
     private suspend fun handleBrokerCompleted(
         state: State,
         isSuccess: Boolean,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         if (state.extractedProfileState.currentExtractedProfileIndex < state.extractedProfileState.extractedProfile.size - 1) {
             if (runType == RunType.OPTOUT) {
                 // Signal complete for previous run.
@@ -733,10 +732,10 @@ internal class RealPirActionsRunner(
         }
     }
 
-    private fun executeBrokerAction(
+    private suspend fun executeBrokerAction(
         state: State,
         requestData: PirScriptRequestData,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         val currentBroker = brokersToExecute[state.currentBrokerIndex]
         if (state.currentActionIndex == currentBroker.actions.size) {
             nextCommand(
@@ -750,9 +749,7 @@ internal class RealPirActionsRunner(
             } else {
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
-                    runBlocking(dispatcherProvider.io()) {
-                        delay(10_000)
-                    }
+                    delay(10_000)
                 }
 
                 if (actionToExecute is EmailConfirmation) {
@@ -770,7 +767,6 @@ internal class RealPirActionsRunner(
                         ),
                     )
                 } else {
-                    timerJob.cancel()
                     timerJob += coroutineScope.launch {
                         delay(60000) // 1 minute
                         // IF this timer completes, then timeout was reached
@@ -827,14 +823,18 @@ internal class RealPirActionsRunner(
     }
 
     private fun cleanUpRunner() {
-        timerJob.cancel()
-        nextCommand(Idle)
-        commandsJob.cancel()
+        if (timerJob.isActive) {
+            timerJob.cancel()
+        }
+        if (commandsJob.isActive) {
+            commandsJob.cancel()
+        }
         coroutineScope.launch(dispatcherProvider.main()) {
             detachedWebView?.stopLoading()
             detachedWebView?.loadUrl("about:blank")
             detachedWebView?.evaluateJavascript("window.stop();", null)
             detachedWebView?.destroy()
+            detachedWebView = null
             logcat { "PIR-RUNNER ($this): Destroyed webview" }
         }
     }
@@ -845,13 +845,15 @@ internal class RealPirActionsRunner(
     }
 
     override fun onSuccess(pirSuccessResponse: PirSuccessResponse) {
-        runBlocking(dispatcherProvider.main()) {
+        coroutineScope.launch(dispatcherProvider.io()) {
             val lastState = commandsFlow.value.state
             val currentBroker = brokersToExecute[lastState.currentBrokerIndex]
             val currentAction = currentBroker.actions[lastState.currentActionIndex]
 
             if (pirSuccessResponse.actionID == currentAction.id) {
-                timerJob.cancel()
+                if (timerJob.isActive) {
+                    timerJob.cancel()
+                }
 
                 logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): onSuccess: $pirSuccessResponse" }
                 if (runType != RunType.OPTOUT) {
@@ -947,13 +949,16 @@ internal class RealPirActionsRunner(
     }
 
     override fun onError(pirErrorReponse: PirErrorReponse) {
-        runBlocking(dispatcherProvider.main()) {
+        coroutineScope.launch(dispatcherProvider.io()) {
             val lastState = commandsFlow.value.state
             val currentBroker = brokersToExecute[lastState.currentBrokerIndex]
             val currentAction = currentBroker.actions[lastState.currentActionIndex]
 
             if (pirErrorReponse.actionID == currentAction.id) {
-                timerJob.cancel()
+                if (timerJob.isActive) {
+                    timerJob.cancel()
+                }
+
                 logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): onError: $pirErrorReponse" }
                 if (runType != RunType.OPTOUT) {
                     pirRunStateHandler.handleState(
@@ -964,18 +969,17 @@ internal class RealPirActionsRunner(
                         ),
                     )
                 } else {
-                    lastState.extractedProfileState.extractedProfile?.get(lastState.extractedProfileState.currentExtractedProfileIndex)
-                        ?.let {
-                            pirRunStateHandler.handleState(
-                                BrokerOptOutActionFailed(
-                                    brokerName = currentBroker.brokerName,
-                                    extractedProfile = it,
-                                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                                    actionType = currentAction.asActionType(),
-                                    result = pirErrorReponse,
-                                ),
-                            )
-                        }
+                    lastState.extractedProfileState.extractedProfile.get(lastState.extractedProfileState.currentExtractedProfileIndex).let {
+                        pirRunStateHandler.handleState(
+                            BrokerOptOutActionFailed(
+                                brokerName = currentBroker.brokerName,
+                                extractedProfile = it,
+                                completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                                actionType = currentAction.asActionType(),
+                                result = pirErrorReponse,
+                            ),
+                        )
+                    }
                 }
                 if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
                     nextCommand(

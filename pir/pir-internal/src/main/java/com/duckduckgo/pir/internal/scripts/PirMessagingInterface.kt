@@ -30,9 +30,10 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.internal.brokers.JSONObjectAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import javax.inject.Inject
 import logcat.logcat
 
-class PirMessagingInterface constructor(
+class PirMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
     private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build() }
