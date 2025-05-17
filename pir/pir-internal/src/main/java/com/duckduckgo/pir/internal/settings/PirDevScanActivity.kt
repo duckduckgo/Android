@@ -181,7 +181,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             lifecycleScope.launch(dispatcherProvider.io()) {
                 repository.deleteAllScanResults()
                 repository.deleteAllUserProfiles()
-                repository.deleteAllLogs()
+                repository.deleteEventLogs()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
