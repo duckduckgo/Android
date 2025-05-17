@@ -83,6 +83,8 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.isVisible = viewState.isBrowserThemingFeatureAvailable
+        binding.experimentalUIMode.setSwitchEnabled(viewState.isBrowserThemingFeatureChangeable)
+        binding.experimentalUIModeConflictAlert.isVisible = viewState.experimentConflictAlertVisible
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
 
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
