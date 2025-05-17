@@ -44,6 +44,9 @@ interface VpnAppTrackerBlockingDao {
     @Query("DELETE from vpn_app_tracker_blocking_list")
     fun deleteTrackerBlockList()
 
+    @Query("SELECT COUNT(*) FROM vpn_app_tracker_blocking_list")
+    fun getTrackerBlockListSize(): Int
+
     @Query("DELETE FROM vpn_app_tracker_blocking_app_packages")
     fun deleteAppPackages()
 
