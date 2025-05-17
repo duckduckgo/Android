@@ -38,7 +38,7 @@ interface PirActionsRunnerStateEngine {
      * This method dispatches new events to the engine.
      * By default, this happens in the IO dispatcher
      */
-    suspend fun dispatch(event: Event)
+    fun dispatch(event: Event)
 
     /**
      * Model representing the running state of the engine

@@ -201,16 +201,14 @@ class RealPirActionsRunner @AssistedInject constructor(
             return
         }
 
-        coroutineScope.launch {
-            if (engine!!.sideEffect.value is LoadUrl) {
-                engine?.dispatch(
-                    LoadUrlComplete(
-                        url = url,
-                    ),
-                )
-            } else {
-                logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
-            }
+        if (engine!!.sideEffect.value is LoadUrl) {
+            engine?.dispatch(
+                LoadUrlComplete(
+                    url = url,
+                ),
+            )
+        } else {
+            logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
         }
     }
 
@@ -219,16 +217,14 @@ class RealPirActionsRunner @AssistedInject constructor(
         if (url == null) {
             return
         }
-        coroutineScope.launch {
-            if (engine!!.sideEffect.value is LoadUrl) {
-                engine?.dispatch(
-                    LoadUrlFailed(
-                        url = url,
-                    ),
-                )
-            } else {
-                logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
-            }
+        if (engine!!.sideEffect.value is LoadUrl) {
+            engine?.dispatch(
+                LoadUrlFailed(
+                    url = url,
+                ),
+            )
+        } else {
+            logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
         }
     }
 
@@ -462,40 +458,36 @@ class RealPirActionsRunner @AssistedInject constructor(
     }
 
     override fun onSuccess(pirSuccessResponse: PirSuccessResponse) {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            val lastSideEffect = engine?.sideEffect?.value
-            if (lastSideEffect is PushJsAction && lastSideEffect.action.id == pirSuccessResponse.actionID) {
-                if (timerJob.isActive) {
-                    timerJob.cancel()
-                }
-
-                engine?.dispatch(
-                    JsActionSuccess(
-                        pirSuccessResponse = pirSuccessResponse,
-                    ),
-                )
-            } else {
-                logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirSuccessResponse" }
+        val lastSideEffect = engine?.sideEffect?.value
+        if (lastSideEffect is PushJsAction && lastSideEffect.action.id == pirSuccessResponse.actionID) {
+            if (timerJob.isActive) {
+                timerJob.cancel()
             }
+
+            engine?.dispatch(
+                JsActionSuccess(
+                    pirSuccessResponse = pirSuccessResponse,
+                ),
+            )
+        } else {
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirSuccessResponse" }
         }
     }
 
     override fun onError(pirErrorReponse: PirErrorReponse) {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            val lastSideEffect = engine?.sideEffect?.value
-            if (lastSideEffect is BrokerActionSideEffect && lastSideEffect.actionId == pirErrorReponse.actionID) {
-                if (timerJob.isActive) {
-                    timerJob.cancel()
-                }
-
-                engine?.dispatch(
-                    JsActionFailed(
-                        pirErrorReponse = pirErrorReponse,
-                    ),
-                )
-            } else {
-                logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirErrorReponse" }
+        val lastSideEffect = engine?.sideEffect?.value
+        if (lastSideEffect is BrokerActionSideEffect && lastSideEffect.actionId == pirErrorReponse.actionID) {
+            if (timerJob.isActive) {
+                timerJob.cancel()
             }
+
+            engine?.dispatch(
+                JsActionFailed(
+                    pirErrorReponse = pirErrorReponse,
+                ),
+            )
+        } else {
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirErrorReponse" }
         }
     }
 }

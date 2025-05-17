@@ -18,6 +18,7 @@ package com.duckduckgo.pir.internal.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -48,6 +49,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -153,10 +155,12 @@ class PirModule {
     fun providePirActionsRunnerStateEngineFactory(
         eventHandlers: PluginPoint<EventHandler>,
         dispatcherProvider: DispatcherProvider,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
     ): PirActionsRunnerStateEngineFactory {
         return RealPirActionsRunnerStateEngineFactory(
             eventHandlers,
             dispatcherProvider,
+            coroutineScope,
         )
     }
 }

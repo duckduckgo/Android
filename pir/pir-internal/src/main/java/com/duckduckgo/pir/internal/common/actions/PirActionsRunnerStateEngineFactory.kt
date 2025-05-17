@@ -16,11 +16,13 @@
 
 package com.duckduckgo.pir.internal.common.actions
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 interface PirActionsRunnerStateEngineFactory {
     fun create(
@@ -32,6 +34,7 @@ interface PirActionsRunnerStateEngineFactory {
 class RealPirActionsRunnerStateEngineFactory @Inject constructor(
     private val eventHandlers: PluginPoint<EventHandler>,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : PirActionsRunnerStateEngineFactory {
     override fun create(
         runType: PirJob.RunType,
@@ -40,6 +43,7 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
         return RealPirActionsRunnerStateEngine(
             eventHandlers = eventHandlers,
             dispatcherProvider = dispatcherProvider,
+            coroutineScope = coroutineScope,
             runType = runType,
             brokers = brokers,
         )
