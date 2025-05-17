@@ -90,7 +90,6 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
             }
 
             is DaxPromptDuckPlayerViewModel.Command.Dismiss -> {
-                viewModel.updateDuckPlayerSettings()
                 setResult(RESULT_OK)
                 finish()
             }
