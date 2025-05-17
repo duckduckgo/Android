@@ -127,6 +127,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         loadToMemory()
+        processedUrls.clear()
     }
 
     sealed class IsMaliciousViewData {
