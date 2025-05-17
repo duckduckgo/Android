@@ -187,4 +187,31 @@ internal class AboutDuckDuckGoViewModelTest {
 
         assertTrue(testee.hasResetEasterEggCounter())
     }
+
+    @Test
+    fun `onComparisonChartLinkClicked sends LaunchWebViewWithComparisonChartUrl`() = runTest {
+        testee.commands().test {
+            testee.onComparisonChartLinkClicked()
+            assertEquals(Command.LaunchWebViewWithComparisonChartUrl, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onPProHelpPageLinkClicked sends LaunchWebViewWithPPROUrl`() = runTest {
+        testee.commands().test {
+            testee.onPProHelpPageLinkClicked()
+            assertEquals(Command.LaunchWebViewWithPPROUrl, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onVPNHelpPageLinkClicked sends LaunchWebViewWithVPNUrl`() = runTest {
+        testee.commands().test {
+            testee.onVPNHelpPageLinkClicked()
+            assertEquals(Command.LaunchWebViewWithVPNUrl, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
