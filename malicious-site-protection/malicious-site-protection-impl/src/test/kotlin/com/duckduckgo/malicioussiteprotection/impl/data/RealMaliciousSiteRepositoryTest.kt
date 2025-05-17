@@ -4,7 +4,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
-import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
@@ -44,14 +43,12 @@ class RealMaliciousSiteRepositoryTest {
     private val maliciousSiteService: MaliciousSiteService = mock()
     private val maliciousSiteDatasetService: MaliciousSiteDatasetService = mock()
     private val mockPixel: Pixel = mock()
-    private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
         maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
-        mockMaliciousSiteProtectionRCFeature,
     )
 
     @Test
