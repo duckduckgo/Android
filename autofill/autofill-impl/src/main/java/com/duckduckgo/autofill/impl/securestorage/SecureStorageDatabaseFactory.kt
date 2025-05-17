@@ -17,33 +17,55 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import timber.log.Timber
 
 interface SecureStorageDatabaseFactory {
     suspend fun getDatabase(): SecureStorageDatabase?
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SecureStorageDatabaseFactory::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
     private val autofillFeature: AutofillFeature,
-) : SecureStorageDatabaseFactory {
+) : SecureStorageDatabaseFactory, MainProcessLifecycleObserver {
     private var _database: SecureStorageDatabase? = null
 
     private val mutex = Mutex()
+
+    override fun onCreate(owner: LifecycleOwner) {
+        Timber.d("Loading the sqlcipher native library")
+        try {
+            LibraryLoader.loadLibrary(context, "sqlcipher")
+        } catch (t: Throwable) {
+            // error loading the library, return null db
+            Timber.e(t, "Error loading sqlcipher library")
+        }
+    }
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
         return if (autofillFeature.createAsyncPreferences().isEnabled()) {
@@ -80,7 +102,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
                 context,
                 SecureStorageDatabase::class.java,
                 "secure_storage_database_encrypted.db",
-            ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
+            ).openHelperFactory(SupportOpenHelperFactory(keyProvider.getl1Key()))
                 .addMigrations(*ALL_MIGRATIONS)
                 .build()
             _database

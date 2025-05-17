@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
-import android.content.Context
 import android.os.Process
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -42,7 +41,6 @@ import logcat.logcat
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceHeartbeat @Inject constructor(
-    private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
