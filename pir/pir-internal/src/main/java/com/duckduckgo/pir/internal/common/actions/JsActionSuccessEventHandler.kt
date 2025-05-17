@@ -90,7 +90,9 @@ class JsActionSuccessEventHandler @Inject constructor(
         return when (pirSuccessResponse) {
             is NavigateResponse -> {
                 Next(
-                    nextState = state,
+                    nextState = state.copy(
+                        pendingUrl = pirSuccessResponse.response.url,
+                    ),
                     sideEffect = LoadUrl(
                         url = pirSuccessResponse.response.url,
                     ),

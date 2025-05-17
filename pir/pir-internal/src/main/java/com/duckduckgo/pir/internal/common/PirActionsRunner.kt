@@ -34,7 +34,6 @@ import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.Email
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.BrokerActionSideEffect
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailConfirmationLinkReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
@@ -196,20 +195,16 @@ class RealPirActionsRunner @AssistedInject constructor(
     }
 
     private fun onLoadingComplete(url: String?) {
-        logcat { "PIR-RUNNER ($this): finished loading $url and latest action ${engine!!.sideEffect.value}" }
+        logcat { "PIR-RUNNER ($this): finished loading $url" }
         if (url == null) {
             return
         }
 
-        if (engine!!.sideEffect.value is LoadUrl) {
-            engine?.dispatch(
-                LoadUrlComplete(
-                    url = url,
-                ),
-            )
-        } else {
-            logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
-        }
+        engine?.dispatch(
+            LoadUrlComplete(
+                url = url,
+            ),
+        )
     }
 
     private fun onLoadingFailed(url: String?) {
@@ -217,15 +212,11 @@ class RealPirActionsRunner @AssistedInject constructor(
         if (url == null) {
             return
         }
-        if (engine!!.sideEffect.value is LoadUrl) {
-            engine?.dispatch(
-                LoadUrlFailed(
-                    url = url,
-                ),
-            )
-        } else {
-            logcat { "PIR-RUNNER ($this): Ignoring $url as next sideeffect has passed" }
-        }
+        engine?.dispatch(
+            LoadUrlFailed(
+                url = url,
+            ),
+        )
     }
 
     private suspend fun awaitResult(): Result<Unit> {
@@ -458,36 +449,26 @@ class RealPirActionsRunner @AssistedInject constructor(
     }
 
     override fun onSuccess(pirSuccessResponse: PirSuccessResponse) {
-        val lastSideEffect = engine?.sideEffect?.value
-        if (lastSideEffect is PushJsAction && lastSideEffect.action.id == pirSuccessResponse.actionID) {
-            if (timerJob.isActive) {
-                timerJob.cancel()
-            }
-
-            engine?.dispatch(
-                JsActionSuccess(
-                    pirSuccessResponse = pirSuccessResponse,
-                ),
-            )
-        } else {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirSuccessResponse" }
+        if (timerJob.isActive) {
+            timerJob.cancel()
         }
+
+        engine?.dispatch(
+            JsActionSuccess(
+                pirSuccessResponse = pirSuccessResponse,
+            ),
+        )
     }
 
     override fun onError(pirErrorReponse: PirErrorReponse) {
-        val lastSideEffect = engine?.sideEffect?.value
-        if (lastSideEffect is BrokerActionSideEffect && lastSideEffect.actionId == pirErrorReponse.actionID) {
-            if (timerJob.isActive) {
-                timerJob.cancel()
-            }
-
-            engine?.dispatch(
-                JsActionFailed(
-                    pirErrorReponse = pirErrorReponse,
-                ),
-            )
-        } else {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Runner can't handle $pirErrorReponse" }
+        if (timerJob.isActive) {
+            timerJob.cancel()
         }
+
+        engine?.dispatch(
+            JsActionFailed(
+                pirErrorReponse = pirErrorReponse,
+            ),
+        )
     }
 }

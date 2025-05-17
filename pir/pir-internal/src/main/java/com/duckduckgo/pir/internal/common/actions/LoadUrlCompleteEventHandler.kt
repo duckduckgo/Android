@@ -51,12 +51,18 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
          * - Else, we proceed to the next action.
          */
         val actualEvent = event as LoadUrlComplete
+
+        if (state.pendingUrl == null) {
+            return Next(state)
+        }
+
         return when (actualEvent.url) {
             DBP_INITIAL_URL -> {
                 Next(
                     nextState = state.copy(
                         currentBrokerIndex = 0,
                         currentActionIndex = 0,
+                        pendingUrl = null,
                     ),
                     nextEvent = ExecuteNextBroker,
                 )
@@ -66,7 +72,9 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 logcat { "PIR-RUNNER ($this): Completing broker due to recovery" }
                 // nextCommand(BrokerCompleted(commandsFlow.value.state, isSuccess = false))
                 Next(
-                    nextState = state,
+                    nextState = state.copy(
+                        pendingUrl = null,
+                    ),
                     nextEvent = BrokerActionsCompleted(false),
                 )
             }
@@ -78,6 +86,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 Next(
                     nextState = state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
+                        pendingUrl = null,
                     ),
                     nextEvent = ExecuteNextBrokerAction(
                         UserProfile(

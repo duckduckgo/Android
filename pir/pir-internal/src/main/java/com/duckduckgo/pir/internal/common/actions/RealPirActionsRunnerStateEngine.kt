@@ -27,8 +27,8 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Si
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.None
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -52,7 +52,7 @@ class RealPirActionsRunnerStateEngine(
         }
     }
 
-    override val sideEffect: StateFlow<SideEffect> = sideEffectFlow.asStateFlow()
+    override val sideEffect: Flow<SideEffect> = sideEffectFlow.asStateFlow()
 
     override fun dispatch(event: Event) {
         coroutineScope.launch {
@@ -79,7 +79,7 @@ class RealPirActionsRunnerStateEngine(
         next.sideEffect?.let {
             logcat { "PIR-ENGINE: Emitting side effect: $it" }
             sideEffectFlow.emit(it)
-        } ?: sideEffectFlow.emit(None)
+        }
 
         next.nextEvent?.let {
             logcat { "PIR-ENGINE: Dispatching event: $it" }

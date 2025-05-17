@@ -42,8 +42,16 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
          * This is our attempt to recover since likely the webview and js loaded into it is unusable.
          * We need to load any url successfully to run the js again.
          */
+        val actualEvent = event as LoadUrlFailed
+
+        if (state.pendingUrl == null) {
+            return Next(state)
+        }
+
         return Next(
-            nextState = state,
+            nextState = state.copy(
+                pendingUrl = RECOVERY_URL,
+            ),
             sideEffect = LoadUrl(
                 RECOVERY_URL,
             ),

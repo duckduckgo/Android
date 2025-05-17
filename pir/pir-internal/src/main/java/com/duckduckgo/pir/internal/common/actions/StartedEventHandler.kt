@@ -41,6 +41,7 @@ class StartedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 profileQuery = (event as Started).profileQuery,
+                pendingUrl = DBP_INITIAL_URL,
             ),
             sideEffect = LoadUrl(
                 url = DBP_INITIAL_URL,

@@ -25,14 +25,14 @@ import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse.ResponseData
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface PirActionsRunnerStateEngine {
 
     /**
      * Flow that emits effects that should be handled outside of this engine
      */
-    val sideEffect: StateFlow<SideEffect>
+    val sideEffect: Flow<SideEffect>
 
     /**
      * This method dispatches new events to the engine.
@@ -53,6 +53,7 @@ interface PirActionsRunnerStateEngine {
         val transactionID: String = "",
         val currentExtractedProfileIndex: Int = 0,
         val extractedProfile: List<ExtractedProfile> = emptyList(),
+        val pendingUrl: String? = null,
     )
 
     /**

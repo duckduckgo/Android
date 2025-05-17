@@ -40,10 +40,13 @@ class EmailConfirmationLinkReceivedEventHandler @Inject constructor() : EventHan
         /**
          * Once we have obtained the email confirmation link, we need to load it into the webview.
          */
+        val link = (event as EmailConfirmationLinkReceived).confirmationLink
         return Next(
-            nextState = state,
+            nextState = state.copy(
+                pendingUrl = link,
+            ),
             sideEffect = LoadUrl(
-                url = (event as EmailConfirmationLinkReceived).confirmationLink,
+                url = link,
             ),
         )
     }
