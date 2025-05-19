@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
+import com.google.android.material.tabs.TabLayout
 
 @InjectWith(ActivityScope::class)
 class DuckChatOmnibarLayout @JvmOverloads constructor(
@@ -43,6 +44,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     val duckChatNewChat: View
     val duckChatStop: View
     val duckChatControls: View
+    val duckChatBack: View
+    val duckChatTabLayout: TabLayout
 
     private var originalStartMargin: Int = 0
 
@@ -50,6 +53,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var onSend: ((String) -> Unit)? = null
     var onNewChat: (() -> Unit)? = null
     var onStop: (() -> Unit)? = null
+    var onBack: (() -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
@@ -60,6 +64,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatNewChat = findViewById(R.id.duckChatNewChat)
         duckChatStop = findViewById(R.id.duckChatStop)
         duckChatControls = findViewById(R.id.duckChatControls)
+        duckChatBack = findViewById(R.id.duckChatBack)
+        duckChatTabLayout = findViewById(R.id.duckChatTabLayout)
 
         (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
             originalStartMargin = params.marginStart
@@ -72,6 +78,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             onStop?.invoke()
             hideStopButton()
         }
+        duckChatBack.setOnClickListener { onBack?.invoke() }
 
         duckChatInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -115,12 +122,22 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    fun selectTab(index: Int) {
+        duckChatTabLayout.post {
+            duckChatTabLayout.getTabAt(index)?.select()
+        }
+    }
+
     fun showStopButton() {
+        duckChatTabLayout.isVisible = false
+        duckChatBack.isVisible = false
         duckChatControls.visibility = View.INVISIBLE
         duckChatStop.isVisible = true
     }
 
     fun hideStopButton() {
+        duckChatTabLayout.isVisible = true
+        duckChatBack.isVisible = true
         duckChatStop.isVisible = false
         duckChatControls.visibility = View.VISIBLE
     }
