@@ -111,16 +111,9 @@
                 android:text="@string/dax_prompt_duck_player_message_primary_button"
                 app:daxButtonSize="large"
                 app:icon="@drawable/ic_duck_player"
+                app:iconGravity="textStart"
                 app:iconTint="@null" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxPromptDuckPlayerSecondaryButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dax_prompt_duck_player_message_secondary_button"
-                app:daxButtonSize="large"
-                app:icon="@drawable/ic_dismiss"
-                app:iconTint="@null" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,13 +55,6 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
         }
     }
 
-    fun onSecondaryButtonClicked() {
-        viewModelScope.launch {
-            command.send(Command.Dismiss)
-            reactivateUsersExperiment.fireDismissDuckPlayer()
-        }
-    }
-
     fun markDuckPlayerPromptAsShown() {
         viewModelScope.launch {
             daxPromptsRepository.setDaxPromptsShowDuckPlayer(false)
@@ -71,7 +64,6 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     sealed class Command {
         data object CloseScreen : Command()
         data class TryDuckPlayer(val url: String) : Command()
-        data object Dismiss : Command()
     }
 
     companion object {

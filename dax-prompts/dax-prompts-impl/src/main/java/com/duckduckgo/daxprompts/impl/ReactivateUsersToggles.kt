@@ -107,14 +107,6 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
                     ConversionWindow(lowerWindow = 0, upperWindow = 0),
                 ),
             ),
-            MetricsPixel(
-                metric = METRIC_DISMISS_DUCK_PLAYER,
-                value = "1",
-                toggle = toggles.reactivateUsersExperimentMay25(),
-                conversionWindow = listOf(
-                    ConversionWindow(lowerWindow = 0, upperWindow = 0),
-                ),
-            ),
         )
     }
 
@@ -138,16 +130,11 @@ class ReactivateUsersPixelsPlugin @Inject constructor(
         return this.getMetrics().firstOrNull { it.metric == METRIC_CLOSE_SCREEN }
     }
 
-    suspend fun getDismissDuckPlayerMetric(): MetricsPixel? {
-        return this.getMetrics().firstOrNull { it.metric == METRIC_DISMISS_DUCK_PLAYER }
-    }
-
     companion object {
         internal const val METRIC_DUCK_PLAYER_USE = "duckPlayerUse"
         internal const val METRIC_SET_BROWSER_AS_DEFAULT = "setBrowserAsDefault"
         internal const val METRIC_DUCK_PLAYER_CLICK = "duckPlayerClick"
         internal const val METRIC_CHOOSE_YOUR_BROWSER_CLICK = "chooseYourBrowserClick"
         internal const val METRIC_CLOSE_SCREEN = "closeScreen"
-        internal const val METRIC_DISMISS_DUCK_PLAYER = "dismissDuckPlayer"
     }
 }

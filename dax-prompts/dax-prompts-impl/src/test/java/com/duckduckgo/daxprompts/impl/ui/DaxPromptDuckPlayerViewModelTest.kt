@@ -66,15 +66,4 @@ class DaxPromptDuckPlayerViewModelTest {
         }
         verify(mockReactivationExperiment).fireDuckPlayerClick()
     }
-
-    @Test
-    fun whenSecondaryButtonClickedThenEmitsDismissCommand() = runTest {
-        testee.onSecondaryButtonClicked()
-
-        testee.commands().test {
-            assertEquals(DaxPromptDuckPlayerViewModel.Command.Dismiss, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(mockReactivationExperiment).fireDismissDuckPlayer()
-    }
 }

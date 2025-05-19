@@ -62,9 +62,6 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
         binding.daxPromptDuckPlayerPrimaryButton.setOnClickListener {
             viewModel.onPrimaryButtonClicked()
         }
-        binding.daxPromptDuckPlayerSecondaryButton.setOnClickListener {
-            viewModel.onSecondaryButtonClicked()
-        }
     }
 
     private fun setupObservers() {
@@ -86,11 +83,6 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
                     putExtra(DAX_PROMPT_DUCK_PLAYER_ACTIVITY_URL_EXTRA, command.url)
                 }
                 setResult(RESULT_OK, resultIntent)
-                finish()
-            }
-
-            is DaxPromptDuckPlayerViewModel.Command.Dismiss -> {
-                setResult(RESULT_OK)
                 finish()
             }
         }
