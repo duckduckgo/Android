@@ -134,6 +134,9 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @Inject
     lateinit var experimentDataStore: VisualDesignExperimentDataStore
 
+    @Inject
+    lateinit var appBrowserNav: BrowserNav
+
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
 
     private var pendingFileDownload: PendingFileDownload? = null
@@ -287,7 +290,11 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                     ),
                 )
             }
-            onSend = { message ->
+            onSearchSent = { message ->
+                context.startActivity(appBrowserNav.openInNewTab(context, message))
+                finish()
+            }
+            onDuckChatSent = { message ->
                 contentScopeScripts.sendSubscriptionEvent(
                     SubscriptionEventData(
                         featureName = DUCK_CHAT_FEATURE_NAME,
