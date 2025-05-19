@@ -69,7 +69,6 @@ class RealSubscriptionsJSHelper @Inject constructor(
     }
 
     companion object {
-        const val SUBSCRIPTIONS_FEATURE_NAME = "subscriptions"
         private const val METHOD_HANDSHAKE = "handshake"
         private const val METHOD_SUBSCRIPTION_DETAILS = "subscriptionDetails"
         private const val AVAILABLE_MESSAGES = "availableMessages"

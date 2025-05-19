@@ -27,3 +27,5 @@ interface SubscriptionsJSHelper {
         data: JSONObject?,
     ): JsCallbackData?
 }
+
+const val SUBSCRIPTIONS_FEATURE_NAME = "subscriptions"
