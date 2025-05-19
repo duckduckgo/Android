@@ -27,9 +27,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -48,17 +48,17 @@ class DuckChatDailyPixelSender @Inject constructor(
             pixel.fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_IS_ENABLED_DAILY,
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.isDuckChatUserEnabled().toString()),
-                type = Daily()
+                type = Daily(),
             )
             pixel.fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY,
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.shouldShowInBrowserMenu().toString()),
-                type = Daily()
+                type = Daily(),
             )
             pixel.fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY,
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.shouldShowInAddressBar().toString()),
-                type = Daily()
+                type = Daily(),
             )
         }
     }
