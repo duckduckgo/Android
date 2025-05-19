@@ -18,20 +18,12 @@ package com.duckduckgo.subscriptions.impl.messaging
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.json.JSONArray
 import org.json.JSONObject
-
-interface SubscriptionsJSHelper {
-    suspend fun processJsCallbackMessage(
-        featureName: String,
-        method: String,
-        id: String?,
-        data: JSONObject?,
-    ): JsCallbackData?
-}
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsJSHelper @Inject constructor(
