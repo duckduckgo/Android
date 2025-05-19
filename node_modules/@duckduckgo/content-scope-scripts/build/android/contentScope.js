@@ -1321,6 +1321,7 @@
       "cookie",
       "messageBridge",
       "duckPlayer",
+      "duckPlayerNative",
       "harmfulApis",
       "webCompat",
       "windowsPermissionUsage",
@@ -1332,8 +1333,16 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", ...baseFeatures],
-    "apple-isolated": ["duckPlayer", "brokerProtection", "performanceMetrics", "clickToLoad", "messageBridge", "favicon"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures],
+    "apple-isolated": [
+      "duckPlayer",
+      "duckPlayerNative",
+      "brokerProtection",
+      "performanceMetrics",
+      "clickToLoad",
+      "messageBridge",
+      "favicon"
+    ],
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
     "android-autofill-password-import": ["autofillPasswordImport"],
@@ -6848,7 +6857,7 @@
   var DuckPlayerOverlayMessages = class {
     /**
      * @param {Messaging} messaging
-     * @param {import('./overlays.js').Environment} environment
+     * @param {import('./environment.js').Environment} environment
      * @internal
      */
     constructor(messaging, environment) {
@@ -7082,9 +7091,11 @@
     }
     /**
      * Remove elements, event listeners etc
+     * @param {string} [name]
      */
-    destroy() {
-      for (const cleanup of this._cleanups) {
+    destroy(name) {
+      const cleanups = name ? this._cleanups.filter((c) => c.name === name) : this._cleanups;
+      for (const cleanup of cleanups) {
         if (typeof cleanup.fn === "function") {
           try {
             if (this.debug) {
@@ -7098,7 +7109,11 @@
           throw new Error("invalid cleanup");
         }
       }
-      this._cleanups = [];
+      if (name) {
+        this._cleanups = this._cleanups.filter((c) => c.name !== name);
+      } else {
+        this._cleanups = [];
+      }
     }
   };
   var _VideoParams = class _VideoParams {
@@ -7119,6 +7134,15 @@
         duckUrl.searchParams.set("t", this.time);
       }
       return duckUrl.href;
+    }
+    /**
+     * Get the large thumbnail URL for the current video id
+     *
+     * @returns {string}
+     */
+    toLargeThumbnailUrl() {
+      const url = new URL(`/vi/${this.id}/maxresdefault.jpg`, "https://i.ytimg.com");
+      return url.href;
     }
     /**
      * Create a VideoParams instance from a href, only if it's on the watch page
@@ -7574,6 +7598,109 @@
     }
   };
 
+  // src/features/duckplayer/environment.js
+  init_define_import_meta_trackerLookup();
+
+  // ../build/locales/duckplayer-locales.js
+  init_define_import_meta_trackerLookup();
+  var duckplayer_locales_default = `{"bg":{"overlays.json":{"videoOverlayTitle2":"\u0412\u043A\u043B\u044E\u0447\u0435\u0442\u0435 Duck Player, \u0437\u0430 \u0434\u0430 \u0433\u043B\u0435\u0434\u0430\u0442\u0435 \u0431\u0435\u0437 \u043D\u0430\u0441\u043E\u0447\u0435\u043D\u0438 \u0440\u0435\u043A\u043B\u0430\u043C\u0438","videoButtonOpen2":"\u0412\u043A\u043B\u044E\u0447\u0432\u0430\u043D\u0435 \u043D\u0430 Duck Player","videoButtonOptOut2":"\u041D\u0435, \u0431\u043B\u0430\u0433\u043E\u0434\u0430\u0440\u044F","rememberLabel":"\u0417\u0430\u043F\u043E\u043C\u043D\u0438 \u043C\u043E\u044F \u0438\u0437\u0431\u043E\u0440"}},"cs":{"overlays.json":{"videoOverlayTitle2":"Zapn\u011Bte si Duck Player a\xA0sledujte videa bez c\xEDlen\xFDch reklam","videoButtonOpen2":"Zapni si Duck Player","videoButtonOptOut2":"Ne, d\u011Bkuji","rememberLabel":"Zapamatovat mou volbu"}},"da":{"overlays.json":{"videoOverlayTitle2":"Sl\xE5 Duck Player til for at se indhold uden m\xE5lrettede reklamer","videoButtonOpen2":"Sl\xE5 Duck Player til","videoButtonOptOut2":"Nej tak.","rememberLabel":"Husk mit valg"}},"de":{"overlays.json":{"videoOverlayTitle2":"Aktiviere den Duck Player, um ohne gezielte Werbung zu schauen","videoButtonOpen2":"Duck Player aktivieren","videoButtonOptOut2":"Nein, danke","rememberLabel":"Meine Auswahl merken"}},"el":{"overlays.json":{"videoOverlayTitle2":"\u0395\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03B9\u03AE\u03C3\u03C4\u03B5 \u03C4\u03BF Duck Player \u03B3\u03B9\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03BF\u03BB\u03BF\u03CD\u03B8\u03B7\u03C3\u03B7 \u03C7\u03C9\u03C1\u03AF\u03C2 \u03C3\u03C4\u03BF\u03C7\u03B5\u03C5\u03BC\u03AD\u03BD\u03B5\u03C2 \u03B4\u03B9\u03B1\u03C6\u03B7\u03BC\u03AF\u03C3\u03B5\u03B9\u03C2","videoButtonOpen2":"\u0395\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03AF\u03B7\u03C3\u03B7 \u03C4\u03BF\u03C5 Duck Player","videoButtonOptOut2":"\u038C\u03C7\u03B9, \u03B5\u03C5\u03C7\u03B1\u03C1\u03B9\u03C3\u03C4\u03CE","rememberLabel":"\u0398\u03C5\u03BC\u03B7\u03B8\u03B5\u03AF\u03C4\u03B5 \u03C4\u03B7\u03BD \u03B5\u03C0\u03B9\u03BB\u03BF\u03B3\u03AE \u03BC\u03BF\u03C5"}},"en":{"native.json":{"blockedVideoErrorHeading":"YouTube won\u2019t let Duck Player load this video","blockedVideoErrorMessage1":"YouTube doesn\u2019t allow this video to be viewed outside of YouTube.","blockedVideoErrorMessage2":"You can still watch this video on YouTube, but without the added privacy of Duck Player.","signInRequiredErrorMessage1":"YouTube is blocking this video from loading. If you\u2019re using a VPN, try turning it off and reloading this page.","signInRequiredErrorMessage2":"If this doesn\u2019t work, you can still watch this video on YouTube, but without the added privacy of Duck Player."},"overlays.json":{"videoOverlayTitle2":"Turn on Duck Player to watch without targeted ads","videoButtonOpen2":"Turn On Duck Player","videoButtonOptOut2":"No Thanks","rememberLabel":"Remember my choice"}},"es":{"overlays.json":{"videoOverlayTitle2":"Activa Duck Player para ver sin anuncios personalizados","videoButtonOpen2":"Activar Duck Player","videoButtonOptOut2":"No, gracias","rememberLabel":"Recordar mi elecci\xF3n"}},"et":{"overlays.json":{"videoOverlayTitle2":"Sihitud reklaamideta vaatamiseks l\xFClita sisse Duck Player","videoButtonOpen2":"L\xFClita Duck Player sisse","videoButtonOptOut2":"Ei ait\xE4h","rememberLabel":"J\xE4ta mu valik meelde"}},"fi":{"overlays.json":{"videoOverlayTitle2":"Jos haluat katsoa ilman kohdennettuja mainoksia, ota Duck Player k\xE4ytt\xF6\xF6n","videoButtonOpen2":"Ota Duck Player k\xE4ytt\xF6\xF6n","videoButtonOptOut2":"Ei kiitos","rememberLabel":"Muista valintani"}},"fr":{"overlays.json":{"videoOverlayTitle2":"Activez Duck Player pour une vid\xE9o sans publicit\xE9s cibl\xE9es","videoButtonOpen2":"Activez Duck Player","videoButtonOptOut2":"Non merci","rememberLabel":"M\xE9moriser mon choix"}},"hr":{"overlays.json":{"videoOverlayTitle2":"Uklju\u010Di Duck Player za gledanje bez ciljanih oglasa","videoButtonOpen2":"Uklju\u010Di Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapamti moj izbor"}},"hu":{"overlays.json":{"videoOverlayTitle2":"Kapcsold be a Duck Playert, hogy c\xE9lzott hirdet\xE9sek n\xE9lk\xFCl vide\xF3zhass","videoButtonOpen2":"Duck Player bekapcsol\xE1sa","videoButtonOptOut2":"Nem, k\xF6sz\xF6n\xF6m","rememberLabel":"V\xE1lasztott be\xE1ll\xEDt\xE1s megjegyz\xE9se"}},"it":{"overlays.json":{"videoOverlayTitle2":"Attiva Duck Player per guardare senza annunci personalizzati","videoButtonOpen2":"Attiva Duck Player","videoButtonOptOut2":"No, grazie","rememberLabel":"Ricorda la mia scelta"}},"lt":{"overlays.json":{"videoOverlayTitle2":"\u012Ejunkite \u201EDuck Player\u201C, kad gal\u0117tum\u0117te \u017Ei\u016Br\u0117ti be tikslini\u0173 reklam\u0173","videoButtonOpen2":"\u012Ejunkite \u201EDuck Player\u201C","videoButtonOptOut2":"Ne, d\u0117koju","rememberLabel":"\u012Esiminti mano pasirinkim\u0105"}},"lv":{"overlays.json":{"videoOverlayTitle2":"Iesl\u0113dz Duck Player, lai skat\u012Btos bez m\u0113r\u0137\u0113t\u0101m rekl\u0101m\u0101m","videoButtonOpen2":"Iesl\u0113gt Duck Player","videoButtonOptOut2":"N\u0113, paldies","rememberLabel":"Atcer\u0113ties manu izv\u0113li"}},"nb":{"overlays.json":{"videoOverlayTitle2":"Sl\xE5 p\xE5 Duck Player for \xE5 se p\xE5 uten m\xE5lrettede annonser","videoButtonOpen2":"Sl\xE5 p\xE5 Duck Player","videoButtonOptOut2":"Nei takk","rememberLabel":"Husk valget mitt"}},"nl":{"overlays.json":{"videoOverlayTitle2":"Zet Duck Player aan om te kijken zonder gerichte advertenties","videoButtonOpen2":"Duck Player aanzetten","videoButtonOptOut2":"Nee, bedankt","rememberLabel":"Mijn keuze onthouden"}},"pl":{"overlays.json":{"videoOverlayTitle2":"W\u0142\u0105cz Duck Player, aby ogl\u0105da\u0107 bez reklam ukierunkowanych","videoButtonOpen2":"W\u0142\u0105cz Duck Player","videoButtonOptOut2":"Nie, dzi\u0119kuj\u0119","rememberLabel":"Zapami\u0119taj m\xF3j wyb\xF3r"}},"pt":{"overlays.json":{"videoOverlayTitle2":"Ativa o Duck Player para ver sem an\xFAncios personalizados","videoButtonOpen2":"Ligar o Duck Player","videoButtonOptOut2":"N\xE3o, obrigado","rememberLabel":"Memorizar a minha op\xE7\xE3o"}},"ro":{"overlays.json":{"videoOverlayTitle2":"Activeaz\u0103 Duck Player pentru a viziona f\u0103r\u0103 reclame direc\u021Bionate","videoButtonOpen2":"Activeaz\u0103 Duck Player","videoButtonOptOut2":"Nu, mul\u021Bumesc","rememberLabel":"Re\u021Bine alegerea mea"}},"ru":{"overlays.json":{"videoOverlayTitle2":"Duck Player\xA0\u2014 \u043F\u0440\u043E\u0441\u043C\u043E\u0442\u0440 \u0431\u0435\u0437 \u0446\u0435\u043B\u0435\u0432\u043E\u0439 \u0440\u0435\u043A\u043B\u0430\u043C\u044B","videoButtonOpen2":"\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C Duck Player","videoButtonOptOut2":"\u041D\u0435\u0442, \u0441\u043F\u0430\u0441\u0438\u0431\u043E","rememberLabel":"\u0417\u0430\u043F\u043E\u043C\u043D\u0438\u0442\u044C \u0432\u044B\u0431\u043E\u0440"}},"sk":{"overlays.json":{"videoOverlayTitle2":"Zapnite Duck Player a pozerajte bez cielen\xFDch rekl\xE1m","videoButtonOpen2":"Zapn\xFA\u0165 prehr\xE1va\u010D Duck Player","videoButtonOptOut2":"Nie, \u010Fakujem","rememberLabel":"Zapam\xE4ta\u0165 si moju vo\u013Ebu"}},"sl":{"overlays.json":{"videoOverlayTitle2":"Vklopite predvajalnik Duck Player za gledanje brez ciljanih oglasov","videoButtonOpen2":"Vklopi predvajalnik Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapomni si mojo izbiro"}},"sv":{"overlays.json":{"videoOverlayTitle2":"Aktivera Duck Player f\xF6r att titta utan riktade annonser","videoButtonOpen2":"Aktivera Duck Player","videoButtonOptOut2":"Nej tack","rememberLabel":"Kom ih\xE5g mitt val"}},"tr":{"overlays.json":{"videoOverlayTitle2":"Hedeflenmi\u015F reklamlar olmadan izlemek i\xE7in Duck Player'\u0131 a\xE7\u0131n","videoButtonOpen2":"Duck Player'\u0131 A\xE7","videoButtonOptOut2":"Hay\u0131r Te\u015Fekk\xFCrler","rememberLabel":"Se\xE7imimi hat\u0131rla"}}}`;
+
+  // src/features/duckplayer/environment.js
+  var Environment = class {
+    /**
+     * @param {object} params
+     * @param {{name: string}} params.platform
+     * @param {boolean|null|undefined} [params.debug]
+     * @param {ImportMeta['injectName']} params.injectName
+     * @param {string} params.locale
+     */
+    constructor(params) {
+      __publicField(this, "allowedProxyOrigins", ["duckduckgo.com"]);
+      __publicField(this, "_strings", JSON.parse(duckplayer_locales_default));
+      this.debug = Boolean(params.debug);
+      this.injectName = params.injectName;
+      this.platform = params.platform;
+      this.locale = params.locale;
+    }
+    /**
+     * @param {"overlays.json" | "native.json"} named
+     * @returns {Record<string, string>}
+     */
+    strings(named) {
+      const matched = this._strings[this.locale];
+      if (matched) return matched[named];
+      return this._strings.en[named];
+    }
+    /**
+     * This is the URL of the page that the user is currently on
+     * It's abstracted so that we can mock it in tests
+     * @return {string}
+     */
+    getPlayerPageHref() {
+      if (this.debug) {
+        const url = new URL(window.location.href);
+        if (url.hostname === "www.youtube.com") return window.location.href;
+        if (url.searchParams.has("v")) {
+          const base = new URL("/watch", "https://youtube.com");
+          base.searchParams.set("v", url.searchParams.get("v") || "");
+          return base.toString();
+        }
+        return "https://youtube.com/watch?v=123";
+      }
+      return window.location.href;
+    }
+    getLargeThumbnailSrc(videoId) {
+      const url = new URL(`/vi/${videoId}/maxresdefault.jpg`, "https://i.ytimg.com");
+      return url.href;
+    }
+    setHref(href) {
+      window.location.href = href;
+    }
+    hasOneTimeOverride() {
+      try {
+        if (window.location.hash !== "#ddg-play") return false;
+        if (typeof document.referrer !== "string") return false;
+        if (document.referrer.length === 0) return false;
+        const { hostname } = new URL(document.referrer);
+        const isAllowed = this.allowedProxyOrigins.includes(hostname);
+        return isAllowed;
+      } catch (e) {
+        console.error(e);
+      }
+      return false;
+    }
+    isIntegrationMode() {
+      return this.debug === true && this.injectName === "integration";
+    }
+    isTestMode() {
+      return this.debug === true;
+    }
+    get opensVideoOverlayLinksViaMessage() {
+      return this.platform.name !== "windows";
+    }
+    /**
+     * @return {boolean}
+     */
+    get isMobile() {
+      return this.platform.name === "ios" || this.platform.name === "android";
+    }
+    /**
+     * @return {boolean}
+     */
+    get isDesktop() {
+      return !this.isMobile;
+    }
+    /**
+     * @return {'desktop' | 'mobile'}
+     */
+    get layout() {
+      if (this.platform.name === "ios" || this.platform.name === "android") {
+        return "mobile";
+      }
+      return "desktop";
+    }
+  };
+
   // src/features/duckplayer/thumbnails.js
   var Thumbnails = class {
     /**
@@ -7745,7 +7872,7 @@
   var DDGVideoOverlay = class extends HTMLElement {
     /**
      * @param {object} options
-     * @param {import("../overlays.js").Environment} options.environment
+     * @param {import("../environment.js").Environment} options.environment
      * @param {import("../util").VideoParams} options.params
      * @param {import("../../duck-player.js").UISettings} options.ui
      * @param {VideoOverlay} options.manager
@@ -8287,7 +8414,7 @@
      * @param {object} options
      * @param {import("../duck-player.js").UserValues} options.userValues
      * @param {import("../duck-player.js").OverlaysFeatureSettings} options.settings
-     * @param {import("./overlays.js").Environment} options.environment
+     * @param {import("./environment.js").Environment} options.environment
      * @param {import("./overlay-messages.js").DuckPlayerOverlayMessages} options.messages
      * @param {import("../duck-player.js").UISettings} options.ui
      */
@@ -8437,7 +8564,7 @@
           document.createElement(DDGVideoOverlayMobile.CUSTOM_TAG_NAME)
         );
         elem.testMode = this.environment.isTestMode();
-        elem.text = mobileStrings(this.environment.strings);
+        elem.text = mobileStrings(this.environment.strings("overlays.json"));
         elem.addEventListener(DDGVideoOverlayMobile.OPEN_INFO, () => this.messages.openInfo());
         elem.addEventListener(DDGVideoOverlayMobile.OPT_OUT, (e) => {
           return this.mobileOptOut(e.detail.remember).catch(console.error);
@@ -8472,7 +8599,7 @@
             document.createElement(DDGVideoDrawerMobile.CUSTOM_TAG_NAME)
           );
           drawer.testMode = this.environment.isTestMode();
-          drawer.text = mobileStrings(this.environment.strings);
+          drawer.text = mobileStrings(this.environment.strings("overlays.json"));
           drawer.addEventListener(DDGVideoDrawerMobile.OPEN_INFO, () => this.messages.openInfo());
           drawer.addEventListener(DDGVideoDrawerMobile.OPT_OUT, (e) => {
             return this.mobileOptOut(e.detail.remember).catch(console.error);
@@ -8672,10 +8799,6 @@
     }
   }
 
-  // ../build/locales/duckplayer-locales.js
-  init_define_import_meta_trackerLookup();
-  var duckplayer_locales_default = `{"bg":{"overlays.json":{"videoOverlayTitle2":"\u0412\u043A\u043B\u044E\u0447\u0435\u0442\u0435 Duck Player, \u0437\u0430 \u0434\u0430 \u0433\u043B\u0435\u0434\u0430\u0442\u0435 \u0431\u0435\u0437 \u043D\u0430\u0441\u043E\u0447\u0435\u043D\u0438 \u0440\u0435\u043A\u043B\u0430\u043C\u0438","videoButtonOpen2":"\u0412\u043A\u043B\u044E\u0447\u0432\u0430\u043D\u0435 \u043D\u0430 Duck Player","videoButtonOptOut2":"\u041D\u0435, \u0431\u043B\u0430\u0433\u043E\u0434\u0430\u0440\u044F","rememberLabel":"\u0417\u0430\u043F\u043E\u043C\u043D\u0438 \u043C\u043E\u044F \u0438\u0437\u0431\u043E\u0440"}},"cs":{"overlays.json":{"videoOverlayTitle2":"Zapn\u011Bte si Duck Player a\xA0sledujte videa bez c\xEDlen\xFDch reklam","videoButtonOpen2":"Zapni si Duck Player","videoButtonOptOut2":"Ne, d\u011Bkuji","rememberLabel":"Zapamatovat mou volbu"}},"da":{"overlays.json":{"videoOverlayTitle2":"Sl\xE5 Duck Player til for at se indhold uden m\xE5lrettede reklamer","videoButtonOpen2":"Sl\xE5 Duck Player til","videoButtonOptOut2":"Nej tak.","rememberLabel":"Husk mit valg"}},"de":{"overlays.json":{"videoOverlayTitle2":"Aktiviere den Duck Player, um ohne gezielte Werbung zu schauen","videoButtonOpen2":"Duck Player aktivieren","videoButtonOptOut2":"Nein, danke","rememberLabel":"Meine Auswahl merken"}},"el":{"overlays.json":{"videoOverlayTitle2":"\u0395\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03B9\u03AE\u03C3\u03C4\u03B5 \u03C4\u03BF Duck Player \u03B3\u03B9\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03BF\u03BB\u03BF\u03CD\u03B8\u03B7\u03C3\u03B7 \u03C7\u03C9\u03C1\u03AF\u03C2 \u03C3\u03C4\u03BF\u03C7\u03B5\u03C5\u03BC\u03AD\u03BD\u03B5\u03C2 \u03B4\u03B9\u03B1\u03C6\u03B7\u03BC\u03AF\u03C3\u03B5\u03B9\u03C2","videoButtonOpen2":"\u0395\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03AF\u03B7\u03C3\u03B7 \u03C4\u03BF\u03C5 Duck Player","videoButtonOptOut2":"\u038C\u03C7\u03B9, \u03B5\u03C5\u03C7\u03B1\u03C1\u03B9\u03C3\u03C4\u03CE","rememberLabel":"\u0398\u03C5\u03BC\u03B7\u03B8\u03B5\u03AF\u03C4\u03B5 \u03C4\u03B7\u03BD \u03B5\u03C0\u03B9\u03BB\u03BF\u03B3\u03AE \u03BC\u03BF\u03C5"}},"en":{"overlays.json":{"videoOverlayTitle2":"Turn on Duck Player to watch without targeted ads","videoButtonOpen2":"Turn On Duck Player","videoButtonOptOut2":"No Thanks","rememberLabel":"Remember my choice"}},"es":{"overlays.json":{"videoOverlayTitle2":"Activa Duck Player para ver sin anuncios personalizados","videoButtonOpen2":"Activar Duck Player","videoButtonOptOut2":"No, gracias","rememberLabel":"Recordar mi elecci\xF3n"}},"et":{"overlays.json":{"videoOverlayTitle2":"Sihitud reklaamideta vaatamiseks l\xFClita sisse Duck Player","videoButtonOpen2":"L\xFClita Duck Player sisse","videoButtonOptOut2":"Ei ait\xE4h","rememberLabel":"J\xE4ta mu valik meelde"}},"fi":{"overlays.json":{"videoOverlayTitle2":"Jos haluat katsoa ilman kohdennettuja mainoksia, ota Duck Player k\xE4ytt\xF6\xF6n","videoButtonOpen2":"Ota Duck Player k\xE4ytt\xF6\xF6n","videoButtonOptOut2":"Ei kiitos","rememberLabel":"Muista valintani"}},"fr":{"overlays.json":{"videoOverlayTitle2":"Activez Duck Player pour une vid\xE9o sans publicit\xE9s cibl\xE9es","videoButtonOpen2":"Activez Duck Player","videoButtonOptOut2":"Non merci","rememberLabel":"M\xE9moriser mon choix"}},"hr":{"overlays.json":{"videoOverlayTitle2":"Uklju\u010Di Duck Player za gledanje bez ciljanih oglasa","videoButtonOpen2":"Uklju\u010Di Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapamti moj izbor"}},"hu":{"overlays.json":{"videoOverlayTitle2":"Kapcsold be a Duck Playert, hogy c\xE9lzott hirdet\xE9sek n\xE9lk\xFCl vide\xF3zhass","videoButtonOpen2":"Duck Player bekapcsol\xE1sa","videoButtonOptOut2":"Nem, k\xF6sz\xF6n\xF6m","rememberLabel":"V\xE1lasztott be\xE1ll\xEDt\xE1s megjegyz\xE9se"}},"it":{"overlays.json":{"videoOverlayTitle2":"Attiva Duck Player per guardare senza annunci personalizzati","videoButtonOpen2":"Attiva Duck Player","videoButtonOptOut2":"No, grazie","rememberLabel":"Ricorda la mia scelta"}},"lt":{"overlays.json":{"videoOverlayTitle2":"\u012Ejunkite \u201EDuck Player\u201C, kad gal\u0117tum\u0117te \u017Ei\u016Br\u0117ti be tikslini\u0173 reklam\u0173","videoButtonOpen2":"\u012Ejunkite \u201EDuck Player\u201C","videoButtonOptOut2":"Ne, d\u0117koju","rememberLabel":"\u012Esiminti mano pasirinkim\u0105"}},"lv":{"overlays.json":{"videoOverlayTitle2":"Iesl\u0113dz Duck Player, lai skat\u012Btos bez m\u0113r\u0137\u0113t\u0101m rekl\u0101m\u0101m","videoButtonOpen2":"Iesl\u0113gt Duck Player","videoButtonOptOut2":"N\u0113, paldies","rememberLabel":"Atcer\u0113ties manu izv\u0113li"}},"nb":{"overlays.json":{"videoOverlayTitle2":"Sl\xE5 p\xE5 Duck Player for \xE5 se p\xE5 uten m\xE5lrettede annonser","videoButtonOpen2":"Sl\xE5 p\xE5 Duck Player","videoButtonOptOut2":"Nei takk","rememberLabel":"Husk valget mitt"}},"nl":{"overlays.json":{"videoOverlayTitle2":"Zet Duck Player aan om te kijken zonder gerichte advertenties","videoButtonOpen2":"Duck Player aanzetten","videoButtonOptOut2":"Nee, bedankt","rememberLabel":"Mijn keuze onthouden"}},"pl":{"overlays.json":{"videoOverlayTitle2":"W\u0142\u0105cz Duck Player, aby ogl\u0105da\u0107 bez reklam ukierunkowanych","videoButtonOpen2":"W\u0142\u0105cz Duck Player","videoButtonOptOut2":"Nie, dzi\u0119kuj\u0119","rememberLabel":"Zapami\u0119taj m\xF3j wyb\xF3r"}},"pt":{"overlays.json":{"videoOverlayTitle2":"Ativa o Duck Player para ver sem an\xFAncios personalizados","videoButtonOpen2":"Ligar o Duck Player","videoButtonOptOut2":"N\xE3o, obrigado","rememberLabel":"Memorizar a minha op\xE7\xE3o"}},"ro":{"overlays.json":{"videoOverlayTitle2":"Activeaz\u0103 Duck Player pentru a viziona f\u0103r\u0103 reclame direc\u021Bionate","videoButtonOpen2":"Activeaz\u0103 Duck Player","videoButtonOptOut2":"Nu, mul\u021Bumesc","rememberLabel":"Re\u021Bine alegerea mea"}},"ru":{"overlays.json":{"videoOverlayTitle2":"Duck Player\xA0\u2014 \u043F\u0440\u043E\u0441\u043C\u043E\u0442\u0440 \u0431\u0435\u0437 \u0446\u0435\u043B\u0435\u0432\u043E\u0439 \u0440\u0435\u043A\u043B\u0430\u043C\u044B","videoButtonOpen2":"\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C Duck Player","videoButtonOptOut2":"\u041D\u0435\u0442, \u0441\u043F\u0430\u0441\u0438\u0431\u043E","rememberLabel":"\u0417\u0430\u043F\u043E\u043C\u043D\u0438\u0442\u044C \u0432\u044B\u0431\u043E\u0440"}},"sk":{"overlays.json":{"videoOverlayTitle2":"Zapnite Duck Player a pozerajte bez cielen\xFDch rekl\xE1m","videoButtonOpen2":"Zapn\xFA\u0165 prehr\xE1va\u010D Duck Player","videoButtonOptOut2":"Nie, \u010Fakujem","rememberLabel":"Zapam\xE4ta\u0165 si moju vo\u013Ebu"}},"sl":{"overlays.json":{"videoOverlayTitle2":"Vklopite predvajalnik Duck Player za gledanje brez ciljanih oglasov","videoButtonOpen2":"Vklopi predvajalnik Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapomni si mojo izbiro"}},"sv":{"overlays.json":{"videoOverlayTitle2":"Aktivera Duck Player f\xF6r att titta utan riktade annonser","videoButtonOpen2":"Aktivera Duck Player","videoButtonOptOut2":"Nej tack","rememberLabel":"Kom ih\xE5g mitt val"}},"tr":{"overlays.json":{"videoOverlayTitle2":"Hedeflenmi\u015F reklamlar olmadan izlemek i\xE7in Duck Player'\u0131 a\xE7\u0131n","videoButtonOpen2":"Duck Player'\u0131 A\xE7","videoButtonOptOut2":"Hay\u0131r Te\u015Fekk\xFCrler","rememberLabel":"Se\xE7imimi hat\u0131rla"}}}`;
-
   // src/features/duckplayer/overlays.js
   async function initOverlays(settings, environment, messages) {
     const domState = new DomState();
@@ -8683,11 +8806,11 @@
     try {
       initialSetup = await messages.initialSetup();
     } catch (e) {
-      console.error(e);
+      console.warn(e);
       return;
     }
     if (!initialSetup) {
-      console.error("cannot continue without user settings");
+      console.warn("cannot continue without user settings");
       return;
     }
     let { userValues, ui } = initialSetup;
@@ -8767,96 +8890,6 @@
     if (settings.videoOverlays.state !== "enabled") return void 0;
     return new VideoOverlay({ userValues, settings, environment, messages, ui });
   }
-  var Environment = class {
-    /**
-     * @param {object} params
-     * @param {{name: string}} params.platform
-     * @param {boolean|null|undefined} [params.debug]
-     * @param {ImportMeta['injectName']} params.injectName
-     * @param {string} params.locale
-     */
-    constructor(params) {
-      __publicField(this, "allowedProxyOrigins", ["duckduckgo.com"]);
-      __publicField(this, "_strings", JSON.parse(duckplayer_locales_default));
-      this.debug = Boolean(params.debug);
-      this.injectName = params.injectName;
-      this.platform = params.platform;
-      this.locale = params.locale;
-    }
-    get strings() {
-      const matched = this._strings[this.locale];
-      if (matched) return matched["overlays.json"];
-      return this._strings.en["overlays.json"];
-    }
-    /**
-     * This is the URL of the page that the user is currently on
-     * It's abstracted so that we can mock it in tests
-     * @return {string}
-     */
-    getPlayerPageHref() {
-      if (this.debug) {
-        const url = new URL(window.location.href);
-        if (url.hostname === "www.youtube.com") return window.location.href;
-        if (url.searchParams.has("v")) {
-          const base = new URL("/watch", "https://youtube.com");
-          base.searchParams.set("v", url.searchParams.get("v") || "");
-          return base.toString();
-        }
-        return "https://youtube.com/watch?v=123";
-      }
-      return window.location.href;
-    }
-    getLargeThumbnailSrc(videoId) {
-      const url = new URL(`/vi/${videoId}/maxresdefault.jpg`, "https://i.ytimg.com");
-      return url.href;
-    }
-    setHref(href) {
-      window.location.href = href;
-    }
-    hasOneTimeOverride() {
-      try {
-        if (window.location.hash !== "#ddg-play") return false;
-        if (typeof document.referrer !== "string") return false;
-        if (document.referrer.length === 0) return false;
-        const { hostname } = new URL(document.referrer);
-        const isAllowed = this.allowedProxyOrigins.includes(hostname);
-        return isAllowed;
-      } catch (e) {
-        console.error(e);
-      }
-      return false;
-    }
-    isIntegrationMode() {
-      return this.debug === true && this.injectName === "integration";
-    }
-    isTestMode() {
-      return this.debug === true;
-    }
-    get opensVideoOverlayLinksViaMessage() {
-      return this.platform.name !== "windows";
-    }
-    /**
-     * @return {boolean}
-     */
-    get isMobile() {
-      return this.platform.name === "ios" || this.platform.name === "android";
-    }
-    /**
-     * @return {boolean}
-     */
-    get isDesktop() {
-      return !this.isMobile;
-    }
-    /**
-     * @return {'desktop' | 'mobile'}
-     */
-    get layout() {
-      if (this.platform.name === "ios" || this.platform.name === "android") {
-        return "mobile";
-      }
-      return "desktop";
-    }
-  };
 
   // src/features/duck-player.js
   var DuckPlayerFeature = class extends ContentFeature {
