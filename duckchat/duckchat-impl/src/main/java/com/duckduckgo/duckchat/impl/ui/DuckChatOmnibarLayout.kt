@@ -50,10 +50,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     private var originalStartMargin: Int = 0
 
     var onFire: (() -> Unit)? = null
-    var onSend: ((String) -> Unit)? = null
     var onNewChat: (() -> Unit)? = null
     var onStop: (() -> Unit)? = null
     var onBack: (() -> Unit)? = null
+    var onSearchSent: ((String) -> Unit)? = null
+    var onDuckChatSent: ((String) -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
@@ -110,7 +111,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     private fun submitMessage() {
         val msg = duckChatInput.text.toString().trim()
         if (msg.isNotEmpty()) {
-            onSend?.invoke(msg)
+            if (duckChatTabLayout.selectedTabPosition == 0) {
+                onSearchSent?.invoke(msg)
+            } else {
+                onDuckChatSent?.invoke(msg)
+            }
             duckChatInput.text.clear()
             duckChatInput.clearFocus()
             duckChatFireButton.isVisible = true
