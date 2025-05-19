@@ -50,6 +50,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_SETTINGS_DISPLAYED("m_aichat_settings_displayed"),
     DUCK_CHAT_SEARCHBAR_BUTTON_OPEN("aichat_searchbar_button_open"),
     DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN("aichat_experiment_searchbar_button_open"),
+    DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED("aichat_search_assist_settings_button_clicked"),
 }
 
 @ContributesMultibinding(AppScope::class)
