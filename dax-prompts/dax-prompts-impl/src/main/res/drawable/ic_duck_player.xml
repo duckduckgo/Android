@@ -20,6 +20,6 @@
     android:viewportWidth="20"
     android:viewportHeight="20">
     <path
-        android:fillColor="#ffffff"
+        android:fillColor="?attr/daxColorButtonPrimaryText"
         android:pathData="M15.983,8.699C16.987,9.275 16.987,10.725 15.983,11.301L5.247,17.461C4.247,18.035 3,17.313 3,16.16L3,3.84C3,2.687 4.247,1.965 5.247,2.539L15.983,8.699Z" />
 </vector>

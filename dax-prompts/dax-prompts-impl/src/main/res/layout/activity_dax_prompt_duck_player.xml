@@ -37,6 +37,7 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_2"
         android:text="@string/dax_prompt_duck_player_close"
+        android:textColor="?attr/daxColorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body2_bold" />
@@ -55,7 +56,7 @@
             android:id="@+id/orangeShape"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="116dp"
+            android:layout_marginTop="93dp"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,10 +66,10 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/daxShape"
-            android:layout_width="280dp"
-            android:layout_height="360dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="-40dp"
+            android:layout_width="316dp"
+            android:layout_height="408dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="-60dp"
             app:layout_constraintBottom_toTopOf="@id/daxPromptDuckPlayerMessageContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/dax" />
@@ -82,7 +83,7 @@
             android:layout_marginBottom="76dp"
             android:background="@drawable/background_dax_message"
             android:orientation="vertical"
-            android:padding="@dimen/keyline_5"
+            android:padding="@dimen/keyline_6"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -91,7 +92,6 @@
                 android:id="@+id/daxPromptDuckPlayerTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/dax_prompt_duck_player_message_title"
                 app:typography="title" />
 
@@ -99,7 +99,7 @@
                 android:id="@+id/daxPromptDuckPlayerDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/dax_prompt_duck_player_message_description"
                 app:typography="body2" />
 
@@ -107,7 +107,7 @@
                 android:id="@+id/daxPromptDuckPlayerPrimaryButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/dax_prompt_duck_player_message_primary_button"
                 app:daxButtonSize="large"
                 app:icon="@drawable/ic_duck_player"

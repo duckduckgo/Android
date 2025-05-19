@@ -38,6 +38,7 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_2"
         android:text="@string/dax_prompt_browser_comparison_close"
+        android:textColor="?attr/daxColorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body2_bold" />
