@@ -139,9 +139,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
-    private val toolbar
-        get() = binding.includeToolbar.toolbar
-
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +148,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
         }
 
         setContentView(binding.root)
-        setupToolbar(toolbar)
         configureUI()
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
@@ -259,6 +255,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
 
     private fun configureUI() {
         binding.duckChatOmnibar.isVisible = experimentDataStore.isDuckAIPoCEnabled.value
+        binding.duckChatOmnibar.selectTab(1)
 
         binding.duckChatOmnibar.apply {
             onFire = {
@@ -319,6 +316,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                     ),
                 )
             }
+            onBack = { onBackPressed() }
         }
     }
 
