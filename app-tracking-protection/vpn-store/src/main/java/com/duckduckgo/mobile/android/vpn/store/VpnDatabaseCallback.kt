@@ -17,44 +17,61 @@
 package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.*
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import logcat.logcat
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class VpnDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
     private val dispatcherProvider: DispatcherProvider,
+    private val coroutineScope: CoroutineScope,
+    private val mutex: Mutex,
 ) : RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
-        ioThread {
-            prepopulateAppTrackerBlockingList()
-            prepopulateAppTrackerExclusionList()
-            prepopulateAppTrackerExceptionRules()
+        coroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                    logcat { "VPN-db onCreate: pre-populating db" }
+                    // only pre-populate when there's no blocklist
+                    prepopulateAppTrackerBlockingList()
+                    prepopulateAppTrackerExclusionList()
+                    prepopulateAppTrackerExceptionRules()
+                } else {
+                    logcat { "VPN-db onCreate: SKIP pre-populating db" }
+                }
+            }
         }
     }
 
     override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateAppTrackerBlockingList()
-            prepopulateAppTrackerExclusionList()
-            prepopulateAppTrackerExceptionRules()
+        coroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                    logcat { "VPN-db onDestructiveMigration: pre-populating db" }
+                    // only pre-populate when there's no blocklist
+                    prepopulateAppTrackerBlockingList()
+                    prepopulateAppTrackerExclusionList()
+                    prepopulateAppTrackerExceptionRules()
+                }
+            }
         }
     }
 
-    @VisibleForTesting
-    internal fun prepopulateAppTrackerBlockingList() {
+    private fun prepopulateAppTrackerBlockingList() {
         context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
             .use { it.readText() }
             .also {
@@ -99,11 +116,5 @@ internal class VpnDatabaseCallback(
         val moshi = Moshi.Builder().build()
         val adapter: JsonAdapter<JsonAppTrackerExceptionRules> = moshi.adapter(JsonAppTrackerExceptionRules::class.java)
         return adapter.fromJson(json)?.rules.orEmpty()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun ioThread(f: () -> Unit) {
-        // At most 1 thread will be doing IO
-        dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
     }
 }

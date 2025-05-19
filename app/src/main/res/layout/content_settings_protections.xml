@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:indicatorStatus="on"
-        app:leadingIcon="@drawable/ic_shield_check_color_24"
+        app:leadingIcon="@drawable/ic_shield_color_24"
         app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem

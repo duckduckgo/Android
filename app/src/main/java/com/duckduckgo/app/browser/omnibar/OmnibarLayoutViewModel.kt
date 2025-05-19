@@ -708,7 +708,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (customTabMode is CustomTab) {
             _viewState.update {
                 it.copy(
-                    viewMode = customTabMode.copy(title = decoration.title),
+                    viewMode = customTabMode.copy(
+                        title = decoration.title,
+                        domain = decoration.domain,
+                        showDuckPlayerIcon = decoration.showDuckPlayerIcon,
+                    ),
                 )
             }
         }
@@ -725,12 +729,12 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
         val viewMode = viewState.value.viewMode
-        if (viewMode is NewTab) {
-            _viewState.update {
-                it.copy(
-                    showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
-                )
-            }
-        }
+        // if (viewMode is NewTab) {
+        //     _viewState.update {
+        //         it.copy(
+        //             showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
+        //         )
+        //     }
+        // }
     }
 }

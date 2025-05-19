@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -32,6 +33,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Provider
+import javax.inject.Qualifier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.sync.Mutex
 
 @Module
 @ContributesTo(AppScope::class)
@@ -47,8 +51,18 @@ object VpnAppModule {
     fun provideVpnDatabaseCallbackProvider(
         context: Context,
         vpnDatabase: Provider<VpnDatabase>,
+        dispatcherProvider: DispatcherProvider,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppTpBlocklistUpdateMutex mutex: Mutex,
     ): VpnDatabaseCallbackProvider {
-        return VpnDatabaseCallbackProvider(context, vpnDatabase)
+        return VpnDatabaseCallbackProvider(context, vpnDatabase, dispatcherProvider, coroutineScope, mutex)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @AppTpBlocklistUpdateMutex
+    fun providesAppTpBlocklistUpdateMutex(): Mutex {
+        return Mutex()
     }
 
     /**
@@ -91,3 +105,7 @@ object VpnAppModule {
         return RealAppTrackerBlockingStatsRepository(vpnDatabase, dispatchers)
     }
 }
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+internal annotation class AppTpBlocklistUpdateMutex

@@ -62,7 +62,13 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), breakageHandler, DuckPlayerHandler(), DuckChatHandler())
+    private val handlers: List<JsMessageHandler> = listOf(
+        ContentScopeHandler(),
+        breakageHandler,
+        DuckPlayerHandler(),
+        DuckChatHandler(),
+        SubscriptionsHandler(),
+    )
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
@@ -164,6 +170,22 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             "openAIChat",
             "closeAIChat",
             "openAIChatSettings",
+        )
+    }
+
+    inner class SubscriptionsHandler : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
+        }
+
+        override val allowedDomains: List<String> = listOf(
+            AppUrl.Url.HOST,
+        )
+
+        override val featureName: String = "subscriptions"
+        override val methods: List<String> = listOf(
+            "handshake",
+            "subscriptionDetails",
         )
     }
 }

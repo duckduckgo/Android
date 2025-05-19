@@ -186,8 +186,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="20dp"
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginStart="16dp"
                                 android:visibility="gone">
 
                                 <include layout="@layout/cookie_scene_1" />
@@ -198,9 +197,9 @@
                         <View
                             android:id="@+id/cookieDummyView"
                             android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
-                            android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+                            android:layout_height="?attr/cookiesAnimationHeight"
                             android:layout_gravity="start|center_vertical"
-                            android:layout_marginStart="2dp"
+                            android:layout_marginStart="@dimen/keyline_1"
                             android:alpha="0"
                             android:background="@drawable/cookies_dummy_background"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -330,7 +329,7 @@
             </androidx.appcompat.widget.Toolbar>
 
             <FrameLayout
-                android:layout_width="76dp"
+                android:layout_width="74dp"
                 android:layout_height="match_parent"
                 android:paddingTop="@dimen/experimentalOmnibarCardMarginTop"
                 android:paddingBottom="@dimen/experimentalOmnibarCardMarginBottom"
@@ -442,6 +441,7 @@
             android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:showShadows="false"
             android:layout_gravity="bottom" />
 
     </LinearLayout>
