@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Rutenettvisning</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt; de siste 7 dagene</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt; de siste 7 dagene</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sporere blokkert &lt;/b&gt;</string>
     <string name="inTheLast7Days">de siste 7 dagene</string>
 
@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privat fane</item>
-        <item quantity="other">%1$d private faner</item>
+        <item quantity="one">%1$d fane</item>
+        <item quantity="other">%1$d faner</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi det er mulig at den distribuerer skadelig programvare som er laget for å kompromittere enheten din eller stjele personopplysningene dine.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette nettstedet utgir seg muligens for å være et legitimt nettsted for å lure deg til å oppgi personopplysninger, som passord eller kredittkortnumre.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi den kan prøve å lure eller manipulere deg til å overføre penger, kjøpe falske varer eller installere skadelig programvare under falske forutsetninger.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Forlat dette nettstedet</string>
     <string name="maliciousSiteAdvancedCTA">Avansert</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener at dette nettstedet er trygt, kan du <a href=\"\">rapportere en feil</a>. Du kan besøke nettstedet på egen risiko.]]></string>

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.feature.toggles.api
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
@@ -109,6 +108,12 @@ class FeatureToggles private constructor(
             } catch (t: Throwable) {
                 throw IllegalStateException("Feature toggle methods shall have annotated default value")
             }
+            val resolvedDefaultValue = when (val value = defaultValue.toValue()) {
+                is Boolean -> value
+                is String -> value.lowercase() == flavorNameProvider.invoke().lowercase()
+                else -> throw IllegalStateException("Unsupported default value type")
+            }
+
             val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
                 method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
             }.getOrNull() != null
@@ -119,7 +124,7 @@ class FeatureToggles private constructor(
             return ToggleImpl(
                 store = store,
                 key = getToggleNameForMethod(method),
-                defaultValue = defaultValue,
+                defaultValue = resolvedDefaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
                 isExperiment = isExperiment,
                 appVersionProvider = appVersionProvider,
@@ -305,8 +310,23 @@ interface Toggle {
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(
-        val defaultValue: Boolean,
+        val defaultValue: DefaultFeatureValue,
     )
+
+    enum class DefaultFeatureValue {
+        FALSE,
+        TRUE,
+        INTERNAL,
+        ;
+
+        fun toValue(): Any {
+            return when (this) {
+                FALSE -> false
+                TRUE -> true
+                INTERNAL -> "internal"
+            }
+        }
+    }
 
     /**
      * This annotation is optional.
@@ -368,12 +388,21 @@ internal class ToggleImpl constructor(
         val cohortDefaultValue = false
 
         return store.get(key)?.let { state ->
-            // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
-            val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
-                state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {
-                    it.assignedCohort?.let { cohort ->
-                        callback?.onCohortAssigned(this.featureName().name, cohort.name, cohort.enrollmentDateET!!)
+            // appVersion should be above or equal to minSupportedVersion for the cohort to be assigned
+            // we do not assign a cohort if the feature flag is not enabled remotely
+            val updatedState = if (
+                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0) &&
+                state.remoteEnableState == true
+            ) {
+                // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
+                if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
+                    state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {
+                        it.assignedCohort?.let { cohort ->
+                            callback?.onCohortAssigned(this.featureName().name, cohort.name, cohort.enrollmentDateET!!)
+                        }
                     }
+                } else {
+                    state
                 }
             } else {
                 state

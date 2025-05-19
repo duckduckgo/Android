@@ -48,7 +48,7 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_find_search_24" />
+            android:src="@drawable/ic_find_search_small_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/omnibarTextInputMockup"
@@ -70,7 +70,7 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_ai_chat_outline_24" />
+            android:src="@drawable/ic_ai_chat_24" />
 
     </LinearLayout>
 

@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.models
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 
 data class Match(
     val hostname: String,
@@ -59,6 +60,13 @@ sealed class FilterSetWithRevision(
         override val revision: Int,
         override val replace: Boolean,
     ) : FilterSetWithRevision(insert, delete, revision, replace, MALWARE)
+
+    data class ScamFilterSetWithRevision(
+        override val insert: Set<Filter>,
+        override val delete: Set<Filter>,
+        override val revision: Int,
+        override val replace: Boolean,
+    ) : FilterSetWithRevision(insert, delete, revision, replace, SCAM)
 }
 
 sealed class HashPrefixesWithRevision(
@@ -82,6 +90,13 @@ sealed class HashPrefixesWithRevision(
         override val revision: Int,
         override val replace: Boolean,
     ) : HashPrefixesWithRevision(insert, delete, revision, replace, MALWARE)
+
+    data class ScamHashPrefixesWithRevision(
+        override val insert: Set<String>,
+        override val delete: Set<String>,
+        override val revision: Int,
+        override val replace: Boolean,
+    ) : HashPrefixesWithRevision(insert, delete, revision, replace, SCAM)
 }
 
 enum class Type {

@@ -164,7 +164,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
-            isVisualExperimentEnabled = visualDesignExperimentDataStore.experimentState.value.isEnabled,
+            isVisualExperimentEnabled = visualDesignExperimentDataStore.isExperimentEnabled.value,
             itemClickListener = this,
             webViewPreviewPersister = webViewPreviewPersister,
             lifecycleOwner = this,
@@ -520,7 +520,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showGridLayoutButton() {
         layoutTypeMenuItem?.let { viewModeMenuItem ->
-            viewModeMenuItem.setIcon(R.drawable.ic_grid_view_24)
+            viewModeMenuItem.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_grid_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherGridViewMenu)
             viewModeMenuItem.setVisible(true)
         }
@@ -528,7 +528,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showListLayoutButton() {
         layoutTypeMenuItem?.let { viewModeMenuItem ->
-            viewModeMenuItem.setIcon(R.drawable.ic_list_view_24)
+            viewModeMenuItem.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_list_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherListViewMenu)
             viewModeMenuItem.setVisible(true)
         }
@@ -671,7 +671,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
+        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu.value
 
         return super.onPrepareOptionsMenu(menu)
     }

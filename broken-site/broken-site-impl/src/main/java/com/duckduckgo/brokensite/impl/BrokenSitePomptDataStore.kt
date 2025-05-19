@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 
 interface BrokenSitePromptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
@@ -80,25 +79,26 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     }
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    private val maxDismissStreak: Flow<Int> = store.data
-        .mapNotNull { prefs ->
+    private val maxDismissStreak: Flow<Int?> = store.data
+        .map { prefs ->
             prefs[MAX_DISMISS_STREAK]
         }
         .distinctUntilChanged()
 
-    private val dismissStreakResetDays: Flow<Int> = store.data
-        .mapNotNull { prefs ->
+    private val dismissStreakResetDays: Flow<Int?> = store.data
+        .map { prefs ->
             prefs[DISMISS_STREAK_RESET_DAYS]
         }
         .distinctUntilChanged()
 
-    private val coolDownDays: Flow<Long> = store.data
-        .mapNotNull { prefs ->
+    private val coolDownDays: Flow<Long?> = store.data
+        .map { prefs ->
             prefs[COOL_DOWN_DAYS]
         }
+        .distinctUntilChanged()
 
-    private val nextShownDate: Flow<String> = store.data
-        .mapNotNull { prefs ->
+    private val nextShownDate: Flow<String?> = store.data
+        .map { prefs ->
             prefs[NEXT_SHOWN_DATE]
         }
         .distinctUntilChanged()

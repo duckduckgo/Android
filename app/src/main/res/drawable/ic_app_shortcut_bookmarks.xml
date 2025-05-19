@@ -1,30 +1,15 @@
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M12,12m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"
-      android:fillColor="#F5F5F5"
-      android:fillType="evenOdd"/>
+      android:pathData="M12,0L12,0A12,12 0,0 1,24 12L24,12A12,12 0,0 1,12 24L12,24A12,12 0,0 1,0 12L0,12A12,12 0,0 1,12 0z"
+      android:fillColor="#F0F0F0"/>
   <path
-      android:pathData="M15.75,5.25h-7.5c-0.825,0 -1.5,0.675 -1.5,1.5v12L12,16.5l5.25,2.25v-12c0,-0.825 -0.675,-1.5 -1.5,-1.5z"
-      android:fillColor="#DE5833"
-      android:fillType="nonZero"/>
+      android:pathData="M8,8.875C8,7.839 8.839,7 9.875,7H11.875C12.609,7 13.245,7.422 13.552,8.036C13.666,8.264 13.475,8.5 13.22,8.5C13.05,8.5 12.904,8.388 12.808,8.247C12.606,7.947 12.264,7.75 11.875,7.75H9.875C9.254,7.75 8.75,8.254 8.75,8.875V13.497C8.75,13.685 8.848,13.836 8.985,13.922C8.992,13.926 9,13.93 9.007,13.935C9.21,14.061 9.5,14.24 9.5,14.472C9.5,14.619 9.396,14.75 9.249,14.75C8.603,14.746 8,14.235 8,13.497V8.875Z"
+      android:fillColor="#DE5833"/>
+  <path
+      android:pathData="M10.25,11.125C10.25,10.09 11.09,9.25 12.125,9.25H14.125C15.16,9.25 16,10.09 16,11.125V15.747C16,16.776 14.826,17.365 14.002,16.748L13.424,16.317C13.247,16.184 13.003,16.184 12.826,16.317L12.248,16.748C11.424,17.365 10.25,16.776 10.25,15.747V11.125Z"
+      android:fillColor="#DE5833"/>
 </vector>

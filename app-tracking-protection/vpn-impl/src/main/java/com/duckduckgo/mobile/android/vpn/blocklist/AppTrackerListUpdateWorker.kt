@@ -28,11 +28,15 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.di.AppTpBlocklistUpdateMutex
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
@@ -49,9 +53,28 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    @AppTpBlocklistUpdateMutex
+    lateinit var mutex: Mutex
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
+
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
-            val updateBlocklistResult = updateTrackerBlocklist()
+            val updateBlocklistResult = mutex.withLock {
+                val res = updateTrackerBlocklist()
+
+                // Report current blocklist status after update
+                deviceShieldPixels.reportBlocklistStats(
+                    mapOf(
+                        "blocklist_etag" to vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag.toString(),
+                        "blocklist_size" to vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlockListSize().toString(),
+                    ),
+                )
+
+                res
+            }
 
             val success = Result.success()
             if (updateBlocklistResult != success) {
@@ -78,7 +101,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                     return Result.success()
                 }
 
-                logcat { "Updating the app tracker blocklist, eTag: ${blocklist.etag.value}" }
+                logcat { "Updating the app tracker blocklist, previous/new eTag: $currentEtag / $updatedEtag" }
 
                 vpnDatabase
                     .vpnAppTrackerBlockingDao()

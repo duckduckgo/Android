@@ -52,13 +52,13 @@
 
     <ImageView
         android:id="@+id/check1"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="@id/feature1"
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/status_check" />
+        app:srcCompat="@drawable/ic_check_green_24" />
 
     <ImageView
         android:id="@+id/cross1"
@@ -68,7 +68,7 @@
         app:layout_constraintEnd_toEndOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="@id/chromeLogo"
         app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/cross_24" />
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <ImageView
         android:id="@+id/featureIcon1"
@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/ic_comparison_chart_search" />
+        app:srcCompat="@drawable/ic_find_search_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature1"
@@ -102,13 +102,13 @@
 
     <ImageView
         android:id="@+id/check2"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="@id/feature2"
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/status_check" />
+        app:srcCompat="@drawable/ic_check_green_24" />
 
     <ImageView
         android:id="@+id/cross2"
@@ -118,7 +118,7 @@
         app:layout_constraintEnd_toEndOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="@id/chromeLogo"
         app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/cross_24" />
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <ImageView
         android:id="@+id/featureIcon2"
@@ -129,7 +129,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/ic_comparison_chart_shield" />
+        app:srcCompat="@drawable/ic_shield_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature2"
@@ -152,13 +152,13 @@
 
     <ImageView
         android:id="@+id/check3"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="@id/feature3"
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/status_check" />
+        app:srcCompat="@drawable/ic_check_green_24" />
 
     <ImageView
         android:id="@+id/cross3"
@@ -168,7 +168,7 @@
         app:layout_constraintEnd_toEndOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="@id/chromeLogo"
         app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/cross_24" />
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <ImageView
         android:id="@+id/featureIcon3"
@@ -179,7 +179,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/ic_comparison_chart_cookie" />
+        app:srcCompat="@drawable/ic_cookie_blocked_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature3"
@@ -202,13 +202,13 @@
 
     <ImageView
         android:id="@+id/check4"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="@id/feature4"
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/status_check" />
+        app:srcCompat="@drawable/ic_check_green_24" />
 
     <ImageView
         android:id="@+id/cross4"
@@ -218,7 +218,7 @@
         app:layout_constraintEnd_toEndOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="@id/chromeLogo"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/cross_24" />
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <ImageView
         android:id="@+id/featureIcon4"
@@ -229,7 +229,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_comparison_chart_ads" />
+        app:srcCompat="@drawable/ic_ads_blocked_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature4"
@@ -252,13 +252,13 @@
 
     <ImageView
         android:id="@+id/check5"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="@id/feature5"
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/status_check" />
+        app:srcCompat="@drawable/ic_check_green_24" />
 
     <ImageView
         android:id="@+id/cross5"
@@ -268,7 +268,7 @@
         app:layout_constraintEnd_toEndOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="@id/chromeLogo"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/cross_24" />
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <ImageView
         android:id="@+id/featureIcon5"
@@ -279,7 +279,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/ic_comparison_chart_fire" />
+        app:srcCompat="@drawable/ic_fire_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature5"

@@ -40,22 +40,35 @@ class DuckChatSettingsViewModel @Inject constructor(
     val commands = commandChannel.receiveAsFlow()
 
     data class ViewState(
+        val isDuckChatUserEnabled: Boolean = false,
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
+        val shouldShowBrowserMenuToggle: Boolean = false,
+        val shouldShowAddressBarToggle: Boolean = false,
     )
 
     val viewState = combine(
+        duckChat.observeEnableDuckChatUserSetting(),
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
-    ) { showInBrowserMenu, showInAddressBar ->
+    ) { isDuckChatUserEnabled, showInBrowserMenu, showInAddressBar ->
         ViewState(
+            isDuckChatUserEnabled = isDuckChatUserEnabled,
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
+            shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
+            shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
         data class OpenLearnMore(val learnMoreLink: String) : Command()
+    }
+
+    fun onDuckChatUserEnabledToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setEnableDuckChatUserSetting(checked)
+        }
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
@@ -74,9 +87,5 @@ class DuckChatSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
         }
-    }
-
-    fun isAddressBarEntryPointEnabled(): Boolean {
-        return duckChat.isAddressBarEntryPointEnabled()
     }
 }

@@ -150,6 +150,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -186,11 +187,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.isFullScreen
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -204,9 +202,9 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -235,10 +233,11 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -250,6 +249,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.isFullScreen
+import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -544,7 +545,7 @@ class BrowserTabFragment :
     lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
     @Inject
-    lateinit var appPersonalityFeature: AppPersonalityFeature
+    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -623,6 +624,7 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+    private var isWebViewGestureInProgress = false
 
     private val tabSwitcherActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -677,8 +679,7 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    if (appPersonalityFeature.self().isEnabled() &&
-                        !appPersonalityFeature.variant1().isEnabled() &&
+                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         if (isCosmetic) {
@@ -891,16 +892,28 @@ class BrowserTabFragment :
         Timber.d("Resuming webview: $tabId")
         webView?.let { webView ->
             if (webView.isShown) {
+                webView.ensureVisible()
                 webView.onResume()
             } else if (swipingTabsFeature.isEnabled) {
-                // Sometimes the tab is brought back from the background but the WebView is not visible yet due to
-                // ViewPager page change delay; this fixes an issue when a tab was blank.
+                // Sometimes a tab is brought back from the background but the WebView is not shown yet due to
+                // ViewPager page change delay; this makes sure the WebView is resumed when it is shown.
                 webView.post {
                     if (webView.isShown) {
+                        webView.ensureVisible()
                         webView.onResume()
                     }
                 }
+            } else {
+                Timber.d("WebView is not shown, not resuming")
             }
+        }
+    }
+
+    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    private fun DuckDuckGoWebView.ensureVisible() = postDelayed(100) {
+        if (swipingTabsFeature.isEnabled) {
+            scrollBy(0, 1)
+            scrollBy(0, -1)
         }
     }
 
@@ -965,11 +978,15 @@ class BrowserTabFragment :
 
     @SuppressLint("ClickableViewAccessibility")
     private fun disableSwipingOutsideTheOmnibar() {
-        newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
+        newBrowserTab.newTabLayout.setOnTouchListener { v, _ ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            true
+        }
+        binding.autoCompleteSuggestionsList.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
-        binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
+        binding.includeErrorView.root.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
@@ -1086,6 +1103,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onOmnibarPrivacyShieldButtonPressed()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1117,7 +1135,7 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isExperimentEnabled.value) {
             // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
@@ -1261,9 +1279,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (appPersonalityFeature.self().isEnabled() &&
-                !appPersonalityFeature.variant1().isEnabled()
-            ) {
+            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon
@@ -1995,6 +2011,7 @@ class BrowserTabFragment :
                 it.isMainFrame,
                 it.onMaliciousWarningShown,
             )
+
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.canGoBack)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
@@ -2050,6 +2067,7 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
+
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
@@ -2635,10 +2653,17 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
-            if (omnibar.isOutlineShown()) {
+        newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+
+            // Check if it can scroll up
+            val canScrollUp = v.canScrollVertically(-1)
+            val canScrollDown = v.canScrollVertically(1)
+            val topOfPage = scrollY == 0
+
+            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 
@@ -2801,6 +2826,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
+        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -2853,11 +2879,29 @@ class BrowserTabFragment :
             }
 
             it.setOnTouchListener { webView, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isWebViewGestureInProgress = true
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isWebViewGestureInProgress = false
+                    }
+                }
+
                 if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
                 false
+            }
+            it.setOnScrollChangeListener { v, _, _, _, _ ->
+                if (!v.canScrollVertically(-1) && !isWebViewGestureInProgress) {
+                    // Automatically expand the omnibar when the web view is at the top, but only if the user isn't actively scrolling.
+                    // Expanding the omnibar changes the web view's offset, which could otherwise be misinterpreted by the framework
+                    // as a fling gesture in the opposite direction and cause unintended content shifting.
+                    omnibar.setExpanded(true)
+                }
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
@@ -3138,9 +3182,9 @@ class BrowserTabFragment :
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let {
-                        val screen = AutofillSettingsScreenDirectlyViewCredentialsParams(
+                        val screen = AutofillPasswordsManagementViewCredential(
                             loginCredentials = loginCredentials,
-                            source = AutofillSettingsLaunchSource.BrowserSnackbar,
+                            source = AutofillScreenLaunchSource.BrowserSnackbar,
                         )
                         globalActivityStarter.start(it, screen)
                     }
@@ -3151,9 +3195,9 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen(privacyProtectionEnabled: Boolean) {
-        val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
+        val screen = AutofillPasswordsManagementScreenWithSuggestions(
             currentUrl = webView?.url,
-            source = AutofillSettingsLaunchSource.BrowserOverflow,
+            source = AutofillScreenLaunchSource.BrowserOverflow,
             privacyProtectionEnabled = privacyProtectionEnabled,
         )
         globalActivityStarter.start(requireContext(), screen)
@@ -4361,7 +4405,7 @@ class BrowserTabFragment :
         private fun goFullScreen() {
             omnibar.hide()
             binding.webViewFullScreenContainer.show()
-            activity?.toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
@@ -4369,7 +4413,7 @@ class BrowserTabFragment :
             omnibar.show()
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
-            activity?.toggleFullScreen()
+            (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
     }

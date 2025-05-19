@@ -70,8 +70,8 @@ interface MaliciousSiteDao {
     @Query("DELETE FROM revisions")
     suspend fun deleteRevisions()
 
-    @Query("SELECT EXISTS(SELECT 1 FROM hash_prefixes WHERE hashPrefix = :prefix LIMIT 1)")
-    suspend fun hashPrefixExists(prefix: String): Boolean
+    @Query("SELECT * FROM hash_prefixes WHERE hashPrefix = :prefix LIMIT 1")
+    suspend fun getHashPrefix(prefix: String): HashPrefixEntity?
 
     @Query("SELECT * FROM filters WHERE hash = :hash LIMIT 1")
     suspend fun getFilter(hash: String): FilterEntity?
@@ -161,19 +161,4 @@ interface MaliciousSiteDao {
     private suspend fun getLatestRevision(feed: Feed, type: Type): Int {
         return getLatestRevision(feed = feed.name, type = type.name)?.revision ?: 0
     }
-
-    @Transaction
-    fun updateAllExceptions(exceptions: List<FeatureExceptionEntity>) {
-        deleteAllExceptions()
-        insertAllExceptions(exceptions)
-    }
-
-    @Query("DELETE FROM featureExceptions")
-    fun deleteAllExceptions() {}
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllExceptions(exceptions: List<FeatureExceptionEntity>)
-
-    @Query("SELECT * FROM featureExceptions")
-    fun getExceptions(): List<FeatureExceptionEntity>
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -272,15 +273,15 @@ abstract class TriggerTestScope private constructor()
     featureName = "appTrackerProtection",
 )
 interface TestBlockListFeature {
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsNextExperimentTest(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsNextExperimentAnotherTest(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun nonMatchingFeatureName(): Toggle
 }

@@ -201,7 +201,6 @@ fladle {
     configs {
         privacyTests {
             async.set(false)
-            variant.set("playDebug")
             flankVersion.set("21.+")
             useOrchestrator.set(true)
             environmentVariables.set([
@@ -211,7 +210,7 @@ fladle {
                     "annotation com.duckduckgo.espresso.PrivacyTest"
             ])
             devices.set([
-                    ["model": "redfin", "version": "30"]
+                    ["model": "MediumPhone.arm", "version": "34"],
             ])
             localResultsDir.set("fladleResults")
             flakyTestAttempts.set(2)
@@ -401,6 +400,9 @@ dependencies {
     implementation project(':survey-impl')
 
     implementation project(':breakage-reporting-impl')
+
+    implementation project(':dax-prompts-api')
+    implementation project(':dax-prompts-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

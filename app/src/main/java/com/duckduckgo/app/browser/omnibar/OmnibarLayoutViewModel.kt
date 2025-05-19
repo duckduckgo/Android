@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -52,11 +53,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -83,29 +84,36 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
     private val pixel: Pixel,
-    private val duckChat: DuckChat,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
-    visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
-    private val appPersonalityFeature: AppPersonalityFeature,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val duckChat: DuckChat,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow(ViewState())
+    private val _viewState = MutableStateFlow(
+        ViewState(
+            showChatMenu = duckChat.showInAddressBar.value,
+        ),
+    )
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentDataStore.navigationBarState,
-    ) { state, tabs, highlightOverflowMenu, navigationBarState ->
+        visualDesignExperimentDataStore.isExperimentEnabled,
+        duckChat.showInAddressBar,
+    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isNavigationBarEnabled = navigationBarState.isEnabled,
+            isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
+            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
+                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || isVisualDesignExperimentEnabled),
         )
-    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -136,10 +144,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val isNavigationBarEnabled: Boolean = false,
-        val experimentalIconsEnabled: Boolean = false,
+        val isVisualDesignExperimentEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
+        val showShadows: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
@@ -149,6 +157,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelAnimations : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object StartExperimentVariant1Animation : Command()
         data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
@@ -190,7 +199,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    showChatMenu = !showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -224,7 +232,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = true,
                     showFireIcon = true,
                     showBrowserMenu = true,
-                    showChatMenu = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -321,7 +328,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
-                            showChatMenu = false,
+                            showShadows = true,
                         )
                     }
                 }
@@ -350,6 +357,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
+                            showShadows = false,
                         )
                     }
                 }
@@ -384,7 +392,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showChatMenu = false,
             )
         }
     }
@@ -402,11 +409,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         }
-
-        pixel.fire(
-            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
-        )
+        if (!_viewState.value.isVisualDesignExperimentEnabled) {
+            pixel.fire(
+                AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
+            )
+        }
     }
 
     fun onPrivacyShieldButtonPressed() {
@@ -464,7 +472,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showChatMenu = !showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
@@ -578,6 +585,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    fun onBackButtonPressed() {
+        Timber.d("Omnibar: onBackButtonPressed")
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLOSED,
+            AppPixelName.ADDRESS_BAR_SERP_CLOSED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_CLOSED,
+        )
+    }
+
     fun onEnterKeyPressed() {
         Timber.d("Omnibar: onEnterKeyPressed")
         firePixelBasedOnCurrentUrl(
@@ -596,9 +612,9 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             is LaunchTrackersAnimation -> {
-                Timber.d("Omnibar: LaunchTrackersAnimation")
                 if (!decoration.entities.isNullOrEmpty()) {
                     val hasFocus = _viewState.value.hasFocus
+                    val visualDesignExperiment = viewState.value.isVisualDesignExperimentEnabled
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
@@ -607,11 +623,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             when {
-                                appPersonalityFeature.self().isEnabled() && appPersonalityFeature.variant1().isEnabled() -> {
+                                visualDesignExperiment -> {
+                                    command.send(
+                                        Command.StartVisualDesignTrackersAnimation(decoration.entities),
+                                    )
+                                }
+
+                                senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
                                     command.send(Command.StartExperimentVariant1Animation)
                                 }
 
-                                appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled() -> {
+                                senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
                                     command.send(
                                         Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
                                     )
@@ -686,9 +708,33 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (customTabMode is CustomTab) {
             _viewState.update {
                 it.copy(
-                    viewMode = customTabMode.copy(title = decoration.title),
+                    viewMode = customTabMode.copy(
+                        title = decoration.title,
+                        domain = decoration.domain,
+                        showDuckPlayerIcon = decoration.showDuckPlayerIcon,
+                    ),
                 )
             }
         }
+    }
+
+    fun onDuckChatButtonPressed() {
+        val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
+        if (experimentEnabled) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
+        } else {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+        }
+    }
+
+    fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
+        val viewMode = viewState.value.viewMode
+        // if (viewMode is NewTab) {
+        //     _viewState.update {
+        //         it.copy(
+        //             showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
+        //         )
+        //     }
+        // }
     }
 }

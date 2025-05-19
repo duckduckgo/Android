@@ -31,10 +31,10 @@
 
     <!-- Trackers Blocking - O-10 -->
     <string name="trackersBlockingExperimentalUISettings">Trackers Blocking design updates from O-10</string>
-    <string name="trackersBlockingVariant1ExperimentalUITitle">Enable Variant 1</string>
+    <string name="trackersBlockingVariant1ExperimentalUITitle">Enable Modified Control</string>
     <string name="trackersBlockingVariant1ExperimentalUIMessage">Current experience with gray logos animation removed.</string>
-    <string name="trackersBlockingVariant2ExperimentalUITitle">Enable Variant 2</string>
+    <string name="trackersBlockingVariant2ExperimentalUITitle">Enable Variant 1</string>
     <string name="trackersBlockingVariant2ExperimentalUIMessage">Persistent Green Shield + X Trackers Blocked animation</string>
-    <string name="trackersBlockingVariant3ExperimentalUITitle">Enable Variant 3</string>
+    <string name="trackersBlockingVariant3ExperimentalUITitle">Enable Variant 2</string>
     <string name="trackersBlockingVariant3ExperimentalUIMessage">Persistent Green Shield + X Trackers Blocked animation + Tab Switcher Tile animation</string>
 </resources>

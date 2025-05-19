@@ -23,14 +23,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
-        AutofillExceptionEntity::class,
         CredentialsSyncMetadataEntity::class,
     ],
 )
 abstract class AutofillDatabase : RoomDatabase() {
-    abstract fun autofillDao(): AutofillDao
     abstract fun credentialsSyncDao(): CredentialsSyncMetadataDao
 }
 
@@ -46,4 +44,10 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE `autofill_exceptions`")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)

@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Puedes importar contraseñas guardadas de otro navegador a DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importar contraseñas</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sincronizar contraseñas de escritorio</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Cómo importar contraseñas</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Cómo sincronizar las contraseñas de escritorio</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importa contraseñas en la versión de escritorio del navegador DuckDuckGo y, a continuación, sincronízalas entre dispositivos.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obtén el navegador de escritorio</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Enlace copiado</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importar contraseñas de Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importar contraseñas de Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar contraseñas de DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar contraseñas de DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar contraseñas de escritorio</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar contraseñas de escritorio</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa tus contraseñas de Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Se ha producido un error al importar tu contraseña</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Omitido (duplicado o no válido): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Contraseñas importadas: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Abrir contraseñas</string>
+    <string name="autofill_service_select_password_activity">Selecciona una contraseña guardada</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Contraseñas y autocompletar</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">¿Restablecer sitios excluidos?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Si restableces los sitios excluidos, se te pedirá que guardes tu contraseña la próxima vez que accedas a cualquiera de estos sitios.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Reiniciar</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
+    <string name="autofillSettingsPasswordsEntry">Contraseñas</string>
+    <string name="autofillSettingsAutofillToggleLabel">Solicitar guardar y autocompletar</string>
+    <string name="autofillSettingsAutofillSubtitle">Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros. <annotation type="learn_more_link">Más información</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importar contraseñas</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importar contraseñas de Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sincronizar contraseñas de escritorio</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Restablecer sitios excluidos</string>
 
 </resources>

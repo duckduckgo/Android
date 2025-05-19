@@ -207,9 +207,12 @@ class Omnibar(
     private fun adjustCoordinatorLayoutBehaviorForBottomOmnibar() {
         removeAppBarBehavior(binding.autoCompleteSuggestionsList)
         removeAppBarBehavior(binding.focusedView)
-        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
 
         binding.browserLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = BottomOmnibarBrowserContainerLayoutBehavior()
+        }
+
+        binding.includeNewBrowserTab.newTabLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = BottomOmnibarBrowserContainerLayoutBehavior()
         }
     }
@@ -448,10 +451,18 @@ class Omnibar(
             null
         }
     }
+
+    fun setContentCanScroll(
+        canScrollUp: Boolean,
+        canScrollDown: Boolean,
+        topOfPage: Boolean,
+    ) {
+        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
+    }
 }
 
 fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {
-    return if (experimentState.value.isEnabled) {
+    return if (isExperimentEnabled.value) {
         FADE
     } else {
         SCROLLING

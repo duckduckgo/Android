@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.NewTabScrollingState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -72,6 +73,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2OrVariant3Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartVisualDesignTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -79,6 +81,7 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -87,7 +90,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
@@ -134,6 +136,11 @@ open class OmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class DisableVoiceSearch(val url: String) : Decoration()
+        data class NewTabScrollingState(
+            val canScrollUp: Boolean,
+            val canScrollDown: Boolean,
+            val topOfPage: Boolean,
+        ) : Decoration()
     }
 
     sealed class StateChange {
@@ -171,7 +178,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
-    lateinit var appPersonalityFeature: AppPersonalityFeature
+    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
@@ -416,7 +423,12 @@ open class OmnibarLayout @JvmOverloads constructor(
                     )
                 }
 
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {
                     Timber.d("Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after")
                     clearQuery = start == 0 && after == 0
                     deleteLastCharacter = count == 1 && clearQuery
@@ -455,6 +467,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
         aiChatMenu?.setOnClickListener {
+            viewModel.onDuckChatButtonPressed()
             omnibarItemPressedListener?.onDuckChatButtonPressed()
         }
         shieldIcon.setOnClickListener {
@@ -484,13 +497,14 @@ open class OmnibarLayout @JvmOverloads constructor(
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
+
             else -> {
                 renderBrowserMode(viewState)
             }
         }
 
         if (viewState.leadingIconState == PRIVACY_SHIELD) {
-            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isVisualDesignExperimentEnabled)
         } else {
             lastSeenPrivacyShield = null
         }
@@ -520,6 +534,10 @@ open class OmnibarLayout @JvmOverloads constructor(
                 moveCaretToFront()
             }
 
+            is StartVisualDesignTrackersAnimation -> {
+                startVisualDesignTrackersAnimation(command.entities)
+            }
+
             is StartExperimentVariant1Animation -> {
                 startExperimentVariant1Animation()
             }
@@ -543,8 +561,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
-        when (iconState) {
+    private fun renderLeadingIconState(viewState: ViewState) {
+        when (viewState.leadingIconState) {
             OmnibarLayoutViewModel.LeadingIconState.SEARCH -> {
                 searchIcon.show()
                 shieldIcon.gone()
@@ -555,8 +573,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
-                if (isExperimentEnabled) {
+                if (shouldShowUpdatedPrivacyShield(viewState.isVisualDesignExperimentEnabled)) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()
                 } else {
@@ -598,6 +615,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun shouldShowUpdatedPrivacyShield(navigationBarEnabled: Boolean): Boolean {
+        return senseOfProtectionExperiment.shouldShowNewPrivacyShield() || navigationBarEnabled
+    }
+
     open fun renderButtons(viewState: ViewState) {
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
@@ -606,7 +627,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             showFireIcon = viewState.showFireIcon,
             showBrowserMenu = viewState.showBrowserMenu,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
-            showChatMenu = duckChat.showInAddressBar() && (viewState.showChatMenu || viewState.viewMode is NewTab),
+            showChatMenu = viewState.showChatMenu,
             showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
@@ -669,13 +690,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
-        renderLeadingIconState(viewState.leadingIconState)
+        renderLeadingIconState(viewState)
 
         renderHint(viewState)
     }
 
     private fun renderHint(viewState: ViewState) {
-        if (viewState.viewMode is NewTab && duckChat.showInAddressBar()) {
+        if (!viewState.isVisualDesignExperimentEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
             omnibarTextInput.hint = context.getString(R.string.search)
         } else {
             omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
@@ -748,6 +769,10 @@ open class OmnibarLayout @JvmOverloads constructor(
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
             }
+
+            is NewTabScrollingState -> {
+                viewModel.onNewTabScrollingStateChanged(decoration)
+            }
         }
     }
 
@@ -776,12 +801,15 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (targetView != null) {
             // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
             val isPrivacyShieldAnimation = targetView == placeholder
-            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
             doOnLayout {
-                pulseAnimation.playOn(targetView, isPrivacyShieldAnimation && isExperimentEnabled)
+                pulseAnimation.playOn(
+                    targetView,
+                    isPrivacyShieldAnimation &&
+                        senseOfProtectionExperiment.shouldShowNewPrivacyShield(),
+                )
             }
         } else {
             pulseAnimation.stop()
@@ -790,7 +818,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     fun isPulseAnimationPlaying() = pulseAnimation.isActive
 
-    private fun createCookiesAnimation(isCosmetic: Boolean, enqueueAnimation: Boolean = false) {
+    private fun createCookiesAnimation(
+        isCosmetic: Boolean,
+        enqueueAnimation: Boolean = false,
+    ) {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.createCookiesAnimation(
                 context,
@@ -818,6 +849,17 @@ open class OmnibarLayout @JvmOverloads constructor(
             trackersAnimationView = trackersAnimation,
             omnibarViews = omnibarViews(),
             entities = events,
+        )
+    }
+
+    private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
+        animatorHelper.startTrackersAnimation(
+            context = context,
+            shieldAnimationView = shieldIconExperiment,
+            trackersAnimationView = trackersAnimation,
+            omnibarViews = omnibarViews(),
+            entities = events,
+            visualDesignExperimentEnabled = true,
         )
     }
 
@@ -851,11 +893,12 @@ open class OmnibarLayout @JvmOverloads constructor(
     private fun renderPrivacyShield(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
+        navigationBarEnabled: Boolean,
     ) {
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
             val shieldIconView = if (viewMode is ViewMode.Browser) {
-                val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && !appPersonalityFeature.variant1().isEnabled()
+                val isExperimentEnabled = shouldShowUpdatedPrivacyShield(navigationBarEnabled)
                 if (isExperimentEnabled) shieldIconExperiment else shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon

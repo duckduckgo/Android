@@ -23,7 +23,6 @@ import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
-import com.duckduckgo.site.permissions.store.drmblock.DrmBlockDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesTo
@@ -54,12 +53,6 @@ object SitePermissionsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSitePermissionsAllowedDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsAllowedDao {
         return sitePermissionsDatabase.sitePermissionsAllowedDao()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesDrmBlockDao(sitePermissionsDatabase: SitePermissionsDatabase): DrmBlockDao {
-        return sitePermissionsDatabase.drmBlockDao()
     }
 
     @Provides

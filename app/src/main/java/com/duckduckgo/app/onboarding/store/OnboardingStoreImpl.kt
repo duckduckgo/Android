@@ -155,17 +155,17 @@ class OnboardingStoreImpl @Inject constructor(
         return listOf(
             DaxDialogIntroOption(
                 optionText = site1,
-                iconRes = drawable.ic_globe_gray_16dp,
+                iconRes = drawable.ic_globe_16,
                 link = site1,
             ),
             DaxDialogIntroOption(
                 optionText = site2,
-                iconRes = drawable.ic_globe_gray_16dp,
+                iconRes = drawable.ic_globe_16,
                 link = site2,
             ),
             DaxDialogIntroOption(
                 optionText = site3,
-                iconRes = drawable.ic_globe_gray_16dp,
+                iconRes = drawable.ic_globe_16,
                 link = site3,
             ),
             DaxDialogIntroOption(

@@ -129,6 +129,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
+    SETTINGS_PASSWORDS_PRESSED("ms_passwords_pressed"),
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
@@ -334,6 +335,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED("m_addressbar_focus_cancel_ntp"),
     ADDRESS_BAR_WEBSITE_CANCELLED("m_addressbar_focus_cancel_website"),
     ADDRESS_BAR_SERP_CANCELLED("m_addressbar_focus_cancel_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_CLOSED("m_addressbar_focus_close_ntp"),
+    ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
+    ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
 
     KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
     KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
@@ -435,4 +439,13 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_INFO_PANEL_IMPRESSIONS("m_tab_manager_info_panel_impressions"),
     TAB_MANAGER_INFO_PANEL_DISMISSED("m_tab_manager_info_panel_dismissed"),
     TAB_MANAGER_INFO_PANEL_TAPPED("m_tab_manager_info_panel_tapped"),
+
+    BROWSER_NAV_NEW_TAB_PRESSED("m_browser_nav_new_tab_pressed"),
+    BROWSER_NAV_BOOKMARKS_PRESSED("m_browser_nav_bookmarks_pressed"),
+    BROWSER_NAV_PASSWORDS_PRESSED("m_browser_nav_passwords_pressed"),
+    BROWSER_NAV_AI_PRESSED("m_browser_nav_duck_ai_pressed"),
+    BROWSER_NAV_FIRE_PRESSED("m_browser_nav_fire_pressed"),
+    BROWSER_NAV_TABS_PRESSED("m_browser_nav_tabs_pressed"),
+    BROWSER_NAV_TABS_LONG_PRESSED("m_browser_nav_tabs_long_pressed"),
+    BROWSER_NAV_MENU_PRESSED("m_browser_nav_menu_pressed"),
 }

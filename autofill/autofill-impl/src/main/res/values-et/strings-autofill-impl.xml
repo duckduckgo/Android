@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Salvestatud paroole saad importida teisest brauserist DuckDuckGo-sse.</string>
 
     <string name="autofillManagementImportPasswords">Impordi paroolid</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Töölaua paroolide sünkroonimine</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kuidas importida paroole</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kuidas sünkroonida töölaua paroole</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Impordi paroolid DuckDuckGo brauseri töölauaversiooni, seejärel sünkrooni need kõigis seadmetes.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hangi töölaua brauser</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopeeritud</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Impordi paroolid Google\'ist</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Impordi paroolid Google\'ist</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo paroolide sünkroonimine</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sünkrooni DuckDuckGo paroolid</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Töölaua paroolide sünkroonimine</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Töölaua paroolide sünkroonimine</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Impordi oma Google\'i paroolid</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Parooli import ebaõnnestus</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Vahele jäetud (duplikaat või kehtetu): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Imporditud paroolid: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Ava paroolid</string>
+    <string name="autofill_service_select_password_activity">Vali salvestatud parool</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Paroolid ja automaatne täitmine</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Kas lähtestada välistatud saidid?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Kui lähtestad välistatud saidid, pakutakse sulle järgmisel korral, kui logid neile saitidele sisse, võimalust parool salvestada.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Lähtesta</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Loobu</string>
+    <string name="autofillSettingsPasswordsEntry">Paroolid</string>
+    <string name="autofillSettingsAutofillToggleLabel">Küsi salvestamise ja automaattäitmise kohta</string>
+    <string name="autofillSettingsAutofillSubtitle">Paroolid on krüpteeritud. Keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Impordi paroolid</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Impordi paroolid Google\'ist</string>
+    <string name="autofillSettingsImportFromDesktopSync">Töölaua paroolide sünkroonimine</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Lähtesta välistatud saidid</string>
 
 </resources>

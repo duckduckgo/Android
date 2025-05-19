@@ -184,6 +184,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY("m_atp_report_anylocal_dns_error_d"),
     ATP_REPORT_DNS_SET_ERROR("m_atp_report_dns_error_c"),
     ATP_REPORT_DNS_SET_ERROR_DAILY("m_atp_report_dns_error_d"),
+    ATP_REPORT_BLOCKLIST_STATS_DAILY("m_atp_report_blocklist_stats_d"),
 
     ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_UNIQUE("m_atp_imp_promote_always_on_dialog_u"),
     ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_imp_promote_always_on_dialog_d"),
@@ -211,6 +212,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT("m_atp_ev_apptp_tunnel_thread_stop_timeout_c", enqueue = true),
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY("m_atp_ev_apptp_tunnel_thread_stop_timeout_d", enqueue = true),
+
+    ATP_REPORT_TUNNEL_THREAD_STOP_CRASH("m_atp_ev_apptp_tunnel_thread_crash_c", enqueue = true),
+    ATP_REPORT_TUNNEL_THREAD_CRASH_DAILY("m_atp_ev_apptp_tunnel_thread_crash_d", enqueue = true),
 
     REPORT_VPN_ALWAYS_ON_TRIGGERED("m_vpn_ev_always_on_triggered_c"),
     REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY("m_vpn_ev_always_on_triggered_d"),

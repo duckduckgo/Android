@@ -13,49 +13,28 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.credential.management.AutofillManagementActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:measureAllChildren="false">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorToolbar">
+        <include
+            android:id="@+id/autofill_available"
+            layout="@layout/view_autofill_settings" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorToolbar"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+        <include
+            android:id="@+id/autofill_unsupported"
+            layout="@layout/view_autofill_unsupported_fragment" />
 
-            <com.duckduckgo.common.ui.view.SearchBarView
-                android:id="@+id/search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/keyline_2"
-                android:visibility="gone"
-                app:clearActionContentDescription="@string/autofillManagementSearchClearDescription"
-                app:searchHint="@string/autofillManagementSearchLogins" />
-        </FrameLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    </ViewSwitcher>
 </LinearLayout>

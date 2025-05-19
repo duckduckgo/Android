@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -44,6 +45,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -82,7 +84,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -104,6 +105,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     private var isExpandable = true
     private var showPlaceholders = false
@@ -170,6 +174,13 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (swipingTabsFeature.isEnabled) {
+            parent.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun configureHomeTabQuickAccessGrid() {

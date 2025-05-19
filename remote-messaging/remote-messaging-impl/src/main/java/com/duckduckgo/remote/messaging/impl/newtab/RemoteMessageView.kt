@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -62,7 +63,6 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -82,6 +82,9 @@ class RemoteMessageView @JvmOverloads constructor(
 
     @Inject
     lateinit var browserNav: BrowserNav
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -147,7 +150,7 @@ class RemoteMessageView @JvmOverloads constructor(
         if (shouldRender) {
             binding.messageCta.show()
             viewModel.onMessageShown()
-            binding.messageCta.setMessage(message.asMessage())
+            binding.messageCta.setMessage(message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled()))
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }

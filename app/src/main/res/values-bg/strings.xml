@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt; през последните 7 дни</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s блокирани тракера &lt;/b&gt;</string>
     <string name="inTheLast7Days">през последните 7 дни</string>
 
@@ -711,8 +711,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d поверителен раздел</item>
-        <item quantity="other">%1$d поверителни раздела</item>
+        <item quantity="one">1 раздел</item>
+        <item quantity="other">%1$d раздела</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -860,6 +860,7 @@
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да се опитва да Ви измами или манипулира да преведете пари, да купите фалшиви стоки или да инсталирате зловреден софтуер под фалшив претекст.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Напускане на този сайт</string>
     <string name="maliciousSiteAdvancedCTA">Разширени</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ако смятате, че този уебсайт е безопасен, можете да <a href=\"\">съобщите за грешка</a>. Все пак можете да посетите уебсайта на свой собствен риск.]]></string>

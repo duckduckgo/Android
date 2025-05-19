@@ -18,5 +18,15 @@
 
     <attr name="cardViewStyle" format="reference"/>
     <attr name="daxSwitchStyle" format="reference"/>
-    <attr name="tabItemSelectionCircleWidth" format="dimension"/>
+
+    <attr name="autocompleteListItemHorizontalPadding" format="dimension"/>
+    <attr name="autocompleteListItemStartPadding" format="dimension"/>
+    <attr name="autocompleteListItemEndPadding" format="dimension"/>
+    <attr name="autocompleteListItemIconMargin" format="dimension"/>
+    <attr name="autocompleteListItemWithoutTrailIconEndPadding" format="dimension"/>
+    <attr name="autocompleteListItemVerticalPadding" format="dimension"/>
+
+    <attr name="cookiesAnimationRadius" format="dimension"/>
+    <attr name="cookiesAnimationHeight" format="dimension"/>
+
 </resources>

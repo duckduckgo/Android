@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:fillViewport="true"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">
 
@@ -36,16 +36,23 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/newTabPage"
         android:layout_width="match_parent"
-        android:foreground="@android:color/transparent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:foreground="@android:color/transparent">
 
-        <FrameLayout
-            android:id="@+id/newTabContainerLayout"
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/newTabContainerScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/newTabContainerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.core.widget.NestedScrollView>
 
         <include
             android:id="@+id/includeOnboardingDaxDialogBubble"

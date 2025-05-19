@@ -50,9 +50,7 @@ class ExceptionListsSettingStore @Inject constructor(
     override fun store(jsonString: String) {
         logcat { "Received configuration: $jsonString" }
         runCatching {
-            jsonAdapter.fromJson(jsonString)?.let { model ->
-
-                val exceptionLists = model.exceptionLists
+            jsonAdapter.fromJson(jsonString)?.exceptionLists?.let { exceptionLists ->
 
                 val appTrackerExceptionRuleList = exceptionLists.appTrackerAllowList.map { appTrackerAllowRule ->
                     AppTrackerExceptionRule(
@@ -78,7 +76,7 @@ class ExceptionListsSettingStore @Inject constructor(
     }
 
     private data class JsonConfigModel(
-        val exceptionLists: JsonExceptionListsModel,
+        val exceptionLists: JsonExceptionListsModel?,
     )
 
     private data class JsonExceptionListsModel(

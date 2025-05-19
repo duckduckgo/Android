@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_duckplayer"
+        android:src="@drawable/ic_video_player_color_24"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/customTabTitle"

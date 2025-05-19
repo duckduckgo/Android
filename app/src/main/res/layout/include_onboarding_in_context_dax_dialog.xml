@@ -200,7 +200,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption1"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -211,7 +211,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption2"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -222,7 +222,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption3"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary

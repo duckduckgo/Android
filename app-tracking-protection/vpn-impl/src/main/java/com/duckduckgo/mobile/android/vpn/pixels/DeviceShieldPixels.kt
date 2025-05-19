@@ -319,6 +319,8 @@ interface DeviceShieldPixels {
     fun reportAnylocalDnsError()
     fun reportGeneralDnsError()
 
+    fun reportBlocklistStats(payload: Map<String, String>)
+
     /**
      * Will fire when the user is interacting with the Promote Always On Dialog
      */
@@ -363,6 +365,8 @@ interface DeviceShieldPixels {
     fun reportErrorCreatingVpnNetworkStack()
 
     fun reportTunnelThreadStopTimeout()
+
+    fun reportTunnelThreadAbnormalCrash()
 
     fun reportVpnAlwaysOnTriggered()
 
@@ -754,6 +758,10 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
     }
 
+    override fun reportBlocklistStats(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY, payload)
+    }
+
     override fun didEnableAppProtectionFromDetail() {
         firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
     }
@@ -881,6 +889,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportTunnelThreadStopTimeout() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT)
+    }
+
+    override fun reportTunnelThreadAbnormalCrash() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_CRASH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_CRASH)
     }
 
     override fun reportVpnAlwaysOnTriggered() {

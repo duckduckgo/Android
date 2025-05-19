@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -209,13 +210,14 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore.FeatureState
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -255,7 +257,6 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -275,7 +276,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -536,22 +539,20 @@ class BrowserTabViewModelTest {
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
     val mockStack: WebBackForwardList = mock()
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
-    private val defaultVisualExperimentStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
-    private val defaultVisualExperimentNavBarStateFlow = MutableStateFlow(FeatureState(isAvailable = true, isEnabled = false))
+    private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
-
-    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
-    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
+    private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
 
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
 
@@ -608,6 +609,7 @@ class BrowserTabViewModelTest {
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -628,6 +630,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             userBrowserProperties = mockUserBrowserProperties,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -664,11 +667,8 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockVisualDesignExperimentDataStore.experimentState).thenReturn(
+        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
-        )
-        whenever(mockVisualDesignExperimentDataStore.navigationBarState).thenReturn(
-            defaultVisualExperimentNavBarStateFlow,
         )
 
         whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
@@ -744,9 +744,8 @@ class BrowserTabViewModelTest {
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
-            appPersonalityFeature = fakeAppPersonalityFeature,
-            userStageStore = mockUserStageStore,
-            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
+            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
+            subscriptionsJSHelper = mockSubscriptionsJSHelper,
         )
 
         testee.loadData("abc", null, false, false)
@@ -865,7 +864,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
-        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
@@ -873,7 +872,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
-        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
+        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(true))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)
@@ -2581,6 +2580,18 @@ class BrowserTabViewModelTest {
         testee.refreshCta()
 
         assertTrue(testee.ctaViewState.value!!.isErrorShowing)
+    }
+
+    @Test
+    fun whenCtaRefreshedGetUserRefreshesCalled() = runTest {
+        setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(expectedRefreshPatterns)
+        testee.refreshCta()
+        verify(mockBrokenSitePrompt).getUserRefreshPatterns()
     }
 
     @Test
@@ -5773,6 +5784,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaAndPatternsDetectedThenSendBreakageRefreshPixels() = runTest {
+        setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+        testee.refreshCta()
+
+        verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
+    }
+
+    @Test
     fun whenPageIsChangedWithWebViewErrorResponseThenPixelIsFired() = runTest {
         testee.onReceivedError(BAD_URL, "example2.com")
 
@@ -5964,10 +5986,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChatAndSendPixel() {
+    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked("example")
         verify(mockDuckChat).openDuckChatWithAutoPrompt("example")
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
     }
 
     @Test
@@ -6199,26 +6220,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        // Variant 2 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = false))
-
-        testee.onAnimationFinished()
-
-        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
-    }
-
-    @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant3EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        // Variant 3 is enabled
-        fakeAppPersonalityFeature.self().setRawStoredState(State(enable = true))
-        fakeAppPersonalityFeature.variant3().setRawStoredState(State(enable = true))
-        // All other variants are disabled
-        fakeAppPersonalityFeature.variant1().setRawStoredState(State(enable = false))
-        fakeAppPersonalityFeature.variant2().setRawStoredState(State(enable = false))
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
 
         testee.onAnimationFinished()
 
@@ -6249,6 +6251,78 @@ class BrowserTabViewModelTest {
 
         verify(mockDuckChat).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChat() = runTest {
+        val url = "https://example.com"
+        loadUrl(url)
+
+        testee.openDuckChat(url)
+
+        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery(query)
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasTextThenOpenDuckChatWithQuery() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.setLastSubmittedUserQuery("foo")
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() = runTest {
+        val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
+        whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
+        testee.processJsCallbackMessage(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            method = "method",
+            id = "id",
+            data = null,
+        ) { "someUrl" }
+        verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForSubscriptionsAndResponseIsNullThenDoNotSendCommand() = runTest {
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+        testee.processJsCallbackMessage(
+            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+            method = "method",
+            id = "id",
+            data = null,
+        ) { "someUrl" }
+        verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
+        assertCommandNotIssued<Command.SendResponseToJs>()
     }
 
     private fun aCredential(): LoginCredentials {

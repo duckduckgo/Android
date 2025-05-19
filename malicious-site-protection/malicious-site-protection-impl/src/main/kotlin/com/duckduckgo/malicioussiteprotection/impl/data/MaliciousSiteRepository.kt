@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
@@ -36,9 +37,11 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.ScamFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.ScamHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
@@ -58,15 +61,15 @@ interface MaliciousSiteRepository {
     /**
      * @throws WriteInProgressException if a write is in progress
      */
-    suspend fun containsHashPrefix(hashPrefix: String): Boolean
+    suspend fun getFeedForHashPrefix(hashPrefix: String): Feed?
 
     /**
      * @throws WriteInProgressException if a write is in progress
      */
     suspend fun getFilters(hash: String): FilterSet?
     suspend fun matches(hashPrefix: String): MatchesResult
-    suspend fun loadFilters(): Result<Unit>
-    suspend fun loadHashPrefixes(): Result<Unit>
+    suspend fun loadFilters(vararg feeds: Feed): Result<Unit>
+    suspend fun loadHashPrefixes(vararg feeds: Feed): Result<Unit>
 }
 
 private const val MATCHES_ENDPOINT_TIMEOUT = 5000L
@@ -83,12 +86,19 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     private val writeMutex = Mutex()
 
-    override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
+    override suspend fun getFeedForHashPrefix(hashPrefix: String): Feed? {
         return withContext(dispatcherProvider.io()) {
             if (writeMutex.isLocked) {
                 throw WriteInProgressException()
             }
-            maliciousSiteDao.hashPrefixExists(hashPrefix)
+            maliciousSiteDao.getHashPrefix(hashPrefix)?.type?.let {
+                when (it) {
+                    PHISHING.name -> PHISHING
+                    MALWARE.name -> MALWARE
+                    SCAM.name -> SCAM
+                    else -> null
+                }
+            }
         }
     }
 
@@ -103,6 +113,7 @@ class RealMaliciousSiteRepository @Inject constructor(
                     feed = when (it.type) {
                         PHISHING.name -> PHISHING
                         MALWARE.name -> MALWARE
+                        SCAM.name -> SCAM
                         else -> return@let null
                     },
                 )
@@ -118,6 +129,7 @@ class RealMaliciousSiteRepository @Inject constructor(
                         val feed = when (it.feed.uppercase()) {
                             PHISHING.name -> PHISHING
                             MALWARE.name -> MALWARE
+                            SCAM.name -> SCAM
                             else -> null
                         }
                         if (feed != null) {
@@ -139,32 +151,38 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 
-    override suspend fun loadFilters(): Result<Unit> {
-        return loadDataOfType(FILTER_SET) { latestRevision, networkRevision, feed -> loadFilters(latestRevision, networkRevision, feed) }
+    override suspend fun loadFilters(vararg feeds: Feed): Result<Unit> {
+        return loadDataOfType(FILTER_SET) {
+                localRevisions, networkRevision ->
+            feeds.forEach { feed ->
+                loadFilters(localRevisions, networkRevision, feed)
+            }
+        }
     }
 
-    override suspend fun loadHashPrefixes(): Result<Unit> {
-        return loadDataOfType(HASH_PREFIXES) { latestRevision, networkRevision, feed -> loadHashPrefixes(latestRevision, networkRevision, feed) }
+    override suspend fun loadHashPrefixes(vararg feeds: Feed): Result<Unit> {
+        return loadDataOfType(HASH_PREFIXES) {
+                localRevisions, networkRevision ->
+            feeds.forEach { feed ->
+                loadHashPrefixes(localRevisions, networkRevision, feed)
+            }
+        }
     }
 
     private suspend fun loadDataOfType(
         type: Type,
-        loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int, feed: Feed) -> Unit,
+        loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int) -> Unit,
     ): Result<Unit> {
         return withContext(dispatcherProvider.io()) {
             val networkRevision = maliciousSiteService.getRevision().revision
+            val localRevisions = writeMutex.withLock { getLocalRevisions(type) }
 
-            val localRevisions = getLocalRevisions(type)
-
-            val result = Feed.entries.fold(Result.success(Unit)) { acc, feed ->
-                try {
-                    loadData(localRevisions, networkRevision, feed)
-                    acc
-                } catch (e: Exception) {
-                    Result.failure(e)
-                }
+            try {
+                loadData(localRevisions, networkRevision)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-            result
         }
     }
 
@@ -176,7 +194,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         updateFunction: suspend (T?) -> Unit,
     ) {
         val revision = latestRevision.getRevisionForFeed(feed)
-        val data: T? = if (networkRevision > revision) {
+        val data = if (networkRevision > revision) {
             getFunction(revision)
         } else {
             null
@@ -197,6 +215,7 @@ class RealMaliciousSiteRepository @Inject constructor(
             when (feed) {
                 PHISHING -> maliciousSiteDatasetService::getPhishingFilterSet
                 MALWARE -> maliciousSiteDatasetService::getMalwareFilterSet
+                SCAM -> maliciousSiteDatasetService::getScamFilterSet
             },
         ) {
             writeMutex.withLock {
@@ -217,6 +236,7 @@ class RealMaliciousSiteRepository @Inject constructor(
             when (feed) {
                 PHISHING -> maliciousSiteDatasetService::getPhishingHashPrefixes
                 MALWARE -> maliciousSiteDatasetService::getMalwareHashPrefixes
+                SCAM -> maliciousSiteDatasetService::getScamHashPrefixes
             },
         ) {
             writeMutex.withLock {
@@ -231,6 +251,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         return when (feed) {
             PHISHING -> PhishingFilterSetWithRevision(insert, delete, revision, replace)
             MALWARE -> MalwareFilterSetWithRevision(insert, delete, revision, replace)
+            SCAM -> ScamFilterSetWithRevision(insert, delete, revision, replace)
         }
     }
 
@@ -238,6 +259,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         return when (feed) {
             PHISHING -> PhishingHashPrefixesWithRevision(insert, delete, revision, replace)
             MALWARE -> MalwareHashPrefixesWithRevision(insert, delete, revision, replace)
+            SCAM -> ScamHashPrefixesWithRevision(insert, delete, revision, replace)
         }
     }
 

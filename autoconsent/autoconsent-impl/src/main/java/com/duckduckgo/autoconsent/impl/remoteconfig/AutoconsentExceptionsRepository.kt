@@ -16,45 +16,56 @@
 
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
-import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.impl.store.AutoconsentExceptionEntity
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface AutoconsentExceptionsRepository {
-    fun insertAllExceptions(exceptions: List<FeatureException>)
     val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-class RealAutoconsentExceptionsRepository(
-    coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider,
-    val database: AutoconsentDatabase,
-    isMainProcess: Boolean,
-) : AutoconsentExceptionsRepository {
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutoconsentExceptionsRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+class RealAutoconsentExceptionsRepository @Inject constructor(
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val autoconsentFeature: AutoconsentFeature,
+    @IsMainProcess private val isMainProcess: Boolean,
+) : AutoconsentExceptionsRepository, PrivacyConfigCallbackPlugin {
 
-    private val dao = database.autoconsentDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            if (isMainProcess) {
-                loadToMemory()
-            }
-        }
-    }
-
-    override fun insertAllExceptions(exceptions: List<FeatureException>) {
-        dao.updateAllExceptions(exceptions.map { AutoconsentExceptionEntity(domain = it.domain, reason = it.reason ?: "") })
         loadToMemory()
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        val exceptionsEntityList = dao.getExceptions()
-        exceptions.addAll(exceptionsEntityList.map { FeatureException(domain = it.domain, reason = it.reason) })
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                exceptions.clear()
+                exceptions.addAll(autoconsentFeature.self().getExceptions())
+            }
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        loadToMemory()
     }
 }

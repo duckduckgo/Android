@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -85,8 +86,10 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -103,7 +106,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 // open class so that we can test BrowserApplicationStateInfo
@@ -176,7 +178,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
-                tabPagerAdapter.currentFragment
+                val selectedTabId = tabManager.getSelectedTabId()
+                supportFragmentManager.fragments
+                    .filterIsInstance<BrowserTabFragment>()
+                    .firstOrNull { it.tabId == selectedTabId }
             } else {
                 _currentTab
             }
@@ -201,12 +206,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private val tabPagerAdapter by lazy {
         TabPagerAdapter(
-            fragmentManager = supportFragmentManager,
-            lifecycleOwner = this,
-            activityIntent = intent,
-            getSelectedTabId = tabManager::getSelectedTabId,
-            getTabById = ::getTabById,
-            requestAndWaitForNewTab = ::requestAndWaitForNewTab,
+            activity = this,
             swipingTabsFeature = swipingTabsFeature,
         )
     }
@@ -295,7 +295,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        initializeTabs()
+        initializeTabs(savedInstanceState)
 
         // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
         // flows only once, so a separate initialization is necessary
@@ -311,6 +311,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        if (swipingTabsFeature.isEnabled) {
+            outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
+        }
     }
 
     private fun configureFlowCollectors() {
@@ -758,6 +766,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         )
     }
 
+    override fun toggleFullScreen() {
+        super.toggleFullScreen()
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModel.onFullScreenModeChanged(isFullScreen())
+        }
+    }
+
     companion object {
 
         fun intent(
@@ -803,6 +819,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
+        private const val KEY_TAB_PAGER_STATE = "tabPagerState"
     }
 
     inner class BrowserStateRenderer {
@@ -846,7 +863,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun initializeTabs() {
+    private fun initializeTabs(savedInstanceState: Bundle?) {
         if (swipingTabsFeature.isEnabled) {
             tabManager.registerCallbacks(
                 onTabsUpdated = ::onTabsUpdated,
@@ -855,6 +872,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.adapter = tabPagerAdapter
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
+
+            savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
+                tabPagerAdapter.restore(it)
+            }
         }
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
@@ -979,16 +1000,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<String>) {
+    private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
-    }
-
-    private fun getTabById(tabId: String): TabEntity? = runBlocking {
-        return@runBlocking tabManager.getTabById(tabId)
-    }
-
-    private fun requestAndWaitForNewTab(): TabEntity = runBlocking {
-        return@runBlocking tabManager.requestAndWaitForNewTab()
     }
 
     fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
@@ -1089,14 +1102,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        if (visualDesignExperimentDataStore.experimentState.value.isEnabled) {
+        if (visualDesignExperimentDataStore.isExperimentEnabled.value) {
             if (settingsDataStore.omnibarPosition == TOP) {
                 experimentalToolbarMockupBinding = binding.topMockupExperimentalToolbar
                 binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar()) {
+                if (!duckChat.showInAddressBar.value) {
                     experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
             } else {
@@ -1105,7 +1118,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar()) {
+                if (!duckChat.showInAddressBar.value) {
                     experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
             }
@@ -1126,7 +1139,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            if (!duckChat.showInAddressBar()) {
+            if (!duckChat.showInAddressBar.value) {
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = false
             }
         }

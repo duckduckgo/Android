@@ -66,7 +66,7 @@ constructor(
         binding.icon.setImageResource(
             attributes.getResourceId(
                 R.styleable.MenuItemView_iconDrawable,
-                R.drawable.ic_globe_gray_16dp,
+                R.drawable.ic_globe_16,
             ),
         )
         updateContentDescription()

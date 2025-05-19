@@ -24,7 +24,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/daxColorBrowserOverlay"
-        android:elevation="4dp"
+        android:elevation="2dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_scrollFlags="noScroll" />
 
@@ -157,6 +157,7 @@
         android:id="@+id/navigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:showShadows="true"
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

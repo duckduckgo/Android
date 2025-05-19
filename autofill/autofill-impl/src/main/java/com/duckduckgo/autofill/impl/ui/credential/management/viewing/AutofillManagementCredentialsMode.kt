@@ -41,23 +41,23 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Activated
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Deactivated
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FailedToObtainStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FetchingActivationStatus
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotSignedIn
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingNewEntry
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialModeCommand
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialModeCommand.ShowEditCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.Activated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.Deactivated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.FailedToObtainStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.FetchingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotADuckAddress
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotManageable
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotSignedIn
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -114,7 +114,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     private var initialActionBarTitle: String? = null
 
     val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
+        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillPasswordsManagementViewModel::class.java]
     }
 
     private val binding: FragmentAutofillManagementEditModeBinding by viewBinding()
@@ -429,7 +429,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
             is Activated -> {
                 duckAddressManagementLabel.quietlySetIsChecked(true, activationStatusChangeListener)
-                duckAddressManagementLabel.setLeadingIconResource(R.drawable.ic_email_24)
+                duckAddressManagementLabel.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_email_16)
                 duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressActivatedLabel))
                 duckAddressManagementLabel.show()
                 duckAddressManagementLabel.isEnabled = true
