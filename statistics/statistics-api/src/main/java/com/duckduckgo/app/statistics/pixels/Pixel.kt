@@ -65,6 +65,7 @@ interface Pixel {
         const val TAB_INACTIVE_1W = "tab_inactive_1w"
         const val TAB_INACTIVE_2W = "tab_inactive_2w"
         const val TAB_INACTIVE_3W = "tab_inactive_3w"
+        const val IS_ENABLED = "is_enabled"
     }
 
     object PixelValues {
