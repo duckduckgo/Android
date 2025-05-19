@@ -153,11 +153,12 @@
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 
-    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+    <com.duckduckgo.navigation.bar.BrowserNavigationBarView
         android:id="@+id/navigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:showShadows="true"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom"
+        app:layout_behavior="com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

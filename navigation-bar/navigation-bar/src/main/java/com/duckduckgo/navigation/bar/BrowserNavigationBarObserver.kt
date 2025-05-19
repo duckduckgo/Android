@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.navigation.bar.view
+package com.duckduckgo.navigation.bar
 
 import androidx.annotation.EmptySuper
 
@@ -57,5 +57,13 @@ interface BrowserNavigationBarObserver {
 
     @EmptySuper
     fun onBookmarksButtonClicked() {
+    }
+
+    @EmptySuper
+    fun onAiChatButtonClicked() {
+    }
+
+    @EmptySuper
+    fun onWebButtonClicked() {
     }
 }

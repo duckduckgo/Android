@@ -18,10 +18,10 @@ package com.duckduckgo.app.browser.navigation.bar
 
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
+import com.duckduckgo.navigation.bar.BrowserNavigationBarObserver
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone

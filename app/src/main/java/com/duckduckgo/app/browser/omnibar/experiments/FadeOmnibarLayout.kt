@@ -36,7 +36,7 @@ import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeFadeOmnibarFindInPageBinding
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.FindInPage
 import com.duckduckgo.app.browser.omnibar.FindInPageImpl
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode

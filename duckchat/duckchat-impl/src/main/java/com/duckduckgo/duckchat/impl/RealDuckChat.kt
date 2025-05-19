@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -268,7 +269,7 @@ class RealDuckChat @Inject constructor(
 
     override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
 
-    override fun openDuckChat(query: String?) {
+    override fun openDuckChat(query: String?, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val parameters = query?.let { originalQuery ->
             val hasDuckChatBang = isDuckChatBang(originalQuery.toUri())
             val cleanedQuery = if (hasDuckChatBang) {
@@ -285,7 +286,7 @@ class RealDuckChat @Inject constructor(
                 }
             }
         } ?: emptyMap()
-        openDuckChat(parameters)
+        openDuckChat(parameters, activityResultLauncher)
     }
 
     private fun stripBang(query: String): String {
@@ -293,23 +294,23 @@ class RealDuckChat @Inject constructor(
         return query.replace(bangPattern, "").trim()
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val parameters = mapOf(
             QUERY to query,
             PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
         )
-        openDuckChat(parameters)
+        openDuckChat(parameters, activityResultLauncher)
     }
 
-    private fun openDuckChat(parameters: Map<String, String>) {
+    private fun openDuckChat(parameters: Map<String, String>, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val url = appendParameters(parameters, duckChatLink)
-        startDuckChatActivity(url)
+        startDuckChatActivity(url, activityResultLauncher)
         appCoroutineScope.launch {
             duckChatFeatureRepository.registerOpened()
         }
     }
 
-    private fun startDuckChatActivity(url: String) {
+    private fun startDuckChatActivity(url: String, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val intent = globalActivityStarter.startIntent(
             context,
             DuckChatWebViewActivityWithParams(
@@ -317,8 +318,12 @@ class RealDuckChat @Inject constructor(
             ),
         )
         intent?.let {
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(it)
+            if (activityResultLauncher != null) {
+                activityResultLauncher.launch(intent)
+            } else {
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(it)
+            }
         }
     }
 

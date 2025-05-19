@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.tabswitcher
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
+import com.duckduckgo.common.ui.tabswitcher.TabSwitcherButton
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 
 class ProductionTabSwitcherButton @JvmOverloads constructor(

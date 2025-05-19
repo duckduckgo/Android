@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
@@ -35,6 +36,7 @@ import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -4070,15 +4072,15 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
-    fun onDuckChatMenuClicked() {
-        openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU)
+    fun onDuckChatMenuClicked(activityResultLauncher: ActivityResultLauncher<Intent>?) {
+        openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, activityResultLauncher = activityResultLauncher)
     }
 
-    fun onDuckChatOmnibarButtonClicked(query: String?) {
-        openDuckChat(query = query)
+    fun onDuckChatOmnibarButtonClicked(query: String?, activityResultLauncher: ActivityResultLauncher<Intent>?) {
+        openDuckChat(query = query, activityResultLauncher = activityResultLauncher)
     }
 
-    private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
+    private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
 
@@ -4089,9 +4091,9 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             if (query?.isNotEmpty() == true) {
-                duckChat.openDuckChatWithAutoPrompt(query)
+                duckChat.openDuckChatWithAutoPrompt(query, activityResultLauncher = activityResultLauncher)
             } else {
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(activityResultLauncher = activityResultLauncher)
             }
         }
     }
@@ -4137,14 +4139,14 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) = when {
-        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+    fun openDuckChat(query: String?, activityResultLauncher: ActivityResultLauncher<Intent>? = null) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat(activityResultLauncher = activityResultLauncher)
 
         query == lastSubmittedUserQuery ||
             (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
-        -> duckChat.openDuckChat(query)
+        -> duckChat.openDuckChat(query, activityResultLauncher = activityResultLauncher)
 
-        else -> duckChat.openDuckChatWithAutoPrompt(query)
+        else -> duckChat.openDuckChatWithAutoPrompt(query, activityResultLauncher = activityResultLauncher)
     }
 
     fun setLastSubmittedUserQuery(query: String) {

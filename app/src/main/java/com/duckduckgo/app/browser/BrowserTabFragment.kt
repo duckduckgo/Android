@@ -138,7 +138,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
+import com.duckduckgo.navigation.bar.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -276,6 +276,11 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatActivityInteractionResult
+import com.duckduckgo.duckchat.api.DuckChatActivityInteractionResult.NewTabButtonClicked
+import com.duckduckgo.duckchat.api.DuckChatActivityInteractionResult.TabsButtonClicked
+import com.duckduckgo.duckchat.api.DuckChatActivityInteractionResult.TabsButtonLongClicked
+import com.duckduckgo.duckchat.api.duckChatActivityInteractionResultExtraName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -668,6 +673,32 @@ class BrowserTabFragment :
         }
     }
 
+    private val activityResultDuckChat = registerForActivityResult(StartActivityForResult()) { activityResult: ActivityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            val data = activityResult.data
+            val interactionResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                data?.getSerializableExtra(duckChatActivityInteractionResultExtraName, DuckChatActivityInteractionResult::class.java)
+            } else {
+                data?.getSerializableExtra(duckChatActivityInteractionResultExtraName) as? DuckChatActivityInteractionResult
+            }
+
+            when (interactionResult) {
+                NewTabButtonClicked -> {
+                    viewModel.onNavigationBarNewTabButtonClicked()
+                }
+                TabsButtonClicked -> {
+                    onTabsButtonPressed()
+                }
+                TabsButtonLongClicked -> {
+                    onTabsButtonLongPressed()
+                }
+                null -> {
+                    // noop
+                }
+            }
+        }
+    }
+
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
@@ -1041,6 +1072,10 @@ class BrowserTabFragment :
             override fun onBookmarksButtonClicked() {
                 viewModel.onNavigationBarBookmarksButtonClicked()
             }
+
+            override fun onAiChatButtonClicked() {
+                viewModel.onDuckChatOmnibarButtonClicked(query = null, activityResultLauncher = activityResultDuckChat)
+            }
         }
 
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
@@ -1114,7 +1149,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.onDuckChatOmnibarButtonClicked(query)
+        viewModel.onDuckChatOmnibarButtonClicked(query, activityResultLauncher = activityResultDuckChat)
     }
 
     private fun configureCustomTab() {
@@ -1172,7 +1207,7 @@ class BrowserTabFragment :
                 viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(duckChatMenuItem) {
-                viewModel.onDuckChatMenuClicked()
+                viewModel.onDuckChatMenuClicked(activityResultLauncher = activityResultDuckChat)
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 viewModel.onBookmarksMenuItemClicked()

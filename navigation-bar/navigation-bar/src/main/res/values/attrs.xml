@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,26 +15,7 @@
   -->
 
 <resources>
-    <attr name="omnibarPosition">
-        <!-- Top -->
-        <enum name="top" value="0" />
-        <!-- Bottom -->
-        <enum name="bottom" value="1" />
-    </attr>
-
-    <!-- LegacyOmnibarView-->
-    <declare-styleable name="LegacyOmnibarView">
-        <attr name="omnibarPosition"/>
+    <declare-styleable name="BrowserNavigationBarView">
+        <attr name="showShadows" format="boolean"/>
     </declare-styleable>
-
-    <!-- NewOmnibarView-->
-    <declare-styleable name="NewOmnibarView">
-        <attr name="omnibarPosition"/>
-    </declare-styleable>
-
-    <!-- FadeOmnibarView-->
-    <declare-styleable name="FadeOmnibarLayout">
-        <attr name="omnibarPosition"/>
-    </declare-styleable>
-
 </resources>

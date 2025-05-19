@@ -372,7 +372,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
+            <com.duckduckgo.common.ui.tabswitcher.ExperimentalTabSwitcherButton
                 android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -437,7 +437,7 @@
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+        <com.duckduckgo.navigation.bar.BrowserNavigationBarView
             android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

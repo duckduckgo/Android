@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -56,6 +57,8 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChatActivityInteractionResult
+import com.duckduckgo.duckchat.api.duckChatActivityInteractionResultExtraName
 import com.duckduckgo.duckchat.impl.ChatState.BLOCKED
 import com.duckduckgo.duckchat.impl.ChatState.ERROR
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -75,6 +78,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.navigation.bar.BrowserNavigationBarObserver
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView.ViewMode
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import javax.inject.Inject
@@ -324,6 +329,34 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                 )
             }
             onBack = { onBackPressed() }
+        }
+
+        binding.navigationBar.setViewMode(ViewMode.DuckChat)
+        binding.navigationBar.browserNavigationBarObserver = object : BrowserNavigationBarObserver {
+            override fun onNewTabButtonClicked() {
+                val data = Intent()
+                data.putExtra(duckChatActivityInteractionResultExtraName, DuckChatActivityInteractionResult.NewTabButtonClicked)
+                setResult(RESULT_OK, data)
+                finish()
+            }
+
+            override fun onWebButtonClicked() {
+                finish()
+            }
+
+            override fun onTabsButtonClicked() {
+                val data = Intent()
+                data.putExtra(duckChatActivityInteractionResultExtraName, DuckChatActivityInteractionResult.TabsButtonClicked)
+                setResult(RESULT_OK, data)
+                finish()
+            }
+
+            override fun onTabsButtonLongClicked() {
+                val data = Intent()
+                data.putExtra(duckChatActivityInteractionResultExtraName, DuckChatActivityInteractionResult.TabsButtonLongClicked)
+                setResult(RESULT_OK, data)
+                finish()
+            }
         }
     }
 

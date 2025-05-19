@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,36 +24,44 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-	implementation project(":duckchat-api")
-    implementation project(':settings-api')
-    implementation project(':navigation-api')
-    implementation project(':common-ui')
+    implementation project(':feature-toggles-api')
     implementation project(':common-utils')
     implementation project(':browser-api')
-    implementation project(':js-messaging-api')
-    implementation project(':downloads-api')
-    implementation project(":navigation-bar")
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
+    implementation project(':common-ui')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':app-build-config-api')
+    implementation project(':navigation-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':settings-api')
     implementation project(':statistics-api')
     api AndroidX.dataStore.preferences
 
+
     ksp AndroidX.room.compiler
 
+    implementation AndroidX.appCompat
     implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation Google.dagger
+    implementation JakeWharton.timber
 
+    implementation "com.airbnb.android:lottie:_"
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
-    testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
@@ -61,19 +69,18 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation AndroidX.lifecycle.runtime.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
-    namespace "com.duckduckgo.duckchat.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
-    lint {
+    namespace "com.duckduckgo.navigation.bar"
+    lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
+    }
+    anvil {
+        generateDaggerFactories = true // default is false
     }
     testOptions {
         unitTests {

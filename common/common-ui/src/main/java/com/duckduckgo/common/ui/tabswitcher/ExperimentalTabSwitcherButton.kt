@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.tabswitcher
+package com.duckduckgo.common.ui.tabswitcher
 
 import android.content.Context
 import android.util.AttributeSet
-import com.duckduckgo.app.browser.databinding.ViewExperimentalTabSwitcherButtonBinding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.databinding.ViewExperimentalTabSwitcherButtonBinding
 import com.duckduckgo.mobile.android.R as CommonR
 
 class ExperimentalTabSwitcherButton @JvmOverloads constructor(

@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.navigation.bar.view
+package com.duckduckgo.navigation.bar
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
-import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -32,31 +30,28 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.PulseAnimation
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
+import com.duckduckgo.common.ui.PulseAnimation
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyAiChatButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.ViewState
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command.NotifyWebButtonClicked
+import com.duckduckgo.navigation.bar.databinding.ViewBrowserNavigationBarBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlin.math.abs
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -65,7 +60,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
+) : FrameLayout(context, attrs, defStyle) {
 
     private var showShadows: Boolean = false
 
@@ -84,7 +79,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         /**
          * This notifies all view behaviors that depend on the [BrowserNavigationBarView] to recalculate whenever the bar's visibility changes,
-         * for example, we require that in [TopOmnibarBrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
+         * for example, we require that in `TopOmnibarBrowserContainerLayoutBehavior` to remove the bottom inset when navigation bar disappears.
          * The base coordinator behavior doesn't notify dependent views when visibility changes, so we need to do that manually.
          */
         val parent = parent
@@ -182,6 +177,14 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.menuButton.setOnClickListener {
             viewModel.onMenuButtonClicked()
         }
+
+        binding.aiChatButton.setOnClickListener {
+            viewModel.onAiChatButtonClicked()
+        }
+
+        binding.webButton.setOnClickListener {
+            viewModel.onWebButtonClicked()
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -189,10 +192,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         conflatedCommandsJob.cancel()
         conflatedStateJob.cancel()
-    }
-
-    override fun getBehavior(): Behavior<*> {
-        return BottomViewBehavior(context, attrs)
     }
 
     private fun renderView(viewState: ViewState) {
@@ -206,6 +205,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
         binding.tabsButton.count = viewState.tabsCount
         binding.tabsButton.hasUnread = viewState.hasUnreadTabs
+        binding.aiChatButton.isVisible = viewState.aiChatButtonVisible
+        binding.webButton.isVisible = viewState.webButtonVisible
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
@@ -222,6 +223,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
             NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
             NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
+            NotifyAiChatButtonClicked -> browserNavigationBarObserver?.onAiChatButtonClicked()
+            NotifyWebButtonClicked -> browserNavigationBarObserver?.onWebButtonClicked()
         }
     }
 
@@ -240,40 +243,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     enum class ViewMode {
         NewTab,
         Browser,
-    }
-
-    /**
-     * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
-     *
-     * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
-     */
-    private class BottomViewBehavior(
-        context: Context,
-        attrs: AttributeSet?,
-    ) : Behavior<View>(context, attrs) {
-
-        override fun layoutDependsOn(
-            parent: CoordinatorLayout,
-            child: View,
-            dependency: View,
-        ): Boolean {
-            return dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP
-        }
-
-        override fun onDependentViewChanged(
-            parent: CoordinatorLayout,
-            child: View,
-            dependency: View,
-        ): Boolean {
-            if (dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP) {
-                val dependencyOffset = abs(dependency.top)
-                val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
-                val childHeight = child.measuredHeight
-                val childOffset = childHeight * offsetPercentage
-                child.translationY = childOffset
-                return true
-            }
-            return false
-        }
+        DuckChat,
     }
 }

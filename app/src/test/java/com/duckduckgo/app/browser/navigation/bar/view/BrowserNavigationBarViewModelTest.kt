@@ -17,11 +17,12 @@
 package com.duckduckgo.app.browser.navigation.bar.view
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.navigation.bar.BrowserNavigationBarViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before

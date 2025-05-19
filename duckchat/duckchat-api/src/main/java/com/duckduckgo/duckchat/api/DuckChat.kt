@@ -16,7 +16,9 @@
 
 package com.duckduckgo.duckchat.api
 
+import android.content.Intent
 import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -48,12 +50,12 @@ interface DuckChat {
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat(query: String? = null)
+    fun openDuckChat(query: String? = null, activityResultLauncher: ActivityResultLauncher<Intent>? = null)
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
-    fun openDuckChatWithAutoPrompt(query: String)
+    fun openDuckChatWithAutoPrompt(query: String, activityResultLauncher: ActivityResultLauncher<Intent>? = null)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
@@ -66,4 +68,12 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
+}
+
+const val duckChatActivityInteractionResultExtraName = "DuckChatActivityInteractionResultExtraName"
+
+enum class DuckChatActivityInteractionResult {
+    NewTabButtonClicked,
+    TabsButtonClicked,
+    TabsButtonLongClicked,
 }
