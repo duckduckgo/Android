@@ -64,8 +64,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             showInlineKeyIcon = true,
             showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
             unknownUsernameCategorization = canCategorizeUnknownUsername(),
+            canCategorizePasswordVariant = canCategorizePasswordVariant(),
             partialFormSaves = partialFormSaves(),
-        )
+        ).also {
+            Timber.v("autofill-config: userPreferences for %s: \n%s", url, it)
+        }
         val availableInputTypes = generateAvailableInputTypes(url)
 
         return StringBuilder(rawJs).apply {
@@ -88,7 +91,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val emailAvailable = determineIfEmailAvailable()
 
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
-            Timber.v("availableInputTypes for %s: \n%s", url, it)
+            Timber.v("autofill-config: availableInputTypes for %s: \n%s", url, it)
         }
         return "availableInputTypes = $json"
     }
@@ -141,6 +144,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
 
     private fun canCategorizeUnknownUsername(): Boolean {
         return autofillFeature.canCategorizeUnknownUsername().isEnabled()
+    }
+
+    private fun canCategorizePasswordVariant(): Boolean {
+        return autofillFeature.passwordVariantCategorization().isEnabled()
     }
 
     private fun partialFormSaves(): Boolean {

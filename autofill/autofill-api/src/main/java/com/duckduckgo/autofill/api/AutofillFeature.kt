@@ -76,6 +76,13 @@ interface AutofillFeature {
     fun canCategorizeUnknownUsername(): Toggle
 
     /**
+     * @return `true` when the remote config has "passwordVariantCategorization" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun passwordVariantCategorization(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "onByDefault" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
