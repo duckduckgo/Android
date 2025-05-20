@@ -25,10 +25,12 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
@@ -83,14 +85,24 @@ class AutofillSettingsViewModel @Inject constructor(
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    // we only want to send this once for this 'session' of being in the management screen
+    private var importGooglePasswordButtonShownPixelSent = false
+
+    private var launchSource: AutofillScreenLaunchSource? = null
+
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState: Flow<ViewState> = _viewState.onStart {
+    private val viewState: Flow<ViewState> = _viewState.onStart {
         _viewState.value = ViewState(
             autofillUnsupported = autofillStore.autofillAvailable().not(),
             autofillDisabled = deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication(),
             autofillEnabled = autofillStore.autofillEnabled,
         )
         onViewStateFlowStart()
+    }
+
+    fun viewState(source: AutofillScreenLaunchSource): Flow<ViewState> {
+        launchSource = source
+        return viewState
     }
 
     fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
@@ -123,12 +135,19 @@ class AutofillSettingsViewModel @Inject constructor(
                 return@runCatching gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
             }.getOrDefault(false)
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
+            if (canImport && !importGooglePasswordButtonShownPixelSent) {
+                importGooglePasswordButtonShownPixelSent = true
+                pixel.fire(
+                    pixel = AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN,
+                    parameters = mapOf("source" to (launchSource ?: Unknown).asString()),
+                )
+            }
         }
     }
 
     fun checkDeviceRequirements() {
         viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = ViewState(
+            _viewState.value = _viewState.value.copy(
                 autofillUnsupported = autofillStore.autofillAvailable().not(),
                 autofillDisabled = deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication(),
             )

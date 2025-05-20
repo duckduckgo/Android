@@ -114,7 +114,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.viewState
+            viewModel.viewState(extractLaunchSource())
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
                     val isAutofillAvailable = state.autofillUnsupported.not() && state.autofillDisabled.not()
