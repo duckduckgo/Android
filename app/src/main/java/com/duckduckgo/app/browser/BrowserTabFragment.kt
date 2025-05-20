@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
@@ -53,8 +54,10 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -344,6 +347,7 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import kotlin.math.hypot
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -1082,53 +1086,40 @@ class BrowserTabFragment :
             private lateinit var previousViewMode : BrowserNavigationBarView.ViewMode
 
 
-            fun View.flip(duration: Long = 500, onEnd: (() -> Unit)? = null) {
-                val flipOut = ObjectAnimator.ofFloat(this, "rotationY", 0f, 90f).apply {
-                    this.duration = duration / 2
-                }
-                val flipIn = ObjectAnimator.ofFloat(this, "rotationY", -90f, 0f).apply {
-                    this.duration = duration / 2
-                }
-
-                flipOut.addListener(onEnd = {
-                    this.visibility = View.INVISIBLE
-                    onEnd?.invoke()
-                })
-
-                flipIn.addListener(onStart = {
-                    this.visibility = View.VISIBLE
-                })
-
-                AnimatorSet().apply {
-                    playSequentially(flipOut, flipIn)
-                    start()
+            fun createCircularReveal(
+                view: View,
+                centerX: Int,
+                centerY: Int,
+                startRadius: Float,
+                endRadius: Float,
+                duration: Long
+            ): Animator {
+                return ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius).apply {
+                    this.duration = duration
+                    interpolator = AccelerateDecelerateInterpolator()
                 }
             }
 
             override fun onAiChatButtonClicked() {
                 val duration = 250L
-                val flipOut = ObjectAnimator.ofFloat( 0f, 90f).apply {
-                    this.duration = duration / 2
-                }
-                flipOut.addUpdateListener {
-                    binding.browserLayout.rotationY = it.animatedValue as Float
-                    binding.fadeOmnibar.rotationY = it.animatedValue as Float
-                }
-                val flipIn = ObjectAnimator.ofFloat(binding.duckChatWebView, "rotationY", -90f, 0f).apply {
-                    this.duration = duration / 2
-                }
-                flipOut.addListener(onEnd = {
-                    binding.browserLayout.hide()
-                    binding.fadeOmnibar.hide()
-                })
-                flipIn.addListener(onStart = {
-                    binding.duckChatWebView.show()
-                })
+                val targetView = binding.duckChatWebView
 
-                AnimatorSet().apply {
-                    playSequentially(flipOut, flipIn)
-                    start()
-                }
+                val centerX = targetView.width / 3
+                val centerY = targetView.height
+                val startRadius = 0f
+                val endRadius = hypot(centerX.toDouble(), centerY.toDouble()).toFloat()
+
+                targetView.show()
+
+                val reveal = createCircularReveal(targetView, centerX, centerY, startRadius, endRadius, duration)
+
+                // reveal.addListener(onStart = {
+                //     binding.browserLayout.hide()
+                //     binding.fadeOmnibar.hide()
+                // })
+
+                reveal.start()
+
                 previousViewMode = binding.navigationBar.getViewMode()
                 binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.DuckChat)
 
@@ -1137,28 +1128,22 @@ class BrowserTabFragment :
 
             override fun onWebButtonClicked() {
                 val duration = 250L
-                val flipIn = ObjectAnimator.ofFloat( 90f, 0f).apply {
-                    this.duration = duration / 2
-                }
-                flipIn.addUpdateListener {
-                    binding.browserLayout.rotationY = it.animatedValue as Float
-                    binding.fadeOmnibar.rotationY = it.animatedValue as Float
-                }
-                val flipOut = ObjectAnimator.ofFloat(binding.duckChatWebView, "rotationY",0f, -90f).apply {
-                    this.duration = duration / 2
-                }
-                flipIn.addListener(onStart = {
-                    binding.browserLayout.show()
-                    binding.fadeOmnibar.show()
-                })
-                flipOut.addListener(onEnd = {
-                    binding.duckChatWebView.hide()
+                val targetView = binding.duckChatWebView
+
+                val centerX = targetView.width / 3
+                val centerY = targetView.height
+                val startRadius = hypot(centerX.toDouble(), centerY.toDouble()).toFloat()
+                val endRadius = 0f
+
+                val hide = createCircularReveal(targetView, centerX, centerY, startRadius, endRadius, duration)
+
+                hide.addListener(onEnd = {
+                    targetView.hide()
+                    // binding.browserLayout.show()
+                    // binding.fadeOmnibar.show()
                 })
 
-                AnimatorSet().apply {
-                    playSequentially(flipOut, flipIn)
-                    start()
-                }
+                hide.start()
 
                 binding.navigationBar.setViewMode(previousViewMode)
             }

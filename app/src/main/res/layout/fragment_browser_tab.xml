@@ -144,6 +144,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
+        android:elevation="5dp"
         app:layout_behavior="com.duckduckgo.app.browser.webview.OnlyNavBarBrowserContainerLayoutBehavior" />
 
     <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
