@@ -103,4 +103,17 @@
     <string name="devSettingsNotificationsScheduledTitle">Scheduled Notifications</string>
     <string name="devSettingsNotificationsVPNTitle">VPN Notifications</string>
 
+    <!-- WebView Dev Settings -->
+    <string name="webview_about">About WebView</string>
+    <string name="webview_version">WebView Version (tap to copy)</string>
+    <string name="webview_package">WebView Package (tap to copy)</string>
+    <string name="webview_utilities">WebView utilities</string>
+    <string name="webview_dev_tools">Launch WebView DevTools</string>
+    <string name="webview_update_play_store">Update WebView through Play store</string>
+    <string name="webview_requires_play_store">Requires Play Store to be installed</string>
+    <string name="webview_dev_settings_label">WebView Dev Settings</string>
+    <string name="webview_internal_feature_title">System WebView</string>
+    <string name="webview_internal_feature_subtitle">WebView dev settings and tools</string>
+    <string name="webview_dev_ui_not_available">WebView Developer UI is not available.</string>
+    <string name="webview_play_store_unavailable">Play Store unavailable on this device</string>
 </resources>
