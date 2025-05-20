@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.subscriptions.api
+
+import com.duckduckgo.js.messaging.api.JsCallbackData
+import org.json.JSONObject
+
+interface SubscriptionsJSHelper {
+    suspend fun processJsCallbackMessage(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+    ): JsCallbackData?
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation project(path: ':navigation-api')
-    implementation project(':js-messaging-api')
-    implementation KotlinX.coroutines.core
-}
-
-android {
-    namespace 'com.duckduckgo.subscriptions.api'
-}
+const val SUBSCRIPTIONS_FEATURE_NAME = "subscriptions"

@@ -319,6 +319,8 @@ interface DeviceShieldPixels {
     fun reportAnylocalDnsError()
     fun reportGeneralDnsError()
 
+    fun reportBlocklistStats(payload: Map<String, String>)
+
     /**
      * Will fire when the user is interacting with the Promote Always On Dialog
      */
@@ -754,6 +756,10 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportGeneralDnsError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
+    }
+
+    override fun reportBlocklistStats(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY, payload)
     }
 
     override fun didEnableAppProtectionFromDetail() {
