@@ -429,14 +429,10 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): Boolean {
         var experimentName: String? = null
-        var cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
-        if (cohort != null) { // Android experiment
-            experimentName = "privacyProFreeTrialJan25"
-        } else {
-            experimentAssigned?.let { // FE experiment details
-                cohort = it.cohort
-                experimentName = it.name
-            }
+        var cohort: String? = null
+        experimentAssigned?.let { // FE experiment details
+            cohort = it.cohort
+            experimentName = it.name
         }
         return try {
             val confirmationResponse = subscriptionsService.confirm(
