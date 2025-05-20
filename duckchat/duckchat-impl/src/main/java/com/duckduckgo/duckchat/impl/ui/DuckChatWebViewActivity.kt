@@ -324,6 +324,8 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                 )
             }
             onBack = { onBackPressed() }
+            enableFireButton = true
+            enableNewChatButton = true
         }
     }
 
