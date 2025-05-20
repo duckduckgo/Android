@@ -99,7 +99,6 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
         maliciousSiteDatasetService,
         coroutineRule.testDispatcherProvider,
         mockPixel,
-        mockMaliciousSiteProtectionRCFeature,
     )
 
     @Before
@@ -148,7 +147,6 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
             ),
         )
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(true)
-        whenever(mockMaliciousSiteProtectionRCRepository.isExempted(any())).thenReturn(false)
         repository.loadFilters(*enumValues<Feed>())
         repository.loadHashPrefixes(*enumValues<Feed>())
 
