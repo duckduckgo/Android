@@ -189,12 +189,15 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             }
             duckChatInput.text.clear()
             duckChatInput.clearFocus()
-            duckChatFireButton.isVisible = enableFireButton
-            duckChatNewChat.isVisible = enableNewChatButton
-            if (enableFireButton) {
-                (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-                    params.marginStart = 0
-                    duckChatInput.layoutParams = params
+
+            if (duckChatTabLayout.selectedTabPosition == 1) {
+                duckChatFireButton.isVisible = enableFireButton
+                duckChatNewChat.isVisible = enableNewChatButton
+                if (enableFireButton) {
+                    (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+                        params.marginStart = 0
+                        duckChatInput.layoutParams = params
+                    }
                 }
             }
         }
