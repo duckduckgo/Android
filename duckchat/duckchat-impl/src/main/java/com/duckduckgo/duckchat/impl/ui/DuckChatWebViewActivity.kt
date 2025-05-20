@@ -257,7 +257,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     }
 
     private fun configureUI() {
-        binding.duckChatOmnibar.isVisible = experimentDataStore.isDuckAIPoCEnabled.value
+        binding.duckChatOmnibar.isVisible = experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value
         binding.duckChatOmnibar.selectTab(1)
 
         binding.duckChatOmnibar.apply {
