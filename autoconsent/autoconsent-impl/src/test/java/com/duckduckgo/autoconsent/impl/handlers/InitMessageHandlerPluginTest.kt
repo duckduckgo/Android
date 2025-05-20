@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.handlers
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -104,6 +105,7 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
         feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [\"MyCmp\"]}"))
         settingsRepository.userSetting = false
@@ -117,6 +119,7 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
     fun whenProcessMessageResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
