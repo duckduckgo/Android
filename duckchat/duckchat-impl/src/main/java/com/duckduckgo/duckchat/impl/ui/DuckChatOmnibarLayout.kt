@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
@@ -133,10 +134,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 duckChatNewChat.isVisible = false
             }
             animateOmnibarFocusedState(hasFocus || isStopButtonVisible)
-            (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-                params.marginStart = originalStartMargin
-                duckChatInput.layoutParams = params
-            }
+            applyLeftInputMargin(originalStartMargin)
         }
 
         duckChatInput.addTextChangedListener(
@@ -177,6 +175,14 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
+        applyLeftInputMargin(originalStartMargin)
+    }
+
+    private fun applyLeftInputMargin(margin: Int) {
+        (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+            params.marginStart = margin
+            duckChatInput.layoutParams = params
+        }
     }
 
     private fun submitMessage() {
@@ -194,10 +200,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 duckChatFireButton.isVisible = enableFireButton
                 duckChatNewChat.isVisible = enableNewChatButton
                 if (enableFireButton) {
-                    (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-                        params.marginStart = 0
-                        duckChatInput.layoutParams = params
-                    }
+                    applyLeftInputMargin(0)
                 }
             }
         }
