@@ -493,6 +493,7 @@
       "cookie",
       "messageBridge",
       "duckPlayer",
+      "duckPlayerNative",
       "harmfulApis",
       "webCompat",
       "windowsPermissionUsage",
@@ -504,8 +505,16 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", ...baseFeatures],
-    "apple-isolated": ["duckPlayer", "brokerProtection", "performanceMetrics", "clickToLoad", "messageBridge", "favicon"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures],
+    "apple-isolated": [
+      "duckPlayer",
+      "duckPlayerNative",
+      "brokerProtection",
+      "performanceMetrics",
+      "clickToLoad",
+      "messageBridge",
+      "favicon"
+    ],
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
     "android-autofill-password-import": ["autofillPasswordImport"],
