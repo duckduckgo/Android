@@ -41,6 +41,7 @@ class TopAppBarBehavior(
             R.id.browserLayout,
             R.id.webViewFullScreenContainer,
             R.id.navigationBar,
+            R.id.duckChatWebView,
         )
     }
 

@@ -17,7 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator.AnimatorListener
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.LayoutTransition
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.PendingIntent
@@ -69,6 +73,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -1076,9 +1081,54 @@ class BrowserTabFragment :
 
             private lateinit var previousViewMode : BrowserNavigationBarView.ViewMode
 
+
+            fun View.flip(duration: Long = 500, onEnd: (() -> Unit)? = null) {
+                val flipOut = ObjectAnimator.ofFloat(this, "rotationY", 0f, 90f).apply {
+                    this.duration = duration / 2
+                }
+                val flipIn = ObjectAnimator.ofFloat(this, "rotationY", -90f, 0f).apply {
+                    this.duration = duration / 2
+                }
+
+                flipOut.addListener(onEnd = {
+                    this.visibility = View.INVISIBLE
+                    onEnd?.invoke()
+                })
+
+                flipIn.addListener(onStart = {
+                    this.visibility = View.VISIBLE
+                })
+
+                AnimatorSet().apply {
+                    playSequentially(flipOut, flipIn)
+                    start()
+                }
+            }
+
             override fun onAiChatButtonClicked() {
-                binding.fadeOmnibar.gone()
-                binding.duckChatWebView.show()
+                val duration = 250L
+                val flipOut = ObjectAnimator.ofFloat( 0f, 90f).apply {
+                    this.duration = duration / 2
+                }
+                flipOut.addUpdateListener {
+                    binding.browserLayout.rotationY = it.animatedValue as Float
+                    binding.fadeOmnibar.rotationY = it.animatedValue as Float
+                }
+                val flipIn = ObjectAnimator.ofFloat(binding.duckChatWebView, "rotationY", -90f, 0f).apply {
+                    this.duration = duration / 2
+                }
+                flipOut.addListener(onEnd = {
+                    binding.browserLayout.hide()
+                    binding.fadeOmnibar.hide()
+                })
+                flipIn.addListener(onStart = {
+                    binding.duckChatWebView.show()
+                })
+
+                AnimatorSet().apply {
+                    playSequentially(flipOut, flipIn)
+                    start()
+                }
                 previousViewMode = binding.navigationBar.getViewMode()
                 binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.DuckChat)
 
@@ -1086,8 +1136,30 @@ class BrowserTabFragment :
             }
 
             override fun onWebButtonClicked() {
-                binding.fadeOmnibar.show()
-                binding.duckChatWebView.hide()
+                val duration = 250L
+                val flipIn = ObjectAnimator.ofFloat( 90f, 0f).apply {
+                    this.duration = duration / 2
+                }
+                flipIn.addUpdateListener {
+                    binding.browserLayout.rotationY = it.animatedValue as Float
+                    binding.fadeOmnibar.rotationY = it.animatedValue as Float
+                }
+                val flipOut = ObjectAnimator.ofFloat(binding.duckChatWebView, "rotationY",0f, -90f).apply {
+                    this.duration = duration / 2
+                }
+                flipIn.addListener(onStart = {
+                    binding.browserLayout.show()
+                    binding.fadeOmnibar.show()
+                })
+                flipOut.addListener(onEnd = {
+                    binding.duckChatWebView.hide()
+                })
+
+                AnimatorSet().apply {
+                    playSequentially(flipOut, flipIn)
+                    start()
+                }
+
                 binding.navigationBar.setViewMode(previousViewMode)
             }
         }

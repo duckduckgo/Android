@@ -142,9 +142,9 @@
     <com.duckduckgo.duckchat.impl.ui.DuckChatWebView
         android:id="@+id/duckChatWebView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:visibility="invisible"
-        app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
-        android:layout_height="match_parent" />
+        app:layout_behavior="com.duckduckgo.app.browser.webview.OnlyNavBarBrowserContainerLayoutBehavior" />
 
     <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
         android:id="@+id/newOmnibarBottom"

@@ -134,15 +134,15 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     fun showStopButton() {
-        duckChatTabLayout.isVisible = false
-        duckChatBack.isVisible = false
+        // duckChatTabLayout.isVisible = false
+        // duckChatBack.isVisible = false
         duckChatControls.visibility = View.INVISIBLE
         duckChatStop.isVisible = true
     }
 
     fun hideStopButton() {
-        duckChatTabLayout.isVisible = true
-        duckChatBack.isVisible = true
+        // duckChatTabLayout.isVisible = true
+        // duckChatBack.isVisible = true
         duckChatStop.isVisible = false
         duckChatControls.visibility = View.VISIBLE
     }

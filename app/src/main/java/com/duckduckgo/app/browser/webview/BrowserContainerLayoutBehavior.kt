@@ -65,6 +65,32 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     }
 }
 
+class OnlyNavBarBrowserContainerLayoutBehavior(
+    context: Context,
+    attrs: AttributeSet?,
+) : Behavior<View>(context, attrs) {
+
+    override fun layoutDependsOn(
+        parent: CoordinatorLayout,
+        child: View,
+        dependency: View,
+    ): Boolean {
+        return dependency.isBrowserNavigationBar()// || super.layoutDependsOn(parent, child, dependency)
+    }
+
+    override fun onDependentViewChanged(
+        parent: CoordinatorLayout,
+        child: View,
+        dependency: View,
+    ): Boolean {
+        return if (dependency.isBrowserNavigationBar()) {
+            offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
+        } else {
+            super.onDependentViewChanged(parent, child, dependency)
+        }
+    }
+}
+
 /**
  * A behavior that observes the position of the bottom [OmnibarLayout] ([OmnibarPosition.BOTTOM]), if present,
  * and applies bottom padding to the target view equal to the visible height of the omnibar.
