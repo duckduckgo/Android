@@ -428,12 +428,9 @@ class RealSubscriptionsManager @Inject constructor(
         packageName: String,
         purchaseToken: String,
     ): Boolean {
-        var experimentName: String? = null
-        var cohort: String? = null
-        experimentAssigned?.let { // FE experiment details
-            cohort = it.cohort
-            experimentName = it.name
-        }
+        // FE experiment details
+        val experimentName: String? = experimentAssigned?.name
+        val cohort: String? = experimentAssigned?.cohort
         return try {
             val confirmationResponse = subscriptionsService.confirm(
                 ConfirmationBody(
