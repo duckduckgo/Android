@@ -16,19 +16,32 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.addListener
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.mobile.android.R as CommonR
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 
 @InjectWith(ActivityScope::class)
@@ -37,6 +50,28 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
+
+    private val omnibarCardMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginHorizontal) }
+    private val omnibarCardMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop) }
+    private val omnibarCardMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom) }
+    private val omnibarCardFocusedMarginHorizontal by lazy {
+        resources.getDimensionPixelSize(
+            CommonR.dimen.experimentalOmnibarCardFocusedMarginHorizontal,
+        )
+    }
+    private val omnibarCardFocusedMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginTop) }
+    private val omnibarCardFocusedMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginBottom) }
+
+    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
+    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
+
+    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.duckChatControls) }
+    private val omnibarContent: View by lazy { findViewById(R.id.duckChatControlsContent) }
+
+    private var focusAnimator: ValueAnimator? = null
+    private var isStopButtonVisible = false
+    var enableFireButton = false
+    var enableNewChatButton = false
 
     val duckChatFireButton: View
     val duckChatInput: EditText
@@ -81,11 +116,23 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
         duckChatBack.setOnClickListener { onBack?.invoke() }
 
+        applyInputBehavior(duckChatTabLayout.selectedTabPosition)
+        duckChatTabLayout.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    applyInputBehavior(tab.position)
+                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            },
+        )
+
         duckChatInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 duckChatFireButton.isVisible = false
                 duckChatNewChat.isVisible = false
             }
+            animateOmnibarFocusedState(hasFocus || isStopButtonVisible)
             (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
                 params.marginStart = originalStartMargin
                 duckChatInput.layoutParams = params
@@ -96,7 +143,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    duckChatSend.isVisible = !s.isNullOrEmpty()
+                    duckChatSend.isVisible = !s.isNullOrEmpty() && duckChatTabLayout.selectedTabPosition == 1
                     duckChatFireButton.isVisible = false
                     duckChatNewChat.isVisible = false
                 }
@@ -104,25 +151,51 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             },
         )
 
+        duckChatInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                submitMessage()
+                true
+            } else {
+                false
+            }
+        }
+
         duckChatFireButton.isVisible = false
         duckChatNewChat.isVisible = false
     }
 
-    private fun submitMessage() {
-        val msg = duckChatInput.text.toString().trim()
-        if (msg.isNotEmpty()) {
-            if (duckChatTabLayout.selectedTabPosition == 0) {
-                onSearchSent?.invoke(msg)
+    private fun applyInputBehavior(tabPosition: Int) {
+        val isSearchTab = tabPosition == 0
+
+        duckChatInput.apply {
+            setSingleLine(isSearchTab)
+            maxLines = if (isSearchTab) 1 else 8
+            imeOptions = if (isSearchTab) {
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
             } else {
-                onDuckChatSent?.invoke(msg)
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_DONE
+            }
+        }
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
+    }
+
+    private fun submitMessage() {
+        val message = duckChatInput.text.toString().trim()
+        if (message.isNotEmpty()) {
+            if (duckChatTabLayout.selectedTabPosition == 0) {
+                onSearchSent?.invoke(message)
+            } else {
+                onDuckChatSent?.invoke(message)
             }
             duckChatInput.text.clear()
             duckChatInput.clearFocus()
-            duckChatFireButton.isVisible = true
-            duckChatNewChat.isVisible = true
-            (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-                params.marginStart = 0
-                duckChatInput.layoutParams = params
+            duckChatFireButton.isVisible = enableFireButton
+            duckChatNewChat.isVisible = enableNewChatButton
+            if (enableFireButton) {
+                (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+                    params.marginStart = 0
+                    duckChatInput.layoutParams = params
+                }
             }
         }
     }
@@ -136,8 +209,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     fun showStopButton() {
         duckChatTabLayout.isVisible = false
         duckChatBack.isVisible = false
-        duckChatControls.visibility = View.INVISIBLE
         duckChatStop.isVisible = true
+        duckChatControls.visibility = View.INVISIBLE
+        isStopButtonVisible = true
     }
 
     fun hideStopButton() {
@@ -145,5 +219,62 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatBack.isVisible = true
         duckChatStop.isVisible = false
         duckChatControls.visibility = View.VISIBLE
+        isStopButtonVisible = false
+    }
+
+    private fun animateOmnibarFocusedState(focused: Boolean) {
+        focusAnimator?.cancel()
+
+        val startTop = omnibarCard.marginTop
+        val startBottom = omnibarCard.marginBottom
+        val startStart = omnibarCard.marginStart
+        val startEnd = omnibarCard.marginEnd
+        val startStroke = omnibarCard.strokeWidth
+
+        val endTop = if (focused) omnibarCardFocusedMarginTop else omnibarCardMarginTop
+        val endBottom = if (focused) omnibarCardFocusedMarginBottom else omnibarCardMarginBottom
+        val endStart = if (focused) omnibarCardFocusedMarginHorizontal else omnibarCardMarginHorizontal
+        val endEnd = if (focused) omnibarCardFocusedMarginHorizontal else omnibarCardMarginHorizontal
+        val endStroke = if (focused) omnibarOutlineFocusedWidth else omnibarOutlineWidth
+
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = DEFAULT_ANIMATION_DURATION
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { valueAnimator ->
+                val fraction = valueAnimator.animatedFraction
+                (omnibarCard.layoutParams as MarginLayoutParams).apply {
+                    leftMargin = (startStart + (endStart - startStart) * fraction).toInt()
+                    topMargin = (startTop + (endTop - startTop) * fraction).toInt()
+                    rightMargin = (startEnd + (endEnd - startEnd) * fraction).toInt()
+                    bottomMargin = (startBottom + (endBottom - startBottom) * fraction).toInt()
+                }.also { omnibarCard.layoutParams = it }
+                omnibarCard.strokeWidth = (startStroke + (endStroke - startStroke) * fraction).toInt()
+            }
+            addListener(
+                onStart = { lockContentDimensions() },
+                onEnd = { if (!focused) unlockContentDimensions() },
+                onCancel = { removeAllListeners() },
+            )
+            start()
+            focusAnimator = this
+        }
+    }
+
+    private fun lockContentDimensions() {
+        omnibarContent.updateLayoutParams {
+            width = omnibarContent.measuredWidth
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+    }
+
+    private fun unlockContentDimensions() {
+        omnibarContent.updateLayoutParams {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_ANIMATION_DURATION = 300L
     }
 }
