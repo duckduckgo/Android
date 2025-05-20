@@ -291,6 +291,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.navigation.bar.BrowserNavigationBarView
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -1073,8 +1074,21 @@ class BrowserTabFragment :
                 viewModel.onNavigationBarBookmarksButtonClicked()
             }
 
+            private lateinit var previousViewMode : BrowserNavigationBarView.ViewMode
+
             override fun onAiChatButtonClicked() {
-                viewModel.onDuckChatOmnibarButtonClicked(query = null, activityResultLauncher = activityResultDuckChat)
+                binding.fadeOmnibar.gone()
+                binding.duckChatWebView.show()
+                previousViewMode = binding.navigationBar.getViewMode()
+                binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.DuckChat)
+
+                // viewModel.onDuckChatOmnibarButtonClicked(query = null, activityResultLauncher = activityResultDuckChat)
+            }
+
+            override fun onWebButtonClicked() {
+                binding.fadeOmnibar.show()
+                binding.duckChatWebView.hide()
+                binding.navigationBar.setViewMode(previousViewMode)
             }
         }
 

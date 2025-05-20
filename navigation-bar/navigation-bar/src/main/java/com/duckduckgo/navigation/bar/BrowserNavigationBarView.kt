@@ -25,6 +25,7 @@ import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -126,6 +127,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             viewModel.setViewMode(viewMode)
         }
     }
+
+    fun getViewMode(): ViewMode = viewModel.viewMode.value
 
     fun setFireButtonHighlight(highlighted: Boolean) {
         doOnAttach {

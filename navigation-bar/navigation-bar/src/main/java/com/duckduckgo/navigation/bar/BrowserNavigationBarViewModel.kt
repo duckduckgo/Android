@@ -17,7 +17,6 @@
 package com.duckduckgo.navigation.bar
 
 import android.annotation.SuppressLint
-import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,7 +60,8 @@ class BrowserNavigationBarViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private val isCustomTab = MutableStateFlow(false)
-    private val viewMode = MutableStateFlow(ViewMode.NewTab)
+    private val _viewMode = MutableStateFlow(ViewMode.NewTab)
+    val viewMode = _viewMode.asStateFlow()
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = combine(
@@ -70,7 +70,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         tabRepository.flowTabs,
         visualDesignExperimentDataStore.isExperimentEnabled,
         visualDesignExperimentDataStore.isDuckAIPoCEnabled,
-        viewMode,
+        _viewMode,
     ) { state, isCustomTab, tabs, isExperimentEnabled, isDuckAIPoCEnabled, viewMode ->
         state.copy(
             newTabButtonVisible = viewMode != ViewMode.NewTab,
@@ -137,7 +137,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
     }
 
     fun setViewMode(viewMode: ViewMode) {
-        this.viewMode.value = viewMode
+        this._viewMode.value = viewMode
     }
 
     fun setFireButtonHighlight(highlighted: Boolean) {
