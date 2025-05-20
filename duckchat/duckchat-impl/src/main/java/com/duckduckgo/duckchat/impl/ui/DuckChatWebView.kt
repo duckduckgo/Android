@@ -479,6 +479,26 @@ class DuckChatWebView @JvmOverloads constructor(
     //     super.onDestroy()
     // }
 
+    fun sendMessage(message: String) {
+        contentScopeScripts.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatNativePrompt",
+                params = JSONObject(
+                    """
+                            {
+                              "platform": "android",
+                              "query": {
+                                "prompt": "$message",
+                                "autoSubmit": true
+                              }
+                            }
+                            """,
+                ),
+            ),
+        )
+    }
+
     companion object {
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =

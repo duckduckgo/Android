@@ -1083,45 +1083,8 @@ class BrowserTabFragment :
                 viewModel.onNavigationBarBookmarksButtonClicked()
             }
 
-            private lateinit var previousViewMode : BrowserNavigationBarView.ViewMode
-
-
-            fun createCircularReveal(
-                view: View,
-                centerX: Int,
-                centerY: Int,
-                startRadius: Float,
-                endRadius: Float,
-                duration: Long
-            ): Animator {
-                return ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius).apply {
-                    this.duration = duration
-                    interpolator = AccelerateDecelerateInterpolator()
-                }
-            }
-
             override fun onAiChatButtonClicked() {
-                val duration = 250L
-                val targetView = binding.duckChatWebView
-
-                val centerX = targetView.width / 3
-                val centerY = targetView.height
-                val startRadius = 0f
-                val endRadius = hypot(centerX.toDouble(), centerY.toDouble()).toFloat()
-
-                targetView.show()
-
-                val reveal = createCircularReveal(targetView, centerX, centerY, startRadius, endRadius, duration)
-
-                // reveal.addListener(onStart = {
-                //     binding.browserLayout.hide()
-                //     binding.fadeOmnibar.hide()
-                // })
-
-                reveal.start()
-
-                previousViewMode = binding.navigationBar.getViewMode()
-                binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.DuckChat)
+                openDuckChat("")
 
                 // viewModel.onDuckChatOmnibarButtonClicked(query = null, activityResultLauncher = activityResultDuckChat)
             }
@@ -1156,6 +1119,51 @@ class BrowserTabFragment :
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
+    }
+    private lateinit var previousViewMode : BrowserNavigationBarView.ViewMode
+
+    fun createCircularReveal(
+        view: View,
+        centerX: Int,
+        centerY: Int,
+        startRadius: Float,
+        endRadius: Float,
+        duration: Long
+    ): Animator {
+        return ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius).apply {
+            this.duration = duration
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+    }
+
+    private fun openDuckChat(message: String) {
+        val duration = 250L
+        val targetView = binding.duckChatWebView
+
+        val centerX = targetView.width / 3
+        val centerY = targetView.height
+        val startRadius = 0f
+        val endRadius = hypot(centerX.toDouble(), centerY.toDouble()).toFloat()
+
+        targetView.show()
+
+        val reveal = createCircularReveal(targetView, centerX, centerY, startRadius, endRadius, duration)
+
+        // reveal.addListener(onStart = {
+        //     binding.browserLayout.hide()
+        //     binding.fadeOmnibar.hide()
+        // })
+
+        reveal.start()
+
+        previousViewMode = binding.navigationBar.getViewMode()
+        binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.DuckChat)
+
+        if (message.isNotBlank()) {
+            binding.duckChatWebView.sendMessage(message)
+        }
+
+        // viewModel.onDuckChatOmnibarButtonClicked(query = null, activityResultLauncher = activityResultDuckChat)
     }
 
     private fun configureEditModeChangeDetection() {
@@ -1220,7 +1228,9 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.onDuckChatOmnibarButtonClicked(query, activityResultLauncher = activityResultDuckChat)
+        openDuckChat(query)
+        hideKeyboard()
+        // viewModel.onDuckChatOmnibarButtonClicked(query, activityResultLauncher = activityResultDuckChat)
     }
 
     private fun configureCustomTab() {
