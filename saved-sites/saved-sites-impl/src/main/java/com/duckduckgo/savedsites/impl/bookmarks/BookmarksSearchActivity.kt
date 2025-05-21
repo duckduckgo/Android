@@ -35,6 +35,7 @@ import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksSearchBinding
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import javax.inject.Inject
 import android.view.MenuItem
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -55,7 +56,6 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupToolbar(binding.toolbar)
         setupBookmarksRecycler()
         observeViewModel()
         initializeSearchBar()
@@ -109,7 +109,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                 val items = state.sortedItems
                 bookmarksAdapter.setItems(
                     items,
-                    items.isEmpty() && intent.getStringExtra(EXTRA_PARENT_FOLDER_ID) == SavedSitesNames.BOOKMARKS_ROOT,
+                    items.isEmpty(),
                     false,
                 )
             }
@@ -120,6 +120,13 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                 is OpenSavedSite -> {
                     val resultIntent = Intent().apply {
                         putExtra(RESULT_URL_EXTRA, it.savedSiteUrl)
+                    }
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    finish()
+                }
+                is OpenBookmarkFolder -> {
+                    val resultIntent = Intent().apply {
+                        putExtra(RESULT_FOLDER, it.bookmarkFolder)
                     }
                     setResult(Activity.RESULT_OK, resultIntent)
                     finish()
@@ -198,18 +205,12 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
 
     companion object {
         const val RESULT_URL_EXTRA = "RESULT_URL_EXTRA"
-        const val EXTRA_PARENT_FOLDER_ID = "EXTRA_PARENT_FOLDER_ID"
-        const val EXTRA_PARENT_FOLDER_NAME = "EXTRA_PARENT_FOLDER_NAME"
+        const val RESULT_FOLDER = "RESULT_FOLDER"
 
         fun intent(
             context: Context,
-            parentFolderId: String,
-            parentFolderName: String
         ): Intent {
-            return Intent(context, BookmarksSearchActivity::class.java).apply {
-                putExtra(EXTRA_PARENT_FOLDER_ID, parentFolderId)
-                putExtra(EXTRA_PARENT_FOLDER_NAME, parentFolderName)
-            }
+            return Intent(context, BookmarksSearchActivity::class.java).apply {}
         }
     }
 } 

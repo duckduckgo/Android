@@ -50,6 +50,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.getSerializable
+import com.duckduckgo.common.utils.extensions.getSerializableExtra
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -207,12 +209,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         }
     }
 
-    private fun getParentFolderName() =
-        intent.extras?.getString(KEY_BOOKMARK_FOLDER_NAME)
-            ?: getString(R.string.bookmarksActivityTitle)
+    private fun getParentFolder(): BookmarkFolder? =
+        intent.extras?.getSerializable<BookmarkFolder>(KEY_BOOKMARK_FOLDER)
 
-    private fun getParentFolderId() = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID)
-        ?: SavedSitesNames.BOOKMARKS_ROOT
+    private fun getParentFolderName() = getParentFolder()?.name ?: ""
+
+    private fun getParentFolderId() = getParentFolder()?.id ?: SavedSitesNames.BOOKMARKS_ROOT
 
     private fun configurePromotionsContainer() {
         lifecycleScope.launch(dispatchers.main()) {
@@ -281,8 +283,15 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             SEARCH_BOOKMARKS_REQUEST_CODE -> {
                 if (resultCode == RESULT_OK) {
                     val savedSiteUrl = data?.getStringExtra(BookmarksSearchActivity.RESULT_URL_EXTRA)
-                    if (savedSiteUrl != null) {
-                        openSavedSite(savedSiteUrl)
+                    val bookmarkFolder = data?.getSerializableExtra<BookmarkFolder>(BookmarksSearchActivity.RESULT_FOLDER)
+
+                    when {
+                        savedSiteUrl != null -> {
+                            openSavedSite(savedSiteUrl)
+                        }
+                        bookmarkFolder != null -> {
+                            openBookmarkFolder(bookmarkFolder)
+                        }
                     }
                 }
             }
@@ -524,8 +533,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun showSearchBar() {
         val intent = BookmarksSearchActivity.intent(
             this,
-            getParentFolderId(),
-            getParentFolderName()
         )
         startActivityForResult(intent, SEARCH_BOOKMARKS_REQUEST_CODE)
     }
@@ -791,8 +798,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             val intent = Intent(context, BookmarksActivity::class.java)
             bookmarkFolder?.let {
                 val bundle = Bundle()
-                bundle.putString(KEY_BOOKMARK_FOLDER_ID, bookmarkFolder.id)
-                bundle.putString(KEY_BOOKMARK_FOLDER_NAME, bookmarkFolder.name)
+                bundle.putSerializable(KEY_BOOKMARK_FOLDER, bookmarkFolder)
                 intent.putExtras(bundle)
             }
             return intent
@@ -804,7 +810,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         private const val ADD_BOOKMARK_FOLDER_FRAGMENT_TAG = "ADD_BOOKMARK_FOLDER"
         private const val EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG = "EDIT_BOOKMARK_FOLDER"
 
-        private const val KEY_BOOKMARK_FOLDER_NAME = "KEY_BOOKMARK_FOLDER_NAME"
+        private const val KEY_BOOKMARK_FOLDER = "KEY_BOOKMARK_FOLDER"
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
