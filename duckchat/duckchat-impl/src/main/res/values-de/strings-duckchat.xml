@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Shortcuts</string>
     <string name="duck_chat_visibility_setting">Browsermenü</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresszeile</string>
+    <string name="duck_chat_assist_settings_title">Assist-Einstellungen</string>
+    <string name="duck_chat_assist_settings_description">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
 </resources>
