@@ -288,6 +288,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -337,7 +338,6 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -1440,7 +1440,7 @@ class BrowserTabFragment :
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.buckTryASearchAnimationEnabled.onEach {
-            if(it) {
+            if (it) {
                 renderer.renderBuckOnboardingTryASearchAnimation()
             }
         }.launchIn(lifecycleScope)
@@ -4252,7 +4252,7 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                             newBrowserTab.buckEndAnimation.isGone = true
                             val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
                             newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
@@ -4291,7 +4291,7 @@ class BrowserTabFragment :
             }
 
             if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                if(configuration is DaxBubbleCta.DaxEndCta) {
+                if (configuration is DaxBubbleCta.DaxEndCta) {
                     requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
                     with(newBrowserTab.buckEndAnimation) {
                         isVisible = true
