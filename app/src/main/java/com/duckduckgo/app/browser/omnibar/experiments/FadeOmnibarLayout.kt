@@ -220,7 +220,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             backIcon.gone()
         }
 
-        omniBarClickCatcher.isVisible = experimentDataStore.isDuckAIPoCEnabled.value
+        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     /**
