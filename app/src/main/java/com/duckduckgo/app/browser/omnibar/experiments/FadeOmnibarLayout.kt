@@ -26,6 +26,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.animation.addListener
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
@@ -161,7 +162,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         if (w != oldw || h != oldh) {
             // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
-            unlockContentDimensions()
+            // We need to do this after the layout pass that triggered onSizeChanged because there appears to be a race condition
+            // where layout param changes done directly in the onSizeChanged loop are not applied correctly.
+            doOnLayout {
+                unlockContentDimensions()
+            }
         }
     }
 
@@ -308,8 +313,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun onFindInPageShown() {
-        omniBarContentContainer.gone()
-        customTabToolbarContainerWrapper.gone()
+        omniBarContentContainer.hide()
+        customTabToolbarContainerWrapper.hide()
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
             omniBarContainer.show()
             browserMenu.gone()
