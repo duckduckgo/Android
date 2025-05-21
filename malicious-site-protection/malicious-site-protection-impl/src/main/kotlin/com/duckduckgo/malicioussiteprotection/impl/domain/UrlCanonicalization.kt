@@ -42,6 +42,7 @@ class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
             .replace(multipleDotsRegex, ".")
             .normalizeIpAddress()
             .percentEncodeDomain()
+            .removePrefix("www.")
             .split('.')
             .takeLast(6)
             .joinToString(".")
