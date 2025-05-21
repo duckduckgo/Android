@@ -43,8 +43,9 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
 
-    private val _experimentFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.self().isEnabled())
-    private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.self().isEnabled())
+    private val _experimentFeatureFlagEnabled =
+        MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
+    private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
 
     override val isExperimentEnabled: StateFlow<Boolean> = _experimentFeatureFlagEnabled.asStateFlow()
     override val isDuckAIPoCEnabled: StateFlow<Boolean> = _duckAIFeatureFlagEnabled.asStateFlow()
