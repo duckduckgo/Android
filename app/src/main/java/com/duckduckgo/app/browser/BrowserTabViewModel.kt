@@ -141,6 +141,7 @@ import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
+import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackgroundColor
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -2819,9 +2820,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta)
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
+
+    private fun isBuckExperimentEnabledAndDaxEndCta(cta: Cta?): Boolean =
+        onboardingDesignExperimentToggles.buckOnboarding().isEnabled() && cta is DaxBubbleCta.DaxEndCta
 
     fun onUserClickCtaOkButton(cta: Cta) {
         viewModelScope.launch {
@@ -4054,7 +4058,11 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+        if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()){
+            command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+        } else {
+            command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+        }
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =

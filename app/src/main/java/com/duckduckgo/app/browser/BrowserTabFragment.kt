@@ -337,6 +337,7 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -2067,6 +2068,7 @@ class BrowserTabFragment :
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
+            is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
@@ -2121,6 +2123,10 @@ class BrowserTabFragment :
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
         daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+    }
+
+    private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
+        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -4246,6 +4252,11 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
+                        if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                            newBrowserTab.buckEndAnimation.isGone = true
+                            val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
+                            newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
+                        }
                         showNewTab()
                     }
                 }
@@ -4278,6 +4289,17 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaDismissButton(configuration)
                 }
             }
+
+            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if(configuration is DaxBubbleCta.DaxEndCta) {
+                    requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+                    with(newBrowserTab.buckEndAnimation) {
+                        isVisible = true
+                        playAnimation()
+                    }
+                }
+            }
+
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
@@ -4306,12 +4328,7 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaDismissButton(configuration)
                 },
             )
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                val color = getBuckExperimentBackgroundColor()
-                daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(color)
-            } else {
-                viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
-            }
+            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
