@@ -185,7 +185,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private var previousTransitionState: TransitionState? = null
 
-    private val lifecycleOwner: LifecycleOwner by lazy {
+    protected val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
     }
 
