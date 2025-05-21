@@ -66,5 +66,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="600dp" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/buckMagnifyingGlassAnimation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.64"
+            app:lottie_rawRes="@raw/ob_5_mag_glass" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

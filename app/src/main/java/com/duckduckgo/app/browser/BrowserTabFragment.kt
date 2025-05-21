@@ -51,6 +51,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -68,12 +69,15 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -189,6 +193,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -321,7 +326,6 @@ import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -546,6 +550,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1431,6 +1438,12 @@ class BrowserTabFragment :
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
+        viewModel.buckTryASearchAnimationEnabled.onEach {
+            if(it) {
+                renderer.renderBuckOnboardingTryASearchAnimation()
+            }
+        }.launchIn(lifecycleScope)
+
         viewModel.command.observe(
             viewLifecycleOwner,
             Observer {
@@ -2052,6 +2065,7 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
+            is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
@@ -2099,6 +2113,10 @@ class BrowserTabFragment :
 
     private fun setBrowserBackgroundRes(backgroundRes: Int) {
         newBrowserTab.browserBackground.setImageResource(backgroundRes)
+    }
+
+    private fun setNewTabBackgroundColor(@ColorRes colorRes: Int) {
+        newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
@@ -4288,7 +4306,12 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaDismissButton(configuration)
                 },
             )
-            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
+            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                val color = getBuckExperimentBackgroundColor()
+                daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(color)
+            } else {
+                viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
+            }
             viewModel.onCtaShown()
         }
 
@@ -4401,6 +4424,11 @@ class BrowserTabFragment :
             binding.webViewFullScreenContainer.gone()
             (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
+        }
+
+        fun renderBuckOnboardingTryASearchAnimation() {
+            newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
+            newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
         }
     }
 
