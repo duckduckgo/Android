@@ -59,6 +59,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         updateFeatureState()
     }
 
+    @SuppressLint("DenyListedApi")
     override fun changeDuckAIPoCFlagPreference(enabled: Boolean) {
         experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         updateFeatureState()
