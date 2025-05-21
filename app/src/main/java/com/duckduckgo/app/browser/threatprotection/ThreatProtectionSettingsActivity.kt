@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.threatprotection
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
@@ -34,12 +34,16 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityThreatProtectionSettingsBinding
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenScamProtectionLearnMore
+import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenSmarterEncryptionLearnMore
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -64,6 +68,11 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
+        (binding.scamProtectionLearnMore.layoutParams as ViewGroup.MarginLayoutParams).let {
+            it.topMargin = -resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+            binding.scamProtectionLearnMore.layoutParams = it
+        }
+
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
@@ -73,7 +82,18 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         with(binding) {
             scamBlockerToggle.setOnCheckedChangeListener(scamProtectionToggleListener)
-            scamProtectionSettingInfo.setSpannable(R.string.scamProtectionSettingInfo) { viewModel.scamProtectionLearnMoreClicked() }
+            smarterEncryptionSettingInfo.setSpannable(R.string.smarterEncryptionDescription) { viewModel.smarterEncryptionLearnMoreClicked() }
+
+            binding.scamProtectionLearnMore.addClickableSpan(
+                textSequence = getText(R.string.maliciousSiteSettingLearnMore),
+                spans = listOf(
+                    "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.scamProtectionLearnMoreClicked()
+                        }
+                    },
+                ),
+            )
         }
     }
 
@@ -82,14 +102,13 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState?.let {
+                    binding.scamBlockerDisabledMessage.isVisible = !it.scamProtectionUserEnabled && it.scamProtectionRCEnabled
+                    binding.scamProtectionLearnMore.isVisible = it.scamProtectionRCEnabled
                     binding.scamBlockerToggle.quietlySetIsChecked(
                         newCheckedState = it.scamProtectionUserEnabled,
                         changeListener = scamProtectionToggleListener,
                     )
                     binding.scamBlockerToggle.isVisible = it.scamProtectionRCEnabled
-                    binding.scamProtectionSettingInfo.isVisible = it.scamProtectionRCEnabled
-
-                    binding.smarterEncryptionItem.setStatus(it.smarterEncryptionEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -110,6 +129,15 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
+            OpenSmarterEncryptionLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = SMARTER_ENCRYPTION_LEARN_MORE,
+                        screenTitle = getString(R.string.threatProtectionLearnMoreTitle),
+                    ),
+                )
+            }
         }
     }
 
@@ -117,7 +145,7 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
         @StringRes errorResource: Int,
         actionHandler: () -> Unit,
     ) {
-        val clickableSpan = object : ClickableSpan() {
+        val clickableSpan = object : DuckDuckGoClickableSpan() {
             override fun onClick(widget: View) {
                 actionHandler()
             }
@@ -143,5 +171,6 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/scam-blocker"
+        private const val SMARTER_ENCRYPTION_LEARN_MORE = "https://duckduckgo.com/duckduckgo-help-pages/privacy/smarter-encryption"
     }
 }
