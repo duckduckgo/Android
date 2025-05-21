@@ -38,4 +38,7 @@
 
     <string name="deep_link_auth_prompt_title">Set up Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Unlock device to set up Sync &amp; Backup</string>
+
+    <string name="login_screen_cant_scan_label">Can\'t Scan?</string>
+    <string name="login_screen_cant_scan_button_text">Copy Text Code</string>
 </resources>
