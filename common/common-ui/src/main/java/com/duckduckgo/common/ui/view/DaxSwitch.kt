@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.widget.CompoundButton
 import com.duckduckgo.mobile.android.R
@@ -30,7 +31,12 @@ class DaxSwitch @JvmOverloads constructor(
     ctx,
     attrs,
     defStyleAttr,
-)
+) {
+    override fun onSaveInstanceState(): Parcelable? {
+        super.onSaveInstanceState()
+        return null
+    }
+}
 
 fun DaxSwitch.quietlySetIsChecked(
     newCheckedState: Boolean,
