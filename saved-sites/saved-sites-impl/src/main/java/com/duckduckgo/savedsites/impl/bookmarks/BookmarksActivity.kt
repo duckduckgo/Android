@@ -86,6 +86,7 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksSearchActivity
 import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
@@ -273,6 +274,15 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     val selectedFile = data?.data
                     if (selectedFile != null) {
                         viewModel.exportSavedSites(selectedFile)
+                    }
+                }
+            }
+
+            SEARCH_BOOKMARKS_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    val savedSiteUrl = data?.getStringExtra(BookmarksSearchActivity.RESULT_URL_EXTRA)
+                    if (savedSiteUrl != null) {
+                        openSavedSite(savedSiteUrl)
                     }
                 }
             }
@@ -504,29 +514,20 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             binding.searchBarSorting.gone()
         }
 
-        searchBar.onAction {
-            when (it) {
-                is SearchBar.Action.PerformUpAction -> hideSearchBar()
-                is SearchBar.Action.PerformSearch -> if (this::searchListener.isInitialized) {
-                    searchListener.onQueryTextChange(it.searchText)
-                }
-            }
-        }
+        // Search bar action handling removed as search is now in a separate activity
     }
 
     override fun onBackPressed() {
-        if (searchBar.isVisible) {
-            hideSearchBar()
-        } else {
-            super.onBackPressed()
-        }
+        super.onBackPressed()
     }
 
     private fun showSearchBar() {
-        viewModel.fetchAllBookmarksAndFolders()
-        toolbar.gone()
-        searchBar.handle(SearchBar.Event.ShowSearchBar)
-        bookmarksAdapter.isInSearchMode = true
+        val intent = BookmarksSearchActivity.intent(
+            this,
+            getParentFolderId(),
+            getParentFolderName()
+        )
+        startActivityForResult(intent, SEARCH_BOOKMARKS_REQUEST_CODE)
     }
 
     private fun showBookmarksPopupMenu(
@@ -572,12 +573,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         popupMenu.show(binding.root, binding.browserMenu)
     }
 
-    private fun hideSearchBar() {
-        toolbar.show()
-        viewModel.fetchBookmarksAndFolders(getParentFolderId())
-        searchBar.handle(SearchBar.Event.DismissSearchBar)
-        bookmarksAdapter.isInSearchMode = false
-    }
+    // Method removed as search is now handled in a separate activity
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
         val dialog = EditSavedSiteDialogFragment.instance(savedSite, getParentFolderId(), getParentFolderName())
@@ -812,6 +808,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
+        private const val SEARCH_BOOKMARKS_REQUEST_CODE = 113
 
         private val EXPORT_BOOKMARKS_FILE_NAME: String
             get() = "bookmarks_ddg_${formattedTimestamp()}.html"

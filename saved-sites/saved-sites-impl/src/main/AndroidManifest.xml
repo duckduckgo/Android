@@ -12,6 +12,11 @@
             android:name="com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity"
             android:exported="false"
             android:label="@string/folderLocationTitle" />
+
+        <activity
+            android:name="com.duckduckgo.savedsites.impl.bookmarks.BookmarksSearchActivity"
+            android:exported="false"
+            android:label="@string/searchDuckDuckGo" />
     </application>
 
 </manifest>
