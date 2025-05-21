@@ -159,6 +159,9 @@
         <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/black</item>
 
+        <!-- Privacy Pro -->
+        <item name="daxColorPaywallToolbar">@color/gray100</item>
+
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
@@ -261,6 +264,9 @@
 
         <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/white_60</item>
+
+        <!-- Privacy Pro -->
+        <item name="daxColorPaywallToolbar">@color/white</item>
 
         <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>

@@ -69,6 +69,7 @@
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>
     <attr name="daxColorBrowserOverlay" format="color"/>
+    <attr name="daxColorPaywallToolbar" format="color"/>
 
     <!-- Visual Design Specific Colors -->
     <attr name="daxColorControlFillPrimary" format="color"/>
