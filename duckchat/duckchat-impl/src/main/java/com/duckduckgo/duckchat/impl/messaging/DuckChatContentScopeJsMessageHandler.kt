@@ -43,6 +43,9 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             "openAIChat",
             "closeAIChat",
             "openAIChatSettings",
+            "responseState",
+            "hideChatInput",
+            "showChatInput",
         )
     }
 }
