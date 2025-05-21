@@ -74,15 +74,15 @@ class RealDuckChatJSHelper @Inject constructor(
         METHOD_RESPONSE_STATE -> {
             ChatState
                 .fromValue(data?.optString("status"))
-                ?.let { status -> duckChat.processChatState(status) }
+                ?.let { status -> duckChat.updateChatState(status) }
             null
         }
         METHOD_HIDE_CHAT_INPUT -> {
-            duckChat.processChatState(HIDE)
+            duckChat.updateChatState(HIDE)
             null
         }
         METHOD_SHOW_CHAT_INPUT -> {
-            duckChat.processChatState(SHOW)
+            duckChat.updateChatState(SHOW)
             null
         }
         else -> null

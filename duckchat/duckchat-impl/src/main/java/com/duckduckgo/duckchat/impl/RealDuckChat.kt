@@ -109,8 +109,14 @@ interface DuckChatInternal : DuckChat {
      */
     fun isDuckChatUserEnabled(): Boolean
 
-    fun processChatState(state: ChatState)
+    /**
+     * Updates the current chat state.
+     */
+    fun updateChatState(state: ChatState)
 
+    /**
+     * Returns the current chat state.
+     */
     val chatState: StateFlow<ChatState>
 }
 
@@ -257,7 +263,7 @@ class RealDuckChat @Inject constructor(
         return isDuckChatUserEnabled
     }
 
-    override fun processChatState(state: ChatState) {
+    override fun updateChatState(state: ChatState) {
         _chatState.value = state
     }
 
