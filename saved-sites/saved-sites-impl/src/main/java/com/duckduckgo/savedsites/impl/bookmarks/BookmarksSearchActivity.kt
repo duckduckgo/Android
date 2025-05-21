@@ -37,6 +37,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import javax.inject.Inject
 import android.view.MenuItem
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 
 @InjectWith(ActivityScope::class)
 class BookmarksSearchActivity : DuckDuckGoActivity() {

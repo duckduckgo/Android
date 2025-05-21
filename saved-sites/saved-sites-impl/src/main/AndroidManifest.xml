@@ -16,7 +16,7 @@
         <activity
             android:name="com.duckduckgo.savedsites.impl.bookmarks.BookmarksSearchActivity"
             android:exported="false"
-            android:label="@string/searchDuckDuckGo" />
+            android:label="@string/bookmarksActivityTitle" />
     </application>
 
 </manifest>

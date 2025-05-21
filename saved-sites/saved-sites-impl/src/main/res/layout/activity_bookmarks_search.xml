@@ -6,11 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".bookmarks.BookmarksSearchActivity">
 
-    <com.duckduckgo.common.ui.view.SearchBar
+    <com.duckduckgo.common.ui.view.SearchBarView
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/keyline_2"
+        android:visibility="gone"
+        app:clearActionContentDescription="@string/searchbar_cleartextaction_content_description_default"
+        app:searchHint="@string/searchBookmarks" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
