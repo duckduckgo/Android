@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Бързи Връзки</string>
     <string name="duck_chat_visibility_setting">Меню на браузъра</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресна лента</string>
+    <string name="duck_chat_assist_settings_title">Настройки на Assist</string>
+    <string name="duck_chat_assist_settings_description">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
 </resources>
