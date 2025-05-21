@@ -89,8 +89,8 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         binding.experimentalUIMode.isVisible = viewState.isBrowserThemingFeatureAvailable
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
 
-        binding.duckAIPoC.isVisible = viewState.isDuckAIPoCFeatureAvailable && viewState.isBrowserThemingFeatureEnabled
-        binding.duckAIPoC.quietlySetIsChecked(viewState.isDuckAIPoCFeatureEnabled, duckAIPoCToggleListener)
+        binding.duckAIPoC.isVisible = viewState.isduckAiPoCFeatureAvailable && viewState.isBrowserThemingFeatureEnabled
+        binding.duckAIPoC.quietlySetIsChecked(viewState.isduckAiPoCFeatureEnabled, duckAIPoCToggleListener)
 
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }
