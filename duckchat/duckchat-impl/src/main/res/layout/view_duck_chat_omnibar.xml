@@ -25,14 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/ic_find_search_24"
-            android:text="Search" />
+            android:text="@string/duck_chat_search_tab" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_duck_ai"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/ic_ai_chat_24"
-            android:text="Duck.ai" />
+            android:text="@string/duck_chat_ai_tab" />
 
     </com.google.android.material.tabs.TabLayout>
 
