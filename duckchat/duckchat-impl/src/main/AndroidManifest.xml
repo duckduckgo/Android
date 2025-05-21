@@ -20,6 +20,7 @@
         <activity
             android:name="com.duckduckgo.duckchat.impl.ui.DuckChatSettingsActivity"
             android:exported="false"
+            android:label="@string/duck_chat_title"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivity"
