@@ -123,7 +123,6 @@ enum class ChatState(val value: String) {
     BLOCKED("blocked"),
     HIDE("hide"),
     SHOW("show"),
-
     ;
 
     companion object {
