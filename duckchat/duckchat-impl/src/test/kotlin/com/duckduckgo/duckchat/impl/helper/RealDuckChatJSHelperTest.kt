@@ -177,6 +177,7 @@ class RealDuckChatJSHelperTest {
             put("isAIChatHandoffEnabled", true)
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
