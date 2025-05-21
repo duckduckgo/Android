@@ -25,10 +25,12 @@ import android.os.Message
 import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.AnyThread
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -43,7 +45,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -66,7 +67,6 @@ import com.duckduckgo.duckchat.impl.ChatState.START_STREAM_NEW_PROMPT
 import com.duckduckgo.duckchat.impl.ChatState.STREAMING
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -137,13 +137,13 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @Inject
     lateinit var appBrowserNav: BrowserNav
 
-    private val binding: ActivityDuckChatWebviewBinding by viewBinding()
-
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
-    private val toolbar
-        get() = binding.includeToolbar.toolbar
+    private val root: ViewGroup by lazy { findViewById(android.R.id.content) }
+    private val toolbar: Toolbar by lazy { findViewById(com.duckduckgo.mobile.android.R.id.toolbar) }
+    private val simpleWebview: WebView by lazy { findViewById(R.id.simpleWebview) }
+    private val duckChatOmnibar: DuckChatOmnibarLayout by lazy { findViewById(R.id.duckChatOmnibar) }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,16 +153,18 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             finish()
         }
 
-        setContentView(binding.root)
         if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
+            setContentView(R.layout.activity_duck_chat_webview_poc)
             configurePoCUI()
+        } else {
+            setContentView(R.layout.activity_duck_chat_webview)
+            setupToolbar(toolbar)
         }
-        setupToolbar(toolbar)
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
         val url = params?.url
 
-        binding.simpleWebview.let {
+        simpleWebview.let {
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -230,17 +232,14 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
         }
 
         url?.let {
-            binding.simpleWebview.loadUrl(it)
+            simpleWebview.loadUrl(it)
         }
     }
 
     private fun configurePoCUI() {
-        binding.duckChatOmnibar.isVisible = true
-        binding.includeToolbar.toolbar.isVisible = false
-
-        binding.duckChatOmnibar.selectTab(1)
-
-        binding.duckChatOmnibar.apply {
+        duckChatOmnibar.apply {
+            isVisible = true
+            selectTab(1)
             onFire = {
                 ActionBottomSheetDialog.Builder(this@DuckChatWebViewActivity)
                     .setTitle(context.getString(R.string.duck_chat_delete_this_chat))
@@ -314,26 +313,26 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                     Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
 
                     when (state) {
-                        START_STREAM_NEW_PROMPT -> binding.duckChatOmnibar.hideStopButton()
-                        LOADING -> binding.duckChatOmnibar.showStopButton()
-                        STREAMING -> binding.duckChatOmnibar.showStopButton()
-                        ERROR -> binding.duckChatOmnibar.hideStopButton()
+                        START_STREAM_NEW_PROMPT -> duckChatOmnibar.hideStopButton()
+                        LOADING -> duckChatOmnibar.showStopButton()
+                        STREAMING -> duckChatOmnibar.showStopButton()
+                        ERROR -> duckChatOmnibar.hideStopButton()
                         READY -> {
-                            binding.duckChatOmnibar.hideStopButton()
-                            binding.duckChatOmnibar.isVisible = true
+                            duckChatOmnibar.hideStopButton()
+                            duckChatOmnibar.isVisible = true
                         }
-                        BLOCKED -> binding.duckChatOmnibar.hideStopButton()
-                        HIDE -> binding.duckChatOmnibar.isVisible = false
-                        SHOW -> binding.duckChatOmnibar.isVisible = true
+                        BLOCKED -> duckChatOmnibar.hideStopButton()
+                        HIDE -> duckChatOmnibar.isVisible = false
+                        SHOW -> duckChatOmnibar.isVisible = true
                     }
                 }
             }
         }
 
-        binding.simpleWebview.apply {
+        simpleWebview.apply {
             setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    hideKeyboard(binding.duckChatOmnibar.duckChatInput)
+                    hideKeyboard(duckChatOmnibar.duckChatInput)
                 }
                 false
             }
@@ -352,8 +351,8 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     }
 
     override fun onBackPressed() {
-        if (binding.simpleWebview.canGoBack()) {
-            binding.simpleWebview.goBack()
+        if (simpleWebview.canGoBack()) {
+            simpleWebview.goBack()
         } else {
             super.onBackPressed()
         }
@@ -385,16 +384,16 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        binding.root.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+        root.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = binding.root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        binding.root.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        val downloadFailedSnackbar = root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        root.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = binding.root.makeSnackbarWithNoBottomInset(
+        val downloadSucceededSnackbar = root.makeSnackbarWithNoBottomInset(
             getString(command.messageId, command.fileName),
             Snackbar.LENGTH_LONG,
         )
@@ -406,7 +405,7 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                     }
                 }
             }
-        binding.root.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        root.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun requestFileDownload(
