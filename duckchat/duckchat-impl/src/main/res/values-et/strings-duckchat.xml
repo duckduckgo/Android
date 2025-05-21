@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Otseteed</string>
     <string name="duck_chat_visibility_setting">Brauseri menüü</string>
     <string name="duck_chat_address_bar_visibility_setting">Aadressiriba</string>
+    <string name="duck_chat_assist_settings_title">Assisti seaded</string>
+    <string name="duck_chat_assist_settings_description">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
 </resources>
