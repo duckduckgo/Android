@@ -45,13 +45,13 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val smarterEncryptionEnabled: Boolean = true,
         val scamProtectionUserEnabled: Boolean,
         val scamProtectionRCEnabled: Boolean,
     )
 
     sealed class Command {
         data object OpenScamProtectionLearnMore : Command()
+        data object OpenSmarterEncryptionLearnMore : Command()
     }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -64,7 +64,8 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             _viewState.value = ViewState(
                 scamProtectionUserEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
-                scamProtectionRCEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
+                scamProtectionRCEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() &&
+                    maliciousSiteProtection.isFeatureEnabled(),
             )
         }
     }
@@ -85,6 +86,10 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
 
     fun scamProtectionLearnMoreClicked() {
         sendCommand(Command.OpenScamProtectionLearnMore)
+    }
+
+    fun smarterEncryptionLearnMoreClicked() {
+        sendCommand(Command.OpenSmarterEncryptionLearnMore)
     }
 
     private fun sendCommand(newCommand: Command) {
