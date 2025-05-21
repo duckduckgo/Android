@@ -48,8 +48,9 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        if (autofillServiceFeature.canUpdateAppToDomainDataset().isEnabled().not()) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (autofillServiceFeature.canUpdateAppToDomainDataset().isEnabled().not()) return@launch
+
             Timber.d("Autofill-mapping: Attempting to download")
             download()
             removeExpiredCachedData()
