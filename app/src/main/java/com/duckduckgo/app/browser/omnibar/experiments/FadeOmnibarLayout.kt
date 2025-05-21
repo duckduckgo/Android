@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +26,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.animation.addListener
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
@@ -34,9 +34,6 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeFadeOmnibarFindInPageBinding
@@ -51,19 +48,10 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -71,8 +59,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
-
-    private val conflatedFocusStateJob = ConflatedJob()
 
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
@@ -83,9 +69,17 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
     }
-    private var isFindInPageVisible = MutableStateFlow(false)
+    private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
-        isFindInPageVisible.value = findInPage.findInPageContainer.isVisible
+        val isVisible = findInPage.findInPageContainer.isVisible
+        if (isFindInPageVisible != isVisible) {
+            isFindInPageVisible = isVisible
+            if (isVisible) {
+                onFindInPageShown()
+            } else {
+                onFindInPageHidden()
+            }
+        }
     }
 
     /**
@@ -149,38 +143,14 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     override fun onAttachedToWindow() {
-        Timber.d("lp_test; onAttachedToWindow")
         super.onAttachedToWindow()
         findInPage.findInPageContainer.viewTreeObserver.addOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
-
-        val coroutineScope = requireNotNull(findViewTreeLifecycleOwner()?.lifecycleScope)
-        conflatedFocusStateJob += coroutineScope.launch {
-            isFindInPageVisible.collect {
-                if (it) {
-                    onFindInPageShown()
-                } else {
-                    onFindInPageHidden()
-                }
-            }
-        }
-        conflatedFocusStateJob += coroutineScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle)
-                .map { it.hasFocus }
-                .combine(isFindInPageVisible) { hasFocus, isFindInPageVisible ->
-                    hasFocus || isFindInPageVisible
-                }.distinctUntilChanged().collectLatest {
-                    animateOmnibarFocusedState(it)
-                }
-        }
     }
 
     override fun onDetachedFromWindow() {
-        Timber.d("lp_test; onDetachedFromWindow")
         super.onDetachedFromWindow()
-        conflatedFocusStateJob.cancel()
         focusAnimator?.cancel()
         findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
-        unlockContentDimensions()
     }
 
     override fun onSizeChanged(
@@ -192,7 +162,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         if (w != oldw || h != oldh) {
             // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
-            unlockContentDimensions()
+            // We need to do this after the layout pass that triggered onSizeChanged because there appears to be a race condition
+            // where layout param changes done directly in the onSizeChanged loop are not applied correctly.
+            doOnLayout {
+                unlockContentDimensions()
+            }
         }
     }
 
@@ -200,12 +174,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         super.render(viewState)
 
         renderShadows(viewState.showShadows)
+
+        if (viewState.hasFocus || isFindInPageVisible) {
+            animateOmnibarFocusedState(focused = true)
+        } else {
+            animateOmnibarFocusedState(focused = false)
+        }
     }
 
     override fun renderButtons(viewState: ViewState) {
         tabsMenu.isVisible = false
         fireIconMenu.isVisible = false
-        browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab && viewState.showBrowserMenu && !isFindInPageVisible.value
+        browserMenu.isVisible = viewState.viewMode is ViewMode.CustomTab && viewState.showBrowserMenu && !isFindInPageVisible
         browserMenuHighlight.isVisible = false
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
@@ -315,7 +295,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
      * When focused, we resize the wrapping card to make the stroke appear "outside" but we don't want the content to expand with it.
      */
     private fun lockContentDimensions() {
-        Timber.d("lp_test ${this.hashCode()}; lock")
         omniBarContentContainer.updateLayoutParams {
             width = omniBarContentContainer.measuredWidth
             height = omniBarContentContainer.measuredHeight
@@ -327,7 +306,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
      * like resizing the app window or changing device orientation.
      */
     private fun unlockContentDimensions() {
-        Timber.d("lp_test ${this.hashCode()}; unlock")
         omniBarContentContainer.updateLayoutParams {
             width = ViewGroup.LayoutParams.MATCH_PARENT
             height = ViewGroup.LayoutParams.MATCH_PARENT
@@ -335,12 +313,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun onFindInPageShown() {
-        omniBarContentContainer.gone()
-        customTabToolbarContainerWrapper.gone()
+        omniBarContentContainer.hide()
+        customTabToolbarContainerWrapper.hide()
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
             omniBarContainer.show()
             browserMenu.gone()
         }
+        animateOmnibarFocusedState(focused = true)
     }
 
     private fun onFindInPageHidden() {
@@ -349,6 +328,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
             omniBarContainer.hide()
             browserMenu.isVisible = viewModel.viewState.value.showBrowserMenu
+        }
+        if (!viewModel.viewState.value.hasFocus) {
+            animateOmnibarFocusedState(focused = false)
         }
     }
 
