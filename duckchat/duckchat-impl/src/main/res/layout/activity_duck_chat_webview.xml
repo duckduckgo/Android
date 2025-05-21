@@ -36,7 +36,6 @@
         android:id="@+id/simpleWebview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:focusableInTouchMode="true"
         app:layout_constraintTop_toBottomOf="@id/includeToolbar"
         app:layout_constraintBottom_toTopOf="@id/duckChatOmnibar"
         app:layout_constraintStart_toStartOf="parent"

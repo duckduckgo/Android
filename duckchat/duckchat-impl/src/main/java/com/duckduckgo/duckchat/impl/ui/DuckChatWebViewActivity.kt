@@ -154,33 +154,13 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
         }
 
         setContentView(binding.root)
-        configureUI()
+        if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
+            configurePoCUI()
+        }
         setupToolbar(toolbar)
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
         val url = params?.url
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                duckChat.chatState.collect { state ->
-                    Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
-
-                    when (state) {
-                        START_STREAM_NEW_PROMPT -> binding.duckChatOmnibar.hideStopButton()
-                        LOADING -> binding.duckChatOmnibar.showStopButton()
-                        STREAMING -> binding.duckChatOmnibar.showStopButton()
-                        ERROR -> binding.duckChatOmnibar.hideStopButton()
-                        READY -> {
-                            binding.duckChatOmnibar.hideStopButton()
-                            binding.duckChatOmnibar.isVisible = true
-                        }
-                        BLOCKED -> binding.duckChatOmnibar.hideStopButton()
-                        HIDE -> binding.duckChatOmnibar.isVisible = false
-                        SHOW -> binding.duckChatOmnibar.isVisible = true
-                    }
-                }
-            }
-        }
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -199,12 +179,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
                     }
                     return false
                 }
-            }
-            binding.simpleWebview.setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    hideKeyboard(binding.duckChatOmnibar.duckChatInput)
-                }
-                false
             }
 
             it.settings.apply {
@@ -260,10 +234,9 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
         }
     }
 
-    private fun configureUI() {
-        val pocEnabled = experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value
-        binding.duckChatOmnibar.isVisible = pocEnabled
-        binding.includeToolbar.toolbar.isVisible = !pocEnabled
+    private fun configurePoCUI() {
+        binding.duckChatOmnibar.isVisible = true
+        binding.includeToolbar.toolbar.isVisible = false
 
         binding.duckChatOmnibar.selectTab(1)
 
@@ -333,6 +306,38 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             onBack = { onBackPressed() }
             enableFireButton = true
             enableNewChatButton = true
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                duckChat.chatState.collect { state ->
+                    Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
+
+                    when (state) {
+                        START_STREAM_NEW_PROMPT -> binding.duckChatOmnibar.hideStopButton()
+                        LOADING -> binding.duckChatOmnibar.showStopButton()
+                        STREAMING -> binding.duckChatOmnibar.showStopButton()
+                        ERROR -> binding.duckChatOmnibar.hideStopButton()
+                        READY -> {
+                            binding.duckChatOmnibar.hideStopButton()
+                            binding.duckChatOmnibar.isVisible = true
+                        }
+                        BLOCKED -> binding.duckChatOmnibar.hideStopButton()
+                        HIDE -> binding.duckChatOmnibar.isVisible = false
+                        SHOW -> binding.duckChatOmnibar.isVisible = true
+                    }
+                }
+            }
+        }
+
+        binding.simpleWebview.apply {
+            setOnTouchListener { v, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    hideKeyboard(binding.duckChatOmnibar.duckChatInput)
+                }
+                false
+            }
+            isFocusableInTouchMode = true
         }
     }
 
