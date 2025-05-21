@@ -59,16 +59,15 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scan QR Code</string>
-    <string name="login_screen_enter_code_cta">Or Manually Enter Code</string>
+    <string name="login_screen_enter_code_cta">Manually Enter Code</string>
     <string name="login_screen_barcode_hint">Point camera at QR code to sync</string>
-    <string name="login_screen_cant_scan">Can\'t Scan? <font color="#7295F6">Share Text Code</font></string>
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync With Another Device.\"</string>
-    <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.</string>
+    <string name="connect_screen_scan_qr_hint">Open the DuckDuckGo app on your other device and go to <b>Settings > Sync &amp; Back Up > Sync With Another Device</b>.</string>
+    <string name="connect_screen_enter_code_cta">Manually Enter Code</string>
+    <string name="connect_screen_connect_qr_hint_title">Or scan with DuckDuckGo on your other device</string>
+    <string name="connect_screen_connect_qr_hint_content">Open DuckDuckGo on your other device and scan this code to sync.</string>
     <string name="connect_screen_share_code">Copy Code</string>
 
     <!-- Enter Code screen -->
