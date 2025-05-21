@@ -43,8 +43,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
     data class ViewState(
         val isBrowserThemingFeatureAvailable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
-        val isduckAiPoCFeatureAvailable: Boolean = false,
-        val isduckAiPoCFeatureEnabled: Boolean = false,
+        val isDuckAIPoCFeatureAvailable: Boolean = false,
+        val isDuckAIPoCFeatureEnabled: Boolean = false,
         val selectedTheme: String = "",
     )
 
@@ -64,8 +64,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
                 it.copy(
                     isBrowserThemingFeatureAvailable = true,
                     isBrowserThemingFeatureEnabled = isBrowserTheming,
-                    isduckAiPoCFeatureAvailable = true,
-                    isduckAiPoCFeatureEnabled = isDuckAIPoC,
+                    isDuckAIPoCFeatureAvailable = true,
+                    isDuckAIPoCFeatureEnabled = isDuckAIPoC,
                 )
             }
         }.launchIn(viewModelScope)
