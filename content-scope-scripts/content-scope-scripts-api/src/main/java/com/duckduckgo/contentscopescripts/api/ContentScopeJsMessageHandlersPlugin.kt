@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.js.messaging.api.JsMessageHandler
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation project(':js-messaging-api')
-}
-
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
+/**
+ * Implement this interface and contribute it as a multibinding to manage JS Messages that are sent to C-S-S
+ */
+interface ContentScopeJsMessageHandlersPlugin {
+    /**
+     * @return a [JsMessageHandler] that will be used to handle the JS messages
+     */
+    fun getJsMessageHandler(): JsMessageHandler
 }
