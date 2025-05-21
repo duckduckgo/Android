@@ -34,7 +34,7 @@ class ThreatProtectionSettingsTitle @Inject constructor(
 ) : ThreatProtectionSettingsPlugin {
     override fun getView(context: Context): View {
         return SettingsListItem(context).apply {
-            setLeadingIconResource(R.drawable.ic_threat_protection)
+            setLeadingIconResource(R.drawable.shield_neutral_color_24)
             setPrimaryText(context.getString(R.string.threatProtectionTitle))
             setOnClickListener {
                 globalActivityStarter.start(this.context, ThreatProtectionSettingsNoParams, null)

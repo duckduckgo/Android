@@ -32,36 +32,45 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-            android:id="@+id/duckPlayerLayout"
+            android:id="@+id/threatProtectionSettingsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
             <ImageView
-                android:id="@+id/duckPlayerSettingsIcon"
+                android:id="@+id/threatProtectionSettingsIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                android:src="@drawable/shield_check_128" />
+                android:src="@drawable/ic_shield_check_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/duckPlayerSettingsTitle"
+                android:id="@+id/threatProtectionSettingsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
                 android:text="@string/threatProtectionTitle"
+                android:breakStrategy="balanced"
                 app:typography="h2" />
 
+            <com.duckduckgo.common.ui.view.StatusIndicatorView
+                android:id="@+id/statusIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_1"
+                app:indicatorStatus="on"/>
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/duckPlayerSettingsText"
+                android:id="@+id/threatProtectionSettingsDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginHorizontal="@dimen/keyline_6"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
                 android:text="@string/threatProtectionDescription"
@@ -71,37 +80,54 @@
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4" />
+                android:layout_marginTop="@dimen/keyline_6" />
 
-            <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/smarterEncryptionItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/smarterEncryptionTitle"
-                app:secondaryText="@string/smarterEncryptionDescription"
-                app:indicatorStatus="alwaysOn"
+                app:secondaryText="@string/alwaysOn"
                 />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/smarterEncryptionSettingInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                tools:text="Automatically upgrades links to HTTPS whenever possible\nLearn More"
+                android:visibility="visible"
+                android:textColor="?daxColorTertiaryText"
+                app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/scamBlockerToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_1"
-                android:paddingHorizontal="16dp"
                 app:primaryText="@string/scamBlockerTitle"
                 app:secondaryText="@string/scamBlockerDescription"
                 app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/scamProtectionSettingInfo"
+                android:id="@+id/scamProtectionLearnMore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                tools:text="Learn More"
+                android:visibility="visible"
+                android:textColor="?daxColorTertiaryText"
+                app:typography="body2"/>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/scamBlockerDisabledMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/scamProtectionSettingInfo"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:text="@string/maliciousSiteSettingDisabled"
                 android:visibility="visible"
-                android:textColor="?daxColorTertiaryText"
+                android:textColor="?daxColorDestructive"
                 app:typography="body2" />
 
         </LinearLayout>
