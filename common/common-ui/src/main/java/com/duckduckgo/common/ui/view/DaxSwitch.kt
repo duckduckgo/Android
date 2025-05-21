@@ -31,12 +31,7 @@ class DaxSwitch @JvmOverloads constructor(
     ctx,
     attrs,
     defStyleAttr,
-) {
-    override fun onSaveInstanceState(): Parcelable? {
-        super.onSaveInstanceState()
-        return null
-    }
-}
+)
 
 fun DaxSwitch.quietlySetIsChecked(
     newCheckedState: Boolean,
