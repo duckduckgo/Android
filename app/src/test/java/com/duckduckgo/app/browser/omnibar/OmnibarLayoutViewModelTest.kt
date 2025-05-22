@@ -68,6 +68,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
+    private val disabledDuckAIPoCStateFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -92,6 +93,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(disabledDuckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
 
         initializeViewModel()
