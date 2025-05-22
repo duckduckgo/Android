@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Περιλαμβάνει το VPN μας και τα Personal Information Removal και Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Περιλαμβάνει το VPN μας και τo Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Απόκτησε το Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Δοκιμάστε το Privacy Pro δωρεάν</string>
     <string name="subscriptionSettingRestore">Έχω συνδρομή</string>
     <string name="subscriptionSettingExpired">Η συνδρομή σας στο Privacy Pro έληξε</string>
     <string name="subscriptionSettingExpiredViewPlans">Προβολή προγραμμάτων</string>

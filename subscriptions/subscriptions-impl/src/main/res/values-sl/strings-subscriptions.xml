@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Vključuje naše storitve VPN, Personal Information Removal in Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Vključuje naš VPN in Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Pridobite Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Preizkusite Privacy Pro brezplačno</string>
     <string name="subscriptionSettingRestore">Imam naročnino</string>
     <string name="subscriptionSettingExpired">Vaša naročnina na Privacy Pro je potekla</string>
     <string name="subscriptionSettingExpiredViewPlans">Oglejte si načrte</string>

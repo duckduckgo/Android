@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Seuraavat sisältyvät: VPN, Personal Information Removal ja Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Sisältää: VPN ja Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Hanki Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Kokeile Privacy Pro -tilausta ilmaiseksi</string>
     <string name="subscriptionSettingRestore">Minulla on tilaus</string>
     <string name="subscriptionSettingExpired">Privacy Pro -tilauksesi on päättynyt</string>
     <string name="subscriptionSettingExpiredViewPlans">Näytä tilaukset</string>
