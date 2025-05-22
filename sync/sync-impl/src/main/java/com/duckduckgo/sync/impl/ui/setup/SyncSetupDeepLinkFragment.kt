@@ -71,7 +71,7 @@ class SyncSetupDeepLinkFragment : DuckDuckGoFragment() {
             val themeAwareInflater = inflater.cloneInContext(ContextThemeWrapper(requireContext(), Theme_DuckDuckGo_Light))
             return themeAwareInflater.inflate(R.layout.fragment_create_account, container, false)
         } else {
-            return super.onCreateView(inflater, container, savedInstanceState)
+            return inflater.inflate(R.layout.fragment_create_account, container, false)
         }
     }
 
