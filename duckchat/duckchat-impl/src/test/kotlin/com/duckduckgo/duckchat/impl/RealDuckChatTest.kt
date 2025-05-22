@@ -26,11 +26,13 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewPoCActivity
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -38,6 +40,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -46,6 +49,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -74,6 +78,7 @@ class RealDuckChatTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
+    private val mockExperimentDataStore: VisualDesignExperimentDataStore = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -96,11 +101,14 @@ class RealDuckChatTest {
                 true,
                 coroutineRule.testScope,
                 mockPixel,
+                mockExperimentDataStore,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
 
         whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
     }
 
     @Test
@@ -241,6 +249,45 @@ class RealDuckChatTest {
         )
         verify(mockContext).startActivity(any())
         verify(mockDuckChatFeatureRepository).registerOpened()
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledAndPoCIsEnabledThenPoCWebViewActivityStarted() = runTest {
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
+
+        whenever(
+            mockGlobalActivityStarter.startIntent(
+                mockContext,
+                DuckChatWebViewActivityWithParams(
+                    url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                ),
+            ),
+        ).thenReturn(Intent())
+
+        testee.openDuckChat()
+
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(mockContext).startActivity(intentCaptor.capture())
+        assertEquals(DuckChatWebViewPoCActivity::class.java.name, intentCaptor.firstValue.component?.className)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledAndPoCIsDisabledThenPoCWebViewActivityNotStarted() = runTest {
+        whenever(
+            mockGlobalActivityStarter.startIntent(
+                mockContext,
+                DuckChatWebViewActivityWithParams(
+                    url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                ),
+            ),
+        ).thenReturn(Intent())
+
+        testee.openDuckChat()
+
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(mockContext).startActivity(intentCaptor.capture())
+        assertNull(intentCaptor.firstValue.component?.className)
     }
 
     @Test
