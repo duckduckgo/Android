@@ -17,7 +17,6 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
-import android.os.Parcelable
 import android.util.AttributeSet
 import android.widget.CompoundButton
 import com.duckduckgo.mobile.android.R
