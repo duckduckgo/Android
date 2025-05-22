@@ -62,7 +62,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/daxShape"
-            app:srcCompat="@drawable/orange_shape" />
+            app:srcCompat="@drawable/background_shape" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/daxShape"

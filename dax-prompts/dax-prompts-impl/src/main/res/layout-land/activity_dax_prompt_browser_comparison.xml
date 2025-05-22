@@ -60,19 +60,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="-480dp"
+        android:layout_marginTop="-80dp"
         app:layout_constraintBottom_toBottomOf="@id/daxPromptBrowserComparisonMessageContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/daxPromptBrowserComparisonMessageContainer"
-        app:srcCompat="@drawable/dax_with_magnifying_glass" />
+        app:srcCompat="@drawable/dax_with_magnifying_glass_no_feet" />
 
     <LinearLayout
         android:id="@+id/daxPromptBrowserComparisonMessageContainer"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="260dp"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="46dp"
         android:background="@drawable/background_dax_message"
         android:orientation="vertical"
         android:padding="@dimen/keyline_5"
@@ -91,7 +91,7 @@
             android:id="@+id/daxPromptBrowserComparisonChart"
             layout="@layout/browser_comparison_chart"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="70dp" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/daxPromptBrowserComparisonMoreLink"

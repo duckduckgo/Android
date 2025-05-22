@@ -15,7 +15,7 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/messageContainerColor" />
+    <solid android:color="@color/buttonColor" />
     <corners
-        android:radius="36dp" />
+        android:radius="8dp" />
 </shape>

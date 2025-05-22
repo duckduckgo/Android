@@ -15,5 +15,10 @@
   -->
 
 <resources>
-    <color name="yellowBackground">#ffe181</color>
+    <color name="yellowBackground">#ffe080</color>
+    <color name="buttonColor">@color/blue50</color>
+    <color name="buttonTextColor">@color/white</color>
+    <color name="messageContainerColor">@color/white</color>
+    <color name="icSearchCircleColor">#876ECB</color>
+    <color name="icSearchHandlerColor">#110336</color>
 </resources>
