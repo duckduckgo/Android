@@ -65,27 +65,24 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     override val anyConflictingExperimentEnabled = _anyConflictingExperimentEnabled.asStateFlow()
 
     private val _experimentFeatureFlagEnabled =
-        MutableStateFlow(experimentalUIThemingFeature.self().isEnabled())
-    private val _visualDesignFeatureFlagEnabled =
-        MutableStateFlow(experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
+        MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
     private val _duckAIFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
 
     override val isExperimentEnabled: StateFlow<Boolean> =
         combine(
             _experimentFeatureFlagEnabled,
-            _visualDesignFeatureFlagEnabled,
             _anyConflictingExperimentEnabled,
-        ) { experimentEnabled, visualDesignFeatureFlagEnabled, conflicts ->
+        ) { experimentEnabled, conflicts ->
             Log.d(
                 "VisualDesign:",
-                "isExperimentEnabled $experimentEnabled isVisualDesignFeatureEnabled $visualDesignFeatureFlagEnabled conflicts $conflicts",
+                "isExperimentEnabled $experimentEnabled conflicts $conflicts",
             )
-            experimentEnabled && visualDesignFeatureFlagEnabled && !conflicts
+            experimentEnabled && !conflicts
         }.stateIn(
             scope = appCoroutineScope,
             started = SharingStarted.Eagerly,
-            initialValue = _experimentFeatureFlagEnabled.value && _visualDesignFeatureFlagEnabled.value && _anyConflictingExperimentEnabled.value,
+            initialValue = _experimentFeatureFlagEnabled.value && !_anyConflictingExperimentEnabled.value,
         )
 
     override val isDuckAIPoCEnabled: StateFlow<Boolean> =

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.experiments.visual.store
 
-import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -121,11 +120,10 @@ class VisualDesignExperimentDataStoreImplTest {
         whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
-        testee.isExperimentEnabled.test {
-            val result = awaitItem()
-            Assert.assertTrue(result)
-            Assert.assertFalse(testee.anyConflictingExperimentEnabled.value)
-        }
+        val result = testee.isExperimentEnabled.value
+
+        Assert.assertTrue(result)
+        Assert.assertFalse(testee.anyConflictingExperimentEnabled.value)
     }
 
     @Test
