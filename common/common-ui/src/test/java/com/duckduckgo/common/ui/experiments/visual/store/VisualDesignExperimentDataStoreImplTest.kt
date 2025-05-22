@@ -42,10 +42,22 @@ class VisualDesignExperimentDataStoreImplTest {
     private lateinit var experimentalUIThemingFeatureToggle: Toggle
 
     @Mock
+    private lateinit var visualDesignFeatureToggle: Toggle
+
+    @Mock
+    private lateinit var duckChatPoCToggle: Toggle
+
+    @Mock
     private lateinit var senseOfProtectionNewUserExperimentApr25Toggle: Toggle
 
     @Mock
     private lateinit var senseOfProtectionExistingUserExperimentApr25: Toggle
+
+    @Mock
+    private lateinit var senseOfProtectionNewUserExperimentMay25Toggle: Toggle
+
+    @Mock
+    private lateinit var senseOfProtectionExistingUserExperimentMay25: Toggle
 
     @Mock
     private lateinit var defaultBrowserAdditionalPrompts202501: Toggle
@@ -61,11 +73,20 @@ class VisualDesignExperimentDataStoreImplTest {
         MockitoAnnotations.openMocks(this)
 
         whenever(experimentalUIThemingFeature.self()).thenReturn(experimentalUIThemingFeatureToggle)
+        whenever(experimentalUIThemingFeature.visualUpdatesFeature()).thenReturn(visualDesignFeatureToggle)
+        whenever(experimentalUIThemingFeature.duckAIPoCFeature()).thenReturn(duckChatPoCToggle)
+
         whenever(senseOfProtectionNewUserExperimentApr25Toggle.featureName()).thenReturn(
             FeatureName("SenseOfProtectionToggles", "senseOfProtectionNewUserExperimentApr25"),
         )
         whenever(senseOfProtectionExistingUserExperimentApr25.featureName()).thenReturn(
             FeatureName("SenseOfProtectionToggles", "senseOfProtectionExistingUserExperimentApr25"),
+        )
+        whenever(senseOfProtectionNewUserExperimentMay25Toggle.featureName()).thenReturn(
+            FeatureName("SenseOfProtectionToggles", "senseOfProtectionNewUserExperimentMay25"),
+        )
+        whenever(senseOfProtectionExistingUserExperimentMay25.featureName()).thenReturn(
+            FeatureName("SenseOfProtectionToggles", "senseOfProtectionExistingUserExperimentMay25"),
         )
         whenever(defaultBrowserAdditionalPrompts202501.featureName()).thenReturn(
             FeatureName("DefaultBrowserPromptsFeatureToggles", "defaultBrowserAdditionalPrompts202501"),
@@ -75,10 +96,16 @@ class VisualDesignExperimentDataStoreImplTest {
         )
     }
 
+    private fun whenVisualExperimentEnabled(enabled: Boolean) {
+        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(enabled)
+        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(enabled)
+        whenever(duckChatPoCToggle.isEnabled()).thenReturn(enabled)
+    }
+
     @Test
     fun `when experiment FF disabled, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(false)
+        whenVisualExperimentEnabled(false)
 
         val testee = createTestee()
         val result = testee.isExperimentEnabled.value
@@ -90,7 +117,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF enabled and no conflicting experiments, experiment enabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
         val result = testee.isExperimentEnabled.value
@@ -102,7 +129,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF enabled and senseOfProtectionNewUserExperimentApr25Toggle active, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionNewUserExperimentApr25Toggle))
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
 
@@ -113,7 +140,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF enabled and senseOfProtectionExistingUserExperimentApr25 active, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperimentApr25))
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
 
@@ -124,7 +151,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF enabled and defaultBrowserAdditionalPrompts202501 active, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(defaultBrowserAdditionalPrompts202501))
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
 
@@ -135,13 +162,13 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF is enabled in new config, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(unrelatedToggle))
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(false)
+        whenVisualExperimentEnabled(false)
 
         val testee = createTestee()
         Assert.assertFalse(testee.isExperimentEnabled.value)
         Assert.assertFalse(testee.anyConflictingExperimentEnabled.value)
 
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
         testee.onPrivacyConfigDownloaded()
 
         Assert.assertTrue(testee.isExperimentEnabled.value)
@@ -151,7 +178,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when conflicting experiment is activated, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(unrelatedToggle))
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
         Assert.assertTrue(testee.isExperimentEnabled.value)
