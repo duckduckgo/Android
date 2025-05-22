@@ -36,10 +36,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -503,6 +505,31 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showInAddressBar.value)
+    }
+
+    @Test
+    fun whenUpdateChatStateThenChatStateUpdated() = runTest {
+        assertEquals(ChatState.HIDE, testee.chatState.value)
+
+        val newState = ChatState.LOADING
+        testee.updateChatState(newState)
+
+        assertEquals(newState, testee.chatState.value)
+    }
+
+    @Test
+    fun whenUpdateChatStateThenFlowEmitsInitialAndNewState() = runTest {
+        val emissions = mutableListOf<ChatState>()
+        val collectJob = launch(start = CoroutineStart.UNDISPATCHED) {
+            testee.chatState
+                .take(2)
+                .toList(emissions)
+        }
+        testee.updateChatState(ChatState.READY)
+        advanceUntilIdle()
+
+        assertEquals(listOf(ChatState.HIDE, ChatState.READY), emissions)
+        collectJob.cancel()
     }
 
     companion object {

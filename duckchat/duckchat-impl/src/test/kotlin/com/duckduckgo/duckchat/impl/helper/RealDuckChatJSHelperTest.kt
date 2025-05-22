@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.helper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -250,5 +251,122 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
         verify(mockDataStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenStartStreamNewPromptResponseStateReceivedThenUpdateChatStateWithStartStreamNewPrompt() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "start_stream:new_prompt"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.START_STREAM_NEW_PROMPT)
+    }
+
+    @Test
+    fun whenLoadingResponseStateReceivedThenUpdateChatStateWithLoading() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "loading"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.LOADING)
+    }
+
+    @Test
+    fun whenStreamingResponseStateReceivedThenUpdateChatStateWithStreaming() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.STREAMING)
+    }
+
+    @Test
+    fun whenErrorResponseStateReceivedThenUpdateChatStateWithError() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "error"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.ERROR)
+    }
+
+    @Test
+    fun whenReadyResponseStateReceivedThenUpdateChatStateWithReady() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "ready"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.READY)
+    }
+
+    @Test
+    fun whenBlockedResponseStateReceivedThenUpdateChatStateWithBlocked() = runTest {
+        val featureName = "aiChat"
+        val method = "responseState"
+        val id = "123"
+        val data = JSONObject(mapOf("status" to "blocked"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChat).updateChatState(ChatState.BLOCKED)
+    }
+
+    @Test
+    fun whenHideChatInputThenUpdateChatStateWithHide() = runTest {
+        val featureName = "aiChat"
+        val method = "hideChatInput"
+        val id = "123"
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
+
+        verify(mockDuckChat).updateChatState(ChatState.HIDE)
+    }
+
+    @Test
+    fun whenShowChatInputThenUpdateChatStateWithShow() = runTest {
+        val featureName = "aiChat"
+        val method = "showChatInput"
+        val id = "123"
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
+
+        verify(mockDuckChat).updateChatState(ChatState.SHOW)
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSupportsNativeChatInputThenReturnJsCallbackDataWithSupportsNativeChatInputEnabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val expectedPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", true)
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
     }
 }

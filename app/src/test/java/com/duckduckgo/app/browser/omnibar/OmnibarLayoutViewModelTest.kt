@@ -68,7 +68,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val disabledDuckAIPoCStateFlow = MutableStateFlow(false)
+    private val duckAIPoCStateFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -93,7 +93,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(disabledDuckAIPoCStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
 
         initializeViewModel()
@@ -1190,6 +1190,28 @@ class OmnibarLayoutViewModelTest {
         testee.onDuckChatButtonPressed()
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+    }
+
+    @Test
+    fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
+        duckAIPoCStateFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
+        duckAIPoCStateFlow.value = false
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {
