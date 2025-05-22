@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,9 +29,13 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -41,14 +46,53 @@ import kotlinx.coroutines.launch
 class VisualDesignExperimentDataStoreImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
+
+    private companion object {
+
+        private val conflictingExperimentsNames = listOf(
+            "senseOfProtectionNewUserExperimentApr25",
+            "senseOfProtectionExistingUserExperimentApr25",
+            "senseOfProtectionNewUserExperimentMay25",
+            "senseOfProtectionExistingUserExperimentMay25",
+            "defaultBrowserAdditionalPrompts202501",
+        )
+    }
+
+    private val _anyConflictingExperimentEnabled = MutableStateFlow(isAnyConflictingExperimentEnabled())
+    override val anyConflictingExperimentEnabled = _anyConflictingExperimentEnabled.asStateFlow()
 
     private val _experimentFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
     private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
 
-    override val isExperimentEnabled: StateFlow<Boolean> = _experimentFeatureFlagEnabled.asStateFlow()
-    override val isDuckAIPoCEnabled: StateFlow<Boolean> = _duckAIFeatureFlagEnabled.asStateFlow()
+    override val isExperimentEnabled: StateFlow<Boolean> =
+        combine(_experimentFeatureFlagEnabled, _anyConflictingExperimentEnabled) { experimentEnabled, conflicts ->
+            experimentEnabled && !conflicts
+        }.stateIn(
+            scope = appCoroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = _experimentFeatureFlagEnabled.value && _anyConflictingExperimentEnabled.value,
+        )
+
+    override val isDuckAIPoCEnabled: StateFlow<Boolean> =
+        combine(_duckAIFeatureFlagEnabled, _anyConflictingExperimentEnabled) { experimentEnabled, conflicts ->
+            experimentEnabled && !conflicts
+        }.stateIn(
+            scope = appCoroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = _experimentFeatureFlagEnabled.value && _anyConflictingExperimentEnabled.value,
+        )
+
+    /**
+     * This is a blocking call but it only blocks the main thread when the class initializes, so when the splash screen is visible.
+     * All subsequent calls are moved off of the main thread.
+     */
+    private fun isAnyConflictingExperimentEnabled(): Boolean = runBlocking {
+        val activeExperimentsNames = featureTogglesInventory.getAllActiveExperimentToggles().map { it.featureName().name }
+        conflictingExperimentsNames.any { activeExperimentsNames.contains(it) }
+    }
 
     override fun onPrivacyConfigDownloaded() {
         updateFeatureState()
@@ -72,6 +116,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
             _experimentFeatureFlagEnabled.value =
                 experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
             _duckAIFeatureFlagEnabled.value = experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
+            _anyConflictingExperimentEnabled.value = isAnyConflictingExperimentEnabled()
         }
     }
 }
