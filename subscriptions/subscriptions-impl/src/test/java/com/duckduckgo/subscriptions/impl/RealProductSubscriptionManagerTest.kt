@@ -277,4 +277,6 @@ private class FakeSubscriptions(
     }
 
     override fun isPrivacyProUrl(uri: Uri): Boolean = false
+
+    override suspend fun isFreeTrialEligible(): Boolean = false
 }
