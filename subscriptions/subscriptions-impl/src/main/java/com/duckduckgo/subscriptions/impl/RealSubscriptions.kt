@@ -127,6 +127,11 @@ class RealSubscriptions @Inject constructor(
         val path = uri.pathSegments.firstOrNull()
         return eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
     }
+
+    override suspend fun isFreeTrialEligible(): Boolean {
+        // TODO Check FF and hadFreeTrial BE
+        return true
+    }
 }
 
 @ContributesRemoteFeature(
