@@ -44,14 +44,18 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -60,11 +64,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
 
+    @Inject
+    lateinit var experimentDataStore: VisualDesignExperimentDataStore
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
+    private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -140,6 +151,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
             omnibarCard.elevation = 0.5f.toDp(context)
         }
+        omniBarClickCatcher.setOnClickListener {
+            globalActivityStarter.start(context, SearchInterstitialActivityParams)
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -205,6 +219,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
+
+        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     /**

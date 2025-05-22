@@ -27,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,6 +37,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewPoCActivity
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -108,6 +110,33 @@ interface DuckChatInternal : DuckChat {
      * Returns whether DuckChat is user enabled or not.
      */
     fun isDuckChatUserEnabled(): Boolean
+
+    /**
+     * Updates the current chat state.
+     */
+    fun updateChatState(state: ChatState)
+
+    /**
+     * Returns the current chat state.
+     */
+    val chatState: StateFlow<ChatState>
+}
+
+enum class ChatState(val value: String) {
+    START_STREAM_NEW_PROMPT("start_stream:new_prompt"),
+    LOADING("loading"),
+    STREAMING("streaming"),
+    ERROR("error"),
+    READY("ready"),
+    BLOCKED("blocked"),
+    HIDE("hide"),
+    SHOW("show"),
+    ;
+
+    companion object {
+        fun fromValue(v: String?): ChatState? =
+            entries.firstOrNull { it.value == v }
+    }
 }
 
 data class DuckChatSettingJson(
@@ -132,11 +161,13 @@ class RealDuckChat @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val experimentDataStore: VisualDesignExperimentDataStore,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
+    private val _chatState = MutableStateFlow(ChatState.HIDE)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -235,9 +266,15 @@ class RealDuckChat @Inject constructor(
         return isDuckChatUserEnabled
     }
 
+    override fun updateChatState(state: ChatState) {
+        _chatState.value = state
+    }
+
     override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
 
     override val showInAddressBar: StateFlow<Boolean> get() = _showInAddressBar.asStateFlow()
+
+    override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->
@@ -281,16 +318,15 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun startDuckChatActivity(url: String) {
-        val intent = globalActivityStarter.startIntent(
-            context,
-            DuckChatWebViewActivityWithParams(
-                url = url,
-            ),
-        )
-        intent?.let {
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(it)
-        }
+        globalActivityStarter
+            .startIntent(context, DuckChatWebViewActivityWithParams(url))
+            ?.apply {
+                if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
+                    setClass(context, DuckChatWebViewPoCActivity::class.java)
+                }
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(this)
+            }
     }
 
     private fun appendParameters(
