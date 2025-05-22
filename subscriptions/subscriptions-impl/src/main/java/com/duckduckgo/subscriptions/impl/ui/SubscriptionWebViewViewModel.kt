@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
@@ -340,8 +341,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private suspend fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
         return offer.offerId?.let {
-            val offerType = when (offer.offerId) {
-                MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US -> OfferType.FREE_TRIAL
+            val offerType = when {
+                LIST_OF_FREE_TRIAL_OFFERS.contains(offer.offerId) -> OfferType.FREE_TRIAL
                 else -> OfferType.UNKNOWN
             }
 
