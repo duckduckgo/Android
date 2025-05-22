@@ -89,7 +89,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
         if (maliciousSiteProtectionRCFeature.isCachingEnabled()) {
             lruCache.get(canonicalUriString)?.let {
-                Timber.tag("Cris").d("Cached result for $canonicalUriString")
+                timber.d("Cached result for $canonicalUriString")
                 return ConfirmedResult(it)
             }
         }
@@ -166,14 +166,12 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     override suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit> {
         return maliciousSiteRepository.loadFilters(*feeds).also {
-            Timber.tag("Cris").d("loadFilters, clearing cache")
             lruCache.evictAll()
         }
     }
 
     override suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit> {
         return maliciousSiteRepository.loadHashPrefixes(*feeds).also {
-            Timber.tag("Cris").d("loadHashPrefixes, clearing cache")
             lruCache.evictAll()
         }
     }
@@ -183,7 +181,6 @@ class RealMaliciousSiteProtection @Inject constructor(
         result: MaliciousStatus,
     ) {
         if (maliciousSiteProtectionRCFeature.isCachingEnabled()) {
-            Timber.tag("Cris").d("Adding to cache $canonicalUriString")
             lruCache.put(canonicalUriString, result)
         }
     }
