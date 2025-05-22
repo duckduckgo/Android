@@ -37,6 +37,7 @@ interface MaliciousSiteProtectionRCFeature {
     fun scamProtectionEnabled(): Boolean
     fun getHashPrefixUpdateFrequency(): Long
     fun getFilterSetUpdateFrequency(): Long
+    fun stripWWWPrefix(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -52,6 +53,7 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     private var isFeatureEnabled = false
     private var canUpdateDatasets = false
     private var scamProtection = false
+    private var shouldStripWWWPrefix = false
 
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
@@ -86,6 +88,10 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
         return scamProtection
     }
 
+    override fun stripWWWPrefix(): Boolean {
+        return shouldStripWWWPrefix
+    }
+
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
             // MSP is disabled in F-Droid builds, as we can't download datasets
@@ -93,6 +99,7 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
                 maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled() && appBuildConfig.flavor != FDROID
             scamProtection = isFeatureEnabled && maliciousSiteProtectionFeature.scamProtection().isEnabled()
             canUpdateDatasets = maliciousSiteProtectionFeature.canUpdateDatasets().isEnabled()
+            shouldStripWWWPrefix = maliciousSiteProtectionFeature.stripWWWPrefix().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     hashPrefixUpdateFrequency = settings.getLong("hashPrefixUpdateFrequency")
