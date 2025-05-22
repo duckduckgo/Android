@@ -27,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,6 +37,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewPoCActivity
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -159,6 +161,7 @@ class RealDuckChat @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val experimentDataStore: VisualDesignExperimentDataStore,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
@@ -315,16 +318,15 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun startDuckChatActivity(url: String) {
-        val intent = globalActivityStarter.startIntent(
-            context,
-            DuckChatWebViewActivityWithParams(
-                url = url,
-            ),
-        )
-        intent?.let {
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(it)
-        }
+        globalActivityStarter
+            .startIntent(context, DuckChatWebViewActivityWithParams(url))
+            ?.apply {
+                if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
+                    setClass(context, DuckChatWebViewPoCActivity::class.java)
+                }
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(this)
+            }
     }
 
     private fun appendParameters(

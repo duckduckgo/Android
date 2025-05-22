@@ -22,9 +22,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Message
-import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -32,22 +30,16 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
-import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -57,14 +49,6 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.impl.ChatState.BLOCKED
-import com.duckduckgo.duckchat.impl.ChatState.ERROR
-import com.duckduckgo.duckchat.impl.ChatState.HIDE
-import com.duckduckgo.duckchat.impl.ChatState.LOADING
-import com.duckduckgo.duckchat.impl.ChatState.READY
-import com.duckduckgo.duckchat.impl.ChatState.SHOW
-import com.duckduckgo.duckchat.impl.ChatState.START_STREAM_NEW_PROMPT
-import com.duckduckgo.duckchat.impl.ChatState.STREAMING
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
@@ -72,7 +56,6 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
@@ -91,7 +74,7 @@ internal data class DuckChatWebViewActivityWithParams(
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatWebViewActivityWithParams::class)
-class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
+open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -131,19 +114,14 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
     @Inject
     lateinit var aiChatDownloadFeature: AIChatDownloadFeature
 
-    @Inject
-    lateinit var experimentDataStore: VisualDesignExperimentDataStore
-
-    @Inject
-    lateinit var appBrowserNav: BrowserNav
-
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
     private val root: ViewGroup by lazy { findViewById(android.R.id.content) }
-    private val toolbar: Toolbar by lazy { findViewById(com.duckduckgo.mobile.android.R.id.toolbar) }
-    private val simpleWebview: WebView by lazy { findViewById(R.id.simpleWebview) }
-    private val duckChatOmnibar: DuckChatOmnibarLayout by lazy { findViewById(R.id.duckChatOmnibar) }
+    private val toolbar: Toolbar? by lazy { findViewById(com.duckduckgo.mobile.android.R.id.toolbar) }
+    internal val simpleWebview: WebView by lazy { findViewById(R.id.simpleWebview) }
+
+    protected open val layoutResId: Int = R.layout.activity_duck_chat_webview
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,12 +131,9 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
             finish()
         }
 
-        if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
-            setContentView(R.layout.activity_duck_chat_webview_poc)
-            configurePoCUI()
-        } else {
-            setContentView(R.layout.activity_duck_chat_webview)
-            setupToolbar(toolbar)
+        setContentView(layoutResId)
+        toolbar?.let {
+            setupToolbar(it)
         }
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
@@ -233,110 +208,6 @@ class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialog
 
         url?.let {
             simpleWebview.loadUrl(it)
-        }
-    }
-
-    private fun configurePoCUI() {
-        duckChatOmnibar.apply {
-            isVisible = true
-            selectTab(1)
-            onFire = {
-                ActionBottomSheetDialog.Builder(this@DuckChatWebViewActivity)
-                    .setTitle(context.getString(R.string.duck_chat_delete_this_chat))
-                    .setPrimaryItem(context.getString(R.string.duck_chat_delete_chat))
-                    .setSecondaryItem(context.getString(R.string.duck_chat_cancel))
-                    .addEventListener(
-                        object : ActionBottomSheetDialog.EventListener() {
-                            override fun onPrimaryItemClicked() {
-                                contentScopeScripts.sendSubscriptionEvent(
-                                    SubscriptionEventData(
-                                        featureName = DUCK_CHAT_FEATURE_NAME,
-                                        subscriptionName = "submitFireButtonAction",
-                                        params = JSONObject("{}"),
-                                    ),
-                                )
-                            }
-                        },
-                    )
-                    .show()
-            }
-            onNewChat = {
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitNewChatAction",
-                        params = JSONObject("{}"),
-                    ),
-                )
-            }
-            onSearchSent = { message ->
-                context.startActivity(appBrowserNav.openInNewTab(context, message))
-                finish()
-            }
-            onDuckChatSent = { message ->
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitAIChatNativePrompt",
-                        params = JSONObject(
-                            """
-                            {
-                              "platform": "android",
-                              "query": {
-                                "prompt": "$message",
-                                "autoSubmit": true
-                              }
-                            }
-                            """,
-                        ),
-                    ),
-                )
-                hideKeyboard(duckChatInput)
-            }
-            onStop = {
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitPromptInterruption",
-                        params = JSONObject("{}"),
-                    ),
-                )
-            }
-            onBack = { onBackPressed() }
-            enableFireButton = true
-            enableNewChatButton = true
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                duckChat.chatState.collect { state ->
-                    Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
-
-                    when (state) {
-                        START_STREAM_NEW_PROMPT -> duckChatOmnibar.hideStopButton()
-                        LOADING -> duckChatOmnibar.showStopButton()
-                        STREAMING -> duckChatOmnibar.showStopButton()
-                        ERROR -> duckChatOmnibar.hideStopButton()
-                        READY -> {
-                            duckChatOmnibar.hideStopButton()
-                            duckChatOmnibar.isVisible = true
-                        }
-                        BLOCKED -> duckChatOmnibar.hideStopButton()
-                        HIDE -> duckChatOmnibar.isVisible = false
-                        SHOW -> duckChatOmnibar.isVisible = true
-                    }
-                }
-            }
-        }
-
-        simpleWebview.apply {
-            setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    hideKeyboard(duckChatOmnibar.duckChatInput)
-                }
-                false
-            }
-            isFocusableInTouchMode = true
         }
     }
 
