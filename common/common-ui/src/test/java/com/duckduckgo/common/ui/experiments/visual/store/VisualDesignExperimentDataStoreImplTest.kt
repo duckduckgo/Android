@@ -138,8 +138,30 @@ class VisualDesignExperimentDataStoreImplTest {
     }
 
     @Test
+    fun `when experiment FF enabled and senseOfProtectionNewUserExperimentMay25Toggle active, experiment disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionNewUserExperimentMay25Toggle))
+        whenVisualExperimentEnabled(true)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.anyConflictingExperimentEnabled.value)
+    }
+
+    @Test
     fun `when experiment FF enabled and senseOfProtectionExistingUserExperimentApr25 active, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperimentApr25))
+        whenVisualExperimentEnabled(true)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.anyConflictingExperimentEnabled.value)
+    }
+
+    @Test
+    fun `when experiment FF enabled and senseOfProtectionExistingUserExperimentMay25 active, experiment disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperimentMay25))
         whenVisualExperimentEnabled(true)
 
         val testee = createTestee()
