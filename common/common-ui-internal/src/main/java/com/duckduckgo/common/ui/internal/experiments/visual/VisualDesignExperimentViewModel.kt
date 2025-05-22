@@ -67,7 +67,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
                 it.copy(
                     isBrowserThemingFeatureAvailable = true,
                     isBrowserThemingFeatureEnabled = isExperimentEnabled,
-                    isDuckAIPoCFeatureAvailable = true,
+                    isDuckAIPoCFeatureAvailable = isExperimentEnabled,
                     isDuckAIPoCFeatureEnabled = isDuckAIPoC,
                     isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
                     experimentConflictAlertVisible = anyConflictingExperimentEnabled,

@@ -92,7 +92,7 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
         binding.experimentalUIModeConflictAlert.isVisible = viewState.experimentConflictAlertVisible
 
-        binding.duckAIPoC.isVisible = viewState.isDuckAIPoCFeatureAvailable && viewState.isBrowserThemingFeatureEnabled
+        binding.duckAIPoC.isVisible = viewState.isDuckAIPoCFeatureAvailable
         binding.duckAIPoC.setSwitchEnabled(viewState.isBrowserThemingFeatureChangeable)
         binding.duckAIPoC.quietlySetIsChecked(viewState.isDuckAIPoCFeatureEnabled, duckAIPoCToggleListener)
 
