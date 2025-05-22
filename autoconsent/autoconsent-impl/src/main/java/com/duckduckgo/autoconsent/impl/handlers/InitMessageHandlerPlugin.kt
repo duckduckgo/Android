@@ -59,7 +59,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    // Remove comment to promote feature
+                    // Remove comment to promote feature and remove @Ignore from tests
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {

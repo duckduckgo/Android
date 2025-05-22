@@ -32,6 +32,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +40,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.Shadows.shadowOf
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -85,7 +87,9 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessIfAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = true
 
@@ -95,7 +99,9 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessIfAutoconsentIsDisabledAndNotHandledThenDoNotCallEvaluate() {
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
@@ -105,10 +111,10 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    @SuppressLint("DenyListedApi")
+    @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
-        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [\"MyCmp\"]}"))
-        settingsRepository.userSetting = false
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
+        settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = false
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
@@ -119,8 +125,78 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    @SuppressLint("DenyListedApi")
+    fun whenProcessIfAutoconsentIsDisabledThenDoNothing() {
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
+        settingsRepository.userSetting = false
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessMessageIfNoSettingsThenDoNotCallEvaluate() {
+        feature.self().setRawStoredState(Toggle.State(settings = null))
+        settingsRepository.userSetting = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        assertNull(result)
+    }
+
+    @Test
+    fun whenProcessMessageIfCanNotParseSettingsThenDoNotCallEvaluate() {
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"random\": []}"))
+        settingsRepository.userSetting = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        assertNull(result)
+    }
+
+    @Test
+    fun whenProcessMessageWithEmptyObjectsInSettingsResponseSentIsCorrect() {
+        settingsRepository.userSetting = true
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {}}"))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+        assertEquals("optOut", initResp!!.config.autoAction)
+        assertTrue(initResp.config.enablePrehide)
+        assertTrue(initResp.config.enabled)
+        assertNotNull(initResp.rules.compact)
+        assertEquals(20, initResp.config.detectRetries)
+        assertEquals("initResp", initResp.type)
+    }
+
+    @Test
     fun whenProcessMessageResponseSentIsCorrect() {
+        settingsRepository.userSetting = true
+        feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+        assertEquals("optOut", initResp!!.config.autoAction)
+        assertTrue(initResp.config.enablePrehide)
+        assertTrue(initResp.config.enabled)
+        assertNotNull(initResp.rules.compact)
+        assertEquals(20, initResp.config.detectRetries)
+        assertEquals("initResp", initResp.type)
+    }
+
+    @Test
+    @Ignore("Only valid when firstPopupHandled is being used")
+    fun whenProcessMessageAndPopupHandledResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
         feature.self().setRawStoredState(Toggle.State(settings = "{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"))
@@ -140,6 +216,16 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageThenOnResultReceivedCalled() {
+        settingsRepository.userSetting = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+    }
+
+    @Test
+    @Ignore("Only valid when firstPopupHandled is being used")
+    fun whenProcessMessageAndFirstPopupHandledThenOnResultReceivedCalled() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
 
