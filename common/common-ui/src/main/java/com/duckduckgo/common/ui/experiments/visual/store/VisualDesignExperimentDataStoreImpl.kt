@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.experiments.visual.store
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -69,6 +70,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
 
     override val isExperimentEnabled: StateFlow<Boolean> =
         combine(_experimentFeatureFlagEnabled, _anyConflictingExperimentEnabled) { experimentEnabled, conflicts ->
+            Log.d("VisualDesign:", "isExperimentEnabled $experimentEnabled conflicts $conflicts")
             experimentEnabled && !conflicts
         }.stateIn(
             scope = appCoroutineScope,

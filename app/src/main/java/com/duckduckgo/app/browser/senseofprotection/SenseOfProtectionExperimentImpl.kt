@@ -32,6 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -204,6 +205,8 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun seesNewVisualDesign(): Boolean {
-        return visualDesignExperimentDataStore.isExperimentEnabled.value
+        val seesNewVisualDesing = visualDesignExperimentDataStore.isExperimentEnabled.value
+        Timber.d("VisualDesign: seesNewVisualDesign $seesNewVisualDesing")
+        return seesNewVisualDesing
     }
 }
