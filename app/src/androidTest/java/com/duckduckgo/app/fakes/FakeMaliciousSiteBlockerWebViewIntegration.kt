@@ -18,19 +18,23 @@ package com.duckduckgo.app.fakes
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 
-class FakeMaliciousSiteBlockerWebViewIntegration : MaliciousSiteBlockerWebViewIntegration {
+class FakeMaliciousSiteBlockerWebViewIntegration(
+    private val isSafe: Boolean = true,
+) : MaliciousSiteBlockerWebViewIntegration {
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
-        return Safe(request.isForMainFrame)
+        return if (isSafe) Safe(request.isForMainFrame) else MaliciousSite("foo.com".toUri(), Feed.MALWARE, false, true)
     }
 
     override fun shouldOverrideUrlLoading(
@@ -38,7 +42,7 @@ class FakeMaliciousSiteBlockerWebViewIntegration : MaliciousSiteBlockerWebViewIn
         isForMainFrame: Boolean,
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
-        return Safe(isForMainFrame)
+        return if (isSafe) Safe(isForMainFrame) else MaliciousSite("foo.com".toUri(), Feed.MALWARE, false, true)
     }
 
     override fun onPageLoadStarted(url: String) {
