@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scansiona il codice QR</string>
-    <string name="login_screen_enter_code_cta">Oppure inserisci manualmente il codice</string>
+    <string name="login_screen_enter_code_cta">Inserisci manualmente il codice</string>
     <string name="login_screen_barcode_hint">Punta la fotocamera sul codice QR per la sincronizzazione</string>
-    <string name="login_screen_cant_scan">Non riesci a eseguire la scansione? <font color="#7295F6">Condividi codice testo</font></string>
+    <string name="login_screen_cant_scan_label">Non riesci a eseguire la scansione?</string>
+    <string name="login_screen_cant_scan_button_text">Copia codice del testo</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scansiona il codice QR</string>
-    <string name="connect_screen_scan_qr_hint">Vai su <b>Impostazioni &gt; Sincronizzazione e backup</b> nel browser DuckDuckGo su un altro dispositivo e seleziona \"Sincronizza con un altro dispositivo\".</string>
-    <string name="connect_screen_enter_code_cta">Oppure inserisci manualmente il codice</string>
-    <string name="connect_screen_connect_qr_hint_title">Da mobile a mobile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scansiona questo codice con un altro dispositivo per sincronizzarlo.</string>
+    <string name="connect_screen_scan_qr_hint">Apri l\'app DuckDuckGo sull\'altro dispositivo e vai su <b>Impostazioni &gt; Sincronizzazione e backup &gt; Sincronizza con un altro dispositivo</b>.</string>
+    <string name="connect_screen_enter_code_cta">Inserisci manualmente il codice</string>
+    <string name="connect_screen_connect_qr_hint_title">Oppure esegui la scansione con DuckDuckGo sull\'altro dispositivo</string>
+    <string name="connect_screen_connect_qr_hint_content">Apri DuckDuckGo sull\'altro dispositivo e scansiona questo codice per sincronizzarlo.</string>
     <string name="connect_screen_share_code">Copia codice</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Cambia sincronizzazione</string>
     <string name="sync_dialog_switch_account_secondary_button">Annulla</string>
     <string name="sync_dialog_switch_account_description">Questo dispositivo è già sincronizzato. Vuoi davvero sincronizzarlo con un backup o un dispositivo diverso? L\'operazione non rimuoverà alcun dato già sincronizzato su questo dispositivo.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sincronizzare nuovo dispositivo?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" potrà accedere ai dati sincronizzati di DuckDuckGo.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sincronizza adesso</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Annulla</string>
+
+    <string name="deep_link_auth_prompt_title">Configura Sincronizzazione e backup</string>
+    <string name="deep_link_auth_prompt_message">Sblocca il dispositivo per configurare Sync &amp; Backup</string>
 </resources>

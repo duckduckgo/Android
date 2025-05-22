@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-code scannen</string>
-    <string name="login_screen_enter_code_cta">Of voer handmatig de code in</string>
+    <string name="login_screen_enter_code_cta">Code handmatig invoeren</string>
     <string name="login_screen_barcode_hint">Richt de camera op QR-code om te synchroniseren</string>
-    <string name="login_screen_cant_scan">Kun je niet scannen? <font color="#7295F6">Tekstcode delen</font></string>
+    <string name="login_screen_cant_scan_label">Kun je niet scannen?</string>
+    <string name="login_screen_cant_scan_button_text">Tekstcode kopiëren</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR-code scannen</string>
-    <string name="connect_screen_scan_qr_hint">Ga naar <b>\'Instellingen\' › \'Synchronisatie en back-up\'</b> in de DuckDuckGo-browser op een ander apparaat en selecteer \'Synchroniseren met een ander apparaat\'.</string>
-    <string name="connect_screen_enter_code_cta">Of voer handmatig de code in</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobiel-naar-mobiel?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scan deze code met een ander apparaat om te synchroniseren.</string>
+    <string name="connect_screen_scan_qr_hint">Open de DuckDuckGo-app op je andere apparaat en ga naar <b>Instellingen &gt; Synchronisatie en back-up &gt; Synchroniseren met een ander apparaat</b>.</string>
+    <string name="connect_screen_enter_code_cta">Code handmatig invoeren</string>
+    <string name="connect_screen_connect_qr_hint_title">Of scan met DuckDuckGo op je andere apparaat.</string>
+    <string name="connect_screen_connect_qr_hint_content">Open DuckDuckGo op je andere apparaat en scan deze code om te synchroniseren.</string>
     <string name="connect_screen_share_code">Code kopiëren</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Schakelen tussen synchronisatie</string>
     <string name="sync_dialog_switch_account_secondary_button">Annuleren</string>
     <string name="sync_dialog_switch_account_description">Dit apparaat is al gesynchroniseerd, weet je zeker dat je het met een andere back-up of een ander apparaat wilt synchroniseren? Als je overschakelt, worden er geen gegevens verwijderd die al met dit apparaat zijn gesynchroniseerd.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Nieuw apparaat synchroniseren?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\'%1$s\' heeft toegang tot je gesynchroniseerde DuckDuckGo-gegevens.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Nu synchroniseren</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Annuleren</string>
+
+    <string name="deep_link_auth_prompt_title">Sync &amp; Backup instellen</string>
+    <string name="deep_link_auth_prompt_message">Ontgrendel het apparaat om synchronisatie en back-up in te stellen</string>
 </resources>

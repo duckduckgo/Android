@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-kód beolvasása</string>
-    <string name="login_screen_enter_code_cta">Vagy manuálisan add meg a kódot</string>
+    <string name="login_screen_enter_code_cta">Kód manuális megadása</string>
     <string name="login_screen_barcode_hint">A szinkronizáláshoz irányítsd a kamerát a QR-kódra</string>
-    <string name="login_screen_cant_scan">Nem lehet beolvasni? <font color="#7295F6">Szöveges kód megosztása</font></string>
+    <string name="login_screen_cant_scan_label">Nem sikerül beolvasni?</string>
+    <string name="login_screen_cant_scan_button_text">Szöveges kód másolása</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR-kód beolvasása</string>
-    <string name="connect_screen_scan_qr_hint">Egy másik eszköz DuckDuckGo böngészőjében lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés</b> menüpontra, és válaszd ki a „Szinkronizálás másik eszközzel” lehetőséget.</string>
-    <string name="connect_screen_enter_code_cta">Vagy manuálisan add meg a kódot</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobilról mobilra?</string>
-    <string name="connect_screen_connect_qr_hint_content">A szinkronizáláshoz olvasd be ezt a kódot egy másik eszközzel.</string>
+    <string name="connect_screen_scan_qr_hint">Nyisd meg a DuckDuckGo alkalmazást a másik eszközödön, és lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés &gt; Szinkronizálás másik eszközzel</b> menüpontra.</string>
+    <string name="connect_screen_enter_code_cta">Kód manuális megadása</string>
+    <string name="connect_screen_connect_qr_hint_title">Vagy olvasd be a másik eszközödön található DuckDuckGo használatával</string>
+    <string name="connect_screen_connect_qr_hint_content">A szinkronizáláshoz nyisd meg a DuckDuckGo alkalmazást a másik eszközödön, és olvasd be ezt a kódot.</string>
     <string name="connect_screen_share_code">Kód másolása</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Váltás másik szinkronizálási lehetőségre</string>
     <string name="sync_dialog_switch_account_secondary_button">Mégsem</string>
     <string name="sync_dialog_switch_account_description">Ez az eszköz már szinkronizálva van. Biztosan szinkronizálni szeretnéd egy másik biztonsági mentéssel vagy eszközzel? A váltás nem távolítja el ezzel az eszközzel már szinkronizált adatokat.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Új eszköz szinkronizálása?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” hozzáférhet a szinkronizált DuckDuckGo-adataidhoz.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Szinkronizálás</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Mégsem</string>
+
+    <string name="deep_link_auth_prompt_title">Szinkronizálás és biztonsági mentés beállítása</string>
+    <string name="deep_link_auth_prompt_message">Oldd fel az eszközt a Szinkronizálás és biztonsági mentés funkció beállításához</string>
 </resources>

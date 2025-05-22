@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-koodi skannimine</string>
-    <string name="login_screen_enter_code_cta">Või sisesta kood käsitsi</string>
+    <string name="login_screen_enter_code_cta">Sisesta kood käsitsi</string>
     <string name="login_screen_barcode_hint">Suuna kaamera sünkroonimiseks QR-koodile</string>
-    <string name="login_screen_cant_scan">Kas sa ei saa skannida? <font color="#7295F6">Jaga tekstikoodi</font></string>
+    <string name="login_screen_cant_scan_label">Kas ei saa skannida?</string>
+    <string name="login_screen_cant_scan_button_text">Kopeeri tekstikood</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR-koodi skannimine</string>
-    <string name="connect_screen_scan_qr_hint">Ava teises seadmes DuckDuckGo brauseris <b>Seaded &gt; Sünkroonimine ja varundus</b> ning vali käsk „Sünkrooni teise seadmega“.</string>
-    <string name="connect_screen_enter_code_cta">Või sisesta kood käsitsi</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobiililt mobiilile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Sünkroonimiseks skanni see kood teise seadmega.</string>
+    <string name="connect_screen_scan_qr_hint">Ava oma teises seadmes rakendus DuckDuckGo ja mine <b>Seaded &gt; Sünkroonimine ja varundamine &gt; Sünkrooni teise seadmega</b>.</string>
+    <string name="connect_screen_enter_code_cta">Sisesta kood käsitsi</string>
+    <string name="connect_screen_connect_qr_hint_title">Või skanni DuckDuckGo abil oma teises seadmes</string>
+    <string name="connect_screen_connect_qr_hint_content">Sünkroonimiseks ava DuckDuckGo oma teises sja skanni see kood.</string>
     <string name="connect_screen_share_code">Kopeeri kood</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Synci lülitamine</string>
     <string name="sync_dialog_switch_account_secondary_button">Loobu</string>
     <string name="sync_dialog_switch_account_description">See seade on juba sünkroonitud, kas soovid kindlasti seda sünkroonida teise varukoopia või seadmega? Vahetamine ei eemalda selle seadmega juba sünkroonitud andmeid.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Kas sünkroonida uus seade?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s saab pääseb ligi sinu sünkroonitud DuckDuckGo andmetele.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sünkrooni kohe</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Loobu</string>
+
+    <string name="deep_link_auth_prompt_title">Seadista sünkroonimine ja varundamine</string>
+    <string name="deep_link_auth_prompt_message">Ava seade, et seadistada Sync &amp; Backup</string>
 </resources>

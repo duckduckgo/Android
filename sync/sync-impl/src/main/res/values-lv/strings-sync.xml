@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Kvadrātkoda skenēšana</string>
-    <string name="login_screen_enter_code_cta">Vai manuāli ievadi kodu</string>
+    <string name="login_screen_enter_code_cta">Manuāla koda ievadīšana</string>
     <string name="login_screen_barcode_hint">Pavērs kameru pret kvadrātkodu, lai sinhronizētu</string>
-    <string name="login_screen_cant_scan">Nevari skenēt? <font color="#7295F6">Kopīgo teksta kodu</font></string>
+    <string name="login_screen_cant_scan_label">Nevar noskenēt?</string>
+    <string name="login_screen_cant_scan_button_text">Kopēt teksta kodu</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Kvadrātkoda skenēšana</string>
-    <string name="connect_screen_scan_qr_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana</b> DuckDuckGo pārlūkā citā ierīcē un izvēlies \"Sinhronizēt ar citu ierīci.\"</string>
-    <string name="connect_screen_enter_code_cta">Vai manuāli ievadi kodu</string>
-    <string name="connect_screen_connect_qr_hint_title">No mobilā uz mobilo?</string>
-    <string name="connect_screen_connect_qr_hint_content">Lai sinhronizētu, skenē šo kodu ar citu ierīci.</string>
+    <string name="connect_screen_scan_qr_hint">Atver savā citā ierīcē lietotni DuckDuckGo un dodies uz <b>Settings &gt; Sync &amp; Back Up &gt; Sync With Another Device</b>.</string>
+    <string name="connect_screen_enter_code_cta">Manuāla koda ievadīšana</string>
+    <string name="connect_screen_connect_qr_hint_title">Vai skenē ar DuckDuckGo citā ierīcē</string>
+    <string name="connect_screen_connect_qr_hint_content">Atver DuckDuckGo citā ierīcē un noskenē šo kodu, lai sinhronizētu.</string>
     <string name="connect_screen_share_code">Kopēt kodu</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Pārslēgt sinhronizāciju</string>
     <string name="sync_dialog_switch_account_secondary_button">Atcelt</string>
     <string name="sync_dialog_switch_account_description">Šī ierīce jau ir sinhronizēta, vai tiešām vēlies to sinhronizēt ar citu dublējumu vai ierīci? Pārslēdzot netiks dzēsti dati, kas jau ir sinhronizēti ar šo ierīci.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sinhronizēt jaunu ierīci?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” varēs piekļūt taviem sinhronizētajiem DuckDuckGo datiem.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sinhronizēt tagad</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Atcelt</string>
+
+    <string name="deep_link_auth_prompt_title">Iestatīt Sinhronizēt un dublēt</string>
+    <string name="deep_link_auth_prompt_message">Atbloķē ierīci, lai iestatītu funkciju Sync &amp; Backup</string>
 </resources>

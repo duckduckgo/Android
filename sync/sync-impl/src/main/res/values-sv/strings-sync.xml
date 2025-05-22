@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skanna QR-kod</string>
-    <string name="login_screen_enter_code_cta">Du kan också ange koden manuellt</string>
+    <string name="login_screen_enter_code_cta">Ange kod manuellt</string>
     <string name="login_screen_barcode_hint">Rikta kameran mot QR-koden för att synkronisera</string>
-    <string name="login_screen_cant_scan">Kan du inte skanna? <font color="#7295F6">Dela textkod</font></string>
+    <string name="login_screen_cant_scan_label">Kan du inte skanna?</string>
+    <string name="login_screen_cant_scan_button_text">Kopiera textkod</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skanna QR-kod</string>
-    <string name="connect_screen_scan_qr_hint">Gå till <b>Inställningar &gt; Synkronisering och säkerhetskopiering</b> i DuckDuckGo-webbläsaren på en annan enhet och välj Synkronisera med en annan enhet.</string>
-    <string name="connect_screen_enter_code_cta">Du kan också ange koden manuellt</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobil-till-mobil?</string>
-    <string name="connect_screen_connect_qr_hint_content">Skanna denna kod med en annan enhet för att synkronisera.</string>
+    <string name="connect_screen_scan_qr_hint">Öppna DuckDuckGo-appen på din andra enhet och gå till <b>Inställningar &gt; Synka och säkerhetskopiera &gt; Synkronisera med en annan enhet</b>.</string>
+    <string name="connect_screen_enter_code_cta">Ange kod manuellt</string>
+    <string name="connect_screen_connect_qr_hint_title">Eller skanna med DuckDuckGo på din andra enhet</string>
+    <string name="connect_screen_connect_qr_hint_content">Öppna DuckDuckGo på din andra enhet och skanna den här koden för att synka.</string>
     <string name="connect_screen_share_code">Kopiera kod</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Byt synkronisering</string>
     <string name="sync_dialog_switch_account_secondary_button">Avbryt</string>
     <string name="sync_dialog_switch_account_description">Den här enheten är redan synkroniserad. Är du säker på att du vill synkronisera den med en annan säkerhetskopia eller enhet? Att byta tar inte bort några data som redan har synkroniserats med den här enheten.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Synkronisera ny enhet?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” kommer få tillgång till dina synkroniserade DuckDuckGo-data.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Synkronisera nu</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Avbryt</string>
+
+    <string name="deep_link_auth_prompt_title">Ställ in Sync &amp; Backup</string>
+    <string name="deep_link_auth_prompt_message">Lås upp enheten för att konfigurera Sync &amp; Backup.</string>
 </resources>

@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scanează codul QR</string>
-    <string name="login_screen_enter_code_cta">Sau completează manual codul</string>
+    <string name="login_screen_enter_code_cta">Completează manual codul</string>
     <string name="login_screen_barcode_hint">Îndreaptă camera spre codul QR pentru a sincroniza</string>
-    <string name="login_screen_cant_scan">Nu se poate scana? <font color="#7295F6">Partajează codul text</font></string>
+    <string name="login_screen_cant_scan_label">Nu poți scana?</string>
+    <string name="login_screen_cant_scan_button_text">Copiază codul textului</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scanează codul QR</string>
-    <string name="connect_screen_scan_qr_hint">Mergi la <b>Setări &gt; Sincronizare și backup</b> în browserul DuckDuckGo pe un alt dispozitiv și selectează „Sincronizează cu un alt dispozitiv”.</string>
-    <string name="connect_screen_enter_code_cta">Sau completează manual codul</string>
-    <string name="connect_screen_connect_qr_hint_title">De la mobil la mobil?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scanează acest cod cu un alt dispozitiv pentru a sincroniza.</string>
+    <string name="connect_screen_scan_qr_hint">Deschide aplicația DuckDuckGo pe celălalt dispozitiv și mergi la <b>Setări &gt; Sincronizare și backup &gt; Sincronizează cu un alt dispozitiv</b>.</string>
+    <string name="connect_screen_enter_code_cta">Completează manual codul</string>
+    <string name="connect_screen_connect_qr_hint_title">Sau scanează cu DuckDuckGo pe celălalt dispozitiv</string>
+    <string name="connect_screen_connect_qr_hint_content">Deschide DuckDuckGo pe celălalt dispozitiv și scanează acest cod pentru a sincroniza.</string>
     <string name="connect_screen_share_code">Copiază codul</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Comută sincronizarea</string>
     <string name="sync_dialog_switch_account_secondary_button">Anulare</string>
     <string name="sync_dialog_switch_account_description">Acest dispozitiv este deja sincronizat, sigur dorești să-l sincronizezi cu o altă copie de rezervă sau alt dispozitiv? Schimbarea nu va șterge datele deja sincronizate cu acest dispozitiv.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sincronizezi un nou dispozitiv?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” va putea accesa datele tale DuckDuckGo sincronizate.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sincronizează acum</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Anulare</string>
+
+    <string name="deep_link_auth_prompt_title">Configurează Sincronizare și backup</string>
+    <string name="deep_link_auth_prompt_message">Deblochează dispozitivul pentru a configura Sync &amp; Backup</string>
 </resources>
