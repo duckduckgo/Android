@@ -52,10 +52,8 @@ class PrivacyConfigDownloadWorker(
         return withContext(dispatcherProvider.io()) {
             val result = privacyConfigDownloader.download()
             return@withContext if (result is Success) {
-                Timber.d("Privacy config download success")
                 Result.success()
             } else {
-                Timber.d("Privacy config download fail")
                 Result.retry()
             }
         }
