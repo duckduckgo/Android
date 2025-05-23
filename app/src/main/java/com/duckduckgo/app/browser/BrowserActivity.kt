@@ -43,7 +43,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
@@ -84,7 +83,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
-import com.duckduckgo.browser.api.ui.BrowserScreens.BrowserActivityWithParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
@@ -100,7 +98,6 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
@@ -113,7 +110,6 @@ import timber.log.Timber
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(BrowserActivityWithParams::class)
 open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -482,14 +478,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent == null) {
             return
-        }
-
-        val params = intent.getActivityParams(BrowserActivityWithParams::class.java)
-        val url = params?.url
-        val interstitialScreen = params?.interstitialScreen ?: true
-        if (url != null) {
-            intent.putExtra(EXTRA_TEXT, url)
-            intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
