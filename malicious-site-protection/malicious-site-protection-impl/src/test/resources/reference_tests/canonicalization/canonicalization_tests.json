@@ -143,7 +143,7 @@
                 "siteURL": "http://192.168.000.001:8000/",
                 "expectDomain": "192.168.0.1",
                 "exceptPlatforms": []
-            },
+            },                        
             {
                 "name": "If there are more than six components in the resulting hostname, discard all but the rightmost six components.",
                 "siteURL": "http://a.b.c.d.e.f.g.h.i.j.example.com",
