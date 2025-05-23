@@ -83,7 +83,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
             primaryLifecycleObserverPluginPoint.getPlugins().forEach {
-                Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
                 addObserver(it)
             }
         }

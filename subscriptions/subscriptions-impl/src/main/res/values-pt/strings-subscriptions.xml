@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Inclui a nossa VPN, a Personal Information Removal e a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Inclui a nossa VPN e a Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Obter Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Experimentar o Privacy Pro gratuitamente</string>
     <string name="subscriptionSettingRestore">Tenho uma Subscrição</string>
     <string name="subscriptionSettingExpired">A tua subscrição Privacy Pro expirou</string>
     <string name="subscriptionSettingExpiredViewPlans">Ver Planos</string>

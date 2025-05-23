@@ -315,6 +315,20 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
+                        <View
+                            android:id="@+id/omnibarClickCatcher"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
+                            app:layout_constraintStart_toStartOf="@id/omnibarTextInput"
+                            app:layout_constraintEnd_toEndOf="@id/omnibarTextInput" />
+
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <include

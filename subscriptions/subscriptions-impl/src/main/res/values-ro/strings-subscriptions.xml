@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Include VPN, Personal Information Removal și Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Include VPN-ul nostru și Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Obține Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Încearcă Privacy Pro gratuit</string>
     <string name="subscriptionSettingRestore">Am un abonament</string>
     <string name="subscriptionSettingExpired">Abonamentul tău Privacy Pro a expirat</string>
     <string name="subscriptionSettingExpiredViewPlans">Vezi planurile</string>

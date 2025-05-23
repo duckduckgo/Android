@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Dazu gehört unsere VPN, Personal Information Removal und Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Dazu gehört unser VPN und Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Privacy Pro kaufen</string>
+    <string name="subscriptionSettingTryFreeTrial">Privacy Pro kostenlos testen</string>
     <string name="subscriptionSettingRestore">Ich habe ein Abonnement</string>
     <string name="subscriptionSettingExpired">Dein Privacy Pro Abonnement ist abgelaufen</string>
     <string name="subscriptionSettingExpiredViewPlans">Tarife anzeigen</string>
