@@ -888,7 +888,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Táto webová lokalita sa môže vydávať za legitímnu lokalitu s cieľom oklamať vás k poskytnutiu osobných údajov, ako sú heslá alebo čísla kreditných kariet.\n<a href=\"\">Viac informácií</a>]]></string>
@@ -903,5 +903,11 @@
     <string name="maliciousSiteToggleHint">Upozorni ma na stránkach označených ako phishing alebo malvér.</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Zistiť viac</annotation></string>
     <string name="maliciousSiteSettingDisabled">Deaktivácia tejto funkcie môže ohroziť tvoje údaje.</string>
-
+    <string name="threatProtectionTitle">Ochrana pred hrozbami</string>
+    <string name="threatProtectionDescription">Vylepšené ochrany DuckDuckGo zastavujú bežné hrozby a zároveň udržiavajú tvoje pripojenie bezpečné.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automaticky inovuje odkazy na HTTPS vždy, keď je to možné.<br><a href=\"\">Zisti viac</a>]]></string>
+    <string name="scamBlockerTitle">Blokátor podvodov</string>
+    <string name="scamBlockerDescription">Upozorniť na stránkach označených ako podvod, phishing a malvér.</string>
+    <string name="threatProtectionLearnMoreTitle">Zistite viac</string>
 </resources>
