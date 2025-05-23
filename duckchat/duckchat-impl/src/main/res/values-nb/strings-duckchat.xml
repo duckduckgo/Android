@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Snarveier</string>
     <string name="duck_chat_visibility_setting">Nettlesermeny</string>
     <string name="duck_chat_address_bar_visibility_setting">Adressefelt</string>
+    <string name="duck_chat_assist_settings_title">Assist-innstillinger</string>
+    <string name="duck_chat_assist_settings_description">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine</string>
 </resources>

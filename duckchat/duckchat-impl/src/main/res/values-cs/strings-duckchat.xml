@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Zkratky</string>
     <string name="duck_chat_visibility_setting">Menu prohlížeče</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresní řádek</string>
+    <string name="duck_chat_assist_settings_title">Nastavení funkce Assist</string>
+    <string name="duck_chat_assist_settings_description">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
 </resources>

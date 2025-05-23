@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -66,6 +67,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     @Inject
     lateinit var pixel: Pixel
@@ -118,18 +122,24 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
+        binding.showDuckChatSearchSettingsLink.setOnClickListener {
+            viewModel.duckChatSearchAISettingsClicked()
+        }
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
-            is DuckChatSettingsViewModel.Command.OpenLearnMore -> {
+            is DuckChatSettingsViewModel.Command.OpenLink -> {
                 globalActivityStarter.start(
                     this,
                     WebViewActivityWithParams(
-                        url = command.learnMoreLink,
+                        url = command.link,
                         screenTitle = getString(R.string.duck_chat_title),
                     ),
                 )
+            }
+            is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
+                startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
             }
         }
     }
