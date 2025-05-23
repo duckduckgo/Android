@@ -85,7 +85,7 @@ object SystemComponentsModule {
             dispatchers = dispatcherProvider,
             appCoroutineScope = appCoroutineScope,
             onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
-            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper
+            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
     }
 }

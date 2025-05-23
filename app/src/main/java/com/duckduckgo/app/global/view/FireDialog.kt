@@ -143,7 +143,6 @@ class FireDialog(
 
     private fun configureFireAnimationView() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
 
