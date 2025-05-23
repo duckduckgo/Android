@@ -261,12 +261,17 @@ class BookmarksViewModel @Inject constructor(
 
     fun fetchAllBookmarksAndFolders() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
-                .map { it.bookmarkFolder }
-                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIdsManager.contains(it.id) }
-            val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIdsManager.contains(it.id) }
-            onSavedSitesItemsChanged(favorites, bookmarks + folders)
+            savedSitesRepository.getFavorites()
+                .combine(hiddenIdsManager.getFlow()) { favorites, hiddenIds ->
+                    val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                        .map { it.bookmarkFolder }
+                        .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIds.contains(it.id) }
+                    val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIds.contains(it.id) }
+                    Pair(favorites, bookmarks + folders)
+                }
+                .collect { (favorites, items) ->
+                    onSavedSitesItemsChanged(favorites, items)
+                }
         }
     }
 
