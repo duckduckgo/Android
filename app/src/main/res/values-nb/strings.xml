@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du fjerner fanene og dataene dine, slettes sporingsblokkeringshistorikken din, og dette tallet tilbakestilles til null.\n\nSkjul dette banneret hvis du ikke vil se det i fanevisningen.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi det er mulig at den distribuerer skadelig programvare som er laget for å kompromittere enheten din eller stjele personopplysningene dine.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette nettstedet utgir seg muligens for å være et legitimt nettsted for å lure deg til å oppgi personopplysninger, som passord eller kredittkortnumre.\n<a href=\"\">Finn ut mer</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Varsle meg om nettsteder som er flagget for phishing eller skadelig programvare</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Les mer</annotation></string>
     <string name="maliciousSiteSettingDisabled">Deaktivering av denne funksjonen kan sette informasjonen din i fare.</string>
-
+    <string name="threatProtectionTitle">Trusselbeskyttelse</string>
+    <string name="threatProtectionDescription">DuckDuckGos forbedrede beskyttelse stopper vanlige trusler mens den holder tilkoblingen din sikker.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Oppgraderer automatisk lenker til HTTPS når det er mulig.<br><a href=\"\">Finn ut mer</a>]]></string>
+    <string name="scamBlockerTitle">Svindelblokkering</string>
+    <string name="scamBlockerDescription">Varsle om nettsteder som er flagget for svindel, phishing og skadelig programvare.</string>
+    <string name="threatProtectionLearnMoreTitle">Finn ut mer</string>
 </resources>
