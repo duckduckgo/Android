@@ -888,7 +888,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[To spletno mesto se morda predstavlja kot zakonito spletno mesto, da bi vas pretentalo, da posredujete osebne podatke, kot so gesla ali številke kreditnih kartic.\n<a href=\"\">Več o tem</a>]]></string>
@@ -903,5 +903,11 @@
     <string name="maliciousSiteToggleHint">Opozori me na spletnih mestih, označenih za lažno predstavljanje ali zlonamerno programsko opremo</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="maliciousSiteSettingDisabled">Če onemogočite to funkcijo, lahko ogrozite varnost svojih podatkov.</string>
-
+    <string name="threatProtectionTitle">Zaščita pred grožnjami</string>
+    <string name="threatProtectionDescription">Izboljšana zaščita DuckDuckGo prestreže pogoste grožnje in obenem skrbi za varnost vaše povezave.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Samodejno nadgradi povezave na HTTPS, kadar je to mogoče.<a href=\"\">Več o tem</a>]]></string>
+    <string name="scamBlockerTitle">Preprečevanje prevar</string>
+    <string name="scamBlockerDescription">Prikaži opozorilo na spletnih mestih, označenih zaradi prevar, lažnega predstavljanja in zlonamerne programske opreme.</string>
+    <string name="threatProtectionLearnMoreTitle">Več</string>
 </resources>
