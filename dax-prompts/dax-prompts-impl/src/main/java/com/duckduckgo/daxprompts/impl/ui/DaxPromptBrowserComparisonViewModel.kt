@@ -22,9 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
-import com.duckduckgo.daxprompts.impl.pixels.DaxPromptsPixel.PLUS_EVEN_MORE_PROTECTIONS_LINK_CLICK
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -40,7 +38,6 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val daxPromptsRepository: DaxPromptsRepository,
     private val reactivateUsersExperiment: ReactivateUsersExperiment,
-    private val pixel: Pixel,
     private val applicationContext: Context,
 ) : ViewModel() {
 
@@ -52,7 +49,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
 
     fun onMoreLinkClicked() {
         viewModelScope.launch {
-            pixel.fire(PLUS_EVEN_MORE_PROTECTIONS_LINK_CLICK)
+            reactivateUsersExperiment.firePlusEvenMoreProtectionsLinkClick()
             command.send(Command.OpenDetailsPage(BROWSER_COMPARISON_MORE_URL))
         }
     }

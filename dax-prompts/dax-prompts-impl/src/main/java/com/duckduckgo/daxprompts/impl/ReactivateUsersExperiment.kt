@@ -39,6 +39,7 @@ interface ReactivateUsersExperiment {
     suspend fun fireDuckPlayerClick()
     suspend fun fireChooseYourBrowserClick()
     suspend fun fireCloseScreen()
+    suspend fun firePlusEvenMoreProtectionsLinkClick()
 }
 
 @ContributesBinding(
@@ -91,6 +92,12 @@ class ReactivateUsersExperimentImpl @Inject constructor(
     override suspend fun fireCloseScreen() {
         withContext(dispatcherProvider.io()) {
             reactivateUsersPixelsPlugin.getCloseScreenMetric()?.fire()
+        }
+    }
+
+    override suspend fun firePlusEvenMoreProtectionsLinkClick() {
+        withContext(dispatcherProvider.io()) {
+            reactivateUsersPixelsPlugin.getPlusEvenMoreProtectionsLinkClickMetric()?.fire()
         }
     }
 
