@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">La cancellazione delle schede e dei dati comporterà l\'eliminazione della cronologia del blocco dei sistemi di tracciamento e azzererà questo numero.\n\nNascondi questo banner se preferisci non vederlo nella vista delle schede.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Nascondi banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Attenzione: questo sito potrebbe essere un rischio per la sicurezza</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloccato questa pagina perché potrebbe distribuire malware progettato per compromettere il tuo dispositivo o rubare le tue informazioni personali.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Questo sito web potrebbe imitare un sito legittimo per ingannarti e indurti a rivelare informazioni personali, come password o numeri di carta di credito.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Avvisami sui siti contrassegnati per phishing o malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
     <string name="maliciousSiteSettingDisabled">Disabilitando questa funzione, si mettono a rischio le proprie informazioni.</string>
-
+    <string name="threatProtectionTitle">Protezione dalle minacce</string>
+    <string name="threatProtectionDescription">Le protezioni avanzate di DuckDuckGo fermano le minacce comuni mantenendo sicura la connessione.</string>
+    <string name="smarterEncryptionTitle">Crittografia più sofisticata</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Aggiorna automaticamente i link a HTTPS quando possibile.<br><a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="scamBlockerTitle">Blocco delle truffe</string>
+    <string name="scamBlockerDescription">Avvisa sui siti contrassegnati per truffe, phishing e malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Ulteriori informazioni</string>
 </resources>
