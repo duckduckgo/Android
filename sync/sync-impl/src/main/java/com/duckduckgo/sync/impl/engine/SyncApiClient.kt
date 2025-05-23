@@ -29,8 +29,8 @@ import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.logcat
 import org.json.JSONObject
-import timber.log.Timber
 
 interface SyncApiClient {
 
@@ -58,7 +58,7 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val updates = JSONObject(changes.jsonString)
-        Timber.d("Sync-Engine: patch data generated $updates")
+        logcat { "Sync-Engine: patch data generated $updates" }
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
@@ -128,7 +128,7 @@ class AppSyncApiClient @Inject constructor(
         response: JSONObject,
     ): SyncChangesResponse {
         val jsonString = response.toString()
-        Timber.d("Sync-Engine: $type response mapped to $jsonString")
+        logcat { "Sync-Engine: $type response mapped to $jsonString" }
         return SyncChangesResponse(type, jsonString)
     }
 }

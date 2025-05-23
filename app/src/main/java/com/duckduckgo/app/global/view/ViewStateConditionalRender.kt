@@ -16,7 +16,8 @@
 
 package com.duckduckgo.app.global.view
 
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 /**
  * This method will execute the given lambda only if the given view states differ
@@ -27,7 +28,12 @@ inline fun renderIfChanged(
     block: () -> Unit,
 ) {
     if (newViewState == lastSeenViewState) {
-        Timber.v("view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}")
+        logcat(
+            tag = "renderIfChanged",
+            priority = VERBOSE,
+        ) {
+            "view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}"
+        }
     } else {
         block()
     }

@@ -27,7 +27,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
 import kotlin.math.roundToInt
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 /**
@@ -85,21 +85,21 @@ class LatencyMeasurerImpl @Inject constructor() : LatencyMeasurer {
         // Parse second line to get latency - e.g. 64 bytes from 109.200.208.196: icmp_seq=1 ttl=52 time=69.0 ms
         val splitLine = bufferedReader.readLine()?.split(WHITE_SPACE)
         if (splitLine == null || splitLine.size < EXPECTED_OUTPUT_ELEMENTS) {
-            logcat(LogPriority.WARN) { "Unexpected ping output size: $splitLine" }
+            logcat(WARN) { "Unexpected ping output size: $splitLine" }
             return PARSING_ERROR_1
         }
 
         // Parse time=69.0
         val timeSplit = splitLine[TIME_INDEX].split("=")
         if (timeSplit.size < EXPECTED_TIME_ELEMENTS || timeSplit[0] != "time") {
-            logcat(LogPriority.WARN) { "Unexpected time format: ${splitLine[TIME_INDEX]}" }
+            logcat(WARN) { "Unexpected time format: ${splitLine[TIME_INDEX]}" }
             return PARSING_ERROR_2
         }
 
         return try {
             timeSplit[1].toDouble().roundToInt()
         } catch (e: NumberFormatException) {
-            logcat(LogPriority.WARN) { "Could not convert to number: ${timeSplit[1]}" }
+            logcat(WARN) { "Could not convert to number: ${timeSplit[1]}" }
             NUMBER_FORMAT_ERROR
         }
     }

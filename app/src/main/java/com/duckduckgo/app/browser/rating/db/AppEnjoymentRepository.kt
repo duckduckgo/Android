@@ -21,7 +21,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface AppEnjoymentRepository {
 
@@ -62,33 +62,33 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
     override suspend fun canUserBeShownFirstPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
             if (appEnjoymentDao.hasUserProvidedRating()) {
-                Timber.d("User has given a rating previously")
+                logcat { "User has given a rating previously" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserProvidedFeedback()) {
-                Timber.d("User has provided feedback previously")
+                logcat { "User has provided feedback previously" }
                 return@withContext false
             }
 
             val promptCount = PromptCount.first().value
 
             if (appEnjoymentDao.hasUserDeclinedRating(promptCount)) {
-                Timber.d("User has declined to give rating previously for prompt number $promptCount")
+                logcat { "User has declined to give rating previously for prompt number $promptCount" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedFeedback(promptCount)) {
-                Timber.d("User has declined feedback previously for prompt number $promptCount")
+                logcat { "User has declined feedback previously for prompt number $promptCount" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(promptCount)) {
-                Timber.d("User has declined to say whether enjoying or not for prompt number $promptCount")
+                logcat { "User has declined to say whether enjoying or not for prompt number $promptCount" }
                 return@withContext false
             }
 
-            Timber.d("User has not recently responded to app enjoyment prompt number $promptCount")
+            logcat { "User has not recently responded to app enjoyment prompt number $promptCount" }
             return@withContext true
         }
     }
@@ -96,33 +96,33 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
     override suspend fun canUserBeShownSecondPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
             if (appEnjoymentDao.hasUserProvidedRating()) {
-                Timber.d("User has given a rating previously")
+                logcat { "User has given a rating previously" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserProvidedFeedback()) {
-                Timber.d("User has provided feedback previously")
+                logcat { "User has provided feedback previously" }
                 return@withContext false
             }
 
             val secondPrompt = PromptCount.second().value
 
             if (appEnjoymentDao.hasUserDeclinedFeedback(secondPrompt)) {
-                Timber.d("User has already declined feedback for second prompt previously")
+                logcat { "User has already declined feedback for second prompt previously" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedRating(secondPrompt)) {
-                Timber.d("User has already declined rating for second prompt previously")
+                logcat { "User has already declined rating for second prompt previously" }
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(secondPrompt)) {
-                Timber.d("User has already declined to say whether enjoying the app or not previously")
+                logcat { "User has already declined to say whether enjoying the app or not previously" }
                 return@withContext false
             }
 
-            Timber.d("User has not recently provided a rating or feedback; they can be shown another prompt")
+            logcat { "User has not recently provided a rating or feedback; they can be shown another prompt" }
             return@withContext true
         }
     }
@@ -131,7 +131,7 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
         return withContext(singleThreadedDispatcher) {
             val declinedDate = appEnjoymentDao.latestDateUserDeclinedRatingOrFeedback()
             if (declinedDate == null) {
-                Timber.d("Never declined rating nor feedback before")
+                logcat { "Never declined rating nor feedback before" }
                 return@withContext null
             }
 

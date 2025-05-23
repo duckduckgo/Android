@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 interface AppInstallationReferrerStateListener {
 
@@ -41,7 +41,7 @@ class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrer
      * Initialises the referrer service. This should only be called once.
      */
     override fun initialiseReferralRetrieval() {
-        Timber.d("Empty referrer, nothing to do here")
+        logcat { "Empty referrer, nothing to do here" }
         referralResult = ParsedReferrerResult.ReferrerNotFound()
     }
 
@@ -53,7 +53,7 @@ class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrer
      */
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ParsedReferrerResult.ReferrerInitialising) {
-            Timber.d("Referrer already determined; immediately answering")
+            logcat { "Referrer already determined; immediately answering" }
             return referralResult
         }
 

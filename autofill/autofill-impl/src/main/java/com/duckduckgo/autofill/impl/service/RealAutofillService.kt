@@ -35,7 +35,8 @@ import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(scope = ServiceScope::class)
 class RealAutofillService : AutofillService() {
@@ -62,7 +63,7 @@ class RealAutofillService : AutofillService() {
 
     override fun onCreate() {
         super.onCreate()
-        Timber.v("DDGAutofillService created")
+        logcat(VERBOSE) { "DDGAutofillService created" }
         AndroidInjection.inject(this)
     }
 
@@ -71,7 +72,7 @@ class RealAutofillService : AutofillService() {
         cancellationSignal: CancellationSignal,
         callback: FillCallback,
     ) {
-        Timber.v("DDGAutofillService onFillRequest: $request")
+        logcat(VERBOSE) { "DDGAutofillService onFillRequest: $request" }
         cancellationSignal.setOnCancelListener { autofillJob.cancel() }
 
         autofillJob += coroutineScope.launch(dispatcherProvider.io()) {
@@ -88,7 +89,7 @@ class RealAutofillService : AutofillService() {
                 val parsedRootNodes = autofillParser.parseStructure(structure)
                 val nodeToAutofill = parsedRootNodes.findBestFillableNode()
                 if (nodeToAutofill == null || shouldSkipAutofillSuggestions(nodeToAutofill)) {
-                    Timber.v("DDGAutofillService onFillRequest: no autofill suggestions")
+                    logcat(VERBOSE) { "DDGAutofillService onFillRequest: no autofill suggestions" }
                     callback.onSuccess(null)
                     return@launch
                 }
@@ -151,22 +152,22 @@ class RealAutofillService : AutofillService() {
         request: SaveRequest,
         callback: SaveCallback,
     ) {
-        Timber.v("DDGAutofillService onSaveRequest")
+        logcat(VERBOSE) { "DDGAutofillService onSaveRequest" }
     }
 
     override fun onConnected() {
         super.onConnected()
-        Timber.v("DDGAutofillService onConnected")
+        logcat(VERBOSE) { "DDGAutofillService onConnected" }
     }
 
     override fun onSavedDatasetsInfoRequest(callback: SavedDatasetsInfoCallback) {
         super.onSavedDatasetsInfoRequest(callback)
-        Timber.v("DDGAutofillService onSavedDatasetsInfoRequest")
+        logcat(VERBOSE) { "DDGAutofillService onSavedDatasetsInfoRequest" }
     }
 
     override fun onDisconnected() {
         super.onDisconnected()
-        Timber.v("DDGAutofillService onDisconnected")
+        logcat(VERBOSE) { "DDGAutofillService onDisconnected" }
     }
 
     private fun isAutofillServiceEnabled(): Boolean {

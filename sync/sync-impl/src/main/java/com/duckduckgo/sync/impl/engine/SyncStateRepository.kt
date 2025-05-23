@@ -21,7 +21,7 @@ import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
+import logcat.logcat
 
 interface SyncStateRepository {
 
@@ -55,7 +55,7 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         val last = syncAttemptDao.lastAttemptSync()
         if (last != null) {
             val updated = last.copy(state = state)
-            Timber.d("Sync-State: updating sync attempt to $updated")
+            logcat { "Sync-State: updating sync attempt to $updated" }
             syncAttemptDao.insert(updated)
         }
     }

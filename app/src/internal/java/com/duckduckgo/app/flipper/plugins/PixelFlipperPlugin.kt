@@ -28,9 +28,10 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import java.time.LocalTime
 import javax.inject.Inject
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Response
-import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 class PixelFlipperPlugin @Inject constructor() :
@@ -45,17 +46,17 @@ class PixelFlipperPlugin @Inject constructor() :
     }
 
     override fun onConnect(connection: FlipperConnection?) {
-        Timber.v("$id: connected")
+        logcat(VERBOSE) { "$id: connected" }
         this.connection = connection
     }
 
     override fun onDisconnect() {
-        Timber.v("$id: disconnected")
+        logcat(VERBOSE) { "$id: disconnected" }
         connection = null
     }
 
     override fun runInBackground(): Boolean {
-        Timber.v("$id: running")
+        logcat(VERBOSE) { "$id: running" }
         return false
     }
 

@@ -24,7 +24,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSitePrompt @Inject constructor(
@@ -78,7 +78,7 @@ class RealBrokenSitePrompt @Inject constructor(
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
             if (currentTimestamp.isBefore(nextDate)) {
-                Timber.d("BrokenSitePrompt should NOT show bc cooldown: NextDate= $nextDate")
+                logcat { "BrokenSitePrompt should NOT show bc cooldown: NextDate= $nextDate" }
                 return false
             }
         }
@@ -89,7 +89,7 @@ class RealBrokenSitePrompt @Inject constructor(
             currentTimestamp.minusDays(dismissStreakResetDays),
             currentTimestamp,
         )
-        Timber.d("BrokenSitePrompt final check: dismissCount($dismissalCount) < maxDismissStreak?")
+        logcat { "BrokenSitePrompt final check: dismissCount($dismissalCount) < maxDismissStreak?" }
 
         return dismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }

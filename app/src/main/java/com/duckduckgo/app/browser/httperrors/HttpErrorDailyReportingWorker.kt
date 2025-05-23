@@ -32,7 +32,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class HttpErrorDailyReportingWorker(context: Context, workerParameters: WorkerParameters) :
@@ -64,7 +65,7 @@ class HttpErrorDailyReportingWorkerScheduler @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        Timber.v("Scheduling http error daily reporting worker")
+        logcat(VERBOSE) { "Scheduling http error daily reporting worker" }
         val workerRequest = PeriodicWorkRequestBuilder<HttpErrorDailyReportingWorker>(24, TimeUnit.HOURS)
             .addTag(DAILY_REPORTING_HTTP_ERROR_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)

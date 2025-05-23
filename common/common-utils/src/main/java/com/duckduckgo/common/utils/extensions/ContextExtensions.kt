@@ -22,7 +22,8 @@ import android.content.IntentFilter
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 /**
  * Constants for PrivateDnsMode
@@ -58,7 +59,7 @@ fun Context.getPrivateDnsServerName(): String? {
 
 fun Context.isAirplaneModeOn(): Boolean {
     val airplaneMode = Settings.Global.getString(contentResolver, "airplane_mode_on")
-    Timber.v("airplane_mode_on $airplaneMode")
+    logcat(VERBOSE) { "airplane_mode_on $airplaneMode" }
     return airplaneMode == "1"
 }
 

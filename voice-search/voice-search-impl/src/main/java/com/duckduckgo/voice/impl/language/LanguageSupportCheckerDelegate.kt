@@ -27,7 +27,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 interface LanguageSupportCheckerDelegate {
     fun checkRecognitionSupport(context: Context, languageTag: String, callback: RecognitionSupportCallback)
@@ -44,7 +46,7 @@ class RealLanguageSupportCheckerDelegate @Inject constructor() : LanguageSupport
                 callback,
             )
         }.onFailure {
-            Timber.e(it, "Failed to check voice recognition support")
+            logcat(ERROR) { "Failed to check voice recognition support: ${it.asLog()}" }
         }
     }
 }

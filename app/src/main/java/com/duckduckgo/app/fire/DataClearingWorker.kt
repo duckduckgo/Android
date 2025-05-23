@@ -30,7 +30,9 @@ import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(
@@ -50,7 +52,7 @@ class DataClearingWorker(
     @WorkerThread
     override suspend fun doWork(): Result {
         if (jobAlreadyExecuted()) {
-            Timber.i("This job has run before; no more work needed")
+            logcat(INFO) { "This job has run before; no more work needed" }
             return success()
         }
 
@@ -58,7 +60,7 @@ class DataClearingWorker(
 
         clearData(settingsDataStore.automaticallyClearWhatOption)
 
-        Timber.i("Clear data job finished; returning SUCCESS")
+        logcat(INFO) { "Clear data job finished; returning SUCCESS" }
         return success()
     }
 
@@ -75,22 +77,22 @@ class DataClearingWorker(
     }
 
     suspend fun clearData(clearWhat: ClearWhatOption) {
-        Timber.i("Clearing data: $clearWhat")
+        logcat(INFO) { "Clearing data: $clearWhat" }
 
         when (clearWhat) {
-            ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
+            ClearWhatOption.CLEAR_NONE -> logcat(WARN) { "Automatically clear data invoked, but set to clear nothing" }
             ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabsAsync(appInForeground = false)
             ClearWhatOption.CLEAR_TABS_AND_DATA -> clearEverything()
         }
     }
 
     private suspend fun clearEverything() {
-        Timber.i("App is in background, so just outright killing the process")
+        logcat(INFO) { "App is in background, so just outright killing the process" }
         withContext(dispatchers.main()) {
             clearDataAction.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
 
-            Timber.i("Will kill process now")
+            logcat(INFO) { "Will kill process now" }
             clearDataAction.killProcess()
         }
     }

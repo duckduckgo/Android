@@ -28,7 +28,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class CustomTabViewModel @Inject constructor(
@@ -59,12 +59,12 @@ class CustomTabViewModel @Inject constructor(
     }
 
     fun onShowCustomTab() {
-        Timber.d("Show Custom Tab with tabId=${viewState.value.tabId}")
+        logcat { "Show Custom Tab with tabId=${viewState.value.tabId}" }
         customTabDetector.setCustomTab(true)
     }
 
     fun onCloseCustomTab() {
-        Timber.d("Close Custom Tab with tabId=${viewState.value.tabId}")
+        logcat { "Close Custom Tab with tabId=${viewState.value.tabId}" }
         customTabDetector.setCustomTab(false)
     }
 

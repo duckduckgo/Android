@@ -35,7 +35,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_AUT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AuthLauncher {
     fun launch(
@@ -54,7 +55,7 @@ interface AuthLauncher {
 }
 
 @ContributesBinding(AppScope::class)
-class RealAuthLauncher @Inject constructor(
+class f @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod,
@@ -99,7 +100,7 @@ class RealAuthLauncher @Inject constructor(
             errString: CharSequence,
         ) {
             super.onAuthenticationError(errorCode, errString)
-            Timber.d("onAuthenticationError: (%d) %s", errorCode, errString)
+            logcat { "onAuthenticationError: ($errorCode) $errString" }
 
             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                 onResult(UserCancelled)
@@ -111,14 +112,14 @@ class RealAuthLauncher @Inject constructor(
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
-            Timber.d("onAuthenticationSucceeded ${result.authenticationType}")
+            logcat { "onAuthenticationSucceeded ${result.authenticationType}" }
             autofillAuthorizationGracePeriod.recordSuccessfulAuthorization()
             onResult(Success)
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            Timber.v("onAuthenticationFailed")
+            logcat(VERBOSE) { "onAuthenticationFailed" }
         }
 
         private fun sendErrorPixel(errorCode: Int) {

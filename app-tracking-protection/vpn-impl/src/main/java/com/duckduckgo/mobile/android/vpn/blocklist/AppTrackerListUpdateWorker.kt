@@ -38,7 +38,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @ContributesWorker(AppScope::class)
@@ -78,7 +78,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 
             val success = Result.success()
             if (updateBlocklistResult != success) {
-                logcat(LogPriority.WARN) { "One of the app tracker list updates failed, scheduling a retry" }
+                logcat(WARN) { "One of the app tracker list updates failed, scheduling a retry" }
                 return@withContext Result.retry()
             }
 
@@ -115,7 +115,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 return Result.success()
             }
             else -> {
-                logcat(LogPriority.WARN) { "Received app tracker blocklist with invalid eTag" }
+                logcat(WARN) { "Received app tracker blocklist with invalid eTag" }
                 return Result.retry()
             }
         }

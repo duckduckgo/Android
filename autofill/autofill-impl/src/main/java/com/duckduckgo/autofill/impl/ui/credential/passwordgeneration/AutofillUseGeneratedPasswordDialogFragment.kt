@@ -50,7 +50,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), UseGeneratedPasswordDialog {
@@ -173,11 +174,11 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
     override fun onCancel(dialog: DialogInterface) {
         if (ignoreCancellationEvents) {
-            Timber.v("onCancel: Ignoring cancellation event")
+            logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
 
-        Timber.v("onCancel: GeneratePasswordDialogCancel. User declined to use generated password")
+        logcat(VERBOSE) { "onCancel: GeneratePasswordDialogCancel. User declined to use generated password" }
 
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
 

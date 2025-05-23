@@ -22,7 +22,8 @@ import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.DEFAULT_VARI
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface ExperimentVariantRepository {
     fun getUserVariant(): String?
@@ -39,7 +40,7 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     override fun getUserVariant(): String? = store.variant
 
     override fun updateVariant(variantKey: String) {
-        Timber.i("Updating variant for user: $variantKey")
+        logcat(INFO) { "Updating variant for user: $variantKey" }
         if (updateVariantIsAllowed()) {
             store.variant = variantKey
         }
@@ -52,7 +53,7 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     override fun getAppReferrerVariant(): String? = store.referrerVariant
 
     override fun updateAppReferrerVariant(variant: String) {
-        Timber.i("Updating variant for app referer: $variant")
+        logcat(INFO) { "Updating variant for app referer: $variant" }
         store.variant = variant
         store.referrerVariant = variant
     }

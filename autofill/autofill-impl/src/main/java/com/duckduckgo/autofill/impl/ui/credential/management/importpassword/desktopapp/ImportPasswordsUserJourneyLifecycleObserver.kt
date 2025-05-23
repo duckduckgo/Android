@@ -33,7 +33,8 @@ import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -68,17 +69,17 @@ class ImportPasswordsUserJourneyLifecycleObserver @Inject constructor(
         if (deviceState is SignedIn && deviceState.isSyncedWithDesktopDevice()) {
             userHasNowSyncedWithDesktopDevice()
         } else {
-            Timber.v("Import Passwords user-journey; user has not yet synced with desktop device. time remaining: %s", timeRemaining)
+            logcat(VERBOSE) { "Import Passwords user-journey; user has not yet synced with desktop device. time remaining: $timeRemaining" }
         }
     }
 
     private suspend fun userHasNowSyncedWithDesktopDevice() {
-        Timber.v("Import Passwords user-journey successful; now synced with desktop device")
+        logcat(VERBOSE) { "Import Passwords user-journey successful; now synced with desktop device" }
         userJourneyEndRecorder.recordSuccessfulJourney()
     }
 
     private suspend fun userJourneyWindowHasExpired() {
-        Timber.v("Import Passwords user-journey expired")
+        logcat(VERBOSE) { "Import Passwords user-journey expired" }
         userJourneyEndRecorder.recordUnsuccessfulJourney()
     }
 

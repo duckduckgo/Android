@@ -27,7 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillSuggestions {
     suspend fun getSiteSuggestions(website: String): List<LoginCredentials>
@@ -54,7 +55,7 @@ class AutofillServiceSuggestions @Inject constructor(
                         .plus(groups.shareableCredentials.values.flatten())
                 }
             }.also {
-                Timber.v("DDGAutofillService credentials for domain: $it")
+                logcat(VERBOSE) { "DDGAutofillService credentials for domain: $it" }
             }
         }
     }
@@ -62,7 +63,7 @@ class AutofillServiceSuggestions @Inject constructor(
     override suspend fun getAppSuggestions(packageId: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             appCredentialProvider.getCredentials(packageId).also {
-                Timber.v("DDGAutofillService credentials for package: $it")
+                logcat(VERBOSE) { "DDGAutofillService credentials for package: $it" }
             }
         }
     }

@@ -113,7 +113,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillPasswordsManagementViewModel @Inject constructor(
@@ -314,13 +316,13 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     suspend fun launchDeviceAuth() {
         if (!autofillStore.autofillAvailable()) {
-            Timber.d("Can't access secure storage so can't offer autofill functionality")
+            logcat(VERBOSE) { "Can't access secure storage so can't offer autofill functionality" }
             deviceUnsupported()
             return
         }
 
         if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
-            Timber.d("Can't show device auth as there is no valid device authentication")
+            logcat(VERBOSE) { "Can't show device auth as there is no valid device authentication" }
             disabled()
             return
         }
@@ -328,7 +330,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val credentialCount = autofillStore.getCredentialCount().firstOrNull()
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
-            Timber.d("No credentials; can skip showing device auth")
+            logcat(VERBOSE) { "No credentials; can skip showing device auth" }
             unlock()
         } else {
             addCommand(LaunchDeviceAuth)
@@ -336,14 +338,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun lock() {
-        Timber.v("Locking autofill settings")
+        logcat(VERBOSE) { "Locking autofill settings" }
         trackCurrentModeBeforeLocking()
         addCommand(ShowLockedMode)
         _viewState.value = _viewState.value.copy(credentialMode = Locked)
     }
 
     fun unlock() {
-        Timber.v("Unlocking autofill settings")
+        logcat(VERBOSE) { "Unlocking autofill settings" }
         addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
 
@@ -353,7 +355,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
 
         credentialModeBeforeLocking?.let { mode ->
-            Timber.v("Will return view state to ${mode.javaClass.name}")
+            logcat(VERBOSE) { "Will return view state to ${mode.javaClass.name}" }
             _viewState.value = _viewState.value.copy(credentialMode = mode)
         }
     }
@@ -384,7 +386,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     private fun addCommand(command: Command) {
-        Timber.v("Adding command %s", command::class.simpleName)
+        logcat(VERBOSE) { "Adding command ${command::class.simpleName}" }
         commands.value.let { commands ->
             val updatedList = commands + command
             _commands.value = updatedList
@@ -456,7 +458,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
             val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
             val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
-            Timber.v("Can import from Google Password Manager: $canImport")
+            logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
             _viewState.value = _viewState.value.copy(
                 canImportFromGooglePasswords = canImport,
                 showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
@@ -487,7 +489,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val existingCredentials = autofillStore.deleteCredentials(credentialsId)
             addCommand(OfferUserUndoDeletion(existingCredentials))
 
-            Timber.i("Deleted $existingCredentials")
+            logcat(INFO) { "Deleted $existingCredentials" }
         }
     }
 
@@ -569,7 +571,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun onSearchQueryChanged(searchText: String) {
-        Timber.v("Search query changed: %s", searchText)
+        logcat(VERBOSE) { "Search query changed: $searchText" }
         searchQueryFilter.value = searchText
         val showAutofillEnabledToggle = searchText.isEmpty() && autofillFeature.settingsScreen().isEnabled().not()
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
@@ -591,16 +593,16 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     private fun updateDuckAddressStatus(username: String?) {
-        Timber.d("Determining duck address status for %s", username)
+        logcat { "Determining duck address status for $username" }
 
         viewModelScope.launch(dispatchers.io()) {
             val mainAddress = emailManager.getEmailAddress()
             if (!isPrivateDuckAddress(username, mainAddress)) {
-                Timber.d("Not a private duck address: %s", username)
+                logcat { "Not a private duck address: $username" }
             } else {
                 val credMode = viewState.value.credentialMode
                 if (credMode is Viewing) {
-                    Timber.d("Fetching duck address status from the network for %s", username)
+                    logcat { "Fetching duck address status from the network for $username" }
                     retrieveStatusFromNetwork(credMode, username)
                 }
             }
@@ -624,17 +626,17 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 }
 
                 ActivationStatusResult.NotSignedIn -> {
-                    Timber.d("Not signed into email protection; can't manage %s", duckAddress)
+                    logcat { "Not signed into email protection; can't manage $duckAddress" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = DuckAddressStatus.NotSignedIn))
                 }
 
                 ActivationStatusResult.Unmanageable -> {
-                    Timber.w("Can't manage %s from this account", duckAddress)
+                    logcat(VERBOSE) { "Can't manage $duckAddress from this account" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = NotManageable))
                 }
 
                 ActivationStatusResult.GeneralError -> {
-                    Timber.w("General error when querying status for %s", duckAddress)
+                    logcat(VERBOSE) { "General error when querying status for $duckAddress" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
                 }
             }
@@ -669,7 +671,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
      */
     fun sendLaunchPixel(launchSource: AutofillScreenLaunchSource) {
         viewModelScope.launch {
-            Timber.v("Opened autofill management screen from from %s", launchSource)
+            logcat(VERBOSE) { "Opened autofill management screen from from $launchSource" }
 
             val source = launchSource.asString()
             val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
@@ -714,7 +716,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onAuthenticatedToDeleteAllPasswords() {
         viewModelScope.launch(dispatchers.io()) {
             val removedCredentials = autofillStore.deleteAllCredentials()
-            Timber.i("Removed %d credentials", removedCredentials.size)
+            logcat(INFO) { "Removed ${removedCredentials.size} credentials" }
 
             if (removedCredentials.isNotEmpty()) {
                 addCommand(OfferUserUndoMassDeletion(removedCredentials))

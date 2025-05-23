@@ -19,7 +19,9 @@ package com.duckduckgo.autofill.store.feature
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillDefaultStateDecider {
     fun defaultState(): Boolean
@@ -33,7 +35,7 @@ class RealAutofillDefaultStateDecider(
 
     override fun defaultState(): Boolean {
         if (internalTestUserChecker.isInternalTestUser) {
-            Timber.v("Internal testing user, enabling autofill by default")
+            logcat(VERBOSE) { "Internal testing user, enabling autofill by default" }
             return true
         }
 
@@ -45,7 +47,7 @@ class RealAutofillDefaultStateDecider(
             return false
         }
 
-        Timber.i("Determined Autofill should be enabled by default")
+        logcat(INFO) { "Determined Autofill should be enabled by default" }
         return true
     }
 }

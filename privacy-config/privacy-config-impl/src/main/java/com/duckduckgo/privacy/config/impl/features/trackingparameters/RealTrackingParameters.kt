@@ -34,7 +34,8 @@ import dagger.SingleInstanceIn
 import dagger.WrongScope
 import java.lang.UnsupportedOperationException
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 @WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
 @ContributesBinding(AppScope::class)
@@ -99,7 +100,7 @@ class RealTrackingParameters @Inject constructor(
             lastCleanedUrl = cleanedUrl
             cleanedUrl
         } catch (exception: UnsupportedOperationException) {
-            Timber.e("Tracking Parameter Removal: ${exception.message}")
+            logcat(ERROR) { "Tracking Parameter Removal: ${exception.message}" }
             null
         }
     }

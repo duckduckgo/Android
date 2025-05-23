@@ -26,7 +26,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillParser {
     // Parses structure, detects autofill fields, and returns a list of root nodes.
@@ -89,7 +90,7 @@ class RealAutofillParser @Inject constructor(
         viewNode: ViewNode,
     ): MutableList<ParsedAutofillField> {
         val autofillId = viewNode.autofillId ?: return mutableListOf()
-        Timber.v("DDGAutofillService Parsing NODE: $autofillId")
+        logcat(VERBOSE) { "DDGAutofillService Parsing NODE: $autofillId" }
         val traversalDataList = mutableListOf<ParsedAutofillField>()
         val packageId = viewNode.validPackageId()
         val website = viewNode.website()
@@ -103,7 +104,7 @@ class RealAutofillParser @Inject constructor(
             type = autofillType,
             originalNode = viewNode,
         )
-        Timber.v("DDGAutofillService Parsed as: $parsedAutofillField")
+        logcat(VERBOSE) { "DDGAutofillService Parsed as: $parsedAutofillField" }
         traversalDataList.add(parsedAutofillField)
 
         for (i in 0 until viewNode.childCount) {

@@ -23,7 +23,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.logcat
 
 class CredentialsLocalWinsStrategy(
     private val credentialsSync: CredentialsSync,
@@ -34,7 +34,7 @@ class CredentialsLocalWinsStrategy(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult {
-        Timber.d("Sync-autofill-Persist: ======= MERGING LOCALWINS =======")
+        logcat { "Sync-autofill-Persist: ======= MERGING LOCALWINS =======" }
         return kotlin.runCatching {
             runBlocking(dispatchers.io()) {
                 credentials.entries.forEach { entry ->
@@ -45,10 +45,10 @@ class CredentialsLocalWinsStrategy(
                 }
             }
         }.getOrElse {
-            Timber.d("Sync-autofill-Persist: merging failed with error $it")
+            logcat { "Sync-autofill-Persist: merging failed with error $it" }
             return Error(reason = "LocalWins merge failed with error $it")
         }.let {
-            Timber.d("Sync-autofill-Persist: merging completed")
+            logcat { "Sync-autofill-Persist: merging completed" }
             Success()
         }
     }
@@ -56,7 +56,7 @@ class CredentialsLocalWinsStrategy(
     private suspend fun processNewEntry(entry: CredentialsSyncEntryResponse, clientModifiedSince: String) {
         if (entry.isDeleted()) return
         val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, clientModifiedSince)
-        Timber.d("Sync-autofill-Persist: >>> no local, save remote $updatedCredentials")
+        logcat { "Sync-autofill-Persist: >>> no local, save remote $updatedCredentials" }
         credentialsSync.saveCredential(updatedCredentials, entry.id)
     }
 }

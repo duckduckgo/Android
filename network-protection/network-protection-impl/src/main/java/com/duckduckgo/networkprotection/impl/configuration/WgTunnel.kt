@@ -37,7 +37,6 @@ import java.io.StringReader
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Qualifier
-import logcat.LogPriority
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -177,7 +176,7 @@ class RealWgTunnel @Inject constructor(
 
             return Result.success(config)
         } catch (e: Throwable) {
-            logcat(LogPriority.ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
+            logcat(ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
             return Result.failure(e)
         }
     }

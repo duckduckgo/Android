@@ -38,7 +38,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -71,8 +75,8 @@ class RxPixelSender @Inject constructor(
                 .switchMapCompletable(this::sendAndDeletePixel)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                    { Timber.v("Pixel finished sync") },
-                    { Timber.w(it, "Pixel failed to sync") },
+                    { logcat(VERBOSE) { "Pixel finished sync" } },
+                    { logcat(WARN) { "Pixel failed to sync: ${it.asLog()}" } },
                 ),
         )
     }
@@ -86,12 +90,12 @@ class RxPixelSender @Inject constructor(
             .andThen(deletePixel(pixel))
             .andThen {
                 with(pixel) {
-                    Timber.i("Pixel sent: $id $pixelName with params: $additionalQueryParams $encodedQueryParams")
+                    logcat(INFO) { "Pixel sent: $id $pixelName with params: $additionalQueryParams $encodedQueryParams" }
                 }
             }
             .doOnError {
                 with(pixel) {
-                    Timber.i("Pixel failed: $id $pixelName with params: $additionalQueryParams $encodedQueryParams")
+                    logcat(INFO) { "Pixel failed: $id $pixelName with params: $additionalQueryParams $encodedQueryParams" }
                 }
             }.onErrorComplete()
     }

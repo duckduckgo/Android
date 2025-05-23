@@ -29,7 +29,7 @@ import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -108,10 +108,10 @@ class RealAmpLinks @Inject constructor(
     override fun processDestinationUrl(initialUrl: String, extractedUrl: String?): String {
         return if (extractedUrl != null && isValidDestinationUrl(extractedUrl)) {
             lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
-            Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")
+            logcat { "AMP link detection: Success! Loading extracted URL: $extractedUrl" }
             extractedUrl
         } else {
-            Timber.d("AMP link detection: Failed! Loading initial URL: $initialUrl")
+            logcat { "AMP link detection: Failed! Loading initial URL: $initialUrl" }
             initialUrl
         }
     }

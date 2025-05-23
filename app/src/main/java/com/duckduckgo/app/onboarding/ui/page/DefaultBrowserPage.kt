@@ -38,7 +38,9 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
@@ -197,7 +199,7 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         try {
             startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
+            logcat(WARN) { "{${getString(R.string.cannotLaunchDefaultAppSettings)}: ${e.asLog()}" }
         }
     }
 

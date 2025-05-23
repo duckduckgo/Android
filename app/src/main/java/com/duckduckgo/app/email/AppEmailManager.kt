@@ -38,8 +38,11 @@ import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import org.json.JSONObject
-import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = EmailManager::class)
@@ -131,7 +134,7 @@ class AppEmailManager @Inject constructor(
     override fun getToken(): String? = emailDataStore.emailToken
 
     private fun refreshEmailState() {
-        Timber.i("Sync-Settings: refreshEmailState()")
+        logcat(INFO) { "Sync-Settings: refreshEmailState()" }
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
             if (isSignedIn()) {
@@ -166,7 +169,7 @@ class AppEmailManager @Inject constructor(
                     "${alias.address}$DUCK_EMAIL_DOMAIN"
                 }
             }.onFailure {
-                Timber.w(it, "Failed to fetch alias")
+                logcat(WARN) { "Failed to fetch alias: ${it.asLog()}" }
             }
         }
     }

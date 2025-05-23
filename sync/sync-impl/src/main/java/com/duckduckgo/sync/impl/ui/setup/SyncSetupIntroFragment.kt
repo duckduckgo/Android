@@ -43,7 +43,7 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) {
@@ -136,7 +136,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         const val KEY_CREATE_ACCOUNT_INTRO = "KEY_CREATE_ACCOUNT_INTRO"
 
         fun instance(screen: Screen): SyncSetupIntroFragment {
-            Timber.d("Sync-Setup: screen $screen")
+            logcat { "Sync-Setup: screen $screen" }
             val fragment = SyncSetupIntroFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_CREATE_ACCOUNT_INTRO, screen)

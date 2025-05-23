@@ -23,9 +23,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import org.json.JSONObject
 import retrofit2.Response
-import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -200,7 +202,7 @@ class SyncServiceRemote @Inject constructor(
     }
 
     override fun getEncryptedMessage(keyId: String): Result<String> {
-        Timber.v("Sync-exchange: Looking for exchange for keyId: $keyId")
+        logcat(VERBOSE) { "Sync-exchange: Looking for exchange for keyId: $keyId" }
         val response = runCatching {
             val request = syncService.getEncryptedMessage(keyId)
             request.execute()
@@ -289,18 +291,18 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         updates: JSONObject,
     ): Result<JSONObject> {
-        Timber.i("Sync-service: patch request $updates")
+        logcat(INFO) { "Sync-service: patch request $updates" }
 
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
-            Timber.i("Sync-service: error ${throwable.localizedMessage}")
+            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Timber.i("Sync-service: patch response: $it")
+            logcat(INFO) { "Sync-service: patch response: $it" }
             val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
             Result.Success(data)
         }
@@ -310,7 +312,7 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         since: String,
     ): Result<JSONObject> {
-        Timber.i("Sync-service: get bookmarks since servertime $since")
+        logcat(INFO) { "Sync-service: get bookmarks since servertime $since" }
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.bookmarksSince("Bearer $token", since)
@@ -332,7 +334,7 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         since: String,
     ): Result<JSONObject> {
-        Timber.i("Sync-service: get credentials since servertime $since")
+        logcat(INFO) { "Sync-service: get credentials since servertime $since" }
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.credentialsSince("Bearer $token", since)
@@ -341,12 +343,12 @@ class SyncServiceRemote @Inject constructor(
             }
             patchCall.execute()
         }.getOrElse { throwable ->
-            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
+            logcat(INFO) { "Sync-service: patch response: ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Timber.i("Sync-service: get credentials response: $it")
+            logcat(INFO) { "Sync-service: get credentials response: $it" }
             val data = response.body() ?: return@onSuccess Result.Error(reason = "GetCredentials: empty body")
             Result.Success(data)
         }
@@ -356,7 +358,7 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         since: String,
     ): Result<JSONObject> {
-        Timber.i("Sync-settings: get settings since servertime $since")
+        logcat(INFO) { "Sync-settings: get settings since servertime $since" }
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.settingsSince("Bearer $token", since)
@@ -365,12 +367,12 @@ class SyncServiceRemote @Inject constructor(
             }
             patchCall.execute()
         }.getOrElse { throwable ->
-            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
+            logcat(INFO) { "Sync-service: patch response: ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Timber.i("Sync-service: get settings response: $it")
+            logcat(INFO) { "Sync-service: get settings response: $it" }
             val data = response.body() ?: return@onSuccess Result.Error(reason = "GetSettings: empty body")
             Result.Success(data)
         }

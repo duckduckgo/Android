@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(scope = AppScope::class, boundType = SyncStateMonitor::class)
 class RealSyncStateMonitor @Inject constructor(
@@ -57,10 +57,10 @@ class RealSyncStateMonitor @Inject constructor(
     ): SyncState {
         return if (signedIn) {
             if (attempt == null) {
-                Timber.d("Sync-State: Sync Monitor signed in, Sync in READY state")
+                logcat { "Sync-State: Sync Monitor signed in, Sync in READY state" }
                 SyncState.READY
             } else {
-                Timber.d("Sync-State: Sync Monitor signed $signedIn, sync in ${attempt.state} state")
+                logcat { "Sync-State: Sync Monitor signed $signedIn, sync in ${attempt.state} state" }
                 val state = when (attempt.state) {
                     IN_PROGRESS -> SyncState.IN_PROGRESS
                     SUCCESS -> SyncState.READY
@@ -69,7 +69,7 @@ class RealSyncStateMonitor @Inject constructor(
                 state
             }
         } else {
-            Timber.d("Sync-State: Sync Monitor not signed in, Sync in OFF state")
+            logcat { "Sync-State: Sync Monitor not signed in, Sync in OFF state" }
             return OFF
         }
     }

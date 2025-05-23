@@ -32,7 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 interface AutofillBreakageReportSender {
     fun sendBreakageReport(
@@ -75,7 +75,7 @@ class AutofillBreakageReportSenderImpl @Inject constructor(
                 "email_protection" to formatEmailProtectionStatus(),
                 "never_prompt" to formatNeverProtectThisSiteStatus(url),
             )
-            Timber.d("Sending autofill breakage report %s", params)
+            logcat { "Sending autofill breakage report $params" }
 
             pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT, parameters = params)
         }

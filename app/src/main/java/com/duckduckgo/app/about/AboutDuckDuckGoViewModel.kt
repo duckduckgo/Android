@@ -34,7 +34,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AboutDuckDuckGoViewModel @Inject constructor(
@@ -106,7 +107,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun onVersionClicked() {
         easterEggCounter++
         if (easterEggCounter >= MAX_EASTER_EGG_COUNT) {
-            Timber.v("Easter egg triggered")
+            logcat(VERBOSE) { "Easter egg triggered" }
             resetEasterEggCounter()
             pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
         }

@@ -28,7 +28,8 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface LongPressHandler {
     fun handleLongPress(
@@ -96,7 +97,7 @@ class WebViewLongPressHandler @Inject constructor(
                 }
             }
             else -> {
-                Timber.v("App does not yet handle target type: $longPressTargetType")
+                logcat(VERBOSE) { "App does not yet handle target type: $longPressTargetType" }
                 menuShown = false
             }
         }

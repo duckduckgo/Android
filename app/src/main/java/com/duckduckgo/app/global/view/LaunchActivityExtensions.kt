@@ -23,7 +23,8 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 fun FragmentActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
@@ -39,7 +40,7 @@ fun Context.launchDefaultAppActivity() {
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
-        Timber.w(errorMessage)
+        logcat(WARN) { errorMessage }
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 }

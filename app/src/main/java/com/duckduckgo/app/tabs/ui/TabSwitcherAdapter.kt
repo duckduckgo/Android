@@ -74,7 +74,8 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class TabSwitcherAdapter(
     private val isVisualExperimentEnabled: Boolean,
@@ -294,7 +295,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
@@ -327,7 +328,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             bundle.getString(DIFF_KEY_URL)?.let {

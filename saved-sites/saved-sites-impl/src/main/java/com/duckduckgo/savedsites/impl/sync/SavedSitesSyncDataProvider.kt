@@ -31,7 +31,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SavedSitesSyncDataProvider @Inject constructor(
@@ -54,18 +54,18 @@ class SavedSitesSyncDataProvider @Inject constructor(
         }
 
         if (updates.isEmpty()) {
-            Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store as request")
+            logcat { "Sync-Bookmarks-Metadata: no local changes, nothing to store as request" }
         } else {
             syncSavedSitesRepository.addRequestMetadata(updates)
         }
 
-        Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")
+        logcat { "Sync-Bookmarks: modifiedSince changes: $updates" }
         return formatUpdates(updates)
     }
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncSavedSitesRequestEntry> {
-        Timber.i("Sync-Bookmarks: generating changes since $since")
+        logcat { "Sync-Bookmarks: generating changes since $since" }
         val updates = mutableListOf<SyncSavedSitesRequestEntry>()
 
         // we start adding individual folders that have been modified
@@ -81,12 +81,12 @@ class SavedSitesSyncDataProvider @Inject constructor(
         // retry invalid items
         val newInvalidItems = mutableListOf<String>()
         val oldInvalidSavedSites = syncSavedSitesRepository.getInvalidSavedSites()
-        Timber.i("Sync-Bookmarks: invalid items to retry: $oldInvalidSavedSites")
+        logcat { "Sync-Bookmarks: invalid items to retry: $oldInvalidSavedSites" }
 
         // then we add individual bookmarks that have been modified
         val bookmarks = syncSavedSitesRepository.getBookmarksModifiedSince(since)
         (oldInvalidSavedSites + bookmarks).forEach { bookmark ->
-            Timber.i("Sync-Bookmarks: processing bookmark ${bookmark.id}")
+            logcat { "Sync-Bookmarks: processing bookmark ${bookmark.id}" }
             if (bookmark.isDeleted()) {
                 updates.add(deletedEntry(bookmark.id))
             } else {
@@ -106,12 +106,12 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncSavedSitesRequestEntry> {
-        Timber.i("Sync-Bookmarks: generating all content")
+        logcat { "Sync-Bookmarks: generating all content" }
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            Timber.d("Sync-Bookmarks: nothing to generate, favourites and bookmarks empty")
+            logcat { "Sync-Bookmarks: nothing to generate, favourites and bookmarks empty" }
             return emptyList()
         }
 
@@ -181,7 +181,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     private fun encryptedFolder(bookmarkFolder: BookmarkFolder): SyncSavedSitesRequestEntry {
         val folderChildren = syncSavedSitesRepository.getFolderDiff(bookmarkFolder.id)
-        Timber.d("Sync-Bookmarks-Metadata: folder diff for ${bookmarkFolder.id} $folderChildren")
+        logcat { "Sync-Bookmarks-Metadata: folder diff for ${bookmarkFolder.id} $folderChildren" }
         return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = syncCrypto.encrypt(bookmarkFolder.name),

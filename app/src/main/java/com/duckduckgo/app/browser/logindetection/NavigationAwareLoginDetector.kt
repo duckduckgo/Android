@@ -29,7 +29,8 @@ import com.duckduckgo.common.utils.ValidUrl
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.getValidUrl
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface NavigationAwareLoginDetector {
     val loginEventLiveData: LiveData<LoginDetected>
@@ -73,10 +74,10 @@ class NextPageLoginDetection constructor(
     override fun onEvent(navigationEvent: NavigationEvent) {
         if (settingsDataStore.automaticFireproofSetting == AutomaticFireproofSetting.NEVER) return
 
-        Timber.v("LoginDetectionDelegate $navigationEvent")
+        logcat(VERBOSE) { "LoginDetectionDelegate $navigationEvent" }
         return when (navigationEvent) {
             is NavigationEvent.PageFinished -> {
-                Timber.v("LoginDetectionDelegate schedule Login detection Job for $urlToCheck")
+                logcat(VERBOSE) { "LoginDetectionDelegate schedule Login detection Job for $urlToCheck" }
                 loginDetectionJob?.cancel()
                 loginDetectionJob = scheduleLoginDetection()
             }
@@ -103,26 +104,26 @@ class NextPageLoginDetection constructor(
         // AToW, it's not possible to inject such scope as dependency due to our single Component Dagger setup.
         return appCoroutineScope.launch(dispatcherProvider.main()) {
             delay(NAVIGATION_EVENT_GRACE_PERIOD)
-            Timber.v("LoginDetectionDelegate execute Login detection Job for $urlToCheck")
+            logcat(VERBOSE) { "LoginDetectionDelegate execute Login detection Job for $urlToCheck" }
             val loginUrlCandidate = urlToCheck
             if (loginUrlCandidate.isNullOrBlank()) {
                 discardLoginAttempt()
             } else {
                 when (val loginResult = detectLogin(loginUrlCandidate)) {
                     is LoginResult.AuthFlow -> {
-                        Timber.v("LoginDetectionDelegate AuthFlow")
+                        logcat(VERBOSE) { "LoginDetectionDelegate AuthFlow" }
                         authDetectedHosts.add(loginResult.authLoginDomain)
                     }
                     is LoginResult.TwoFactorAuthFlow -> {
-                        Timber.v("LoginDetectionDelegate TwoFactorAuthFlow")
+                        logcat(VERBOSE) { "LoginDetectionDelegate TwoFactorAuthFlow" }
                     }
                     is LoginResult.LoginDetected -> {
-                        Timber.d("LoginDetectionDelegate LoginDetected")
+                        logcat { "LoginDetectionDelegate LoginDetected" }
                         loginEventLiveData.value = LoginDetected(loginResult.authLoginDomain, loginResult.forwardedToDomain)
                         loginAttempt = null
                     }
                     is LoginResult.Unknown -> {
-                        Timber.v("LoginDetectionDelegate Unknown")
+                        logcat(VERBOSE) { "LoginDetectionDelegate Unknown" }
                         discardLoginAttempt()
                     }
                 }
@@ -131,14 +132,14 @@ class NextPageLoginDetection constructor(
     }
 
     private fun saveLoginAttempt(navigationEvent: NavigationEvent.LoginAttempt) {
-        Timber.v("LoginDetectionDelegate saveLoginAttempt $navigationEvent")
+        logcat(VERBOSE) { "LoginDetectionDelegate saveLoginAttempt $navigationEvent" }
         loginAttempt = Uri.parse(navigationEvent.url).getValidUrl() ?: return
     }
 
     private fun discardLoginAttempt() {
         if (!gpcRefreshed) {
             gpcRefreshed = false
-            Timber.v("LoginDetectionDelegate discardLoginAttempt")
+            logcat(VERBOSE) { "LoginDetectionDelegate discardLoginAttempt" }
             urlToCheck = null
             loginAttempt = null
         }
@@ -182,7 +183,7 @@ class NextPageLoginDetection constructor(
         val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
         if (validUrl.isOAuthUrl() || validUrl.isSSOUrl() || authDetectedHosts.any { validUrl.baseHost.contains(it) }) {
             authDetectedHosts.add(validUrl.baseHost)
-            Timber.d("LoginDetectionDelegate Auth domain added $authDetectedHosts")
+            logcat { "LoginDetectionDelegate Auth domain added $authDetectedHosts" }
         }
 
         if (loginAttempt != null) {
@@ -202,7 +203,7 @@ class NextPageLoginDetection constructor(
 
         if (forwardedToUri.is2FAUrl()) return LoginResult.TwoFactorAuthFlow(forwardedToUri.host)
 
-        Timber.d("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl // $authDetectedHosts")
+        logcat { "LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl // $authDetectedHosts" }
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
             return LoginResult.LoginDetected(validLoginAttempt.host, forwardedToUri.host)
         }

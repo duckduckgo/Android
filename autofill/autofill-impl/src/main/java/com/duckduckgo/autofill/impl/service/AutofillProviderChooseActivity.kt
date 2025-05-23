@@ -54,7 +54,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class AutofillProviderChooseActivity : DuckDuckGoActivity() {
@@ -87,7 +88,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("DDGAutofillService onCreate!")
+        logcat(INFO) { "DDGAutofillService onCreate!" }
 
         assistStructure = IntentCompat.getParcelableExtra(intent, AutofillManager.EXTRA_ASSIST_STRUCTURE, AssistStructure::class.java)
 
@@ -108,7 +109,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is RequestAuthentication -> {
-                Timber.i("DDGAutofillService auth IS REQUIRED!")
+                logcat(INFO) { "DDGAutofillService auth IS REQUIRED!" }
                 deviceAuthenticator.authenticate(this) {
                     when (it) {
                         Success -> {

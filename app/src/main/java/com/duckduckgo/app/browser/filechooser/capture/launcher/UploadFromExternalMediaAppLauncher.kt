@@ -40,7 +40,9 @@ import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 /**
  * Public API for launching any external media capturing app (e.g camera, sound recorder) and capturing.
@@ -125,18 +127,18 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
 
     override fun launch(inputAction: String) {
         if (permissionHelper.hasMediaPermissionsGranted(inputAction)) {
-            Timber.d("permission already granted for $inputAction. launching app now")
+            logcat { "permission already granted for $inputAction. launching app now" }
             launchMediaApp(inputAction)
         } else {
             // ask for permission
-            Timber.d("no permission yet for $inputAction, need to request permission before launching")
+            logcat { "no permission yet for $inputAction, need to request permission before launching" }
             when (inputAction) {
                 MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE ->
                     permissionHelper.requestPermission(Manifest.permission.CAMERA, inputAction)
                 MediaStore.Audio.Media.RECORD_SOUND_ACTION ->
                     permissionHelper.requestPermission(Manifest.permission.RECORD_AUDIO, inputAction)
                 else ->
-                    Timber.d("Unknown permissions needed for $inputAction")
+                    logcat { "Unknown permissions needed for $inputAction" }
             }
         }
     }
@@ -145,7 +147,7 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
         try {
             launcher.launch(inputAction)
         } catch (e: Exception) {
-            Timber.w(e, "exception launching camera / sound recorder")
+            logcat(WARN) { e.asLog() + "exception launching camera / sound recorder" }
             if (inputAction == MediaStore.ACTION_IMAGE_CAPTURE || inputAction == MediaStore.ACTION_VIDEO_CAPTURE) {
                 callback.invoke(MediaCaptureResult.ErrorAccessingMediaApp(R.string.imageCaptureCameraUnavailable))
             } else if (inputAction == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {
@@ -219,11 +221,11 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
     }
 
     private fun onResultSystemPermissionRequest(granted: Boolean, inputAction: String) {
-        Timber.d("permission request received for $inputAction. granted=$granted")
+        logcat { "permission request received for $inputAction. granted=$granted" }
         if (granted) {
             launchMediaApp(inputAction)
         } else {
-            callback(MediaCaptureResult.CouldNotCapturePermissionDenied(inputAction))
+            callback.invoke(MediaCaptureResult.CouldNotCapturePermissionDenied(inputAction))
         }
     }
 

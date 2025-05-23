@@ -108,7 +108,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 open class OmnibarLayout @JvmOverloads constructor(
@@ -333,13 +333,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (lastViewMode != null) {
-            Timber.d("Omnibar: onAttachedToWindow lastViewMode $lastViewMode")
+            logcat { "Omnibar: onAttachedToWindow lastViewMode $lastViewMode" }
             decorateDeferred(lastViewMode!!)
             lastViewMode = null
         }
 
         if (decoration != null) {
-            Timber.d("Omnibar: onAttachedToWindow decoration $decoration")
+            logcat { "Omnibar: onAttachedToWindow decoration $decoration" }
             decorateDeferred(decoration!!)
             decoration = null
         }
@@ -429,7 +429,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                     count: Int,
                     after: Int,
                 ) {
-                    Timber.d("Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after")
+                    logcat { "Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after" }
                     clearQuery = start == 0 && after == 0
                     deleteLastCharacter = count == 1 && clearQuery
                 }
@@ -707,13 +707,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         viewState: ViewState,
         viewMode: ViewMode.CustomTab,
     ) {
-        Timber.d("Omnibar: renderCustomTabMode $viewState")
+        logcat { "Omnibar: renderCustomTabMode $viewState" }
         configureCustomTabOmnibar(viewMode)
         renderCustomTab(viewMode)
     }
 
     fun decorate(decoration: Decoration) {
-        Timber.d("Omnibar: decorate $decoration")
+        logcat { "Omnibar: decorate $decoration" }
         if (isAttachedToWindow) {
             decorateDeferred(decoration)
         } else {
@@ -780,7 +780,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         if (isAttachedToWindow) {
             reduceDeferred(stateChange)
         } else {
-            Timber.d("Omnibar: reduce not attached saving $stateChange")
+            logcat { "Omnibar: reduce not attached saving $stateChange" }
             this.stateBuffer.add(stateChange)
         }
     }
@@ -941,7 +941,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderCustomTab(viewMode: CustomTab) {
-        Timber.d("Omnibar: updateCustomTabTitle $decoration")
+        logcat { "Omnibar: updateCustomTabTitle $decoration" }
 
         viewMode.domain?.let {
             customTabToolbarContainer.customTabDomain.text = viewMode.domain

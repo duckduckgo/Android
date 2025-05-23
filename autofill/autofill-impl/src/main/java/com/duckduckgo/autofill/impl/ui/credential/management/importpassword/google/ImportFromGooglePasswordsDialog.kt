@@ -59,7 +59,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
@@ -248,7 +249,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         if (ignoreCancellationEvents) {
-            Timber.v("onCancel: Ignoring cancellation event")
+            logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
 

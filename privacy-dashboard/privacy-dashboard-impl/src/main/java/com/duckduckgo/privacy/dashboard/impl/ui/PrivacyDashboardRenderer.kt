@@ -26,7 +26,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class PrivacyDashboardRenderer(
     private val webView: WebView,
@@ -74,7 +75,7 @@ class PrivacyDashboardRenderer(
     }
 
     fun render(viewState: ViewState) {
-        Timber.i("PrivacyDashboard viewState $viewState")
+        logcat(INFO) { "PrivacyDashboard viewState $viewState" }
         val siteViewStateAdapter = moshi.adapter(SiteViewState::class.java)
         val siteViewStateJson = siteViewStateAdapter.toJson(viewState.siteViewState)
 

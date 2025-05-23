@@ -23,7 +23,8 @@ import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageRepositoryFactory @Inject constructor(
@@ -43,7 +44,7 @@ class RealSecureStorageRepositoryFactory @Inject constructor(
             websiteLoginCredentialsDao().websiteLoginCredentials().firstOrNull()
             true
         }.getOrElse {
-            Timber.e("Secure storage database exists but is not readable")
+            logcat(ERROR) { "Secure storage database exists but is not readable" }
             false
         }
     }

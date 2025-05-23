@@ -30,7 +30,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) : DownloadsFileActions {
@@ -41,7 +42,7 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(applicationContext, intent)
             } else {
-                Timber.e("Failed to resolve activity")
+                logcat(ERROR) { "Failed to resolve activity" }
                 false
             }
         }
@@ -58,7 +59,7 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
             applicationContext.startActivity(intent)
             true
         } catch (error: ActivityNotFoundException) {
-            Timber.e("No suitable activity found to satisfy intent $intent")
+            logcat(ERROR) { "No suitable activity found to satisfy intent $intent" }
             false
         }
     }

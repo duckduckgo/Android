@@ -30,7 +30,7 @@ import javax.inject.Inject
 import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -82,7 +82,7 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
                     )
                 }
             } catch (e: Throwable) {
-                logcat(LogPriority.ERROR) { e.asLog() }
+                logcat(ERROR) { e.asLog() }
             } finally {
                 originalHandler.uncaughtException(thread, originalException)
             }

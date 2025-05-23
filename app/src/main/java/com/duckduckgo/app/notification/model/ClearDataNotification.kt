@@ -37,7 +37,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class ClearDataNotification(
     private val context: Context,
@@ -49,12 +50,12 @@ class ClearDataNotification(
 
     override suspend fun canShow(): Boolean {
         if (notificationDao.exists(id)) {
-            Timber.v("Notification already seen")
+            logcat(VERBOSE) { "Notification already seen" }
             return false
         }
 
         if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
-            Timber.v("No need for notification, user already has clear option set")
+            logcat(VERBOSE) { "No need for notification, user already has clear option set" }
             return false
         }
 

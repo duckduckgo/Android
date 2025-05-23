@@ -24,7 +24,8 @@ import com.duckduckgo.remote.messaging.impl.models.toIntOrDefault
 import com.duckduckgo.remote.messaging.impl.models.toStringList
 import com.duckduckgo.remote.messaging.impl.models.toStringOrDefault
 import java.text.SimpleDateFormat
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 
@@ -234,6 +235,6 @@ private fun Map.Entry<String, JsonMatchingAttribute>.map(matchingAttributeMapper
         }
         attributesMappers[this.key]?.invoke(this.value) ?: Unknown(this.value.fallback)
     }.onFailure {
-        Timber.i("RMF: error $it")
+        logcat(INFO) { "RMF: error $it" }
     }.getOrDefault(Unknown(this.value.fallback))
 }

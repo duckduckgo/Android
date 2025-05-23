@@ -39,7 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -99,7 +99,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 logcat { "Validated $activeNetwork VPN network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
-                logcat(LogPriority.ERROR) { t.asLog() }
+                logcat(ERROR) { t.asLog() }
                 return false
             } finally {
                 runCatching { socket?.close() }
@@ -120,7 +120,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 logcat { "Validated $activeNetwork device network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
-                logcat(LogPriority.ERROR) { t.asLog() }
+                logcat(ERROR) { t.asLog() }
                 return false
             } finally {
                 runCatching { socket?.close() }

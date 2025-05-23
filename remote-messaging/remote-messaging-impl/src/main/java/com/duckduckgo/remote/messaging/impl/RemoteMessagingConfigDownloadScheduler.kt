@@ -35,7 +35,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 const val REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG = "REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG"
 
@@ -81,12 +82,12 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
 
     private fun scheduleDownload() {
         val refreshInterval = if (remoteMessagingFeatureToggles.scheduleEveryHour().isEnabled()) 1L else 4L
-        Timber.v("RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours")
+        logcat(VERBOSE) { "RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours" }
         val requestBuilder = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(refreshInterval, TimeUnit.HOURS)
             .addTag(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
         if (remoteMessagingFeatureToggles.canScheduleOnPrivacyConfigUpdates().isEnabled()) {
-            Timber.v("RMF: Add delay to remote config worker")
+            logcat(VERBOSE) { "RMF: Add delay to remote config worker" }
             requestBuilder.setInitialDelay(5L, TimeUnit.MINUTES)
         }
         val workerRequest = requestBuilder.build()

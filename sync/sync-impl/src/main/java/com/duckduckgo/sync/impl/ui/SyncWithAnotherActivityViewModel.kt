@@ -64,7 +64,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncWithAnotherActivityViewModel @Inject constructor(
@@ -174,7 +175,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
             when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
-                    Timber.w("Sync: error processing code ${result.reason}")
+                    logcat(WARN) { "Sync: error processing code ${result.reason}" }
                     emitError(result, qrCode)
                 }
 

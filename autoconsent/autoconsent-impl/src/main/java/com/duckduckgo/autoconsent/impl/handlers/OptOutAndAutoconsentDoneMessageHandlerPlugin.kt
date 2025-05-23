@@ -30,7 +30,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
@@ -63,7 +63,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
                 selfTest = true
             }
         } catch (e: Exception) {
-            Timber.d(e.localizedMessage)
+            logcat { e.localizedMessage }
         }
     }
 
@@ -82,7 +82,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             }
             selfTest = false
         } catch (e: Exception) {
-            Timber.d(e.localizedMessage)
+            logcat { e.localizedMessage }
         }
     }
 

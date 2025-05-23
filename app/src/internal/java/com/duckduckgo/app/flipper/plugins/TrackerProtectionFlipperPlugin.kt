@@ -31,7 +31,8 @@ import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
@@ -51,7 +52,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
     }
 
     override fun onConnect(connection: FlipperConnection?) {
-        Timber.v("$id: connected")
+        logcat(VERBOSE) { "$id: connected" }
         this.connection = connection
 
         periodicSenderJob += appCoroutineScope.launch(senderDispatcher) {
@@ -64,7 +65,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
         job += trackerRepository.getLatestTracker()
             .onEach { tracker ->
                 tracker?.let {
-                    Timber.v("$id: sending $tracker")
+                    logcat(VERBOSE) { "$id: sending $tracker" }
                     FlipperObject.Builder()
                         .put("timestamp", tracker.timestamp)
                         .put("domain", tracker.domain)
@@ -80,14 +81,14 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
     }
 
     override fun onDisconnect() {
-        Timber.v("$id: disconnected")
+        logcat(VERBOSE) { "$id: disconnected" }
         connection = null
         job.cancel()
         periodicSenderJob.cancel()
     }
 
     override fun runInBackground(): Boolean {
-        Timber.v("$id: running")
+        logcat(VERBOSE) { "$id: running" }
         return false
     }
 

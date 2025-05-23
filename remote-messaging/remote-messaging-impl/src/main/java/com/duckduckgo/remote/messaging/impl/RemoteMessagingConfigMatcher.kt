@@ -26,7 +26,8 @@ import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.impl.models.Rule
 import com.duckduckgo.remote.messaging.impl.models.Unknown
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class RemoteMessagingConfigMatcher(
     private val matchers: Set<AttributeMatcherPlugin>,
@@ -61,14 +62,14 @@ class RemoteMessagingConfigMatcher(
             result = EvaluationResult.Match
 
             if (rule.targetPercentile != null && remoteMessagingCohortStore.getPercentile(messageId) > rule.targetPercentile.before) {
-                Timber.i("RMF: percentile check failed")
+                logcat(INFO) { "RMF: percentile check failed" }
                 return EvaluationResult.Fail
             }
 
             for (attr in rule.attributes) {
                 result = evaluateAttribute(attr)
                 if (result == EvaluationResult.Fail || result == EvaluationResult.NextMessage) {
-                    Timber.i("RMF: first failed attribute $attr")
+                    logcat(INFO) { "RMF: first failed attribute $attr" }
                     break
                 }
             }
@@ -87,14 +88,14 @@ class RemoteMessagingConfigMatcher(
             result = EvaluationResult.Fail
 
             if (rule.targetPercentile != null && remoteMessagingCohortStore.getPercentile(messageId) > rule.targetPercentile.before) {
-                Timber.i("RMF: percentile check failed")
+                logcat(INFO) { "RMF: percentile check failed" }
                 return EvaluationResult.Fail
             }
 
             for (attr in rule.attributes) {
                 result = evaluateAttribute(attr)
                 if (result == EvaluationResult.Fail || result == EvaluationResult.NextMessage) {
-                    Timber.i("RMF: first failed attribute $attr")
+                    logcat(INFO) { "RMF: first failed attribute $attr" }
                     break
                 }
             }

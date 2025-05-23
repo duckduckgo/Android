@@ -26,7 +26,8 @@ import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.io.File
 import javax.inject.*
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig) {
 
@@ -66,7 +67,7 @@ class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig
             applicationContext.startActivity(intent)
             true
         } catch (error: ActivityNotFoundException) {
-            Timber.e("No suitable activity found to satisfy intent $intent")
+            logcat(ERROR) { "No suitable activity found to satisfy intent $intent" }
             false
         }
     }

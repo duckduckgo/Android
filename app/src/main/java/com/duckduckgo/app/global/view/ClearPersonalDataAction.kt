@@ -40,7 +40,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface ClearDataAction {
 
@@ -78,12 +79,12 @@ class ClearPersonalDataAction(
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
-        Timber.i("Restarting process")
+        logcat(INFO) { "Restarting process" }
         FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
     }
 
     override fun killProcess() {
-        Timber.i("Killing process")
+        logcat(INFO) { "Killing process" }
         System.exit(0)
     }
 
@@ -115,24 +116,24 @@ class ClearPersonalDataAction(
             clearDataAsync(shouldFireDataClearPixel)
         }
 
-        Timber.i("Finished clearing everything")
+        logcat(INFO) { "Finished clearing everything" }
     }
 
     @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
-            Timber.i("Clearing tabs")
+            logcat(INFO) { "Clearing tabs" }
             dataManager.clearWebViewSessions()
             tabRepository.deleteAll()
             adClickManager.clearAll()
             setAppUsedSinceLastClearFlag(appInForeground)
-            Timber.d("Finished clearing tabs")
+            logcat { "Finished clearing tabs" }
         }
     }
 
     @UiThread
     private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
-        Timber.i("Clearing data")
+        logcat(INFO) { "Clearing data" }
 
         if (shouldFireDataClearPixel) {
             clearingStore.incrementCount()
@@ -141,7 +142,7 @@ class ClearPersonalDataAction(
         dataManager.clearData(createWebView(), createWebStorage())
         appCacheClearer.clearCache()
 
-        Timber.i("Finished clearing data")
+        logcat(INFO) { "Finished clearing data" }
     }
 
     private fun createWebView(): WebView {
@@ -155,7 +156,7 @@ class ClearPersonalDataAction(
     override suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
         withContext(dispatchers.io()) {
             settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
-            Timber.d("Set appUsedSinceClear flag to $appUsedSinceLastClear")
+            logcat { "Set appUsedSinceClear flag to $appUsedSinceLastClear" }
         }
     }
 }

@@ -30,7 +30,8 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.asLog
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(DuckPlayerFeature::class)
@@ -58,7 +59,7 @@ class DuckPlayerFatureSettingsStore @Inject constructor(
                     duckPlayerFeatureRepository.storeDuckPlayerDisabledHelpPageLink(null)
                 }
             } catch (e: Exception) {
-                Timber.d("Failed to store DuckPlayer settings", e)
+                logcat { "Failed to store DuckPlayer settings: ${e.asLog()}" }
                 // If no help link page present, we clear the stored one
                 duckPlayerFeatureRepository.storeDuckPlayerDisabledHelpPageLink(null)
             }

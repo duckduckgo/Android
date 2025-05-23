@@ -27,7 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillProviderDeviceAuth {
     suspend fun isAuthRequired(): Boolean
@@ -49,7 +50,7 @@ class RealAutofillProviderDeviceAuth @Inject constructor(
 
         val timeSinceLastAuth = timeProvider.currentTimeMillis() - lastAuthTime
         if (timeSinceLastAuth <= AUTH_GRACE_EXTENDED_PERIOD_MS) {
-            Timber.v("Within grace period; auth not required")
+            logcat(VERBOSE) { "Within grace period; auth not required" }
             return false
         }
         return true

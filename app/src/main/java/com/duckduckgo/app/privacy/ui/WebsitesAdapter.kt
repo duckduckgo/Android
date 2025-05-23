@@ -33,7 +33,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 class WebsitesAdapter(
     private val viewModel: AllowListViewModel,
@@ -95,7 +95,7 @@ class WebsitesAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): WebsiteViewHolder {
-        Timber.d("AllowList: onCreateViewHolder $viewType ")
+        logcat { "AllowList: onCreateViewHolder $viewType " }
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {

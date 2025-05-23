@@ -32,7 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -50,7 +50,7 @@ class LocationPermissionMigrationPlugin @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (!settingsDataStore.appLocationPermissionMigrated) {
                 sitePermissionsRepository.askLocationEnabled = settingsDataStore.appLocationPermission
-                Timber.d("Location permissions migrated: location permission set to ${sitePermissionsRepository.askLocationEnabled}")
+                logcat { "Location permissions migrated: location permission set to ${sitePermissionsRepository.askLocationEnabled}" }
                 val locationPermissions = locationPermissionsRepository.getLocationPermissionsSync()
                 val alwaysAllowedPermissions = locationPermissions.filter { it.permission == ALLOW_ALWAYS }
                 val alwaysDeniedPermissions = locationPermissions.filter { it.permission == DENY_ALWAYS }
@@ -69,7 +69,7 @@ class LocationPermissionMigrationPlugin @Inject constructor(
                     )
                 }
                 settingsDataStore.appLocationPermissionMigrated = true
-                Timber.d("Location permissions migrated: ALLOW ALWAYS ${alwaysAllowedPermissions.size} DENY ALWAYS ${alwaysDeniedPermissions.size}.")
+                logcat { "Location permissions migrated: ALLOW ALWAYS ${alwaysAllowedPermissions.size} DENY ALWAYS ${alwaysDeniedPermissions.size}." }
             }
         }
     }

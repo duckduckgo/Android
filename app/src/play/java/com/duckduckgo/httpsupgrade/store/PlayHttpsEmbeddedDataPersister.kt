@@ -8,7 +8,7 @@ import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import timber.log.Timber
+import logcat.logcat
 
 class PlayHttpsEmbeddedDataPersister(
     private val httpsDataPersister: HttpsDataPersister,
@@ -24,7 +24,7 @@ class PlayHttpsEmbeddedDataPersister(
     }
 
     override fun persistEmbeddedData() {
-        Timber.d("Updating https data from embedded files")
+        logcat { "Updating https data from embedded files" }
         val specJson = context.resources.openRawResource(R.raw.https_mobile_v2_bloom_spec).bufferedReader().use { it.readText() }
         val specAdapter = moshi.adapter(HttpsBloomFilterSpec::class.java)
 

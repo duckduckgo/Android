@@ -27,7 +27,8 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class WebViewCookieManager @Inject constructor(
@@ -61,7 +62,7 @@ class WebViewCookieManager @Inject constructor(
         cookies.keys.forEach { host ->
             cookies[host]?.forEach {
                 val cookie = it.trim()
-                Timber.d("Restoring DDB cookie: $cookie")
+                logcat { "Restoring DDB cookie: $cookie" }
                 storeCookie(cookie, host)
             }
         }
@@ -70,7 +71,7 @@ class WebViewCookieManager @Inject constructor(
     private suspend fun storeCookie(cookie: String, host: String) {
         suspendCoroutine { continuation ->
             cookieManager.get()?.setCookie(host, cookie) { success ->
-                Timber.v("Cookie $cookie stored successfully: $success")
+                logcat(VERBOSE) { "Cookie $cookie stored successfully: $success" }
                 continuation.resume(Unit)
             }
         }

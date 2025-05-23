@@ -24,7 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class PagePaintedOfflinePixelSender @Inject constructor(
@@ -53,7 +54,7 @@ class PagePaintedOfflinePixelSender @Inject constructor(
                 }
                 pixels.add(pixel)
             }
-            Timber.v("Sending %d page painted pixels", pixels.size)
+            logcat(VERBOSE) { "Sending ${pixels.size} page painted pixels" }
             return@defer Completable.mergeDelayError(pixels)
         }
     }

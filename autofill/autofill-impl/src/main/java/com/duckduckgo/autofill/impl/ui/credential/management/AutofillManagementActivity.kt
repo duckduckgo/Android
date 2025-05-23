@@ -79,7 +79,8 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillPasswordsManagementScreen::class)
@@ -211,7 +212,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             else -> processed = false
         }
         if (processed) {
-            Timber.v("Processed command $command")
+            logcat(VERBOSE) { "Processed command $command" }
             viewModel.commandProcessed(command)
         }
     }
@@ -254,7 +255,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         val currentUrl = extractSuggestionsUrl()
         val privacyProtectionStatus = extractPrivacyProtectionEnabled()
         val launchSource = extractLaunchSource()
-        Timber.v("showListMode (isLegacy = %s). currentUrl is %s", legacyList, currentUrl)
+        logcat(VERBOSE) { "showListMode (isLegacy = $legacyList). currentUrl is $currentUrl" }
 
         supportFragmentManager.commitNow {
             val fragment = if (legacyList) {

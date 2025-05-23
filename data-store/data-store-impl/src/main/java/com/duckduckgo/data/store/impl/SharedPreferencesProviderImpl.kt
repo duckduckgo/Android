@@ -29,7 +29,7 @@ import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
@@ -109,7 +109,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 is String -> {
                     destination.edit { putString(key, originalValue) }
                 }
-                else -> logcat(LogPriority.WARN) { "Could not migrate $key from $name preferences" }
+                else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
             }
         }
 

@@ -17,7 +17,8 @@
 package com.duckduckgo.app.global.rating
 
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface AppEnjoymentUserEventRecorder {
 
@@ -36,12 +37,12 @@ class AppEnjoymentUserEventDatabaseRecorder(
 ) : AppEnjoymentUserEventRecorder {
 
     override fun onUserEnjoyingApp(promptCount: PromptCount) {
-        Timber.i("User is enjoying app; asking for rating")
+        logcat(INFO) { "User is enjoying app; asking for rating" }
         appEnjoymentPromptEmitter.promptType.value = AppEnjoymentPromptOptions.ShowRatingPrompt(promptCount)
     }
 
     override fun onUserNotEnjoyingApp(promptCount: PromptCount) {
-        Timber.i("User is not enjoying app; asking for feedback")
+        logcat(INFO) { "User is not enjoying app; asking for feedback" }
         appEnjoymentPromptEmitter.promptType.value = AppEnjoymentPromptOptions.ShowFeedbackPrompt(promptCount)
     }
 
@@ -50,7 +51,7 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
         appEnjoymentRepository.onUserSelectedToRateApp(promptCount)
 
-        Timber.i("Recorded that user selected to rate app")
+        logcat(INFO) { "Recorded that user selected to rate app" }
     }
 
     override suspend fun userDeclinedToRateApp(promptCount: PromptCount) {
@@ -58,7 +59,7 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
         appEnjoymentRepository.onUserDeclinedToRateApp(promptCount)
 
-        Timber.i("Recorded that user declined to rate app")
+        logcat(INFO) { "Recorded that user declined to rate app" }
     }
 
     override suspend fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
@@ -66,7 +67,7 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
         appEnjoymentRepository.onUserSelectedToGiveFeedback(promptCount)
 
-        Timber.i("Recorded that user selected to give feedback")
+        logcat(INFO) { "Recorded that user selected to give feedback" }
     }
 
     override suspend fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
@@ -74,7 +75,7 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
         appEnjoymentRepository.onUserDeclinedToGiveFeedback(promptCount)
 
-        Timber.i("Recorded that user declined to give feedback")
+        logcat(INFO) { "Recorded that user declined to give feedback" }
     }
 
     override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) {
@@ -82,7 +83,7 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
         appEnjoymentRepository.onUserDeclinedToSayIfEnjoyingApp(promptCount)
 
-        Timber.i("Recorded that user didn't want to participate in app enjoyment")
+        logcat(INFO) { "Recorded that user didn't want to participate in app enjoyment" }
     }
 
     private fun hideAllPrompts() {

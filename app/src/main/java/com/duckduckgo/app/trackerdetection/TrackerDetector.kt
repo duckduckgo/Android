@@ -36,7 +36,8 @@ import dagger.SingleInstanceIn
 import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -88,7 +89,7 @@ class TrackerDetectorImpl @Inject constructor(
         val documentUrlString = documentUrl.toString()
 
         if (checkFirstParty && firstParty(cleanedUrl, documentUrl)) {
-            Timber.v("$url is a first party url")
+            logcat(VERBOSE) { "$url is a first party url" }
             return null
         }
 
@@ -113,7 +114,7 @@ class TrackerDetectorImpl @Inject constructor(
         val documentUrlString = documentUrl.toString()
 
         if (checkFirstParty && firstParty(documentUrl, cleanedUrl)) {
-            Timber.v("$url is a first party url")
+            logcat(VERBOSE) { "$url is a first party url" }
             return null
         }
 
@@ -158,7 +159,7 @@ class TrackerDetectorImpl @Inject constructor(
             webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
         }
 
-        Timber.v("$documentUrlString resource $urlString WAS identified as a tracker and status=$status")
+        logcat(VERBOSE) { "$documentUrlString resource $urlString WAS identified as a tracker and status=$status" }
 
         return TrackingEvent(documentUrlString, urlString, result.categories, entity, result.surrogate, status, type)
     }

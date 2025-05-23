@@ -29,7 +29,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface FaviconPersister {
     fun faviconFile(
@@ -171,7 +172,7 @@ class FileBasedFaviconPersister(
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
         if (existingFile.exists()) {
-            Timber.i("Favicon favicon exists for $domain in $subFolder")
+            logcat(INFO) { "Favicon favicon exists for $domain in $subFolder" }
             val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
             existingFavicon?.let {
@@ -201,7 +202,7 @@ class FileBasedFaviconPersister(
             val existingFile = fileForFavicon(directory, subFolder, domain)
 
             if (existingFile.exists()) {
-                Timber.i("Favicon favicon exists for $domain in $subFolder")
+                logcat(INFO) { "Favicon favicon exists for $domain in $subFolder" }
                 val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
                 existingFavicon?.let {

@@ -57,6 +57,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import org.json.JSONObject
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -67,7 +68,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import timber.log.Timber
 
 // FIXME reference tests forced to have visibility in things we should not have visibility like httpsupgrade-impl and impl classes :shrug:
 @RunWith(Parameterized::class)
@@ -216,7 +216,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         }
 
         override fun persistEmbeddedData() {
-            Timber.d("Updating https data from embedded files")
+            logcat { "Updating https data from embedded files" }
             val specJson = FileUtilities.loadText(
                 javaClass.classLoader!!,
                 "reference_tests/https/https_bloomfilter_spec_reference.json",

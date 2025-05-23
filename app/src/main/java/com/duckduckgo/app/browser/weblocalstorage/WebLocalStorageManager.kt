@@ -32,10 +32,10 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
-import timber.log.Timber
 
 interface WebLocalStorageManager {
     fun clearWebLocalStorage()
@@ -68,8 +68,8 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         domains = webLocalStorageSettings.domains.list + fireproofedDomains
         matchingRegex = webLocalStorageSettings.matchingRegex.list
 
-        Timber.d("WebLocalStorageManager: Allowed domains: $domains")
-        Timber.d("WebLocalStorageManager: Matching regex: $matchingRegex")
+        logcat { "WebLocalStorageManager: Allowed domains: $domains" }
+        logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
         val db = databaseProvider.get()
         db.iterator().use { iterator ->
@@ -81,7 +81,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
                 if (!isAllowedKey(key)) {
                     db.delete(entry.key)
-                    Timber.d("WebLocalStorageManager: Deleted key: $key")
+                    logcat { "WebLocalStorageManager: Deleted key: $key" }
                 }
             }
         }

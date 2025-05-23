@@ -34,7 +34,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
@@ -45,10 +45,10 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
                 val url = result.data?.getStringExtra(DAX_PROMPT_DUCK_PLAYER_ACTIVITY_URL_EXTRA)
-                Timber.d("Received RESULT_OK from DaxPromptDuckPlayerActivity with extra: $url.")
+                logcat { "Received RESULT_OK from DaxPromptDuckPlayerActivity with extra: $url." }
                 viewModel.onDaxPromptDuckPlayerActivityResult(url)
             } else {
-                Timber.d("Received non-OK result from DaxPromptDuckPlayerActivity.")
+                logcat { "Received non-OK result from DaxPromptDuckPlayerActivity." }
                 viewModel.onDaxPromptDuckPlayerActivityResult()
             }
         }
@@ -57,10 +57,10 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
                 val show = result.data?.getBooleanExtra(DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA, false)
-                Timber.d("Received RESULT_OK from DaxPromptBrowserComparisonActivity with extra: $show")
+                logcat { "Received RESULT_OK from DaxPromptBrowserComparisonActivity with extra: $show" }
                 viewModel.onDaxPromptBrowserComparisonActivityResult(show)
             } else {
-                Timber.d("Received non-OK result from DaxPromptBrowserComparisonActivity")
+                logcat { "Received non-OK result from DaxPromptBrowserComparisonActivity" }
                 viewModel.onDaxPromptBrowserComparisonActivityResult()
             }
         }

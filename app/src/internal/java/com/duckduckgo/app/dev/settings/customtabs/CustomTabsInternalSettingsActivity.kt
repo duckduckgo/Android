@@ -33,7 +33,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
@@ -109,7 +110,7 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
             activityLauncher.launch(intent)
         } catch (e: ActivityNotFoundException) {
             val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
-            Timber.w(errorMessage)
+            logcat(WARN) { errorMessage }
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         }
     }

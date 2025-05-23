@@ -23,7 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AccessibilitySettingsDataStore {
     val systemFontSize: Float
@@ -90,7 +91,7 @@ class AccessibilitySettingsSharedPreferences(
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
-            Timber.v("AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
+            logcat(VERBOSE) { "AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}" }
         }
     }
 

@@ -43,7 +43,8 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment(), EmailProtectionInContextSignUpDialog {
@@ -117,7 +118,7 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
     }
 
     private fun returnResult(resultType: EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult) {
-        Timber.v("User action: %s", resultType::class.java.simpleName)
+        logcat(VERBOSE) { "User action: ${resultType::class.java.simpleName}" }
 
         val result = Bundle().also {
             it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_RESULT, resultType)

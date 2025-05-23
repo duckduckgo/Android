@@ -23,7 +23,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -35,7 +35,7 @@ class GpcMigrationPlugin @Inject constructor(
     override val version: Int = 1
 
     override fun run() {
-        Timber.d("Migrating gpc settings")
+        logcat { "Migrating gpc settings" }
         val gpcEnabled = settingsDataStore.globalPrivacyControlEnabled
         if (gpcEnabled) {
             gpc.enableGpc()

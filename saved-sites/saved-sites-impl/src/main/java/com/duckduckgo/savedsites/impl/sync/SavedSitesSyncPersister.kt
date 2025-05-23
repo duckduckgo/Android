@@ -32,7 +32,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SavedSitesSyncPersister @Inject constructor(
@@ -53,10 +54,10 @@ class SavedSitesSyncPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
-            Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
+            logcat { "Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution" }
             savedSitesSyncState.onSuccess(changes)
             val result = process(changes, conflictResolution)
-            Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
+            logcat { "Sync-Bookmarks: merging bookmarks finished with $result" }
 
             result
         } else {
@@ -109,7 +110,7 @@ class SavedSitesSyncPersister @Inject constructor(
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
         if (changes.isEmpty()) {
-            Timber.d("Sync-Bookmarks: JSON doesn't have changes, nothing to store")
+            logcat { "Sync-Bookmarks: JSON doesn't have changes, nothing to store" }
             return SyncDataValidationResult.NoChanges
         }
 
@@ -124,16 +125,24 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        Timber.i("Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}")
-        Timber.i(
-            "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}",
-        )
+        logcat(INFO) {
+            """
+            Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince}
+             to ${bookmarks.last_modified}
+            """.trimIndent()
+        }
+        logcat(INFO) {
+            """
+            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} 
+            to ${savedSitesSyncStore.startTimeStamp}
+            """.trimIndent()
+        }
 
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
 
         val result = if (bookmarks.entries.isEmpty()) {
-            Timber.d("Sync-Bookmarks: merging completed, no entries to merge")
+            logcat { "Sync-Bookmarks: merging completed, no entries to merge" }
             Success(false)
         } else {
             algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)

@@ -78,7 +78,8 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -168,7 +169,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureSettings() {
         if (syncSettingsPlugin.isEmpty()) {
-            Timber.i("configureSettings: plugins empty")
+            logcat(INFO) { "configureSettings: plugins empty" }
         } else {
             syncSettingsPlugin.keys.toSortedSet().forEach {
                 syncSettingsPlugin[it]?.let { plugin ->

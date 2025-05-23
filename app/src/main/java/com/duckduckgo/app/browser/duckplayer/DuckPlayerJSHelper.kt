@@ -57,8 +57,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
+import logcat.logcat
 import org.json.JSONObject
-import timber.log.Timber
 
 const val DUCK_PLAYER_PAGE_FEATURE_NAME = "duckPlayerPage"
 const val DUCK_PLAYER_FEATURE_NAME = "duckPlayer"
@@ -261,7 +261,7 @@ class DuckPlayerJSHelper @Inject constructor(
                 }
             }
             "reportPageException", "reportInitException" -> {
-                Timber.tag(method).d(data.toString())
+                logcat(tag = method) { "$data" }
             }
             "openSettings" -> {
                 return OpenDuckPlayerSettings

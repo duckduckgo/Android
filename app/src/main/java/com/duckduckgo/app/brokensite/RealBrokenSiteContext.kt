@@ -25,8 +25,8 @@ import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.logcat
 import org.json.JSONArray
-import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSiteContext @Inject constructor(
@@ -55,11 +55,9 @@ class RealBrokenSiteContext @Inject constructor(
                 referrer.toUri().isHttp || referrer.toUri().isHttps -> BrokenSiteOpenerContext.NAVIGATION
                 else -> null
             }
-            Timber.d(
-                "openerContext inferred -> ${openerContext?.context}",
-            )
+            logcat { "openerContext inferred -> ${openerContext?.context}" }
         } else {
-            Timber.d("openerContext not inferred because referrer is null")
+            logcat { "openerContext not inferred because referrer is null" }
         }
     }
 
@@ -69,6 +67,6 @@ class RealBrokenSiteContext @Inject constructor(
             recordedJsValues[i] = performanceMetrics.getDouble(i)
         }
         jsPerformance = recordedJsValues
-        Timber.d("jsPerformance recorded as $performanceMetrics")
+        logcat { "jsPerformance recorded as $performanceMetrics" }
     }
 }

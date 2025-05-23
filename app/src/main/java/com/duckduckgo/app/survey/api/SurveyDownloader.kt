@@ -30,8 +30,9 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import retrofit2.Response
-import timber.log.Timber
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
@@ -47,22 +48,22 @@ class SurveyDownloader @Inject constructor(
         // Why? see https://app.asana.com/0/414730916066338/1201395604254213/f
         // check temporary NetP survey endpoint else fallback to v2 survey endpoint
         if (responseNetP.isSuccessful && responseNetP.body()?.id != null) {
-            Timber.v("Returning NetP response")
+            logcat(VERBOSE) { "Returning NetP response" }
             return responseNetP
         }
 
         val call = service.survey()
-        Timber.v("Returning v2 response")
+        logcat(VERBOSE) { "Returning v2 response" }
         return call.execute()
     }
 
     fun download(): Completable {
         return Completable.fromAction {
-            Timber.d("Downloading user survey data")
+            logcat { "Downloading user survey data" }
 
             val response = getSurveyResponse()
 
-            Timber.d("Response received, success=${response.isSuccessful}")
+            logcat { "Response received, success=${response.isSuccessful}" }
 
             if (!response.isSuccessful) {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
@@ -70,17 +71,17 @@ class SurveyDownloader @Inject constructor(
 
             val surveyGroup = response.body()
             if (surveyGroup?.id == null) {
-                Timber.d("No survey received, deleting old unused surveys")
+                logcat { "No survey received, deleting old unused surveys" }
                 surveyRepository.deleteUnusedSurveys()
                 return@fromAction
             }
 
             if (surveyRepository.surveyExists(surveyGroup.id)) {
-                Timber.d("Survey received already in db, ignoring ${surveyGroup.id}")
+                logcat { "Survey received already in db, ignoring ${surveyGroup.id}" }
                 return@fromAction
             }
 
-            Timber.d("New survey received. Unused surveys cleared and new survey saved")
+            logcat { "New survey received. Unused surveys cleared and new survey saved" }
             surveyRepository.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
 
@@ -100,7 +101,7 @@ class SurveyDownloader @Inject constructor(
 
             newSurvey?.let {
                 if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
-                    Timber.v("User eligible for survey, storing")
+                    logcat(VERBOSE) { "User eligible for survey, storing" }
                     surveyRepository.persistSurvey(newSurvey)
                 }
             }
@@ -136,9 +137,9 @@ class SurveyDownloader @Inject constructor(
             val days = netpCohortStore.cohortLocalDate?.let { cohortLocalDate ->
                 ChronoUnit.DAYS.between(cohortLocalDate, now)
             } ?: 0
-            Timber.v("Days since netp enabled = $days")
+            logcat(VERBOSE) { "Days since netp enabled = $days" }
             return surveyOption.daysSinceNetPEnabled?.let { daysSinceNetPEnabled ->
-                Timber.v("Days required since NetP enabled = $daysSinceNetPEnabled")
+                logcat(VERBOSE) { "Days required since NetP enabled = $daysSinceNetPEnabled" }
                 days >= daysSinceNetPEnabled
             } ?: false
         } else {

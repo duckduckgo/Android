@@ -32,7 +32,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface RefreshPixelSender {
     fun sendMenuRefreshPixels()
@@ -81,7 +82,7 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
                             pixel.fire(it.pixelName, it.params)
                         }
                     }
-                    else -> Timber.w("Unknown refresh pattern: $detectedPattern, no pixels fired")
+                    else -> logcat(WARN) { "Unknown refresh pattern: $detectedPattern, no pixels fired" }
                 }
             }
         }

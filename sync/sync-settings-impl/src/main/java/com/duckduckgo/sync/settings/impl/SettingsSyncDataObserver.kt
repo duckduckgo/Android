@@ -37,7 +37,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -75,7 +76,7 @@ class SettingsSyncDataObserver @Inject constructor(
             syncTriggerJob += appCoroutineScope.launch(dispatchers.io()) {
                 // drop first since we only want to observe changes
                 syncMetadata.getAllObservable().drop(1).collect {
-                    Timber.i("Sync-Settings: TRIGGER DATA_CHANGE $it")
+                    logcat(INFO) { "Sync-Settings: TRIGGER DATA_CHANGE $it" }
                     syncEngine.triggerSync(DATA_CHANGE)
                 }
             }

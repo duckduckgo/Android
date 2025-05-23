@@ -27,7 +27,8 @@ import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 // Please don't rename any Worker class name or class path
 // More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
@@ -80,7 +81,7 @@ class NotificationScheduler(
         unit: TimeUnit,
         tag: String,
     ) {
-        Timber.v("Scheduling notification for $duration")
+        logcat(VERBOSE) { "Scheduling notification for $duration" }
         val request = builder
             .addTag(tag)
             .setInitialDelay(duration, unit)

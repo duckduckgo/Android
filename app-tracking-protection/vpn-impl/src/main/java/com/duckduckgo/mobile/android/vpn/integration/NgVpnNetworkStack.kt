@@ -41,7 +41,8 @@ import java.net.InetAddress
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -163,7 +164,7 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onExit(reason: String) {
-        logcat(LogPriority.WARN) { "Native exit reason=$reason" }
+        logcat(WARN) { "Native exit reason=$reason" }
 
         fun killProcess() {
             runtime.exit(0)
@@ -180,7 +181,7 @@ class NgVpnNetworkStack @Inject constructor(
             return this == EMFILE_ERRNO
         }
 
-        logcat(LogPriority.WARN) { "onError $errorCode:$message" }
+        logcat(WARN) { "onError $errorCode:$message" }
 
         if (errorCode.isEmfile()) {
             onExit(message)
@@ -221,7 +222,7 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun startNative(tunfd: Int): Result<Unit> {
         if (jniContext == 0L) {
-            logcat(LogPriority.ERROR) { "Trying to start VPN Network without previously creating it" }
+            logcat(ERROR) { "Trying to start VPN Network without previously creating it" }
             return Result.failure(IllegalStateException("Trying to start VPN Network without previously creating it"))
         }
 
@@ -237,11 +238,11 @@ class NgVpnNetworkStack @Inject constructor(
                 try {
                     vpnNetwork.run(jniContext, tunfd)
                 } catch (t: Throwable) {
-                    logcat(LogPriority.ERROR) { "Tunnel thread crashed: ${t.asLog()}" }
+                    logcat(ERROR) { "Tunnel thread crashed: ${t.asLog()}" }
                     deviceShieldPixels.reportTunnelThreadAbnormalCrash()
                 } finally {
                     tunnelThread = null
-                    logcat(LogPriority.WARN) { "Tunnel exited" }
+                    logcat(WARN) { "Tunnel exited" }
                 }
             }.also { it.start() }
 
@@ -261,7 +262,7 @@ class NgVpnNetworkStack @Inject constructor(
             // In this case we don't check for jniContext == 0 and rather runCatching because we want to make sure we stop the tunnelThread
             // if the jniContext is invalid the stop() call should fail, we log and continue
             runCatching { vpnNetwork.stop(jniContext) }.onFailure {
-                logcat(LogPriority.ERROR) { "Error stopping the VPN network ${it.asLog()}" }
+                logcat(ERROR) { "Error stopping the VPN network ${it.asLog()}" }
             }
 
             var thread = tunnelThread
@@ -292,7 +293,7 @@ class NgVpnNetworkStack @Inject constructor(
         return runCatching {
             get()
         }.onFailure {
-            logcat(LogPriority.ERROR) { it.asLog() }
+            logcat(ERROR) { it.asLog() }
             Result.failure<VpnNetwork>(it)
         }
     }

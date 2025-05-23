@@ -26,7 +26,8 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(
@@ -41,7 +42,7 @@ class InlineBrowserAutofill @Inject constructor(
         emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener?,
         tabId: String,
     ) {
-        Timber.v("Injecting BrowserAutofill interface")
+        logcat(VERBOSE) { "Injecting BrowserAutofill interface" }
         // Adding the interface regardless if the feature is available or not
         webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
         autofillInterface.webView = webView

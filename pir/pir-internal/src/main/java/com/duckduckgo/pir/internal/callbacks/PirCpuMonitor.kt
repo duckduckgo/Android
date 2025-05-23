@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -60,7 +60,7 @@ class PirCpuMonitor @Inject constructor(
                     }
                     delay(60_000)
                 } catch (e: Exception) {
-                    logcat(LogPriority.ERROR) { e.asLog() }
+                    logcat(ERROR) { e.asLog() }
                     monitorJob.cancel()
                 }
             }

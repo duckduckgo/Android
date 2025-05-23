@@ -23,7 +23,8 @@ import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResul
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface UsernameBackFiller {
     suspend fun isBackFillingUsernameSupported(
@@ -52,14 +53,14 @@ class UsernameBackFillerImpl @Inject constructor(
         }
 
         if (!usernameFromJavascript.isNullOrBlank()) {
-            Timber.v("BackFilling username from partial save not supported because username provided already, for %s", currentUrl)
+            logcat(VERBOSE) { "BackFilling username from partial save not supported because username provided already. $currentUrl" }
             return BackFillNotSupported
         } else {
             val username = partialCredentialSaveStore.getUsernameForBackFilling(currentUrl) ?: return BackFillNotSupported.also {
-                Timber.v("BackFilling username from partial save not supported, for %s", currentUrl)
+                logcat(VERBOSE) { "BackFilling username from partial save not supported. $currentUrl" }
             }
 
-            Timber.v("BackFilling username [%s] from partial save is supported, for %s", username, currentUrl)
+            logcat(VERBOSE) { "BackFilling username [$username] from partial save is supported. $currentUrl" }
             return BackFillSupported(username)
         }
     }

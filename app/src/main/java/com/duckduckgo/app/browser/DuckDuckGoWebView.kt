@@ -38,7 +38,9 @@ import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 /**
  * WebView subclass which allows the WebView to
@@ -429,7 +431,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
             false
         }
     }.getOrElse { exception ->
-        Timber.e(exception, "Error adding WebMessageListener: $jsObjectName")
+        logcat(ERROR) { "Error adding WebMessageListener: $jsObjectName: ${exception.asLog()}" }
         false
     }
 
@@ -448,7 +450,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
             false
         }
     }.getOrElse { exception ->
-        Timber.e(exception, "Error removing WebMessageListener: $jsObjectName")
+        logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
         false
     }
 

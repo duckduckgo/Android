@@ -32,7 +32,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(
@@ -70,7 +71,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     }
 
     fun onForceZoomChanged(checked: Boolean) {
-        Timber.v("AccessibilityActSettings: onForceZoomChanged $checked")
+        logcat(VERBOSE) { "AccessibilityActSettings: onForceZoomChanged $checked" }
         accessibilitySettings.forceZoom = checked
         viewModelScope.launch {
             viewState.emit(
@@ -82,7 +83,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     }
 
     fun onSystemFontSizeChanged(checked: Boolean) {
-        Timber.v("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
+        logcat(VERBOSE) { "AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked" }
         accessibilitySettings.overrideSystemFontSize = checked
         viewModelScope.launch {
             viewState.emit(
@@ -94,7 +95,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     }
 
     fun onFontSizeChanged(newValue: Float) {
-        Timber.v("AccessibilityActSettings: onFontSizeChanged $newValue")
+        logcat(VERBOSE) { "AccessibilityActSettings: onFontSizeChanged $newValue" }
         accessibilitySettings.appFontSize = newValue
         viewModelScope.launch {
             viewState.emit(

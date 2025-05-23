@@ -78,7 +78,7 @@ class DebugLoggingReceiverRegister @Inject constructor(
             when {
                 DebugLoggingReceiver.isLoggingOnIntent(intent) -> {
                     appTpLocalFeature.verboseLogging().setRawStoredState(Toggle.State(enable = true))
-                    TimberExtensions.enableLogging()
+                    LoggingExtensions.enableLogging()
 
                     // To propagate changes to NetGuard, reconfigure the VPN
                     Intent("vpn-service").apply {
@@ -89,7 +89,7 @@ class DebugLoggingReceiverRegister @Inject constructor(
                 }
                 DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
                     appTpLocalFeature.verboseLogging().setRawStoredState(Toggle.State(enable = false))
-                    TimberExtensions.disableLogging()
+                    LoggingExtensions.disableLogging()
 
                     // To propagate changes to NetGuard, reconfigure the VPN
                     Intent("vpn-service").apply {

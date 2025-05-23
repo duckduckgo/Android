@@ -32,7 +32,7 @@ import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAY
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class LaunchViewModel @Inject constructor(
@@ -59,17 +59,17 @@ class LaunchViewModel @Inject constructor(
 
         when (daxPrompts.evaluate()) {
             SHOW_CONTROL, NONE -> {
-                Timber.d("Control / None action")
+                logcat { "Control / None action" }
                 showOnboardingOrHome()
             }
 
             SHOW_VARIANT_DUCKPLAYER -> {
-                Timber.d("Variant Duck Player action")
+                logcat { "Variant Duck Player action" }
                 command.value = Command.DaxPromptDuckPlayer
             }
 
             SHOW_VARIANT_BROWSER_COMPARISON -> {
-                Timber.d("Variant Browser Comparison action")
+                logcat { "Variant Browser Comparison action" }
                 command.value = Command.DaxPromptBrowserComparison
             }
         }
@@ -102,10 +102,10 @@ class LaunchViewModel @Inject constructor(
         val startTime = System.currentTimeMillis()
 
         withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-            Timber.d("Waiting for referrer")
+            logcat { "Waiting for referrer" }
             return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
         }
 
-        Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
+        logcat { "Waited ${System.currentTimeMillis() - startTime}ms for referrer" }
     }
 }

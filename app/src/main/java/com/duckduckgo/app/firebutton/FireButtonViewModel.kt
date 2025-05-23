@@ -36,7 +36,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class FireButtonViewModel @Inject constructor(
@@ -109,7 +110,7 @@ class FireButtonViewModel @Inject constructor(
 
     fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
         if (settingsDataStore.isCurrentlySelected(clearWhatNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
+            logcat(VERBOSE) { "User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else" }
             return
         }
 
@@ -132,7 +133,7 @@ class FireButtonViewModel @Inject constructor(
 
     fun onAutomaticallyWhenOptionSelected(clearWhenNewSetting: ClearWhenOption) {
         if (settingsDataStore.isCurrentlySelected(clearWhenNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
+            logcat(VERBOSE) { "User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else" }
             return
         }
 
@@ -160,7 +161,7 @@ class FireButtonViewModel @Inject constructor(
 
     fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
         if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
-            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
+            logcat(VERBOSE) { "User selected same thing they already have set: $selectedFireAnimation; no need to do anything else" }
             return
         }
         settingsDataStore.selectedFireAnimation = selectedFireAnimation

@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -66,11 +66,11 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private fun observeSavedSitesChanges() {
         if (!dataObserverJob.isActive) {
             dataObserverJob += coroutineScope.launch(dispatchers.io()) {
-                Timber.d("Sync-Bookmarks: Listening for changes to Saved Sites")
+                logcat { "Sync-Bookmarks: Listening for changes to Saved Sites" }
                 // we drop the first value emitted because it is the current value of the flow
                 // we are only interested in actual data changes
                 savedSitesRepository.lastModified().drop(1).collect {
-                    Timber.d("Sync-Bookmarks: Changes to Saved Sites detected, triggering sync")
+                    logcat { "Sync-Bookmarks: Changes to Saved Sites detected, triggering sync" }
                     syncEngine.triggerSync(DATA_CHANGE)
                 }
             }
@@ -78,7 +78,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     }
 
     private fun cancelSavedSitesChanges() {
-        Timber.d("Sync-Bookmarks: not listening to changes to Saved Sites")
+        logcat { "Sync-Bookmarks: not listening to changes to Saved Sites" }
         dataObserverJob.cancel()
     }
 }

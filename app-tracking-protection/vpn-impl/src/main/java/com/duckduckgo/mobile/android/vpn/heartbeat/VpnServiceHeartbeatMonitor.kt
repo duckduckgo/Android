@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @Module
@@ -109,7 +109,7 @@ class VpnServiceHeartbeatMonitorWorker(
 
         logcat { "HB monitor checking last HB: $lastHeartBeat" }
         if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
-            logcat(LogPriority.WARN) { "HB monitor: VPN stopped, restarting it" }
+            logcat(WARN) { "HB monitor: VPN stopped, restarting it" }
 
             // TODO this is for now just in NetP, move it to public repo once tested
             // Just make sure the internal state is consistent with the actual state before we re-start the VPN service

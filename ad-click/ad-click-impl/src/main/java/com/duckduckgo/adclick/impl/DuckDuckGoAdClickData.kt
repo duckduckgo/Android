@@ -24,7 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 interface AdClickData {
 
@@ -72,17 +72,17 @@ class DuckDuckGoAdClickData(
 
     override fun setAdDomainTldPlusOne(adDomainTldPlusOne: String) {
         tabAdDomains[activeTabId] = adDomainTldPlusOne
-        Timber.d("Detected ad. Tab ad domains: $tabAdDomains")
+        logcat { "Detected ad. Tab ad domains: $tabAdDomains" }
     }
 
     override fun removeAdDomain() {
         tabAdDomains.remove(activeTabId)
-        Timber.d("Removed previously detected ad. Tab ad domains: $tabAdDomains")
+        logcat { "Removed previously detected ad. Tab ad domains: $tabAdDomains" }
     }
 
     override fun removeAdDomain(tabId: String) {
         tabAdDomains.remove(tabId)
-        Timber.d("Removed previously detected ad for $tabId. Current active tabId is $activeTabId. Tab ad domains: $tabAdDomains")
+        logcat { "Removed previously detected ad for $tabId. Current active tabId is $activeTabId. Tab ad domains: $tabAdDomains" }
     }
 
     override fun setActiveTab(tabId: String) {
@@ -90,12 +90,12 @@ class DuckDuckGoAdClickData(
     }
 
     override fun getAdDomainTldPlusOne(): String? {
-        Timber.d("Is ad? ${tabAdDomains[activeTabId] != null} Tab ad domains: $tabAdDomains")
+        logcat { "Is ad? ${tabAdDomains[activeTabId] != null} Tab ad domains: $tabAdDomains" }
         return tabAdDomains[activeTabId]
     }
 
     override fun getAdDomainTldPlusOne(tabId: String): String? {
-        Timber.d("Is ad for tabId $tabId? ${tabAdDomains[tabId] != null}. Active tab is $activeTabId. Tab ad domains: $tabAdDomains")
+        logcat { "Is ad for tabId $tabId? ${tabAdDomains[tabId] != null}. Active tab is $activeTabId. Tab ad domains: $tabAdDomains" }
         return tabAdDomains[tabId]
     }
 
@@ -106,7 +106,7 @@ class DuckDuckGoAdClickData(
                 adClickExemptionsDao.deleteTabExemption(activeTabId)
             }
         }
-        Timber.d("Removed exemption for active tab $activeTabId. Tab exemptions: $tabExemptions")
+        logcat { "Removed exemption for active tab $activeTabId. Tab exemptions: $tabExemptions" }
     }
 
     override fun addExemption(exemption: Exemption) {
@@ -124,7 +124,7 @@ class DuckDuckGoAdClickData(
                 )
             }
         }
-        Timber.d("Added exemption for active tab $activeTabId. Tab exemptions: $tabExemptions")
+        logcat { "Added exemption for active tab $activeTabId. Tab exemptions: $tabExemptions" }
     }
 
     override fun addExemption(tabId: String, exemption: Exemption) {
@@ -142,11 +142,11 @@ class DuckDuckGoAdClickData(
                 )
             }
         }
-        Timber.d("Added exemption for tab $tabId. Tab exemptions: $tabExemptions")
+        logcat { "Added exemption for tab $tabId. Tab exemptions: $tabExemptions" }
     }
 
     override fun getExemption(): Exemption? {
-        Timber.d("Get exemption for tab $activeTabId. Tab exemptions: $tabExemptions")
+        logcat { "Get exemption for tab $activeTabId. Tab exemptions: $tabExemptions" }
         return tabExemptions[activeTabId]
     }
 
@@ -167,7 +167,7 @@ class DuckDuckGoAdClickData(
                 adClickExemptionsDao.deleteTabExemption(tabId)
             }
         }
-        Timber.d("Removed data for tab $tabId. Tab ad domains: $tabAdDomains. Tab exemptions: $tabExemptions")
+        logcat { "Removed data for tab $tabId. Tab ad domains: $tabAdDomains. Tab exemptions: $tabExemptions" }
     }
 
     override fun removeAll() {
@@ -178,7 +178,7 @@ class DuckDuckGoAdClickData(
                 adClickExemptionsDao.deleteAllTabExemptions()
             }
         }
-        Timber.d("Removed all data. Ad clicked map is empty ${tabAdDomains.isEmpty()}. Empty tab exemptions? ${tabExemptions.isEmpty()}")
+        logcat { "Removed all data. Ad clicked map is empty ${tabAdDomains.isEmpty()}. Empty tab exemptions? ${tabExemptions.isEmpty()}" }
     }
 
     override fun removeAllExpired() {
@@ -195,7 +195,7 @@ class DuckDuckGoAdClickData(
                 adClickExemptionsDao.deleteAllExpiredTabExemptions(currentTime)
             }
         }
-        Timber.d("Removed all expired data. Tab exemptions: $tabExemptions")
+        logcat { "Removed all expired data. Tab exemptions: $tabExemptions" }
     }
 
     override fun setCurrentPage(currentPageUrl: String) {

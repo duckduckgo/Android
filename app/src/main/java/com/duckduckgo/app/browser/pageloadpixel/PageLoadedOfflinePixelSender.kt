@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
@@ -59,7 +59,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     mapOf(),
                     Count,
                 ).ignoreElement().doOnComplete {
-                    Timber.d("Sent page loaded pixel with params: $params")
+                    logcat { "Sent page loaded pixel with params: $params" }
                     pageLoadedPixelDao.delete(it)
                 }
                 pixels.add(pixel)
