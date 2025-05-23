@@ -142,9 +142,8 @@ class FireDialog(
 
     private fun configureFireAnimationView() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
-            val resId = if(selectedFireAnimation is FireAnimation.HeroFire) {
+            val resId = if (selectedFireAnimation is FireAnimation.HeroFire) {
                 R.raw.buck_experiment_fire
             } else {
                 settingsDataStore.selectedFireAnimation.resId

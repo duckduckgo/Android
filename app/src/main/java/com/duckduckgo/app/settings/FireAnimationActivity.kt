@@ -62,9 +62,8 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         fireAnimation: FireAnimation,
         fireAnimationView: LottieAnimationView,
     ) {
-
-        if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            val resId = if(fireAnimation is FireAnimation.HeroFire) {
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            val resId = if (fireAnimation is FireAnimation.HeroFire) {
                 R.raw.buck_experiment_fire
             } else {
                 fireAnimation.resId
