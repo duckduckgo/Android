@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Предупреди ме за сайтове, отбелязани за фишинг или злонамерен софтуер</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="maliciousSiteSettingDisabled">Деактивирането на тази функция може да изложи информацията Ви на риск.</string>
-
+    <string name="threatProtectionTitle">Защита от заплахи</string>
+    <string name="threatProtectionDescription">Усъвършенстваните защити на DuckDuckGo предотвратяват често срещаните заплахи, като същевременно запазват връзката ви сигурна.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Автоматично надграждане на връзките до HTTPS, когато е възможно.<a href=\"\">Научете повече</a>]]></string>
+    <string name="scamBlockerTitle">Блокиране на измами</string>
+    <string name="scamBlockerDescription">Предупреждения в сайтове, за които има сигнали за измами, фишинг и злонамерен софтуер.</string>
+    <string name="threatProtectionLearnMoreTitle">Научете повече</string>
 </resources>
