@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skannaa QR-koodi</string>
-    <string name="login_screen_enter_code_cta">Tai syötä koodi manuaalisesti</string>
+    <string name="login_screen_enter_code_cta">Syötä koodi manuaalisesti</string>
     <string name="login_screen_barcode_hint">Synkronoi osoittamalla kameralla QR-koodia</string>
-    <string name="login_screen_cant_scan">Etkö voi skannata? <font color="#7295F6">Jaa tekstikoodi</font></string>
+    <string name="login_screen_cant_scan_label">Eikö skannaus onnistu?</string>
+    <string name="login_screen_cant_scan_button_text">Kopioi tekstikoodi</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skannaa QR-koodi</string>
-    <string name="connect_screen_scan_qr_hint">Siirry kohtaan <b>Asetukset &gt; Synkronointi ja varmuuskopiointi</b> DuckDuckGo-selaimessa muulla laitteella ja valitse ”Synkronoi toisen laitteen kanssa.”</string>
-    <string name="connect_screen_enter_code_cta">Tai syötä koodi manuaalisesti</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Skannaa tämä koodi toisella laitteella synkronoidaksesi.</string>
+    <string name="connect_screen_scan_qr_hint">Avaa DuckDuckGo-sovellus toisella laitteellasi ja siirry kohtaan <b>Asetukset &gt; Synkronointi ja varmuuskopiointi &gt; Synkronoi toisella laitteella</b>.</string>
+    <string name="connect_screen_enter_code_cta">Syötä koodi manuaalisesti</string>
+    <string name="connect_screen_connect_qr_hint_title">Tai skannaa DuckDuckGolla toisella laitteellasi</string>
+    <string name="connect_screen_connect_qr_hint_content">Avaa DuckDuckGo toisella laitteellasi ja skannaa tämä koodi synkronoidaksesi.</string>
     <string name="connect_screen_share_code">Kopioi koodi</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Vaihda synkronointi</string>
     <string name="sync_dialog_switch_account_secondary_button">Peruuta</string>
     <string name="sync_dialog_switch_account_description">Tämä laite on jo synkronoitu. Haluatko varmasti synkronoida sen toisen varmuuskopion tai laitteen kanssa? Vaihtaminen ei poista tähän laitteeseen jo synkronoituja tietoja.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Synkronoidaanko uusi laite?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" voi käyttää synkronoituja DuckDuckGo-tietojasi.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Synkronoi nyt</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Peruuta</string>
+
+    <string name="deep_link_auth_prompt_title">Synkronoinnin ja varmuuskopioinnin määrittäminen</string>
+    <string name="deep_link_auth_prompt_message">Avaa laitteen lukitus ja määritä Sync &amp; Backup</string>
 </resources>
