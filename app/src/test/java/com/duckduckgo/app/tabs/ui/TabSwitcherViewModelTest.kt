@@ -211,6 +211,7 @@ class TabSwitcherViewModelTest {
             userBrowserProperties = FakeUserBrowserProperties(),
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
+            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             pixel = FakePixel(),
         )
 
