@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniraj QR kôd</string>
-    <string name="login_screen_enter_code_cta">Ili ručno unesi šifru</string>
+    <string name="login_screen_enter_code_cta">Ručno unesi šifru</string>
     <string name="login_screen_barcode_hint">Usmjeri kameru prema QR kodu za sinkronizaciju</string>
-    <string name="login_screen_cant_scan">Ne možeš skenirati? <font color="#7295F6">Podijeli tekstualnu šifru</font></string>
+    <string name="login_screen_cant_scan_label">Ne možeš skenirati?</string>
+    <string name="login_screen_cant_scan_button_text">Kopiraj tekstnu šifru</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skeniraj QR kôd</string>
-    <string name="connect_screen_scan_qr_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje</b> u pregledniku DuckDuckGo na drugom uređaju i odaberi \"Sinkroniziraj s drugim uređajem\".</string>
-    <string name="connect_screen_enter_code_cta">Ili ručno unesi šifru</string>
-    <string name="connect_screen_connect_qr_hint_title">S mobilnog uređaja na mobilni uređaj?</string>
-    <string name="connect_screen_connect_qr_hint_content">Skeniraj ovaj kôd drugim uređajem za sinkronizaciju.</string>
+    <string name="connect_screen_scan_qr_hint">Otvori aplikaciju DuckDuckGo na svom drugom uređaju i idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje &gt; Sinkronizacija s drugim uređajem</b>.</string>
+    <string name="connect_screen_enter_code_cta">Ručno unesi šifru</string>
+    <string name="connect_screen_connect_qr_hint_title">Ili skeniraj s DuckDuckGoom na svom drugom uređaju</string>
+    <string name="connect_screen_connect_qr_hint_content">Otvori DuckDuckGo na svom drugom uređaju i skeniraj ovu šifru za sinkronizaciju.</string>
     <string name="connect_screen_share_code">Kopiraj šifru</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Prebaci sinkronizaciju</string>
     <string name="sync_dialog_switch_account_secondary_button">Odustani</string>
     <string name="sync_dialog_switch_account_description">Ovaj je uređaj već sinkroniziran. Jesi li siguran da ga želiš sinkronizirati s drugom sigurnosnom kopijom ili uređajem? Prebacivanjem se neće ukloniti nijedan podatak koji je već sinkroniziran s ovim uređajem.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sinkronizirati novi uređaj?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" će moći pristupiti tvojim sinkroniziranim podacima DuckDuckGoa.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sinkroniziraj</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Odustani</string>
+
+    <string name="deep_link_auth_prompt_title">Postavi Sync &amp; Backup</string>
+    <string name="deep_link_auth_prompt_message">Otključaj uređaj za postavljanje opcije Sync &amp; Backup</string>
 </resources>
