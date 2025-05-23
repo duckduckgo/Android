@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 class BrowserNavigationBarViewIntegration(
     private val lifecycleScope: CoroutineScope,
     private val browserTabFragmentBinding: FragmentBrowserTabBinding,
-    private val isExperimentEnabled: Boolean,
+    isExperimentEnabled: Boolean,
     private val omnibar: Omnibar,
     browserNavigationBarObserver: BrowserNavigationBarObserver,
 ) {
@@ -52,17 +52,14 @@ class BrowserNavigationBarViewIntegration(
         browserTabFragmentBinding.rootView.removeView(browserTabFragmentBinding.navigationBar)
     } ?: browserTabFragmentBinding.navigationBar
 
-    private var stateObserverJob: Job? = null
     private var keyboardVisibilityObserverJob: Job? = null
     private var navigationBarVisibilityChangeJob: Job? = null
 
     init {
-        stateObserverJob = lifecycleScope.launch {
-            if (isExperimentEnabled) {
-                onEnabled()
-            } else {
-                onDisabled()
-            }
+        if (isExperimentEnabled) {
+            onEnabled()
+        } else {
+            onDisabled()
         }
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
     }
@@ -84,11 +81,11 @@ class BrowserNavigationBarViewIntegration(
     }
 
     fun onDestroyView() {
-        stateObserverJob?.cancel()
         onDisabled()
     }
 
     private fun onEnabled() {
+        navigationBarView.show()
         // we're hiding the navigation bar when keyboard is shown,
         // to prevent it from being "pushed up" within the coordinator layout
         keyboardVisibilityObserverJob = lifecycleScope.launch {
@@ -107,6 +104,7 @@ class BrowserNavigationBarViewIntegration(
     }
 
     private fun onDisabled() {
+        navigationBarView.gone()
         keyboardVisibilityObserverJob?.cancel()
     }
 }
