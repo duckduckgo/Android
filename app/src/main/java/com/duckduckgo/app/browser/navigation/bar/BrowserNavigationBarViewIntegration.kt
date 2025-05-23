@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
@@ -43,7 +42,7 @@ import kotlinx.coroutines.launch
 class BrowserNavigationBarViewIntegration(
     private val lifecycleScope: CoroutineScope,
     private val browserTabFragmentBinding: FragmentBrowserTabBinding,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val isExperimentEnabled: Boolean,
     private val omnibar: Omnibar,
     browserNavigationBarObserver: BrowserNavigationBarObserver,
 ) {
@@ -59,12 +58,10 @@ class BrowserNavigationBarViewIntegration(
 
     init {
         stateObserverJob = lifecycleScope.launch {
-            visualDesignExperimentDataStore.isExperimentEnabled.collect { isExperimentEnabled ->
-                if (isExperimentEnabled) {
-                    onEnabled()
-                } else {
-                    onDisabled()
-                }
+            if (isExperimentEnabled) {
+                onEnabled()
+            } else {
+                onDisabled()
             }
         }
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
