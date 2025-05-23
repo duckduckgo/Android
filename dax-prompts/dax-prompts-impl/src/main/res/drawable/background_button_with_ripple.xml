@@ -14,8 +14,19 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/white" />
-    <corners
-        android:radius="36dp" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+
+    <!-- Keep the existing background -->
+    <item
+        android:id="@android:id/background"
+        android:drawable="@drawable/background_button" />
+
+    <!-- This is the mask for the ripple -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+</ripple>

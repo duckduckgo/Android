@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/daxPromptBackground"
-    tools:context=".ui.DaxPromptDuckPlayerActivity">
+    tools:context=".ui.DaxPromptDuckPlayerActivity"
+    tools:ignore="InvalidColorAttribute">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/orangeShape"

@@ -21,13 +21,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/daxPromptBackground"
-    tools:context=".ui.DaxPromptDuckPlayerActivity">
+    tools:context=".ui.DaxPromptDuckPlayerActivity"
+    tools:ignore="InvalidColorAttribute">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/orangeShape"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="-56dp"
+        android:layout_marginTop="36dp"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,10 +60,10 @@
         android:layout_width="316dp"
         android:layout_height="408dp"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="-50dp"
-        app:layout_constraintBottom_toTopOf="@id/daxPromptDuckPlayerMessageContainer"
+        android:layout_marginBottom="-48dp"
+        app:layout_constraintBottom_toBottomOf="@id/daxPromptDuckPlayerMessageContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/dax" />
+        app:srcCompat="@drawable/dax_no_feet" />
 
     <LinearLayout
         android:id="@+id/daxPromptDuckPlayerMessageContainer"
@@ -70,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginBottom="76dp"
+        android:layout_marginBottom="46dp"
         android:background="@drawable/background_dax_message"
         android:orientation="vertical"
         android:padding="@dimen/keyline_6"

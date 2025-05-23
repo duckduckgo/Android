@@ -80,7 +80,7 @@
             app:layout_constraintEnd_toStartOf="@id/feature1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/feature1"
-            app:srcCompat="@drawable/ic_find_search_color_24" />
+            app:srcCompat="@drawable/ic_comparison_chart_search" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feature1"
@@ -130,7 +130,7 @@
             app:layout_constraintEnd_toStartOf="@id/feature2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/feature2"
-            app:srcCompat="@drawable/ic_shield_color_24" />
+            app:srcCompat="@drawable/ic_comparison_chart_shield" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feature2"
@@ -180,7 +180,7 @@
             app:layout_constraintEnd_toStartOf="@id/feature3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/feature3"
-            app:srcCompat="@drawable/ic_cookie_blocked_color_24" />
+            app:srcCompat="@drawable/ic_comparison_chart_cookies" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feature3"
@@ -230,7 +230,7 @@
             app:layout_constraintEnd_toStartOf="@id/feature4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/feature4"
-            app:srcCompat="@drawable/ic_ads_blocked_color_24" />
+            app:srcCompat="@drawable/ic_comparison_chart_ads" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feature4"
