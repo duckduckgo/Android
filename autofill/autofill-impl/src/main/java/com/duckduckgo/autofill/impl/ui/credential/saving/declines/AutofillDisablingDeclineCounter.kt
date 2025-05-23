@@ -125,7 +125,11 @@ class AutofillDisablingDeclineCounter @Inject constructor(
             val shouldOffer = declineCountHasReachedThreshold() && !promptedToDisablePreviously
 
             logcat {
-                "User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions. Prompted to disable before: $promptedToDisablePreviously. Should prompt to disable: $shouldOffer"
+                """
+                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions. 
+                    Prompted to disable before: $promptedToDisablePreviously. 
+                    Should prompt to disable: $shouldOffer
+                """.trimIndent()
             }
 
             return@withContext shouldOffer

@@ -125,8 +125,18 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        logcat(INFO) { "Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}" }
-        logcat(INFO) { "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}" }
+        logcat(INFO) {
+            """
+            Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince}
+             to ${bookmarks.last_modified}
+            """.trimIndent()
+        }
+        logcat(INFO) {
+            """
+            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} 
+            to ${savedSitesSyncStore.startTimeStamp}
+            """.trimIndent()
+        }
 
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp

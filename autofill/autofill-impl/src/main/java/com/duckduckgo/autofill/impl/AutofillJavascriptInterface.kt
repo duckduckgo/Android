@@ -433,7 +433,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 .filter { it.username != null }
                 .filter { it.username == username }
                 .filter { it.password.isNullOrEmpty() }
-                .also { list -> logcat(VERBOSE) { "Found ${list.size} credentials with missing password for username=$username and url=$originalUrl" } }
+                .also { list ->
+                    logcat(VERBOSE) {
+                        "Found ${list.size} credentials with missing password for username=$username and url=$originalUrl"
+                    }
+                }
                 .map { it.copy(password = password) }
                 .forEach {
                     if (autofillStore.updateCredentials(originalUrl, it, CredentialUpdateType.Password) != null) {

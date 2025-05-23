@@ -489,7 +489,14 @@ class AppSyncAccountRepository @Inject constructor(
                 val otherDevicePublicKey = response.publicKey
                 val otherDeviceKeyId = response.keyId
 
-                logcat(VERBOSE) { "Sync-exchange: We have received the other device's details. name:${response.deviceName}, keyId:${response.keyId}, public key: ${response.publicKey}" }
+                logcat(VERBOSE) {
+                    """
+                    Sync-exchange: We have received the other device's details. 
+                    name:${response.deviceName}, 
+                    keyId:${response.keyId}, 
+                    public key: ${response.publicKey}
+                    """.trimIndent()
+                }
 
                 // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
                 return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {

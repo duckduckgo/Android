@@ -80,7 +80,12 @@ class RealPrivacyConfigPersister @Inject constructor(
         val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
 
         logcat(VERBOSE) {
-            "Should persist privacy config: $shouldPersist. version=(existing: $previousVersion, new: $newVersion), hash=(existing: $previousPluginHashCode, new: $currentPluginHashCode)"
+            """
+                Should persist privacy config: $shouldPersist. 
+                version=(existing: $previousVersion, 
+                new: $newVersion), 
+                hash=(existing: $previousPluginHashCode, new: $currentPluginHashCode)
+            """.trimIndent()
         }
 
         if (shouldPersist) {

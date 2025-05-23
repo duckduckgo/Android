@@ -40,7 +40,13 @@ class RealAutofillFireproofDialogSuppressor @Inject constructor(private val time
     override fun isAutofillPreventingFireproofPrompts(): Boolean {
         val timeSinceLastDismissed = timeProvider.currentTimeMillis() - lastTimeUserSawAutofillDialog
         val suppressing = autofillDialogShowing || (timeSinceLastDismissed <= TIME_PERIOD_TO_SUPPRESS_FIREPROOF_PROMPT)
-        logcat { "isAutofillPreventingFireproofPrompts: $suppressing (autofillDialogShowing=$autofillDialogShowing, timeSinceLastDismissed=${timeSinceLastDismissed}ms)" }
+        logcat {
+            """
+            isAutofillPreventingFireproofPrompts: $suppressing 
+            (autofillDialogShowing=$autofillDialogShowing, 
+            timeSinceLastDismissed=${timeSinceLastDismissed}ms)
+            """.trimIndent()
+        }
         return suppressing
     }
 
