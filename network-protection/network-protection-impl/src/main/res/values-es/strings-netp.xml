@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">Servidor DNS</string>
     <string name="netpPrivateDns">DNS privado</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Bloquear dominios de riesgo)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Bloqueador de estafas)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (recomendado)</string>
     <string name="netpCustomDnsCustom">Personalizar</string>
     <string name="netpCustomDnsInputAddressHint">Dirección IPv4</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo enruta las consultas de DNS a través de nuestros servidores DNS para que tu proveedor de Internet no pueda ver qué sitios web visitas.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Bloqueo y filtrado de contenido</string>
-    <string name="netpDnsBlockMalwarePrimary">Bloquear dominios de riesgo</string>
+    <string name="netpDnsBlockMalwareHeader">Bloqueo de contenido malicioso</string>
+    <string name="netpDnsBlockMalwarePrimary">Bloqueador de estafas</string>
     <string name="netpDnsBlockMalwareByline">Bloquea más de 150 000 dominios identificados por alojar malware, ataques de phishing y estafas en Internet con una lista de bloqueo a nivel de DNS. <annotation type="learn_more_link">Más información</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Listas de bloqueo de DNS</string>
 
