@@ -125,15 +125,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
+        binding.showDuckChatSearchSettingsLink.setOnClickListener {
+            viewModel.duckChatSearchAISettingsClicked()
+        }
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
-            is DuckChatSettingsViewModel.Command.OpenLearnMore -> {
+            is DuckChatSettingsViewModel.Command.OpenLink -> {
                 globalActivityStarter.start(
                     this,
                     WebViewActivityWithParams(
-                        url = command.learnMoreLink,
+                        url = command.link,
                         screenTitle = getString(R.string.duck_chat_title),
                     ),
                 )
