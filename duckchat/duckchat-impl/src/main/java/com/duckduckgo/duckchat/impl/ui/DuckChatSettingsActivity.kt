@@ -26,7 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.BrowserActivityWithParams
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -67,6 +67,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     @Inject
     lateinit var pixel: Pixel
@@ -143,12 +146,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 )
             }
             is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
-                globalActivityStarter.start(
-                    this,
-                    BrowserActivityWithParams(
-                        url = command.link,
-                    ),
-                )
+                startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
             }
         }
     }
