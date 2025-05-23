@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.experiments.visual.store
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -108,10 +109,13 @@ class VisualDesignExperimentDataStoreImplTest {
         whenVisualExperimentEnabled(false)
 
         val testee = createTestee()
-        val result = testee.isExperimentEnabled.value
+        testee.isExperimentEnabled.test {
+            Assert.assertFalse(awaitItem())
+        }
 
-        Assert.assertFalse(result)
-        Assert.assertFalse(testee.anyConflictingExperimentEnabled.value)
+        testee.anyConflictingExperimentEnabled.test {
+            Assert.assertFalse(awaitItem())
+        }
     }
 
     @Test
@@ -182,11 +186,12 @@ class VisualDesignExperimentDataStoreImplTest {
     }
 
     @Test
-    fun `when experiment FF is enabled in new config, experiment disabled`() = runTest {
+    fun `when visual designs FF is enabled in new config, visual design enabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(unrelatedToggle))
         whenVisualExperimentEnabled(false)
 
         val testee = createTestee()
+
         Assert.assertFalse(testee.isExperimentEnabled.value)
         Assert.assertFalse(testee.anyConflictingExperimentEnabled.value)
 
