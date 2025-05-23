@@ -24,7 +24,8 @@ import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class AppNotificationSender(
     private val context: Context,
@@ -36,7 +37,7 @@ class AppNotificationSender(
 
     override suspend fun sendNotification(notification: SchedulableNotification) {
         if (!notification.canShow() || notificationDao.exists(notification.id)) {
-            Timber.v("Notification should not be shown")
+            logcat(VERBOSE) { "Notification should not be shown" }
             return
         }
 
@@ -47,7 +48,7 @@ class AppNotificationSender(
         }
 
         if (notificationPlugin == null) {
-            Timber.v("No plugin found for notification class ${notification.javaClass}")
+            logcat(VERBOSE) { "No plugin found for notification class ${notification.javaClass}" }
             return
         }
 

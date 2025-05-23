@@ -45,7 +45,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
@@ -92,7 +93,7 @@ class AutomaticDataClearer @Inject constructor(
     suspend fun onAppForegroundedAsync() {
         postDataClearerState(INITIALIZING)
 
-        Timber.i("onAppForegrounded; is from fresh app launch? $isFreshAppLaunch")
+        logcat { "onAppForegrounded; is from fresh app launch? $isFreshAppLaunch" }
 
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
@@ -105,19 +106,19 @@ class AutomaticDataClearer @Inject constructor(
 
             val clearWhat = settingsDataStore.automaticallyClearWhatOption
             val clearWhen = settingsDataStore.automaticallyClearWhenOption
-            Timber.i("Currently configured to automatically clear $clearWhat / $clearWhen")
+            logcat { "Currently configured to automatically clear $clearWhat / $clearWhen" }
 
             if (clearWhat == ClearWhatOption.CLEAR_NONE) {
-                Timber.i("No data will be cleared as it's configured to clear nothing automatically")
+                logcat { "No data will be cleared as it's configured to clear nothing automatically" }
                 postDataClearerState(FINISHED)
             } else {
                 if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
-                    Timber.i("Decided data should be cleared")
+                    logcat { "Decided data should be cleared" }
                     withContext(dispatchers.main()) {
                         clearDataWhenAppInForeground(clearWhat)
                     }
                 } else {
-                    Timber.i("Decided not to clear data at this time")
+                    logcat { "Decided not to clear data at this time" }
                     postDataClearerState(FINISHED)
                 }
             }
@@ -136,7 +137,7 @@ class AutomaticDataClearer @Inject constructor(
     override fun onClose() {
         launch {
             val timeNow = SystemClock.elapsedRealtime()
-            Timber.i("Recording when app backgrounded ($timeNow)")
+            logcat { "Recording when app backgrounded ($timeNow)" }
 
             postDataClearerState(INITIALIZING)
 
@@ -147,7 +148,7 @@ class AutomaticDataClearer @Inject constructor(
                 val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
 
                 if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-                    Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
+                    logcat { "No background timer required for current configuration: $clearWhatOption / $clearWhenOption" }
                 } else {
                     scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
                 }
@@ -169,10 +170,10 @@ class AutomaticDataClearer @Inject constructor(
                 .addTag(DataClearingWorker.WORK_REQUEST_TAG)
                 .build()
             it.enqueue(workRequest)
-            Timber.i(
+            logcat {
                 "Work request scheduled, ${durationMillis}ms from now, " +
-                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}",
-            )
+                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}"
+            }
         }
     }
 
@@ -180,23 +181,23 @@ class AutomaticDataClearer @Inject constructor(
     @Suppress("NON_EXHAUSTIVE_WHEN")
     private suspend fun clearDataWhenAppInForeground(clearWhat: ClearWhatOption) {
         withContext(dispatchers.main()) {
-            Timber.i("Clearing data when app is in the foreground: $clearWhat")
+            logcat { "Clearing data when app is in the foreground: $clearWhat" }
 
             when (clearWhat) {
                 ClearWhatOption.CLEAR_TABS_ONLY -> {
                     clearDataAction.clearTabsAsync(true)
 
-                    Timber.i("Notifying listener that clearing has finished")
+                    logcat { "Notifying listener that clearing has finished" }
                     postDataClearerState(FINISHED)
                 }
 
                 ClearWhatOption.CLEAR_TABS_AND_DATA -> {
                     val processNeedsRestarted = !isFreshAppLaunch
-                    Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
+                    logcat { "App is in foreground; restart needed? $processNeedsRestarted" }
 
                     clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
 
-                    Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
+                    logcat { "All data now cleared, will restart process? $processNeedsRestarted" }
                     if (processNeedsRestarted) {
                         withContext(dispatchers.io()) {
                             clearDataAction.setAppUsedSinceLastClearFlag(false)
@@ -205,11 +206,11 @@ class AutomaticDataClearer @Inject constructor(
 
                         // need a moment to draw background color (reduces flickering UX)
                         Handler().postDelayed(100) {
-                            Timber.i("Will now restart process")
+                            logcat { "Will now restart process" }
                             clearDataAction.killAndRestartProcess(notifyDataCleared = true)
                         }
                     } else {
-                        Timber.i("Will not restart process")
+                        logcat { "Will not restart process" }
                         postDataClearerState(FINISHED)
                     }
                 }
@@ -224,31 +225,32 @@ class AutomaticDataClearer @Inject constructor(
         appUsedSinceLastClear: Boolean,
         appIconChanged: Boolean,
     ): Boolean {
-        Timber.d("Determining if data should be cleared for option $cleanWhenOption")
+        logcat { "Determining if data should be cleared for option $cleanWhenOption" }
 
         if (!appUsedSinceLastClear) {
-            Timber.d("App hasn't been used since last clear; no need to clear again")
+            logcat { "App hasn't been used since last clear; no need to clear again" }
             return false
         }
 
-        Timber.d("App has been used since last clear")
+        logcat { "App has been used since last clear" }
 
         if (isFreshAppLaunch) {
-            Timber.d("This is a fresh app launch, so will clear the data")
+            logcat { "This is a fresh app launch, so will clear the data" }
             return true
         }
 
         if (appIconChanged) {
-            Timber.i("No data will be cleared as the app icon was just changed")
+            logcat { "No data will be cleared as the app icon was just changed" }
             return false
         }
 
         if (cleanWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-            Timber.d("This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data")
+            logcat { "This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data" }
             return false
         }
         if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
-            Timber.w("No background timestamp recorded; will not clear the data")
+            logcat { "No background timestamp recorded; will not clear the data" }
+            logcat(WARN) { "No background timestamp recorded; will not clear the data" }
             return false
         }
 
@@ -256,7 +258,7 @@ class AutomaticDataClearer @Inject constructor(
             backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
             clearWhenOption = cleanWhenOption,
         )
-        Timber.d("Has enough time passed to trigger the data clear? $enoughTimePassed")
+        logcat { "Has enough time passed to trigger the data clear? $enoughTimePassed" }
 
         return enoughTimePassed
     }

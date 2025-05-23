@@ -31,7 +31,7 @@ import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -48,7 +48,7 @@ class GoBackend @Inject constructor(
         } catch (ignored: Throwable) {
             pixels.get().reportWireguardLibraryLoadFailed()
             Thread.sleep(100)
-            logcat(LogPriority.ERROR) { "Error loading wireguard-go library: ${ignored.asLog()}" }
+            logcat(ERROR) { "Error loading wireguard-go library: ${ignored.asLog()}" }
             exitProcess(1)
         }
     }

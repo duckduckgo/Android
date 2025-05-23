@@ -27,8 +27,12 @@ import dagger.SingleInstanceIn
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import retrofit2.HttpException
-import timber.log.Timber
 
 /**
  * Repository for Duck Address activation status
@@ -84,13 +88,13 @@ class RemoteDuckAddressStatusRepository @Inject constructor(
     ): ActivationStatusResult {
         return try {
             val status = service.getActivationStatus(authorization = formattedAuthToken, duckAddress = formattedDuckAddress)
-            Timber.d("Got status of duck address %s. Activated=%s", formattedDuckAddress, status.active)
+            logcat(VERBOSE) { "Got status of duck address $formattedDuckAddress. Activated=${status.active}" }
             if (status.active) Activated else Deactivated
         } catch (e: Exception) {
             when (e) {
                 is HttpException -> when (e.code()) {
                     HttpURLConnection.HTTP_NOT_FOUND -> {
-                        Timber.w("Duck address not found: %s", formattedDuckAddress)
+                        logcat(WARN) { "Duck address not found: $formattedDuckAddress" }
                         Unmanageable
                     }
 
@@ -123,10 +127,10 @@ class RemoteDuckAddressStatusRepository @Inject constructor(
         return try {
             val status =
                 service.setActivationStatus(authorization = formattedAuthToken, duckAddress = formattedDuckAddress, isActive = isActive)
-            Timber.i("Network request to update status succeeded. Activated=${status.active}")
+            logcat(INFO) { "Network request to update status succeeded. Activated=${status.active}" }
             return status.active == isActive
         } catch (e: Exception) {
-            Timber.w("Failed to update activation status", e)
+            logcat(WARN) { "Failed to update activation status ${e.asLog()}" }
             false
         }
     }

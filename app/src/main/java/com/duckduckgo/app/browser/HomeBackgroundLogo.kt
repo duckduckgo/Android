@@ -20,7 +20,8 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class HomeBackgroundLogo(private var ddgLogoView: View) {
 
@@ -45,7 +46,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     }
 
     private fun fadeLogoIn() {
-        Timber.v("showLogo")
+        logcat(VERBOSE) { "showLogo" }
         // To avoid glitches when calling show/hide logo within a small amount of time we keep this 50ms animation
         ddgLogoView.animate().apply {
             duration = FADE_IN_DURATION
@@ -56,7 +57,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     }
 
     private fun fadeLogoOut() {
-        Timber.v("hideLogo")
+        logcat(VERBOSE) { "hideLogo" }
         ddgLogoView.gone()
     }
 

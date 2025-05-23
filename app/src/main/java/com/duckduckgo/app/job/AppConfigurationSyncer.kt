@@ -34,7 +34,9 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -66,17 +68,17 @@ class AppConfigurationSyncer(
             .doAfterTerminate {
                 scheduleRegularSync()
             }
-            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+            .subscribe({}, { logcat(WARN) { "Failed to download initial app configuration ${it.localizedMessage}" } })
     }
 
     @CheckResult
     fun scheduleImmediateSync(): Completable {
-        Timber.i("Running immediate attempt to download app configuration")
+        logcat(INFO) { "Running immediate attempt to download app configuration" }
         return appConfigurationDownloader.downloadTask()
     }
 
     fun scheduleRegularSync() {
-        Timber.i("Scheduling regular sync")
+        logcat(INFO) { "Scheduling regular sync" }
         val workRequest = appConfigurationSyncWorkRequestBuilder.appConfigurationWork()
         workManager.enqueueUniquePeriodicWork(APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }

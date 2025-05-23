@@ -27,7 +27,7 @@ import com.duckduckgo.sync.store.model.SyncApiErrorType.TOO_MANY_REQUESTS
 import com.duckduckgo.sync.store.model.SyncApiErrorType.VALIDATION_ERROR
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 interface SyncApiErrorRecorder {
 
@@ -46,7 +46,7 @@ class RealSyncApiErrorRecorder @Inject constructor(
         feature: SyncableType,
         apiError: Error,
     ) {
-        Timber.d("Sync-Error: Recording API Error for $feature as $apiError")
+        logcat { "Sync-Error: Recording API Error for $feature as $apiError" }
         when (apiError.code) {
             API_CODE.COUNT_LIMIT.code -> {
                 syncApiErrorRepository.addError(feature, OBJECT_LIMIT_EXCEEDED)

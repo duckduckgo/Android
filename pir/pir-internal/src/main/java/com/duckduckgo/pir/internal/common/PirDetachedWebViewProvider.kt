@@ -140,9 +140,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
                         requestedUrl == request.url.toString() &&
                         requestedUrl != DBP_INITIAL_URL
                     ) {
-                        logcat {
-                            "PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} mainframe ${request.isForMainFrame}"
-                        }
+                        logcat { "PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} mainframe ${request.isForMainFrame}" }
                         receivedError = true
                         onPageLoadFailed(requestedUrl)
                     }

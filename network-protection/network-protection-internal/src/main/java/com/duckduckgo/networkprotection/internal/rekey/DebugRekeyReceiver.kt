@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @InjectWith(VpnScope::class)
@@ -64,7 +64,7 @@ class DebugRekeyReceiver @Inject constructor(
             }
 
             else -> {
-                logcat(LogPriority.WARN) { "Unknown action" }
+                logcat(WARN) { "Unknown action" }
                 pendingResult?.finish()
             }
         }

@@ -37,7 +37,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
@@ -228,7 +229,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun deleteEntity(entity: FireproofWebsiteEntity) {
-            Timber.i("Deleting website with domain: ${entity.domain}")
+            logcat(INFO) { "Deleting website with domain: ${entity.domain}" }
             viewModel.onDeleteRequested(entity)
         }
     }

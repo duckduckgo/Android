@@ -94,7 +94,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.logcat
 import retrofit2.HttpException
 
@@ -736,7 +736,7 @@ class RealSubscriptionsManager @Inject constructor(
                     authRepository.setAuthToken(response.authToken)
                     exchangeAuthToken(response.authToken)
                     if (fetchAndStoreAllData()) {
-                        logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
+                        logcat { "Subs: store login succeeded" }
                         val subscription = authRepository.getSubscription()
                         if (subscription?.isActive() == true) {
                             RecoverSubscriptionResult.Success(subscription)
@@ -751,7 +751,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            logcat(LogPriority.DEBUG) { "Subs: Exception!" }
+            logcat { "Subs: Exception!" }
             RecoverSubscriptionResult.Failure(extractError(e))
         }
     }
@@ -876,7 +876,7 @@ class RealSubscriptionsManager @Inject constructor(
 
             purchaseFlowStartedUsingRestoredAccount = restoredAccount
 
-            logcat(LogPriority.DEBUG) { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
+            logcat { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
             playBillingManager.launchBillingFlow(
                 activity = activity,
@@ -886,7 +886,7 @@ class RealSubscriptionsManager @Inject constructor(
             )
         } catch (e: Exception) {
             val error = extractError(e)
-            logcat(LogPriority.ERROR) { "Subs: $error" }
+            logcat(ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
             purchaseFlowStartedUsingRestoredAccount = false
@@ -913,7 +913,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             return when (extractError(e)) {
                 "expired_token" -> {
-                    logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
+                    logcat { "Subs: auth token expired" }
                     val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthTokenResult.Success(authRepository.getAuthToken()!!)

@@ -55,7 +55,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragment_autofill_provider_list) {
@@ -225,7 +226,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
 
         withContext(dispatchers.io()) {
             val showSuggestionsFor = getRequestedUrl().takeUnless { it.isNullOrBlank() } ?: getRequestedPackage()
-            Timber.i("DDGAutofillService showSuggestionsFor: $showSuggestionsFor")
+            logcat(INFO) { "DDGAutofillService showSuggestionsFor: $showSuggestionsFor" }
             val directSuggestions = suggestionMatcher.getDirectSuggestions(showSuggestionsFor, credentials)
             val shareableCredentials = suggestionMatcher.getShareableSuggestions(showSuggestionsFor)
             adapter.updateLogins(credentials, directSuggestions, shareableCredentials, false)

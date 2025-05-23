@@ -30,7 +30,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SettingsSyncDataProvider @Inject constructor(
@@ -45,13 +46,13 @@ class SettingsSyncDataProvider @Inject constructor(
         val syncableSettings = syncableSettings.getPlugins()
         if (settingsSyncStore.serverModifiedSince == "0") {
             val keys = syncableSettings.map { it.key }
-            Timber.i("Sync-Settings: initialize keys=$keys")
+            logcat(INFO) { "Sync-Settings: initialize keys=$keys" }
             settingsSyncMetadataDao.initialize(keys)
         }
 
         val since = settingsSyncStore.clientModifiedSince
         val updates = getUpdatesSince(syncableSettings, since)
-        Timber.i("Sync-Settings: getChanges() since=$since updates=$updates")
+        logcat(INFO) { "Sync-Settings: getChanges() since=$since updates=$updates" }
         return formatUpdates(updates)
     }
 
@@ -72,7 +73,7 @@ class SettingsSyncDataProvider @Inject constructor(
             val settingsToUpdate = settingsSyncMetadataDao.getChangesSince(clientModifiedSince)
             syncableSettings.forEach { setting ->
                 val metadata = settingsToUpdate.find { it.key == setting.key } ?: return@forEach
-                Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=$metadata")
+                logcat(INFO) { "Sync-Settings: changes since=$clientModifiedSince metadata=$metadata" }
                 updates.add(
                     setting.asSettingEntry(metadata.modified_at ?: SyncDateProvider.now()),
                 )
@@ -89,7 +90,7 @@ class SettingsSyncDataProvider @Inject constructor(
             ModifiedSince.Timestamp(settingsSyncStore.serverModifiedSince)
         }
 
-        Timber.i("Sync-Settings: formatUpdates() modifiedSince=$modifiedSince updates=$updates")
+        logcat(INFO) { "Sync-Settings: formatUpdates() modifiedSince=$modifiedSince updates=$updates" }
 
         return if (updates.isEmpty()) {
             SyncChangesRequest(SETTINGS, "", modifiedSince)

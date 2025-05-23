@@ -27,7 +27,9 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface PartialCredentialSaveStore {
     suspend fun saveUsername(
@@ -59,12 +61,12 @@ class PartialCredentialSaveInMemoryStore @Inject constructor(
     ) {
         withContext(dispatchers.io()) {
             if (!autofillFeature.partialFormSaves().isEnabled()) {
-                Timber.w("Partial form saves are disabled. Not saving username [%s] for %s")
+                logcat(WARN) { "Partial form saves are disabled. Not saving username [$username] for $url" }
                 return@withContext
             }
 
             val etldPlusOne = extractEtldPlusOne(url) ?: return@withContext
-            Timber.v("Storing username [%s] as a backFill candidate for %s", username, etldPlusOne)
+            logcat(VERBOSE) { "Storing username [$username] as a backFill candidate for $etldPlusOne" }
             backFillHistory.put(etldPlusOne, PartialSave(username = username, creationTimestamp = timeProvider.currentTimeMillis()))
         }
     }
@@ -75,7 +77,7 @@ class PartialCredentialSaveInMemoryStore @Inject constructor(
     override suspend fun getUsernameForBackFilling(url: String): String? {
         return withContext(dispatchers.io()) {
             if (!autofillFeature.partialFormSaves().isEnabled()) {
-                Timber.w("Partial form saves are disabled. Not checking for username for %s")
+                logcat(WARN) { "Partial form saves are disabled. Not checking for username for $url" }
                 return@withContext null
             }
 
@@ -83,7 +85,7 @@ class PartialCredentialSaveInMemoryStore @Inject constructor(
             val activeBackFill = backFillHistory[etldPlusOne] ?: return@withContext null
 
             if (activeBackFill.isExpired()) {
-                Timber.v("Found expired username [%s] for %s. Not using for backFill.", activeBackFill.username, etldPlusOne)
+                logcat(VERBOSE) { "Found expired username [$activeBackFill.username] for $etldPlusOne. Not using for backFill." }
                 return@withContext null
             }
 
@@ -98,7 +100,7 @@ class PartialCredentialSaveInMemoryStore @Inject constructor(
     ): Boolean {
         return withContext(dispatchers.io()) {
             if (!autofillFeature.partialFormSaves().isEnabled()) {
-                Timber.w("Partial form saves are disabled. Cannot have been backFilled recently.")
+                logcat(WARN) { "Partial form saves are disabled. Cannot have been backFilled recently." }
                 return@withContext false
             }
 

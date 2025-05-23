@@ -44,7 +44,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
-import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
+import com.duckduckgo.vpn.internal.feature.logs.LoggingExtensions
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.google.android.material.snackbar.Snackbar
@@ -246,7 +246,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }.apply { register() }
 
         // initial state
-        binding.debugLoggingToggle.setIsChecked(TimberExtensions.isLoggingEnabled())
+        binding.debugLoggingToggle.setIsChecked(LoggingExtensions.isLoggingEnabled())
 
         // listener
         binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)

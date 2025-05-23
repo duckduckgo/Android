@@ -40,7 +40,9 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 class WriteInProgressException : Exception("Write in progress")
 
@@ -55,8 +57,6 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val urlCanonicalization: UrlCanonicalization,
 ) : MaliciousSiteProtection {
 
-    private val timber = Timber.tag("MaliciousSiteProtection")
-
     override fun isFeatureEnabled(): Boolean {
         return maliciousSiteProtectionRCFeature.isFeatureEnabled()
     }
@@ -65,10 +65,10 @@ class RealMaliciousSiteProtection @Inject constructor(
         url: Uri,
         confirmationCallback: (confirmedResult: MaliciousStatus) -> Unit,
     ): IsMaliciousResult {
-        timber.d("isMalicious $url")
+        logcat { "MaliciousSiteProtection: isMalicious $url" }
 
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
-            timber.d("should not block (feature disabled) $url")
+            logcat { "MaliciousSiteProtection: should not block (feature disabled) $url" }
             return ConfirmedResult(Ignored)
         }
 
@@ -78,7 +78,7 @@ class RealMaliciousSiteProtection @Inject constructor(
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
         if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
-            timber.d("should not block (exempted) $hostname")
+            logcat { "MaliciousSiteProtection: should not block (exempted) $hostname" }
             return ConfirmedResult(Safe)
         }
 
@@ -88,23 +88,23 @@ class RealMaliciousSiteProtection @Inject constructor(
         try {
             maliciousSiteRepository.getFeedForHashPrefix(hashPrefix).let {
                 if (it == null) {
-                    timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+                    logcat { "MaliciousSiteProtection: should not block (no hash) $hashPrefix,  $canonicalUri" }
                     return ConfirmedResult(Safe)
                 } else if (it == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
-                    timber.d("should not block (scam protection disabled) $canonicalUri")
+                    logcat { "MaliciousSiteProtection: should not block (scam protection disabled) $canonicalUri" }
                     return ConfirmedResult(Ignored)
                 }
             }
             maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
                 filterSet.filters.let {
                     if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
-                        timber.d("should block $canonicalUriString")
+                        logcat { "MaliciousSiteProtection: should block $canonicalUriString" }
                         return ConfirmedResult(Malicious(filterSet.feed))
                     }
                 }
             }
         } catch (e: WriteInProgressException) {
-            timber.d("Write in progress, ignoring")
+            logcat { "MaliciousSiteProtection: Write in progress, ignoring" }
             return ConfirmedResult(Ignored)
         }
         appCoroutineScope.launch(dispatchers.io()) {
@@ -122,17 +122,17 @@ class RealMaliciousSiteProtection @Inject constructor(
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUriString, result: ${result.feed}")
-                    is Safe -> timber.d("should not block (no match) $canonicalUriString")
-                    is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
+                    is Malicious -> logcat { "MaliciousSiteProtection: should block (matches) $canonicalUriString, result: ${result.feed}" }
+                    is Safe -> logcat { "MaliciousSiteProtection: should not block (no match) $canonicalUriString" }
+                    is Ignored -> logcat { "MaliciousSiteProtection: should not block (ignored) $canonicalUriString" }
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
-                timber.e(e, "shouldBlock $canonicalUriString")
+                logcat(ERROR) { "MaliciousSiteProtection: shouldBlock $canonicalUriString: ${e.asLog()}" }
                 confirmationCallback(Safe)
             }
         }
-        timber.d("wait for confirmation $canonicalUriString")
+        logcat { "MaliciousSiteProtection: wait for confirmation $canonicalUriString" }
         return IsMaliciousResult.WaitForConfirmation
     }
 

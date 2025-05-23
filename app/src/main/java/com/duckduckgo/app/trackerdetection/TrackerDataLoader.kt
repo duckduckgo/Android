@@ -38,9 +38,9 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import okio.buffer
 import okio.source
-import timber.log.Timber
 
 @WorkerThread
 @ContributesMultibinding(
@@ -68,7 +68,7 @@ class TrackerDataLoader @Inject constructor(
     }
 
     private fun loadData() {
-        Timber.d("Loading tracker data")
+        logcat { "Loading tracker data" }
         loadTds()
     }
 
@@ -81,7 +81,7 @@ class TrackerDataLoader @Inject constructor(
     }
 
     private fun updateTdsFromFile() {
-        Timber.d("Updating tds from file")
+        logcat { "Updating tds from file" }
         runCatching {
             val adapter = moshi.adapter(TdsJson::class.java)
             val inputStream = context.resources.openRawResource(R.raw.tds).source()
@@ -107,7 +107,7 @@ class TrackerDataLoader @Inject constructor(
 
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
-        Timber.d("Loaded ${trackers.size} tds trackers from DB")
+        logcat { "Loaded ${trackers.size} tds trackers from DB" }
         val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
         trackerDetector.addClient(client)
     }

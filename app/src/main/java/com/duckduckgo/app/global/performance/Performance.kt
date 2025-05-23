@@ -19,7 +19,12 @@
 package com.duckduckgo.app.global.performance
 
 import android.util.Log
-import timber.log.Timber
+import logcat.LogPriority.DEBUG
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 object PerformanceConstants {
     const val NANO_TO_MILLIS_DIVISOR = 1_000_000.0
@@ -33,6 +38,14 @@ inline fun <T> measureExecution(
     val startTime = System.nanoTime()
     return function.invoke().also {
         val difference = (System.nanoTime() - startTime) / PerformanceConstants.NANO_TO_MILLIS_DIVISOR
-        Timber.log(logLevel, "$logMessage; took ${difference}ms")
+        val priority = when (logLevel) {
+            Log.VERBOSE -> VERBOSE
+            Log.DEBUG -> DEBUG
+            Log.INFO -> INFO
+            Log.WARN -> WARN
+            Log.ERROR -> ERROR
+            else -> DEBUG
+        }
+        logcat(tag = "Performance", priority = priority) { "$logMessage; took ${difference}ms" }
     }
 }

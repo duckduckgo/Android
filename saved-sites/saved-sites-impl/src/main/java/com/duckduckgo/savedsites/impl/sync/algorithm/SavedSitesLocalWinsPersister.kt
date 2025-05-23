@@ -24,7 +24,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("localWinsStrategy")
@@ -39,16 +39,16 @@ class SavedSitesLocalWinsPersister @Inject constructor(
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
             if (folder.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: folder ${localFolder.id} exists locally but was deleted remotely, deleting locally too")
+                logcat { "Sync-Bookmarks-Persister: folder ${localFolder.id} exists locally but was deleted remotely, deleting locally too" }
                 savedSitesRepository.delete(localFolder)
             } else {
-                Timber.d("Sync-Bookmarks-Persister: folder ${localFolder.id} exists locally, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: folder ${localFolder.id} exists locally, nothing to do" }
             }
         } else {
             if (folder.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do" }
             } else {
-                Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting")
+                logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting" }
                 savedSitesRepository.insert(folder)
             }
         }
@@ -69,16 +69,16 @@ class SavedSitesLocalWinsPersister @Inject constructor(
         val storedBookmark = savedSitesRepository.getBookmarkById(bookmark.id)
         if (storedBookmark != null) {
             if (bookmark.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} exists locally but was deleted remotely, deleting locally too")
+                logcat { "Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} exists locally but was deleted remotely, deleting locally too" }
                 savedSitesRepository.delete(bookmark)
             } else {
-                Timber.d("Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} exists locally, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} exists locally, nothing to do" }
             }
         } else {
             if (bookmark.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally but was deleted, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally but was deleted, nothing to do" }
             } else {
-                Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting")
+                logcat { "Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting" }
                 savedSitesRepository.insert(bookmark)
             }
         }

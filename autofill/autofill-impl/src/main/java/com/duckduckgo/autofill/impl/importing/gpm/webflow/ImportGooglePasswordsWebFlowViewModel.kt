@@ -34,7 +34,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesViewModel(FragmentScope::class)
 class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
@@ -67,7 +68,7 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     }
 
     fun onCsvError() {
-        Timber.w("Error decoding CSV")
+        logcat(WARN) { "Error decoding CSV" }
         _viewState.value = ViewState.UserFinishedCannotImport(ErrorParsingCsv)
     }
 

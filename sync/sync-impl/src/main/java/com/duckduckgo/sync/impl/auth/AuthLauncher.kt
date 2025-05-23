@@ -31,7 +31,8 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AuthLauncher {
 
@@ -73,7 +74,7 @@ class RealAuthLauncher @Inject constructor(
             errString: CharSequence,
         ) {
             super.onAuthenticationError(errorCode, errString)
-            Timber.d("onAuthenticationError: (%d) %s", errorCode, errString)
+            logcat { "onAuthenticationError: ($errorCode) $errString" }
 
             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                 onResult(UserCancelled)
@@ -84,14 +85,14 @@ class RealAuthLauncher @Inject constructor(
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
-            Timber.d("onAuthenticationSucceeded ${result.authenticationType}")
+            logcat { "onAuthenticationSucceeded ${result.authenticationType}" }
             deviceAuthorizationGracePeriod.recordSuccessfulAuthorization()
             onResult(Success)
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            Timber.v("onAuthenticationFailed")
+            logcat(VERBOSE) { "onAuthenticationFailed" }
         }
     }
 

@@ -32,7 +32,9 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface DeviceAuthenticator {
     /**
@@ -144,7 +146,7 @@ class RealDeviceAuthenticator @Inject constructor(
         try {
             context.startActivity(Intent(this))
         } catch (e: ActivityNotFoundException) {
-            Timber.w("%s. Trying fallback? %s", e.message, tryFallback)
+            logcat(WARN) { "${e.asLog()}. Trying fallback? $tryFallback" }
             if (tryFallback) {
                 SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(context, tryFallback = false)
             }

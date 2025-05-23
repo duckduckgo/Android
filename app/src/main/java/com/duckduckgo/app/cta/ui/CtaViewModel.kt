@@ -65,7 +65,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 class CtaViewModel @Inject constructor(
@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun completeStageIfDaxOnboardingCompleted() {
         if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            Timber.d("Completing DAX ONBOARDING")
+            logcat { "Completing DAX ONBOARDING" }
             userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
         }
     }
@@ -221,7 +221,7 @@ class CtaViewModel @Inject constructor(
     // Temporary function to complete onboarding if all CTAs were shown
     private suspend fun markOnboardingAsCompletedIfRequiredCtasShown() {
         if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            Timber.d("Auto completing DAX ONBOARDING")
+            logcat { "Auto completing DAX ONBOARDING" }
             userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
             pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
         }

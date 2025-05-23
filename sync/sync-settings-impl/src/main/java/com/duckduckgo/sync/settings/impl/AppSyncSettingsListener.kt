@@ -21,7 +21,8 @@ import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.squareup.anvil.annotations.*
 import dagger.*
 import javax.inject.Inject
-import timber.log.*
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -29,7 +30,7 @@ class AppSyncSettingsListener @Inject constructor(
     private val syncMetadataDao: SettingsSyncMetadataDao,
 ) : SyncSettingsListener {
     override fun onSettingChanged(settingKey: String) {
-        Timber.i("Sync-Settings: onSettingChanged($settingKey)")
+        logcat(INFO) { "Sync-Settings: onSettingChanged($settingKey)" }
         val entity = SettingsSyncMetadataEntity(
             key = settingKey,
             modified_at = SyncDateProvider.now(),

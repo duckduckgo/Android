@@ -34,7 +34,9 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabl
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementDisabledMode : DuckDuckGoFragment() {
@@ -95,7 +97,7 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
         try {
             requireActivity().startActivity(Intent(this))
         } catch (e: ActivityNotFoundException) {
-            Timber.w("%s. Trying fallback? %s", e.message, tryFallback)
+            logcat(WARN) { "${e.asLog()}. Trying fallback? $tryFallback" }
             if (tryFallback) {
                 SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(tryFallback = false)
             }

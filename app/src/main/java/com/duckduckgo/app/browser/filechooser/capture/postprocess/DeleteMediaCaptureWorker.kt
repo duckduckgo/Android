@@ -25,7 +25,9 @@ import com.duckduckgo.di.scopes.AppScope
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 /**
  * Media captured from camera / sound recorder to be uploaded through the WebView shouldn't be kept forever.
@@ -62,17 +64,17 @@ class DeleteMediaCaptureWorker(
 
         val file = File(fileUri)
         if (!file.exists()) {
-            Timber.v("file doesn't exist; nothing to do here. file=%s", file.absolutePath)
+            logcat(VERBOSE) { "file doesn't exist; nothing to do here. file=${file.absolutePath}" }
             return Result.success()
         }
 
-        Timber.d("time to delete the temporary captured image file %s", file)
+        logcat { "time to delete the temporary captured image file $file" }
 
         return if (file.delete()) {
-            Timber.d("Successfully deleted the file %s", file.absolutePath)
+            logcat { "Successfully deleted the file=${file.absolutePath}" }
             Result.success()
         } else {
-            Timber.w("Failed to delete the file %s", file.absolutePath)
+            logcat(WARN) { "Failed to delete the file ${file.absolutePath}" }
 
             if (runAttemptCount < MAX_ATTEMPTS) {
                 Result.retry()

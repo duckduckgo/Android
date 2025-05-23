@@ -32,7 +32,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class RemoteMessagingConfigDownloadWorker(
@@ -82,7 +83,7 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         if (remoteMessagingFeatureToggles.invalidateRMFAfterPrivacyConfigDownloaded().isEnabled()) {
             appCoroutineScope.launch(context = dispatcherProvider.io()) {
-                Timber.d("RMF: onPrivacyConfigDownloaded, invalidating and re-downloading")
+                logcat { "RMF: onPrivacyConfigDownloaded, invalidating and re-downloading" }
                 remoteMessagingConfigRepository.invalidate()
                 downloader.download()
             }
@@ -90,7 +91,7 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     }
 
     private fun scheduleDownload() {
-        Timber.v("RMF: Scheduling remote config worker")
+        logcat(VERBOSE) { "RMF: Scheduling remote config worker" }
         val workerRequest = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(4, TimeUnit.HOURS)
             .addTag(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)

@@ -78,7 +78,8 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -159,7 +160,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureCurrentSiteState()
         observeViewModel()
         configureToolbar()
-        Timber.v("${this::class.java.simpleName} created")
+        logcat(VERBOSE) { "${this::class.java.simpleName} created" }
     }
 
     private suspend fun getPromotionView(): View? {
@@ -411,7 +412,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         promotionView: View?,
     ) {
         if (credentials == null) {
-            Timber.v("Credentials is null, meaning we haven't retrieved them yet. Don't know if empty or not yet")
+            logcat(VERBOSE) { "Credentials is null, meaning we haven't retrieved them yet. Don't know if empty or not yet" }
             renderCredentialList(
                 credentials = null,
                 allowBreakageReporting = allowBreakageReporting,

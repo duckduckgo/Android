@@ -23,7 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface ViewNodeClassifier {
     fun classify(viewNode: ViewNode): AutofillFieldType
@@ -34,14 +35,14 @@ interface ViewNodeClassifier {
 class AutofillServiceViewNodeClassifier @Inject constructor() : ViewNodeClassifier {
     override fun classify(viewNode: ViewNode): AutofillFieldType {
         val autofillId = viewNode.autofillId
-        Timber.v("DDGAutofillService node $autofillId has autofillHints ${viewNode.autofillHints?.joinToString()}")
-        Timber.v("DDGAutofillService node $autofillId has options ${viewNode.autofillOptions?.joinToString()}")
-        Timber.v("DDGAutofillService node $autofillId has idEntry ${viewNode.idEntry}")
-        Timber.v("DDGAutofillService node $autofillId has hints ${viewNode.hint}")
-        Timber.v("DDGAutofillService node $autofillId is inputType ${viewNode.inputType and InputType.TYPE_CLASS_TEXT > 0}")
-        Timber.v("DDGAutofillService node $autofillId has inputType ${viewNode.inputType}")
-        Timber.v("DDGAutofillService node $autofillId has className ${viewNode.className}")
-        Timber.v("DDGAutofillService node $autofillId has htmlInfo.attributes ${viewNode.htmlInfo?.attributes?.joinToString()}")
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has autofillHints ${viewNode.autofillHints?.joinToString()}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has options ${viewNode.autofillOptions?.joinToString()}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has idEntry ${viewNode.idEntry}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has hints ${viewNode.hint}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId is inputType ${viewNode.inputType and InputType.TYPE_CLASS_TEXT > 0}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has inputType ${viewNode.inputType}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has className ${viewNode.className}" }
+        logcat(VERBOSE) { "DDGAutofillService node $autofillId has htmlInfo.attributes ${viewNode.htmlInfo?.attributes?.joinToString()}" }
 
         var autofillType = getType(viewNode.autofillHints)
         if (autofillType == AutofillFieldType.UNKNOWN) {

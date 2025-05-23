@@ -22,8 +22,8 @@ import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlPa
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.normalizeScheme
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import timber.log.Timber
 
 /**
  * This interface is used to clean and match URLs for autofill purposes. It can offer support for:
@@ -89,7 +89,7 @@ class AutofillDomainNameUrlMatcher @Inject constructor(
                 port = port,
             )
         } catch (e: IllegalArgumentException) {
-            Timber.d("Unable to parse e-tld+1 from [%s]", originalUrl)
+            logcat { "Unable to parse e-tld+1 from [$originalUrl]" }
             unextractable()
         }
     }

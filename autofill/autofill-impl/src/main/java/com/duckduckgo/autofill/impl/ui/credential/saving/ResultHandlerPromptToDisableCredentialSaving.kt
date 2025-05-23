@@ -48,7 +48,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
@@ -66,7 +67,7 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
@@ -173,7 +174,7 @@ class AskToDisableDialog(
 
     @VisibleForTesting
     fun onKeepUsingAutofill() {
-        Timber.i("User selected to keep using autofill; will not prompt to disable again")
+        logcat(INFO) { "User selected to keep using autofill; will not prompt to disable again" }
         appCoroutineScope.launch(dispatchers.io()) {
             declineCounter.disableDeclineCounter()
         }
@@ -190,7 +191,7 @@ class AskToDisableDialog(
                 callback.onAutofillStateChange()
             }
 
-            Timber.i("Autofill disabled at user request")
+            logcat(INFO) { "Autofill disabled at user request" }
         }
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_DISABLE)
     }

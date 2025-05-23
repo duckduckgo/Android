@@ -97,7 +97,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -236,7 +237,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun configureInternalFeatures() {
         viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
         internalFeaturePlugins.getPlugins().forEach { feature ->
-            Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
+            logcat(VERBOSE) { "Adding internal feature ${feature.internalFeatureTitle()}" }
             val view = TwoLineListItem(this).apply {
                 setPrimaryText(feature.internalFeatureTitle())
                 setSecondaryText(feature.internalFeatureSubtitle())

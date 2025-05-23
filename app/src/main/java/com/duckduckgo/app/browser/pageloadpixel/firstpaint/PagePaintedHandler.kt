@@ -33,7 +33,8 @@ import kotlin.math.roundToLong
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface PagePaintedHandler {
     operator fun invoke(
@@ -69,7 +70,7 @@ class RealPagePaintedHandler @Inject constructor(
                         ),
                     )
 
-                    Timber.v("First-paint duration extracted: %dms for %s", firstPaint, url)
+                    logcat(VERBOSE) { "First-paint duration extracted: ${firstPaint}ms for $url" }
                 }
             }
         }

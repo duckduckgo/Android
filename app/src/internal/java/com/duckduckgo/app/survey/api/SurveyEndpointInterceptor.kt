@@ -20,10 +20,11 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
-import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -43,7 +44,7 @@ class SurveyEndpointInterceptor @Inject constructor(
             val newRequest = chain.request().newBuilder()
 
             val changedUrl = "$scheme://$SURVEY_SANDBOX_HOST$encodedPath"
-            Timber.v("Survey endpoint changed to $changedUrl")
+            logcat(VERBOSE) { "Survey endpoint changed to $changedUrl" }
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
         }

@@ -17,14 +17,15 @@
 package com.duckduckgo.app.browser.logindetection
 
 import android.webkit.JavascriptInterface
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @Suppress("unused")
 class LoginDetectionJavascriptInterface(private val onLoginDetected: () -> Unit) {
 
     @JavascriptInterface
     fun log(message: String) {
-        Timber.i("LoginDetectionInterface $message")
+        logcat(INFO) { "LoginDetectionInterface $message" }
     }
 
     @JavascriptInterface

@@ -42,7 +42,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class EmailProtectionInContextSignupViewModel @Inject constructor(
@@ -54,7 +56,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
 
     fun onPageFinished(url: String) {
         val urlActions = url.getUrlActions()
-        Timber.v("EmailProtectionInContextSignup: onPageFinished: %s, urlActions=%s", url, urlActions)
+        logcat(VERBOSE) { "EmailProtectionInContextSignup: onPageFinished: $url, urlActions=$urlActions" }
 
         _viewState.value = ShowingWebContent(urlActions = urlActions)
     }
@@ -63,7 +65,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
         url: String?,
         canGoBack: Boolean,
     ) {
-        Timber.v("onBackButtonPressed: %s, canGoBack=%s", url, canGoBack)
+        logcat(VERBOSE) { "onBackButtonPressed: $url, canGoBack=$canGoBack" }
 
         // if WebView can't go back, then we're at the first stage or something's gone wrong. Either way, time to cancel out of the screen.
         if (!canGoBack) {
@@ -113,12 +115,12 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
         signedIn: Boolean,
         url: String?,
     ) {
-        Timber.i("Now signed in: %s. Current URL is %s", signedIn, url)
+        logcat(INFO) { "Now signed in: $signedIn. Current URL is $url" }
 
         if (!signedIn) return
 
         if (url?.contains(EMAIL_VERIFICATION_LINK_URL) == true) {
-            Timber.d("Detected email verification link")
+            logcat { "Detected email verification link" }
             _viewState.value = ExitingAsSuccess
         }
     }

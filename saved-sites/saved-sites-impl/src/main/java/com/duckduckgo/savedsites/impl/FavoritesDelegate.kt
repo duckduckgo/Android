@@ -29,7 +29,6 @@ import io.reactivex.*
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
-import timber.log.*
 
 interface FavoritesDelegate {
     fun getFavoritesSync(): List<SavedSite.Favorite>

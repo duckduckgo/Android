@@ -36,7 +36,11 @@ import io.reactivex.plugins.RxJavaPlugins
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.AndroidLogcatLogger
+import logcat.LogPriority.DEBUG
+import logcat.LogPriority.WARN
+import logcat.LogcatLogger
+import logcat.logcat
 
 private const val VPN_PROCESS_NAME = "vpn"
 
@@ -73,7 +77,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onMainProcessCreate() {
         configureLogging()
-        Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
+        logcat { "onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}" }
 
         configureStrictMode()
         configureDependencyInjection()
@@ -96,7 +100,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         if (shortProcessName != "UNKNOWN") {
             runInSecondaryProcessNamed(shortProcessName) {
                 configureLogging()
-                Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
+                logcat { "Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}" }
                 configureStrictMode()
                 configureDependencyInjection()
                 configureUncaughtExceptionHandler()
@@ -123,7 +127,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
-                Timber.w(throwable, "An exception happened inside RxJava code but no subscriber was still around to handle it")
+                logcat(WARN) { "An exception happened inside RxJava code but no subscriber was still around to handle it: ${throwable.message}" }
             } else {
                 uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
@@ -131,7 +135,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureLogging() {
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        if (BuildConfig.DEBUG) {
+            LogcatLogger.install(AndroidLogcatLogger(DEBUG))
+        }
     }
 
     private fun configureDependencyInjection() {
@@ -179,7 +185,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 val processName = shortProcessName
                 if (processName != "UNKNOWN") {
                     return File("${dir.absolutePath}/$processName").apply {
-                        Timber.d(":$processName process getDir = $absolutePath")
+                        logcat { ":$processName process getDir = $absolutePath" }
                         if (!exists()) {
                             mkdirs()
                         }
@@ -196,7 +202,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             val processName = shortProcessName
             if (processName != "UNKNOWN") {
                 return File("${dir.absolutePath}/$processName").apply {
-                    Timber.d(":$processName process getCacheDir = $absolutePath")
+                    logcat { ":$processName process getCacheDir = $absolutePath" }
                     if (!exists()) {
                         mkdirs()
                     }

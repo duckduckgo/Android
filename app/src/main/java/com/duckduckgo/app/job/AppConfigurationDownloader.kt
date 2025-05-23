@@ -21,7 +21,8 @@ import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
 import io.reactivex.Completable
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface ConfigurationDownloader {
     fun downloadTask(): Completable
@@ -50,7 +51,7 @@ class AppConfigurationDownloader(
                 surveyDownload,
             ),
         ).doOnComplete {
-            Timber.i("Download task completed successfully")
+            logcat(INFO) { "Download task completed successfully" }
         }
     }
 }

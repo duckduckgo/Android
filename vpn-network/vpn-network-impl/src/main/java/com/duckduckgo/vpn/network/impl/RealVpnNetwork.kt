@@ -37,7 +37,10 @@ import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -209,12 +212,12 @@ class RealVpnNetwork @Inject constructor(
         try {
             packages = context.packageManager.getPackagesForUid(uid)
         } catch (e: SecurityException) {
-            logcat(LogPriority.ERROR) { "Failed to get package ID for UID: $uid due to security violation: ${e.asLog()}" }
+            logcat(ERROR) { "Failed to get package ID for UID: $uid due to security violation: ${e.asLog()}" }
             return "unknown"
         }
 
         if (packages.isNullOrEmpty()) {
-            logcat(LogPriority.WARN) { "Failed to get package ID for UID: $uid" }
+            logcat(WARN) { "Failed to get package ID for UID: $uid" }
             return "unknown"
         }
 
@@ -234,7 +237,7 @@ class RealVpnNetwork @Inject constructor(
             logcat { "Loading native VPN networking library" }
             LibraryLoader.loadLibrary(context, "netguard")
         } catch (ignored: Throwable) {
-            logcat(LogPriority.ERROR) { "Error loading netguard library: ${ignored.asLog()}" }
+            logcat(ERROR) { "Error loading netguard library: ${ignored.asLog()}" }
             exitProcess(1)
         }
     }
