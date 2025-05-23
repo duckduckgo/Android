@@ -50,4 +50,8 @@ interface MaliciousSiteProtectionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun stripWWWPrefix(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun enableCaching(): Toggle
 }
