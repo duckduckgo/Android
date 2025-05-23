@@ -39,7 +39,6 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
-    implementation JakeWharton.timber
     implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core

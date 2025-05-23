@@ -51,7 +51,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.airbnb.android:lottie:_"

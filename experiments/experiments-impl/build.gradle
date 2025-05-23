@@ -46,7 +46,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
 
