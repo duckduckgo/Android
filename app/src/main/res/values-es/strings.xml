@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Al borrar tus pestañas y datos, se eliminará el historial de bloqueo de rastreadores y se restablecerá este número a cero.\n\nOculta este banner si prefieres no verlo en la vista de pestañas.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advertencia: este sitio puede suponer un riesgo para la seguridad</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo ha bloqueado esta página porque podría estar distribuyendo malware diseñado para comprometer tu dispositivo o robar tu información personal.\n<a href=\"\">Más información</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Este sitio web puede hacerse pasar por un sitio legítimo con el fin de engañarte para que proporciones información personal, como contraseñas o números de tarjetas de crédito.\n<a href=\"\">Más información</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Avisarme sobre sitios marcados como phishing o malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Más información</annotation></string>
     <string name="maliciousSiteSettingDisabled">Desactivar esta función puede poner en riesgo tu información.</string>
-
+    <string name="threatProtectionTitle">Protección contra amenazas</string>
+    <string name="threatProtectionDescription">Las protecciones mejoradas de DuckDuckGo detienen las amenazas comunes mientras mantienen tu conexión segura.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Actualiza automáticamente los enlaces a HTTPS siempre que sea posible.<a href=\"\">Más información</a>]]></string>
+    <string name="scamBlockerTitle">Bloqueador de estafas</string>
+    <string name="scamBlockerDescription">Avisar sobre sitios marcados como estafas, phishing y malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Más información</string>
 </resources>
