@@ -88,26 +88,19 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        configureUiEventHandlers()
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
     }
 
-    private fun configureUiEventHandlers() {
-        binding.userEnabledDuckChatToggle.setOnCheckedChangeListener(userEnabledDuckChatToggleListener)
-        binding.showDuckChatInMenuToggle.setOnCheckedChangeListener(menuToggleListener)
-        binding.showDuckChatInAddressBarToggle.setOnCheckedChangeListener(addressBarToggleListener)
-    }
-
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
 
         viewModel.commands
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }

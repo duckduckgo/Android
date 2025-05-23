@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Zahrnuje naše funkce VPN, Personal Information Removal a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Zahrnuje naši VPN a službu Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Pořiď si službu Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Vyzkoušej zdarma službu Privacy Pro</string>
     <string name="subscriptionSettingRestore">Mám předplatné</string>
     <string name="subscriptionSettingExpired">Tvoje předplatné Privacy Pro vypršelo</string>
     <string name="subscriptionSettingExpiredViewPlans">Zobrazit tarify</string>

@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Ietver mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Ietver mūsu VPN un Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Iegūsti Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Izmēģināt Privacy Pro bez maksas</string>
     <string name="subscriptionSettingRestore">Man ir abonements</string>
     <string name="subscriptionSettingExpired">Tavs Privacy Pro abonements ir beidzies</string>
     <string name="subscriptionSettingExpiredViewPlans">Skatīt plānus</string>
