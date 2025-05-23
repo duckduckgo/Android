@@ -72,12 +72,14 @@ object DataSourceModule {
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagingRepository: RemoteMessagingRepository,
         remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher,
+        remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository,
             remoteMessagingRepository,
             remoteMessagingConfigMatcher,
+            remoteMessagingFeatureToggles,
         )
     }
 
