@@ -97,7 +97,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 tools:text="Automatically upgrades links to HTTPS whenever possible\nLearn More"
                 android:visibility="visible"
-                android:textColor="?daxColorTertiaryText"
+                app:textType="secondary"
                 app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -116,7 +116,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 tools:text="Learn More"
                 android:visibility="visible"
-                android:textColor="?daxColorTertiaryText"
+                app:textType="secondary"
                 app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
