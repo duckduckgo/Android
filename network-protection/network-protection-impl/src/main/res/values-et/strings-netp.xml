@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">DNS server</string>
     <string name="netpPrivateDns">Privaatne DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokeerige riskantsed domeenid)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Pettuste blokeerija)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (soovitatav)</string>
     <string name="netpCustomDnsCustom">Kohandatud</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 aadress</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo suunab DNS-päringud meie DNS-serverite kaudu, nii et sinu internetiteenuse pakkuja ei näe, milliseid veebisaite sa külastad.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Sisu blokeerimine ja filtreerimine</string>
-    <string name="netpDnsBlockMalwarePrimary">Riskantsete domeenide blokeerimine</string>
+    <string name="netpDnsBlockMalwareHeader">Pahatahtliku sisu blokeerimine</string>
+    <string name="netpDnsBlockMalwarePrimary">Pettuste blokeerija</string>
     <string name="netpDnsBlockMalwareByline">Blokeerige 150 000+ domeeni, mis on märgistatud pahavara, andmepüügirünnakute ja võrgupettuste eest DNS-tasandi blokeerimisloendiga. <annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS-i blokeerimisnimekirjad</string>
 
