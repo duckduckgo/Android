@@ -45,6 +45,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
+import com.duckduckgo.mobile.android.vpn.integration.NgVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -406,9 +407,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
         tunnelConfig?.let { config ->
             // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
-            if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
-                // noop whenever NetP is enabled
-            } else if (config.dns.isNotEmpty()) {
+            if (vpnNetworkStack is NgVpnNetworkStack && config.dns.isNotEmpty()) {
+                // This solution is only relevant for AppTP
                 // just temporary pixel to know quantify how many users would be impacted
                 deviceShieldPixels.reportMotoGFix()
                 dnsChangeCallback.register()
