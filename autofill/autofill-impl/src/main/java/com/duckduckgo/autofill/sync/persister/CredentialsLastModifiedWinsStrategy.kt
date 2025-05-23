@@ -25,7 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.logcat
 
 class CredentialsLastModifiedWinsStrategy(
     private val credentialsSync: CredentialsSync,
@@ -36,7 +36,7 @@ class CredentialsLastModifiedWinsStrategy(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult {
-        Timber.d("Sync-autofill-Persist: ======= MERGING TIMESTAMP =======")
+        logcat { "Sync-autofill-Persist: ======= MERGING TIMESTAMP =======" }
         var hasDataChangedWhileSyncing = false
         return kotlin.runCatching {
             runBlocking(dispatchers.io()) {
@@ -47,7 +47,7 @@ class CredentialsLastModifiedWinsStrategy(
                     } else {
                         val localId = localCredential.id!!
                         if (entry.isDeleted()) {
-                            Timber.d("Sync-autofill-Persist: >>> delete local ${localCredential.id}")
+                            logcat { "Sync-autofill-Persist: >>> delete local ${localCredential.id}" }
                             credentialsSync.deleteCredential(localId)
                         } else {
                             val hasCredentialChangedWhileSyncing =
@@ -57,7 +57,7 @@ class CredentialsLastModifiedWinsStrategy(
                             if (!hasCredentialChangedWhileSyncing) {
                                 processExistingEntry(localCredential, entry, clientModifiedSince)
                             } else {
-                                Timber.d("Sync-autofill-Persist: >>> local ${localCredential.id} modified after syncing, skipping")
+                                logcat { "Sync-autofill-Persist: >>> local ${localCredential.id} modified after syncing, skipping" }
                                 hasDataChangedWhileSyncing = true
                             }
                         }
@@ -65,10 +65,10 @@ class CredentialsLastModifiedWinsStrategy(
                 }
             }
         }.getOrElse {
-            Timber.d("Sync-autofill-Persist: merging failed with error $it")
+            logcat { "Sync-autofill-Persist: merging failed with error $it" }
             return Error(reason = "LastModified merge failed with error $it")
         }.let {
-            Timber.d("Sync-autofill-Persist: merging completed, hasDataChangedWhileSyncing = $hasDataChangedWhileSyncing ")
+            logcat { "Sync-autofill-Persist: merging completed, hasDataChangedWhileSyncing = $hasDataChangedWhileSyncing " }
             Success(timestampConflict = hasDataChangedWhileSyncing)
         }
     }
@@ -82,7 +82,7 @@ class CredentialsLastModifiedWinsStrategy(
             remoteEntry = entry,
             lastModified = clientModifiedSince,
         )
-        Timber.d("Sync-autofill-Persist: >>> save remote $newCredential")
+        logcat { "Sync-autofill-Persist: >>> save remote $newCredential" }
         credentialsSync.saveCredential(newCredential, remoteId = entry.id)
     }
 
@@ -93,7 +93,7 @@ class CredentialsLastModifiedWinsStrategy(
     ) {
         val localId = localCredential.id!!
         val remoteCredentials = mapRemoteToLocalLoginCredential(remoteEntry, localId, clientModifiedSince)
-        Timber.d("Sync-autofill-Persist: >>> update with remote $remoteCredentials")
+        logcat { "Sync-autofill-Persist: >>> update with remote $remoteCredentials" }
         credentialsSync.updateCredentials(remoteCredentials, remoteEntry.id)
     }
 

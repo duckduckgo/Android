@@ -26,7 +26,7 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.N
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("deduplicationStrategy")
@@ -44,19 +44,19 @@ class SavedSitesDeduplicationPersister @Inject constructor(
         when (val result = duplicateFinder.findFolderDuplicate(folder)) {
             is Duplicate -> {
                 if (folder.isDeleted()) {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} has a local duplicate in ${result.id} and needs to be deleted")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} has a local duplicate in ${result.id} and needs to be deleted" }
                     savedSitesRepository.delete(folder)
                 } else {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} has a local duplicate in ${result.id}, replacing content")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} has a local duplicate in ${result.id}, replacing content" }
                     savedSitesRepository.replaceFolderContent(folder, result.id)
                 }
             }
 
             is NotDuplicate -> {
                 if (folder.isDeleted()) {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do" }
                 } else {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting" }
                     savedSitesRepository.insert(folder)
                 }
             }
@@ -77,17 +77,17 @@ class SavedSitesDeduplicationPersister @Inject constructor(
         folderId: String,
     ) {
         if (bookmark.isDeleted()) {
-            Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} is removed and not present locally, nothing to do")
+            logcat { "Sync-Bookmarks-Persister: child ${bookmark.id} is removed and not present locally, nothing to do" }
         } else {
             // if there's a bookmark duplicate locally (url and name) then we replace it
             when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
                 is Duplicate -> {
-                    Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} has a local duplicate in ${result.id}, replacing")
+                    logcat { "Sync-Bookmarks-Persister: child ${bookmark.id} has a local duplicate in ${result.id}, replacing" }
                     syncSavedSitesRepository.replaceBookmark(bookmark, result.id)
                 }
 
                 is NotDuplicate -> {
-                    Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting")
+                    logcat { "Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting" }
                     savedSitesRepository.insert(bookmark)
                 }
             }

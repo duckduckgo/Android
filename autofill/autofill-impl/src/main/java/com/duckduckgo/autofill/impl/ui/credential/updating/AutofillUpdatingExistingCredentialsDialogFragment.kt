@@ -56,7 +56,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
@@ -94,7 +94,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     private val wasUsernameBackFilled: Deferred<Boolean> = lifecycleScope.async(start = LAZY) {
         val usernameToSave = getCredentialsToSave().username ?: return@async false
         partialCredentialSaveStore.wasBackFilledRecently(url = getOriginalUrl(), username = usernameToSave).also {
-            Timber.v("Determined that username was %sbackFilled", if (it) "" else "not ")
+            logcat { "Determined that username was ${if (it) "" else "not "}backFilled" }
         }
     }
 
@@ -135,7 +135,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         val credentials = getCredentialsToSave()
         val originalUrl = getOriginalUrl()
         val updateType = getUpdateType()
-        Timber.v("Update type is $updateType")
+        logcat { "Update type is $updateType" }
 
         configureDialogTitle(binding, updateType)
         configureCloseButtons(binding)
@@ -209,11 +209,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     override fun onCancel(dialog: DialogInterface) {
         if (ignoreCancellationEvents) {
-            Timber.v("onCancel: Ignoring cancellation event")
+            logcat { "onCancel: Ignoring cancellation event" }
             return
         }
 
-        Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
+        logcat { "onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials" }
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
         pixelNameDialogEvent(Dismissed)?.let {
             lifecycleScope.launch {

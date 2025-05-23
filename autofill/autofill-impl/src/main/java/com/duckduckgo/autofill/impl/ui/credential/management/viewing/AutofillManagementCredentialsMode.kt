@@ -78,7 +78,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
@@ -497,7 +498,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             else -> processed = false
         }
         if (processed) {
-            Timber.v("Processed command $command")
+            logcat(VERBOSE) { "Processed command $command" }
             viewModel.commandProcessed(command)
         }
     }

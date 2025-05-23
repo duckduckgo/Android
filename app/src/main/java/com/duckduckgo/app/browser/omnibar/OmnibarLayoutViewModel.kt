@@ -74,7 +74,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(FragmentScope::class)
 class OmnibarLayoutViewModel @Inject constructor(
@@ -193,7 +193,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasFocus: Boolean,
         query: String,
     ) {
-        Timber.d("Omnibar: onOmnibarFocusChanged")
+        logcat { "Omnibar: onOmnibarFocusChanged" }
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = query.isBlank()
 
@@ -223,17 +223,17 @@ class OmnibarLayoutViewModel @Inject constructor(
         } else {
             _viewState.update {
                 val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText()
-                Timber.d("Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText")
+                logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
-                        Timber.d("Omnibar: is DDG url, showing query ${it.query}")
+                        logcat { "Omnibar: is DDG url, showing query ${it.query}" }
                         it.query
                     } else {
-                        Timber.d("Omnibar: is url, showing URL ${it.url}")
+                        logcat { "Omnibar: is url, showing URL ${it.url}" }
                         it.url
                     }
                 } else {
-                    Timber.d("Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text")
+                    logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
                     it.omnibarText
                 }
                 it.copy(
@@ -327,9 +327,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
-        Timber.d("Omnibar: onViewModeChanged $viewMode")
+        logcat { "Omnibar: onViewModeChanged $viewMode" }
         if (currentViewMode is CustomTab) {
-            Timber.d("Omnibar: custom tab mode enabled, sending updates there")
+            logcat { "Omnibar: custom tab mode enabled, sending updates there" }
         } else {
             when (viewMode) {
                 is CustomTab -> {
@@ -379,7 +379,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        Timber.d("Omnibar: onPrivacyShieldChanged $privacyShield")
+        logcat { "Omnibar: onPrivacyShieldChanged $privacyShield" }
         _viewState.update {
             it.copy(
                 privacyShield = privacyShield,
@@ -388,7 +388,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onClearTextButtonPressed() {
-        Timber.d("Omnibar: onClearTextButtonPressed")
+        logcat { "Omnibar: onClearTextButtonPressed" }
         firePixelBasedOnCurrentUrl(
             AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
             AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
@@ -410,7 +410,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
-        Timber.d("Omnibar: onFireIconPressed")
+        logcat { "Omnibar: onFireIconPressed" }
         if (_viewState.value.highlightFireButton.isHighlighted()) {
             _viewState.update {
                 it.copy(
@@ -431,7 +431,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldButtonPressed() {
-        Timber.d("Omnibar: onPrivacyShieldButtonPressed")
+        logcat { "Omnibar: onPrivacyShieldButtonPressed" }
         if (_viewState.value.highlightPrivacyShield.isHighlighted()) {
             _viewState.update {
                 it.copy(
@@ -463,17 +463,17 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
-        Timber.d("Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter")
+        logcat { "Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter" }
 
         _viewState.update {
             val updatedQuery = if (deleteLastCharacter) {
-                Timber.d("Omnibar: deleting last character, old query ${it.query} also deleted")
+                logcat { "Omnibar: deleting last character, old query ${it.query} also deleted" }
                 it.url
             } else if (clearQuery) {
-                Timber.d("Omnibar: clearing old query ${it.query}, we keep it as reference")
+                logcat { "Omnibar: clearing old query ${it.query}, we keep it as reference" }
                 it.query
             } else {
-                Timber.d("Omnibar: not clearing or deleting old query ${it.query}, updating query to $query")
+                logcat { "Omnibar: not clearing or deleting old query ${it.query}, updating query to $query" }
                 query
             }
 
@@ -498,7 +498,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
         // We only want to disable scrolling if one of the elements is highlighted
-        Timber.d("Omnibar: onHighlightItem")
+        logcat { "Omnibar: onHighlightItem" }
         val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
         _viewState.update {
             it.copy(
@@ -523,7 +523,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState) {
-        Timber.d("Omnibar: onExternalOmnibarStateChanged $omnibarViewState")
+        logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState" }
         if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText)) {
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
@@ -555,7 +555,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
-        Timber.d("Omnibar: onExternalLoadingStateChanged $loadingState")
+        logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
         _viewState.update {
             it.copy(
                 url = loadingState.url,
@@ -573,7 +573,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
-        Timber.d("Omnibar: onUserTouchedOmnibarTextInput")
+        logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
         if (touchAction == ACTION_UP) {
             firePixelBasedOnCurrentUrl(
                 AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
@@ -584,7 +584,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onBackKeyPressed() {
-        Timber.d("Omnibar: onBackKeyPressed")
+        logcat { "Omnibar: onBackKeyPressed" }
         firePixelBasedOnCurrentUrl(
             AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
             AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
@@ -599,7 +599,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onBackButtonPressed() {
-        Timber.d("Omnibar: onBackButtonPressed")
+        logcat { "Omnibar: onBackButtonPressed" }
         firePixelBasedOnCurrentUrl(
             AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLOSED,
             AppPixelName.ADDRESS_BAR_SERP_CLOSED,
@@ -608,7 +608,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onEnterKeyPressed() {
-        Timber.d("Omnibar: onEnterKeyPressed")
+        logcat { "Omnibar: onEnterKeyPressed" }
         firePixelBasedOnCurrentUrl(
             AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
             AppPixelName.KEYBOARD_GO_SERP_CLICKED,
@@ -706,7 +706,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onVoiceSearchDisabled(url: String) {
-        Timber.d("Omnibar: onVoiceSearchDisabled")
+        logcat { "Omnibar: onVoiceSearchDisabled" }
         _viewState.update {
             it.copy(
                 showVoiceSearch = shouldShowVoiceSearch(

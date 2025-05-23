@@ -22,7 +22,9 @@ import com.duckduckgo.sync.impl.applyUrlSafetyFromB64
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.URLEncoder
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface SyncBarcodeUrlWrapper {
 
@@ -41,7 +43,7 @@ class SyncBarcodeUrlUrlWrapper @Inject constructor(
 
     override fun wrapCodeInUrl(originalCodeB64Encoded: String): String {
         return originalCodeB64Encoded.wrapInUrl().also {
-            Timber.v("Sync: code to include in the barcode is $it")
+            logcat(VERBOSE) { "Sync: code to include in the barcode is $it" }
         }
     }
 
@@ -50,7 +52,7 @@ class SyncBarcodeUrlUrlWrapper @Inject constructor(
             val urlSafeCode = this.applyUrlSafetyFromB64()
             SyncBarcodeUrl(webSafeB64EncodedCode = urlSafeCode, urlEncodedDeviceName = getDeviceName()).asUrl()
         }.getOrElse {
-            Timber.w("Sync-url: Failed to encode string for use inside a URL; returning original code")
+            logcat(WARN) { "Sync-url: Failed to encode string for use inside a URL; returning original code" }
             this
         }
     }

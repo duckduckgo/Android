@@ -33,7 +33,8 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import timber.log.*
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SettingsSyncDataPersister @Inject constructor(
@@ -56,7 +57,7 @@ class SettingsSyncDataPersister @Inject constructor(
         if (changes.type == SETTINGS) {
             val syncableSettings = syncableSettings.getPlugins()
             return runBlocking(dispatchers.io()) {
-                Timber.i("Sync-Settings: persist() changes=${changes.jsonString}")
+                logcat(INFO) { "Sync-Settings: persist() changes=${changes.jsonString}" }
                 val result = process(changes, syncableSettings, conflictResolution)
                 result
             }
@@ -74,28 +75,28 @@ class SettingsSyncDataPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         if (changes.jsonString.isEmpty()) {
-            Timber.i("Sync-Settings: jsonString is empty")
+            logcat(INFO) { "Sync-Settings: jsonString is empty" }
             return Success()
         }
 
         val response = runCatching {
             updatesAdapter.fromJson(changes.jsonString)!!
         }.getOrElse {
-            Timber.i("Sync-Settings: process() error parsing settings ${it.message}")
+            logcat(INFO) { "Sync-Settings: process() error parsing settings ${it.message}" }
             return SyncMergeResult.Error(reason = "Error parsing settings ${it.message}")
         }
 
         val result = processEntries(response.settings, syncableSettings, conflictResolution)
 
         if (result is Success) {
-            Timber.i("Sync-Settings: updating timestamps post-persist")
+            logcat(INFO) { "Sync-Settings: updating timestamps post-persist" }
             syncSettingsSyncStore.serverModifiedSince = response.settings.last_modified
             syncSettingsSyncStore.clientModifiedSince = syncSettingsSyncStore.startTimeStamp
 
             if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
                 // first sync has a special case: ensure we send next time settings not updated during deduplication
                 settingsSyncMetadataDao.getAllObservable().firstOrNull()?.filterNot { it.modified_at.isNullOrEmpty() }?.forEach {
-                    Timber.i("Sync-Settings: post-dedup update timestamp for ${it.key} so we can send them next time")
+                    logcat(INFO) { "Sync-Settings: post-dedup update timestamp for ${it.key} so we can send them next time" }
                     settingsSyncMetadataDao.addOrUpdate(
                         SettingsSyncMetadataEntity(key = it.key, modified_at = SyncDateProvider.now(), deleted_at = null),
                     )
@@ -103,7 +104,7 @@ class SettingsSyncDataPersister @Inject constructor(
             }
         }
 
-        Timber.i("Sync-Settings: process() result=$result")
+        logcat(INFO) { "Sync-Settings: process() result=$result" }
         return result
     }
 
@@ -113,9 +114,9 @@ class SettingsSyncDataPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         settings.entries.forEach { entry ->
-            Timber.i("Sync-Settings: processEntries() entry=${entry.key}")
+            logcat(INFO) { "Sync-Settings: processEntries() entry=${entry.key}" }
             val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key } ?: return@forEach
-            Timber.i("Sync-Settings: plugin found for ${entry.key}")
+            logcat(INFO) { "Sync-Settings: plugin found for ${entry.key}" }
             when (conflictResolution) {
                 SyncConflictResolution.DEDUPLICATION -> {
                     val valueUpdated = if (entry.isDeleted()) {

@@ -48,7 +48,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
@@ -119,9 +119,9 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        Timber.d("User toggled theme, theme to set: $selectedTheme")
+        logcat { "User toggled theme, theme to set: $selectedTheme" }
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            logcat { "User selected same theme they've already set: $selectedTheme; no need to do anything else" }
             return
         }
         viewModelScope.launch(dispatcherProvider.io()) {

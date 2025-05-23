@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
+import logcat.logcat
 
 class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -575,7 +575,7 @@ class RealSavedSitesRepository(
     }
 
     override fun pruneDeleted() {
-        Timber.d("Sync-Bookmarks: pruning soft deleted entities")
+        logcat { "Sync-Bookmarks: pruning soft deleted entities" }
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)

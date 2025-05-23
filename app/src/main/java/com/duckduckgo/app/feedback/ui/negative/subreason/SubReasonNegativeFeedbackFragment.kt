@@ -29,7 +29,8 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeS
 import com.duckduckgo.app.feedback.ui.negative.displayText
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
@@ -102,7 +103,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
                 binding.subtitle.text = getString(display.subtitleDisplayResId)
 
                 val subReasons = getDisplayTextForReasonType(mainReason)
-                Timber.i("There are ${subReasons.size} subReasons to show")
+                logcat(INFO) { "There are ${subReasons.size} subReasons to show" }
                 recyclerAdapter.submitList(subReasons)
             }
         }

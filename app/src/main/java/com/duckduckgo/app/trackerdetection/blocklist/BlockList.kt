@@ -36,7 +36,8 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -125,7 +126,7 @@ class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
                 trackerDataDownloader.downloadTds()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({}, { Timber.w("Failed to download from blocklist experiment") })
+                    .subscribe({}, { logcat(WARN) { "Failed to download from blocklist experiment" } })
             }
         }
     }

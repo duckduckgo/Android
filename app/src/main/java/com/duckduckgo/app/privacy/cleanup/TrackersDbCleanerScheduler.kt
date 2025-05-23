@@ -39,7 +39,9 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -57,7 +59,7 @@ class TrackersDbCleanerSchedulerModule {
 class TrackersDbCleanerScheduler(private val workManager: WorkManager) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.v("Scheduling Trackers Blocked DB cleaner")
+        logcat(VERBOSE) { "Scheduling Trackers Blocked DB cleaner" }
         val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
             .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
@@ -87,7 +89,7 @@ class TrackersDbCleanerWorker(
         webTrackersBlockedDao.deleteOldDataUntil(dateOfLastWeek())
         appTrackerBlockingStatsRepository.deleteTrackersUntil(dateOfLastWeek())
 
-        Timber.i("Clear trackers dao job finished; returning SUCCESS")
+        logcat(INFO) { "Clear trackers dao job finished; returning SUCCESS" }
         return Result.success()
     }
 

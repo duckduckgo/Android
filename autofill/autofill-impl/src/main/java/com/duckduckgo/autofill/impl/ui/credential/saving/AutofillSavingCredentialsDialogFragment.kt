@@ -85,7 +85,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
@@ -137,7 +138,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private val wasUsernameBackFilled: Deferred<Boolean> = lifecycleScope.async(start = LAZY) {
         val usernameToSave = getCredentialsToSave().username ?: return@async false
         partialCredentialSaveStore.wasBackFilledRecently(url = getOriginalUrl(), username = usernameToSave).also {
-            Timber.v("Determined that username was %sbackFilled", if (it) "" else "not ")
+            logcat(VERBOSE) { "Determined that username was ${if (it) "" else "not "}backFilled" }
         }
     }
 
@@ -203,7 +204,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureSaveButton(binding: ContentAutofillSaveNewCredentialsBinding) {
         binding.saveLoginButton.setOnClickListener {
-            Timber.v("onSave: AutofillSavingCredentialsDialogFragment. User saved credentials")
+            logcat(VERBOSE) { "onSave: AutofillSavingCredentialsDialogFragment. User saved credentials" }
 
             pixelNameDialogEvent(Accepted, binding.keyFeaturesContainer.isVisible)?.let {
                 lifecycleScope.launch {
@@ -228,11 +229,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     override fun onCancel(dialog: DialogInterface) {
         if (ignoreCancellationEvents) {
-            Timber.v("onCancel: Ignoring cancellation event")
+            logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
 
-        Timber.v("onCancel: AutofillSavingCredentialsDialogFragment. User declined to save credentials")
+        logcat(VERBOSE) { "onCancel: AutofillSavingCredentialsDialogFragment. User declined to save credentials" }
 
         onUserRejectedToSaveCredentials()
 

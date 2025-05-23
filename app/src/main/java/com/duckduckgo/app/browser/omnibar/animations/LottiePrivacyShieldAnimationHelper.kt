@@ -30,7 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -77,9 +77,9 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             holder.setAnimation(newAnimation)
             holder.tag = newAnimation
             holder.progress = if (privacyShield == UNPROTECTED) 1.0f else 0.0f
-            Timber.d("Shield: $privacyShield")
+            logcat { "Shield: $privacyShield" }
         } else {
-            Timber.d("Shield: $privacyShield - no change")
+            logcat { "Shield: $privacyShield - no change" }
         }
     }
 }

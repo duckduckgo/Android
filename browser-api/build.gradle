@@ -28,7 +28,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.okHttp3.okHttp
     // Room
     implementation AndroidX.room.runtime

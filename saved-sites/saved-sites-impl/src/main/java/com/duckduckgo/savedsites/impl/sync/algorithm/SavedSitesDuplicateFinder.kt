@@ -24,7 +24,6 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.D
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.*
 
 interface SavedSitesDuplicateFinder {
 

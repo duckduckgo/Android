@@ -20,7 +20,7 @@ import android.icu.text.IDNA
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 interface UrlUnicodeNormalizer {
     fun normalizeAscii(url: String?): String?
@@ -40,7 +40,7 @@ class UrlUnicodeNormalizerImpl @Inject constructor() : UrlUnicodeNormalizer {
         val info = IDNA.Info()
         IDNA.getUTS46Instance(IDNA.DEFAULT).nameToASCII(noScheme, sb, info)
         if (info.hasErrors()) {
-            Timber.d("Unable to convert to ASCII: $url")
+            logcat { "Unable to convert to ASCII: $url" }
             return url
         }
         return "${originalScheme}$sb"
@@ -53,7 +53,7 @@ class UrlUnicodeNormalizerImpl @Inject constructor() : UrlUnicodeNormalizer {
         val info = IDNA.Info()
         IDNA.getUTS46Instance(IDNA.DEFAULT).nameToUnicode(url, sb, info)
         if (info.hasErrors()) {
-            Timber.d("Unable to convert to unicode: $url")
+            logcat { "Unable to convert to unicode: $url" }
             return url
         }
         return sb.toString()

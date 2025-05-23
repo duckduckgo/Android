@@ -28,7 +28,8 @@ import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.*
 import javax.inject.*
-import timber.log.*
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
@@ -54,7 +55,7 @@ class EmailSync @Inject constructor(
     }
 
     override fun save(value: String?): Boolean {
-        Timber.i("Sync-Settings: save($value)")
+        logcat(INFO) { "Sync-Settings: save($value)" }
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
             val duckAddress = duckAddressSetting.username
@@ -68,7 +69,7 @@ class EmailSync @Inject constructor(
     }
 
     override fun deduplicate(value: String?): Boolean {
-        Timber.i("Sync-Settings: mergeRemote($value)")
+        logcat(INFO) { "Sync-Settings: mergeRemote($value)" }
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
             val duckUsername = duckAddressSetting.username
@@ -88,7 +89,7 @@ class EmailSync @Inject constructor(
     }
 
     private fun storeNewCredentials(username: String, token: String) {
-        Timber.i("Sync-Settings: storeNewCredentials($username, $token)")
+        logcat(INFO) { "Sync-Settings: storeNewCredentials($username, $token)" }
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
         listener.invoke()

@@ -36,7 +36,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
@@ -46,7 +47,7 @@ class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : AutofillFragmentResultsPlugin {
     override fun processResult(result: Bundle, context: Context, tabId: String, fragment: Fragment, autofillCallback: AutofillEventListener) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         val userSelection = result.safeGetParcelable<EmailProtectionInContextSignUpResult>(EmailProtectionInContextSignUpDialog.KEY_RESULT) ?: return
 
@@ -66,13 +67,13 @@ class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     }
 
     private suspend fun doNotAskAgain(autofillCallback: AutofillEventListener) {
-        Timber.i("User selected to not show sign up for email protection again")
+        logcat(INFO) { "User selected to not show sign up for email protection again" }
         dataStore.onUserChoseNeverAskAgain()
         notifyEndOfFlow(autofillCallback)
     }
 
     private suspend fun cancelled(autofillCallback: AutofillEventListener) {
-        Timber.i("User cancelled sign up for email protection")
+        logcat(INFO) { "User cancelled sign up for email protection" }
         notifyEndOfFlow(autofillCallback)
     }
 

@@ -23,7 +23,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import java.lang.Error
-import timber.log.Timber
+import logcat.logcat
 
 class SyncFaviconsFetchingPrompt(
     private val faviconsFetchingStore: FaviconsFetchingStore,
@@ -49,7 +49,7 @@ class SyncFaviconsFetchingPrompt(
 
         return if (syncAccountRepository.isSignedIn()) {
             val result = syncAccountRepository.getConnectedDevices()
-            Timber.d("Sync: Connected Devices $result")
+            logcat { "Sync: Connected Devices $result" }
             when (result) {
                 is Result.Error -> false
                 is Success -> result.data.size >= MIN_CONNECTED_DEVICES_FOR_PROMPT
@@ -60,7 +60,7 @@ class SyncFaviconsFetchingPrompt(
     }
 
     override fun onPromptAnswered(fetchingEnabled: Boolean) {
-        Timber.d("Favicons: Feching en")
+        logcat { "Favicons: Feching en" }
         faviconsFetchingStore.promptShown = true
         faviconsFetchingStore.isFaviconsFetchingEnabled = fetchingEnabled
     }

@@ -434,7 +434,7 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation("io.github.pcmind:leveldb:_") {
         exclude group: 'com.google.guava', module: 'guava'

@@ -24,7 +24,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.logcat
 
 class CredentialsRemoteWinsStrategy constructor(
     private val credentialsSync: CredentialsSync,
@@ -35,7 +35,7 @@ class CredentialsRemoteWinsStrategy constructor(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult {
-        Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
+        logcat { "Sync-autofill-Persist: ======= MERGING REMOTEWINS =======" }
         return kotlin.runCatching {
             runBlocking(dispatchers.io()) {
                 credentials.entries.forEach { entry ->
@@ -48,10 +48,10 @@ class CredentialsRemoteWinsStrategy constructor(
                 }
             }
         }.getOrElse {
-            Timber.d("Sync-autofill-Persist: merging failed with error $it")
+            logcat { "Sync-autofill-Persist: merging failed with error $it" }
             return Error(reason = "RemoteWins merge failed with error $it")
         }.let {
-            Timber.d("Sync-autofill-Persist: merging completed")
+            logcat { "Sync-autofill-Persist: merging completed" }
             Success()
         }
     }
@@ -62,7 +62,7 @@ class CredentialsRemoteWinsStrategy constructor(
             remoteEntry = remoteEntry,
             lastModified = clientModifiedSince,
         )
-        Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
+        logcat { "Sync-autofill-Persist: >>> save remote $updatedCredentials" }
         credentialsSync.saveCredential(updatedCredentials, remoteEntry.id)
     }
 
@@ -73,7 +73,7 @@ class CredentialsRemoteWinsStrategy constructor(
     ) {
         val localId = localCredential.id!!
         if (remoteEntry.isDeleted()) {
-            Timber.d("Sync-autofill-Persist: >>> delete local $localId")
+            logcat { "Sync-autofill-Persist: >>> delete local $localId" }
             credentialsSync.deleteCredential(localId)
             return
         }

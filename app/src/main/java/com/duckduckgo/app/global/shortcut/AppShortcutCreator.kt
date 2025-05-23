@@ -48,7 +48,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -67,7 +68,7 @@ class AppShortcutCreatorLifecycleObserver(
 ) : MainProcessLifecycleObserver {
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.i("Configure app shortcuts")
+        logcat(INFO) { "Configure app shortcuts" }
         appShortcutCreator.refreshAppShortcuts()
     }
 }

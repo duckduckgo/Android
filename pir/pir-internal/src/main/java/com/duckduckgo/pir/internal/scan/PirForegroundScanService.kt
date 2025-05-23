@@ -42,6 +42,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
+import logcat.LogPriority.DEBUG
 import logcat.LogcatLogger
 import logcat.logcat
 

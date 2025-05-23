@@ -35,7 +35,7 @@ dependencies {
 
     implementation AndroidX.appCompat
     implementation Google.android.material
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
 

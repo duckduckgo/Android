@@ -38,7 +38,7 @@ import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -96,7 +96,7 @@ class WgVpnNetworkStack @Inject constructor(
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
         } catch (e: Throwable) {
-            logcat(LogPriority.ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
+            logcat(ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
             crashLogger.logCrash(Crash("vpn_on_prepare_error", e))
             Result.failure(e)
         }.onFailure {
@@ -136,7 +136,7 @@ class WgVpnNetworkStack @Inject constructor(
             pcapConfig = null,
         )
         return if (result.isFailure) {
-            logcat(LogPriority.ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
+            logcat(ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
             netpPixels.get().reportErrorWgBackendCantStart()
             result
         } else {
@@ -157,7 +157,7 @@ class WgVpnNetworkStack @Inject constructor(
         kotlin.runCatching {
             wgProtocol.get().stopWg()
         }.onFailure {
-            logcat(LogPriority.ERROR) { "WG network: ${it.asLog()}" }
+            logcat(ERROR) { "WG network: ${it.asLog()}" }
         }
         logcat { "Completed turnOffNative" }
 

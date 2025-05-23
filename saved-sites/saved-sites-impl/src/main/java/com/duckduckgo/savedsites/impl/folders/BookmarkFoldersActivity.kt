@@ -30,7 +30,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarkFoldersBindin
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
@@ -50,7 +50,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         setupAdapter()
 
         val currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER)
-        Timber.d("Saved sites: $currentFolder")
+        logcat { "Saved sites: $currentFolder" }
 
         viewModel.fetchBookmarkFolders(
             intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT,

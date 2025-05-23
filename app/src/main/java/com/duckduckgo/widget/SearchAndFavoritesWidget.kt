@@ -39,7 +39,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 enum class WidgetTheme {
     LIGHT,
@@ -91,7 +92,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        Timber.i("SearchAndFavoritesWidget - onUpdate")
+        logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
         appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
@@ -106,7 +107,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
+        logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
         appCoroutineScope.launch(dispatchers.io()) {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
@@ -134,7 +135,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         val widgetTheme = withContext(dispatchers.io()) {
             widgetPrefs.widgetTheme(appWidgetId)
         }
-        Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
+        logcat(INFO) { "SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme" }
 
         val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
@@ -230,7 +231,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         var columns = gridCalculator.calculateColumns(context, width)
         var rows = gridCalculator.calculateRows(context, height)
 
-        Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
+        logcat(INFO) { "SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows" }
         return Pair(columns, rows)
     }
 

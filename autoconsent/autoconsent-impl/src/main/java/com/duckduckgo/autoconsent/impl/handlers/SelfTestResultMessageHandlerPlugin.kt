@@ -25,7 +25,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerPlugin {
@@ -38,7 +38,7 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerP
                 val message: SelfTestResultMessage = parseMessage(jsonString) ?: return
                 autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
             } catch (e: Exception) {
-                Timber.d(e.localizedMessage)
+                logcat { e.localizedMessage }
             }
         }
     }

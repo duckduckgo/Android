@@ -69,7 +69,7 @@ dependencies {
     }
 
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     // Room
     implementation AndroidX.room.runtime

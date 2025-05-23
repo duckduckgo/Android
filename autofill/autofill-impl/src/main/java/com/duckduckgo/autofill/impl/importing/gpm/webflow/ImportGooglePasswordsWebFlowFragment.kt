@@ -70,7 +70,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class ImportGooglePasswordsWebFlowFragment :
@@ -309,7 +310,7 @@ class ImportGooglePasswordsWebFlowFragment :
         withContext(dispatchers.main()) {
             val url = binding?.webView?.url ?: return@withContext
             if (url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return@withContext
             }
 
@@ -336,7 +337,7 @@ class ImportGooglePasswordsWebFlowFragment :
         selectedCredentials: LoginCredentials,
     ) {
         if (binding?.webView?.url != originalUrl) {
-            Timber.w("WebView url has changed since autofill request; bailing")
+            logcat(WARN) { "WebView url has changed since autofill request; bailing" }
             return
         }
         browserAutofill.injectCredentials(selectedCredentials)
@@ -344,7 +345,7 @@ class ImportGooglePasswordsWebFlowFragment :
 
     override fun onNoCredentialsChosenForAutofill(originalUrl: String) {
         if (binding?.webView?.url != originalUrl) {
-            Timber.w("WebView url has changed since autofill request; bailing")
+            logcat(WARN) { "WebView url has changed since autofill request; bailing" }
             return
         }
         browserAutofill.injectCredentials(null)

@@ -58,7 +58,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncConnectViewModel @Inject constructor(
@@ -146,7 +146,7 @@ class SyncConnectViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             syncAccountRepository.getConnectQR().getOrNull()?.let { code ->
-                Timber.d("Sync: code available for sharing manually: $code")
+                logcat { "Sync: code available for sharing manually: $code" }
                 clipboard.copyToClipboard(code.rawCode)
                 command.send(ShowMessage(R.string.sync_code_copied_message))
             } ?: command.send(FinishWithError)

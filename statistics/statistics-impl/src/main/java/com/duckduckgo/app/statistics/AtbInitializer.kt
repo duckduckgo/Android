@@ -32,7 +32,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -64,7 +65,7 @@ class AtbInitializer @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         if (!statisticsDataStore.hasInstallationStatistics) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                Timber.v("Initialize ATB")
+                logcat(VERBOSE) { "Initialize ATB" }
                 listeners.getPlugins().forEach {
                     withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
                 }

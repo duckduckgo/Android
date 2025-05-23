@@ -25,8 +25,8 @@ import com.duckduckgo.common.utils.store.BinaryDataStore
 import io.reactivex.Completable
 import java.io.IOException
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.Headers
-import timber.log.Timber
 
 class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
@@ -38,7 +38,7 @@ class TrackerDataDownloader @Inject constructor(
 
     fun downloadTds(): Completable {
         return Completable.fromAction {
-            Timber.d("Downloading tds.json")
+            logcat { "Downloading tds.json" }
 
             val call = trackerListService.tds()
             val response = call.execute()
@@ -51,7 +51,7 @@ class TrackerDataDownloader @Inject constructor(
             val eTag = response.headers().extractETag()
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
-                Timber.d("Updating tds data from server")
+                logcat { "Updating tds data from server" }
                 appDatabase.runInTransaction {
                     trackerDataLoader.persistTds(eTag, body)
                     trackerDataLoader.loadTrackers()

@@ -41,5 +41,5 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 }

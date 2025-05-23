@@ -65,7 +65,7 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import kotlinx.coroutines.flow.distinctUntilChanged
-import timber.log.Timber
+import logcat.logcat
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
@@ -261,7 +261,7 @@ class Omnibar(
         }
 
     fun setViewMode(viewMode: ViewMode) {
-        Timber.d("Omnibar: setViewMode $viewMode")
+        logcat { "Omnibar: setViewMode $viewMode" }
         when (viewMode) {
             Error -> {
                 newOmnibar.decorate(Mode(viewMode))
@@ -327,7 +327,7 @@ class Omnibar(
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
-        Timber.d("Omnibar: renderOmnibarViewState $viewState")
+        logcat { "Omnibar: renderOmnibarViewState $viewState" }
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
     }
 

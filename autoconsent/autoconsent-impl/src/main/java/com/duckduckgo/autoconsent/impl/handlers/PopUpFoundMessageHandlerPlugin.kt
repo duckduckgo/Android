@@ -26,7 +26,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository: AutoconsentSettingsRepository) : MessageHandlerPlugin {
@@ -43,7 +43,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository:
                 autoconsentCallback.onFirstPopUpHandled()
             }
         } catch (e: Exception) {
-            Timber.d(e.localizedMessage)
+            logcat { e.localizedMessage }
         }
     }
 

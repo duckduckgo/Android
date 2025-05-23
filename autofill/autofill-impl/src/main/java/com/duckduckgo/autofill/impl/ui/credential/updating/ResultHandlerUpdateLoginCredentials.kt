@@ -39,7 +39,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerUpdateLoginCredentials @Inject constructor(
@@ -57,7 +57,7 @@ class ResultHandlerUpdateLoginCredentials @Inject constructor(
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 

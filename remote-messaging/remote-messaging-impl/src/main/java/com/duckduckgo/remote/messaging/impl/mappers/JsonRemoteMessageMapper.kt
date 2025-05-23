@@ -35,7 +35,8 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import java.util.Locale
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 private val smallMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Small(
@@ -111,7 +112,7 @@ private fun JsonRemoteMessage.map(
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
-        Timber.e("RMF: error $it")
+        logcat(ERROR) { "RMF: error $it" }
     }.getOrNull()
 }
 

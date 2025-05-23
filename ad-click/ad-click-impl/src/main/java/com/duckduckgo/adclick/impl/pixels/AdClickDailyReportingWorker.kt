@@ -32,7 +32,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class AdClickDailyReportingWorker(context: Context, workerParameters: WorkerParameters) :
@@ -62,7 +63,7 @@ class AdClickDailyReportingWorkerScheduler @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        Timber.v("Scheduling ad click daily reporting worker")
+        logcat(VERBOSE) { "Scheduling ad click daily reporting worker" }
         val workerRequest = PeriodicWorkRequestBuilder<AdClickDailyReportingWorker>(24, TimeUnit.HOURS)
             .addTag(DAILY_REPORTING_AD_CLICK_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
