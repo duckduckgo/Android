@@ -872,7 +872,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Ștergerea filelor și a datelor tale va șterge istoricul blocării tehnologiilor de urmărire și va reseta acest număr la zero.\n\nAscunde acest banner dacă preferi să nu-l vezi în vizualizarea filelor.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ascunde bannerul</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Acest site poate imita un site legitim pentru a te induce în eroare să furnizezi informații personale, cum ar fi parole sau numere de carduri de credit.\n<a href=\"\">Află mai multe</a>]]></string>
@@ -887,5 +887,11 @@
     <string name="maliciousSiteToggleHint">Avertizează-mă cu privire la site-urile marcate pentru phishing sau programe rău intenționate.</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="maliciousSiteSettingDisabled">Dezactivarea acestei funcții poate genera riscuri privind informațiile tale.</string>
-
+    <string name="threatProtectionTitle">Protecție împotriva amenințărilor</string>
+    <string name="threatProtectionDescription">Protecțiile îmbunătățite oferite de DuckDuckGo stopează amenințările comune, menținându-ți în același timp conexiunea securizată.</string>
+    <string name="smarterEncryptionTitle">Criptare inteligentă</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Actualizează automat linkurile la HTTPS, oricând este posibil.<br><a href=\"\">Află mai multe</a>]]></string>
+    <string name="scamBlockerTitle">Instrument de blocare a înșelătoriilor</string>
+    <string name="scamBlockerDescription">Avertizează cu privire la site-urile marcate ca incluzând escrocherii, phishing și programe rău intenționate.</string>
+    <string name="threatProtectionLearnMoreTitle">Află mai multe</string>
 </resources>
