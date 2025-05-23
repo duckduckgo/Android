@@ -19,7 +19,10 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
@@ -43,8 +46,32 @@ class ContentScopeScriptsJsMessagingTest {
     private val mockWebView: WebView = mock()
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
-    private val breakageHandler: JsMessageHandler = mock()
+    private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
+
+    private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> {
+            return listOf(FakePlugin())
+        }
+
+        inner class FakePlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler {
+                return object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        secret: String,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = listOf("example.com")
+                    override val featureName: String = "webCompat"
+                    override val methods: List<String> = listOf("webShare", "permissionsQuery")
+                }
+            }
+        }
+    }
 
     @Before
     fun setUp() {
@@ -55,12 +82,25 @@ class ContentScopeScriptsJsMessagingTest {
             jsMessageHelper,
             coroutineRule.testDispatcherProvider,
             coreContentScopeScripts,
-            breakageHandler,
+            handlers,
         )
     }
 
     @Test
-    fun whenProcessUnknownMessageDoNothing() = runTest {
+    fun `when process and message can be handled then execute callback`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun `when processing unknown message do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         contentScopeScriptsJsMessaging.process("", contentScopeScriptsJsMessaging.secret)
@@ -69,7 +109,7 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
-    fun whenProcessUnknownSecretDoNothing() = runTest {
+    fun `when processing unknown secret do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -82,7 +122,7 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
-    fun whenProcessInterfaceNotRegisteredDoNothing() = runTest {
+    fun `if interface is not registered do nothing`() = runTest {
         whenever(mockWebView.url).thenReturn("https://example.com")
 
         val message = """
@@ -95,15 +135,16 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
-    fun whenRegisterInterfaceThenAddJsInterface() {
+    fun `when registering interface then add javascript interface is called`() {
         contentScopeScriptsJsMessaging.register(mockWebView, callback)
 
         verify(mockWebView).addJavascriptInterface(any(), anyOrNull())
     }
 
     @Test
-    fun whenProcessAndWebShareThenCallbackExecutedAndNotResponseSent() = runTest {
+    fun `when url is not allowed do nothing`() = runTest {
         givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://nowAllowed.com")
 
         val message = """
             {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
@@ -111,11 +152,11 @@ class ContentScopeScriptsJsMessagingTest {
 
         contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
-        assertEquals(1, callback.counter)
+        assertEquals(0, callback.counter)
     }
 
     @Test
-    fun whenProcessAndWebShareIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when feature does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -128,219 +169,11 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
-    fun whenProcessAndWebShareIfIdDoesNotExistThenDoNothing() = runTest {
+    fun `when id does not exist do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
             {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessAndPermissionsQueryThenCallbackExecutedAndNotResponseSent() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"permissionsQuery","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessAndPermissionsQueryIfIdDoesNotExistThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","method":"permissionsQuery","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithGetAIChatNativeHandoffDataThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeHandoffData","params":{"key":"value"}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithGetAIChatNativeConfigValuesThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeConfigValues","params":{"key":"value"}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithOpenAIChatThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"openAIChat","params":{"key":"value"}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithCloseAIChatThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"closeAIChat","params":{"key":"value"}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithOpenAIChatSettingsThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"openAIChatSettings","params":{"key":"value"}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithUnknownMethodThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"unknownMethod","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithInvalidFeatureNameThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"invalidFeature","id":"myId","method":"getAIChatNativeHandoffData","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessDuckChatMessageWithInvalidDomainThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://invalid-domain.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeHandoffData","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessSubscriptionsMessageWithHandshakeMethodThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"handshake"}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessSubscriptionsMessageWithSubscriptionDetailsMethodThenCallbackExecuted() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"subscriptionDetails"}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessSubscriptionsMessageWithUnknownMethodThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"unknownMethod"}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessSubscriptionsMessageWithInvalidFeatureNameThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"invalidFeature","id":"myId","method":"handshake"}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun whenProcessSubscriptionsMessageWithInvalidDomainThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://invalid-domain.com")
-
-        val message = """
-        {"context":"contentScopeScripts","featureName":"subscriptions","id":"myId","method":"subscriptionDetails"}
         """.trimIndent()
 
         contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)

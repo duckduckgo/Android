@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Sisaldab meie VPN-i, rakendusi Personal Information Removal ja Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Sisaldab meie VPN-i ja teenust Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Proovi Privacy Pro\'d tasuta</string>
     <string name="subscriptionSettingRestore">Mul on tellimus</string>
     <string name="subscriptionSettingExpired">Sinu Privacy Pro tellimus on aegunud</string>
     <string name="subscriptionSettingExpiredViewPlans">Kuva plaane</string>

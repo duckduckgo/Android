@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 interface VisualDesignExperimentDataStore {
 
     val isExperimentEnabled: StateFlow<Boolean>
+    val isDuckAIPoCEnabled: StateFlow<Boolean>
 
     fun changeExperimentFlagPreference(enabled: Boolean)
+    fun changeDuckAIPoCFlagPreference(enabled: Boolean)
 }

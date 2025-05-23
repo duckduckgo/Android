@@ -16,7 +16,18 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.di.RMFMapperModule
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
+import com.squareup.moshi.JsonAdapter
+import dagger.Lazy
 
-fun getMessageMapper() = MessageMapper(RMFMapperModule.provideMoshiAdapter(messageActionPlugins))
+fun getMessageMapper(): MessageMapper {
+    val lazyAdapter = object : Lazy<JsonAdapter<RemoteMessage>> {
+        override fun get(): JsonAdapter<RemoteMessage> {
+            return RMFMapperModule.provideMoshiAdapter(messageActionPlugins)
+        }
+    }
+
+    return MessageMapper(lazyAdapter)
+}

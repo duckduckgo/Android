@@ -44,8 +44,10 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
 
     private val _experimentFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.self().isEnabled())
+    private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.self().isEnabled())
 
     override val isExperimentEnabled: StateFlow<Boolean> = _experimentFeatureFlagEnabled.asStateFlow()
+    override val isDuckAIPoCEnabled: StateFlow<Boolean> = _duckAIFeatureFlagEnabled.asStateFlow()
 
     override fun onPrivacyConfigDownloaded() {
         updateFeatureState()
@@ -57,9 +59,16 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         updateFeatureState()
     }
 
+    @SuppressLint("DenyListedApi")
+    override fun changeDuckAIPoCFlagPreference(enabled: Boolean) {
+        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+        updateFeatureState()
+    }
+
     private fun updateFeatureState() {
         appCoroutineScope.launch {
             _experimentFeatureFlagEnabled.value = experimentalUIThemingFeature.self().isEnabled()
+            _duckAIFeatureFlagEnabled.value = experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
         }
     }
 }
