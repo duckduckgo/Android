@@ -75,7 +75,7 @@ class RealMaliciousSiteProtection @Inject constructor(
         url: Uri,
         confirmationCallback: (confirmedResult: MaliciousStatus) -> Unit,
     ): IsMaliciousResult {
-        timber.d("isMalicious $url, ${this.hashCode()}")
+        timber.d("isMalicious $url")
 
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
             timber.d("should not block (feature disabled) $url")
