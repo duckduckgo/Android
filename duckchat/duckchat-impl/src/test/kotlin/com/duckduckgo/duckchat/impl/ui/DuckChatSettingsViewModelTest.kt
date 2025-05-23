@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -191,10 +192,10 @@ class DuckChatSettingsViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertTrue(command is OpenLink)
-            command as OpenLink
+            assertTrue(command is OpenLinkInNewTab)
+            command as OpenLinkInNewTab
             assertEquals(
-                "https://duckduckgo.com/settings#aifeatures",
+                "https://duckduckgo.com/settings?ko=-1#aifeatures",
                 command.link,
             )
             cancelAndIgnoreRemainingEvents()
