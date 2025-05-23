@@ -32,6 +32,11 @@ sealed class BrowserScreens {
         val supportNewWindows: Boolean = false,
     ) : GlobalActivityStarter.ActivityParams
 
+    data class BrowserActivityWithParams(
+        val url: String,
+        val interstitialScreen: Boolean = true,
+    ) : GlobalActivityStarter.ActivityParams
+
     /**
      * Use this model to launch the Feedback screen
      */
