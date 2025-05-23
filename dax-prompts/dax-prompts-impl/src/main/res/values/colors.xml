@@ -16,6 +16,6 @@
   -->
 
 <resources>
-    <color name="yellowBackground">#ffe080</color>
-    <color name="yellowBackgroundDark">#074daf</color>
+    <color name="daxPromptBackground">#ffe080</color>
+    <color name="daxPromptBackgroundDark">#074daf</color>
 </resources>

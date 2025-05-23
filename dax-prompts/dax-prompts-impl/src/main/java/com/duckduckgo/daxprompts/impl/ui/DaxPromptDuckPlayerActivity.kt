@@ -64,14 +64,14 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
 
     private fun renderDarkUi() {
         binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape_dark))
-        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.yellowBackgroundDark))
+        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.daxPromptBackgroundDark))
         binding.daxPromptDuckPlayerMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message_dark)
         binding.daxPromptDuckPlayerPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_dark_with_ripple)
     }
 
     private fun renderLightUi() {
         binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape))
-        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.yellowBackground))
+        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.daxPromptBackground))
         binding.daxPromptDuckPlayerMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message)
         binding.daxPromptDuckPlayerPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_with_ripple)
     }

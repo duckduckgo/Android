@@ -96,7 +96,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
     private fun renderDarkUi() {
         binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape_dark))
-        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.yellowBackgroundDark))
+        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackgroundDark))
         binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message_dark)
         binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_dark_with_ripple)
         binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.black))
@@ -110,7 +110,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
     private fun renderLightUi() {
         binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape))
-        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.yellowBackground))
+        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackground))
         binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message)
         binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_with_ripple)
         binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.white))

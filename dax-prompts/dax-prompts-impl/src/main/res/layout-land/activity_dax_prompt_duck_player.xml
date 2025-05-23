@@ -20,7 +20,7 @@
     android:id="@+id/daxPromptDuckPlayerContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yellowBackground"
+    android:background="@color/daxPromptBackground"
     tools:context=".ui.DaxPromptDuckPlayerActivity"
     tools:ignore="InvalidColorAttribute">
 
