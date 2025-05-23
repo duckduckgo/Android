@@ -110,7 +110,7 @@
             android:gravity="center"
             android:padding="14dp"
             android:text="@string/dax_prompt_browser_comparison_message_primary_button"
-            android:textColor="@color/buttonTextColor"
+            android:textColor="@color/white"
             app:typography="body2_bold" />
 
     </LinearLayout>

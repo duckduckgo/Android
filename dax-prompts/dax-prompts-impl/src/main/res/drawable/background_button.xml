@@ -15,7 +15,7 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/buttonColor" />
+    <solid android:color="@color/blue50" />
     <corners
         android:radius="8dp" />
 </shape>

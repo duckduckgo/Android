@@ -14,11 +14,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <color name="yellowBackground">#074daf</color>
-    <color name="buttonColor">#FFDF80</color>
-    <color name="buttonTextColor">@color/black</color>
-    <color name="messageContainerColor">#011d34</color>
-    <color name="icSearchCircleColor">#A591DC</color>
-    <color name="icSearchHandlerColor">#6B4EBA</color>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#011d34" />
+    <corners
+        android:radius="36dp" />
+</shape>
