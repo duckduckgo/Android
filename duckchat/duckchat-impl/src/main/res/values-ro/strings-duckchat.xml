@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Scurtături</string>
     <string name="duck_chat_visibility_setting">Meniu browser</string>
     <string name="duck_chat_address_bar_visibility_setting">Bara de adrese</string>
+    <string name="duck_chat_assist_settings_title">Setări Assist</string>
+    <string name="duck_chat_assist_settings_description">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
 </resources>

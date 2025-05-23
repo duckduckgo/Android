@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Skróty</string>
     <string name="duck_chat_visibility_setting">Menu przeglądarki</string>
     <string name="duck_chat_address_bar_visibility_setting">Pasek adresu</string>
+    <string name="duck_chat_assist_settings_title">Ustawienia Assist</string>
+    <string name="duck_chat_assist_settings_description">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
 </resources>
