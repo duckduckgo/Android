@@ -51,7 +51,6 @@ dependencies {
     implementation project(path: ':common-utils')
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation JakeWharton.timber
 
     implementation Google.android.material
 

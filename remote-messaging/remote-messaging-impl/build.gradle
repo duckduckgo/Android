@@ -53,7 +53,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.work.runtimeKtx
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi

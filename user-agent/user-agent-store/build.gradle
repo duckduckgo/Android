@@ -29,7 +29,7 @@ dependencies {
 
     implementation AndroidX.core.ktx
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
 
     // Room

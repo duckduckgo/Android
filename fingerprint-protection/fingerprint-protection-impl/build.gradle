@@ -78,7 +78,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp

@@ -58,7 +58,7 @@ dependencies {
 
     implementation Google.dagger
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation Square.okHttp3.okHttp
     implementation Square.retrofit2.retrofit

@@ -52,7 +52,7 @@ dependencies {
     implementation project(path: ':settings-api') // temporary until we release new settings
 
     implementation AndroidX.appCompat
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core
     implementation Google.android.material
 

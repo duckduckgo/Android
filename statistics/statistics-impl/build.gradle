@@ -60,7 +60,7 @@ dependencies {
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     
     implementation AndroidX.core.ktx
 

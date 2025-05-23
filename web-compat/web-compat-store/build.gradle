@@ -36,7 +36,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     // Room
     implementation AndroidX.room.runtime
