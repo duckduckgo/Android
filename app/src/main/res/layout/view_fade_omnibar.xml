@@ -186,8 +186,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="20dp"
-                                android:layout_marginEnd="4dp"
+                                android:layout_marginStart="16dp"
                                 android:visibility="gone">
 
                                 <include layout="@layout/cookie_scene_1" />
@@ -198,9 +197,9 @@
                         <View
                             android:id="@+id/cookieDummyView"
                             android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
-                            android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
+                            android:layout_height="?attr/cookiesAnimationHeight"
                             android:layout_gravity="start|center_vertical"
-                            android:layout_marginStart="2dp"
+                            android:layout_marginStart="@dimen/keyline_1"
                             android:alpha="0"
                             android:background="@drawable/cookies_dummy_background"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -315,6 +314,20 @@
                                 tools:visibility="visible" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <View
+                            android:id="@+id/omnibarClickCatcher"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
+                            app:layout_constraintStart_toStartOf="@id/omnibarTextInput"
+                            app:layout_constraintEnd_toEndOf="@id/omnibarTextInput" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -442,6 +455,7 @@
             android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:showShadows="false"
             android:layout_gravity="bottom" />
 
     </LinearLayout>

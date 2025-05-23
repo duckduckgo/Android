@@ -8,6 +8,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
@@ -67,6 +68,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
+    private val duckAIPoCStateFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -91,6 +93,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
 
         initializeViewModel()
@@ -298,16 +301,67 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
-        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
+        val expectedToolbarColor = 100
+        val expectedTitle = "example"
+        val expectedDomain = "example.com"
+        val expectedShowDuckPlayerIcon = false
+        testee.onViewModeChanged(
+            ViewMode.CustomTab(
+                toolbarColor = expectedToolbarColor,
+                title = expectedTitle,
+                domain = expectedDomain,
+                showDuckPlayerIcon = expectedShowDuckPlayerIcon,
+            ),
+        )
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.CustomTab)
             assertFalse(viewState.showClearButton)
             assertFalse(viewState.showVoiceSearch)
             assertFalse(viewState.showTabsMenu)
             assertFalse(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
+
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(expectedToolbarColor, customTabMode.toolbarColor)
+            assertEquals(expectedTitle, customTabMode.title)
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun `when custom tab title updates, update view mode state`() = runTest {
+        val expectedTitle = "newTitle"
+        val expectedDomain = "newDomain"
+        val expectedShowDuckPlayerIcon = true
+        val decoration = ChangeCustomTabTitle(
+            title = expectedTitle,
+            domain = expectedDomain,
+            showDuckPlayerIcon = expectedShowDuckPlayerIcon,
+        )
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+        testee.viewState.test {
+            // skipping initial update
+            skipItems(1)
+            // this function needs to be called only when the flow is consumed,
+            // otherwise, the values are not produced and the internal check for custom tab state fails
+            testee.onCustomTabTitleUpdate(decoration)
+            val viewState = awaitItem()
+            assertFalse(viewState.showClearButton)
+            assertFalse(viewState.showVoiceSearch)
+            assertFalse(viewState.showTabsMenu)
+            assertFalse(viewState.showFireIcon)
+            assertTrue(viewState.showBrowserMenu)
+
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            val customTabMode = viewState.viewMode as ViewMode.CustomTab
+            assertEquals(100, customTabMode.toolbarColor)
+            assertEquals(expectedTitle, customTabMode.title)
+            assertEquals(expectedDomain, customTabMode.domain)
+            assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
         }
     }
 
@@ -1136,6 +1190,28 @@ class OmnibarLayoutViewModelTest {
         testee.onDuckChatButtonPressed()
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+    }
+
+    @Test
+    fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
+        duckAIPoCStateFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
+        duckAIPoCStateFlow.value = false
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {

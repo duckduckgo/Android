@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Включва нашите функции VPN, Personal Information Removal и Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Включва нашите функции VPN и Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Вземете Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Изпробвайте Privacy Pro безплатно</string>
     <string name="subscriptionSettingRestore">Имам абонамент</string>
     <string name="subscriptionSettingExpired">Абонамент ви за Privacy Pro е изтекъл</string>
     <string name="subscriptionSettingExpiredViewPlans">Преглед на плановете</string>

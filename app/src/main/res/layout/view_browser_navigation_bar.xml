@@ -21,17 +21,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
-        android:id="@+id/shadowView"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/background_navigation_bar_shadow"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
-
     <LinearLayout
         android:id="@+id/barView"
         android:layout_width="match_parent"
@@ -42,7 +31,7 @@
         android:paddingHorizontal="@dimen/keyline_4"
         android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
         android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
-        app:layout_constraintTop_toBottomOf="@+id/shadowView"
+        app:layout_constraintTop_toTopOf="parent"
         tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
         <FrameLayout
@@ -115,10 +104,9 @@
 
         <FrameLayout
             android:id="@+id/fireButton"
-            android:layout_width="@dimen/bottomNavFireIconContainerWidth"
-            android:layout_height="@dimen/bottomNavFireIconContainerHeight"
-            android:background="@drawable/bottom_nav_fire_button_background"
-            android:foreground="@drawable/bottom_nav_fire_button_foreground">
+            android:layout_width="@dimen/bottomNavIconContainer"
+            android:layout_height="@dimen/bottomNavIconContainer"
+            android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
                 android:id="@+id/fireIconImageView"
@@ -162,6 +150,15 @@
         </FrameLayout>
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/shadowView"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/background_navigation_bar_shadow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

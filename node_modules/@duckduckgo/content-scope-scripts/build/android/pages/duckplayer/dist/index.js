@@ -2865,6 +2865,15 @@
       return duckUrl.href;
     }
     /**
+     * Get the large thumbnail URL for the current video id
+     *
+     * @returns {string}
+     */
+    toLargeThumbnailUrl() {
+      const url = new URL(`/vi/${this.id}/maxresdefault.jpg`, "https://i.ytimg.com");
+      return url.href;
+    }
+    /**
      * Create a VideoParams instance from a href, only if it's on the watch page
      *
      * @param {string} href

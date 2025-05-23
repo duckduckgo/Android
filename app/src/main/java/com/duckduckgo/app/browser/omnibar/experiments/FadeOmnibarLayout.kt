@@ -21,12 +21,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.animation.addListener
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
@@ -44,14 +44,18 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -60,11 +64,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
 
+    @Inject
+    lateinit var experimentDataStore: VisualDesignExperimentDataStore
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
+    private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -90,6 +101,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private val toolbarContainerPaddingTopWhenAtBottom by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingTopWhenAtBottom)
+    }
+    private val toolbarContainerPaddingHorizontalWhenAtBottom by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingHorizontalWhenAtBottom)
     }
     private val omnibarCardMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginHorizontal) }
     private val omnibarCardMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop) }
@@ -127,13 +141,18 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             // When omnibar is at the bottom, we're adding an additional space at the top
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
+                right = toolbarContainerPaddingHorizontalWhenAtBottom,
+                left = toolbarContainerPaddingHorizontalWhenAtBottom,
             )
             // at the same time, we remove that space from the navigation bar which now sits below the omnibar
-            navBar.findViewById<LinearLayout>(R.id.rootView).updatePadding(
+            navBar.findViewById<LinearLayout>(R.id.barView).updatePadding(
                 top = 0,
             )
 
             omnibarCard.elevation = 0.5f.toDp(context)
+        }
+        omniBarClickCatcher.setOnClickListener {
+            globalActivityStarter.start(context, SearchInterstitialActivityParams)
         }
     }
 
@@ -157,7 +176,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         if (w != oldw || h != oldh) {
             // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
-            unlockContentDimensions()
+            // We need to do this after the layout pass that triggered onSizeChanged because there appears to be a race condition
+            // where layout param changes done directly in the onSizeChanged loop are not applied correctly.
+            doOnLayout {
+                unlockContentDimensions()
+            }
         }
     }
 
@@ -196,6 +219,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
+
+        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     /**
@@ -304,8 +329,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun onFindInPageShown() {
-        omniBarContentContainer.gone()
-        customTabToolbarContainerWrapper.gone()
+        omniBarContentContainer.hide()
+        customTabToolbarContainerWrapper.hide()
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
             omniBarContainer.show()
             browserMenu.gone()
@@ -334,11 +359,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderShadows(showShadows: Boolean) {
-        outlineProvider = if (showShadows) {
-            ViewOutlineProvider.BACKGROUND
-        } else {
-            null
-        }
+        // outlineProvider = if (showShadows) {
+        //     ViewOutlineProvider.BACKGROUND
+        // } else {
+        //     null
+        // }
     }
 
     companion object {
