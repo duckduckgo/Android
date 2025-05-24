@@ -212,7 +212,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun getParentFolder(): BookmarkFolder? =
         intent.extras?.getSerializable<BookmarkFolder>(KEY_BOOKMARK_FOLDER)
 
-    private fun getParentFolderName() = getParentFolder()?.name ?: ""
+    private fun getParentFolderName() = getParentFolder()?.name ?: getString(R.string.bookmarksActivityTitle)
 
     private fun getParentFolderId() = getParentFolder()?.id ?: SavedSitesNames.BOOKMARKS_ROOT
 
