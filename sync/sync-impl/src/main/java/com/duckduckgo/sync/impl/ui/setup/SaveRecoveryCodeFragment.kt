@@ -73,8 +73,8 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         ViewModelProvider(this, viewModelFactory)[SaveRecoveryCodeViewModel::class.java]
     }
 
-    private val listener: SetupFlowListener?
-        get() = activity as? SetupFlowListener
+    private val listener: SyncSetupNavigationFlowListener?
+        get() = activity as? SyncSetupNavigationFlowListener
 
     override fun onViewCreated(
         view: View,

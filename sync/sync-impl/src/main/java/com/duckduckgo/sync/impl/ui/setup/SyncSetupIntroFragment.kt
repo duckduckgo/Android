@@ -56,8 +56,8 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         ViewModelProvider(this, viewModelFactory)[SyncSetupIntroViewModel::class.java]
     }
 
-    private val listener: SetupFlowListener?
-        get() = activity as? SetupFlowListener
+    private val listener: SyncSetupNavigationFlowListener?
+        get() = activity as? SyncSetupNavigationFlowListener
 
     override fun onViewCreated(
         view: View,
