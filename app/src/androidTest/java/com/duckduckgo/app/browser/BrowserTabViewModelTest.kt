@@ -172,6 +172,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
@@ -556,6 +557,9 @@ class BrowserTabViewModelTest {
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
 
+    private val fakeOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles =
+        FakeFeatureToggleFactory.create(OnboardingDesignExperimentToggles::class.java)
+
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
 
     @Before
@@ -564,6 +568,9 @@ class BrowserTabViewModelTest {
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+
+        fakeOnboardingDesignExperimentToggles.self().setRawStoredState(State(enable = true))
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -755,6 +762,7 @@ class BrowserTabViewModelTest {
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             subscriptionsJSHelper = mockSubscriptionsJSHelper,
+            onboardingDesignExperimentToggles = fakeOnboardingDesignExperimentToggles,
         )
 
         testee.loadData("abc", null, false, false)
