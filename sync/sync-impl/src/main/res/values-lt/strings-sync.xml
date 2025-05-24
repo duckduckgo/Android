@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Nuskaityti QR kodą</string>
-    <string name="login_screen_enter_code_cta">Arba įveskite kodą ranka</string>
+    <string name="login_screen_enter_code_cta">Įveskite kodą ranka</string>
     <string name="login_screen_barcode_hint">Norėdami sinchronizuoti, nukreipkite kamerą į QR kodą</string>
-    <string name="login_screen_cant_scan">Negalite nuskaityti? <font color="#7295F6">Bendrinti teksto kodą</font></string>
+    <string name="login_screen_cant_scan_label">Nepavyksta nuskaityti?</string>
+    <string name="login_screen_cant_scan_button_text">Kopijuoti teksto kodą</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Nuskaityti QR kodą</string>
-    <string name="connect_screen_scan_qr_hint">Eikite į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas</b> „DuckDuckGo“ naršyklėje kitame įrenginyje ir pasirinkite „Sinchronizuoti su kitu įrenginiu“.</string>
-    <string name="connect_screen_enter_code_cta">Arba įveskite kodą ranka</string>
-    <string name="connect_screen_connect_qr_hint_title">Iš mobiliojo įrenginio į mobilųjį įrenginį?</string>
-    <string name="connect_screen_connect_qr_hint_content">Norėdami sinchronizuoti, nuskaitykite šį kodą su kitu įrenginiu.</string>
+    <string name="connect_screen_scan_qr_hint">Kitame įrenginyje atidaryk „DuckDuckGo“ programėlę ir eik į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas &gt; Sinchronizuoti su kitu įrenginiu</b>.</string>
+    <string name="connect_screen_enter_code_cta">Įveskite kodą ranka</string>
+    <string name="connect_screen_connect_qr_hint_title">Arba nuskaityk su „DuckDuckGo“ savo kitame įrenginyje</string>
+    <string name="connect_screen_connect_qr_hint_content">Kitame įrenginyje atidaryk „DuckDuckGo“ ir nuskaityk šį kodą, kad sinchronizuotum.</string>
     <string name="connect_screen_share_code">Kopijuoti kodą</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Perjungti sinchronizavimą</string>
     <string name="sync_dialog_switch_account_secondary_button">Atšaukti</string>
     <string name="sync_dialog_switch_account_description">Šis įrenginys jau sinchronizuotas, ar tikrai norite jį sinchronizuoti su kita atsargine kopija ar įrenginiu? Perjungiant nebus pašalinti jokie duomenys, jau sinchronizuoti su šiuo įrenginiu.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sinchronizuoti naują įrenginį?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ galės pasiekti tavo sinchronizuotus „DuckDuckGo“ duomenis.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sinchronizuok dabar</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Atšaukti</string>
+
+    <string name="deep_link_auth_prompt_title">Nustatyk sinchronizavimą ir atsarginės kopijos kūrimą</string>
+    <string name="deep_link_auth_prompt_message">Atrakinkite įrenginį, kad galėtumėte nustatyti funkciją „Sinchronizuoti ir kurti atsarginę kopiją“.</string>
 </resources>
