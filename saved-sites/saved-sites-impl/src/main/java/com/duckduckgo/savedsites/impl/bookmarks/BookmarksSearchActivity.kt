@@ -40,6 +40,9 @@ import javax.inject.Inject
 import android.view.MenuItem
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
+import com.duckduckgo.common.utils.extensions.html
 
 @InjectWith(ActivityScope::class)
 class BookmarksSearchActivity : DuckDuckGoActivity() {
@@ -131,6 +134,12 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                     setResult(Activity.RESULT_OK, resultIntent)
                     finish()
                 }
+                is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> {
+                    confirmDeleteSavedSite(it.savedSite)
+                }
+                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> {
+                    confirmDeleteBookmarkFolder(it.bookmarkFolder)
+                }
                 else -> {
                     // Other commands are handled by the parent activity
                 }
@@ -194,6 +203,54 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
             true
         }
         popup.show()
+    }
+
+    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_LONG,
+        )
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.undoDelete(savedSite)
+            }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_LONG,
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.undoDelete(bookmarkFolder)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteBookmarkFolderSnackbarDismissed(bookmarkFolder)
+                        }
+                    }
+                },
+            ).show()
     }
 
     override fun onDestroy() {
