@@ -123,7 +123,7 @@ class BookmarksViewModel @Inject constructor(
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    private val hiddenIdsManager = HiddenIdsManager()
+    private val hiddenIdsManager = HiddenIdsManager.getInstance()
 
     init {
         viewState.value = ViewState()
