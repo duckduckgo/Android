@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">När du rensar dina flikar och data kommer historiken för spårningsblockering att raderas och detta nummer att nollställas.\n\nDölj den här bannern om du inte vill se den i flikvyn.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Dölj banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan distribuera skadlig programvara avsedd att göra intrång på din enhet eller stjäla din personliga information.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Den här webbplatsen kan utge sig för att vara en legitim webbplats för att lura dig att lämna ut personlig information som lösenord eller kortnummer.\n<a href=\"\">Mer information</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Varna mig på webbplatser som har flaggats för nätfiske eller skadlig programvara</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Läs mer</annotation></string>
     <string name="maliciousSiteSettingDisabled">Om den här funktionen inaktiveras kan dina uppgifter utsättas för risker.</string>
-
+    <string name="threatProtectionTitle">Skydd mot hot</string>
+    <string name="threatProtectionDescription">DuckDuckGos förbättrade skydd stoppar vanliga hot samtidigt som din anslutning förblir säker.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Uppgraderar automatiskt länkar till HTTPS när det är möjligt.<br><a href=\"\">Läs mer</a>]]></string>
+    <string name="scamBlockerTitle">Bedrägeriblockerare</string>
+    <string name="scamBlockerDescription">Varna på webbplatser som har flaggats för bedrägerier, nätfiske och skadlig programvara.</string>
+    <string name="threatProtectionLearnMoreTitle">Läs mer</string>
 </resources>
