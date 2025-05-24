@@ -267,10 +267,24 @@ class BookmarksViewModel @Inject constructor(
                         .map { it.bookmarkFolder }
                         .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIds.contains(it.id) }
                     val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIds.contains(it.id) }
-                    Pair(favorites, bookmarks + folders)
+                    
+                    // Calculate visible child counts for folders in search mode
+                    val allItems = bookmarks + folders
+                    val foldersWithVisibleCounts = folders.map { folder ->
+                        val visibleChildCount = allItems.count { item ->
+                            when (item) {
+                                is Bookmark -> item.parentId == folder.id
+                                is BookmarkFolder -> item.parentId == folder.id
+                                else -> false
+                            }
+                        }
+                        folder to visibleChildCount
+                    }
+                    
+                    Triple(favorites, bookmarks, foldersWithVisibleCounts)
                 }
-                .collect { (favorites, items) ->
-                    onSavedSitesItemsChanged(favorites, items)
+                .collect { (favorites, bookmarks, foldersWithCounts) ->
+                    onSavedSitesItemsChanged(favorites, bookmarks, foldersWithCounts)
                 }
         }
     }
@@ -350,6 +364,38 @@ class BookmarksViewModel @Inject constructor(
                 is BookmarkFolder -> BookmarkFolderItem(bookmark)
                 else -> null
             }
+        }
+
+        withContext(dispatcherProvider.main()) {
+            val sortingMode = bookmarksDataStore.getSortingMode()
+            viewState.value = viewState.value?.copy(
+                favorites = favorites,
+                bookmarkItems = bookmarkItems,
+                sortedItems = sortElements(bookmarkItems, sortingMode),
+                enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
+                sortingMode = sortingMode,
+            )
+        }
+
+        showSyncPromotionIfEligible()
+    }
+
+    private suspend fun onSavedSitesItemsChanged(
+        favorites: List<Favorite>,
+        bookmarks: List<Bookmark>,
+        foldersWithCounts: List<Pair<BookmarkFolder, Int>>,
+    ) {
+        val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+        
+        // Add bookmarks
+        bookmarks.forEach { bookmark ->
+            val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
+            bookmarkItems.add(BookmarkItem(bookmark.copy(isFavorite = isFavorite)))
+        }
+        
+        // Add folders with visible child counts
+        foldersWithCounts.forEach { (folder, visibleCount) ->
+            bookmarkItems.add(BookmarkFolderItem(folder, visibleCount))
         }
 
         withContext(dispatcherProvider.main()) {

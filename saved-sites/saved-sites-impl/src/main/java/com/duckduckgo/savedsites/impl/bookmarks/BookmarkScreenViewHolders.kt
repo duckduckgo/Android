@@ -155,6 +155,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
         private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
         private val onLongClick: () -> Unit,
+        private val adapter: BookmarksAdapter? = null,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -180,13 +181,49 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
             listItem.setPrimaryText(bookmarkFolder.name)
 
-            val text: String
-            if (bookmarkFolder.isEmpty()) {
-                text = context.getString(R.string.bookmarkFolderEmpty)
+            val text: String = if (bookmarkFolder.isEmpty()) {
+                context.getString(R.string.bookmarkFolderEmpty)
             } else {
                 val totalItems = bookmarkFolder.getTotalItems()
-                text = context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+                context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
+            
+            listItem.setSecondaryText(text)
+            listItem.setLeadingIconResource(R.drawable.ic_folder_24)
+
+            listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            listItem.setTrailingIconClickListener { anchor ->
+                onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
+            }
+
+            listItem.setClickListener {
+                onBookmarkFolderClick(listItem, bookmarkFolder)
+            }
+
+            listItem.setLongClickListener {
+                onLongClick()
+            }
+        }
+
+        fun update(bookmarkFolderItem: BookmarksAdapter.BookmarkFolderItem) {
+            val bookmarkFolder = bookmarkFolderItem.bookmarkFolder
+            val listItem = binding.root
+            listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
+
+            listItem.setPrimaryText(bookmarkFolder.name)
+
+            val text: String = if (bookmarkFolder.isEmpty() && bookmarkFolderItem.visibleChildCount == null) {
+                context.getString(R.string.bookmarkFolderEmpty)
+            } else {
+                // Use visibleChildCount in search mode, otherwise use the folder's total items
+                val totalItems = bookmarkFolderItem.visibleChildCount ?: bookmarkFolder.getTotalItems()
+                if (totalItems == 0) {
+                    context.getString(R.string.bookmarkFolderEmpty)
+                } else {
+                    context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+                }
+            }
+            
             listItem.setSecondaryText(text)
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 

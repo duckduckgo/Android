@@ -63,7 +63,10 @@ class BookmarksAdapter(
     data object EmptyHint : BookmarksItemTypes
     data object EmptySearchHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
-    data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
+    data class BookmarkFolderItem(
+        val bookmarkFolder: BookmarkFolder,
+        val visibleChildCount: Int? = null // Only used in search mode
+    ) : BookmarksItemTypes
 
     fun setItems(
         bookmarkItems: List<BookmarksItemTypes>,
@@ -115,6 +118,7 @@ class BookmarksAdapter(
                     onBookmarkFolderClick,
                     onBookmarkFolderOverflowClick,
                     onLongClick,
+                    this,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -140,9 +144,9 @@ class BookmarksAdapter(
                 holder.showDragHandle(isReordering, bookmark)
             }
             is BookmarkFoldersViewHolder -> {
-                val bookmarkFolder = (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder
-                holder.update(bookmarkFolder)
-                holder.showDragHandle(isReordering, bookmarkFolder)
+                val bookmarkFolderItem = (this.bookmarkItems[position] as BookmarkFolderItem)
+                holder.update(bookmarkFolderItem)
+                holder.showDragHandle(isReordering, bookmarkFolderItem.bookmarkFolder)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()
