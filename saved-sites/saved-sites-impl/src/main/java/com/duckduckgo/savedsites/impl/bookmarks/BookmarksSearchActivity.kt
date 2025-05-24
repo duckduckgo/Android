@@ -36,6 +36,8 @@ import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksSearchBindin
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import javax.inject.Inject
 import android.view.MenuItem
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -134,6 +136,9 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                     setResult(Activity.RESULT_OK, resultIntent)
                     finish()
                 }
+                is ShowEditSavedSite -> {
+                    showEditSavedSiteDialog(it.savedSite)
+                }
                 is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> {
                     confirmDeleteSavedSite(it.savedSite)
                 }
@@ -141,7 +146,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                     confirmDeleteBookmarkFolder(it.bookmarkFolder)
                 }
                 else -> {
-                    // Other commands are handled by the parent activity
+                    // Other commands are handled elsewhere
                 }
             }
         }
@@ -253,6 +258,17 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
             ).show()
     }
 
+    private fun showEditSavedSiteDialog(savedSite: SavedSite) {
+        val dialog = EditSavedSiteDialogFragment.instance(
+            savedSite,
+            SavedSitesNames.BOOKMARKS_ROOT,
+            null
+        )
+        dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
+        dialog.listener = viewModel
+        dialog.deleteBookmarkListener = viewModel
+    }
+
     override fun onDestroy() {
         if (this::searchListener.isInitialized) {
             searchListener.cancelSearch()
@@ -263,6 +279,9 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val RESULT_URL_EXTRA = "RESULT_URL_EXTRA"
         const val RESULT_FOLDER = "RESULT_FOLDER"
+        
+        // Fragment Tags
+        private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
 
         fun intent(
             context: Context,
