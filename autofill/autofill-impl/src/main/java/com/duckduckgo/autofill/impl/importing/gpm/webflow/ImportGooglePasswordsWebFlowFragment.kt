@@ -36,6 +36,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillPrompt
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -65,12 +67,12 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class ImportGooglePasswordsWebFlowFragment :
@@ -123,6 +125,7 @@ class ImportGooglePasswordsWebFlowFragment :
     private val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[ImportGooglePasswordsWebFlowViewModel::class.java]
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -320,6 +323,14 @@ class ImportGooglePasswordsWebFlowFragment :
                 CUSTOM_FLOW_TAB_ID,
             )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
+        }
+    }
+
+    override suspend fun promtUserTo(importPasswords: AutofillPrompt) {
+        when (importPasswords) {
+            is ImportPasswords -> {
+                //do not promote import inside import flow
+            }
         }
     }
 

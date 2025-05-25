@@ -87,7 +87,6 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             autofillPrefsStore.hasEverImportedPasswords = value
         }
 
-
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {

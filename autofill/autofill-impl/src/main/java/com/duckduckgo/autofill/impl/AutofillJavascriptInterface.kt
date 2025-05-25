@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
@@ -33,6 +34,7 @@ import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -91,7 +93,6 @@ interface AutofillJavascriptInterface {
     fun rejectGeneratedPassword()
 
     fun inContextEmailProtectionFlowFinished()
-
     var callback: Callback?
     var emailProtectionInContextCallback: EmailProtectionUserPromptListener?
     var emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener?
@@ -128,6 +129,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val partialCredentialSaveStore: PartialCredentialSaveStore,
     private val usernameBackFiller: UsernameBackFiller,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val inBrowserImportPromo: InBrowserImportPromo,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -178,6 +180,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             } else {
                 Timber.w("Unable to process request; don't know how to handle request %s", requestString)
             }
+        }
+    }
+
+    private fun handlePromoteImport(url: String) {
+        coroutineScope.launch {
+            callback?.promtUserTo(ImportPasswords(url))
         }
     }
 
@@ -241,7 +249,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
 
         if (finalCredentialList.isEmpty()) {
-            callback?.noCredentialsAvailable(url)
+            val canShowImport = inBrowserImportPromo.canShowPromo()
+            if (canShowImport) {
+                handlePromoteImport(url)
+            } else {
+                callback?.noCredentialsAvailable(url)
+            }
         } else {
             callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
         }
