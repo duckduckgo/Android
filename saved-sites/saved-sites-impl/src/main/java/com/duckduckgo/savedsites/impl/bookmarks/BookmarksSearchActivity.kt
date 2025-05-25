@@ -37,7 +37,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import javax.inject.Inject
 import android.view.MenuItem
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -138,6 +140,9 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                 }
                 is ShowEditSavedSite -> {
                     showEditSavedSiteDialog(it.savedSite)
+                }
+                is ShowEditBookmarkFolder -> {
+                    showEditBookmarkFolderDialog(it.bookmarkFolder)
                 }
                 is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> {
                     confirmDeleteSavedSite(it.savedSite)
@@ -269,6 +274,16 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
         dialog.deleteBookmarkListener = viewModel
     }
 
+    private fun showEditBookmarkFolderDialog(bookmarkFolder: BookmarkFolder) {
+        val dialog = EditBookmarkFolderDialogFragment.instance(
+            bookmarkFolder.parentId,
+            "",  // Parent folder name not needed in search context
+            bookmarkFolder
+        )
+        dialog.show(supportFragmentManager, EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG)
+        dialog.listener = viewModel
+    }
+
     override fun onDestroy() {
         if (this::searchListener.isInitialized) {
             searchListener.cancelSearch()
@@ -282,6 +297,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
         
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+        private const val EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG = "EDIT_BOOKMARK_FOLDER"
 
         fun intent(
             context: Context,
