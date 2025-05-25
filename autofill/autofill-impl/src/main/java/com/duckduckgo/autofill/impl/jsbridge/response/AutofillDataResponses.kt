@@ -57,6 +57,7 @@ data class EmptyResponse(
 data class AvailableInputSuccessResponse(
     val credentials: AvailableInputTypeCredentials,
     val email: Boolean,
+    val credentialsImport: Boolean,
 )
 
 data class AvailableInputTypeCredentials(

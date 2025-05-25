@@ -29,6 +29,7 @@ interface AutofillPrefsStore {
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
+    var hasEverImportedPasswords: Boolean
     val autofillStateSetByUser: Boolean
     var timestampUserLastPromptedToDisableAutofill: Long?
     var domainTargetDatasetVersion: Long
@@ -82,6 +83,10 @@ class RealAutofillPrefsStore(
     override var hasEverBeenPromptedToSaveLogin: Boolean
         get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
         set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
+
+    override var hasEverImportedPasswords: Boolean
+        get() = prefs.getBoolean(HAS_EVER_IMPORT_PASSWORDS, false)
+        set(value) = prefs.edit { putBoolean(HAS_EVER_IMPORT_PASSWORDS, value) }
 
     override val autofillStateSetByUser: Boolean
         get() = autofillStateSetByUser()
@@ -152,6 +157,7 @@ class RealAutofillPrefsStore(
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
+        const val HAS_EVER_IMPORT_PASSWORDS = "autofill_has_ever_import_passwords"
         const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
