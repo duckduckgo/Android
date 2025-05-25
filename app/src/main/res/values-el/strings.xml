@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Η εκκαθάριση των καρτελών και των δεδομένων σας θα διαγράψει το ιστορικό αποκλεισμού εφαρμογών παρακολούθησης και θα μηδενίσει αυτόν τον αριθμό.\n\nΑποκρύψτε αυτό το banner αν προτιμάτε να μην το βλέπετε στην προβολή καρτελών.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Απόκρυψη banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ο ιστότοπος αυτός μπορεί να υποδύεται έναν νόμιμο ιστότοπο προκειμένου να σας εξαπατήσει ώστε να παράσχετε προσωπικές πληροφορίες, όπως κωδικούς πρόσβασης ή αριθμούς πιστωτικών καρτών.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Να λάβω προειδοποίηση για ιστότοπους που έχουν επισημανθεί για ηλεκτρονικό ψάρεμα ή κακόβουλο λογισμικό</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="maliciousSiteSettingDisabled">Η απενεργοποίηση της λειτουργίας αυτής μπορεί να θέσει σε κίνδυνο τα στοιχεία σας.</string>
-
+    <string name="threatProtectionTitle">Προστασία από απειλές</string>
+    <string name="threatProtectionDescription">Οι βελτιωμένες προστασίες του DuckDuckGo σταματούν τις συνήθεις απειλές, διατηρώντας τη σύνδεσή σας ασφαλή.</string>
+    <string name="smarterEncryptionTitle">Πιο έξυπνη κρυπτογράφηση</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Αναβαθμίζει αυτόματα τους συνδέσμους σε HTTPS όποτε είναι εφικτό.<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="scamBlockerTitle">Πρόγραμμα αποκλεισμού απάτης</string>
+    <string name="scamBlockerDescription">Προειδοποίηση για ιστότοπους που έχουν επισημανθεί για απάτες, ηλεκτρονικό ψάρεμα και κακόβουλο λογισμικό.</string>
+    <string name="threatProtectionLearnMoreTitle">Μάθετε περισσότερα</string>
 </resources>
