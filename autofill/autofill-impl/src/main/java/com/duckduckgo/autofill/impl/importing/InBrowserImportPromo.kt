@@ -28,7 +28,7 @@ interface InBrowserImportPromo {
 @ContributesBinding(AppScope::class)
 class RealInBrowserImportPromo @Inject constructor(
     private val autofillStore: InternalAutofillStore,
-): InBrowserImportPromo {
+) : InBrowserImportPromo {
 
     override suspend fun canShowPromo(): Boolean {
         // TODO: stopShowing if:
