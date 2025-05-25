@@ -28,6 +28,7 @@ interface RuntimeConfigurationWriter {
     fun generateResponseGetAvailableInputTypes(
         credentialsAvailable: AvailableInputTypeCredentials,
         emailAvailable: Boolean,
+        credentialsImport: Boolean,
     ): String
 
     fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String
@@ -51,8 +52,9 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     override fun generateResponseGetAvailableInputTypes(
         credentialsAvailable: AvailableInputTypeCredentials,
         emailAvailable: Boolean,
+        credentialsImport: Boolean,
     ): String {
-        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
+        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable, credentialsImport)
         return availableInputTypesAdapter.toJson(availableInputTypes)
     }
 
