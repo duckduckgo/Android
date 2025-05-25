@@ -115,6 +115,8 @@ interface EmailProtectionInContextSignupFlowListener {
  */
 interface Callback {
 
+    suspend fun promtUserTo(importPasswords: AutofillPrompt)
+
     /**
      * Called when we've determined we have credentials we can offer to autofill for the user.
      * When this is called, we should present the list to the user for them to choose which one, if any, to autofill.
@@ -153,4 +155,8 @@ interface Callback {
      * Called when credentials have been saved, and we want to show the user some visual confirmation.
      */
     fun onCredentialsSaved(savedCredentials: LoginCredentials)
+}
+
+sealed class AutofillPrompt {
+    data class ImportPasswords(val currentUrl: String) : AutofillPrompt()
 }

@@ -36,6 +36,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillPrompt
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -321,6 +323,14 @@ class ImportGooglePasswordsWebFlowFragment :
                 CUSTOM_FLOW_TAB_ID,
             )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
+        }
+    }
+
+    override suspend fun promtUserTo(importPasswords: AutofillPrompt) {
+        when (importPasswords) {
+            is ImportPasswords -> {
+                // do not promote import inside import flow
+            }
         }
     }
 

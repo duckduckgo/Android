@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.email.EmailProtectionChooseEmailFragment
 import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptFragment
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
@@ -33,6 +34,13 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialAutofillDialogFactory {
+
+    override fun autofillImportPasswordsDialog(
+        url: String,
+        tabId: String,
+    ): DialogFragment {
+        return ImportFromGooglePasswordsDialog.instance(tabId)
+    }
 
     override fun autofillSelectCredentialsDialog(
         url: String,

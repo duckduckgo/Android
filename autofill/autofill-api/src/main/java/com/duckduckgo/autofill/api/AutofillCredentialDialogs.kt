@@ -189,6 +189,11 @@ interface EmailProtectionInContextSignUpDialog {
  */
 interface CredentialAutofillDialogFactory {
 
+    fun autofillImportPasswordsDialog(
+        url: String,
+        tabId: String,
+    ): DialogFragment
+
     /**
      * Creates a dialog which prompts the user to choose which saved credential to autofill
      */
@@ -251,7 +256,7 @@ interface CredentialAutofillDialogFactory {
     fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
 }
 
-private fun prefix(
+fun prefix(
     tabId: String,
     tag: String,
 ): String {

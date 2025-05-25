@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +35,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.autofill.api.prefix
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
@@ -94,6 +96,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private val viewModel by bindViewModel<ImportFromGooglePasswordsDialogViewModel>()
 
+    private var successImport = false
+
+    private fun getTabId(): String? = arguments?.getString(ImportPasswordsDialog.KEY_TAB_ID)
+
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
             lifecycleScope.launch {
@@ -130,6 +136,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun processSuccessResult(result: CredentialImporter.ImportResult.Finished) {
+        successImport = true
         binding.postflow.importFinished.errorNotImported.visibility = View.GONE
         binding.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
@@ -252,10 +259,22 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
-
         importPasswordsPixelSender.onUserCancelledImportPasswordsDialog()
-
         dismiss()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        setResult(successImport)
+    }
+
+    private fun setResult(successImport: Boolean) {
+        getTabId()?.let { tabId ->
+            val result = Bundle().also {
+                it.putBoolean(ImportPasswordsDialog.KEY_IMPORT_SUCCESS, successImport)
+            }
+            parentFragment?.setFragmentResult(ImportPasswordsDialog.resultKey(tabId), result)
+        }
     }
 
     private fun configureCloseButton(binding: ContentImportFromGooglePasswordDialogBinding) {
@@ -266,9 +285,32 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     companion object {
 
+        fun instance(
+            tabId: String,
+        ): ImportFromGooglePasswordsDialog {
+            val fragment = ImportFromGooglePasswordsDialog()
+            fragment.arguments =
+                Bundle().also {
+                    it.putString(ImportPasswordsDialog.KEY_TAB_ID, tabId)
+                }
+            return fragment
+        }
+
         fun instance(): ImportFromGooglePasswordsDialog {
             val fragment = ImportFromGooglePasswordsDialog()
             return fragment
         }
+    }
+}
+
+interface ImportPasswordsDialog {
+
+    companion object {
+
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "ImportPasswordsDialog"
+        const val KEY_IMPORT_SUCCESS = "importSuccess"
+        const val KEY_TAB_ID = "tabId"
     }
 }

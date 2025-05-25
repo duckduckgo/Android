@@ -208,6 +208,8 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillPrompt
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
@@ -723,6 +725,21 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
+
+        override suspend fun promtUserTo(event: AutofillPrompt) {
+            withContext(dispatchers.main()) {
+                when (event) {
+                    is ImportPasswords -> {
+                        showDialogHidingPrevious(
+                            credentialAutofillDialogFactory.autofillImportPasswordsDialog(event.currentUrl, tabId),
+                            AUTOFILL_DIALOG_TAB,
+                            event.currentUrl,
+                        )
+                    }
+                }
+            }
+        }
+
         override suspend fun onCredentialsAvailableToInject(
             originalUrl: String,
             credentials: List<LoginCredentials>,
@@ -3983,6 +4000,7 @@ class BrowserTabFragment :
 
         private const val URL_BUNDLE_KEY = "url"
 
+        private const val AUTOFILL_DIALOG_TAB = "AUTOFILL_DIALOG_TAB"
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
