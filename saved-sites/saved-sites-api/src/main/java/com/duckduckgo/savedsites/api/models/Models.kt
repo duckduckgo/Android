@@ -81,8 +81,8 @@ data class BookmarkFolder(
     override val id: String = UUID.randomUUID().toString(),
     val name: String,
     val parentId: String,
-    private val numBookmarks: Int = 0,
-    private val numFolders: Int = 0,
+    val numBookmarks: Int = 0,
+    val numFolders: Int = 0,
     val lastModified: String? = null,
     val deleted: String? = null,
 ) : Serializable, BookmarkEntry {
