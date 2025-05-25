@@ -888,7 +888,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Wyczyszczenie kart i danych spowoduje usunięcie historii blokowania mechanizmów śledzących i zresetowanie tej liczby do zera.\n\nUkryj ten baner, jeśli wolisz go nie widzieć w widoku kart.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ukryj baner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ta witryna może podszywać się pod legalną witrynę w celu nakłonienia użytkownika do podania danych osobowych, takich jak hasła lub numery kart kredytowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
@@ -903,5 +903,11 @@
     <string name="maliciousSiteToggleHint">Ostrzegaj mnie przed witrynami oznaczonymi jako wyłudzanie informacji lub złośliwe oprogramowanie</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="maliciousSiteSettingDisabled">Wyłączenie tej funkcji może narazić Twoje dane na ryzyko.</string>
-
+    <string name="threatProtectionTitle">Ochrona przed zagrożeniami</string>
+    <string name="threatProtectionDescription">Ulepszone mechanizmy ochrony dostępne w DuckDuckGo blokują typowe zagrożenia, a jednocześnie zapewniają bezpieczeństwo połączenia.</string>
+    <string name="smarterEncryptionTitle">Inteligentniejsze szyfrowanie</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatycznie aktualizuje łącza do protokołu HTTPS, jeśli to możliwe.<br><a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="scamBlockerTitle">Blokowanie oszustw</string>
+    <string name="scamBlockerDescription">Ostrzegaj przed witrynami oznaczonymi z powodu oszustw, wyłudzania informacji i złośliwego oprogramowania.</string>
+    <string name="threatProtectionLearnMoreTitle">Dowiedz się więcej</string>
 </resources>
