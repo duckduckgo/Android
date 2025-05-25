@@ -19,9 +19,11 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
@@ -38,6 +40,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialImporter: CredentialImporter,
     private val dispatchers: DispatcherProvider,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
+    private val autofillStore: InternalAutofillStore,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -58,6 +61,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
                     fireImportSuccessPixel(savedCredentials = it.savedCredentials, numberSkipped = it.numberSkipped)
                     _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
+                    autofillStore.hasEverImportedPasswords = true
                 }
             }
         }
