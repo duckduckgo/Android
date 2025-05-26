@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Ярлыки</string>
     <string name="duck_chat_visibility_setting">Меню браузера</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресная строка</string>
+    <string name="duck_chat_assist_settings_title">Настройки Assist</string>
+    <string name="duck_chat_assist_settings_description">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
 </resources>

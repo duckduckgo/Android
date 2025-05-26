@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,5 +16,6 @@
   -->
 
 <resources>
-    <color name="yellowBackground">#ffe181</color>
+    <color name="daxPromptBackground">#ffe080</color>
+    <color name="daxPromptBackgroundDark">#074daf</color>
 </resources>

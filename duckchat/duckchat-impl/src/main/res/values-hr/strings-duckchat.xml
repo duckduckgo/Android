@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Prečaci</string>
     <string name="duck_chat_visibility_setting">Izbornik preglednika</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
+    <string name="duck_chat_assist_settings_title">Postavke Assista</string>
+    <string name="duck_chat_assist_settings_description">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
 </resources>

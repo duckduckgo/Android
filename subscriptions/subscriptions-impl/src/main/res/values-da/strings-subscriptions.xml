@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Inkluderer vores VPN, Personal Information Removal og Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Inkluderer vores VPN og Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Få Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Prøv Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Jeg har et abonnement</string>
     <string name="subscriptionSettingExpired">Dit Privacy Pro-abonnement er udløbet</string>
     <string name="subscriptionSettingExpiredViewPlans">Se abonnementer</string>

@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Genveje</string>
     <string name="duck_chat_visibility_setting">Browsermenu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresselinje</string>
+    <string name="duck_chat_assist_settings_title">Assist-indstillinger</string>
+    <string name="duck_chat_assist_settings_description">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger</string>
 </resources>

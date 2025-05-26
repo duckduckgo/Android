@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Genvägar</string>
     <string name="duck_chat_visibility_setting">Webbläsarmeny</string>
     <string name="duck_chat_address_bar_visibility_setting">Adressfält</string>
+    <string name="duck_chat_assist_settings_title">Assist-inställningar</string>
+    <string name="duck_chat_assist_settings_description">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
 </resources>

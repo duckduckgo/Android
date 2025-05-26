@@ -26,4 +26,6 @@
     <string name="duck_chat_show_in_heading">Shortcuts</string>
     <string name="duck_chat_visibility_setting">Browser Menu</string>
     <string name="duck_chat_address_bar_visibility_setting">Address Bar</string>
+    <string name="duck_chat_assist_settings_title">Assist Settings</string>
+    <string name="duck_chat_assist_settings_description">Choose how often you want AI-assisted answers to appear in your searches</string>
 </resources>

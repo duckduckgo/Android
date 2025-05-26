@@ -1046,7 +1046,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            visualDesignExperimentDataStore = visualDesignExperimentDataStore,
+            isExperimentEnabled = visualDesignExperimentDataStore.isExperimentEnabled.value,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )

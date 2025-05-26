@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Saīsnes</string>
     <string name="duck_chat_visibility_setting">Pārlūka izvēlne</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
+    <string name="duck_chat_assist_settings_title">Assist iestatījumi</string>
+    <string name="duck_chat_assist_settings_description">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
 </resources>
