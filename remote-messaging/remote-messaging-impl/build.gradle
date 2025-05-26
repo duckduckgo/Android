@@ -69,6 +69,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine
