@@ -132,24 +132,17 @@ class RealMaliciousSiteProtection @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
-                    is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
-                            (hostname == match.hostname) &&
-                            (hash == match.hash)
-                    }?.feed?.let { feed: Feed ->
-                        if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
-                        return@let Malicious(feed)
-                    } ?: Safe
+                    is Result -> extractMaliciousStatus(matches, canonicalUriString, hostname, hash).also { result ->
+                        cacheResult(canonicalUriString, result)
+                    }
                     is MatchesResult.Ignored -> Ignored
                 }
 
                 when (result) {
                     is Malicious -> {
-                        cacheResult(canonicalUriString, result)
                         timber.d("should block (matches) $canonicalUriString, result: ${result.feed}")
                     }
                     is Safe -> {
-                        cacheResult(canonicalUriString, result)
                         timber.d("should not block (no match) $canonicalUriString")
                     }
                     is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
@@ -163,6 +156,22 @@ class RealMaliciousSiteProtection @Inject constructor(
         timber.d("wait for confirmation $canonicalUriString")
         return IsMaliciousResult.WaitForConfirmation
     }
+
+    private fun extractMaliciousStatus(
+        matches: Result,
+        canonicalUriString: String,
+        hostname: String,
+        hash: String,
+    ): MaliciousStatus = (
+        matches.matches.firstOrNull { match ->
+            Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
+                (hostname == match.hostname) &&
+                (hash == match.hash)
+        }?.feed?.let { feed: Feed ->
+            if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
+            return@let Malicious(feed)
+        } ?: Safe
+        )
 
     override suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit> {
         return maliciousSiteRepository.loadFilters(*feeds).also {
