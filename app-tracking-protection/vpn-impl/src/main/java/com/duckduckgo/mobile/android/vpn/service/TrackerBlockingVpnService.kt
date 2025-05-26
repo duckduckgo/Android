@@ -85,8 +85,6 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
-private const val DDG_VPN_SESSION = "DuckDuckGo"
-
 @InjectWith(
     scope = VpnScope::class,
     delayGeneration = true,
@@ -449,7 +447,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 // TODO should we protect all comms with our controller BE? other VPNs do that
                 safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
-                setSession(DDG_VPN_SESSION)
                 setMtu(1280)
                 try {
                     prepare(this@TrackerBlockingVpnService)
@@ -530,9 +527,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
 
             setBlocking(true)
-            // optional in docs but apparently some OEMs may expect to have a session
-            setSession(DDG_VPN_SESSION)
-
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
             setMtu(tunnelConfig.mtu)
