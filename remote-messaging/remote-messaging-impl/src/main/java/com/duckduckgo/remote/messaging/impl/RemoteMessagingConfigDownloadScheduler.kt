@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
-import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -81,18 +81,15 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
 
     private fun scheduleDownload() {
         val refreshInterval = if (remoteMessagingFeatureToggles.scheduleEveryHour().isEnabled()) 1L else 4L
-        val workPolicy = if (remoteMessagingFeatureToggles.canScheduleOnPrivacyConfigUpdates().isEnabled()) {
-            ExistingPeriodicWorkPolicy.KEEP
-        } else {
-            // if canScheduleOnPrivacyConfigUpdates is disabled, best to trigger on App start
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
-        }
-
-        Timber.v("RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours / $workPolicy")
-        val workerRequest = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(refreshInterval, TimeUnit.HOURS)
+        Timber.v("RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours")
+        val requestBuilder = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(refreshInterval, TimeUnit.HOURS)
             .addTag(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG, workPolicy, workerRequest)
+        if (remoteMessagingFeatureToggles.canScheduleOnPrivacyConfigUpdates().isEnabled()) {
+            Timber.v("RMF: Add delay to remote config worker")
+            requestBuilder.setInitialDelay(5L, TimeUnit.MINUTES)
+        }
+        val workerRequest = requestBuilder.build()
+        workManager.enqueueUniquePeriodicWork(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG, CANCEL_AND_REENQUEUE, workerRequest)
     }
 }
