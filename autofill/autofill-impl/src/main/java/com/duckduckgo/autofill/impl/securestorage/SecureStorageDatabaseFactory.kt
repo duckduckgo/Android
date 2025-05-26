@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.impl.securestorage
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
+import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
-import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
