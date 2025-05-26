@@ -249,7 +249,6 @@ dependencies {
 
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
-    implementation project(':autofill-store')
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 

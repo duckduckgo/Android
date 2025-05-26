@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.impl.securestorage
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
+import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
-import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.Key
 import javax.inject.Inject

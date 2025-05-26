@@ -19,11 +19,12 @@ package com.duckduckgo.securestorage
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageKeyGenerator
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
-import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
+import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import java.security.Key
 import okio.ByteString.Companion.decodeBase64
 
-class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) : SecureStorageKeyRepository {
+class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) :
+    SecureStorageKeyRepository {
     private var _password: ByteArray? = null
     override suspend fun getPassword(): ByteArray? = _password
     override suspend fun setPassword(value: ByteArray?) { _password = value }

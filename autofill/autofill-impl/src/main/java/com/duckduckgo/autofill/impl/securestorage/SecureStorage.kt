@@ -18,10 +18,10 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedString
+import com.duckduckgo.autofill.store.SecureStorageRepository
+import com.duckduckgo.autofill.store.db.WebsiteLoginCredentialsEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.store.SecureStorageRepository
-import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
