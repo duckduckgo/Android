@@ -138,7 +138,7 @@
         <item name="autocompleteListItemEndPadding">@dimen/keyline_2</item>
         <item name="autocompleteListItemIconMargin">10dp</item>
         <item name="autocompleteListItemWithoutTrailIconEndPadding">@dimen/keyline_4</item>
-        <item name="autocompleteListItemVerticalPadding">14dp</item>
+        <item name="autocompleteListItemVerticalPadding">12dp</item>
 
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
         <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
