@@ -1,5 +1,6 @@
 appId: com.duckduckgo.mobile.android
 ---
+- hideKeyboard
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn: "Bookmarks"
