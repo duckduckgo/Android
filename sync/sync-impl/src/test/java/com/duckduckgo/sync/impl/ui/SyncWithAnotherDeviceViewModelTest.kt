@@ -51,6 +51,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
@@ -64,9 +65,9 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -226,7 +227,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -242,7 +245,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -256,7 +261,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -271,7 +278,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -386,7 +395,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -400,6 +411,18 @@ class SyncWithAnotherDeviceViewModelTest {
             verify(syncPixels).fireLoginPixel()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenUserCancelsThenAbandonedPixelFired() = runTest {
+        testee.onUserCancelledWithoutSyncSetup()
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE))
+    }
+
+    @Test
+    fun whenBarcodeShownThenPixelFired() = runTest {
+        testee.onBarcodeScreenShown()
+        verify(syncPixels).fireSyncBarcodeScreenShown(eq(SYNC_EXCHANGE))
     }
 
     private fun configureExchangeKeysSupported(): Pair<Bitmap, AuthCode> {

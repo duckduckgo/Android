@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -67,11 +68,20 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
         extractDeepLinkCode()?.let {
             configureDeepLinkMode(it)
         }
+
+        onBackPressedDispatcher.addCallback(this) {
+            onUserCancelled()
+        }
+
         observeUiEvents()
         configureListeners()
+        if (savedInstanceState == null && !isDeepLinkSetup()) {
+            viewModel.onBarcodeScreenShown()
+        }
     }
 
     private fun configureDeepLinkMode(deepLink: String) {
@@ -97,9 +107,14 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         binding.qrCodeReader.pause()
     }
 
+    private fun onUserCancelled() {
+        viewModel.onUserCancelledWithoutSyncSetup()
+        finish()
+    }
+
     private fun observeUiEvents() {
         viewModel
-            .viewState(canTimeout = isDeepLinkSetup())
+            .viewState(isDeepLink = isDeepLinkSetup())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
