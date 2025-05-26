@@ -58,6 +58,9 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         configureListeners()
+        if (savedInstanceState == null) {
+            viewModel.onEnterManualCodeScreenShown(codeType)
+        }
     }
 
     private fun configureListeners() {

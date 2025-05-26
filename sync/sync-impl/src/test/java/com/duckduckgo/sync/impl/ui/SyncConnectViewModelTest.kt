@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import kotlinx.coroutines.test.runTest
@@ -49,9 +50,9 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -178,8 +179,10 @@ class SyncConnectViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
-            verify(syncPixels).fireLoginPixel()
             assertTrue(command is Command.LoginSuccess)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireLoginPixel()
+            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -192,7 +195,9 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -206,7 +211,9 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verifyNoInteractions(syncPixels)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels, never()).fireLoginPixel()
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -218,8 +225,21 @@ class SyncConnectViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
             verify(syncPixels).fireLoginPixel()
+            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenUserCancelsThenAbandonedPixelFired() = runTest {
+        testee.onUserCancelledWithoutSyncSetup()
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT))
+    }
+
+    @Test
+    fun whenBarcodeShownThenPixelFired() = runTest {
+        testee.onBarcodeScreenShown()
+        verify(syncPixels).fireSyncBarcodeScreenShown(eq(SYNC_CONNECT))
     }
 
     @Test
