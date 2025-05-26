@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -68,6 +69,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var browserNav: BrowserNav
+
+    @Inject
     lateinit var pixel: Pixel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,26 +92,19 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        configureUiEventHandlers()
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
     }
 
-    private fun configureUiEventHandlers() {
-        binding.userEnabledDuckChatToggle.setOnCheckedChangeListener(userEnabledDuckChatToggleListener)
-        binding.showDuckChatInMenuToggle.setOnCheckedChangeListener(menuToggleListener)
-        binding.showDuckChatInAddressBarToggle.setOnCheckedChangeListener(addressBarToggleListener)
-    }
-
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
 
         viewModel.commands
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }
@@ -125,18 +122,24 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
+        binding.showDuckChatSearchSettingsLink.setOnClickListener {
+            viewModel.duckChatSearchAISettingsClicked()
+        }
     }
 
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
-            is DuckChatSettingsViewModel.Command.OpenLearnMore -> {
+            is DuckChatSettingsViewModel.Command.OpenLink -> {
                 globalActivityStarter.start(
                     this,
                     WebViewActivityWithParams(
-                        url = command.learnMoreLink,
+                        url = command.link,
                         screenTitle = getString(R.string.duck_chat_title),
                     ),
                 )
+            }
+            is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
+                startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
             }
         }
     }

@@ -58,6 +58,10 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         viewModel.onExperimentalUIModeChanged(isChecked)
     }
 
+    private val duckAIPoCToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onDuckAIPoCChanged(isChecked)
+    }
+
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
@@ -83,7 +87,14 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.isVisible = viewState.isBrowserThemingFeatureAvailable
+        binding.experimentalUIMode.setSwitchEnabled(viewState.isBrowserThemingFeatureChangeable)
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
+
+        binding.experimentalUIModeConflictAlert.isVisible = viewState.experimentConflictAlertVisible
+
+        binding.duckAIPoC.isVisible = viewState.isDuckAIPoCFeatureAvailable
+        binding.duckAIPoC.setSwitchEnabled(viewState.isBrowserThemingFeatureChangeable)
+        binding.duckAIPoC.quietlySetIsChecked(viewState.isDuckAIPoCFeatureEnabled, duckAIPoCToggleListener)
 
         Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }

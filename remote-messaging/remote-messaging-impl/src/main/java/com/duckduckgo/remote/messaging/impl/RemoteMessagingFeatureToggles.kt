@@ -30,6 +30,15 @@ interface RemoteMessagingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun invalidateRMFAfterPrivacyConfigDownloaded(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun alwaysProcessRemoteConfig(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun scheduleEveryHour(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canScheduleOnPrivacyConfigUpdates(): Toggle
 }

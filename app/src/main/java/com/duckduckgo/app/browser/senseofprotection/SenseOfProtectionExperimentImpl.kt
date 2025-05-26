@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
@@ -31,6 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -57,6 +59,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
@@ -64,19 +67,27 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-                if (!isEnrolledInNewUserExperiment()) {
+                if (canBeEnrolledInExistingUserExperiment()) {
                     enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
                 }
             }
         }
     }
 
+    private fun canBeEnrolledInExistingUserExperiment(): Boolean {
+        return !isEnrolledInNewUserExperiment() && !seesNewVisualDesign()
+    }
+
     override fun enrolUserInNewExperimentIfEligible(): Boolean {
-        return if (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) {
+        return if (canBeEnrolledInNewUserExperiment()) {
             enrollInNewUserExperiment(cohortName = MODIFIED_CONTROL)
         } else {
             false
         }
+    }
+
+    private fun canBeEnrolledInNewUserExperiment(): Boolean {
+        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) && !seesNewVisualDesign()
     }
 
     override fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -191,5 +202,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
+    }
+
+    private fun seesNewVisualDesign(): Boolean {
+        val seesNewVisualDesing = visualDesignExperimentDataStore.isExperimentEnabled.value
+        Timber.d("VisualDesign: seesNewVisualDesign $seesNewVisualDesing")
+        return seesNewVisualDesing
     }
 }

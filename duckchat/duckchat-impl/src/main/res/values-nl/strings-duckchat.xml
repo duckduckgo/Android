@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Sneltoetsen</string>
     <string name="duck_chat_visibility_setting">Browsermenu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresbalk</string>
+    <string name="duck_chat_assist_settings_title">Assist-instellingen</string>
+    <string name="duck_chat_assist_settings_description">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>
 </resources>

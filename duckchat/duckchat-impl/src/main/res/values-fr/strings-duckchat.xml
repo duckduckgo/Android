@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Raccourcis</string>
     <string name="duck_chat_visibility_setting">Menu du navigateur</string>
     <string name="duck_chat_address_bar_visibility_setting">Barre d\'adresse</string>
+    <string name="duck_chat_assist_settings_title">Paramètres d\'Assist</string>
+    <string name="duck_chat_assist_settings_description">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches</string>
 </resources>

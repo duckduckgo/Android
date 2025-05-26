@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Pikavalinnat</string>
     <string name="duck_chat_visibility_setting">Selainvalikko</string>
     <string name="duck_chat_address_bar_visibility_setting">Osoitekenttä</string>
+    <string name="duck_chat_assist_settings_title">Assist-asetukset</string>
+    <string name="duck_chat_assist_settings_description">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
 </resources>

@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Šaukiniai</string>
     <string name="duck_chat_visibility_setting">Naršyklės meniu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
+    <string name="duck_chat_assist_settings_title">„Assist“ nustatymai</string>
+    <string name="duck_chat_assist_settings_description">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
 </resources>

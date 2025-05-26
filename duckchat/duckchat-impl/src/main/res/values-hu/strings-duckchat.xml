@@ -27,4 +27,6 @@
     <string name="duck_chat_show_in_heading">Gyorsparancsok</string>
     <string name="duck_chat_visibility_setting">Böngészési menü</string>
     <string name="duck_chat_address_bar_visibility_setting">Címsor</string>
+    <string name="duck_chat_assist_settings_title">Assist-beállítások</string>
+    <string name="duck_chat_assist_settings_description">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
 </resources>

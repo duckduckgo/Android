@@ -100,11 +100,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-        binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
-        binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
         binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
-        binding.maliciousToggle.setOnCheckedChangeListener(maliciousSiteProtectionToggleListener)
     }
 
     private fun observeViewModel() {

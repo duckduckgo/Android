@@ -1,0 +1,31 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="37dp"
+    android:height="36dp"
+    android:viewportWidth="37"
+    android:viewportHeight="36">
+    <path
+        android:fillColor="#3969EF"
+        android:pathData="M18,0L19,0A18,18 0,0 1,37 18L37,18A18,18 0,0 1,19 36L18,36A18,18 0,0 1,0 18L0,18A18,18 0,0 1,18 0z" />
+    <group>
+        <clip-path android:pathData="M7.5,6h22v24h-22z" />
+        <path
+            android:fillColor="#FDFBFC"
+            android:pathData="M10.803,11.572C10.242,9.892 11.982,8.366 13.575,9.141L28.088,16.202C29.588,16.931 29.588,19.069 28.088,19.799L13.575,26.859C11.982,27.634 10.242,26.109 10.803,24.428L12.612,19H18.999C19.552,19 19.999,18.552 19.999,18C19.999,17.448 19.552,17 18.999,17H12.612L10.803,11.572Z" />
+    </group>
+</vector>

@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Tartalmazza a VPN-megoldásunkat, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Tartalmazza a VPN-megoldásunkat és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
     <string name="subscriptionSettingGet">Privacy Pro előfizetése</string>
+    <string name="subscriptionSettingTryFreeTrial">Próbáld ki a Privacy Prót ingyen</string>
     <string name="subscriptionSettingRestore">Van előfizetésem</string>
     <string name="subscriptionSettingExpired">Lejárt a Privacy Pro-előfizetésed</string>
     <string name="subscriptionSettingExpiredViewPlans">Csomagok megtekintése</string>
