@@ -13,6 +13,9 @@ inputs:
   username:
     description: 'The Github username to search for'
     required: true
+outputs:
+  task_id:
+    description: 'The Asana task ID that was found and assigned'
 runs:
   using: 'composite'
   steps:
@@ -36,6 +39,7 @@ runs:
           exit 1
         else
           echo "Task ID for the task named '$task_name': $task_id"        
+          echo "task_id=$task_id" >> $GITHUB_OUTPUT
         fi
       
         asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
