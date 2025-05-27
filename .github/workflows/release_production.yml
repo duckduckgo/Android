@@ -20,21 +20,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Assign task to Github Actor
-        id: assign-release-task
-        uses: ./.github/actions/assign-release-task
-        with:
-          task_name: 'Android Release ${{ github.event.inputs.app-version }} [100% rollout]'
-          asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          username: 'malmstein'
-
       - name: Get Asana Task Permalink
         id: get-task-permalink
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          asana-task-id: 1210190705129819
           action: 'get-asana-task-permalink'
 
       - name: Notify Mattermost of Task created
