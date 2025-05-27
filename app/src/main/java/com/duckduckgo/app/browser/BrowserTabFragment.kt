@@ -3012,6 +3012,11 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if(daxBubbleCta is DaxBubbleCta.DaxEndCta) {
+                hideBuckEndAnimation()
+            }
+        }
         renderer.showNewTab()
         showKeyboard()
     }
@@ -4253,9 +4258,7 @@ class BrowserTabFragment :
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
                         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                            newBrowserTab.buckEndAnimation.isGone = true
-                            val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
-                            newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
+                            hideBuckEndAnimation()
                         }
                         showNewTab()
                     }
@@ -4447,6 +4450,12 @@ class BrowserTabFragment :
             newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
             newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
         }
+    }
+
+    private fun hideBuckEndAnimation() {
+        newBrowserTab.buckEndAnimation.isGone = true
+        val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
+        newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun launchPrint(
