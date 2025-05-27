@@ -30,7 +30,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature.Cohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
@@ -53,7 +52,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIA
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -87,7 +85,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
-    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -306,12 +303,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             sendOptionJson(subscriptionOptions)
-            pixelSender.reportFreeTrialExperimentOnPaywallImpression() // move to paywallShown() if needed after experiment
         }
     }
 
-    private fun isFreeTrialEligible(): Boolean {
-        return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT)
+    private suspend fun isFreeTrialEligible(): Boolean {
+        return subscriptionsManager.isFreeTrialsEnabled()
     }
 
     private suspend fun createSubscriptionOptions(
@@ -377,9 +373,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     fun paywallShown() {
         pixelSender.reportOfferScreenShown()
-        viewModelScope.launch {
-            freeTrialExperimentDataStore.increaseMetricForPaywallImpressions()
-        }
     }
 
     data class SubscriptionOptionsJson(

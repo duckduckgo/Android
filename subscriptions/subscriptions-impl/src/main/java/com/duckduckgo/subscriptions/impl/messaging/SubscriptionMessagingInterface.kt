@@ -230,14 +230,8 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             appCoroutineScope.launch {
                 when (jsMessage.method) {
-                    "subscriptionsMonthlyPriceClicked" -> {
-                        pixelSender.reportMonthlyPriceClick()
-                        pixelSender.reportFreeTrialOnStartClickedMonthly()
-                    }
-                    "subscriptionsYearlyPriceClicked" -> {
-                        pixelSender.reportYearlyPriceClick()
-                        pixelSender.reportFreeTrialOnStartClickedYearly()
-                    }
+                    "subscriptionsMonthlyPriceClicked" -> pixelSender.reportMonthlyPriceClick()
+                    "subscriptionsYearlyPriceClicked" -> pixelSender.reportYearlyPriceClick()
                     "subscriptionsAddEmailSuccess" -> {
                         pixelSender.reportAddEmailSuccess()
                         subscriptionsManager.tryRefreshAccessToken()

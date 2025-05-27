@@ -227,6 +227,11 @@ interface SubscriptionsManager {
      * @return [Boolean] indicating if the user has had a trial before.
      */
     suspend fun hadTrial(): Boolean
+
+    /**
+     * Checks whether free trials feature is enabled.
+     */
+    suspend fun isFreeTrialsEnabled(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -351,6 +356,8 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    override suspend fun isFreeTrialsEnabled(): Boolean = privacyProFeature.get().privacyProFreeTrial().isEnabled()
+
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
     override suspend fun getPortalUrl(): String? {
@@ -468,12 +475,6 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             if (subscription.isActive()) {
-                // Free Trial experiment metrics
-                if (confirmationResponse.subscription.productId.contains("monthly-renews-us")) {
-                    pixelSender.reportFreeTrialOnSubscriptionStartedMonthly()
-                } else if (confirmationResponse.subscription.productId.contains("yearly-renews-us")) {
-                    pixelSender.reportFreeTrialOnSubscriptionStartedYearly()
-                }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
