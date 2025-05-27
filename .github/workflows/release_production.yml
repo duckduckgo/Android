@@ -20,13 +20,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Assemble release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
-
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
         uses: duckduckgo/native-github-asana-sync@v1.8
@@ -46,7 +39,7 @@ jobs:
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           name: releaseTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
+          app-binary-id: '01jw7wvrf8evkbsx0xpfskpezd'
           android-api-level: 30
           workspace: .maestro
           include-tags: androidDesignSystemTest
