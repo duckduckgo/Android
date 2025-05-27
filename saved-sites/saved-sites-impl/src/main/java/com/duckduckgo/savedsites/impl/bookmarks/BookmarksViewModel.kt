@@ -67,12 +67,12 @@ import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
@@ -269,7 +269,7 @@ class BookmarksViewModel @Inject constructor(
                         .map { it.bookmarkFolder }
                         .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIds.contains(it.id) }
                     val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIds.contains(it.id) }
-                    
+
                     // Calculate visible child counts for folders in search mode
                     val allItems = bookmarks + folders
                     val foldersWithVisibleCounts = folders.map { folder ->
@@ -282,7 +282,7 @@ class BookmarksViewModel @Inject constructor(
                         }
                         folder to visibleChildCount
                     }
-                    
+
                     Triple(favorites, bookmarks, foldersWithVisibleCounts)
                 }
                 .collect { (favorites, bookmarks, foldersWithCounts) ->
@@ -388,13 +388,13 @@ class BookmarksViewModel @Inject constructor(
         foldersWithCounts: List<Pair<BookmarkFolder, Int>>,
     ) {
         val bookmarkItems = mutableListOf<BookmarksItemTypes>()
-        
+
         // Add bookmarks
         bookmarks.forEach { bookmark ->
             val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
             bookmarkItems.add(BookmarkItem(bookmark.copy(isFavorite = isFavorite)))
         }
-        
+
         // Add folders with visible child counts
         foldersWithCounts.forEach { (folder, visibleCount) ->
             bookmarkItems.add(BookmarkFolderItem(folder, visibleCount))

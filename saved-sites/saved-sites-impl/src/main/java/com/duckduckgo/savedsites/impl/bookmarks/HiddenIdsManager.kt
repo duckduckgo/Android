@@ -28,7 +28,7 @@ class HiddenIdsManager private constructor() {
     companion object {
         @Volatile
         private var instance: HiddenIdsManager? = null
-        
+
         fun getInstance(): HiddenIdsManager =
             instance ?: synchronized(this) {
                 instance ?: HiddenIdsManager().also { instance = it }

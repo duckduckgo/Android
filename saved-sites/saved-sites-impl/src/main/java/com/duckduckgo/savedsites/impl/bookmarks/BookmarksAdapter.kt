@@ -65,7 +65,7 @@ class BookmarksAdapter(
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
     data class BookmarkFolderItem(
         val bookmarkFolder: BookmarkFolder,
-        val visibleChildCount: Int? = null // Only used in search mode
+        val visibleChildCount: Int? = null, // Only used in search mode
     ) : BookmarksItemTypes
 
     fun setItems(

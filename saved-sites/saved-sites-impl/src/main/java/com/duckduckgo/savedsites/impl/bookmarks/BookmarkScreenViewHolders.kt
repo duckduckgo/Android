@@ -187,7 +187,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 val totalItems = bookmarkFolder.getTotalItems()
                 context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
-            
+
             listItem.setSecondaryText(text)
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 
@@ -223,7 +223,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                     context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
                 }
             }
-            
+
             listItem.setSecondaryText(text)
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 

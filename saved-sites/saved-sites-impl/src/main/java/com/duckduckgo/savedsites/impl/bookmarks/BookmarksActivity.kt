@@ -30,6 +30,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
+import androidx.core.view.isEmpty
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -53,6 +54,7 @@ import com.duckduckgo.common.utils.extensions.getSerializableExtra
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksBinding
@@ -90,14 +92,12 @@ import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as commonR
-import androidx.core.view.isEmpty
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")

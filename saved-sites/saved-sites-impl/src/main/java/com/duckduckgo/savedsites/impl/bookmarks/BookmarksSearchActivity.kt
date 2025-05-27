@@ -55,7 +55,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBookmarksSearchBinding by viewBinding()
     private val viewModel: BookmarksViewModel by bindViewModel()
-    
+
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
 
@@ -105,7 +105,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
                 }
             }
         }
-        
+
         binding.searchBar.handle(SearchBar.Event.ShowSearchBar)
     }
 
@@ -266,7 +266,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
         val dialog = EditSavedSiteDialogFragment.instance(
             savedSite,
             SavedSitesNames.BOOKMARKS_ROOT,
-            null
+            null,
         )
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
@@ -276,8 +276,8 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
     private fun showEditBookmarkFolderDialog(bookmarkFolder: BookmarkFolder) {
         val dialog = EditBookmarkFolderDialogFragment.instance(
             bookmarkFolder.parentId,
-            "",  // Parent folder name not needed in search context
-            bookmarkFolder
+            "", // Parent folder name not needed in search context
+            bookmarkFolder,
         )
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG)
         dialog.listener = viewModel
@@ -293,7 +293,7 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val RESULT_URL_EXTRA = "RESULT_URL_EXTRA"
         const val RESULT_FOLDER = "RESULT_FOLDER"
-        
+
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
         private const val EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG = "EDIT_BOOKMARK_FOLDER"
@@ -304,4 +304,4 @@ class BookmarksSearchActivity : DuckDuckGoActivity() {
             return Intent(context, BookmarksSearchActivity::class.java).apply {}
         }
     }
-} 
+}
