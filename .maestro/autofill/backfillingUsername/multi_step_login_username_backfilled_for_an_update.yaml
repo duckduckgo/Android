@@ -12,6 +12,7 @@ tags:
           clearState: true
 
       - runFlow: ../../shared/skip_all_onboarding.yaml
+      - hideKeyboard
 
       # setup an existing credential
       - runFlow: ../steps/manually_add_existing_credential.yaml
