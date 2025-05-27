@@ -124,7 +124,6 @@ class SettingsViewModel @Inject constructor(
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
-        val threatProtectionStatus: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
     )
