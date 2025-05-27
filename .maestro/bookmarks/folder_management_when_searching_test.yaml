@@ -1,0 +1,70 @@
+appId: com.duckduckgo.mobile.android
+name: "Folder Management when searching"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      # Open bookmarks
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "bookmarks"
+      - tapOn:
+          text: "bookmarks"
+
+      # Create folder A
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/addFolderMenuView"
+      - assertVisible:
+          text: "Add Folder"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/titleInput"
+      - inputText: "Folder A"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+
+      # Create subfolder B in A
+      - assertVisible:
+          text: "Folder A"
+      - tapOn:
+          text: "Folder A"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/addFolderMenuView"
+      - assertVisible:
+          text: "Add Folder"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/titleInput"
+      - inputText: "Folder B"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+
+      - assertVisible:
+          text: "Folder B"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/searchMenuView"
+
+      - assertVisible:
+          text: "Folder A"
+      - assertVisible:
+          text: "1 item"
+      - assertVisible:
+          text: "Folder B"
+      - assertVisible:
+          text: "Empty"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/trailingIcon"
+          index: 1
+      - tapOn: Delete
+      - assertVisible:
+          text: "Folder A"
+      - assertVisible: Empty
+      - assertNotVisible:
+          text: "Folder B"
