@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.databinding.ActivityThreatProtectionSettingsBi
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenScamProtectionLearnMore
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenSmarterEncryptionLearnMore
+import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
@@ -176,7 +177,6 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/scam-blocker"
         private const val SMARTER_ENCRYPTION_LEARN_MORE = "https://duckduckgo.com/duckduckgo-help-pages/privacy/smarter-encryption"
     }
 }
