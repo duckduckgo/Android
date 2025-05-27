@@ -25,7 +25,7 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: 1210190705129819
+          asana-task-id: '1210190705129819'
           action: 'get-asana-task-permalink'
 
       - name: Notify Mattermost of Task created
