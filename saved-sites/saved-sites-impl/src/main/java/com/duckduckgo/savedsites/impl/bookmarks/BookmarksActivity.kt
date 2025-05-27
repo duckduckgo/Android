@@ -125,7 +125,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     lateinit var bookmarksSortingFeature: BookmarksSortingFeature
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
-    private lateinit var searchListener: BookmarksQueryListener
 
     private lateinit var itemTouchHelperCallback: BookmarkItemTouchHelperCallback
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -145,14 +144,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 binding.toolbarSorting
             } else {
                 binding.toolbar
-            }
-
-    private val searchBar
-        get() =
-            if (bookmarksSortingFeature.self().isEnabled()) {
-                binding.searchBarSorting
-            } else {
-                binding.searchBar
             }
 
     private val startBookmarkFoldersActivityForResult =
@@ -334,7 +325,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             exportMenuItem?.title = spannable
             exportMenuItem?.isEnabled = false
         }
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
         initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)
     }
@@ -388,8 +378,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
-                binding.searchMenu.isVisible =
-                    viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
                 exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
@@ -509,18 +497,15 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter)
         if (bookmarksSortingFeature.self().isEnabled()) {
             binding.searchMenu.setOnClickListener {
                 showSearchBar()
             }
-            binding.searchBar.gone()
         } else {
             searchMenuItem?.setOnMenuItemClickListener {
                 showSearchBar()
                 return@setOnMenuItemClickListener true
             }
-            binding.searchBarSorting.gone()
         }
 
         // Search bar action handling removed as search is now in a separate activity
@@ -705,9 +690,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     override fun onDestroy() {
         deleteDialog?.dismiss()
-        if (this::searchListener.isInitialized) {
-            searchListener.cancelSearch()
-        }
         super.onDestroy()
     }
 
