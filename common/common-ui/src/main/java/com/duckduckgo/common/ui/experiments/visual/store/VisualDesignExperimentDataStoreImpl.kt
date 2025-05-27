@@ -56,6 +56,8 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
             "senseOfProtectionExistingUserExperimentApr25",
             "senseOfProtectionNewUserExperimentMay25",
             "senseOfProtectionExistingUserExperimentMay25",
+            "senseOfProtectionNewUserExperiment27May25",
+            "senseOfProtectionExistingUserExperiment27May25",
             "defaultBrowserAdditionalPrompts202501",
         )
     }
