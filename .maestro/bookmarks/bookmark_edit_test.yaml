@@ -1,0 +1,121 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Bookmark Edit Functionality"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      # Add a bookmark to edit
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://example.com"
+      - pressKey: Enter
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+
+      # Open bookmarks
+      - tapOn:
+          id: "browserMenuImageView"
+      - tapOn:
+          text: "bookmarks"
+      - assertVisible:
+          text: "Example Domain"
+
+      # Edit bookmark title and URL
+      - tapOn:
+          id: "trailingIcon"
+      - tapOn:
+          text: "edit"
+      - assertVisible:
+          text: "Edit Bookmark"
+      
+      # Clear and update title
+      - tapOn:
+          id: "titleInput"
+      - eraseText
+      - inputText: "My Example Site"
+      
+      # Clear and update URL
+      - tapOn:
+          id: "urlInput"
+      - eraseText
+      - inputText: "https://example.org"
+      
+      # Save changes
+      - tapOn:
+          id: "action_confirm_changes"
+      
+      # Verify changes were saved
+      - assertVisible:
+          text: "My Example Site"
+      - assertNotVisible:
+          text: "Example Domain"
+
+      # Create folder and move bookmark to it
+      - tapOn:
+          id: "addFolderMenuView"
+      - assertVisible:
+          text: "Add Folder"
+      - tapOn:
+          id: "titleInput"
+      - inputText: "Test Folder"
+      - tapOn:
+          id: "action_confirm_changes"
+      - assertVisible:
+          text: "Test Folder"
+
+      # Edit bookmark and move to folder
+      - tapOn:
+          id: "trailingIcon"
+      - tapOn:
+          text: "edit"
+      - tapOn:
+          text: "bookmarks"
+      - assertVisible:
+          text: "Select Location"
+      - tapOn:
+          text: "Test Folder"
+      - assertVisible:
+          text: "Test Folder"
+      - tapOn:
+          id: "action_confirm_changes"
+
+      # Verify bookmark is no longer in root
+      - assertNotVisible:
+          text: "My Example Site"
+      
+      # Navigate to folder and verify bookmark is there
+      - tapOn:
+          text: "Test Folder"
+      - assertVisible:
+          text: "My Example Site"
+      
+      # Test delete functionality
+      - tapOn:
+          id: "trailingIcon"
+      - tapOn:
+          text: "edit"
+      - tapOn:
+          id: "action_delete"
+      - assertVisible:
+          text: "Delete My Example Site.*"
+      - tapOn:
+          text: "delete"
+      - assertNotVisible:
+          text: "My Example Site"
+      - assertVisible:
+          text: "Undo"
+      - tapOn:
+          text: "Undo"
+      - assertVisible:
+          text: "My Example Site"
