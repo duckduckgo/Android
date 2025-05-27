@@ -1,0 +1,80 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Bookmark Favorites Functionality"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      # Add multiple bookmarks for favorites testing
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://duckduckgo.com"
+      - pressKey: Enter
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+      - tapOn:
+          id: "bookmarksBottomSheetSwitch"
+      - pressKey: back
+      - tapOn:
+          id: "omnibarTextInput"
+      - eraseText
+      - inputText: "https://github.com"
+      - pressKey: Enter
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+
+      - tapOn:
+          id: "omnibarTextInput"
+      - eraseText
+      - assertVisible:
+          text: "DuckDuckGo.*"
+      - assertNotVisible:
+          text: "GitHub"
+
+      # Open bookmarks
+      - tapOn:
+          id: "browserMenuImageView"
+      - tapOn:
+          text: "bookmarks"
+
+      - assertVisible:
+          text: "DuckDuckGo.*"
+      - assertVisible:
+          text: "GitHub.*"
+
+      # Remove DuckDuckGo from favorites
+      - tapOn:
+          id: "trailingIcon"
+      - assertVisible:
+          text: "Remove from Favorites"
+      - tapOn:
+          text: "Remove from Favorites"
+      
+      # Add GitHub to favorites
+      - tapOn:
+          id: "trailingIcon"
+          index: 1
+      - assertVisible:
+          text: "Add to Favorites"
+      - tapOn:
+          text: "Add to Favorites"
+
+      - pressKey: back
+      - tapOn:
+          id: "omnibarTextInput"
+      - eraseText
+      - assertVisible:
+          text: "GitHub.*"
