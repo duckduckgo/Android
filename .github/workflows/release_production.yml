@@ -1,38 +1,32 @@
-name: Release - Android App Production Release
+name: Test Asana Task Assignment
 
 on:
   workflow_dispatch:
     inputs:
-      app-version:
-        description: 'App Version for Release'
+      task_name:
+        description: 'Name of the Asana task to find'
         required: true
-        default: 'PLACEHOLDER'
-
-env:
-  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+        type: string
+      github_username:
+        description: 'GitHub username to assign the task to'
+        required: true
+        type: string
+        default: 'malmstein'
 
 jobs:
-  create_release_task:
-    uses: ./.github/workflows/release_create_task.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  create_release_tag:
-    needs: create_release_task
-    uses: ./.github/workflows/release_create_tag.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
+      - name: Test Asana Task Assignment
+        id: assign-task
+        uses: ./.github/actions/assign-release-task
+        with:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_PAT_TEST }}
+          ASANA_TASK_NAME: ${{ inputs.task_name }}
+          GITHUB_USERNAME: ${{ inputs.github_username }}
 
-  launch_release_tests:
-    needs: create_release_tag
-    uses: ./.github/workflows/release_tests.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
-
-  report_workflow_failed:
-    if: ${{ failure() }}
-    uses: ./.github/workflows/release_report_error.yml
+      - name: Print Results
+        run: |
+          echo "Task URL: ${{ steps.assign-task.outputs.asana_task_url }}"
