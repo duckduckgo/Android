@@ -38,7 +38,7 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-binary-id: 'app_01hkqhj1thevwtn9ym8a2ctn2r'
+          app-binary-id: 'd3f35f59729e610100752bf258dfa5d298007493'
           android-api-level: 30
           workspace: .maestro
           include-tags: androidDesignSystemTest
