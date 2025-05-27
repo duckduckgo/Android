@@ -59,6 +59,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -699,6 +700,34 @@ class SecureStoreBackedAutofillStoreTest {
         val saved = storeCredentials(id = 1, domain = "example.com", username = "username", password = "password")
         val updated = testee.updateCredentials(saved, refreshLastUpdatedTimestamp = false)!!
         assertEquals(DEFAULT_INITIAL_LAST_UPDATED, updated.lastUpdatedMillis)
+    }
+
+    @Test
+    fun whenUserHasNeverImportedPasswordThenCallsThroughToStoreCorrectly() = runTest {
+        setupTesteeWithAutofillAvailable()
+        testee.hasEverImportedPasswords
+        verify(autofillPrefsStore).hasEverImportedPasswords
+    }
+
+    @Test
+    fun whenUserHasImportedPasswordThenCallsThroughToStoreCorrectly() = runTest {
+        setupTesteeWithAutofillAvailable()
+        testee.hasEverImportedPasswords = true
+        verify(autofillPrefsStore).hasEverImportedPasswords = true
+    }
+
+    @Test
+    fun whenUserHasNeverDismissedImportPasswordPromoThenCallsThroughToStoreCorrectly() = runTest {
+        setupTesteeWithAutofillAvailable()
+        testee.hasDismissedImportedPasswordsPromo
+        verify(autofillPrefsStore).hasDismissedImportedPasswordsPromo
+    }
+
+    @Test
+    fun whenUserHasDismissedImportPasswordPromoThenCallsThroughToStoreCorrectly() = runTest {
+        setupTesteeWithAutofillAvailable()
+        testee.hasDismissedImportedPasswordsPromo = true
+        verify(autofillPrefsStore).hasDismissedImportedPasswordsPromo = true
     }
 
     private fun enableDeepDomainCheckFeatureFlag() {
