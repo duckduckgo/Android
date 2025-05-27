@@ -40,6 +40,10 @@ interface InternalAutofillStore : AutofillStore {
      */
     var hasEverBeenPromptedToSaveLogin: Boolean
 
+    var hasEverImportedPasswords: Boolean
+
+    var hasDismissedImportedPasswordsPromo: Boolean
+
     /**
      * Find saved credential for the given id
      * @param id of the saved credential

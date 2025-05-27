@@ -50,6 +50,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
+import com.duckduckgo.autofill.impl.store.AutofillEffect.ImportPasswords
+import com.duckduckgo.autofill.impl.store.AutofillEffectDispatcher
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitCredentialMode
@@ -138,6 +140,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -444,6 +447,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                     reportBreakageState = updatedBreakageState,
                 )
                 showPromotionIfEligible()
+            }
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            autofillEffectDispatcher.effects.collect { effect ->
+                when {
+                    effect is ImportPasswords -> addCommand(LaunchImportPasswordsFromGooglePasswordManager)
+                }
             }
         }
 
