@@ -85,6 +85,12 @@ class CredentialImporterImpl @Inject constructor(
         val insertedIds = autofillStore.bulkInsert(importList)
 
         skippedCredentials += (importList.size - insertedIds.size)
+
+        // Set the flag when at least one credential was successfully imported
+        if (insertedIds.isNotEmpty()) {
+            autofillStore.hasEverImportedPasswords = true
+        }
+
         _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials))
     }
 

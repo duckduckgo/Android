@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
@@ -40,7 +41,7 @@ interface ImportPasswordsPixelSender {
     fun onUserCancelledImportWebFlow(stage: String)
     fun onImportSuccessful(savedCredentials: Int, numberSkipped: Int)
     fun onImportFailed(reason: UserCannotImportReason)
-    fun onImportPasswordsButtonTapped()
+    fun onImportPasswordsButtonTapped(launchSource: AutofillImportLaunchSource)
     fun onImportPasswordsOverflowMenuTapped()
     fun onImportPasswordsViaDesktopSyncButtonTapped()
     fun onImportPasswordsViaDesktopSyncOverflowMenuTapped()
@@ -87,8 +88,9 @@ class ImportPasswordsPixelSenderImpl @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    override fun onImportPasswordsButtonTapped() {
-        pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED)
+    override fun onImportPasswordsButtonTapped(launchSource: AutofillImportLaunchSource) {
+        val params = mapOf(SOURCE_KEY to launchSource.value)
+        pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED, params)
     }
 
     override fun onImportPasswordsOverflowMenuTapped() {
@@ -105,6 +107,7 @@ class ImportPasswordsPixelSenderImpl @Inject constructor(
 
     companion object {
         private const val CANCELLATION_STAGE_KEY = "stage"
+        private const val SOURCE_KEY = "source"
         private const val PRE_IMPORT_DIALOG_STAGE = "pre-import-dialog"
     }
 }
