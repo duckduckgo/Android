@@ -68,6 +68,12 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
+        /*
+         * TwoLineListItem doesn't support links, and has an intrinsic bottom padding of keyline_2
+         * that can't be modified by consumers. Since we want the Learn More to be placed wight below
+         * secondary text in the toggle, with no spacing, we need to set a negative top margin to the
+         * Learn More text view. See figma.com/design/uP27mEGEaHCI7ZYXAs1815?node-id=3232-39585&m=dev#1266019353
+         */
         (binding.scamProtectionLearnMore.layoutParams as ViewGroup.MarginLayoutParams).let {
             it.topMargin = -resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
             binding.scamProtectionLearnMore.layoutParams = it
