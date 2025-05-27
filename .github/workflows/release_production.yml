@@ -17,6 +17,9 @@ jobs:
     name: Create and Push git tag for version
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Assign task to Github Actor
         id: assign-release-task
         uses: ./.github/actions/assign-release-task
