@@ -22,7 +22,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
             on { it.isEnabled() } doReturn true
             on { it.getCohort() } doReturn modifiedControlCohort
         }
-        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25()).thenReturn(mockToggle)
+        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
@@ -36,7 +36,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
             on { it.isEnabled() } doReturn true
             on { it.getCohort() } doReturn modifiedControlCohort
         }
-        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25()).thenReturn(mockToggle)
+        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
@@ -50,7 +50,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
             on { it.isEnabled() } doReturn true
             on { it.getCohort() } doReturn modifiedControlCohort
         }
-        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25()).thenReturn(mockToggle)
+        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
@@ -63,7 +63,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
             on { it.isEnabled() } doReturn false
             on { it.getCohort() } doReturn null
         }
-        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25()).thenReturn(mockToggle)
+        whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 

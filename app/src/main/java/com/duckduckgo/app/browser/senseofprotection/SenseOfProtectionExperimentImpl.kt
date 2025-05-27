@@ -143,11 +143,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun enrollInNewUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().isEnabled(cohortName)
     }
 
     private fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().isEnabled(cohortName)
     }
 
     private fun isUserEnrolledInNewUserExperimentModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -183,22 +183,22 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun isNewUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().isEnrolledAndEnabled(cohortName)
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().isEnrolledAndEnabled(cohortName)
 
     private fun getNewUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().getCohort()?.name
 
     private fun getNewUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name
 
     private fun getExistingUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().getCohort()?.name
 
     private fun getExistingUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().featureName().name
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
