@@ -256,8 +256,8 @@ class RealPirScan @Inject constructor(
             pixelSender.reportManualScanCompleted(
                 totalTimeInMillis = totalTimeInMillis,
                 totalParallelWebViews = totalParallelWebViews,
-                totalBrokerSuccess = repository.getSuccessResultsCount(),
-                totalBrokerFailed = repository.getErrorResultsCount(),
+                totalBrokerSuccess = repository.getScanSuccessResultsCount(),
+                totalBrokerFailed = repository.getScanErrorResultsCount(),
             )
             repository.saveScanLog(
                 PirEventLog(
@@ -269,8 +269,8 @@ class RealPirScan @Inject constructor(
             pixelSender.reportScheduledScanCompleted(
                 totalTimeInMillis = totalTimeInMillis,
                 totalParallelWebViews = totalParallelWebViews,
-                totalBrokerSuccess = repository.getSuccessResultsCount(),
-                totalBrokerFailed = repository.getErrorResultsCount(),
+                totalBrokerSuccess = repository.getScanSuccessResultsCount(),
+                totalBrokerFailed = repository.getScanErrorResultsCount(),
             )
             repository.saveScanLog(
                 PirEventLog(
