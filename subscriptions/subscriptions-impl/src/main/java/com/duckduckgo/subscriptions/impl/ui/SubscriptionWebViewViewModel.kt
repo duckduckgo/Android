@@ -267,7 +267,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
-                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) && isFreeTrialEligible() -> {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
                         createSubscriptionOptions(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
@@ -275,7 +276,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
-                        isFreeTrialEligible() -> {
+                        subscriptionsManager.isFreeTrialEligible() -> {
                         createSubscriptionOptions(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
@@ -304,10 +305,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
             sendOptionJson(subscriptionOptions)
         }
-    }
-
-    private suspend fun isFreeTrialEligible(): Boolean {
-        return subscriptionsManager.isFreeTrialsEnabled()
     }
 
     private suspend fun createSubscriptionOptions(
@@ -346,7 +343,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 type = offerType.type,
                 id = it,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
-                isUserEligible = !subscriptionsManager.hadTrial(),
+                isUserEligible = !subscriptionsManager.isFreeTrialEligible(),
             )
         }
     }
