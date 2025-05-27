@@ -3013,7 +3013,7 @@ class BrowserTabFragment :
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            if(daxBubbleCta is DaxBubbleCta.DaxEndCta) {
+            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
                 hideBuckEndAnimation()
             }
         }
