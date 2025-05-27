@@ -61,6 +61,12 @@ class VisualDesignExperimentDataStoreImplTest {
     private lateinit var senseOfProtectionExistingUserExperimentMay25: Toggle
 
     @Mock
+    private lateinit var senseOfProtectionNewUserExperiment27May25: Toggle
+
+    @Mock
+    private lateinit var senseOfProtectionExistingUserExperiment27May25: Toggle
+
+    @Mock
     private lateinit var defaultBrowserAdditionalPrompts202501: Toggle
 
     @Mock
@@ -88,6 +94,12 @@ class VisualDesignExperimentDataStoreImplTest {
         )
         whenever(senseOfProtectionExistingUserExperimentMay25.featureName()).thenReturn(
             FeatureName("SenseOfProtectionToggles", "senseOfProtectionExistingUserExperimentMay25"),
+        )
+        whenever(senseOfProtectionNewUserExperiment27May25.featureName()).thenReturn(
+            FeatureName("SenseOfProtectionToggles", "senseOfProtectionNewUserExperiment27May25"),
+        )
+        whenever(senseOfProtectionExistingUserExperiment27May25.featureName()).thenReturn(
+            FeatureName("SenseOfProtectionToggles", "senseOfProtectionExistingUserExperiment27May25"),
         )
         whenever(defaultBrowserAdditionalPrompts202501.featureName()).thenReturn(
             FeatureName("DefaultBrowserPromptsFeatureToggles", "defaultBrowserAdditionalPrompts202501"),
@@ -166,6 +178,28 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when experiment FF enabled and senseOfProtectionExistingUserExperimentMay25 active, experiment disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperimentMay25))
+        whenVisualExperimentEnabled(true)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.anyConflictingExperimentEnabled.value)
+    }
+
+    @Test
+    fun `when experiment FF enabled and senseOfProtectionNewUserExperiment27May25 active, experiment disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionNewUserExperiment27May25))
+        whenVisualExperimentEnabled(true)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.anyConflictingExperimentEnabled.value)
+    }
+
+    @Test
+    fun `when experiment FF enabled and senseOfProtectionExistingUserExperiment27May25 active, experiment disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperiment27May25))
         whenVisualExperimentEnabled(true)
 
         val testee = createTestee()

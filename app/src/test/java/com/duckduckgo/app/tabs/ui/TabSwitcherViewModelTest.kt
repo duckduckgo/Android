@@ -1246,7 +1246,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel then tab switcher items include animation tile and tabs`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1275,7 +1275,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel not visible then tab switcher items contain only tabs`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1322,7 +1322,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then animated info panel is still visible`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1351,7 +1351,7 @@ class TabSwitcherViewModelTest {
     fun `when animated info panel negative button clicked then animated info panel is removed`() = runTest {
         initializeViewModel(FakeTabSwitcherDataStore())
 
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1375,7 +1375,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1393,7 +1393,7 @@ class TabSwitcherViewModelTest {
             pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
             parameters = mapOf(
                 "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().featureName().name,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name,
             ),
         )
     }
@@ -1401,7 +1401,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1418,14 +1418,14 @@ class TabSwitcherViewModelTest {
             pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED,
             parameters = mapOf(
                 "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().featureName().name,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().featureName().name,
             ),
         )
     }
 
     @Test
     fun `when animated info panel negative button clicked then dismiss pixel fired`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1444,14 +1444,14 @@ class TabSwitcherViewModelTest {
             parameters = mapOf(
                 "trackerCount" to "15",
                 "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().featureName().name,
+                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name,
             ),
         )
     }
 
     @Test
     fun `when user is in modified control of sense of protection experiment then animated tile is not shown`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -1469,7 +1469,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when user is in variant 1 of sense of protection experiment then animated tile is not shown`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentMay25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
