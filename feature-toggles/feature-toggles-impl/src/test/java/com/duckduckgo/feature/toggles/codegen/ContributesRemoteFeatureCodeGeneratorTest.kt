@@ -2967,7 +2967,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
-        // we call isEnabled(cohort), then we should assign cohort
+        // we call isEnabled(cohort), then we should NOT assign cohort
         testFeature.fooFeature().isEnabled(BLUE)
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
@@ -3032,7 +3032,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
-        // we call isEnabled(cohort), then we should assign cohort
+        // we call isEnabled(cohort), then we should NOT assign cohort
         testFeature.fooFeature().isEnabled(BLUE)
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
@@ -3162,7 +3162,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
-        // we call isEnabled(cohort), then we should assign cohort
+        // we call isEnabled(cohort), then we should NOT assign cohort
         testFeature.fooFeature().isEnabled(BLUE)
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
@@ -3237,6 +3237,610 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when feature is rolled-out`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just above the threshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold + 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        // user in rollout, variant enabled, overall enabled
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+    }
+
+    @Test
+    fun `test cohort is not unassigned when feature is rolled-out and then rolled back`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just above the threshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold + 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        // user in rollout, variant enabled, overall enabled
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // rolling back the rollout should not re-enroll or undo the experiment enrollment
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold - 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+    }
+
+    @Test
+    fun `test cohort is not assigned when feature is not rolled-out`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just below the threshold, aka user doesn't enter rollout
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold - 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // test the user has not entered rollout
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        // parent feature remains disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we call isEnabled(cohort), then we should NOT assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is only assigned when targets match`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.FRANCE.language}",
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // targets don't match, feature disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        // parent feature remains disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we call isEnabled(cohort), but targets don't match, cohort should NOT be assigned either
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.US.language}",
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertEquals(2, rawState?.cohorts?.size)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.US.country)
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.US.language}",
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertEquals(2, rawState?.cohorts?.size)
+        // targets match, should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertTrue(testFeature.fooFeature().isEnabled())
     }
 

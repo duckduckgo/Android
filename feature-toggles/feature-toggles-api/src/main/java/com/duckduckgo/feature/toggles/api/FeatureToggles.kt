@@ -388,12 +388,9 @@ internal class ToggleImpl constructor(
         val cohortDefaultValue = false
 
         return store.get(key)?.let { state ->
-            // appVersion should be above or equal to minSupportedVersion for the cohort to be assigned
-            // we do not assign a cohort if the feature flag is not enabled remotely
-            val updatedState = if (
-                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0) &&
-                state.remoteEnableState == true
-            ) {
+            // the feature flag should be "rollout-enabled" before we assign cohorts
+            // this means checking EVERYTHING we check when we call [isEnabled(ANY_COHORT)]
+            val updatedState = if (isRolloutEnabled() == true) {
                 // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
                 if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
                     state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {

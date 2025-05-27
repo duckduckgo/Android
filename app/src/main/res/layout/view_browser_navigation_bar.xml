@@ -140,7 +140,7 @@
             android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
-                android:id="@+id/menuIconImageView"
+                android:id="@+id/browserMenuImageView"
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
