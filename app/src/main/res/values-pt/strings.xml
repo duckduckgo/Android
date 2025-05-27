@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Limpar os separadores e os dados elimina o teu histórico de bloqueio de rastreadores e redefine este número para zero.\n\nOculta esta faixa se preferires não a ver na vista de separadores.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar faixa</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[O DuckDuckGo bloqueou esta página porque pode estar a distribuir malware projetado para comprometer o teu dispositivo ou roubar as tuas informações pessoais.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Este site pode estar a fazer-se passar por um site legítimo para te enganar a fornecer informações pessoais, como palavras-passe ou números de cartão de crédito.\n<a href=\"\">Sabe mais</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Avisar-me sobre sites sinalizados como phishing ou malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="maliciousSiteSettingDisabled">Desativar esta funcionalidade pode pôr em risco as tuas informações.</string>
-
+    <string name="threatProtectionTitle">Proteção contra ameaças</string>
+    <string name="threatProtectionDescription">As proteções melhoradas do DuckDuckGo impedem ameaças comuns enquanto mantêm a tua ligação segura.</string>
+    <string name="smarterEncryptionTitle">Encriptação mais inteligente</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Atualiza automaticamente links para HTTPS sempre que possível.<br><a href=\"\">Sabe mais</a>]]></string>
+    <string name="scamBlockerTitle">Bloqueador de fraude</string>
+    <string name="scamBlockerDescription">Avisar sobre sites sinalizados por fraudes, phishing e malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Saiba mais</string>
 </resources>

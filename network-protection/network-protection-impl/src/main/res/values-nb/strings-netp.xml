@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">DNS-server</string>
     <string name="netpPrivateDns">Privat DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokker risikable domener)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (svindelblokkering)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (anbefalt)</string>
     <string name="netpCustomDnsCustom">Tilpasset</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-adresse</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo ruter DNS-spørringer gjennom DNS-serverne våre, slik at internettleverandøren din ikke kan se hvilke nettsteder du går til.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blokkering og filtrering av innhold</string>
-    <string name="netpDnsBlockMalwarePrimary">Blokker risikable domener</string>
+    <string name="netpDnsBlockMalwareHeader">Blokkering av skadelig innhold</string>
+    <string name="netpDnsBlockMalwarePrimary">Svindelblokkering</string>
     <string name="netpDnsBlockMalwareByline">Blokker over 150 000 domener som er flagget for skadelig programvare, phishing-angrep og nettsvindel, med en blokkeringsliste på DNS-nivå. <annotation type="learn_more_link">Les mer</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS-blokkeringslister</string>
 

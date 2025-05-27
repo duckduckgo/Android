@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">DNS-сервер</string>
     <string name="netpPrivateDns">Приватный DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (блокировка рискованных доменов)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (блокировщик мошенничества)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (рекомендуется)</string>
     <string name="netpCustomDnsCustom">Свой</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-адрес</string>
@@ -235,8 +235,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo направляет DNS-запросы через собственные DNS-серверы, поэтому ваш интернет-провайдер не увидит, какие сайты вы посещаете.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Блокировка и фильтрация контента</string>
-    <string name="netpDnsBlockMalwarePrimary">Блокировать опасные домены</string>
+    <string name="netpDnsBlockMalwareHeader">Блокировка вредоносного контента</string>
+    <string name="netpDnsBlockMalwarePrimary">Блокировщик мошенничества</string>
     <string name="netpDnsBlockMalwareByline">Стоп-списки на уровне DNS блокируют более 150 тысяч доменов, на которые поступили жалобы за размещение вредоносного ПО, фишинговые атаки и онлайн-мошенничество. <annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Стоп-списки DNS</string>
 
