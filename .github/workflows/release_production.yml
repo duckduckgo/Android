@@ -20,6 +20,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Assemble release APK
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
         uses: duckduckgo/native-github-asana-sync@v1.8
