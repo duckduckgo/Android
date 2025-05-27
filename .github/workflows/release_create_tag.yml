@@ -54,7 +54,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. Tag created.
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

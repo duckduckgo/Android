@@ -10,29 +10,19 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  emoji_info: ":information_source:" # ℹ️
 
 jobs:
   create_release_task:
-    uses: ./.github/workflows/release_create_task.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
-
-  create_release_tag:
-    needs: create_release_task
-    uses: ./.github/workflows/release_create_tag.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
-
-  launch_release_tests:
-    needs: create_release_tag
-    uses: ./.github/workflows/release_tests.yml
-    with:
-      app-version: ${{ github.event.inputs.app-version }}
-
-  report_workflow_failed:
-    if: ${{ failure() }}
-    uses: ./.github/workflows/release_report_error.yml
+    name: Create and Push git tag for version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Mattermost
+        id: send-mm-message
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
+          action: 'send-mattermost-message'
