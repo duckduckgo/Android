@@ -42,8 +42,8 @@ interface ReactivateUsersToggles {
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"), // no Dax prompts
-        VARIANT_DUCKPLAYER_PROMPT("duckplayer_prompt"), // show Duck Player Dax Prompt
-        VARIANT_BROWSER_PROMPT("browser_prompt"), // show Browser Comparison Dax Prompt
+        VARIANT_DUCKPLAYER_PROMPT("duckplayerPrompt"), // show Duck Player Dax Prompt
+        VARIANT_BROWSER_PROMPT("browserPrompt"), // show Browser Comparison Dax Prompt
     }
 
     companion object {
