@@ -65,7 +65,7 @@ object AsanaSync {
                 }
 
                 // Set output for GitHub Actions
-                File(System.getenv("GITHUB_OUTPUT")).appendText("asana_task_url=${task.permalinkUrl}\n")
+                File(System.getenv("GITHUB_OUTPUT")).appendText("ASANA_TASK_URL=${task.permalinkUrl}\n")
                 println("Task URL: ${task.permalinkUrl}")
             } else {
                 System.err.println("No task found with name: $taskName")

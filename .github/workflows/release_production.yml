@@ -23,8 +23,9 @@ jobs:
         id: assign-task
         uses: ./.github/actions/assign-release-task
         with:
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_PAT_TEST }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           ASANA_TASK_NAME: ${{ inputs.task_name }}
+          ASANA_PROJECT_ID: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           GITHUB_USERNAME: ${{ inputs.github_username }}
 
       - name: Print Results
